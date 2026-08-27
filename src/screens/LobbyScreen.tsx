@@ -67,7 +67,7 @@ import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobby
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
-import { createRemoteMatch, getMatchByRoomCode, getOwnUserId } from '../utils/remoteMatches';
+import { createRemoteMatch, getMatchByRoomCode, getOwnUserId, hasRemote1v1RelationshipWith } from '../utils/remoteMatches';
 import { saveLobby } from '../utils/savedLobbies';
 import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
@@ -2048,11 +2048,56 @@ export default function LobbyScreen() {
   const joinGraceSeenRef = useRef<Set<string>>(new Set());
   const joinGraceTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [invitedFriendIds, setInvitedFriendIds] = useState<Set<string>>(new Set());
-  // Input för "Add by Player Name"-raden i Share invite — speglar Profile:s
-  // friends-modal så host kan lägga till en QuizVibe friend direkt från lobby
-  // utan att behöva navigera till Profile först. Nyligen tillagd friend
-  // dyker upp i listan med en Invite-knapp redo att tappas.
+  // Checkbox-urval i Share invite (2026-08-27, ersatte per-rad "Invite"-
+  // knappen) — host bockar för flera friends och skickar dem alla på en gång
+  // via "Send invite"-knappen längst ner. Rensas vid varje modal-open och
+  // efter en lyckad Send. Redan skickade (invitedFriendIds) är INTE med här
+  // — deras kryssruta renderas grön+låst separat.
+  const [selectedFriendIds, setSelectedFriendIds] = useState<Set<string>>(new Set());
+  // Input för "Add by Player Name"-raden i Share invite (2026-08-27,
+  // omarbetad till samma split-field-struktur som PlayerName skapas överallt
+  // annars i appen — se AddPlayerModal ovan) — speglar Profile:s friends-
+  // modal så host kan lägga till en QuizVibe friend direkt från lobby utan
+  // att behöva navigera till Profile först. Nyligen tillagd friend dyker
+  // upp i listan med en kryssruta redo att bockas för.
   const [newFriendPlayerName, setNewFriendPlayerName] = useState('');
+  const [addFriendKbMode, setAddFriendKbMode] = useState<'letter' | 'digit'>('letter');
+  const [addFriendFocused, setAddFriendFocused] = useState(false);
+  const addFriendLettersRef = useRef<TextInput>(null);
+  const addFriendDigitsRef = useRef<TextInput>(null);
+  // Async uniqueness/existence-check på Add-knappen (playerNameExists) —
+  // host får bara lägga till Player Names som faktiskt tillhör en
+  // registrerad QuizVibe-user. `addFriendChecking` disable:ar knappen under
+  // roundtrip:en, `addFriendError` visas inline under fältet vid miss.
+  const [addFriendChecking, setAddFriendChecking] = useState(false);
+  const [addFriendError, setAddFriendError] = useState<string | null>(null);
+  // Pending friends (2026-08-27) — en Player Name som "Add" verifierat
+  // finns (playerNameExists) men som INTE redan är en sparad friend hamnar
+  // här istället för att persisteras direkt. De blir en riktig, sparad
+  // friend (via addFriend) FÖRST när spelaren med matchande playerName
+  // faktiskt dyker upp i players[] (= accepterat inviten och joinat detta
+  // rum) — se watcher-effekten längre ner. Rensas ALDRIG av
+  // handleOpenShareModal så en pending post överlever att host stänger och
+  // öppnar Share invite-modalen igen inom samma lobby-session; den lever
+  // och dör med LobbyScreen-mountet (ingen persistens över app-omstart).
+  const [pendingFriends, setPendingFriends] = useState<Friend[]>([]);
+  // Ids (pending-<lower>) för de pending-poster som FAKTISKT har en utestående
+  // waiting_invites-rad — dvs. host har bockat för dem och tryckt "Send
+  // invite" (eller en invite skickad i en tidigare lobby lever kvar).
+  // Driver "Pending"-badgen: en NYSS tillagd (handleAddFriendFromShare) men
+  // ännu ej skickad kandidat är INTE här → ingen badge (Peter 2026-08-27:
+  // "pending"-perioden startar först när inviten skickas). Full re-sync mot
+  // waiting_invites vid varje modal-open (handleOpenShareModal) → en denied/
+  // accepterad/utgången invite faller ur setet, badgen slocknar och posten
+  // prunas ur listan om den inte hunnit bli en sparad friend.
+  const [sentPendingIds, setSentPendingIds] = useState<Set<string>>(new Set());
+  // Ref-spegel av sentPendingIds så den asynkrona Realtime-DELETE-handlern
+  // (live-borttagning av denied pending nedan) alltid läser det senaste
+  // värdet utan att behöva ligga i sin egen effekt-deps.
+  const sentPendingIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    sentPendingIdsRef.current = sentPendingIds;
+  }, [sentPendingIds]);
 
   // Ref till lobby:s primär-ScrollView. Används för att snäppa scroll-position
   // till toppen vid varje fresh entry (mount eller URL-params-byte) — utan
@@ -3260,15 +3305,26 @@ export default function LobbyScreen() {
     !singlePlayerDefault &&
     lobbyPeerHealth[p.id] !== 'unstable' &&
     (!spotifyEnabled || !!p.spotifyConnected);
-  const willAutoApproveOnJoin = (p: LobbyPlayer) =>
-    p.type === 'registered' &&
-    (hostFriendsRef.current ?? []).some(
-      (fr) => fr.playerName.toLowerCase() === p.name.trim().toLowerCase(),
-    ) &&
-    passesSilentApproveGuards(p) &&
-    // Host:s explicita un-approve vinner alltid — en friend host flyttat
-    // till waiting ska synas där direkt.
-    !hostUnapprovedIdsRef.current.has(p.id);
+  const willAutoApproveOnJoin = (p: LobbyPlayer) => {
+    const nameLower = p.name.trim().toLowerCase();
+    return (
+      p.type === 'registered' &&
+      ((hostFriendsRef.current ?? []).some((fr) => fr.playerName.toLowerCase() === nameLower) ||
+        // En pending friend = en spelare host UTTRYCKLIGEN bjudit in OCH som
+        // consent:at till join + ömsesidig vänskap via accept-popupen. De ska
+        // auto-approvas tyst precis som en sparad friend — annars FLASHAR
+        // join-popupen ("<namn> wants to join / Approve + Add to Friend list")
+        // i en tick innan pending→confirmed-watchern hinner promota dem till
+        // sparad friend, varpå auto-approven slår till och stänger popupen
+        // (Peter 2026-08-27). Matcha mot pendingFriends så beslutet är rätt
+        // redan på FÖRSTA watcher-varvet efter join.
+        pendingFriends.some((pf) => pf.playerName.toLowerCase() === nameLower)) &&
+      passesSilentApproveGuards(p) &&
+      // Host:s explicita un-approve vinner alltid — en friend host flyttat
+      // till waiting ska synas där direkt.
+      !hostUnapprovedIdsRef.current.has(p.id)
+    );
+  };
 
   // ⚠ Håll tillbaka joiners vars godkännande-beslut ännu inte är fattat.
   // Watchern nedan kör FÖRST efter render-commit, så en QuizVibe friend
@@ -3466,9 +3522,41 @@ export default function LobbyScreen() {
     // ändrats sedan dess (joiner som hann in före loadFriends-resolven).
     // willAutoApproveOnJoin är MEDVETET inte i deps — den återskapas varje
     // render och skulle få effekten att köra på varenda render. Allt den
-    // läser (players, guards, friends) ligger redan i arrayen.
+    // läser (players, guards, friends, pendingFriends) ligger redan i arrayen.
+    // pendingFriends: en pending friend är auto-approve-eligible (se
+    // willAutoApproveOnJoin) — utan den i deps kan en pending post som
+    // hamnat i listan efter senaste players-ändring missas.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends]);
+  }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends, pendingFriends]);
+
+  // ── Pending friends → bekräftade friends (host) ───────────────────────
+  // Peter 2026-08-27: en Player Name som "Add" verifierat finns men som
+  // INTE redan är sparad friend hamnar som "Pending" (se
+  // handleAddFriendFromShare) — inte skriven till friends-storage. Den
+  // befordras till en riktig, sparad friend (via addFriend) FÖRST när
+  // spelaren med matchande playerName faktiskt dyker upp som en
+  // icke-host, icke-hasLeft rad i players[] — dvs. accepterat inviten och
+  // joinat DENNA lobby. Matchning är case-insensitive playerName, samma
+  // konvention som friend-auto-approve-watchern ovan.
+  useEffect(() => {
+    if (pendingFriends.length === 0) return;
+    const joinedNames = new Set(
+      players.filter((p) => !p.isHost && !p.hasLeft).map((p) => p.name.trim().toLowerCase()),
+    );
+    const toConfirm = pendingFriends.filter((pf) => joinedNames.has(pf.playerName.toLowerCase()));
+    if (toConfirm.length === 0) return;
+    setPendingFriends((prev) => prev.filter((pf) => !toConfirm.some((c) => c.id === pf.id)));
+    (async () => {
+      let updated: Friend[] = [];
+      for (const pf of toConfirm) {
+        updated = await addFriend(pf.playerName, pf.avatarId);
+      }
+      setFriends(updated);
+      // Håll auto-approve-listan i sync så personen auto-approvas direkt
+      // om de lämnar och joinar igen senare i samma lobby.
+      hostFriendsRef.current = updated;
+    })();
+  }, [players, pendingFriends]);
 
   // Driver "Waiting for approval"-mellansteget för non-host. När host inte
   // har godkänt mig än ska jag inte se lobby:n överhuvudtaget — bara en
@@ -3869,30 +3957,297 @@ export default function LobbyScreen() {
       return arr;
     });
   };
+  // Re-syncar pending-listan mot host:s utestående waiting_invites-rader.
+  // Delas av handleOpenShateModal (vid modal-open) OCH Realtime-DELETE-
+  // handlern (live medan modalen är öppen). Läser friends ur hostFriendsRef
+  // och prev-sent ur sentPendingIdsRef så den kan köras ur en effekt utan
+  // deps-beroende.
+  const resyncPendingFromInvites = useCallback(async () => {
+    const hostUserId = await getOwnUserId();
+    if (!hostUserId) return;
+    const { data, error } = await supabase
+      .from('waiting_invites')
+      .select('to_player_name')
+      .eq('from_user_id', hostUserId);
+    if (error || !data) return;
+    const friendLower = new Set((hostFriendsRef.current ?? []).map((f) => f.playerName.toLowerCase()));
+    // Namn (lowercase) med minst en LEVANDE invite från denna host. Så länge
+    // NÅGON invite kvarstår är namnet med → posten stannar som "Pending".
+    // Först när mottagaren denied:at ALLA host→spelare-invites (raden borta)
+    // faller namnet ur och posten prunas.
+    const outstandingLower = new Set<string>();
+    for (const row of data) {
+      if (!friendLower.has(row.to_player_name)) outstandingLower.add(row.to_player_name);
+    }
+    const prevSent = sentPendingIdsRef.current;
+    const nextSent = new Set<string>();
+    for (const lower of outstandingLower) nextSent.add(`pending-${lower}`);
+    setSentPendingIds(nextSent);
+    setPendingFriends((prev) => {
+      const kept = prev.filter((pf) => {
+        const lower = pf.playerName.toLowerCase();
+        if (friendLower.has(lower)) return false; // blivit sparad friend
+        if (outstandingLower.has(lower)) return true; // fortfarande utestående
+        return !prevSent.has(pf.id); // aldrig skickad → behåll; skickad-men-borta → släpp
+      });
+      const keptLower = new Set(kept.map((p) => p.playerName.toLowerCase()));
+      const reconstructed: Friend[] = [];
+      for (const lower of outstandingLower) {
+        if (keptLower.has(lower)) continue;
+        reconstructed.push({
+          id: `pending-${lower}`,
+          // SÄKERT ENBART EFTERSOM profiles.player_name enbart sätts via
+          // Register:s prefix-lösa generatePlayerName() eller manuell
+          // inmatning via appendPlayerNameLetter — båda tvingar kanonisk
+          // versal-först/gemener-resten-formatering (playerName.ts).
+          playerName: lower.charAt(0).toUpperCase() + lower.slice(1),
+        });
+      }
+      return [...kept, ...reconstructed];
+    });
+  }, []);
+
   // Öppnar Share invite-modalen och laddar in den senaste friends-listan.
   const handleOpenShareModal = async () => {
     setInvitedFriendIds(new Set());
+    setSelectedFriendIds(new Set());
     setNewFriendPlayerName('');
+    setAddFriendKbMode('letter');
+    setAddFriendFocused(false);
+    setAddFriendError(null);
     setShareModalOpen(true);
     const list = await loadFriends();
     setFriends(list);
     hostFriendsRef.current = list;
     setHostFriendsLoaded(true);
+
+    // Re-sync mot waiting_invites (Peter 2026-08-27). Två syften:
+    //  1. Cross-session Pending: en invite skickad från en TIDIGARE lobby
+    //     ska fortsatt synas här (med "Pending"-badge) så länge den lever.
+    //  2. Auto-borttagning: en post som VAR skickad men vars rad nu är borta
+    //     (mottagaren denied ALLA host→spelare-invites/accepterade, eller
+    //     rums-cascade) försvinner ur listan om den inte blivit sparad friend.
+    // hostFriendsRef.current är just satt = list ovan, så resyncen läser rätt
+    // friend-lista. Live-uppdatering medan modalen är öppen sker via Realtime-
+    // DELETE-subscriptionen (effekten nedan), som anropar samma resync.
+    await resyncPendingFromInvites();
   };
 
-  // Lägg till en QuizVibe friend direkt från Share invite-modalen. Speglar
-  // Profile:s handleAddFriend exakt — addFriend dedupar case-insensitive på
-  // playerName så dubbel-add är säkert. Efter tillagd friend syns hen i
-  // listan med en Invite-knapp; host kan välja att invite:a direkt eller
-  // bara behålla för senare spel.
+  // Live-borttagning av denied pending (Peter 2026-08-27) — medan Share
+  // invite-modalen är öppen prenumererar host på DELETE-events på sina EGNA
+  // utestående invites (from_user_id=eq.<host>). När mottagaren denied:ar en
+  // invite raderas raden → eventet triggar en resync. Först när mottagaren
+  // denied:at ALLA aktiva host→spelare-invites (sista raden borta) faller
+  // spelaren ur `outstandingLower` i resyncen och "Pending"-posten försvinner.
+  // Kräver REPLICA IDENTITY FULL på waiting_invites (migration 0039) så
+  // DELETE-eventets OLD-record bär from_user_id (för både Realtime-RLS och
+  // klient-filtret). getChannels-rensningen speglar lobby-channel-effekten
+  // ovan: samma topic → befintlig subscribed channel, .on() efteråt kraschar.
+  useEffect(() => {
+    if (!shareModalOpen || !roomCode) return;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    (async () => {
+      const hostUserId = await getOwnUserId();
+      if (!hostUserId || cancelled) return;
+      const topic = `realtime:share-invites:${roomCode}`;
+      supabase.getChannels()
+        .filter((c) => c.topic === topic)
+        .forEach((c) => supabase.removeChannel(c));
+      channel = supabase
+        .channel(`share-invites:${roomCode}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'waiting_invites',
+            filter: `from_user_id=eq.${hostUserId}`,
+          },
+          () => { void resyncPendingFromInvites(); },
+        )
+        .subscribe();
+    })();
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [shareModalOpen, roomCode, resyncPendingFromInvites]);
+
+  // Lägg till en QuizVibe friend direkt från Share invite-modalen.
+  // `playerNameExists` (samma RPC som Register/Add Player-uniqueness-
+  // checken) verifierar FÖRST att namnet tillhör en registrerad QuizVibe-
+  // user — host ska inte kunna spara/bjuda in ett påhittat namn som aldrig
+  // kan svara på inviten.
+  //
+  // Är namnet redan en sparad friend: no-op (den finns redan i listan).
+  // Annars (2026-08-27, Peter): namnet skrivs INTE till friends-storage
+  // direkt — det hamnar som en "Pending"-post i `pendingFriends` och blir
+  // en riktig, sparad friend först när personen faktiskt joinar DENNA lobby
+  // (accepterar inviten) — se watcher-effekten som confirm:ar pendingFriends
+  // mot players[].
   const handleAddFriendFromShare = async () => {
-    if (!newFriendPlayerName.trim()) return;
-    const updated = await addFriend(newFriendPlayerName);
-    setFriends(updated);
-    // Håll auto-approve-listan i sync så en nyligen tillagd friend som
-    // joinar direkt efteråt auto-approvas utan popup.
-    hostFriendsRef.current = updated;
+    const trimmed = normalizePlayerName(newFriendPlayerName.trim());
+    if (!trimmed || addFriendChecking) return;
+    setAddFriendError(null);
+    setAddFriendChecking(true);
+    try {
+      const exists = await playerNameExists(trimmed);
+      if (!exists) {
+        setAddFriendError('No QuizVibe user found with that Player Name');
+        return;
+      }
+      const lower = trimmed.toLowerCase();
+      const alreadyFriend = friends.some((f) => f.playerName.toLowerCase() === lower);
+      const alreadyPending = pendingFriends.some((f) => f.playerName.toLowerCase() === lower);
+      if (!alreadyFriend && !alreadyPending) {
+        // Deterministiskt id (namn-baserat, inte timestamp) — krävs så
+        // cross-session-rekonstruktionen i handleOpenShareModal kan
+        // merge:a/dedupe:a mot samma id istället för att alltid skapa nya.
+        setPendingFriends((prev) => [...prev, { id: `pending-${lower}`, playerName: trimmed }]);
+      }
+      setNewFriendPlayerName('');
+      setAddFriendKbMode('letter');
+    } finally {
+      setAddFriendChecking(false);
+    }
+  };
+
+  // CodeKeyboard-handlers för Add-by-Player-Name-fältet — speglar
+  // AddPlayerModal:s handlePlayerNameKeyPress/Backspace/togglePlayerNameKbMode
+  // exakt (samma append/backspace-helpers => samma versal-först/gemener-
+  // resten-format och samma max-längder).
+  const handleAddFriendKeyPress = (char: string) => {
+    setNewFriendPlayerName((prev) =>
+      addFriendKbMode === 'letter' ? appendPlayerNameLetter(prev, char) : appendPlayerNameDigit(prev, char),
+    );
+    if (addFriendError) setAddFriendError(null);
+  };
+
+  const handleAddFriendBackspace = () => {
+    setNewFriendPlayerName((prev) =>
+      addFriendKbMode === 'letter' ? backspacePlayerNameLetters(prev) : backspacePlayerNameDigits(prev),
+    );
+    if (addFriendError) setAddFriendError(null);
+  };
+
+  const toggleAddFriendKbMode = () => {
+    if (newFriendPlayerName.length === 0 && addFriendKbMode === 'letter') return;
+    if (addFriendKbMode === 'letter') {
+      setAddFriendKbMode('digit');
+      addFriendDigitsRef.current?.focus();
+    } else {
+      setAddFriendKbMode('letter');
+      addFriendLettersRef.current?.focus();
+    }
+  };
+
+  // Merged + sorterad lista för Share invite-renderingen: sparade friends
+  // (redan alfabetiskt sorterade av friendsStorage) + de ännu ej bekräftade
+  // pendingFriends, om varandra alfabetiskt så en pending post inte alltid
+  // hamnar sist. `checkbox`/`Send invite`-flödet nedan opererar på DENNA
+  // lista så en pending friend kan bockas för och bjudas in precis som en
+  // bekräftad — det ÄR ju just genom att bjuda in dem de kan bli bekräftade.
+  const displayFriends = useMemo(
+    () =>
+      [...friends, ...pendingFriends].sort((a, b) =>
+        a.playerName.localeCompare(b.playerName, undefined, { sensitivity: 'base', numeric: true }),
+      ),
+    [friends, pendingFriends],
+  );
+
+  // "Cancel" på CodeKeyboard:et (2026-08-27) — Share invite:s "Done"-knapp
+  // ersattes tidigare med "Send invite" (disabled tills minst en friend är
+  // ibockad), vilket lämnade Add-by-Player-Name-fältet utan något sätt att
+  // avbryta inmatningen och stänga tangentbordet. Tömmer fältet + blur:ar
+  // BÅDA refs (oavsett vilken som var fokuserad) → onBlur döljer
+  // tangentbordet via addFriendFocused.
+  const handleAddFriendCancel = () => {
     setNewFriendPlayerName('');
+    setAddFriendKbMode('letter');
+    setAddFriendError(null);
+    addFriendLettersRef.current?.blur();
+    addFriendDigitsRef.current?.blur();
+    setAddFriendFocused(false);
+  };
+
+  // Skickar invite till alla ibockade friends i ETT svep — sekventiellt
+  // (inte Promise.all) så remote-1v1-räknaren i handleInviteFriend (max 4
+  // obesvarade) räknar rätt mellan varje skickat anrop. Stänger modalen
+  // efteråt (ersätter f.d. "Done"-knappen).
+  const handleSendInvites = async () => {
+    const toSend = displayFriends.filter(
+      (f) => selectedFriendIds.has(f.id) && !invitedFriendIds.has(f.id),
+    );
+    if (toSend.length === 0) {
+      setShareModalOpen(false);
+      return;
+    }
+
+    const hostUserId = await getOwnUserId();
+
+    if (gameMode === 'remote-1v1') {
+      // Bara EN mottagare kan någonsin vara ibockad här (radio-button-
+      // beteende i checkbox-handlern nedan) — inget batch/"vissa spärrade"-
+      // scenario att hantera, bara en enkel ja/nej-check.
+      const friend = toSend[0];
+      if (hostUserId && (await hasRemote1v1RelationshipWith(hostUserId, friend.playerName))) {
+        Alert.alert(
+          'Invitation limit reached',
+          `You already have an ongoing or pending 1vs1 invitation with ${friend.playerName}. Wait for it to finish or be answered before sending a new one.`,
+        );
+        return;
+      }
+      await handleInviteFriend(friend);
+      setSelectedFriendIds(new Set());
+      setShareModalOpen(false);
+      return;
+    }
+
+    // Pre-flight per-recipient 3-cap check (Peter 2026-08-27) — kollas för
+    // HELA batchen i förväg så en flerval-sändning visar EN summering
+    // istället för en alert per spärrad mottagare mitt i loopen. Gäller
+    // alla ANDRA lobbytyper (remote-1v1 har redan returnerat ovan).
+    const cappedIds = new Set<string>();
+    if (hostUserId) {
+      for (const friend of toSend) {
+        const { count, error } = await supabase
+          .from('waiting_invites')
+          .select('id', { count: 'exact', head: true })
+          .eq('from_user_id', hostUserId)
+          .eq('to_player_name', friend.playerName.trim().toLowerCase());
+        if (!error && (count ?? 0) >= 3) cappedIds.add(friend.id);
+      }
+    }
+
+    const sendable = toSend.filter((f) => !cappedIds.has(f.id));
+
+    if (cappedIds.size > 0) {
+      if (sendable.length === 0) {
+        Alert.alert(
+          'Invitation limit reached',
+          'The selected player(s) already have the maximum of 3 pending invitations from you. Either play those first or ask them to deny at least one to make room for a new invitation.',
+        );
+        return;
+      }
+      const proceed = await new Promise<boolean>((resolve) => {
+        Alert.alert(
+          'Invitation limit reached',
+          'Some users already have maximum of 3 invitations pending from you. Send this invitation to the other players anyway?',
+          [
+            { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+            { text: 'Send to others', onPress: () => resolve(true) },
+          ],
+        );
+      });
+      if (!proceed) return;
+    }
+
+    for (const friend of sendable) {
+      await handleInviteFriend(friend);
+    }
+    setSelectedFriendIds(new Set());
+    setShareModalOpen(false);
   };
 
   // Remote 1v1-lobby (inte single player). Gatar "Save 1vs1 – Play later"
@@ -5020,12 +5375,22 @@ export default function LobbyScreen() {
       roomCode,
       fromPlayerName,
       fromAvatarId: profile?.selectedAvatarId,
+      alreadyFriend: !friend.id.startsWith('pending-'),
     });
     setInvitedFriendIds((prev) => {
       const next = new Set(prev);
       next.add(friend.id);
       return next;
     });
+    // "Pending"-perioden startar HÄR (inviten är nu en levande waiting_invites-
+    // rad) — inte redan vid Add. Driver badgen på nästa modal-open.
+    if (friend.id.startsWith('pending-')) {
+      setSentPendingIds((prev) => {
+        const next = new Set(prev);
+        next.add(friend.id);
+        return next;
+      });
+    }
   };
 
   const handleStartGame = async (ptpConfirmed = false) => {
@@ -7749,14 +8114,14 @@ export default function LobbyScreen() {
               style={styles.startGameCompactRow}
             >
               <BlinkingLabel
-                style={isRematchLobby ? styles.startGameCompactLabelTwoLine : styles.startGameCompactLabel}
-                numberOfLines={isRematchLobby ? 2 : 1}
+                style={styles.startGameCompactLabelTwoLine}
+                numberOfLines={2}
               >
                 {isRematchLobby
                   ? singlePlayerDefault
                     ? 'Start\nReplay'
                     : 'Start\nRe-match'
-                  : 'Start Game'}
+                  : 'Start\nGame'}
               </BlinkingLabel>
               <View style={styles.startGameCompactLogoWrap}>
                 <Animated.View
@@ -8016,41 +8381,128 @@ export default function LobbyScreen() {
               Add a QuizVibe friend or invite an existing one to this lobby.
             </Text>
 
-            {/* QuizVibe friends section label */}
+            {/* QuizVibe friends section label + antal-badge (2026-08-27) —
+                samma rund-pill-form (primaryMuted bg + primaryBorder +
+                tabular-nums primary text) som Profile-skärmens
+                friendsCount, så räknaren ser identisk ut på båda ställena. */}
             <View style={shareSheet.sectionLabelRow}>
-              <QuizVibeFriendsLogo size={28} />
-              <Text style={shareSheet.sectionLabel}>QuizVibe friends</Text>
+              <View style={shareSheet.sectionLabelCluster}>
+                <QuizVibeFriendsLogo size={28} />
+                <Text style={shareSheet.sectionLabel}>QuizVibe friends</Text>
+              </View>
+              <View style={shareSheet.friendsCount}>
+                <Text style={shareSheet.friendsCountText}>{friends.length}</Text>
+              </View>
             </View>
 
-            {/* Add by Player Name — speglar Profile:s friends-modal så host
-                kan lägga till en friend direkt från lobby utan att hoppa
-                till Profile. Efter Add hamnar friend:en i listan nedan med
-                en Invite-knapp redo att tappas. */}
-            <View style={shareSheet.addRow}>
+            {/* Add by Player Name — samma split-field-struktur (bokstäver +
+                siffror, QuizVibe:s egna CodeKeyboard) som PlayerName skapas
+                överallt annars i appen (Register/Guest-form/AddPlayerModal),
+                Peter 2026-08-27. `appendPlayerNameLetter` sköter versal-
+                först/gemener-resten-formatet automatiskt per tangenttryck.
+                `playerNameExists` verifierar att namnet tillhör en
+                registrerad QuizVibe-user innan det sparas — se
+                handleAddFriendFromShare. Efter Add hamnar friend:en i
+                listan nedan med en kryssruta redo att bockas för. */}
+            <Text style={shareSheet.addFieldLabel}>Add by Player Name</Text>
+            <View style={shareSheet.addPlayerNameRow}>
               <TextInput
-                style={shareSheet.addInput}
-                placeholder="Add by Player Name"
+                ref={addFriendLettersRef}
+                style={[
+                  shareSheet.addInput,
+                  shareSheet.addPlayerNameLettersInput,
+                  addFriendKbMode === 'letter' && shareSheet.addPlayerNameInputActive,
+                ]}
+                placeholder="Anna"
                 placeholderTextColor={Colors.textDisabled}
-                value={newFriendPlayerName}
-                onChangeText={setNewFriendPlayerName}
-                maxLength={20}
-                returnKeyType="done"
-                onSubmitEditing={handleAddFriendFromShare}
+                value={getPlayerNameLetters(newFriendPlayerName)}
+                maxLength={PLAYER_NAME_MAX_LETTERS}
+                editable={!addFriendChecking}
+                showSoftInputOnFocus={false}
+                selection={{
+                  start: getPlayerNameLetters(newFriendPlayerName).length,
+                  end: getPlayerNameLetters(newFriendPlayerName).length,
+                }}
+                selectTextOnFocus={false}
+                contextMenuHidden={true}
+                onFocus={() => {
+                  setAddFriendKbMode('letter');
+                  setAddFriendFocused(true);
+                }}
+                onBlur={() => setAddFriendFocused(false)}
+              />
+              <Text style={shareSheet.addPlayerNameSeparator}>–</Text>
+              <TextInput
+                ref={addFriendDigitsRef}
+                style={[
+                  shareSheet.addInput,
+                  shareSheet.addPlayerNameDigitsInput,
+                  addFriendKbMode === 'digit' && shareSheet.addPlayerNameInputActive,
+                  getPlayerNameLetters(newFriendPlayerName).length === 0 && shareSheet.addPlayerNameInputDisabled,
+                ]}
+                placeholder="1234"
+                placeholderTextColor={Colors.textDisabled}
+                value={getPlayerNameDigits(newFriendPlayerName)}
+                maxLength={PLAYER_NAME_MAX_DIGITS}
+                editable={!addFriendChecking && getPlayerNameLetters(newFriendPlayerName).length > 0}
+                showSoftInputOnFocus={false}
+                selection={{
+                  start: getPlayerNameDigits(newFriendPlayerName).length,
+                  end: getPlayerNameDigits(newFriendPlayerName).length,
+                }}
+                selectTextOnFocus={false}
+                contextMenuHidden={true}
+                onFocus={() => {
+                  if (getPlayerNameLetters(newFriendPlayerName).length === 0) {
+                    addFriendLettersRef.current?.focus();
+                    return;
+                  }
+                  setAddFriendKbMode('digit');
+                  setAddFriendFocused(true);
+                }}
+                onBlur={() => setAddFriendFocused(false)}
               />
               <Pressable
                 onPress={handleAddFriendFromShare}
-                disabled={!newFriendPlayerName.trim()}
+                disabled={!newFriendPlayerName.trim() || addFriendChecking}
                 style={({ pressed }) => [
                   shareSheet.addBtn,
-                  !newFriendPlayerName.trim() && shareSheet.addBtnDisabled,
+                  (!newFriendPlayerName.trim() || addFriendChecking) && shareSheet.addBtnDisabled,
                   pressed && { opacity: 0.85 },
                 ]}
               >
-                <Text style={shareSheet.addBtnText}>Add</Text>
+                <Text style={shareSheet.addBtnText}>
+                  {addFriendChecking ? '…' : 'Add'}
+                </Text>
               </Pressable>
             </View>
+            {addFriendError && (
+              <Text style={shareSheet.addErrorText}>{addFriendError}</Text>
+            )}
+            {addFriendFocused && (
+              <CodeKeyboard
+                mode={addFriendKbMode}
+                letterCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                onPress={handleAddFriendKeyPress}
+                onBackspace={handleAddFriendBackspace}
+                onModeToggle={toggleAddFriendKbMode}
+                // Digit-mode kräver minst 1 letter — toggle dimmas i letter-
+                // mode tills letter-sektionen har innehåll.
+                modeToggleDisabled={addFriendKbMode === 'letter' && newFriendPlayerName.length === 0}
+                // Share invite:s botten-knapp är "Send invite" (disabled
+                // tills en friend är ibockad) — ingen "Done" att avbryta
+                // via. Cancel ersätter mode-toggle i botten-raden; togglen
+                // flyttar in i grid:en (direkt efter Z).
+                onCancel={handleAddFriendCancel}
+              />
+            )}
 
-            {friends.length === 0 ? (
+            {/* Tjock avdelare mellan Add by Player Name-rutorna och listan
+                nedanför (Peter 2026-08-27) — tydligare sektions-brytning än
+                den tunna 1px-dividern mellan enskilda friend-rader. */}
+            <View style={shareSheet.addSectionDivider} />
+
+            {displayFriends.length === 0 ? (
               <View style={shareSheet.emptyState}>
                 <Text style={shareSheet.emptyText}>No friends saved yet</Text>
                 <Text style={shareSheet.emptySubtext}>
@@ -8058,46 +8510,112 @@ export default function LobbyScreen() {
                 </Text>
               </View>
             ) : (
-              <ScrollView style={{ maxHeight: 260 }} keyboardShouldPersistTaps="handled">
-                {friends.map((friend, i) => {
+              // maxHeight krymps medan CodeKeyboard:et är uppe (Add by
+              // Player Name fokuserad) så hela sheet:en ryms inom
+              // container:s 90%-tak på kortare skärmar.
+              <ScrollView
+                style={{ maxHeight: addFriendFocused ? 140 : 260 }}
+                keyboardShouldPersistTaps="handled"
+              >
+                {displayFriends.map((friend, i) => {
                   const invited = invitedFriendIds.has(friend.id);
+                  const checked = invited || selectedFriendIds.has(friend.id);
+                  // Pending (2026-08-27): visas ENBART när inviten faktiskt
+                  // skickats (en levande waiting_invites-rad finns, spårad i
+                  // sentPendingIds) — INTE redan när host tryckt Add. En
+                  // pending-post utan badge är en tillagd kandidat som host
+                  // ännu inte bockat för och skickat. Blir en sparad friend
+                  // först när personen joinar (se pendingFriends-watchern).
+                  const isPending =
+                    friend.id.startsWith('pending-') && sentPendingIds.has(friend.id);
                   return (
                     <View key={friend.id}>
                       <View style={shareSheet.friendRow}>
-                        <Text style={shareSheet.friendEmoji}>
-                          {getAvatarEmojiById(friend.avatarId)}
-                        </Text>
-                        <Text style={shareSheet.friendName}>{friend.playerName}</Text>
-                        <TouchableOpacity
-                          onPress={() => handleInviteFriend(friend)}
+                        <View style={shareSheet.friendNameCluster}>
+                          {/* Namn-pillen speglar TopUserBanner:s inloggade
+                              login-pill (avatar + Player Name, primaryMuted
+                              bg + primaryBorder + primary text) — Peter
+                              2026-08-27: "skrivs så som de syns när de är
+                              inloggade". */}
+                          <View style={shareSheet.friendNamePill}>
+                            <Text style={shareSheet.friendPillIcon}>
+                              {getAvatarEmojiById(friend.avatarId)}
+                            </Text>
+                            <Text style={shareSheet.friendPillText} numberOfLines={1}>
+                              {friend.playerName}
+                            </Text>
+                          </View>
+                          {isPending && (
+                            <View style={shareSheet.pendingBadge}>
+                              <Text style={shareSheet.pendingBadgeText}>Pending</Text>
+                            </View>
+                          )}
+                        </View>
+                        {/* Kryssruta ersätter den tidigare per-rad "Invite"-
+                            knappen (2026-08-27) — host bockar för flera
+                            friends och skickar dem alla via "Send invite"
+                            längst ner. Redan skickade (invited) renderas
+                            grön+låst så host inte råkar dubbel-skicka. */}
+                        <Pressable
+                          onPress={() => {
+                            if (invited) return;
+                            setSelectedFriendIds((prev) => {
+                              // Remote 1v1 har bara EN motståndarplats —
+                              // radio-button-beteende: att bocka för en ny
+                              // spelare ersätter alltid ett tidigare val
+                              // istället för att lägga till det (Peter
+                              // 2026-08-27). Alla andra lobbytyper behåller
+                              // multi-select-togglet oförändrat.
+                              if (gameMode === 'remote-1v1') {
+                                return prev.has(friend.id) ? new Set() : new Set([friend.id]);
+                              }
+                              const next = new Set(prev);
+                              if (next.has(friend.id)) next.delete(friend.id);
+                              else next.add(friend.id);
+                              return next;
+                            });
+                          }}
                           disabled={invited}
+                          hitSlop={8}
                           style={[
-                            shareSheet.inviteBtn,
-                            invited && shareSheet.inviteBtnDone,
+                            shareSheet.checkbox,
+                            checked && shareSheet.checkboxChecked,
                           ]}
+                          accessibilityRole="checkbox"
+                          accessibilityState={{ checked }}
+                          accessibilityLabel={`Invite ${friend.playerName}`}
                         >
-                          <Text
-                            style={[
-                              shareSheet.inviteBtnText,
-                              invited && shareSheet.inviteBtnTextDone,
-                            ]}
-                          >
-                            {invited ? '✓ Invited' : 'Invite'}
-                          </Text>
-                        </TouchableOpacity>
+                          {checked && <Text style={shareSheet.checkmark}>✓</Text>}
+                        </Pressable>
                       </View>
-                      {i < friends.length - 1 && <View style={shareSheet.divider} />}
+                      {i < displayFriends.length - 1 && <View style={shareSheet.divider} />}
                     </View>
                   );
                 })}
               </ScrollView>
             )}
 
+            {/* "Send invite" ersätter f.d. "Done"-knappen (2026-08-27) —
+                skickar in-app-invites till alla ibockade friends i ett svep
+                och stänger modalen. Disabled tills minst en är ibockad;
+                backdrop-tap/hardware-back stänger fortfarande utan att
+                skicka något. */}
             <TouchableOpacity
-              onPress={() => setShareModalOpen(false)}
-              style={shareSheet.closeBtn}
+              onPress={handleSendInvites}
+              disabled={selectedFriendIds.size === 0}
+              style={[
+                shareSheet.closeBtn,
+                selectedFriendIds.size === 0 && shareSheet.closeBtnDisabled,
+              ]}
             >
-              <Text style={shareSheet.closeBtnText}>Done</Text>
+              <Text
+                style={[
+                  shareSheet.closeBtnText,
+                  selectedFriendIds.size === 0 && shareSheet.closeBtnTextDisabled,
+                ]}
+              >
+                Send invite
+              </Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -10634,12 +11152,12 @@ const styles = StyleSheet.create({
   // att uppställningen är återanvänd. Mindre fontStorlek än enrads-varianten
   // så två rader ryms inom samma sticky-bar-höjd.
   startGameCompactLabelTwoLine: {
-    fontSize: 15,
+    fontSize: 19,
     fontWeight: FontWeight.bold,
     color: Colors.warning,
     letterSpacing: 0.3,
     textAlign: 'center',
-    lineHeight: 17,
+    lineHeight: 22,
   },
   // Halo bara bakom logon (inte texten) så labeln förblir läsbar när
   // glow-opaciteten pulsar upp mot 0.85.
@@ -11080,6 +11598,10 @@ const shareSheet = StyleSheet.create({
     gap: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border,
+    // Bounder sheet:en till viewport så toppen aldrig spiller över skärmen
+    // när CodeKeyboard:et (Add by Player Name) tar plats — samma mönster
+    // som modal.container ovan (AddPlayerModal).
+    maxHeight: '90%',
   },
   handle: {
     width: 36, height: 4, borderRadius: 2,
@@ -11091,21 +11613,65 @@ const shareSheet = StyleSheet.create({
   subtitle: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center', marginBottom: Spacing.sm },
 
   // Rad med QuizVibeFriendsLogo bredvid "QuizVibe friends"-labeln —
-  // samma ikon som på Profile-skärmens friends-kort.
+  // samma ikon som på Profile-skärmens friends-kort. justifyContent:
+  // space-between skjuter antal-badgen (friendsCount) till radens
+  // högerkant, samma layout som Profile:s friendsHeader-rad.
   sectionLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
+    justifyContent: 'space-between',
     paddingHorizontal: Spacing.xs,
+  },
+  // Vänster-klustret (logo + rubrik) hålls ihop som EN enhet så
+  // space-between på sectionLabelRow bara öppnar upp mellan klustret och
+  // antal-badgen — inte mellan logo och text.
+  sectionLabelCluster: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  // Antal-badge — pixel-identisk med Profile-skärmens friendsCount/
+  // friendsCountText (ProfileScreen.tsx) så räknaren ser likadan ut
+  // oavsett var i appen host öppnar sin QuizVibe friends-lista.
+  friendsCount: {
+    minWidth: 32,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.primaryMuted,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  friendsCountText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.primary,
+    fontVariant: ['tabular-nums'],
   },
   sectionLabel: {
     ...Typography.overline,
     color: Colors.textSecondary,
   },
 
-  // Add-by-Player-Name-rad — speglar Profile:s friendsModal.addRow exakt så
-  // visual-vokabulär förblir konsistent mellan Profile och Lobby.
-  addRow: {
+  // Add-by-Player-Name-label + split-field-rad (2026-08-27) — samma
+  // struktur som PlayerName skapas överallt annars i appen: en bokstavs-
+  // ruta (versal först, gemener resten via appendPlayerNameLetter) + en
+  // siffer-ruta, båda matade av QuizVibe:s egna CodeKeyboard (ingen system-
+  // tangentbord). Speglar modal.playerNameLettersInput/-DigitsInput
+  // (AddPlayerModal) med samma 7:6-flex-ratio.
+  addFieldLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    paddingHorizontal: Spacing.xs,
+  },
+  addPlayerNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
   },
   addInput: {
@@ -11118,12 +11684,33 @@ const shareSheet = StyleSheet.create({
     fontSize: 15,
     color: Colors.textPrimary,
   },
+  addPlayerNameLettersInput: {
+    flex: 7,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  addPlayerNameDigitsInput: {
+    flex: 6,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  addPlayerNameSeparator: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    paddingHorizontal: 2,
+  },
+  addPlayerNameInputActive: { borderColor: Colors.primary },
+  addPlayerNameInputDisabled: { opacity: 0.45 },
   addBtn: {
     height: 44,
     borderRadius: Radius.md,
     backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
   },
   addBtnDisabled: {
     backgroundColor: 'rgba(255,255,255,0.06)',
@@ -11133,6 +11720,13 @@ const shareSheet = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: '#fff',
     letterSpacing: 0.3,
+  },
+  // Inline felmeddelande under Add-raden — visas när playerNameExists()
+  // inte hittar någon registrerad user med det inskrivna Player Name.
+  addErrorText: {
+    fontSize: FontSize.xs,
+    color: Colors.error,
+    paddingHorizontal: Spacing.xs,
   },
 
   emptyState: {
@@ -11151,26 +11745,95 @@ const shareSheet = StyleSheet.create({
   friendRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: Spacing.md,
     paddingVertical: Spacing.sm + 2,
   },
-  friendEmoji: { fontSize: 22, width: 36, textAlign: 'center' },
-  friendName: { flex: 1, fontSize: FontSize.md, fontWeight: FontWeight.medium, color: Colors.textPrimary },
-  inviteBtn: {
+  // Klustrar namn-pillen + ev. Pending-badge ihop som EN enhet så
+  // justifyContent: space-between på friendRow bara öppnar upp mellan
+  // klustret och kryssrutan — inte mellan pillen och badgen.
+  friendNameCluster: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    flexShrink: 1,
+  },
+  // Pending-badge (2026-08-27) — en Add:ad friend som ännu inte accepterat
+  // inviten och joinat lobbyn. Amber/gold i samma "väntar"-ton som PREMIUM-
+  // lås-badges, tydligt skild från den gröna checkbox-vokabulären.
+  pendingBadge: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    backgroundColor: 'rgba(245,166,35,0.12)',
+    borderColor: Colors.warning,
+  },
+  pendingBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.warning,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  // Namn-pill — speglar TopUserBanner:s inloggade login-pill (avatar +
+  // Player Name) 1:1 (samma bg/border/text-färg, rounded-full), Peter
+  // 2026-08-27: "skrivs så som de syns när de är inloggade". Hugger sitt
+  // innehåll (ingen flex:1) så den ser likadan ut som pillen i header:n
+  // istället för att sträckas ut över hela raden.
+  friendNamePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 6,
     paddingHorizontal: Spacing.md,
     paddingVertical: 6,
     borderRadius: Radius.full,
-    backgroundColor: Colors.primary,
-  },
-  inviteBtnDone: {
-    backgroundColor: 'transparent',
     borderWidth: 1,
+    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.primaryBorder,
+    maxWidth: 200,
+    flexShrink: 1,
+  },
+  friendPillIcon: { fontSize: 14 },
+  friendPillText: { fontSize: 12, fontWeight: '600', color: Colors.primary, flexShrink: 1 },
+  // Kryssruta (2026-08-27, ersatte per-rad "Invite"-knappen) — tom ruta
+  // omarkerad, grön ruta + vit ✓ markerad. Samma geometri som Lobby:s
+  // singlePlayerCheckbox men grön istället för grå (Peter bad om "green
+  // check-icon"). Redan skickade invites renderar samma gröna state men
+  // med `disabled` — checked-stilen är alltså delad mellan urval och
+  // "redan skickat".
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.success,
     borderColor: Colors.success,
   },
-  inviteBtnText: { fontSize: FontSize.xs, fontWeight: FontWeight.bold, color: '#fff', letterSpacing: 0.3 },
-  inviteBtnTextDone: { color: Colors.success },
+  checkmark: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+    lineHeight: 15,
+  },
 
   divider: { height: 1, backgroundColor: Colors.separator },
+  // Tjock sektions-avdelare mellan Add-raden/CodeKeyboard och friend-listan
+  // (2026-08-27) — bredare + starkare färg än den tunna friend-till-friend-
+  // dividern ovan, så övergången "lägga till" → "lista" läses tydligt.
+  addSectionDivider: {
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: Colors.borderStrong,
+    marginVertical: Spacing.xs,
+  },
 
   closeBtn: {
     height: 48,
@@ -11181,4 +11844,10 @@ const shareSheet = StyleSheet.create({
     marginTop: Spacing.xs,
   },
   closeBtnText: { fontSize: 15, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
+  // "Send invite" disabled tills minst en friend är ibockad.
+  closeBtnDisabled: {
+    backgroundColor: 'transparent',
+    borderColor: Colors.border,
+  },
+  closeBtnTextDisabled: { color: Colors.textDisabled },
 });
