@@ -624,7 +624,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "vtjdTPnCcu0"
-        startSec: 8
+        startSec: 13
         endSec: 38
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2013 vinnare. ESC 2013 performance."

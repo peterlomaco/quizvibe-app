@@ -18411,7 +18411,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "vtjdTPnCcu0",
-        "startSec": 8,
+        "startSec": 13,
         "endSec": 38,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
