@@ -5833,8 +5833,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "ySOCalwr6Yo",
-        "startSec": 15,
-        "endSec": 20,
+        "startSec": 20,
+        "endSec": 40,
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
@@ -10225,8 +10225,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "2soGJXQAQec",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 50,
+        "endSec": 80,
         "channelTitle": "SnoopDoggVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
