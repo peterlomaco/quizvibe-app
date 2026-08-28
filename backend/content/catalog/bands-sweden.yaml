@@ -96,7 +96,7 @@ items:
     correctYear: 1984
     probability: 65
     region: ["sweden"]
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
     wikimediaSearchHints: ["Herreys"]
     answerMethods: ["name-letters"]
   - id: icona-pop

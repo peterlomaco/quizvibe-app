@@ -137,7 +137,7 @@ items:
         endSec: 30
         channelTitle: "AbbaVEVO"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Officiell musikvideo; ersatte Topic-audion 9y-8ZiAJiQo. Titeln namner inte Eurovision/artal."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   # Bohemian Rhapsody flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # Hotel California flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: bee-gees-stayin-alive
@@ -790,7 +790,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1980 vinnare."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: tomas-ledin-hon-gor-allt
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hon gör allt för att göra mig lycklig — Tomas Ledin"
@@ -1012,6 +1012,7 @@ items:
         endSec: 36
         channelTitle: "Lasse Berghagen - Topic"
         notes: "Peter-kurerad 2026-08-27. startSec 6 angiven av Peter. Ersatte uhYOEoQyqT4 vars titel 'Lasse Berghagen - Ding Dong (1973)' ar 34 tecken med aret vid 29 = spoiler."
+    genrePackages: ["Melodifestivalen"]
   - id: streaplers-vad-har-du-under-blusen-rut
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vad har du under blusen Rut — Streaplers"

@@ -790,7 +790,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1998 vinnare."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: charlotte-nilsson-tusen-och-en-natt
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tusen och en natt — Charlotte Nilsson"
@@ -804,7 +804,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1999 vinnare, ESC-vinnare 1999. ESC-version på engelska (Take Me To Your Heaven)."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: roger-pontare-vindarna-viskar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "När vindarna viskar mitt namn — Roger Pontare"
@@ -818,7 +818,7 @@ items:
         endSec: 45
         channelTitle: "Melodifestivalen"
         notes: "Melodifestivalen 2000 vinnare."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: lena-philipsson-det-gor-ont
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Det gör ont — Lena Philipsson"
@@ -832,6 +832,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2004 vinnare. ESC-version It Hurts."
+    genrePackages: ["Melodifestivalen"]
   - id: martin-stenmarck-las-vegas
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Las Vegas — Martin Stenmarck"
@@ -845,6 +846,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2005 vinnare. ESC 2005 performance."
+    genrePackages: ["Melodifestivalen"]
   - id: carola-evighet
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Evighet — Carola"
@@ -858,6 +860,7 @@ items:
         endSec: 45
         channelTitle: "Melodifestivalen"
         notes: "Melodifestivalen 2006 vinnare."
+    genrePackages: ["Melodifestivalen"]
   - id: the-ark-the-worrying-kind
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Worrying Kind — The Ark"
@@ -871,6 +874,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2007 vinnare. ESC 2007 performance."
+    genrePackages: ["Melodifestivalen"]
   - id: charlotte-perrelli-hero
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hero — Charlotte Perrelli"
@@ -884,7 +888,7 @@ items:
         endSec: 33
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2008 vinnare. ESC 2008 performance."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: malena-ernman-la-voix
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "La Voix — Malena Ernman"
@@ -898,7 +902,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2009 vinnare. ESC 2009 performance."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: anna-bergendahl-this-is-my-life
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "This Is My Life — Anna Bergendahl"
@@ -912,7 +916,7 @@ items:
         endSec: 45
         channelTitle: "Anakina_Skywalker"
         notes: "Melodifestivalen 2010 vinnare."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: eric-saade-popular
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Popular — Eric Saade"
@@ -926,7 +930,7 @@ items:
         endSec: 50
         channelTitle: "Eric Saade"
         notes: "Melodifestivalen 2011 vinnare. Officiell music video (Director's Cut)."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   # ===== Eurovision Song Contest vinnare =====
   - id: katrina-waves-love-shine-a-light
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]

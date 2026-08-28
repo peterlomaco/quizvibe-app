@@ -22,11 +22,20 @@ export interface MusicQuestion {
   correctYear?: number;
   contentSubject: YoutubeContentSubject;
   questionText: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Klientens HCP-filter
+   *  väljer item om itemHcp >= spelarens HCP (relaxas om poolen blir för tunn). */
+  itemHcp: number;
   audiences: MusicQuestionAudience[];
   genrePackages?: string[];
+  /** false = paket-exklusiv (spelas bara när matchande Host-paket är aktivt).
+   *  Utelämnat = default true = med i baspoolen. */
+  inBaseCatalog?: boolean;
   /** Geografisk igenkännings-scope. Item-level overridar fil-header.
    *  'unknown-region' = ej i base-pool; filtreras bort i SEED_QUESTIONS. */
   region: string[];
+  /** Parent control-tagg. true = klippet filtreras bort ur frågeurvalet när
+   *  host har Parent Control påslaget. Sätts i YAML (default false). */
+  parentControlled?: boolean;
   youtubeClips: YoutubeClip[];
   /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
   spotifyTrackId?: string;
@@ -45,6 +54,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1928,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -72,6 +82,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1931,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -91,6 +102,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1932,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -118,6 +130,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1933,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -145,6 +158,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1934,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
     "audiences": [
       "elder",
       "gen-x",
@@ -172,6 +186,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1939,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -199,6 +214,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1939,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -218,6 +234,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1939,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -255,6 +272,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1941,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -292,6 +310,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1942,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -314,11 +333,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bing-crosby-white-christmas",
+    "displayName": "White Christmas — Bing Crosby",
+    "correctYear": 1942,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "christmas"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "w7mz91nTF40",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Bing Crosby - Topic",
+        "license": "standard",
+        "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
+      }
+    ]
+  },
+  {
     "id": "casablanca-1942",
     "displayName": "Casablanca",
     "correctYear": 1942,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -357,6 +409,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1944,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -384,6 +437,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1945,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -411,6 +465,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1946,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -438,6 +493,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1947,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -465,6 +521,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1947,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
     "audiences": [
       "elder",
       "gen-x",
@@ -492,6 +549,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1948,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -519,6 +577,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1949,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -546,6 +605,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1950,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -565,6 +625,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1952,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -603,6 +664,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1954,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -630,6 +692,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1955,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -657,6 +720,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1955,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -684,6 +748,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1955,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -703,6 +768,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1956,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -730,6 +796,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1957,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -757,6 +824,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1957,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -784,6 +852,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1958,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -811,6 +880,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1958,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -838,6 +908,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1959,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -865,6 +936,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1959,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -892,6 +964,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1960,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -919,6 +992,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1960,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -946,6 +1020,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1960,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -973,6 +1048,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1961,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -1001,6 +1077,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1962,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -1028,6 +1105,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1963,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -1055,6 +1133,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1963,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -1083,6 +1162,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1963,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -1111,6 +1191,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1964,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -1138,6 +1219,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1964,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -1165,6 +1247,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1964,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -1193,6 +1276,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1964,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -1220,6 +1304,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1964,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -1247,6 +1332,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1965,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -1274,6 +1360,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1965,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -1301,6 +1388,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1965,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -1328,6 +1416,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1965,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -1355,6 +1444,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1965,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -1382,6 +1472,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1965,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -1409,6 +1500,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1966,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -1436,6 +1528,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1966,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -1458,11 +1551,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rolling-stones-paint-it-black",
+    "displayName": "Paint It Black — The Rolling Stones",
+    "correctYear": 1966,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "rock"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "63T7DJ1AFDD6Bn8VzG6JE8",
+    "youtubeClips": [
+      {
+        "videoId": "170sceOWWXc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "The Rolling Stones - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
     "id": "the-good-the-bad-and-the-ugly-1966",
     "displayName": "The Good, the Bad and the Ugly",
     "correctYear": 1966,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -1500,6 +1627,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1967,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -1527,6 +1655,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1967,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -1554,6 +1683,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1967,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -1582,6 +1712,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1967,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -1610,6 +1741,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1967,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -1638,6 +1770,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1967,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -1666,6 +1799,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1967,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -1693,6 +1827,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1968,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -1720,6 +1855,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1968,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -1748,6 +1884,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1968,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -1775,6 +1912,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1968,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -1802,6 +1940,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1969,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
     "audiences": [
       "elder",
       "gen-x",
@@ -1829,6 +1968,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1969,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -1856,6 +1996,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1969,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -1883,6 +2024,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1969,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -1910,6 +2052,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1969,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -1937,6 +2080,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1970,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -1959,11 +2103,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dana-all-kinds-of-everything",
+    "displayName": "All Kinds of Everything — Dana",
+    "correctYear": 1970,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 64,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "sZ8W9oOgjM4",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1970 vinnare — Irland."
+      }
+    ]
+  },
+  {
     "id": "elton-john-your-song",
     "displayName": "Your Song — Elton John",
     "correctYear": 1970,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -1986,11 +2163,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mungo-jerry-in-the-summertime",
+    "displayName": "In the Summertime — Mungo Jerry",
+    "correctYear": 1970,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "2uzlv8PjqsVvF1DhEahyhy",
+    "youtubeClips": []
+  },
+  {
     "id": "simon-garfunkel-bridge-over-troubled-water",
     "displayName": "Bridge Over Troubled Water — Simon & Garfunkel",
     "correctYear": 1970,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -2018,6 +2220,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1971,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -2040,6 +2243,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1971,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -2067,6 +2271,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1971,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -2095,6 +2300,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1971,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -2122,6 +2328,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1971,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -2149,6 +2356,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1971,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 83,
     "audiences": [
       "elder",
       "gen-x",
@@ -2171,11 +2379,68 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "severine-un-banc-un-arbre",
+    "displayName": "Un banc, un arbre, une rue — Séverine",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 62,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "JQUC9TycGWU",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1971 vinnare — Monaco."
+      }
+    ]
+  },
+  {
+    "id": "the-who-behind-blue-eyes",
+    "displayName": "Behind Blue Eyes — The Who",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "rock"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "0cKk8BKEi7zXbdrYdyqBP5",
+    "youtubeClips": []
+  },
+  {
     "id": "bill-withers-lean-on-me",
     "displayName": "Lean on Me — Bill Withers",
     "correctYear": 1972,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -2203,6 +2468,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1972,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 87,
     "audiences": [
       "elder",
       "gen-x",
@@ -2230,6 +2496,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1972,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -2257,6 +2524,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1972,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -2284,6 +2552,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1972,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -2317,11 +2586,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "vicky-leandros-apres-toi",
+    "displayName": "Après toi — Vicky Leandros",
+    "correctYear": 1972,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 64,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "52W1665yI1Y",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1972 vinnare — Luxemburg."
+      }
+    ]
+  },
+  {
     "id": "abba-ring-ring",
     "displayName": "Ring Ring — ABBA",
     "correctYear": 1973,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -2345,11 +2647,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "anne-marie-david-tu-te-reconnaitras",
+    "displayName": "Tu te reconnaîtras — Anne-Marie David",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 62,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "vfgR0sXxVWA",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1973 vinnare — Luxemburg."
+      }
+    ]
+  },
+  {
     "id": "dolly-parton-jolene",
     "displayName": "Jolene — Dolly Parton",
     "correctYear": 1973,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -2377,6 +2712,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1973,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -2404,6 +2740,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1973,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -2413,6 +2750,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
     ],
     "spotifyTrackId": "1oS8V9VCSuF0fgLQGMKXQY",
     "youtubeClips": [
@@ -2432,6 +2772,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1973,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -2459,6 +2800,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1973,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -2486,6 +2828,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1973,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -2513,6 +2856,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1973,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -2544,6 +2888,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1973,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -2575,6 +2920,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1974,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -2586,7 +2932,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "spotifyTrackId": "3Dy4REq8O09IlgiwuHQ3sk",
     "youtubeClips": [
@@ -2606,6 +2953,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1974,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -2633,6 +2981,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1974,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -2660,6 +3009,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1974,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -2687,6 +3037,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1974,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -2714,6 +3065,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1975,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -2742,6 +3094,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1975,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -2770,6 +3123,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1975,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -2797,6 +3151,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1975,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -2835,6 +3190,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1975,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -2862,6 +3218,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1975,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -2893,6 +3250,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1975,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -2915,11 +3273,76 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "teach-in-ding-a-dong",
+    "displayName": "Ding-a-dong — Teach-In",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 65,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "jqqJvMTNeq4",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1975 vinnare — Nederländerna."
+      }
+    ]
+  },
+  {
+    "id": "brotherhood-of-man-save-your-kisses",
+    "displayName": "Save Your Kisses for Me — Brotherhood of Man",
+    "correctYear": 1976,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "5yJUi6ke71I",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1976 vinnare — Storbritannien."
+      }
+    ]
+  },
+  {
     "id": "dancing-queen",
     "displayName": "Dancing Queen — ABBA",
     "correctYear": 1976,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -2948,6 +3371,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1976,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -2967,6 +3391,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1976,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -2994,6 +3419,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1976,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -3021,6 +3447,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1976,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -3061,6 +3488,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1976,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -3088,6 +3516,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1977,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -3115,6 +3544,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1977,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -3143,6 +3573,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1977,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -3170,6 +3601,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1977,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -3189,6 +3621,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1977,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -3211,11 +3644,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "marie-myriam-loiseau-et-lenfant",
+    "displayName": "L'Oiseau et l'Enfant — Marie Myriam",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 62,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "bybdhTg_g20",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1977 vinnare — Frankrike."
+      }
+    ]
+  },
+  {
     "id": "queen-we-are-the-champions",
     "displayName": "We Are the Champions — Queen",
     "correctYear": 1977,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -3246,6 +3712,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1977,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -3276,6 +3743,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1977,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -3314,6 +3782,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1978,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -3340,6 +3809,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1978,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -3375,6 +3845,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1978,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -3402,6 +3873,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1978,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -3429,6 +3901,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1978,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -3462,11 +3935,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "izhar-cohen-a-ba-ni-bi",
+    "displayName": "A-Ba-Ni-Bi — Izhar Cohen & The Alphabeta",
+    "correctYear": 1978,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 66,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "uFd5nk2sXow",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1978 vinnare — Israel."
+      }
+    ]
+  },
+  {
     "id": "police-roxanne",
     "displayName": "Roxanne — The Police",
     "correctYear": 1978,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -3494,6 +4000,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1978,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -3521,6 +4028,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1978,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -3549,6 +4057,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1979,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -3571,11 +4080,77 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "acdc-highway-to-hell",
+    "displayName": "Highway to Hell — AC/DC",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "rock"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "2zYzyRzz6pRmhPzyfMEC8s",
+    "youtubeClips": [
+      {
+        "videoId": "ikFFVfObwss",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "AC/DC - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "milk-and-honey-hallelujah",
+    "displayName": "Hallelujah — Milk & Honey",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "vvmHIhhlzOA",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1979 vinnare — Israel."
+      }
+    ]
+  },
+  {
     "id": "sugarhill-gang-rappers-delight",
     "displayName": "Rapper's Delight — Sugarhill Gang",
     "correctYear": 1979,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -3598,6 +4173,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1979,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -3626,6 +4202,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -3653,6 +4230,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -3672,6 +4250,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -3693,11 +4272,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "johnny-logan-whats-another-year",
+    "displayName": "What's Another Year — Johnny Logan",
+    "correctYear": 1980,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "R7k1DH71bO8",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1980 vinnare — Irland."
+      }
+    ]
+  },
+  {
     "id": "miracle-on-ice-1980",
     "displayName": "Miracle on Ice — USA besegrar Sovjet",
     "correctYear": 1980,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -3725,6 +4337,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -3753,6 +4366,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -3793,6 +4407,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -3831,6 +4446,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -3869,6 +4485,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
     "audiences": [
       "elder",
       "gen-x",
@@ -3896,6 +4513,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -3907,7 +4525,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "spotifyTrackId": "2Hx61KuedgBKOaJ1GfflJe",
     "youtubeClips": [
@@ -3927,6 +4546,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1980,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -3954,6 +4574,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
     "audiences": [
       "elder",
       "gen-x",
@@ -3965,7 +4586,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -3984,6 +4606,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -4011,6 +4634,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -4048,6 +4672,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -4079,6 +4704,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -4101,6 +4727,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -4127,6 +4754,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -4164,6 +4792,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -4191,6 +4820,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -4218,6 +4848,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -4245,6 +4876,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -4271,6 +4903,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1981,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -4301,6 +4934,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -4328,6 +4962,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -4366,6 +5001,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -4393,6 +5029,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -4420,6 +5057,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -4447,6 +5085,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -4474,6 +5113,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -4500,6 +5140,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -4526,6 +5167,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -4553,6 +5195,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -4580,6 +5223,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -4611,6 +5255,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1982,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 89,
     "audiences": [
       "elder",
       "gen-x",
@@ -4633,11 +5278,75 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bananarama-cruel-summer",
+    "displayName": "Cruel Summer — Bananarama",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "l9ml3nyww80",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "billy-idol-rebel-yell",
+    "displayName": "Rebel Yell — Billy Idol",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "rock"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "zkTqiuNj6xI",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "Austech",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Videotiteln innehåller '1983' men först långt in i raden ('Billy Idol - Rebel Yell - Official Video 1983 - 4K Remaster') — Peter bedömde 2026-08-13 att den delen inte hinner läsas i spelaren. Klippet BEHÅLLS medvetet; flagga inte om som spoiler. Privat re-upload (ej rättsinnehavare) — takedown-risk kvarstår."
+      }
+    ]
+  },
+  {
     "id": "bonnie-tyler-total-eclipse-of-the-heart",
     "displayName": "Total Eclipse of the Heart — Bonnie Tyler",
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -4657,6 +5366,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -4679,11 +5389,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "corinne-hermes-si-la-vie-est-cadeau",
+    "displayName": "Si la vie est cadeau — Corinne Hermès",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 64,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "F8y5xc8UodE",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1983 vinnare — Luxemburg."
+      }
+    ]
+  },
+  {
     "id": "cyndi-lauper-girls-just-want-to-have-fun",
     "displayName": "Girls Just Want to Have Fun — Cyndi Lauper",
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -4711,6 +5454,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 83,
     "audiences": [
       "elder",
       "gen-x",
@@ -4738,6 +5482,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -4765,6 +5510,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -4792,6 +5538,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -4811,6 +5558,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -4838,6 +5586,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -4864,6 +5613,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -4893,6 +5643,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1983,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -4914,11 +5665,43 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "zz-top-gimme-all-your-lovin",
+    "displayName": "Gimme All Your Lovin' — ZZ Top",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "rock"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "Ae829mFAGGE",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
     "id": "bryan-adams-heaven",
     "displayName": "Heaven — Bryan Adams",
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -4947,6 +5730,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -4974,6 +5758,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -5000,6 +5785,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -5027,6 +5813,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -5054,6 +5841,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -5065,7 +5853,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -5084,6 +5873,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -5106,6 +5896,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 83,
     "audiences": [
       "elder",
       "gen-x",
@@ -5143,6 +5934,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -5169,6 +5961,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -5196,6 +5989,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -5223,6 +6017,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -5250,6 +6045,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -5276,6 +6072,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -5302,6 +6099,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -5329,6 +6127,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -5356,6 +6155,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -5383,6 +6183,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -5409,6 +6210,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -5435,6 +6237,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -5473,6 +6276,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -5496,11 +6300,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "van-halen-jump",
+    "displayName": "Jump — Van Halen",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "rock"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "SwYN7mTi6HM",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "Van Halen",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiella musikvideon på bandets egen kanal."
+      }
+    ]
+  },
+  {
     "id": "wham-last-christmas",
     "displayName": "Last Christmas — Wham!",
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -5528,6 +6365,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -5555,6 +6393,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -5582,6 +6421,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -5619,6 +6459,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -5646,6 +6487,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -5672,6 +6514,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -5698,6 +6541,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -5724,6 +6568,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -5750,6 +6595,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -5776,6 +6622,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -5787,7 +6634,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "spotifyTrackId": "0FSlaiuv4eBrrjz05jpxz6",
     "youtubeClips": [
@@ -5807,6 +6655,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -5833,6 +6682,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -5859,6 +6709,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -5887,6 +6738,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -5915,6 +6767,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1985,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -5942,6 +6795,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1986,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -5969,6 +6823,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1986,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -5996,6 +6851,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1986,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -6027,6 +6883,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1986,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -6048,11 +6905,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "peter-cetera-glory-of-love",
+    "displayName": "Glory of Love — Peter Cetera",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Film",
+      "Soft & Ballads"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "wktJg27TXx4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Truett Turk",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Ersatte yQHhqDRn4_c. VERIFIERA I SPELAREN: titeln ar 78 tecken med 1986 vid tecken 57 - bor kapas bort, men aret ar svaret."
+      }
+    ]
+  },
+  {
     "id": "peter-gabriel-sledgehammer",
     "displayName": "Sledgehammer — Peter Gabriel",
     "correctYear": 1986,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -6079,6 +6970,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1986,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -6097,11 +6989,75 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "prince-kiss",
+    "displayName": "Kiss — Prince and the Revolution",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "H9tEvfIsDyo",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "sandra-kim-jaime-la-vie",
+    "displayName": "J'aime la vie — Sandra Kim",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "AT3c41gi3B4",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1986 vinnare — Belgien."
+      }
+    ]
+  },
+  {
     "id": "top-gun",
     "displayName": "Top Gun",
     "correctYear": 1986,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -6135,11 +7091,68 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "cornelis-vreeswijk-sommarkort",
+    "displayName": "Sommarkort (En stund på jorden) — Cornelis Vreeswijk",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "5lRvBRQJFVWZGRqDm7YkL4",
+    "youtubeClips": []
+  },
+  {
+    "id": "def-leppard-pour-some-sugar-on-me",
+    "displayName": "Pour Some Sugar on Me — Def Leppard",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "rock"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "0UIB9Y4OFPs",
+        "startSec": 30,
+        "endSec": 60,
+        "channelTitle": "DEF LEPPARD",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiella musikvideon på bandets egen kanal."
+      }
+    ]
+  },
+  {
     "id": "fleetwood-mac-everywhere",
     "displayName": "Everywhere — Fleetwood Mac",
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -6166,6 +7179,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -6192,6 +7206,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -6218,6 +7233,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -6239,11 +7255,76 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "guns-n-roses-sweet-child-o-mine",
+    "displayName": "Sweet Child o' Mine — Guns N' Roses",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "rock"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "qoflJn7zkFM",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "7clouds Rock",
+        "license": "standard",
+        "notes": "Lyric-video, katalogens standard-lyric-kanal. Peter-kurerad 2026-08-11."
+      }
+    ]
+  },
+  {
+    "id": "johnny-logan-hold-me-now",
+    "displayName": "Hold Me Now — Johnny Logan",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "gl2yKH5zbyo",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1987 vinnare — Irland."
+      }
+    ]
+  },
+  {
     "id": "lili-sussie-oh-mama",
     "displayName": "Oh Mama — Lili & Sussie",
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -6263,6 +7344,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -6274,7 +7356,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -6293,6 +7376,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -6321,6 +7405,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -6348,6 +7433,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -6374,6 +7460,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 75,
     "audiences": [
       "elder",
       "gen-x",
@@ -6401,6 +7488,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -6428,6 +7516,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1987,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 87,
     "audiences": [
       "elder",
       "gen-x",
@@ -6455,6 +7544,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -6477,11 +7567,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "celine-dion-ne-partez-pas",
+    "displayName": "Ne partez pas sans moi — Céline Dion",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "VXLWfXmlXPc",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1988 vinnare — Schweiz."
+      }
+    ]
+  },
+  {
     "id": "kylie-minogue-the-loco-motion",
     "displayName": "The Loco-Motion — Kylie Minogue",
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -6508,6 +7631,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -6535,6 +7659,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -6562,6 +7687,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -6590,6 +7716,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -6618,6 +7745,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -6648,6 +7776,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -6688,6 +7817,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -6715,6 +7845,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -6742,6 +7873,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1988,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -6772,6 +7904,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1989,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -6798,6 +7931,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1989,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -6835,6 +7969,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1989,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -6865,6 +8000,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1989,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -6896,6 +8032,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1989,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -6922,6 +8059,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1989,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -6944,11 +8082,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "orup-da-star-pojkarna-pa-rad",
+    "displayName": "Då står pojkarna på rad — Orup",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "0fN96hLpE08LmXFfS5VmdE",
+    "youtubeClips": []
+  },
+  {
     "id": "phil-collins-another-day-in-paradise",
     "displayName": "Another Day in Paradise — Phil Collins",
     "correctYear": 1989,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -6971,11 +8134,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "riva-rock-me",
+    "displayName": "Rock Me — Riva",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "ZWwmCT7P3VE",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1989 vinnare — Jugoslavien."
+      }
+    ]
+  },
+  {
     "id": "ronny-ragge-de-e-sommar",
     "displayName": "De e sommar — Ronny & Ragge",
     "correctYear": 1989,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -7007,6 +8203,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1989,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -7034,6 +8231,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1989,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7057,6 +8255,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -7076,6 +8275,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -7106,6 +8306,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1990,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 93,
     "audiences": [
       "elder",
       "gen-x",
@@ -7143,6 +8344,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7171,6 +8373,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -7193,11 +8396,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mc-hammer-u-cant-touch-this",
+    "displayName": "U Can't Touch This — MC Hammer",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "q8WSdypJ4WA",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "Petter Oliveira",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Privat re-upload av musikvideon — ej rättsinnehavare. Spelbar i SE 2026-08-12; takedown-risk kvarstår."
+      }
+    ]
+  },
+  {
     "id": "new-order-world-in-motion",
     "displayName": "World in Motion — New Order",
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -7228,6 +8464,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7258,6 +8495,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 83,
     "audiences": [
       "elder",
       "gen-x",
@@ -7285,6 +8523,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -7312,6 +8551,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1990,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -7334,11 +8574,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "toto-cutugno-insieme",
+    "displayName": "Insieme: 1992 — Toto Cutugno",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "JiRppGSF-tI",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1990 vinnare — Italien."
+      }
+    ]
+  },
+  {
     "id": "bryan-adams-everything-i-do",
     "displayName": "(Everything I Do) I Do It for You — Bryan Adams",
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -7366,6 +8639,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -7375,6 +8649,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -7388,11 +8665,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "fresh-prince-summertime",
+    "displayName": "Summertime — DJ Jazzy Jeff & The Fresh Prince",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Summer",
+      "hiphop"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "20XdEFyaUR9C7aDIdq2OAd",
+    "youtubeClips": []
+  },
+  {
     "id": "metallica-enter-sandman",
     "displayName": "Enter Sandman — Metallica",
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -7420,6 +8723,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -7447,6 +8751,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7477,6 +8782,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7509,6 +8815,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -7536,6 +8843,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7566,6 +8874,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7597,6 +8906,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 81,
     "audiences": [
       "elder",
       "gen-x",
@@ -7624,6 +8934,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7651,6 +8962,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -7678,6 +8990,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -7705,6 +9018,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7732,6 +9046,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1991,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7763,6 +9078,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -7790,6 +9106,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -7818,6 +9135,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -7845,6 +9163,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -7876,6 +9195,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -7903,6 +9223,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -7934,6 +9255,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -7964,6 +9286,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -7991,6 +9314,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -8013,11 +9337,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "inner-circle-sweat",
+    "displayName": "Sweat (A La La La Long) — Inner Circle",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "24Si0Kw3pu2RxX1jrbBg5A",
+    "youtubeClips": []
+  },
+  {
     "id": "jon-secada-just-another-day",
     "displayName": "Just Another Day — Jon Secada",
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8043,11 +9392,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "linda-martin-why-me",
+    "displayName": "Why Me? — Linda Martin",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "DKd50924Qxs",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1992 vinnare — Irland."
+      }
+    ]
+  },
+  {
     "id": "niklas-stromstedt-oslagbara",
     "displayName": "Oslagbara — Niklas Strömstedt",
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -8071,11 +9453,69 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "orup-magaluf",
+    "displayName": "Magaluf — Orup",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer",
+      "100% svenska"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "39ADGrzCrbWwTFlhDcsf9P",
+    "youtubeClips": []
+  },
+  {
+    "id": "radiohead-creep",
+    "displayName": "Creep — Radiohead",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Punk & Rock"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "XFkzRNyygfk",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Radiohead",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1992 = singeln (21 sep 1992); albumet Pablo Honey kom 1993."
+      }
+    ]
+  },
+  {
     "id": "roxette-queen-of-rain",
     "displayName": "Queen of Rain — Roxette",
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8095,6 +9535,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -8117,11 +9558,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sir-mix-a-lot-baby-got-back",
+    "displayName": "Baby Got Back — Sir Mix-a-Lot",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "-TsEFYY95mE",
+        "startSec": 30,
+        "endSec": 60,
+        "channelTitle": "Sir Mix-A-Lot - Topic",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). Peters rad hade RHCP-klippet inklistrat av misstag; officiell Topic-audio uppsokt."
+      }
+    ]
+  },
+  {
     "id": "snap-rhythm-is-a-dancer",
     "displayName": "Rhythm Is a Dancer — Snap!",
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -8149,6 +9623,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8176,6 +9651,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -8207,6 +9683,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8234,6 +9711,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -8271,6 +9749,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8302,6 +9781,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1992,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -8329,6 +9809,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8359,6 +9840,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -8387,6 +9869,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -8398,7 +9881,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -8417,6 +9901,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8448,6 +9933,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8478,6 +9964,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -8518,6 +10005,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8548,6 +10036,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -8578,6 +10067,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8608,6 +10098,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -8646,6 +10137,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8668,11 +10160,76 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mariah-carey-hero",
+    "displayName": "Hero — Mariah Carey",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Ballads"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "0IA3ZvCkRkQ",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "MariahCareyVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). OBS: detta ar Vevo-kanalens LIVE-version, inte studioinspelningen."
+      }
+    ]
+  },
+  {
+    "id": "niamh-kavanagh-in-your-eyes",
+    "displayName": "In Your Eyes — Niamh Kavanagh",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "pysQioMtrAU",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1993 vinnare — Irland."
+      }
+    ]
+  },
+  {
     "id": "snoop-dogg-whats-my-name",
     "displayName": "Who Am I (What's My Name)? — Snoop Doggy Dogg",
     "correctYear": 1993,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8703,6 +10260,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1993,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -8735,11 +10293,78 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "all-4-one-i-swear",
+    "displayName": "I Swear — All-4-One",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Soft & Ballads"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "cVpvlaKfLQc",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "RHINO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "bon-jovi-always",
+    "displayName": "Always — Bon Jovi",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Soft & Ballads"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "9BMwcO6_hyA",
+        "startSec": 20,
+        "endSec": 50,
+        "channelTitle": "BonJoviVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "brolin-vm-94-rumanien",
     "displayName": "Tomas Brolins frisparksmål mot Rumänien i VM",
     "correctYear": 1994,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -8767,6 +10392,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
     "audiences": [
       "elder",
       "gen-x",
@@ -8789,6 +10415,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8819,6 +10446,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -8846,6 +10474,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -8876,6 +10505,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -8906,6 +10536,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -8936,6 +10567,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -8966,6 +10598,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -8996,6 +10629,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 93,
     "audiences": [
       "elder",
       "gen-x",
@@ -9033,6 +10667,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 96,
     "audiences": [
       "elder",
       "gen-x",
@@ -9060,6 +10695,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -9092,6 +10728,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9122,6 +10759,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9147,11 +10785,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "paul-harrington-rock-n-roll-kids",
+    "displayName": "Rock 'n' Roll Kids — Paul Harrington & Charlie McGettigan",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 66,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "ohBO8OxQbv8",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1994 vinnare — Irland."
+      }
+    ]
+  },
+  {
     "id": "pulp-fiction",
     "displayName": "Pulp Fiction",
     "correctYear": 1994,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -9190,6 +10861,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -9218,6 +10890,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9240,6 +10913,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -9267,6 +10941,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9298,6 +10973,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9326,6 +11002,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "movie",
     "questionText": "What is the name of the main character in this film?",
+    "itemHcp": 93,
     "audiences": [
       "elder",
       "gen-x",
@@ -9363,6 +11040,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1994,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9393,6 +11071,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9423,6 +11102,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9442,6 +11122,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -9469,6 +11150,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -9496,6 +11178,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9527,6 +11210,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -9557,6 +11241,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -9584,6 +11269,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9614,6 +11300,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -9641,6 +11328,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9671,6 +11359,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9701,6 +11390,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1995,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -9709,11 +11399,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "u-gA0aU-d88",
@@ -9731,6 +11422,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -9758,6 +11450,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9788,6 +11481,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -9811,11 +11505,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "eimear-quinn-the-voice",
+    "displayName": "The Voice — Eimear Quinn",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 66,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "0KiE1byYXtA",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1996 vinnare — Irland."
+      }
+    ]
+  },
+  {
     "id": "eros-ramazzotti-la-cosa-mas-bella",
     "displayName": "La Cosa Más Bella (Più bella cosa) — Eros Ramazzotti",
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9847,6 +11574,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -9874,6 +11602,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9905,6 +11634,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9935,6 +11665,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -9962,6 +11693,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -9989,6 +11721,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10019,6 +11752,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -10049,6 +11783,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10079,6 +11814,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -10101,11 +11837,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "orup-flickan-ovanpa",
+    "displayName": "Flickan ovanpå — Orup",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "6WhseDHUvM0lOk5oavjztk",
+    "youtubeClips": []
+  },
+  {
     "id": "spice-girls-wannabe",
     "displayName": "Wannabe — Spice Girls",
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -10136,6 +11897,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10158,6 +11920,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1996,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10188,6 +11951,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10219,6 +11983,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -10249,6 +12014,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -10276,6 +12042,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -10307,6 +12074,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -10338,6 +12106,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -10365,6 +12134,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -10387,11 +12157,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "eagle-eye-cherry-save-tonight",
+    "displayName": "Save Tonight — Eagle-Eye Cherry",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Soft & Ballads"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "Nntd2fgMUYw",
+        "startSec": 3,
+        "endSec": 33,
+        "channelTitle": "EagleEyeCherryVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). xlsx hade artist och lat i omvand ordning."
+      }
+    ]
+  },
+  {
     "id": "hanson-mmmbop",
     "displayName": "MMMBop — Hanson",
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10422,6 +12225,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10447,11 +12251,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "katrina-waves-love-shine-a-light",
+    "displayName": "Love Shine a Light — Katrina and the Waves",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "KwLBCKA5-ls",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1997 vinnare — Storbritannien."
+      }
+    ]
+  },
+  {
     "id": "kent-om-du-var-har",
     "displayName": "Om du var här — Kent",
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10479,6 +12316,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10510,6 +12348,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -10532,11 +12371,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "savage-garden-truly-madly-deeply",
+    "displayName": "Truly Madly Deeply — Savage Garden",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Ballads"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "WQnAxOQxQIU",
+        "startSec": 4,
+        "endSec": 34,
+        "channelTitle": "SavageGardenVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "shania-twain-man-i-feel-like-a-woman",
     "displayName": "Man! I Feel Like a Woman! — Shania Twain",
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -10559,11 +12431,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "shania-twain-youre-still-the-one",
+    "displayName": "You’re Still the One — Shania Twain",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Ballads",
+      "Love & Peace"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "KNZH-emehxA",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "ShaniaTwainVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1997 = albumet Come On Over (nov 1997); singeln kom 1998."
+      }
+    ]
+  },
+  {
     "id": "the-verve-bitter-sweet-symphony",
     "displayName": "Bitter Sweet Symphony — The Verve",
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -10591,6 +12497,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1997,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -10624,11 +12531,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ace-of-base-cruel-summer",
+    "displayName": "Cruel Summer — Ace of Base",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "4AxVXHgv0clBuS4dl4S7Gw",
+    "youtubeClips": []
+  },
+  {
     "id": "baby-one-more-time",
     "displayName": "...Baby One More Time — Britney Spears",
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -10656,6 +12588,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10686,6 +12619,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10705,6 +12639,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -10726,11 +12661,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dana-international-diva",
+    "displayName": "Diva — Dana International",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "4No1oClTp_E",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 1998 vinnare — Israel."
+      }
+    ]
+  },
+  {
     "id": "dario-g-carnaval-de-paris",
     "displayName": "Carnaval de Paris — Dario G",
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -10763,6 +12731,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10793,6 +12762,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -10804,7 +12774,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -10823,6 +12794,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10850,6 +12822,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10877,6 +12850,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -10903,6 +12877,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -10934,6 +12909,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -10961,6 +12937,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -10991,6 +12968,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -11010,6 +12988,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -11040,6 +13019,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -11068,6 +13048,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -11098,6 +13079,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1998,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -11128,6 +13110,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -11155,6 +13138,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -11185,6 +13169,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -11211,6 +13196,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -11222,7 +13208,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -11241,6 +13228,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -11271,6 +13259,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -11301,6 +13290,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -11327,6 +13317,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -11349,6 +13340,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -11374,11 +13366,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jennifer-lopez-if-you-had-my-love",
+    "displayName": "If You Had My Love — Jennifer Lopez",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Soft & Ballads"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "lYfkl-HXfuU",
+        "startSec": 30,
+        "endSec": 60,
+        "channelTitle": "JenniferLopezVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "kent-music-non-stop",
     "displayName": "Music Non Stop — Kent",
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -11406,6 +13432,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -11433,6 +13460,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -11455,11 +13483,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "smash-mouth-all-star",
+    "displayName": "All Star — Smash Mouth",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Punk & Rock"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "L_jWHffIx5E",
+        "startSec": 37,
+        "endSec": 67,
+        "channelTitle": "SmashMouthVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1999 = albumet Astro Lounge (MusicBrainz gav felaktigt 1997)."
+      }
+    ]
+  },
+  {
     "id": "the-matrix",
     "displayName": "The Matrix",
     "correctYear": 1999,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 93,
     "audiences": [
       "elder",
       "gen-x",
@@ -11498,6 +13559,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 1999,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -11529,6 +13591,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -11557,6 +13620,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -11584,6 +13648,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -11610,6 +13675,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -11636,6 +13702,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -11673,6 +13740,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -11704,6 +13772,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -11730,6 +13799,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -11761,6 +13831,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -11791,6 +13862,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -11821,6 +13893,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -11832,7 +13905,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -11851,6 +13925,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -11892,6 +13967,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2000,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -11911,6 +13987,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -11932,11 +14009,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "antique-die-for-you",
+    "displayName": "(I Would) Die for You — Antique",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "VVLfuW3KiLY",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Antique",
+        "license": "standard",
+        "notes": "Official music video. ESC 2001 Greece entry (3rd place)."
+      }
+    ]
+  },
+  {
     "id": "destinys-child-bootylicious",
     "displayName": "Bootylicious — Destiny’s Child",
     "correctYear": 2001,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -11967,6 +14077,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -11994,6 +14105,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 91,
     "audiences": [
       "elder",
       "gen-x",
@@ -12032,6 +14144,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -12058,6 +14171,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -12085,6 +14199,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 89,
     "audiences": [
       "elder",
       "gen-x",
@@ -12123,6 +14238,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -12150,6 +14266,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -12177,6 +14294,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -12208,6 +14326,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2001,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -12230,11 +14349,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "tanel-padar-everybody",
+    "displayName": "Everybody — Tanel Padar, Dave Benton & 2XL",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "92TSUlqzFi8",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2001 vinnare — Estland."
+      }
+    ]
+  },
+  {
     "id": "avril-lavigne-complicated",
     "displayName": "Complicated — Avril Lavigne",
     "correctYear": 2002,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -12261,6 +14413,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2002,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -12291,6 +14444,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2002,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -12318,6 +14472,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2002,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -12344,6 +14499,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2002,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -12374,6 +14530,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2002,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -12404,6 +14561,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2003,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -12434,6 +14592,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2003,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -12461,6 +14620,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2003,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -12491,6 +14651,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2003,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -12518,6 +14679,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2003,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -12545,6 +14707,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2003,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -12571,11 +14734,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sertab-erener-everyway-that-i-can",
+    "displayName": "Everyway That I Can — Sertab Erener",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "j0_QrKnqd5E",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2003 vinnare — Turkiet."
+      }
+    ]
+  },
+  {
     "id": "the-killers-mr-brightside",
     "displayName": "Mr. Brightside — The Killers",
     "correctYear": 2003,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -12603,6 +14799,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2003,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -12630,6 +14827,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2003,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -12657,6 +14855,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -12684,6 +14883,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -12712,6 +14912,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -12750,6 +14951,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -12769,6 +14971,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -12778,6 +14981,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -12796,6 +15002,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -12826,6 +15033,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -12867,6 +15075,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -12888,11 +15097,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ruslana-wild-dances",
+    "displayName": "Wild Dances — Ruslana",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "MTLmoV0E_6c",
+        "startSec": 50,
+        "endSec": 65,
+        "channelTitle": "Ruslana",
+        "license": "standard",
+        "notes": "ESC 2004 vinnare — Ukraina. Officiell remastered MV."
+      }
+    ]
+  },
+  {
     "id": "sa-som-i-himmelen",
     "displayName": "Så som i himmelen",
     "correctYear": 2004,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -12930,6 +15172,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -12957,6 +15200,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -12983,6 +15227,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2004,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -13010,6 +15255,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2005,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -13031,11 +15277,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "helena-paparizou-my-number-one",
+    "displayName": "My Number One — Helena Paparizou",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "rcOwvZ26KFQ",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2005 vinnare — Grekland."
+      }
+    ]
+  },
+  {
     "id": "madonna-hung-up",
     "displayName": "Hung Up — Madonna",
     "correctYear": 2005,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -13062,6 +15341,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2005,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -13071,6 +15351,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -13089,6 +15372,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2005,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -13116,6 +15400,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2005,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13146,6 +15431,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2005,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -13173,6 +15459,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2005,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -13203,6 +15490,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13233,6 +15521,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -13242,6 +15531,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -13260,6 +15552,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13290,6 +15583,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -13316,6 +15610,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -13346,6 +15641,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13376,6 +15672,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13406,6 +15703,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -13433,6 +15731,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -13460,6 +15759,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2006,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -13487,6 +15787,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13517,6 +15818,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13542,11 +15844,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "marija-serifovic-molitva",
+    "displayName": "Molitva — Marija Šerifović",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "Kbi08wfT7mA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Marija Šerifović",
+        "license": "standard",
+        "notes": "ESC 2007 vinnare — Serbien. Officiell music video."
+      }
+    ]
+  },
+  {
     "id": "ne-yo-because-of-you",
     "displayName": "Because of You — Ne-Yo",
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13577,6 +15912,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13607,6 +15943,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13637,6 +15974,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -13663,6 +16001,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -13682,6 +16021,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -13691,6 +16031,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -13709,6 +16052,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -13735,6 +16079,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13765,6 +16110,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2007,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13795,6 +16141,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2008,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -13834,6 +16181,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2008,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -13845,7 +16193,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -13864,6 +16213,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2008,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -13890,6 +16240,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2008,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -13917,6 +16268,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2008,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -13944,6 +16296,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2008,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -13970,6 +16323,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2008,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -13989,6 +16343,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2008,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -14016,6 +16371,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2008,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -14038,11 +16394,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rio-shine-on",
+    "displayName": "Shine On — R.I.O.",
+    "correctYear": 2008,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "7yIGRf80h3Kwi4GfwJUiQl",
+    "youtubeClips": [
+      {
+        "videoId": "OhLOOdI23bE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Kontor.TV",
+        "license": "standard",
+        "notes": "Officiell label-kanal. Peter-kurerad 2026-08-11."
+      }
+    ]
+  },
+  {
     "id": "the-dark-knight-2008",
     "displayName": "The Dark Knight",
     "correctYear": 2008,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -14081,6 +16471,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2009,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -14108,6 +16499,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2009,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 93,
     "audiences": [
       "elder",
       "gen-x",
@@ -14146,6 +16538,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2009,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -14181,6 +16574,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2009,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -14208,6 +16602,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2009,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -14230,11 +16625,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "hadise-dum-tek-tek",
+    "displayName": "Dum Tek Tek — Hadise",
+    "correctYear": 2009,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "3Gp3YziRNAbiCDzGV5E6Xm",
+    "youtubeClips": [
+      {
+        "videoId": "TzKgojZqO5Y",
+        "startSec": 50,
+        "endSec": 65,
+        "channelTitle": "Hadise",
+        "license": "standard",
+        "notes": "Official music video. ESC 2009 Turkey entry."
+      }
+    ]
+  },
+  {
     "id": "jay-z-empire-state-of-mind",
     "displayName": "Empire State of Mind — Jay-Z ft. Alicia Keys",
     "correctYear": 2009,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -14263,6 +16692,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2009,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -14293,6 +16723,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2009,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -14319,6 +16750,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2009,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -14330,7 +16762,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -14349,6 +16782,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2009,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -14377,6 +16811,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 89,
     "audiences": [
       "elder",
       "gen-x",
@@ -14404,6 +16839,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -14415,7 +16851,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -14434,6 +16871,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -14461,6 +16899,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -14488,6 +16927,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -14518,6 +16958,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -14544,6 +16985,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -14574,6 +17016,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -14596,11 +17039,77 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "knaan-wavin-flag",
+    "displayName": "Wavin' Flag — K'naan",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "NENQMda7Mbs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "K'NAAN - Topic",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "lena-satellite",
+    "displayName": "Satellite — Lena",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "8QSgNM9yNjo",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2010 vinnare — Tyskland. Officiell music video."
+      }
+    ]
+  },
+  {
     "id": "rihanna-only-girl",
     "displayName": "Only Girl (In the World) — Rihanna",
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -14631,6 +17140,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -14659,6 +17169,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -14681,6 +17192,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -14715,6 +17227,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -14745,6 +17258,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -14783,6 +17297,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2010,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -14813,6 +17328,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -14840,6 +17356,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -14867,6 +17384,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -14892,11 +17410,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "eric-saade-popular",
-    "displayName": "Popular — Eric Saade",
+    "id": "ell-nikki-running-scared",
+    "displayName": "Running Scared — Ell & Nikki",
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -14909,6 +17428,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "3Vk4HYUatv8",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."
+      }
+    ]
+  },
+  {
+    "id": "eric-saade-popular",
+    "displayName": "Popular — Eric Saade",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -14927,6 +17479,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -14954,6 +17507,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -14981,6 +17535,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -15008,6 +17563,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15035,6 +17591,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -15062,6 +17619,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -15089,6 +17647,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15129,6 +17688,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15159,6 +17719,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15189,6 +17750,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2011,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15217,6 +17779,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -15244,6 +17807,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -15272,6 +17836,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15311,6 +17876,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15338,6 +17904,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -15366,6 +17933,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -15406,6 +17974,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -15432,6 +18001,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -15459,6 +18029,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -15487,6 +18058,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2012,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -15514,6 +18086,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -15542,6 +18115,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -15570,6 +18144,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -15596,6 +18171,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -15626,6 +18202,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -15653,6 +18230,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -15690,6 +18268,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15712,6 +18291,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15742,6 +18322,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -15769,6 +18350,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -15796,6 +18378,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15826,6 +18409,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -15835,6 +18419,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -15853,6 +18440,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15880,6 +18468,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2013,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -15908,6 +18497,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2014,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15936,6 +18526,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2014,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15967,6 +18558,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2014,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -15992,11 +18584,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "conchita-wurst-rise-like-a-phoenix",
+    "displayName": "Rise Like a Phoenix — Conchita Wurst",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "ToqNa0rqUtY",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2014 vinnare — Österrike. Officiell music video."
+      }
+    ]
+  },
+  {
     "id": "ed-sheeran-thinking-out-loud",
     "displayName": "Thinking Out Loud — Ed Sheeran",
     "correctYear": 2014,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -16024,6 +18649,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2014,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -16051,6 +18677,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2014,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 89,
     "audiences": [
       "elder",
       "gen-x",
@@ -16078,6 +18705,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2014,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -16105,6 +18733,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2014,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -16114,6 +18743,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -16132,6 +18764,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2014,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16159,6 +18792,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2014,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -16185,6 +18819,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -16211,6 +18846,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -16238,6 +18874,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -16265,6 +18902,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -16292,6 +18930,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -16329,6 +18968,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16351,11 +18991,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mans-zelmerlow-heroes",
+    "displayName": "Heroes — Måns Zelmerlöw",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision",
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "oAQKr5aJJjQ",
+        "startSec": 2,
+        "endSec": 32,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27, ersatte tidigare klipp -nbq6Ur103Q."
+      }
+    ]
+  },
+  {
     "id": "shawn-mendes-i-know-what-you-did-last-summer",
     "displayName": "I Know What You Did Last Summer — Shawn Mendes & Camila Cabello",
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16383,6 +19056,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16410,6 +19084,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 83,
     "audiences": [
       "elder",
       "gen-x",
@@ -16438,6 +19113,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -16464,6 +19140,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2015,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -16491,6 +19168,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "movie",
     "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16518,6 +19196,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16545,6 +19224,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -16572,6 +19252,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -16598,6 +19279,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -16628,6 +19310,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16655,6 +19338,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -16681,6 +19365,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -16708,6 +19393,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16733,11 +19419,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jamala-1944",
+    "displayName": "1944 — Jamala",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "wNECV2h-y58",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Jamala",
+        "license": "standard",
+        "notes": "ESC 2016 vinnare — Ukraina. Officiell music video."
+      }
+    ]
+  },
+  {
     "id": "justin-timberlake-cant-stop-the-feeling",
     "displayName": "Can't Stop the Feeling! — Justin Timberlake",
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -16765,6 +19484,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -16796,6 +19516,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -16823,6 +19544,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16850,6 +19572,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -16877,6 +19600,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -16904,6 +19628,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -16934,6 +19659,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -16961,6 +19687,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -16988,6 +19715,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -17018,6 +19746,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -17048,6 +19777,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2016,
     "contentSubject": "movie",
     "questionText": "What is the name of the main character in this film?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -17085,6 +19815,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "movie",
     "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -17126,6 +19857,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -17153,6 +19885,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -17180,6 +19913,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -17207,6 +19941,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -17217,14 +19952,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Christmas Edition"
+    ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "0tgVpDi06FyKpA1z0VMD4v",
     "youtubeClips": [
       {
         "videoId": "2Vv-BfVoq4g",
-        "startSec": 15,
+        "startSec": 5,
         "endSec": 60,
         "channelTitle": "Ed Sheeran",
-        "license": "standard"
+        "license": "standard",
+        "notes": "Officiell musikvideo (Ed Sheeran-kanalen)."
       }
     ]
   },
@@ -17234,6 +19974,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -17261,6 +20002,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -17280,6 +20022,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -17308,6 +20051,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -17334,6 +20078,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -17360,6 +20105,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -17371,7 +20117,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -17390,6 +20137,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -17417,6 +20165,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -17444,6 +20193,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 75,
     "audiences": [
       "elder",
       "gen-x",
@@ -17471,6 +20221,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2017,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -17501,6 +20252,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2018,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -17531,6 +20283,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2018,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -17550,6 +20303,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2018,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -17572,11 +20326,52 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "drake-gods-plan",
+    "displayName": "God's Plan — Drake",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "hiphop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "xpVfcZ0ZcFM",
+        "startSec": 48,
+        "endSec": 78,
+        "channelTitle": "DrakeVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Officiella musikvideon. startSec 48 angiven av Peter."
+      },
+      {
+        "videoId": "bChS476h-T8",
+        "startSec": 3,
+        "endSec": 33,
+        "channelTitle": "BEST ARTIST ALIVE OVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Lyric video. startSec 3 angiven av Peter."
+      }
+    ]
+  },
+  {
     "id": "emil-forsberg-vs-schweiz-vm-2018",
     "displayName": "Emil Forsbergs mål mot Schweiz åttondelsfinal",
     "correctYear": 2018,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -17599,11 +20394,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "fuego-eleni-foureira",
+    "displayName": "Fuego — Eleni Foureira",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "22ppznuzVF9LKamaaqMMqu",
+    "youtubeClips": []
+  },
+  {
     "id": "lady-gaga-bradley-cooper-shallow",
     "displayName": "Shallow — Lady Gaga & Bradley Cooper",
     "correctYear": 2018,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -17634,11 +20454,53 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lewis-capaldi-someone-you-loved",
+    "displayName": "Someone You Loved — Lewis Capaldi",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Love & Peace",
+      "Soft & Ballads"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "zABLecsR5UE",
+        "startSec": 2,
+        "endSec": 32,
+        "channelTitle": "LewisCapaldiVEVO",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Ersatte Topic-stillbilden pRIZohFFOMo. Officiella musikvideon. startSec 2 angiven av Peter."
+      },
+      {
+        "videoId": "JotQ4LtmkuU",
+        "startSec": 3,
+        "endSec": 33,
+        "channelTitle": "7clouds",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Ersatte Topic-stillbilden pRIZohFFOMo. Lyrics-version. startSec 3 angiven av Peter."
+      }
+    ]
+  },
+  {
     "id": "lil-nas-x-old-town-road",
     "displayName": "Old Town Road — Lil Nas X",
     "correctYear": 2018,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -17665,6 +20527,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2018,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -17683,11 +20546,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "netta-toy",
+    "displayName": "Toy — Netta",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "CziHrYYSyPc",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2018 vinnare — Israel. Officiell music video."
+      }
+    ]
+  },
+  {
     "id": "arvingarna-i-do",
     "displayName": "I Do — Arvingarna",
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -17716,6 +20612,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -17742,6 +20639,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -17773,6 +20671,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -17795,11 +20694,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "duncan-laurence-arcade",
+    "displayName": "Arcade — Duncan Laurence",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "Eztx7Wr8PtE",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2019 vinnare — Nederländerna. Officiell music video."
+      }
+    ]
+  },
+  {
     "id": "harry-styles-watermelon-sugar",
     "displayName": "Watermelon Sugar — Harry Styles",
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -17826,6 +20758,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -17837,7 +20770,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -17856,6 +20790,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -17886,6 +20821,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -17914,6 +20850,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -17941,6 +20878,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -17971,6 +20909,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -18002,6 +20941,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -18029,6 +20969,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2019,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 95,
     "audiences": [
       "elder",
       "gen-x",
@@ -18057,6 +20998,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18087,6 +21029,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -18113,6 +21056,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -18124,7 +21068,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Melodifestivalen"
     ],
     "spotifyTrackId": "4RcEx6TvICENelSh3O7gvu",
     "youtubeClips": []
@@ -18135,6 +21079,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18165,6 +21110,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -18192,6 +21138,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18222,6 +21169,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -18249,6 +21197,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -18268,6 +21217,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18295,6 +21245,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2020,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -18322,11 +21273,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "anis-don-demina-flaggan-i-topp",
+    "displayName": "Flaggan i topp — Anis Don Demina",
+    "correctYear": 2021,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "7w2sCUWVAop5sTmikAdhCD",
+    "youtubeClips": [
+      {
+        "videoId": "ajZxDhowQ8g",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Anis Don Demina",
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "bono-we-are-the-people",
     "displayName": "We Are the People — Martin Garrix ft. Bono & The Edge",
     "correctYear": 2021,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18345,11 +21330,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "el-diablo-elena-tsagkrinou",
+    "displayName": "El Diablo — Elena Tsagkrinou",
+    "correctYear": 2021,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "4TAttqXwjj56xZQVKvlX0K",
+    "youtubeClips": [
+      {
+        "videoId": "ZHeydRCBPNs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Elena Tsagkrinou",
+        "license": "standard",
+        "notes": "Official music video. ESC 2021 Cyprus entry."
+      }
+    ]
+  },
+  {
     "id": "kid-laroi-justin-bieber-stay",
     "displayName": "Stay — The Kid LAROI & Justin Bieber",
     "correctYear": 2021,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -18371,11 +21390,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "maneskin-zitti-e-buoni",
+    "displayName": "Zitti e buoni — Måneskin",
+    "correctYear": 2021,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "RVH5dn1cxAQ",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2021 vinnare — Italien."
+      }
+    ]
+  },
+  {
     "id": "olivia-rodrigo-drivers-license",
     "displayName": "Drivers License — Olivia Rodrigo",
     "correctYear": 2021,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -18402,6 +21454,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2021,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
     "audiences": [
       "elder",
       "gen-x",
@@ -18429,6 +21482,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2021,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18456,6 +21510,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2021,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -18467,7 +21522,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -18486,6 +21542,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2022,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -18513,6 +21570,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2022,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
     "audiences": [
       "elder",
       "gen-x",
@@ -18524,7 +21582,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -18543,6 +21602,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2022,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18573,6 +21633,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2022,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -18594,11 +21655,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "kalush-orchestra-stefania",
+    "displayName": "Stefania — Kalush Orchestra",
+    "correctYear": 2022,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "UiEGVYOruLk",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2022 vinnare — Ukraina. Officiell music video."
+      }
+    ]
+  },
+  {
     "id": "lucianoz-det-ar-ju-dej",
     "displayName": "Det är ju dej jag går och väntar på — Lucianoz",
     "correctYear": 2022,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
     "audiences": [
       "elder",
       "gen-x",
@@ -18627,6 +21721,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2022,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18657,6 +21752,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2022,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -18684,6 +21780,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2023,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
     "audiences": [
       "elder",
       "gen-x",
@@ -18710,6 +21807,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2023,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18740,6 +21838,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2023,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -18751,7 +21850,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "spotifyTrackId": "1DmW5Ep6ywYwxc2HMT5BG6",
     "youtubeClips": [
@@ -18771,6 +21871,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2023,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 92,
     "audiences": [
       "elder",
       "gen-x",
@@ -18797,6 +21898,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2024,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18824,6 +21926,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2024,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18851,6 +21954,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2024,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -18878,6 +21982,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2024,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -18903,11 +22008,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "europapa-joost-klein",
+    "displayName": "Europapa — Joost Klein",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "0uHrMbMv3c78398pIANDqR",
+    "youtubeClips": []
+  },
+  {
     "id": "lady-gaga-bruno-mars-die-with-a-smile",
     "displayName": "Die With a Smile — Lady Gaga & Bruno Mars",
     "correctYear": 2024,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -18935,6 +22065,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2024,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
     "audiences": [
       "elder",
       "gen-x",
@@ -18944,6 +22075,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -18962,6 +22096,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2024,
     "contentSubject": "sport-event",
     "questionText": "Which Year did this happen?",
+    "itemHcp": 72,
     "audiences": [
       "elder",
       "gen-x",
@@ -18984,11 +22119,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "nemo-the-code",
+    "displayName": "The Code — Nemo",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "kiGDvM14Kwg",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2024 vinnare — Schweiz. Officiell music video."
+      }
+    ]
+  },
+  {
     "id": "rose-bruno-mars-apt",
     "displayName": "APT. — ROSÉ & Bruno Mars",
     "correctYear": 2024,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
     "audiences": [
       "elder",
       "gen-x",
@@ -19016,6 +22184,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2024,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
     "audiences": [
       "elder",
       "gen-x",
@@ -19042,6 +22211,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2025,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -19069,6 +22239,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2025,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -19091,11 +22262,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "kaj-bara-bada-bastu",
-    "displayName": "Bara bada bastu — KAJ",
+    "id": "jj-wasted-love",
+    "displayName": "Wasted Love — JJ",
     "correctYear": 2025,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -19108,6 +22280,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "-ieSTNpxvio",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2025 vinnare — Österrike. Officiell music video."
+      }
+    ]
+  },
+  {
+    "id": "kaj-bara-bada-bastu",
+    "displayName": "Bara bada bastu — KAJ",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -19126,6 +22331,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2025,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -19153,6 +22359,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2025,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -19183,6 +22390,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2025,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -19210,6 +22418,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2026,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
     "audiences": [
       "elder",
       "gen-x",
@@ -19236,11 +22445,69 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "brandsta-all-in-for-sverige",
+    "displayName": "All in för Sverige — Brandsta",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "3AGFGLUAhu0Cwv1Mkea3d4",
+    "youtubeClips": []
+  },
+  {
+    "id": "dara-bangaranga",
+    "displayName": "Bangaranga — DARA",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Eurovision"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "J3oGYo_mekw",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Eurovision Song Contest",
+        "license": "standard",
+        "notes": "ESC 2026 vinnare — Bulgarien. Officiell music video."
+      }
+    ]
+  },
+  {
     "id": "edivibz-gul-och-bla",
     "displayName": "Gul och blå — Edivibz",
     "correctYear": 2026,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
     "audiences": [
       "elder",
       "gen-x",
@@ -19272,6 +22539,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2026,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",
@@ -19283,7 +22551,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Eurovision",
+      "Melodifestivalen"
     ],
     "youtubeClips": [
       {
@@ -19302,6 +22571,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2026,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
     "audiences": [
       "elder",
       "gen-x",
@@ -19329,6 +22599,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "correctYear": 2026,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
     "audiences": [
       "elder",
       "gen-x",

@@ -490,7 +490,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Måns Zelmerlöw Heroes Eurovision 2015"]
     answerMethods: ["timeline"]
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
     youtubeClips:
       - videoId: "oAQKr5aJJjQ"
         startSec: 2
@@ -518,10 +518,13 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "2Vv-BfVoq4g"
-        startSec: 15
+        startSec: 5
         endSec: 60
         channelTitle: "Ed Sheeran"
+        notes: "Officiell musikvideo (Ed Sheeran-kanalen)."
     spotifyTrackId: "0tgVpDi06FyKpA1z0VMD4v"
+    genrePackages: ["Christmas Edition"]
+    inBaseCatalog: false
   - id: dua-lipa-dont-start-now
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don't Start Now — Dua Lipa"
@@ -624,6 +627,7 @@ items:
         endSec: 38
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2013 vinnare. ESC 2013 performance."
+    genrePackages: ["Melodifestivalen"]
   - id: sanna-nielsen-undo
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Undo — Sanna Nielsen"
@@ -637,6 +641,7 @@ items:
         endSec: 45
         channelTitle: "Sanna Nielsen"
         notes: "Melodifestivalen 2014 vinnare. Officiell music video."
+    genrePackages: ["Melodifestivalen"]
   - id: frans-if-i-were-sorry
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "If I Were Sorry — Frans"
@@ -663,7 +668,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2017 vinnare. ESC 2017 official music video."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: john-lundvik-too-late-for-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Too Late for Love — John Lundvik"
@@ -677,7 +682,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2019 vinnare. ESC 2019 official video."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: the-mamas-move
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Move — The Mamas"
@@ -706,7 +711,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2021 vinnare. ESC 2021 official video."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: cornelia-jakobs-hold-me-closer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hold Me Closer — Cornelia Jakobs"
@@ -720,7 +725,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2022 vinnare. ESC 2022 official music video."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: loreen-tattoo
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tattoo — Loreen"
@@ -735,7 +740,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2023 vinnare, ESC-vinnare 2023. ESC 2023 official music video."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: marcus-martinus-unforgettable
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Unforgettable — Marcus & Martinus"
@@ -749,6 +754,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2024 vinnare. ESC 2024 official music video."
+    genrePackages: ["Melodifestivalen"]
   - id: kaj-bara-bada-bastu
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bara bada bastu — KAJ"
@@ -762,7 +768,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2025 vinnare. ESC 2025 official music video."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: felicia-my-system
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My System — Felicia"
@@ -776,7 +782,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2026 vinnare. ESC 2026 official music video."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   # ===== Eurovision Song Contest vinnare =====
   - id: emmelie-de-forest-only-teardrops
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1003,7 +1009,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Dotter Bulletproof Melodifestivalen 2020 Swedish"]
     answerMethods: ["timeline"]
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Melodifestivalen"]
     spotifyTrackId: "4RcEx6TvICENelSh3O7gvu"
   - id: el-diablo-elena-tsagkrinou
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]

@@ -91,7 +91,17 @@ export function finalizeRows(
     });
 }
 
-export function LeaderboardTable({ entries }: { entries: LeaderboardRow[] }) {
+export function LeaderboardTable({
+  entries,
+  hcpChanges,
+}: {
+  entries: LeaderboardRow[];
+  // §5 — nytt HCP + förändring från matchens start per spelare, t.ex.
+  // "HCP 42 (-1)". Bara rader som finns i mappen får en HCP-rad (i dag
+  // den lokala spelaren; andra spelares HCP kräver cross-device-sync).
+  // Utelämnad (Aggregate-vyn) → ingen HCP-rad.
+  hcpChanges?: Record<string, { before: number; after: number }>;
+}) {
   return (
         <View style={styles.lbTable}>
         {/* Vänster fixed kolumn: Position + Namn */}
@@ -104,6 +114,9 @@ export function LeaderboardTable({ entries }: { entries: LeaderboardRow[] }) {
               entry.assistance ? ASSISTANCE_LABEL[entry.assistance] : null,
               typeof entry.age === 'number' ? `Age ${entry.age}` : null,
             ].filter(Boolean).join(' · ');
+            // §5 — HCP + förändring (after − before). Negativ = bättre.
+            const hcp = hcpChanges?.[entry.playerId];
+            const hcpDelta = hcp ? hcp.after - hcp.before : 0;
             return (
               <View
                 key={entry.playerId}
@@ -125,6 +138,12 @@ export function LeaderboardTable({ entries }: { entries: LeaderboardRow[] }) {
                   {meta.length > 0 && (
                     <Text style={styles.lbNameMeta} numberOfLines={1}>
                       {meta}
+                    </Text>
+                  )}
+                  {hcp && (
+                    <Text style={styles.lbNameHcp} numberOfLines={1}>
+                      HCP {hcp.after}
+                      {hcpDelta !== 0 ? ` (${hcpDelta > 0 ? '+' : ''}${hcpDelta})` : ''}
                     </Text>
                   )}
                 </View>
@@ -310,6 +329,15 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.medium,
     color: Colors.textSecondary,
     letterSpacing: 0,
+  },
+  // §5 — HCP-raden i Player-kolumnen ("HCP 42 (-1)"). Blå + halvfet så den
+  // sticker ut lite mer än den grå meta-raden ovanför.
+  lbNameHcp: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: Colors.primary,
+    letterSpacing: 0,
+    marginTop: 1,
   },
   lbMidScroll: {
     flex: 1,

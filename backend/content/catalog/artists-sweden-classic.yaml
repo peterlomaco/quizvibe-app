@@ -53,7 +53,7 @@ items:
     correctYear: 1974
     probability: 65
     region: ["sweden"]
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
     wikimediaSearchHints: ["Charlotte Nilsson"]
     answerMethods: ["name-letters"]
   - id: gunther
@@ -96,7 +96,7 @@ items:
     correctYear: 1951
     probability: 65
     region: ["sweden"]
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
     wikimediaSearchHints: ["Roger Pontare"]
     answerMethods: ["name-letters"]
   - id: thomas-di-leva

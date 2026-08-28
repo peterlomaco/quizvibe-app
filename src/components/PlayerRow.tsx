@@ -6,6 +6,7 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
 import { Avatar } from './Avatar';
+import { HCPShield } from './HCPShield';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { WifiFanIcon } from './WifiFanIcon';
 
@@ -69,6 +70,12 @@ interface PlayerRowProps {
   // Visa Spotify-attest-badgen? Default true. 1vs1- OCH single player-lobbyn
   // skickar false — inget av lägena kan servera Spotify-frågor.
   showSpotifyBadge?: boolean;
+  // Player-HCP-sköld (§2 UI) bredvid avataren. `hcp` = talet som visas
+  // (1–99, lågt = bättre). `hcpNotDefined` → gäst-sköld med "Not Defined"-
+  // vattenstämpel (gästen har ett riktigt internt HCP men det visas inte).
+  // Utelämnas båda → ingen sköld renderas (t.ex. spelare utan age/assistance).
+  hcp?: number;
+  hcpNotDefined?: boolean;
 }
 
 export function PlayerRow({
@@ -94,6 +101,8 @@ export function PlayerRow({
   peerHealth,
   spotifyConnected,
   showSpotifyBadge = true,
+  hcp,
+  hcpNotDefined,
 }: PlayerRowProps) {
   // "Details +/-"-toggle per spelarkort — gömmer Assistance + Age-pillarna
   // tills man fäller ut. Default hopfällt (Details +).
@@ -179,6 +188,14 @@ export function PlayerRow({
             useBrandFallback={!isGuest}
           />
         </View>
+
+        {/* Player-HCP-sköld bredvid avataren (§2 UI). Döljs för left-spelare
+            (kortet är då nedtonat/"borta"). Gäst → "Not Defined"-vattenstämpel. */}
+        {!hasLeft && (hcpNotDefined || hcp !== undefined) && (
+          <View style={styles.hcpShieldWrap}>
+            <HCPShield hcp={hcp ?? 99} size={40} notDefined={hcpNotDefined} />
+          </View>
+        )}
 
         <View style={styles.info}>
           <View style={styles.nameRow}>
@@ -470,6 +487,13 @@ const styles = StyleSheet.create({
   // avatar-layout.
   avatarWrap: {
     position: 'relative',
+  },
+  // HCP-sköld bredvid avataren — vertikalt centrerad i övre raden.
+  hcpShieldWrap: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: Spacing.sm,
+    marginRight: Spacing.xs,
   },
   // Avatar-wrapper när spelaren har left: dimmas via opacity så själva
   // emoji/foto kvarstår men signalerar nedprioritet.

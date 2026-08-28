@@ -36,6 +36,9 @@ export interface SavedAggregateSummary {
 export interface SavedAggregate {
   id: string;
   name: string;
+  /** Skaparen = competitionens host (0037). Bara created_by kan initiera en
+   *  re-match från Home (0041). */
+  createdBy: string;
   participants: { userId: string; playerName: string }[];
   games: AggregateSeriesGame[];
 }
@@ -43,6 +46,7 @@ export interface SavedAggregate {
 interface LeaderboardRow {
   id: string;
   name: string;
+  created_by: string;
   aggregate_leaderboard_players?: { user_id: string; player_name: string }[];
   aggregate_leaderboard_games?: { room_code: string; stats: AggregateGamePlayer[] }[];
 }
@@ -54,6 +58,7 @@ function rowToSaved(row: LeaderboardRow): SavedAggregate {
   return {
     id: row.id,
     name: row.name,
+    createdBy: row.created_by,
     participants: (row.aggregate_leaderboard_players ?? []).map((p) => ({
       userId: p.user_id,
       playerName: p.player_name,

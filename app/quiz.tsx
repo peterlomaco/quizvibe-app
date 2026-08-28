@@ -8,7 +8,6 @@ import { MediaPlayer } from '@/src/components/MediaPlayer';
 import {
   generateOpponentRoundScore,
   generateOpponentTimeUsed,
-  MOCK_OPPONENT_HCP_BEFORE,
   MOCK_OPPONENTS,
   RoundLeaderboard,
   type HcpChange,
@@ -21,7 +20,7 @@ import FinalCelebration from '@/src/components/FinalCelebration';
 import { RemoteMatchResultPanel } from '@/src/components/RemoteMatchResultPanel';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
-import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload, type QuestionAdvancePayload } from '@/src/lib/realtime/syncChannel';
+import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload, type PlayerHcpChangedPayload, type QuestionAdvancePayload } from '@/src/lib/realtime/syncChannel';
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
@@ -47,6 +46,8 @@ import {
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { appendGameHistoryEntry, saveLatestResult, type GameResult, type HistoryEntry, type RoundResult } from '@/src/utils/gameResults';
+import { recordGameResultForName, recordSelfGameResult } from '@/src/utils/hcpProgress';
+import { filterByItemHcp, HCP_START } from '@/src/utils/hcpEngine';
 import {
   finalizePlayer,
   forfeitRemoteMatch,
@@ -84,10 +85,11 @@ import {
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
-import { isMainCategory, subjectToMainCategory, itemMatchesEnabledCategories, type MainCategory } from '@/src/utils/mainCategory';
+import { isMainCategory, subjectToMainCategory, itemMatchesEnabledCategories, MAIN_CATEGORIES, type MainCategory } from '@/src/utils/mainCategory';
 import { buildMatchHighlights } from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
+import { resolveActivePackageTags, itemInActivePackages, computePackageCoverage } from '@/src/utils/hostPackages';
 import {
   computeDJRotationPlan,
   getDJForQuestionIndex,
@@ -180,12 +182,21 @@ interface TimelineQuestion {
    *  crossover-filter: sport-musik (subject=song → mainCategory='Music') surfar
    *  ÄVEN under Sport-toggeln. Se itemMatchesEnabledCategories. */
   genrePackages?: readonly string[];
+  /** false = paket-exklusiv (spelas bara när matchande Host-paket aktivt).
+   *  Utelämnat = default true = med i baspoolen. Driver tema-pool-filtret. */
+  inBaseCatalog?: boolean;
   // Pre-curerade YouTube-klipp för frågan. Optional — items utan klipp
   // renderar `NoSourcePlayer`-placeholder via pickMediaSource.
   youtubeClips?: YoutubeClip[];
   /** Spotify track ID — satt när frågan är en Spotify DJ-kandidat.
    *  Driver isSpotifyQuestion + djRotationPlan i quiz-screen:en. */
   spotifyTrackId?: string;
+  /** Parent control-tagg. true = filtreras bort ur frågeurvalet när host har
+   *  Parent Control påslaget (se inEraMusic-filtret). */
+  parentControlled?: boolean;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Driver HCP-frågefiltret
+   *  (item valbart om itemHcp >= spelarens HCP, relaxas om poolen blir tunn). */
+  itemHcp: number;
 }
 
 interface ImageQuestion {
@@ -220,6 +231,8 @@ interface ImageQuestion {
   hints?: HintLibrary;
   /** Profession-etikett härledd från contentSubject ('Actor' | 'Artist' | 'Athlete' | 'Band'). */
   profession?: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Se TimelineQuestion. */
+  itemHcp: number;
 }
 
 interface ActorSelectQuestion {
@@ -241,7 +254,13 @@ interface ActorSelectQuestion {
   /** Filmens releasår — används för era-filtrering (inte för scoring). */
   correctYear?: number;
   genrePackages?: readonly string[];
+  /** false = paket-exklusiv (spelas bara när matchande Host-paket aktivt). */
+  inBaseCatalog?: boolean;
   youtubeClips?: YoutubeClip[];
+  /** Parent control-tagg. true = filtreras bort när host har Parent Control på. */
+  parentControlled?: boolean;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Se TimelineQuestion. */
+  itemHcp: number;
 }
 
 type QuizQuestion = TimelineQuestion | ImageQuestion | ActorSelectQuestion;
@@ -278,7 +297,10 @@ const SEED_QUESTIONS: (TimelineQuestion | ActorSelectQuestion)[] = MUSIC_QUESTIO
       distractorNames: q.distractorNames ?? [],
       correctYear: q.correctYear,
       genrePackages: q.genrePackages,
+      inBaseCatalog: q.inBaseCatalog,
       youtubeClips: q.youtubeClips,
+      parentControlled: q.parentControlled,
+      itemHcp: q.itemHcp,
     };
     return actorQ;
   }
@@ -293,8 +315,11 @@ const SEED_QUESTIONS: (TimelineQuestion | ActorSelectQuestion)[] = MUSIC_QUESTIO
     correctYear: q.correctYear!,
     hint: q.displayName,
     genrePackages: q.genrePackages,
+    inBaseCatalog: q.inBaseCatalog,
     youtubeClips: q.youtubeClips,
     spotifyTrackId: q.spotifyTrackId,
+    parentControlled: q.parentControlled,
+    itemHcp: q.itemHcp,
   };
   return tq;
 });
@@ -338,6 +363,7 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
     source: q,
     hints: HINTS_LIBRARY[q.id],
     profession: professionFromSubject(q.contentSubject),
+    itemHcp: q.itemHcp,
   }),
 );
 
@@ -1152,6 +1178,9 @@ export default function QuizScreen() {
      *  (enforced av Lobby/Profile-validering). */
     spotifyAnswerYear?: string;
     spotifyAnswerName?: string;
+    /** 'true' om host har Parent Control påslaget — YT-items taggade
+     *  parentControlled filtreras då bort ur frågeurvalet. Default 'false'. */
+    parentControlEnabled?: string;
     /** 'true' om spelets host är en guest (lobbyn skapad via "Start Game as
      *  Guest"). Sätts på ALLA enheter (host-path + non-host-path) — döljer
      *  Play Again på final leaderboard och skippar Player history-skrivning. */
@@ -1239,6 +1268,9 @@ export default function QuizScreen() {
     gameMode === 'individual-devices';
   const spotifyAnswerYear = (params.spotifyAnswerYear ?? 'true') === 'true';
   const spotifyAnswerName = (params.spotifyAnswerName ?? 'true') === 'true';
+  // Parent Control — host:ens val (Profile/Lobby-switch). När på filtreras
+  // YT-items taggade parentControlled bort ur frågeurvalet (se inEraMusic).
+  const parentControlEnabled = (params.parentControlEnabled ?? 'false') === 'true';
 
   // Deterministisk svarstyp per Spotify-fråga baserat på Spotify-frågens ordinalposition.
   // Båda aktiva → alternerande per "Spotify-runda" = turnOrder.length Spotify-frågor.
@@ -1585,15 +1617,48 @@ export default function QuizScreen() {
     // Audience-set byggs en gång och delas mellan båda pools.
     const audienceSet = buildAudienceSet(turnOrder);
 
+    // ── Host-paket (tema-only) ─────────────────────────────────────────
+    // Aktivt paket → musikpoolen restrikteras till paketets taggar (inkluderar
+    // både inBaseCatalog true/false tema-items, utesluter all icke-tema-musik).
+    // Inget paket → exkludera paket-exklusiva (inBaseCatalog===false) items ur
+    // baspoolen (oförändrat beteende). Image/Hints-poolen bär inga paket-taggar
+    // (image-exporten emitterar dem inte), så när ett Music-paket är aktivt
+    // exkluderas hela image-poolen (tema-only) — Lobby gråar redan ut Hints.
+    // eraFrom/eraTo levereras redan som paketets span från Lobby (era-lås).
+    const activePackageTags = resolveActivePackageTags(selectedExtraPackages);
+    const packageActive = activePackageTags.size > 0;
+    const packagedMusic = SEED_QUESTIONS.filter((q) =>
+      packageActive
+        ? itemInActivePackages(q.genrePackages, activePackageTags)
+        : q.inBaseCatalog !== false,
+    );
+    const packagedImages: ImageQuestion[] = packageActive ? [] : IMAGE_SEED_QUESTIONS;
+    // Effektiva YouTube-kategorier: host:s toggles ∩ paketens täckning. När paket
+    // är aktivt begränsar detta kategori-filtret till de kolumner paketet har
+    // material i (host kan fortfarande välja bort en täckt kolumn). Utan paket =
+    // host:s val orört. Tema-filtret ovan har redan restrikterat innehållet.
+    const effectiveYoutubeCategories = packageActive
+      ? (() => {
+          const cov = computePackageCoverage(selectedExtraPackages);
+          const covered = MAIN_CATEGORIES.filter((mc) => cov[mc].youtube);
+          return youtubeEnabledCategories.filter((c) => covered.includes(c));
+        })()
+      : youtubeEnabledCategories;
+
     // ── Music-pool ────────────────────────────────────────────────────
     // Era HÅRD: filtrera SEED_QUESTIONS på correctYear ∈ [eraFrom, eraTo].
     // Bygg music-pool när YT är aktivt ELLER Spotify är aktivt — Spotify DJ
     // är en separat toggle och ska fungera även när youtubeEnabledCategories=[].
     const inEraMusic = (youtubeEnabled || spotifyEnabled)
-      ? SEED_QUESTIONS.filter(
-          (q) => q.correctYear !== undefined
-            ? q.correctYear >= eraFrom && q.correctYear <= eraTo
-            : true,
+      ? packagedMusic.filter(
+          (q) =>
+            // Parent Control: host har slagit på filtret → items taggade
+            // parentControlled sorteras bort ur HELA YT-urvalet (både pure-
+            // YouTube- och Spotify-poolen härleds från denna array).
+            (!parentControlEnabled || !q.parentControlled) &&
+            (q.correctYear !== undefined
+              ? q.correctYear >= eraFrom && q.correctYear <= eraTo
+              : true),
         )
       : [];
     // Audience MJUK: filtrera era-träffarna ytterligare. MUSIC_QUESTIONS har
@@ -1623,7 +1688,7 @@ export default function QuizScreen() {
       'artist', 'band', 'actor', 'character', 'athlete', 'celebrity', 'cultural-person',
     ]);
     const inEraImages = imagesEnabled
-      ? IMAGE_SEED_QUESTIONS.filter((q) => {
+      ? packagedImages.filter((q) => {
           if (q.peakFrom !== undefined && q.peakTo !== undefined) {
             // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
             return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
@@ -1657,16 +1722,32 @@ export default function QuizScreen() {
     //   Personbilder (artist/band/actor/athlete — non-null mainCategory) är
     //   juridiskt parkerade och aldrig inkluderade oavsett toggles.
     const isAllYoutubeCats =
-      youtubeEnabledCategories.length === 3 &&
-      youtubeEnabledCategories.includes('Music') &&
-      youtubeEnabledCategories.includes('Film') &&
-      youtubeEnabledCategories.includes('Sport');
+      effectiveYoutubeCategories.length === 3 &&
+      effectiveYoutubeCategories.includes('Music') &&
+      effectiveYoutubeCategories.includes('Film') &&
+      effectiveYoutubeCategories.includes('Sport');
+    // ── §4.1 HCP-frågefilter ────────────────────────────────────────────
+    // Spelaren får items vars Item-HCP (= probability) >= sitt HCP, relaxat
+    // nedåt om poolen blir för tunn (se filterByItemHcp). Gäller BARA Single
+    // Player + Pass-the-Phone (individanpassat per §4.1). IndDev delar host:s
+    // identiska sekvens (ej individanpassad); remote (server-sekvens) + guest-
+    // hostade spel (anonyma, grundar inget HCP) filtreras inte. Filtret läser
+    // DENNA enhets spelar-HCP ur profil-spegeln.
+    const applyHcp =
+      gameMode !== 'individual-devices' && !isRemote && !isGuestHostGame;
+    const playerHcpForFilter = getCachedProfile()?.hcp ?? HCP_START;
+    // Tuning-knopp: hur många items en pool minst måste behålla innan HCP-
+    // golvet relaxas. Högre = mildare filter + mer variation över spel; lägre
+    // = hårdare svårighetsstyrning men tunnare pool (fler reprisrisk).
+    const HCP_FILTER_MIN_POOL = 30;
+    const applyItemHcp = (pool: QuizQuestion[]): QuizQuestion[] =>
+      applyHcp ? filterByItemHcp(pool, playerHcpForFilter, HCP_FILTER_MIN_POOL) : pool;
     const youtubePool = isAllYoutubeCats
       ? youtubePoolPreCategory
       : youtubePoolPreCategory.filter((q) =>
           itemMatchesEnabledCategories(
             q.mainCategory,
-            youtubeEnabledCategories,
+            effectiveYoutubeCategories,
             q.type === 'timeline' ? q.genrePackages : undefined,
           ),
         );
@@ -1678,24 +1759,24 @@ export default function QuizScreen() {
       imagesEnabledCategories.includes('Music') &&
       imagesEnabledCategories.includes('Film') &&
       imagesEnabledCategories.includes('Sport');
-    const imagePool: QuizQuestion[] = isAllImageCats
+    const imagePool: QuizQuestion[] = applyItemHcp(isAllImageCats
       ? imagePoolPreCategory
       : imagePoolPreCategory.filter((q) => {
           const mc = q.mainCategory;
           return isAllImageCats ? true : mc !== null && imagesEnabledCategories.includes(mc);
-        });
+        }));
 
     // ── Spotify-pool (separat tredje pool) ──────────────────────────────
     // Byggs från pre-category-poolen (youtubePoolPreCategory) för att vara
     // oberoende av youtubeEnabledCategories — Spotify DJ ska fungera även
     // när YT Music är avstängt (youtubeEnabledCategories=[] eller Music saknas).
-    const spotifyPool: QuizQuestion[] = spotifyEnabled
+    const spotifyPool: QuizQuestion[] = applyItemHcp(spotifyEnabled
       ? youtubePoolPreCategory.filter((q) => q.type === 'timeline' && q.spotifyTrackId)
-      : [];
+      : []);
     // Ren YouTube-pool: category-filtrad pool minus Spotify-items.
     // När Spotify är AV: filtrera bort Spotify-only items (har spotifyTrackId men
     // tomma youtubeClips) — de kan inte spelas utan Spotify-appen.
-    const pureYoutubePool: QuizQuestion[] = spotifyEnabled
+    const pureYoutubePool: QuizQuestion[] = applyItemHcp(spotifyEnabled
       ? youtubePool.filter((q) => !(q.type === 'timeline' && q.spotifyTrackId))
       : youtubePool.filter(
           (q) =>
@@ -1704,7 +1785,7 @@ export default function QuizScreen() {
               q.spotifyTrackId &&
               (!q.youtubeClips || q.youtubeClips.length === 0)
             ),
-        );
+        ));
 
     const playerCount = Math.max(1, turnOrder.length);
     const hasSpotify = spotifyPool.length > 0;
@@ -2042,7 +2123,7 @@ export default function QuizScreen() {
       return shuffleArray(SEED_QUESTIONS);
     }
     return mixed;
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt, parentControlEnabled, selectedExtraPackages]);
 
   // Det FAKTISKA antalet frågor: aldrig fler än poolen faktiskt levererade.
   //
@@ -2557,6 +2638,16 @@ export default function QuizScreen() {
   const [phase, setPhase] = useState<'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard'>(
     turnOrder.length > 0 ? 'intro' : 'question',
   );
+  // Ambient-slingan från lobbyn tonas ut vid navigationen till quiz. Peter vill
+  // ha ~5 s tystnad i Get Ready-vyn innan slingan tas upp igen (2026-08-28).
+  // Sätts EN gång vid quiz-mount, så efterföljande intro-vyer mellan rundor
+  // spelar direkt (flaggan är då redan true). MorseAmbientSound skapar ingen
+  // AudioContext så länge active=false, så de 5 sekunderna är helt tysta.
+  const [ambientReady, setAmbientReady] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setAmbientReady(true), 5000);
+    return () => clearTimeout(t);
+  }, []);
   // Synkron mirror av phase-state. Uppdateras vid varje render (ingen delay).
   // Används av confirm-handlers för att undvika stale-closure-race mot
   // useEffect([timeLeft]) — om setPhase('awaiting') anropats men React inte
@@ -3025,11 +3116,21 @@ export default function QuizScreen() {
         byPlayer.set(s.playerId, s);
       });
     });
-    if (byPlayer.size === 0) return null;
+    // DJ:n på en Spotify-fråga svarar aldrig och registrerar därför ingen
+    // RoundScore — visas i en egen "DJ"-sektion i stället för under Wrong.
+    // Slås upp i turnOrder på effectiveDJId så vi får full spelardata
+    // (avatarUri). Explicit skip nedan är belt-and-suspenders mot en
+    // ev. stale/legacy score som ändå råkat attribueras till DJ:n.
+    const dj: TurnOrderPlayer | null =
+      isSpotifyQuestion && effectiveDJId
+        ? (turnOrder.find((p) => p.id === effectiveDJId && !leftPlayerIds.has(p.id)) ?? null)
+        : null;
+    if (byPlayer.size === 0 && !dj) return null;
     const correct: { player: TurnOrderPlayer; score: RoundScore }[] = [];
     const wrong: { player: TurnOrderPlayer; score: RoundScore }[] = [];
     turnOrder.forEach((p) => {
       if (leftPlayerIds.has(p.id)) return;
+      if (dj && p.id === dj.id) return; // DJ visas i egen sektion, aldrig under Wrong
       const score = byPlayer.get(p.id);
       if (!score) return;
       (score.correct ? correct : wrong).push({ player: p, score });
@@ -3038,9 +3139,9 @@ export default function QuizScreen() {
     // leaderboardens avg-kolumn använder.
     correct.sort((a, b) => a.score.timeUsed - b.score.timeUsed);
     wrong.sort((a, b) => a.score.timeUsed - b.score.timeUsed);
-    if (correct.length === 0 && wrong.length === 0) return null;
-    return { correct, wrong };
-  }, [gameMode, turnOrder, allRoundScoresHistory, questionIndex, leftPlayerIds]);
+    if (correct.length === 0 && wrong.length === 0 && !dj) return null;
+    return { correct, wrong, dj };
+  }, [gameMode, turnOrder, allRoundScoresHistory, questionIndex, leftPlayerIds, isSpotifyQuestion, effectiveDJId]);
 
   const timerRef = useRef<any>(null);
   // pulseAnim driver opacity:n på timer-progress-baren när tiden
@@ -3231,6 +3332,8 @@ export default function QuizScreen() {
           // ImageQuizQuestion kräver fältet. 'global' = neutralt/bredast.
           region: ['global'],
           questionText: '',
+          // Distraktor-källa, filtreras aldrig av HCP — 100 = neutral default.
+          itemHcp: 100,
         },
         type: cand.meta.type,
         country: cand.meta.country,
@@ -3276,6 +3379,8 @@ export default function QuizScreen() {
       // region-filtret, men fältet krävs av typen.
       region: ['global'],
       questionText: '',
+      // Syntetiskt item, filtreras aldrig av HCP — 100 = neutral default.
+      itemHcp: 100,
     };
     const variant = buildImageVariant(
       syntheticItem,
@@ -3429,6 +3534,16 @@ export default function QuizScreen() {
       return;
     }
     if (phase === 'question') {
+      // Spotify DJ svarar aldrig på sin egen fråga (canConfirm=false) — ingen
+      // runda och ingen score ska registreras. Utan post attribueras frågan
+      // aldrig till DJ:n på NÅGON enhet (den skulle annars broadcastats
+      // vidare), så DJ:n hamnar varken i reveal-facitets "Wrong" (visas i
+      // egen "DJ"-sektion) eller i leaderboardens Q-räkning. Gå bara vidare
+      // till reveal så DJ-handover-flödet kan visas.
+      if (isSpotifyQuestion && isCurrentPlayerDJ) {
+        setPhase('reveal');
+        return;
+      }
       // Time ran out utan Confirm — registrera ronden som missad (0 poäng,
       // inget giltigt svar) och gå direkt till reveal.
       if (question.type === 'timeline') {
@@ -3660,6 +3775,12 @@ export default function QuizScreen() {
     // skulle en framtida ändring kunna injicera en fantom-post (0 pts) under
     // spelarens id OCH broadcasta den tillbaka till host.
     if (isPtPSpectator) return;
+    // Spotify DJ:n svarar aldrig på sin egen fråga (canConfirm=false) — ingen
+    // RoundScore ska attribueras till DJ:n. Belt-and-suspenders utöver
+    // timeout-effektens tidiga return: skulle någon annan väg anropa hit får
+    // DJ:n ändå ingen post (som annars broadcastats till alla enheter och
+    // dykt upp i både leaderboard och reveal-facit).
+    if (isSpotifyQuestion && isCurrentPlayerDJ) return;
     // Förhindra double-scoring per fråga (race: handleConfirm* + useEffect([timeLeft])).
     if (hasRecordedScoreForCurrentQuestionRef.current) return;
     hasRecordedScoreForCurrentQuestionRef.current = true;
@@ -5115,6 +5236,16 @@ export default function QuizScreen() {
     responseSecondsChangedHandlerRef.current = (seconds) => {
       setResponseSeconds(seconds);
     };
+    // Mottagare av player_hcp_changed: en annan IndDev-enhet har räknat om
+    // sitt Player-HCP vid game-end. Merge:a deltat i playerHcpChanges så §5-
+    // raden ("HCP 42 (-1)") visas för alla spelare på alla enheter. Idempotent
+    // (nycklar på player_id) → säkert vid retry-broadcasts.
+    playerHcpChangedHandlerRef.current = (payload) => {
+      setPlayerHcpChanges((prev) => ({
+        ...prev,
+        [payload.player_id]: { before: payload.before, after: payload.after },
+      }));
+    };
     // Mottagare av player_score_recorded: någon annan enhet har registrerat
     // ett svar. Lägg in deras RoundScore i lokal allRoundScoresHistory så
     // liveLeaderboard + final leaderboard visar komplett bild.
@@ -5295,20 +5426,82 @@ export default function QuizScreen() {
   // Kör när sista rundans leaderboard visas: beräkna HCP-förändringar + spara spel
   useEffect(() => {
     if (phase === 'leaderboard' && isLastQuestion) {
-      // Beräkna HCP-förändring för alla spelare.
-      // Formel (placeholder till Fas 6): delta = round(totalPoints / 500)
-      const changes: Record<string, HcpChange> = {};
+      // §2/§5 — HCP-motorn vid game-end. Grundar INGET HCP: guest-hostade spel
+      // (anonyma), remote (server-side finalize) och PtP-spectator (spelaren
+      // svarade inte på denna enhet).
+      //
+      // • Pass-the-Phone: ALLA svarar på DENNA enhet, så vi uppdaterar VARJE
+      //   registrerad deltagare (self via profil-speglingen, övriga per namn)
+      //   och visar allas §5-delta.
+      // • Individual Devices / Single: bara self (peers svarar på sina egna
+      //   enheter); i IndDev broadcastas self:s delta så alla enheters
+      //   leaderboard visar hela bilden.
+      //
+      // ⚠ Fönster-gaten (§2.1): HCP rör sig först när nivåns fönster har 20
+      // svar (~5 spel à 4 rundor) — ett enstaka testspel ändrar inte siffran.
+      if (!isGuestHostGame && !isRemote && !isPtPSpectator) {
+        const flat = allRoundScoresHistory.flat();
+        const answersFor = (pid: string): boolean[] =>
+          flat
+            .filter((s) => s.playerId === pid)
+            .sort((a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0))
+            .map((s) => s.correct);
 
-      // Iterera över alla gamePlayers (turnOrder i pass-the-phone, mocks
-      // vid direkt-nav). gameTotals har redan per-id summorna från history.
-      gamePlayers.forEach((p) => {
-        const total = gameTotals[p.id] ?? 0;
-        const delta = Math.round(total / 500);
-        const before = p.isHost ? 99 : MOCK_OPPONENT_HCP_BEFORE[p.id] ?? 99;
-        changes[p.id] = { before, after: Math.max(1, before - delta) };
-      });
+        if (gameMode === 'pass-the-phone') {
+          void (async () => {
+            const changes: Record<string, HcpChange> = {};
+            for (const p of turnOrder) {
+              if (p.type === 'guest') continue;
+              const answers = answersFor(p.id);
+              if (answers.length === 0) continue;
+              const level: AssistanceLevel = p.assistance ?? fallbackAssistance;
+              changes[p.id] =
+                p.id === selfPlayerId
+                  ? await recordSelfGameResult(level, answers)
+                  : await recordGameResultForName(p.name, level, answers);
+            }
+            if (Object.keys(changes).length > 0) {
+              setPlayerHcpChanges((prev) => ({ ...prev, ...changes }));
+              // PtP multi-device: dela deltana med ev. spectator som följer
+              // leaderboarden på egen enhet (samma parity som score-broadcasten).
+              if (syncChannelRef.current) {
+                for (const [pid, ch] of Object.entries(changes)) {
+                  const payload: PlayerHcpChangedPayload = {
+                    player_id: pid,
+                    before: ch.before,
+                    after: ch.after,
+                  };
+                  const send = () =>
+                    syncChannelRef.current?.broadcastPlayerHcpChanged(payload).catch(() => {});
+                  send();
+                  setTimeout(send, 800);
+                  setTimeout(send, 2000);
+                }
+              }
+            }
+          })();
+        } else {
+          const selfEntry = turnOrder.find((p) => p.id === selfPlayerId);
+          const selfAnswers = selfPlayerId ? answersFor(selfPlayerId) : [];
+          if (selfEntry?.type !== 'guest' && selfAnswers.length > 0) {
+            const level: AssistanceLevel = selfEntry?.assistance ?? fallbackAssistance;
+            void recordSelfGameResult(level, selfAnswers).then(({ before, after }) => {
+              setPlayerHcpChanges((prev) => ({ ...prev, [selfPlayerId]: { before, after } }));
+              // IndDev: dela self:s delta med peers så allas leaderboard visar
+              // det (retries mot tappade broadcasts; mottagaren är idempotent).
+              if (gameMode === 'individual-devices' && syncChannelRef.current) {
+                const payload: PlayerHcpChangedPayload = { player_id: selfPlayerId, before, after };
+                const send = () =>
+                  syncChannelRef.current?.broadcastPlayerHcpChanged(payload).catch(() => {});
+                send();
+                setTimeout(send, 800);
+                setTimeout(send, 2000);
+              }
+            });
+          }
+        }
+      }
 
-      setPlayerHcpChanges(changes);
       saveFinalGame();
       // Remote 1v1: finalisera egen spelarrad server-side. Sista finishern
       // triggar atomisk vinnarberäkning i RPC:n (radlås — ingen klient-race).
@@ -7357,6 +7550,7 @@ export default function QuizScreen() {
   // quiz.tsx-mount; ny instans → nytt Set).
   const receivedRemoteScoreKeysRef = useRef<Set<string>>(new Set());
   const playerScoreRecordedHandlerRef = useRef<(payload: PlayerScoreRecordedPayload) => void>(() => {});
+  const playerHcpChangedHandlerRef = useRef<(payload: PlayerHcpChangedPayload) => void>(() => {});
   // Pending-kö för score-broadcasts som kan ha tappats under offline-period.
   // Broadcasten körs omedelbart + sparas här; vid reconnect skickas alla om.
   // Mottagarsidan deduplicerar via player_id+question_index — omskick är säkert.
@@ -7722,6 +7916,7 @@ export default function QuizScreen() {
         setDjHandedOver(true);
       },
       onPlayerScoreRecorded: (payload) => playerScoreRecordedHandlerRef.current(payload),
+      onPlayerHcpChanged: (payload) => playerHcpChangedHandlerRef.current(payload),
       // Cross-player-historik: non-host skickar sin 20-sessions-historik vid
       // quiz-mount. Merge:as ENDAST innan spelet startat (host står i intro
       // på fråga 0) — senare ankomst (t.ex. reconnect-re-broadcast) ignoreras
@@ -8299,13 +8494,16 @@ export default function QuizScreen() {
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
-      {/* Ambient-slinga fortsätter sömlöst från Lobby-ljud under GetReady — ingen pulsering.
-          Grindas ENBART på isAudioMutedForSelf, precis som appens tre övriga
-          ljudkällor: den memon kodar redan hela policyn per läge (PtP alltid
-          på, remote lokalt, IndDev via override med host=on/non-host=off som
-          default). Ett extra isHost-villkor här skulle göra en non-host som
-          slagit på sitt ljud halvt tyst. */}
-      {!isAudioMutedForSelf && <MorseAmbientSound active />}
+      {/* Ambient-slingan tas upp under GetReady — men FÖRST efter ~5 s tystnad
+          när man just kommit in från lobbyn (ambientReady, se quiz-mount-
+          effekten). Grindas i övrigt ENBART på isAudioMutedForSelf, precis som
+          appens tre andra ljudkällor: den memon kodar redan hela policyn per
+          läge (PtP alltid på, remote lokalt, IndDev via override med host=on/
+          non-host=off som default). Ett extra isHost-villkor här skulle göra en
+          non-host som slagit på sitt ljud halvt tyst. Komponenten hålls
+          monterad och styrs via active-proppen så fördröjningen bara är tystnad,
+          inte en teardown (som klickar i högtalaren). */}
+      {!isAudioMutedForSelf && <MorseAmbientSound active={ambientReady} />}
       </View>
     );
   }
@@ -9380,7 +9578,7 @@ export default function QuizScreen() {
                         }}
                         activeOpacity={0.85}
                       >
-                        <Text style={styles.djStopConfirmInlineBtnText}>Spotify song has been stopped</Text>
+                        <Text style={styles.djStopConfirmInlineBtnText}>Track has been stopped in Spotify</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   </>
@@ -9427,29 +9625,20 @@ export default function QuizScreen() {
                   // QuizVibe och gick tillbaka fick låten omstartad medan
                   // klockan tickade (Peters test 2026-08-19).
                   //
-                  // Omstart är i stället en EXPLICIT sekundär åtgärd. Den är
-                  // korrekt i BÅDA lägena — DJ:n väljer den bara när inget
-                  // spelas (misslyckad autoplay, typiskt varm Spotify-session
-                  // efter Play Again där förra låten ligger pausad i mini-
-                  // playern) — och farlig i inget.
+                  // Restart-knappen ("Nothing playing? Restart track…") togs
+                  // bort 2026-08-28 (Peter) — den var enda kvarvarande
+                  // deep-link till track:en här och riskerade en oavsiktlig
+                  // omstart mitt i nedräkningen. "Open Spotify" räcker.
                   <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null} trackId={currentSpotifyTrackId}>
-                    <Pressable
-                      style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
-                      onPress={() => openSpotifyApp()}
-                    >
-                      <SpotifyBrandIcon size={20} variant="white" />
-                      <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
-                    </Pressable>
-                    <Pressable
-                      style={styles.djRestartTrackBtn}
-                      onPress={() => {
-                        if (currentSpotifyTrackId) openSpotifyTrack(currentSpotifyTrackId);
-                      }}
-                    >
-                      <Text style={styles.djRestartTrackBtnText}>
-                        Nothing playing? Restart track from the beginning
-                      </Text>
-                    </Pressable>
+                    <Animated.View style={nextTabPulseStyle}>
+                      <Pressable
+                        style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
+                        onPress={() => openSpotifyApp()}
+                      >
+                        <SpotifyBrandIcon size={20} variant="white" />
+                        <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
+                      </Pressable>
+                    </Animated.View>
                   </DJTrackCard>
                 )}
               </View>
@@ -9655,6 +9844,32 @@ export default function QuizScreen() {
                   </TouchableOpacity>
                   {answersExpanded && (
                   <>
+                  {revealAnswerSummary.dj && (
+                    <View>
+                      <Text style={[rv.answersHeading, rv.answersHeadingDJ]}>
+                        DJ
+                      </Text>
+                      <View style={rv.answerRow}>
+                        {revealAnswerSummary.dj.avatarUri ? (
+                          <Image
+                            source={{ uri: revealAnswerSummary.dj.avatarUri }}
+                            style={rv.answerAvatar}
+                          />
+                        ) : (
+                          <View style={[rv.answerAvatar, rv.answerAvatarFallback]}>
+                            <Text style={rv.answerAvatarEmoji}>
+                              {revealAnswerSummary.dj.emoji ?? '👤'}
+                            </Text>
+                          </View>
+                        )}
+                        <Text style={rv.answerName} numberOfLines={1} ellipsizeMode="tail">
+                          {revealAnswerSummary.dj.name}
+                          {revealAnswerSummary.dj.id === selfPlayerId ? ' (You)' : ''}
+                        </Text>
+                        <SpotifyBrandIcon size={16} variant="white" />
+                      </View>
+                    </View>
+                  )}
                   <View>
                     <Text style={[rv.answersHeading, rv.answersHeadingCorrect]}>
                       Correct
@@ -10465,25 +10680,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
   },
-  // Sekundär, medvetet nedtonad åtgärd under den gröna "Open Spotify":
-  // omstart av spåret. Låg visuell vikt (ingen fyllnad, dämpad kant) så den
-  // aldrig förväxlas med primärknappen — ett felaktigt tap startar om låten
-  // mitt i gissarnas nedräkning.
-  djRestartTrackBtn: {
-    marginTop: Spacing.sm,
-    alignSelf: 'center',
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.md,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
-  },
-  djRestartTrackBtnText: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-    color: 'rgba(255,255,255,0.65)',
-    textAlign: 'center',
-  },
   spotifyDJHint: {
     fontSize: FontSize.xs,
     color: 'rgba(255,255,255,0.5)',
@@ -11107,6 +11303,9 @@ const rv = StyleSheet.create({
   },
   answersHeadingWrong: {
     color: QUIZ_ERROR_RED,
+  },
+  answersHeadingDJ: {
+    color: '#1DB954',
   },
   answersEmpty: {
     fontSize: FontSize.xs,

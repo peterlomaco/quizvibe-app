@@ -925,7 +925,7 @@ items:
         endSec: 45
         channelTitle: "SchlagerArchive"
         notes: "Melodifestivalen 1981 vinnare."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: chips-dag-efter-dag
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dag efter dag — Chips"
@@ -952,7 +952,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: kikki-danielsson-bra-vibrationer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bra vibrationer — Kikki Danielsson"
@@ -967,7 +967,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1985 vinnare. ESC 1985 performance."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: lotta-engberg-fyra-bugg
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fyra bugg och en Coca Cola — Lotta Engberg"
@@ -981,7 +981,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1987 vinnare."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: tommy-korberg-stad-i-ljus
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stad i ljus — Tommy Körberg"
@@ -1016,6 +1016,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1991 vinnare, ESC-vinnare 1991."
+    genrePackages: ["Melodifestivalen"]
   - id: arvingarna-eloise
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eloise — Arvingarna"
@@ -1029,7 +1030,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1993 vinnare. ESC 1993 performance."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   # ===== Eurovision Song Contest vinnare =====
   - id: bucks-fizz-making-your-mind-up
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1212,6 +1213,7 @@ items:
     displayName: "Nocturne — Secret Garden"
     correctYear: 1995
     probability: 74
+    region: ["nordic"]
     wikimediaSearchHints: ["Secret Garden Nocturne Eurovision 1995 Norway"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -1221,6 +1223,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1995 vinnare — Norge."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: eimear-quinn-the-voice
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Voice — Eimear Quinn"

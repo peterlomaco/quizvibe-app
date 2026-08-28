@@ -109,7 +109,7 @@ items:
     correctYear: 1987
     probability: 65
     region: ["sweden"]
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Melodifestivalen"]
     wikimediaSearchHints: ["Dotter"]
     answerMethods: ["name-letters"]
   - id: frans
@@ -127,7 +127,7 @@ items:
     probability: 65
     region: ["sweden"]
     inBaseCatalog: false
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
     wikimediaSearchHints: ["Helena Paparizou"]
     answerMethods: ["name-letters"]
   - id: john-lundvik
@@ -136,7 +136,7 @@ items:
     correctYear: 1983
     probability: 65
     region: ["sweden"]
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
     wikimediaSearchHints: ["John Lundvik"]
     answerMethods: ["name-letters"]
   - id: kapten-rod

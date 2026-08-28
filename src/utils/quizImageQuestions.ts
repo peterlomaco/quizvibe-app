@@ -81,6 +81,9 @@ export interface ImageQuizQuestion {
    *  'unknown-region' når ingen spelare. */
   region: string[];
   questionText: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Klientens HCP-filter
+   *  väljer item om itemHcp >= spelarens HCP (relaxas om poolen blir för tunn). */
+  itemHcp: number;
 }
 
 export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
@@ -100,7 +103,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "4-non-blondes",
@@ -118,7 +122,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "50-cent",
@@ -136,7 +141,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "abba",
@@ -154,7 +160,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 98
   },
   {
     "id": "acdc",
@@ -172,7 +179,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 90
   },
   {
     "id": "ace-of-base",
@@ -190,7 +198,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "adele",
@@ -210,7 +219,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 94
   },
   {
     "id": "alain-prost",
@@ -228,7 +238,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "alan-shearer",
@@ -246,7 +257,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "albin-ekdal",
@@ -264,7 +276,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 74
   },
   {
     "id": "alcazar",
@@ -283,7 +296,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 78
   },
   {
     "id": "alessandro-del-piero",
@@ -301,7 +315,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "alessandro-nesta",
@@ -319,7 +334,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "alex-morgan",
@@ -337,7 +353,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "alex-warren",
@@ -355,7 +372,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "alexander-isak",
@@ -373,7 +391,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "alexander-noren",
@@ -393,7 +412,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 64
   },
   {
     "id": "alexander-skarsgard",
@@ -413,7 +433,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 86
   },
   {
     "id": "alexia",
@@ -431,7 +452,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "alexis-sanchez",
@@ -449,7 +471,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "alf-ramsey",
@@ -467,7 +490,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "all-4-one",
@@ -485,7 +509,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "anastacia",
@@ -503,7 +528,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "andre-agassi",
@@ -521,7 +547,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "andrea-bocelli-artist",
@@ -539,7 +566,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "andrea-pirlo",
@@ -557,7 +585,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "andreas-granqvist",
@@ -575,7 +604,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "andreas-isaksson",
@@ -593,7 +623,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 76
   },
   {
     "id": "andrew-garfield",
@@ -613,7 +644,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "andriy-shevchenko",
@@ -631,7 +663,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "angel-di-maria",
@@ -649,7 +682,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 84
   },
   {
     "id": "anis-don-demina",
@@ -667,7 +701,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "anna-bergendahl",
@@ -686,7 +721,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 74
   },
   {
     "id": "anna-nordqvist",
@@ -706,7 +742,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 66
   },
   {
     "id": "anne-marie-david",
@@ -724,7 +761,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "annie-lennox",
@@ -744,7 +782,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 80
   },
   {
     "id": "annika-sorenstam",
@@ -762,7 +801,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 85
   },
   {
     "id": "antique",
@@ -780,7 +820,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "antoine-griezmann",
@@ -798,7 +839,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 90
   },
   {
     "id": "aqua",
@@ -816,7 +858,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "ariana-grande",
@@ -834,7 +877,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 92
   },
   {
     "id": "armand-duplantis",
@@ -852,7 +896,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "arnold-schwarzenegger",
@@ -872,7 +917,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 89
   },
   {
     "id": "arturo-vidal",
@@ -890,7 +936,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "arvingarna",
@@ -909,7 +956,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 78
   },
   {
     "id": "ashley-cole",
@@ -927,7 +975,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "audrey-hepburn",
@@ -947,7 +996,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 90
   },
   {
     "id": "ava-max",
@@ -965,7 +1015,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "avicii",
@@ -985,7 +1036,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 97
   },
   {
     "id": "avril-lavigne",
@@ -1005,7 +1057,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 85
   },
   {
     "id": "ayrton-senna",
@@ -1023,7 +1076,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "bananarama",
@@ -1041,7 +1095,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "barbados",
@@ -1059,7 +1114,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "barbra-streisand",
@@ -1079,7 +1135,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
   },
   {
     "id": "beatles",
@@ -1097,7 +1154,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 98
   },
   {
     "id": "ben-e-king",
@@ -1115,7 +1173,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "benny-benassi",
@@ -1133,7 +1192,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "bette-midler",
@@ -1151,7 +1211,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "beyonce",
@@ -1169,7 +1230,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 90
   },
   {
     "id": "bill-withers",
@@ -1187,7 +1249,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "billie-eilish",
@@ -1205,7 +1268,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 95
   },
   {
     "id": "billy-idol",
@@ -1223,7 +1287,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "bing-crosby",
@@ -1241,7 +1306,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "bjorn-borg",
@@ -1259,7 +1325,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 97
   },
   {
     "id": "bjorn-nordqvist",
@@ -1277,7 +1344,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "bjorn-skifs",
@@ -1295,7 +1363,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 84
   },
   {
     "id": "blink-182",
@@ -1313,7 +1382,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "blondie",
@@ -1331,7 +1401,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "bloodhound-gang",
@@ -1349,7 +1420,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "blur",
@@ -1367,7 +1439,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "bob-dylan",
@@ -1387,7 +1460,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 90
   },
   {
     "id": "bobby-charlton",
@@ -1405,7 +1479,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "bobby-mcferrin",
@@ -1423,7 +1498,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "bobby-moore",
@@ -1441,7 +1517,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 84
   },
   {
     "id": "bobbysocks",
@@ -1459,7 +1536,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "bolaget",
@@ -1477,7 +1555,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "bon-jovi",
@@ -1495,7 +1574,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "boney-m",
@@ -1513,7 +1593,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "borje-salming",
@@ -1531,7 +1612,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "boyz-ii-men",
@@ -1549,7 +1631,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "brandsta",
@@ -1567,7 +1650,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "britney-spears",
@@ -1587,7 +1671,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 92
   },
   {
     "id": "brotherhood-of-man",
@@ -1605,7 +1690,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "bruce-willis",
@@ -1625,7 +1711,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "bruno-fernandes",
@@ -1643,7 +1730,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "bryan-adams",
@@ -1661,7 +1749,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "bts",
@@ -1679,7 +1768,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "bucks-fizz",
@@ -1697,7 +1787,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "burt-reynolds",
@@ -1717,7 +1808,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 80
   },
   {
     "id": "cab-calloway",
@@ -1735,7 +1827,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "cajsa-stina-akerstrom",
@@ -1753,7 +1846,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "cameron-diaz",
@@ -1773,7 +1867,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "carl-lewis",
@@ -1791,7 +1886,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 85
   },
   {
     "id": "carly-rae-jepsen",
@@ -1809,7 +1905,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "carola-haggkvist",
@@ -1827,7 +1924,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
   },
   {
     "id": "caroline-seger",
@@ -1845,7 +1943,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 76
   },
   {
     "id": "cesc-fabregas",
@@ -1863,7 +1962,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "charles-barkley",
@@ -1881,7 +1981,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "charlie-chaplin",
@@ -1901,7 +2002,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 90
   },
   {
     "id": "charlotte-nilsson",
@@ -1919,7 +2021,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "chic",
@@ -1937,7 +2040,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "chips",
@@ -1955,7 +2059,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "chris-brown",
@@ -1973,7 +2078,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "christian-pulisic",
@@ -1991,7 +2097,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 80
   },
   {
     "id": "chuck-berry",
@@ -2011,7 +2118,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
   },
   {
     "id": "clarence-seedorf",
@@ -2029,7 +2137,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "clint-eastwood",
@@ -2049,7 +2158,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "cody-gakpo",
@@ -2067,7 +2177,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "cole-porter",
@@ -2085,7 +2196,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "connor-mcdavid",
@@ -2103,7 +2215,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 80
   },
   {
     "id": "coolio",
@@ -2121,7 +2234,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "corinne-hermes",
@@ -2139,7 +2253,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "cristiano-ronaldo",
@@ -2157,7 +2272,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 97
   },
   {
     "id": "cypress-hill",
@@ -2175,7 +2291,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "dana",
@@ -2193,7 +2310,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "dana-international",
@@ -2211,7 +2329,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "daniel-alfredsson",
@@ -2229,7 +2348,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 80
   },
   {
     "id": "daniel-sedin",
@@ -2247,7 +2367,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "daniele-de-rossi",
@@ -2265,7 +2386,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "dara",
@@ -2283,7 +2405,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "dario-g",
@@ -2300,7 +2423,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "david-beckham",
@@ -2318,7 +2442,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 96
   },
   {
     "id": "david-bowie",
@@ -2338,7 +2463,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 90
   },
   {
     "id": "david-lee-roth",
@@ -2356,7 +2482,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "david-tavare",
@@ -2374,7 +2501,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "david-trezeguet",
@@ -2392,7 +2520,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "david-villa",
@@ -2410,7 +2539,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "debbie-reynolds",
@@ -2430,7 +2560,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 76
   },
   {
     "id": "declan-rice",
@@ -2448,7 +2579,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "deco",
@@ -2466,7 +2598,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "deep-purple",
@@ -2484,7 +2617,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "def-leppard",
@@ -2502,7 +2636,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "dejan-kulusevski",
@@ -2520,7 +2655,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 80
   },
   {
     "id": "demetrio-albertini",
@@ -2538,7 +2674,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "demi-lovato",
@@ -2558,7 +2695,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 82
   },
   {
     "id": "denzel-washington",
@@ -2578,7 +2716,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 90
   },
   {
     "id": "destinys-child",
@@ -2596,7 +2735,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "diane-keaton",
@@ -2616,7 +2756,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "didier-deschamps",
@@ -2634,7 +2775,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "didier-drogba",
@@ -2652,7 +2794,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "diego-costa",
@@ -2670,7 +2813,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "diego-forlan",
@@ -2688,7 +2832,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "diego-maradona",
@@ -2706,7 +2851,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 96
   },
   {
     "id": "diego-simeone",
@@ -2724,7 +2870,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "dino-zoff",
@@ -2742,7 +2889,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 84
   },
   {
     "id": "dire-straits",
@@ -2760,7 +2908,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "dirk-kuyt",
@@ -2778,7 +2927,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "dj-otzi",
@@ -2796,7 +2946,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "dnce",
@@ -2814,7 +2965,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "dolly-parton",
@@ -2834,7 +2986,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
   },
   {
     "id": "don-mclean",
@@ -2852,7 +3005,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "dooley-wilson",
@@ -2870,7 +3024,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "doris-day",
@@ -2888,7 +3043,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "dotter",
@@ -2906,7 +3062,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "dr-alban",
@@ -2924,7 +3081,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "drew-barrymore",
@@ -2944,7 +3102,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 80
   },
   {
     "id": "duke-ellington",
@@ -2962,7 +3121,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "duncan-laurence",
@@ -2980,7 +3140,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "dusty-springfield",
@@ -2998,7 +3159,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "dwayne-johnson",
@@ -3018,7 +3180,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 92
   },
   {
     "id": "eden-hazard",
@@ -3036,7 +3199,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "edinson-cavani",
@@ -3054,7 +3218,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "edith-piaf",
@@ -3072,7 +3237,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "eiffel-65",
@@ -3090,7 +3256,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "eimear-quinn",
@@ -3108,7 +3275,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "elena-tsagkrinou",
@@ -3126,7 +3294,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "eleni-foureira",
@@ -3144,7 +3313,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "elijah-wood",
@@ -3164,7 +3334,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 80
   },
   {
     "id": "ellie-goulding",
@@ -3182,7 +3353,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "elton-john",
@@ -3202,7 +3374,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 95
   },
   {
     "id": "elvis-presley",
@@ -3222,7 +3395,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 98
   },
   {
     "id": "emil-forsberg",
@@ -3240,7 +3414,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 83
   },
   {
     "id": "emil-krafth",
@@ -3258,7 +3433,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 73
   },
   {
     "id": "eminem",
@@ -3276,7 +3452,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 94
   },
   {
     "id": "emma-watson",
@@ -3296,7 +3473,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 92
   },
   {
     "id": "emmanuel-adebayor",
@@ -3314,7 +3492,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "emmelie-de-forest",
@@ -3332,7 +3511,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "eric-cantona",
@@ -3350,7 +3530,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "erling-haaland",
@@ -3368,7 +3549,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 90
   },
   {
     "id": "eros-ramazzotti",
@@ -3386,7 +3568,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "ethel-waters",
@@ -3404,7 +3587,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "etta-james",
@@ -3422,7 +3606,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "europe",
@@ -3440,7 +3625,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "eusebio",
@@ -3458,7 +3644,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "everything-but-the-girl",
@@ -3476,7 +3663,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "ewan-mcgregor",
@@ -3496,7 +3684,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "fernando-hierro",
@@ -3514,7 +3703,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "floyd-mayweather",
@@ -3532,7 +3722,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "foreigner",
@@ -3550,7 +3741,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "frank-lampard",
@@ -3568,7 +3760,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "frank-rijkaard",
@@ -3586,7 +3779,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "frank-sinatra",
@@ -3606,7 +3800,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 92
   },
   {
     "id": "frans",
@@ -3624,7 +3819,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "franz-beckenbauer",
@@ -3642,7 +3838,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "fred-astaire",
@@ -3660,7 +3857,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "freddie-ljungberg",
@@ -3678,7 +3876,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "frenkie-de-jong",
@@ -3696,7 +3895,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "fugees",
@@ -3714,7 +3914,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "gareth-bale",
@@ -3732,7 +3933,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "gene-kelly",
@@ -3752,7 +3954,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 80
   },
   {
     "id": "gennaro-gattuso",
@@ -3770,7 +3973,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "george-benson",
@@ -3788,7 +3992,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "george-best",
@@ -3806,7 +4011,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 85
   },
   {
     "id": "george-harrison",
@@ -3824,7 +4030,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "george-michael",
@@ -3844,7 +4051,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
   },
   {
     "id": "gerard-pique",
@@ -3862,7 +4070,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 84
   },
   {
     "id": "gerd-muller",
@@ -3880,7 +4089,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 84
   },
   {
     "id": "ges",
@@ -3898,7 +4108,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "glass-animals",
@@ -3916,7 +4127,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "glenn-hoddle",
@@ -3934,7 +4146,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "glenn-hysen",
@@ -3952,7 +4165,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 75
   },
   {
     "id": "glenn-miller",
@@ -3970,7 +4184,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "glenn-stromberg",
@@ -3988,7 +4203,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 76
   },
   {
     "id": "gloria-gaynor",
@@ -4006,7 +4222,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "gnarls-barkley",
@@ -4024,7 +4241,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "gonzalo-higuain",
@@ -4042,7 +4260,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "goo-goo-dolls",
@@ -4060,7 +4279,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "gorillaz",
@@ -4078,7 +4298,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "gotye",
@@ -4096,7 +4317,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "greta-garbo",
@@ -4116,7 +4338,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 80
   },
   {
     "id": "guillermo-ochoa",
@@ -4134,7 +4357,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "gunnar-gren",
@@ -4152,7 +4376,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 80
   },
   {
     "id": "gunnar-nordahl",
@@ -4170,7 +4395,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 80
   },
   {
     "id": "gunther",
@@ -4188,7 +4414,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "guus-hiddink",
@@ -4206,7 +4433,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "gyllene-tider",
@@ -4224,7 +4452,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 92
   },
   {
     "id": "haddaway",
@@ -4242,7 +4471,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "hadise",
@@ -4260,7 +4490,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "hakan-hellstrom",
@@ -4278,7 +4509,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 82
   },
   {
     "id": "hakan-mild",
@@ -4296,7 +4528,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 75
   },
   {
     "id": "hanson",
@@ -4314,7 +4547,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "harrison-ford",
@@ -4334,7 +4568,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 92
   },
   {
     "id": "harry-kane",
@@ -4352,7 +4587,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "hasse-andersson",
@@ -4370,7 +4606,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "heath-ledger",
@@ -4390,7 +4627,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 84
   },
   {
     "id": "helen-alfredsson",
@@ -4410,7 +4648,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 60
   },
   {
     "id": "helena-paparizou",
@@ -4428,7 +4667,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "henrik-larsson",
@@ -4446,7 +4686,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 90
   },
   {
     "id": "henrik-lundqvist",
@@ -4464,7 +4705,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "henrik-stenson",
@@ -4482,7 +4724,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "henry-thomas",
@@ -4502,7 +4745,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 68
   },
   {
     "id": "herreys",
@@ -4520,7 +4764,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "hilary-swank",
@@ -4540,7 +4785,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 76
   },
   {
     "id": "hugo-lloris",
@@ -4558,7 +4804,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "ian-mckellen",
@@ -4578,7 +4825,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 84
   },
   {
     "id": "ian-rush",
@@ -4596,7 +4844,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 75
   },
   {
     "id": "icona-pop",
@@ -4614,7 +4863,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "iker-casillas",
@@ -4632,7 +4882,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "imagine-dragons",
@@ -4650,7 +4901,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "ingemar-stenmark",
@@ -4668,7 +4920,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 95
   },
   {
     "id": "ingrid-bergman",
@@ -4688,7 +4941,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 85
   },
   {
     "id": "inner-circle",
@@ -4706,7 +4960,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "irene-cara",
@@ -4724,7 +4979,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "ivan-rakitic",
@@ -4742,7 +4998,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "jakob-ingebrigtsen",
@@ -4760,7 +5017,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "nordic"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 80
   },
   {
     "id": "jamala",
@@ -4778,7 +5036,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "james-rodriguez",
@@ -4796,7 +5055,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "jan-hammer",
@@ -4814,7 +5074,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "janet-jackson",
@@ -4832,7 +5093,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "janne-carlsson",
@@ -4852,7 +5114,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 66
   },
   {
     "id": "jaromir-jagr",
@@ -4870,7 +5133,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 84
   },
   {
     "id": "jason-derulo",
@@ -4888,7 +5152,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "jason-statham",
@@ -4908,7 +5173,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "javier-zanetti",
@@ -4926,7 +5192,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "jennifer-lawrence",
@@ -4946,7 +5213,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "jennifer-rush",
@@ -4964,7 +5232,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "jesper-parnevik",
@@ -4982,7 +5251,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "jesse-eisenberg",
@@ -5002,7 +5272,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "jessie-j",
@@ -5020,7 +5291,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "jimi-hendrix",
@@ -5038,7 +5310,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "jimmy-durmaz",
@@ -5056,7 +5329,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 75
   },
   {
     "id": "jj",
@@ -5074,7 +5348,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "jo-stafford",
@@ -5092,7 +5367,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "joachim-low",
@@ -5110,7 +5386,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "europe"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "joao-felix",
@@ -5128,7 +5405,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 80
   },
   {
     "id": "joaquin-phoenix",
@@ -5148,7 +5426,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "joe-frazier",
@@ -5166,7 +5445,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "joel-kinnaman",
@@ -5186,7 +5466,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "johan-cruyff",
@@ -5204,7 +5485,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 90
   },
   {
     "id": "john-candy",
@@ -5224,7 +5506,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "john-denver",
@@ -5242,7 +5525,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "john-lennon",
@@ -5260,7 +5544,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "john-lundvik",
@@ -5278,7 +5563,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "john-mcenroe",
@@ -5296,7 +5582,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "john-newman",
@@ -5314,7 +5601,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "john-terry",
@@ -5332,7 +5620,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "johnnie-ray",
@@ -5350,7 +5639,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "johnny-logan",
@@ -5368,7 +5658,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "jon-secada",
@@ -5386,7 +5677,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "jonas-thern",
@@ -5404,7 +5696,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 80
   },
   {
     "id": "joost-klein",
@@ -5422,7 +5715,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "jordan-larsson",
@@ -5440,7 +5734,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 75
   },
   {
     "id": "juan-mata",
@@ -5458,7 +5753,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "jude-bellingham",
@@ -5476,7 +5772,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "judy-garland",
@@ -5496,7 +5793,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "julia-roberts",
@@ -5516,7 +5814,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 92
   },
   {
     "id": "julio-cesar",
@@ -5534,7 +5833,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "jurgen-klinsmann",
@@ -5552,7 +5852,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "kaj",
@@ -5570,7 +5871,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "kaka",
@@ -5588,7 +5890,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "kalush-orchestra",
@@ -5606,7 +5909,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "kaoma",
@@ -5624,7 +5928,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "kapten-rod",
@@ -5642,7 +5947,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "karl-heinz-rummenigge",
@@ -5660,7 +5966,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "karsten-warholm",
@@ -5678,7 +5985,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "nordic"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "kate-bush",
@@ -5698,7 +6006,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 80
   },
   {
     "id": "kate-ryan",
@@ -5716,7 +6025,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "katy-perry",
@@ -5734,7 +6044,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "keiino",
@@ -5752,7 +6063,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "kennet-andersson",
@@ -5771,7 +6083,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 70
   },
   {
     "id": "kenny-dalglish",
@@ -5789,7 +6102,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "kent",
@@ -5807,7 +6121,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 86
   },
   {
     "id": "kesha",
@@ -5825,7 +6140,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "kevin-de-bruyne",
@@ -5843,7 +6159,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "kim-carnes",
@@ -5861,7 +6178,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "kim-kallstrom",
@@ -5880,7 +6198,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 72
   },
   {
     "id": "knaan",
@@ -5898,7 +6217,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "kobe-bryant",
@@ -5916,7 +6236,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "kosovare-asllani",
@@ -5935,7 +6256,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 74
   },
   {
     "id": "kylian-mbappe",
@@ -5953,7 +6275,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "kylie-minogue",
@@ -5973,7 +6296,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 90
   },
   {
     "id": "la-bouche",
@@ -5991,7 +6315,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "lady-gaga",
@@ -6011,7 +6336,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 92
   },
   {
     "id": "lasse-aberg",
@@ -6031,7 +6357,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 84
   },
   {
     "id": "laura-branigan",
@@ -6049,7 +6376,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "laurence-fishburne",
@@ -6069,7 +6397,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "lena",
@@ -6087,7 +6416,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "leonard-cohen",
@@ -6107,7 +6437,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 80
   },
   {
     "id": "leonardo-dicaprio",
@@ -6127,7 +6458,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 96
   },
   {
     "id": "lewis-hamilton",
@@ -6145,7 +6477,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "liam-neeson",
@@ -6165,7 +6498,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "linda-hamilton",
@@ -6185,7 +6519,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "linda-martin",
@@ -6203,7 +6538,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "linn-grant",
@@ -6223,7 +6559,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 58
   },
   {
     "id": "lionel-messi",
@@ -6241,7 +6578,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 97
   },
   {
     "id": "liselotte-neumann",
@@ -6261,7 +6599,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 62
   },
   {
     "id": "ll-cool-j",
@@ -6281,7 +6620,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 78
   },
   {
     "id": "lmfao",
@@ -6299,7 +6639,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "londonbeat",
@@ -6317,7 +6658,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "loreen",
@@ -6337,7 +6679,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 82
   },
   {
     "id": "los-del-rio",
@@ -6355,7 +6698,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "lothar-matthaus",
@@ -6373,7 +6717,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "lotta-schelin",
@@ -6392,7 +6737,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 72
   },
   {
     "id": "lou-bega",
@@ -6410,7 +6756,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "louis-van-gaal",
@@ -6428,7 +6775,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 84
   },
   {
     "id": "lucianoz",
@@ -6446,7 +6794,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "ludvig-aberg",
@@ -6464,7 +6813,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 84
   },
   {
     "id": "luis-figo",
@@ -6482,7 +6832,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "luis-suarez",
@@ -6500,7 +6851,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "luka-modric",
@@ -6518,7 +6870,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 85
   },
   {
     "id": "lynyrd-skynyrd",
@@ -6536,7 +6889,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "mabel",
@@ -6554,7 +6908,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "macaulay-culkin",
@@ -6574,7 +6929,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "madonna",
@@ -6594,7 +6950,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 96
   },
   {
     "id": "magic-johnson",
@@ -6612,7 +6969,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 90
   },
   {
     "id": "magnus-uggla",
@@ -6630,7 +6988,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 80
   },
   {
     "id": "magnus-wislander",
@@ -6648,7 +7007,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "mando-diao",
@@ -6666,7 +7026,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 78
   },
   {
     "id": "manuel-neuer",
@@ -6684,7 +7045,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "marcello-lippi",
@@ -6702,7 +7064,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "marco-van-basten",
@@ -6720,7 +7083,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 85
   },
   {
     "id": "marcus-berg",
@@ -6738,7 +7102,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 74
   },
   {
     "id": "marcus-martinus",
@@ -6757,7 +7122,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 84
   },
   {
     "id": "margot-robbie",
@@ -6777,7 +7143,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 90
   },
   {
     "id": "marie-fredriksson",
@@ -6795,7 +7162,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 82
   },
   {
     "id": "marie-myriam",
@@ -6813,7 +7181,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "marie-n",
@@ -6831,7 +7200,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "marija-serifovic",
@@ -6849,7 +7219,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "marilyn-monroe",
@@ -6869,7 +7240,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "mark-hamill",
@@ -6889,7 +7261,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "mark-morrison",
@@ -6907,7 +7280,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "markus-naslund",
@@ -6925,7 +7299,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "marlon-brando",
@@ -6945,7 +7320,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "martin-dahlin",
@@ -6963,7 +7339,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "martin-odegaard",
@@ -6981,7 +7358,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "martin-stenmarck",
@@ -6999,7 +7377,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "martina-navratilova",
@@ -7017,7 +7396,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 85
   },
   {
     "id": "mats-naslund",
@@ -7035,7 +7415,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 75
   },
   {
     "id": "mats-sundin",
@@ -7053,7 +7434,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 90
   },
   {
     "id": "mats-wilander",
@@ -7071,7 +7453,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "max-von-sydow",
@@ -7091,7 +7474,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 84
   },
   {
     "id": "mc-hammer",
@@ -7109,7 +7493,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "meghan-trainor",
@@ -7127,7 +7512,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "memphis-depay",
@@ -7145,7 +7531,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "men-at-work",
@@ -7163,7 +7550,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "meryl-streep",
@@ -7183,7 +7571,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "michael-douglas",
@@ -7203,7 +7592,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "michael-j-fox",
@@ -7223,7 +7613,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 84
   },
   {
     "id": "michael-jackson",
@@ -7243,7 +7634,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 98
   },
   {
     "id": "michael-jordan",
@@ -7261,7 +7653,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 99
   },
   {
     "id": "michael-owen",
@@ -7279,7 +7672,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "michael-schumacher",
@@ -7297,7 +7691,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 95
   },
   {
     "id": "mikael-lustig",
@@ -7315,7 +7710,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 76
   },
   {
     "id": "miley-cyrus",
@@ -7335,7 +7731,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 90
   },
   {
     "id": "milli-vanilli",
@@ -7353,7 +7750,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "millie-bobby-brown",
@@ -7373,7 +7771,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 85
   },
   {
     "id": "miroslav-klose",
@@ -7391,7 +7790,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "modern-talking",
@@ -7409,7 +7809,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "mohamed-salah",
@@ -7427,7 +7828,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "monica-zetterlund",
@@ -7445,7 +7847,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 75
   },
   {
     "id": "mr-big",
@@ -7463,7 +7866,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "mr-president",
@@ -7481,7 +7885,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "muddy-waters",
@@ -7499,7 +7904,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "muhammad-ali",
@@ -7517,7 +7923,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 98
   },
   {
     "id": "mungo-jerry",
@@ -7535,7 +7942,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "nancy-sinatra",
@@ -7553,7 +7961,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "nani",
@@ -7571,7 +7980,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "natalie-imbruglia",
@@ -7589,7 +7999,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "neil-diamond",
@@ -7607,7 +8018,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "nemo",
@@ -7625,7 +8037,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "new-order",
@@ -7643,7 +8056,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "neymar",
@@ -7661,7 +8075,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 90
   },
   {
     "id": "ngolo-kante",
@@ -7679,7 +8094,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "niamh-kavanagh",
@@ -7697,7 +8113,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "nick-borgen",
@@ -7715,7 +8132,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "nickelback",
@@ -7733,7 +8151,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "nicklas-lidstrom",
@@ -7751,7 +8170,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "niclas-alexandersson",
@@ -7769,7 +8189,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 76
   },
   {
     "id": "nicolas-cage",
@@ -7789,7 +8210,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 85
   },
   {
     "id": "nicole",
@@ -7807,7 +8229,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "nirvana",
@@ -7825,7 +8248,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "no-doubt",
@@ -7843,7 +8267,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "no-mercy",
@@ -7861,7 +8286,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "o-zone",
@@ -7879,7 +8305,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "oasis",
@@ -7897,7 +8324,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "ola-toivonen",
@@ -7915,7 +8343,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 75
   },
   {
     "id": "oliver-kahn",
@@ -7933,7 +8362,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "olivia-newton-john",
@@ -7953,7 +8383,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "olivia-rodrigo",
@@ -7973,7 +8404,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 85
   },
   {
     "id": "olof-mellberg",
@@ -7992,7 +8424,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 70
   },
   {
     "id": "olsen-brothers",
@@ -8010,7 +8443,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "one-direction",
@@ -8028,7 +8462,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "onerepublic",
@@ -8046,7 +8481,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "orson-welles",
@@ -8066,7 +8502,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "oscar-wendt",
@@ -8084,7 +8521,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 74
   },
   {
     "id": "otto-rehhagel",
@@ -8102,7 +8540,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "outkast",
@@ -8120,7 +8559,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "paolo-maldini",
@@ -8138,7 +8578,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 85
   },
   {
     "id": "paolo-rossi",
@@ -8156,7 +8597,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "europe"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "patrick-kluivert",
@@ -8174,7 +8616,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "patrick-vieira",
@@ -8192,7 +8635,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "patrik-andersson",
@@ -8210,7 +8654,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "patti-page",
@@ -8228,7 +8673,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "paul-pogba",
@@ -8246,7 +8692,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "paula-abdul",
@@ -8264,7 +8711,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "pele",
@@ -8282,7 +8730,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 98
   },
   {
     "id": "per-gessle",
@@ -8300,7 +8749,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 84
   },
   {
     "id": "perry-como",
@@ -8318,7 +8768,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "pet-shop-boys",
@@ -8336,7 +8787,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "peter-cetera",
@@ -8354,7 +8806,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "peter-forsberg",
@@ -8372,7 +8825,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "peter-gabriel",
@@ -8390,7 +8844,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "peter-haber",
@@ -8410,7 +8865,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 76
   },
   {
     "id": "peter-lundblad",
@@ -8428,7 +8884,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "petter",
@@ -8446,7 +8903,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 76
   },
   {
     "id": "phil-collins",
@@ -8466,7 +8924,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 85
   },
   {
     "id": "phil-foden",
@@ -8484,7 +8943,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "planet-funk",
@@ -8501,7 +8961,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "prince",
@@ -8521,7 +8982,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 90
   },
   {
     "id": "psy",
@@ -8539,7 +9001,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "queen",
@@ -8557,7 +9020,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 96
   },
   {
     "id": "r-e-m",
@@ -8575,7 +9039,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "r-i-o",
@@ -8593,7 +9058,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "radiohead",
@@ -8611,7 +9077,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "rafael-nadal",
@@ -8629,7 +9096,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 94
   },
   {
     "id": "ragnbone-man",
@@ -8647,7 +9115,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "ralf-edstrom",
@@ -8665,7 +9134,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 76
   },
   {
     "id": "raphael-varane",
@@ -8683,7 +9153,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "raymond-domenech",
@@ -8701,7 +9172,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 72
   },
   {
     "id": "red-hot-chili-peppers",
@@ -8719,7 +9191,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "rednex",
@@ -8737,7 +9210,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "ricardo-quaresma",
@@ -8755,7 +9229,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "richard-dreyfuss",
@@ -8775,7 +9250,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "rick-astley",
@@ -8795,7 +9271,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 82
   },
   {
     "id": "rihanna",
@@ -8813,7 +9290,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 95
   },
   {
     "id": "rio-ferdinand",
@@ -8831,7 +9309,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "ritchie-valens",
@@ -8849,7 +9328,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "riva",
@@ -8867,7 +9347,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "rivaldo",
@@ -8885,7 +9366,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "robbie-keane",
@@ -8903,7 +9385,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "robert-karlsson",
@@ -8923,7 +9406,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 58
   },
   {
     "id": "robert-lewandowski",
@@ -8941,7 +9425,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "robert-miles",
@@ -8959,7 +9444,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "roberta-flack",
@@ -8977,7 +9463,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "roberto-baggio",
@@ -8995,7 +9482,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 85
   },
   {
     "id": "roberto-donadoni",
@@ -9013,7 +9501,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "robin-olsen",
@@ -9032,7 +9521,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 68
   },
   {
     "id": "robin-van-persie",
@@ -9050,7 +9540,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "robyn",
@@ -9070,7 +9561,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 80
   },
   {
     "id": "roger-federer",
@@ -9088,7 +9580,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 96
   },
   {
     "id": "roger-pontare",
@@ -9106,7 +9599,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "roland-nilsson",
@@ -9124,7 +9618,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "rolandz",
@@ -9142,7 +9637,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "romelu-lukaku",
@@ -9160,7 +9656,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "ronaldo-nazario",
@@ -9178,7 +9675,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 96
   },
   {
     "id": "rowan-atkinson",
@@ -9198,7 +9696,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 90
   },
   {
     "id": "roxette",
@@ -9216,7 +9715,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 92
   },
   {
     "id": "roy-orbison",
@@ -9236,7 +9736,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 78
   },
   {
     "id": "roy-scheider",
@@ -9256,7 +9757,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 74
   },
   {
     "id": "ruslana",
@@ -9274,7 +9776,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "russell-crowe",
@@ -9294,7 +9797,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 84
   },
   {
     "id": "ruud-gullit",
@@ -9312,7 +9816,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "ryan-giggs",
@@ -9330,7 +9835,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "sam-neill",
@@ -9350,7 +9856,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "sam-worthington",
@@ -9370,7 +9877,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 76
   },
   {
     "id": "sandra-kim",
@@ -9388,7 +9896,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "sara-sjostrom",
@@ -9406,7 +9915,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "sarek",
@@ -9424,7 +9934,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "savage-garden",
@@ -9442,7 +9953,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "scatman-john",
@@ -9460,7 +9972,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "scooter",
@@ -9478,7 +9991,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "scorpions",
@@ -9496,7 +10010,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "sebastian-larsson",
@@ -9515,7 +10030,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 70
   },
   {
     "id": "secret-garden",
@@ -9532,7 +10048,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "selena-gomez",
@@ -9552,7 +10069,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
   },
   {
     "id": "sepp-maier",
@@ -9570,7 +10088,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "serena-williams",
@@ -9588,7 +10107,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 96
   },
   {
     "id": "sergio-aguero",
@@ -9606,7 +10126,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "sergio-busquets",
@@ -9624,7 +10145,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "sertab-erener",
@@ -9642,7 +10164,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "severine",
@@ -9660,7 +10183,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "shakespears-sister",
@@ -9678,7 +10202,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "shania-twain",
@@ -9696,7 +10221,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "shia-labeouf",
@@ -9716,7 +10242,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "sia",
@@ -9736,7 +10263,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 85
   },
   {
     "id": "sidney-crosby",
@@ -9754,7 +10282,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "sinead-oconnor",
@@ -9772,7 +10301,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "sir-mix-a-lot",
@@ -9790,7 +10320,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "smash-mouth",
@@ -9808,7 +10339,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "snap",
@@ -9826,7 +10358,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "snoop-doggy-dogg",
@@ -9844,7 +10377,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "snow",
@@ -9862,7 +10396,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "sombr",
@@ -9880,7 +10415,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "spin-doctors",
@@ -9898,7 +10434,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "starship",
@@ -9916,7 +10453,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "stefan-edberg",
@@ -9934,7 +10472,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 90
   },
   {
     "id": "steppenwolf",
@@ -9952,7 +10491,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "steven-gerrard",
@@ -9970,7 +10510,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "stina-nilsson",
@@ -9988,7 +10529,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 76
   },
   {
     "id": "sting",
@@ -10008,7 +10550,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
   },
   {
     "id": "streaplers",
@@ -10026,7 +10569,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "sugarhill-gang",
@@ -10044,7 +10588,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "survivor",
@@ -10062,7 +10607,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "sven-goran-eriksson",
@@ -10080,7 +10626,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "sven-ingvars",
@@ -10098,7 +10645,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "sverrir-gudnason",
@@ -10118,7 +10666,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 76
   },
   {
     "id": "sylvester-stallone",
@@ -10138,7 +10687,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 88
   },
   {
     "id": "talk-talk",
@@ -10156,7 +10706,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "taylor-swift",
@@ -10176,7 +10727,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 95
   },
   {
     "id": "teach-in",
@@ -10194,7 +10746,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-archies",
@@ -10212,7 +10765,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-ark",
@@ -10230,7 +10784,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 74
   },
   {
     "id": "the-b-52s",
@@ -10248,7 +10803,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-beach-boys",
@@ -10266,7 +10822,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-black-eyed-peas",
@@ -10284,7 +10841,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-cardigans",
@@ -10302,7 +10860,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-chainsmokers",
@@ -10320,7 +10879,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-cranberries",
@@ -10338,7 +10898,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-everly-brothers",
@@ -10356,7 +10917,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-hives",
@@ -10374,7 +10936,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 80
   },
   {
     "id": "the-human-league",
@@ -10392,7 +10955,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-killers",
@@ -10410,7 +10974,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-mamas",
@@ -10427,7 +10992,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-offspring",
@@ -10445,7 +11011,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-rasmus",
@@ -10463,7 +11030,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-rolling-stones",
@@ -10481,7 +11049,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-verve",
@@ -10499,7 +11068,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-white-stripes",
@@ -10517,7 +11087,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "the-who",
@@ -10535,7 +11106,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "thiago-silva",
@@ -10553,7 +11125,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "thierry-henry",
@@ -10571,7 +11144,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 90
   },
   {
     "id": "thomas-di-leva",
@@ -10589,7 +11163,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "thomas-muller",
@@ -10607,7 +11182,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "thomas-ravelli",
@@ -10625,7 +11201,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "tim-cahill",
@@ -10643,7 +11220,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "tim-howard",
@@ -10661,7 +11239,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "timoteij",
@@ -10679,7 +11258,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "tlc",
@@ -10697,7 +11277,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "tom-brady",
@@ -10715,7 +11296,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "tom-cruise",
@@ -10735,7 +11317,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 92
   },
   {
     "id": "tom-hanks",
@@ -10755,7 +11338,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 95
   },
   {
     "id": "tomas-brolin",
@@ -10773,7 +11357,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 85
   },
   {
     "id": "tommy-nilsson",
@@ -10791,7 +11376,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "toni-kroos",
@@ -10809,7 +11395,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "toto",
@@ -10827,7 +11414,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "toto-cutugno",
@@ -10845,7 +11433,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "usa-for-africa",
@@ -10863,7 +11452,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "usain-bolt",
@@ -10881,7 +11471,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 97
   },
   {
     "id": "val-kilmer",
@@ -10901,7 +11492,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 78
   },
   {
     "id": "van-halen",
@@ -10919,7 +11511,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "vengaboys",
@@ -10937,7 +11530,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "venus-williams",
@@ -10955,7 +11549,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "veronica-maggio",
@@ -10973,7 +11568,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 80
   },
   {
     "id": "vicente-del-bosque",
@@ -10991,7 +11587,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 82
   },
   {
     "id": "vicky-leandros",
@@ -11009,7 +11606,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "victor-hedman",
@@ -11027,7 +11625,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "victor-lindelof",
@@ -11045,7 +11644,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "sweden"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 84
   },
   {
     "id": "viktor-gyokeres",
@@ -11064,7 +11664,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "europe"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "village-people",
@@ -11082,7 +11683,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "virgil-van-dijk",
@@ -11100,7 +11702,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 86
   },
   {
     "id": "wayne-gretzky",
@@ -11118,7 +11721,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 88
   },
   {
     "id": "wayne-rooney",
@@ -11136,7 +11740,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "wesley-sneijder",
@@ -11154,7 +11759,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "unknown-region"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "whitesnake",
@@ -11172,7 +11778,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "whitney-houston",
@@ -11192,7 +11799,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 92
   },
   {
     "id": "whoopi-goldberg",
@@ -11212,7 +11820,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 85
   },
   {
     "id": "will-ferrell",
@@ -11232,7 +11841,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "xabi-alonso",
@@ -11250,7 +11860,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 78
   },
   {
     "id": "yes",
@@ -11268,7 +11879,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "zara-larsson",
@@ -11286,7 +11898,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 82
   },
   {
     "id": "zayn",
@@ -11304,7 +11917,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this Artist?"
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "zinedine-zidane",
@@ -11322,7 +11936,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 92
   },
   {
     "id": "zlatan-ibrahimovic",
@@ -11340,7 +11955,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this athlete?"
+    "questionText": "What is the Name of this athlete?",
+    "itemHcp": 98
   },
   {
     "id": "zoe-saldana",
@@ -11360,7 +11976,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this actor?"
+    "questionText": "What is the Name of this actor?",
+    "itemHcp": 82
   },
   {
     "id": "zombie-nation",
@@ -11378,7 +11995,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "zz-top",
@@ -11396,7 +12014,8 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "region": [
       "global"
     ],
-    "questionText": "What is the Name of this band?"
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   }
 ];
 

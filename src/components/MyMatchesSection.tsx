@@ -71,7 +71,11 @@ function buildSignature(list: MyRemoteMatch[]): string {
  * (inloggad/guest) och en framtida gren som glömmer proppen ska få den
  * smala rutan, inte råka återinföra den breda.
  */
-export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
+export function MyMatchesSection({
+  full = false,
+  inRow = false,
+  onVisible,
+}: { full?: boolean; inRow?: boolean; onVisible?: (v: boolean) => void } = {}) {
   const compact = !full;
   // Var knappen renderas ('/' på Home, '/profile' i Player history) —
   // skickas med som `from` så /my-matches Back-knapp går tillbaka hit
@@ -159,11 +163,21 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
   // Hooks måste köras före den villkorliga return:en nedan.
   const blink = useBlink(hasUpdate);
 
+  // Rapportera synlighet uppåt (HomeExtrasRow kollapsar raden när varken
+  // Competition eller 1vs1 finns). Effekten måste ligga före return:en.
+  const isVisible = !(visible.length === 0 && visibleSavedCount === 0);
+  useEffect(() => {
+    onVisible?.(isVisible);
+  }, [isVisible, onVisible]);
+
   if (visible.length === 0 && visibleSavedCount === 0) return null;
 
   return (
     <TouchableOpacity
-      style={[styles.mainBtn, compact && styles.mainBtnCompact]}
+      style={[
+        styles.mainBtn,
+        compact && (inRow ? styles.mainBtnInRow : styles.mainBtnCompact),
+      ]}
       activeOpacity={0.8}
       onPress={() => handlePress(signature)}
     >
@@ -277,6 +291,15 @@ const styles = StyleSheet.create({
   mainBtnCompact: {
     width: '50%',
     alignSelf: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 4,
+    paddingHorizontal: 6,
+  },
+  // Home-rad-variant (HomeExtrasRow): samma compact-visual men UTAN egen
+  // bredd/alignSelf — fyller sin flex:1-slot så knappen anchoras till höger
+  // halvan bredvid Competition-knappen. Slot:ens default stretch ger full
+  // bredd inom halvan.
+  mainBtnInRow: {
     justifyContent: 'space-between',
     gap: 4,
     paddingHorizontal: 6,

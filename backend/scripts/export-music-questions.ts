@@ -33,15 +33,24 @@ interface ExportedMusicQuestion {
   /** Frågetext från FIXED_QUESTION_TEXT[contentSubject] eller override för
    *  actor-select. Inline:as i exporten så klienten slipper rebakad lookup-tabell. */
   questionText: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Driver klientens
+   *  HCP-frågefilter: item valbart om itemHcp >= spelarens HCP. */
+  itemHcp: number;
   /** Generationer som item:et är curerat för — kopieras från file-header
    *  audience eller item-override. Driver klient-side audience-filtret. */
   audiences: Audience[];
   /** Genre/tema-paket-taggar (t.ex. ["sport"]). Emittas bara när non-empty.
    *  Driver klientens crossover-filter (sport-musik surfar under Music+Sport). */
   genrePackages?: string[];
+  /** false = paket-exklusiv (spelas bara när ett matchande Host-paket är aktivt).
+   *  Emittas bara när false — utelämnat = default true = med i baspoolen. */
+  inBaseCatalog?: boolean;
   /** Geografisk igenkännings-scope. Item-level overridar fil-header.
    *  'unknown-region' = ej i base-pool (reserverat för host-paket). */
   region: string[];
+  /** Parent control-tagg. true = filtreras bort när host har Parent Control på.
+   *  Emittas bara när true (default false = alltid med). */
+  parentControlled?: boolean;
   youtubeClips: ExportedYoutubeClip[];
   /** actor-select: true = animerad film (karaktärnamn), false/utelämnat = live-action (skådespelarnamn). */
   isAnimated?: boolean;
@@ -76,11 +85,20 @@ export interface MusicQuestion {
   correctYear?: number;
   contentSubject: YoutubeContentSubject;
   questionText: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Klientens HCP-filter
+   *  väljer item om itemHcp >= spelarens HCP (relaxas om poolen blir för tunn). */
+  itemHcp: number;
   audiences: MusicQuestionAudience[];
   genrePackages?: string[];
+  /** false = paket-exklusiv (spelas bara när matchande Host-paket är aktivt).
+   *  Utelämnat = default true = med i baspoolen. */
+  inBaseCatalog?: boolean;
   /** Geografisk igenkännings-scope. Item-level overridar fil-header.
    *  'unknown-region' = ej i base-pool; filtreras bort i SEED_QUESTIONS. */
   region: string[];
+  /** Parent control-tagg. true = klippet filtreras bort ur frågeurvalet när
+   *  host har Parent Control påslaget. Sätts i YAML (default false). */
+  parentControlled?: boolean;
   youtubeClips: YoutubeClip[];
   /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
   spotifyTrackId?: string;
@@ -107,13 +125,10 @@ async function main(): Promise<void> {
     // CategorySchema saknar 'movies'). Filtrera istället på contentForm.
     if (file.contentForm !== 'youtube') continue;
     for (const item of file.items) {
-      // inBaseCatalog=false → item är reserverat för ett kommande Host-paket
-      // (t.ex. christmas, eurovision) och ska INTE in i base-poolen som spelas
-      // nu. Klippet + taggen bevaras i katalogen tills paket-systemet aktiveras.
-      if (!item.inBaseCatalog) {
-        skipped.push(`${item.id} (inBaseCatalog=false → reserverat för paket)`);
-        continue;
-      }
+      // inBaseCatalog=false → item är paket-exklusivt (spelas bara när ett
+      // matchande Host-paket är aktivt). Vi EMITTERAR det numera (med flaggan
+      // nedan) så klienten kan inkludera det när paketet är valt; klientens
+      // baspool-filter exkluderar det när inget paket är aktivt.
       // Inkludera item om det har youtubeClips ELLER spotifyTrackId.
       // Spotify-only items (utan YouTube-klipp) är renodlade DJ-rundor.
       const hasYoutube = !!(item.youtubeClips && item.youtubeClips.length > 0);
@@ -146,6 +161,8 @@ async function main(): Promise<void> {
         ...(item.correctYear !== undefined ? { correctYear: item.correctYear } : {}),
         contentSubject: subject,
         questionText,
+        // Item-HCP (§4.1) = curator-satt probability (0–100).
+        itemHcp: item.probability,
         // Item-level audience-override har företräde över file-header.
         audiences: item.audience ?? file.audience,
         // Item-level region-override har företräde över fil-header.
@@ -153,6 +170,10 @@ async function main(): Promise<void> {
         region: item.region ?? file.region,
         // genrePackages (t.ex. ["sport"]) — bara när non-empty.
         ...(item.genrePackages.length ? { genrePackages: item.genrePackages } : {}),
+        // inBaseCatalog — bara när false (paket-exklusiv). Default true utelämnas.
+        ...(item.inBaseCatalog === false ? { inBaseCatalog: false } : {}),
+        // Parent control — bara när true (default false = alltid med).
+        ...(item.parentControlled ? { parentControlled: true } : {}),
         // Spotify track ID — bara om satt.
         ...(item.spotifyTrackId ? { spotifyTrackId: item.spotifyTrackId } : {}),
         // actor-select-specifika fält — bara för filmfrågor.

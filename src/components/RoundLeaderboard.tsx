@@ -458,6 +458,7 @@ export function RoundLeaderboard({
   guestReplaysUsed = 0,
   hostInitiatedPlayAgain = false,
   allRoundScoresHistory,
+  hcpChanges,
   belowTable,
   remote1v1 = false,
   onStartNewGame,
@@ -484,8 +485,8 @@ export function RoundLeaderboard({
 }: {
   players: LeaderboardPlayer[];
   /** Behållen för API-bakåtkompabilitet — tabellen aggregerar allt från
-   *  allRoundScoresHistory så roundScores och hcpChanges används inte längre
-   *  i renderingen. Lämnas i signaturen så call-sites slipper ändras. */
+   *  allRoundScoresHistory så roundScores används inte längre i renderingen.
+   *  Lämnas i signaturen så call-sites slipper ändras. */
   roundScores: RoundScore[];
   totalsByPlayerId: Record<string, number>;
   roundNumber: number;
@@ -520,6 +521,10 @@ export function RoundLeaderboard({
    *  för host. */
   hostInitiatedPlayAgain?: boolean;
   allRoundScoresHistory: RoundScore[][];
+  /** §5 — per-spelare HCP + start-värde ({before, after}), t.ex. HCP 42 (-1).
+   *  Vidarebefordras till LeaderboardTable som renderar HCP-raden. I dag bara
+   *  den lokala spelaren (device-lokal progression). Undefined på interim-
+   *  rundor + Aggregate-vyn → ingen HCP-rad. */
   hcpChanges?: Record<string, HcpChange>;
   /** Extra sektion som renderas UNDER tabellen, inuti scroll-innehållet
    *  (dvs ovanför sticky-footern). Remote 1v1 skickar hit sin duell-panel
@@ -872,18 +877,18 @@ export function RoundLeaderboard({
                 }
               >
                 <View style={{ width: pageWidth }}>
-                  <LeaderboardTable entries={tableEntries} />
+                  <LeaderboardTable entries={tableEntries} hcpChanges={hcpChanges} />
                 </View>
                 <View style={{ width: pageWidth }}>
                   <LeaderboardTable entries={aggregateEntries!} />
                 </View>
               </ScrollView>
             ) : (
-              <LeaderboardTable entries={tableEntries} />
+              <LeaderboardTable entries={tableEntries} hcpChanges={hcpChanges} />
             )}
           </View>
         ) : (
-          <LeaderboardTable entries={tableEntries} />
+          <LeaderboardTable entries={tableEntries} hcpChanges={hcpChanges} />
         )}
 
       {/* Extra sektion under tabellen (Remote 1v1-duellpanelen). Ligger inuti

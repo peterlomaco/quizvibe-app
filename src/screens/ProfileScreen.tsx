@@ -26,6 +26,7 @@ import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
+import { HCPShield } from '../components/HCPShield';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeQAvatar } from '../components/QuizVibeQAvatar';
@@ -92,6 +93,8 @@ import { clearLobbySettings } from '../utils/mockLobbySettings';
 import { clearGameStarted } from '../utils/mockStartedGames';
 import { generateRoomCode } from '../utils/roomCode';
 import { checkSpotifyInstalled } from '../utils/spotifyDJ';
+import { resolveDisplayHcp } from '../utils/hcpEngine';
+import { refreshOwnHcpDecay } from '../utils/hcpProgress';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -354,6 +357,12 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (!hasPremium && maxPlayers > 4) setMaxPlayers(4);
   }, [hasPremium, maxPlayers]);
+  // §2.4 — kör inaktivitets-decay vid Profile-open så HCP-skölden reflekterar
+  // ev. inaktivitet redan innan nästa spel (motorn applicerar annars decayen
+  // först vid nästa spelomgång). Fire-and-forget; speglar till profile.hcp.
+  useEffect(() => {
+    void refreshOwnHcpDecay();
+  }, []);
   const handleSelectMaxPlayers = (n: 4 | 12) => {
     if (n === 12 && gameMode !== 'individual-devices') {
       Alert.alert(
@@ -533,6 +542,11 @@ export default function ProfileScreen() {
   const [spotifyGuideVisible, setSpotifyGuideVisible] = useState(false);
   // I Profile: Spotify DJ-defaulten är valbar om usern attestat "Spotify user".
   const isSpotifyAvailable = spotifyConnected;
+
+  // ── Parent Control ───────────────────────────────────────────────────
+  // Host-default: när på filtreras YT-items taggade parentControlled bort ur
+  // frågeurvalet i alla spel där denna profil är host. Default av.
+  const [parentControlEnabled, setParentControlEnabled] = useState(false);
 
   const [smColWidth, setSmColWidth] = useState(0);
   const smCellStyle = smColWidth > 0 ? { width: smColWidth } : undefined;
@@ -920,6 +934,7 @@ export default function ProfileScreen() {
         setSpotifyEnabled(augmented.spotifyDefaultEnabled ?? false);
         setSpotifyAnswerYear(augmented.spotifyAnswerYear ?? true);
         setSpotifyAnswerName(augmented.spotifyAnswerName ?? true);
+        setParentControlEnabled(augmented.parentControlEnabled ?? false);
         // Snapshot av laddad state — jämförs vid navigation bort.
         // gameMode speglar den COERCADE staten (inte rå augmented) så en
         // stale 'remote-1v1'-profil inte fastnar i evig "unsaved changes".
@@ -939,6 +954,7 @@ export default function ProfileScreen() {
           youtubeEnabledCategories: augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories(),
           imagesEnabledCategories: augmented.imagesEnabledCategories ?? defaultEnabledMainCategories(),
           enabledHostPackages: augmented.enabledHostPackages ?? [],
+          parentControlEnabled: augmented.parentControlEnabled ?? false,
         });
       });
       loadFriends().then((list) => {
@@ -1083,6 +1099,10 @@ export default function ProfileScreen() {
   const selectedAvatar = AVATARS.find((a) => a.id === selectedAvatarId);
   const age = birthYear !== null ? CURRENT_YEAR - birthYear : null;
   const assistanceLabel  = ASSISTANCE_OPTIONS.find((s) => s.id === assistance)?.label;
+  // Player-HCP-sköld (§2 UI). Läser det intjänade värdet ur profil-spegeln
+  // (motorn skriver profile.hcp efter varje spel); saknas det faller
+  // resolveDisplayHcp tillbaka på startvärdet 99 (§1.1 — alla startar på 99).
+  const hcpDisplay = resolveDisplayHcp(getCachedProfile()?.hcp);
   const regionLabel = REGION_OPTIONS.find((r) => r.id === region)?.label;
   const answerResponseLabel = ANSWER_RESPONSE_OPTIONS.find(
     (o) => o.id === answerResponseSeconds,
@@ -1128,6 +1148,7 @@ export default function ProfileScreen() {
         spotifyAnswerYear,
         spotifyAnswerName,
         spotifyAppConfirmed: spotifyConnected,
+        parentControlEnabled,
       });
       savedSnapshotRef.current = JSON.stringify({
         birthYear, assistance,
@@ -1135,6 +1156,7 @@ export default function ProfileScreen() {
         gameMode, maxPlayers, roundsCount,
         answerResponseSeconds, youtubeEnabledCategories,
         imagesEnabledCategories, enabledHostPackages,
+        parentControlEnabled,
       });
       setSavedSection(section);
       setTimeout(() => setSavedSection(null), 2000);
@@ -1151,6 +1173,7 @@ export default function ProfileScreen() {
       gameMode, maxPlayers, roundsCount,
       answerResponseSeconds, youtubeEnabledCategories,
       imagesEnabledCategories, enabledHostPackages,
+      parentControlEnabled,
     });
     return current !== savedSnapshotRef.current;
   };
@@ -1455,6 +1478,12 @@ export default function ProfileScreen() {
             <Text style={styles.playerNameDisplay} numberOfLines={1}>
               {playerName}
             </Text>
+
+            {/* Player-HCP-sköld under avatar + namn (§2 UI). En registrerad
+                användare har alltid ett HCP (startar på 99). */}
+            <View style={styles.hcpShieldWrap}>
+              <HCPShield hcp={hcpDisplay} size={64} />
+            </View>
           </View>
 
           {/* Högerkolumn: competition setup */}
@@ -1901,6 +1930,32 @@ export default function ProfileScreen() {
 
             </View>
 
+          </View>
+
+          {/* Parent Control — host-default. När på filtreras YT-klipp taggade
+              parentControlled bort ur frågeurvalet i spel där denna profil är
+              host. Placerad under Source Mixerboard, precis ovanför Game era. */}
+          <View style={styles.field}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={[styles.regionLabelRow, { flex: 1, marginBottom: 0 }]}>
+                <Text style={styles.sectionLabel}>Parent Control</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() => Alert.alert('Parent Control', 'When on, YouTube clips flagged as parent-controlled are removed from the question selection in games you host.')}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
+              <Switch
+                value={parentControlEnabled}
+                onValueChange={setParentControlEnabled}
+                trackColor={{ false: '#3C3C3C', true: Colors.success }}
+                thumbColor="#FFF"
+                ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
+                style={styles.sourceMatrixSwitch}
+              />
+            </View>
           </View>
 
           {/* Game era — adjustable år-spann för frågor. */}
@@ -3903,6 +3958,10 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     textAlign: 'center',
     width: '100%',
+  },
+  hcpShieldWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // Right column: competition setup

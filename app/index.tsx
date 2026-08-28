@@ -15,6 +15,7 @@ import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { buildRemoteQuizParams, getMatchByRoomCode, getOwnUserId, splitMatchForUser } from '@/src/utils/remoteMatches';
 import { MyMatchesSection } from '@/src/components/MyMatchesSection';
+import { HomeExtrasRow } from '@/src/components/HomeExtrasRow';
 import {
   appendPlayerNameDigit,
   appendPlayerNameLetter,
@@ -2848,7 +2849,7 @@ export default function HomeScreen() {
               Utloggade guests får den kvar sist på skärmen (se blocket
               efter actionsSection). Renderar sig själv bara när användaren
               har minst en 1vs1-match — annars null. */}
-          {isLoggedIn && hostTypeExpanded === 'none' && <MyMatchesSection />}
+          {isLoggedIn && hostTypeExpanded === 'none' && <HomeExtrasRow />}
 
           {/* Guest-sektionen (rubrik + två knappar) — döljs HELT när
               inloggad (registered users använder Join with Room Code —

@@ -335,6 +335,21 @@ export interface PlayerScoreRecordedPayload {
 }
 
 /**
+ * En spelare har räknat om sitt Player-HCP vid game-end. Broadcastas av VARJE
+ * IndDev-klient EN gång (med några retries) när sista rundans leaderboard
+ * visas — mottagarna merge:ar deltat i sin `playerHcpChanges` så §5-raden
+ * ("HCP 42 (-1)") syns för alla spelare på alla enheter. `before`/`after` är
+ * DISPLAY-HCP (avrundat uppåt). Idempotent: mottagaren nycklar på player_id.
+ */
+export interface PlayerHcpChangedPayload {
+  /** Lobby_players.player_id för spelaren vars HCP räknades om. */
+  player_id: string;
+  /** Display-HCP före/efter denna omgång (1–99). */
+  before: number;
+  after: number;
+}
+
+/**
  * Non-host skickar sin lokala fråge-historik (rullande 20-sessions-fönstret
  * från hostQuestionHistory) till host direkt vid quiz-mount. Host unionerar
  * ALLA spelares historik och exkluderar frågor som NÅGON deltagare sett i
@@ -453,6 +468,11 @@ export interface SyncChannelHandlers {
    */
   onPlayerScoreRecorded?: (payload: PlayerScoreRecordedPayload) => void;
   /**
+   * En annan IndDev-spelare har räknat om sitt Player-HCP vid game-end.
+   * Merge:as in i `playerHcpChanges` för §5-raden på alla enheter.
+   */
+  onPlayerHcpChanged?: (payload: PlayerHcpChangedPayload) => void;
+  /**
    * En non-host har skickat sin lokala fråge-historik (20-sessions-fönstret).
    * Host unionerar in i peer-seen-set:en som exkluderar frågor någon
    * deltagare redan sett — ignoreras efter att spelet startat (pool-rebuild
@@ -527,6 +547,8 @@ export interface SyncChannel {
    * så leaderboarden är komplett på alla enheter.
    */
   broadcastPlayerScoreRecorded: (payload: PlayerScoreRecordedPayload) => Promise<void>;
+  /** Broadcasta vårt omräknade Player-HCP vid game-end (IndDev). */
+  broadcastPlayerHcpChanged: (payload: PlayerHcpChangedPayload) => Promise<void>;
   /**
    * Non-host broadcastar sin lokala fråge-historik till host vid quiz-mount
    * så host:s pool-bygge kan exkludera frågor NÅGON deltagare sett i sina
@@ -782,6 +804,14 @@ function vPlayerScoreRecorded(raw: unknown): PlayerScoreRecordedPayload | null {
   };
 }
 
+function vPlayerHcpChanged(raw: unknown): PlayerHcpChangedPayload | null {
+  if (!isObj(raw) || !str(raw.player_id) || !num(raw.before) || !num(raw.after))
+    return null;
+  if (raw.before < 1 || raw.before > 99 || raw.after < 1 || raw.after > 99)
+    return null;
+  return { player_id: raw.player_id, before: raw.before, after: raw.after };
+}
+
 /**
  * Subscribe till `quiz_sync:<roomCode>`-channel. Bägge host och non-host
  * kan subscribe:a — `broadcast.self: false` är default i Supabase Realtime
@@ -940,6 +970,12 @@ export function subscribeSyncChannel(
   if (handlers.onPlayerScoreRecorded)
     onEvent('player_score_recorded', vPlayerScoreRecorded, (p) => {
       if (known(p.player_id, 'player_score_recorded')) handlers.onPlayerScoreRecorded!(p);
+    });
+  // player_hcp_changed: en annan IndDev-enhet har räknat om sitt Player-HCP
+  // vid game-end. Player-id-bärande → samma membership-guard som scores.
+  if (handlers.onPlayerHcpChanged)
+    onEvent('player_hcp_changed', vPlayerHcpChanged, (p) => {
+      if (known(p.player_id, 'player_hcp_changed')) handlers.onPlayerHcpChanged!(p);
     });
   // player_seen_questions: non-host:s fråge-historik → host:s peer-union.
   // Player-id-bärande → membership-guard som övriga sådana events.
@@ -1105,6 +1141,9 @@ export function subscribeSyncChannel(
     },
     broadcastPlayerScoreRecorded: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'player_score_recorded', payload });
+    },
+    broadcastPlayerHcpChanged: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'player_hcp_changed', payload });
     },
     broadcastPlayerReady: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'player_ready', payload });

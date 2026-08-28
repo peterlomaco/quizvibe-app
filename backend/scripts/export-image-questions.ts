@@ -50,6 +50,9 @@ interface ExportedQuestion {
    *  HINTS_REGION_MAP:s region-roll är retirerad. */
   region: string[];
   questionText: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Driver klientens
+   *  HCP-frågefilter: item valbart om itemHcp >= spelarens HCP. */
+  itemHcp: number;
 }
 
 
@@ -99,6 +102,8 @@ function buildExportedQuestion(
     audiences: Array.from(audiencesSet),
     region: Array.from(regionSet),
     questionText: FIXED_QUESTION_TEXT[contentSubject],
+    // Item-HCP (§4.1) = curator-satt probability (0–100).
+    itemHcp: item.probability,
   };
 }
 
@@ -189,6 +194,9 @@ export interface ImageQuizQuestion {
    *  'unknown-region' når ingen spelare. */
   region: string[];
   questionText: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Klientens HCP-filter
+   *  väljer item om itemHcp >= spelarens HCP (relaxas om poolen blir för tunn). */
+  itemHcp: number;
 }
 
 export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = ${JSON.stringify(questions, null, 2)};

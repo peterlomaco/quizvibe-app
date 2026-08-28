@@ -11,6 +11,7 @@ import {
   type SavedAggregate,
 } from '../utils/aggregateLeaderboards';
 import { isAnonymousSession } from '../utils/auth';
+import { CompetitionRematchActions } from './CompetitionRematchActions';
 import { finalizeRows, LeaderboardTable } from './LeaderboardTable';
 
 /**
@@ -24,7 +25,18 @@ import { finalizeRows, LeaderboardTable } from './LeaderboardTable';
  * som slutskärmen använder, så en sparad serie ser identisk ut med hur den
  * såg ut i spelet.
  */
-export function SavedAggregatesCard() {
+/**
+ * @param showRematch  När true renderar detalj-modalen re-match/replay-
+ *   åtgärderna (CompetitionRematchActions — host initierar, deltagare
+ *   accepterar, host startar) ovanför Close. Används av /competitions-skärmen
+ *   (öppnad från Home:s Competition-knapp). Profile-call-siten utelämnar den →
+ *   bara Close, som förut.
+ */
+export function SavedAggregatesCard({
+  showRematch = false,
+}: {
+  showRematch?: boolean;
+} = {}) {
   const [items, setItems] = useState<SavedAggregate[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -120,6 +132,16 @@ export function SavedAggregatesCard() {
             <ScrollView style={{ maxHeight: 360 }}>
               <LeaderboardTable entries={openRows} />
             </ScrollView>
+            {/* Re-match/Replay-åtgärder — bara när kortet öppnats från Home
+                (/competitions). Host initierar, deltagare accepterar, host
+                startar (två-fas, migration 0041). Profile-vyn utelämnar
+                showRematch → bara Close. */}
+            {showRematch && open && (
+              <CompetitionRematchActions
+                saved={open}
+                onClose={() => setOpenId(null)}
+              />
+            )}
             <Pressable
               style={({ pressed }) => [
                 styles.modalCloseBtn,

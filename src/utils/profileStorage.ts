@@ -90,6 +90,11 @@ export interface ProfileData {
   // Om Spotify DJ-läget är aktiverat som standard-val i Host defaults.
   // Optional — defaultas till false om saknas.
   spotifyDefaultEnabled?: boolean;
+  // Parent Control (barnvänligt urval). När true filtreras YT-items taggade
+  // parentControlled bort ur frågeurvalet i alla spel där denna profil är host.
+  // AsyncStorage-ONLY (ingen DB-kolumn — samma mönster som spotifyDefaultEnabled).
+  // Default false om saknas.
+  parentControlEnabled?: boolean;
   // Spotify-svarstyper. Båda true = alternerar per frågeindex (Year / Name).
   // Minst en måste vara true när Spotify är aktiverat.
   spotifyAnswerYear?: boolean;   // default true
@@ -99,6 +104,19 @@ export interface ProfileData {
   // OAuth-verifieringen — ingen DB-kolumn, lever enbart i AsyncStorage-cachen.
   // Default false. Seedar lobby_players.spotify_verified vid join/host.
   spotifyAppConfirmed?: boolean;
+  // Player HCP (Dynamic Handicap System). Skala 1–99, 1 = elit, 99 = nybörjare
+  // (se src/utils/hcp.ts). Aktuellt intjänat värde per registrerad profil;
+  // sköldarna faller tillbaka på calculateInitialHCP(age, assistance) tills
+  // justeringsmotorn (Phase D) skrivit ett riktigt värde här.
+  //
+  // ⚠ AsyncStorage-ONLY (som spotify*-fälten) — MEDVETET ingen DB-kolumn ännu.
+  // (a) En upsert som nämner en okörd kolumn failar HELA profiles-skrivningen
+  // (samma klass som sketch_enabled/spotify_answer_*), och (b) HCP-progressens
+  // INDATA (sliding-fönstren) är device-lokala, så att spegla enbart det
+  // härledda värdet cross-device utan fönster-historiken ger inkonsekventa
+  // justeringar. Promotera till en profiles-kolumn (egen migration) först när
+  // cross-device-HCP faktiskt behövs. Optional för bakåtkompat.
+  hcp?: number;
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -432,6 +450,9 @@ async function loadProfileFresh(): Promise<ProfileData | null> {
         spotifyAnswerYear: cached?.spotifyAnswerYear,
         spotifyAnswerName: cached?.spotifyAnswerName,
         spotifyAppConfirmed: cached?.spotifyAppConfirmed,
+        // AsyncStorage-only (ingen DB-kolumn) — alltid från cache.
+        parentControlEnabled: cached?.parentControlEnabled,
+        hcp: cached?.hcp,
       };
     }
     const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
@@ -542,6 +563,8 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     spotifyAnswerYear: cache?.spotifyAnswerYear,
     spotifyAnswerName: cache?.spotifyAnswerName,
     spotifyAppConfirmed: cache?.spotifyAppConfirmed,
+    parentControlEnabled: cache?.parentControlEnabled,
+    hcp: cache?.hcp,
   };
 
   // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha

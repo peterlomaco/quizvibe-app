@@ -59,11 +59,12 @@ import { isAnonymousSession } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
+import { displayHcp, resolveDisplayHcp } from '../utils/hcpEngine';
 import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
-import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnHcp, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
@@ -78,6 +79,13 @@ import {
   PURCHASED_PACKAGES,
   type MusicPackage,
 } from '../utils/mockPurchasedPackages';
+import {
+  hasActivePackage,
+  computePackageCoverage,
+  computePackageEraRange,
+  resolveActivePackageTags,
+  itemInActivePackages,
+} from '../utils/hostPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import {
   appendPlayerNameDigit,
@@ -142,6 +150,10 @@ export interface LobbyPlayer extends Player {
   // RLS så ingen annan klient kan slå upp namnet. undefined = spelaren
   // använder sitt kontonamn, eller är en ren guest utan konto.
   accountPlayerName?: string;
+  // Spelarens intjänade display-HCP (1–99). Publiceras av spelaren själv via
+  // publishOwnHcp → lobby_players.hcp (migration 0042) så övriga ser det på
+  // spelarkortet. undefined = ännu ej progressad (skölden visar 99) / gäst.
+  hcp?: number;
 }
 
 type GameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
@@ -214,6 +226,10 @@ function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): Lobb
     isHost: true,
   };
 }
+
+// Competition re-match (från Home): begäran lever i 5 minuter — hinner inte
+// alla inbjudna joina rivs lobbyn och inbjudningarna cascade:as bort.
+const COMPETITION_REMATCH_TTL_MS = 5 * 60 * 1000;
 
 const SEED_PLAYERS: LobbyPlayer[] = [
   { id: '1', name: 'Alex K.',   emoji: '🦊', isReady: true,  type: 'registered', hcpComplete: true,  age: 32, assistance: 'standard', isHost: true, approved: true  },
@@ -1033,6 +1049,23 @@ function publishOwnAccountAlias(roomCode: string, playerId: string): void {
 }
 
 /**
+ * Publicerar spelarens EGET intjänade display-HCP (1–99, ceil per §1.2.3) till
+ * sin egen lobby_players-rad så övriga enheter kan visa det på spelarkortet.
+ * Samma fire-and-forget-kedjning som publishOwnAccountAlias — MÅSTE anropas
+ * efter att egen rad finns i DB. No-op för gäster + ännu ej progressade
+ * spelare (ingen profile.hcp) → kolumnen förblir null → skölden visar 99.
+ */
+function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
+  loadProfile()
+    .then((profile) => {
+      const hcp = profile?.hcp;
+      if (typeof hcp !== 'number') return;
+      return publishOwnHcp(roomCode, playerId, displayHcp(hcp));
+    })
+    .catch(() => {});
+}
+
+/**
  * Alert.alert som en await-bar Promise<boolean>. Används för guards inuti
  * redan-async flöden (t.ex. handleStartGame) där vi vill avbryta på Cancel
  * utan att lägga till en parameter + rekursion à la ptpConfirmed — och utan
@@ -1197,6 +1230,7 @@ export default function LobbyScreen() {
     carryOverPlayerId,
     lobbyType,
     rematchLocked,
+    competitionRematch,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
@@ -1228,6 +1262,13 @@ export default function LobbyScreen() {
      *  Skickas som param (utöver rums-radens rematch_locked) så låst läge
      *  renderas redan på första framen, utan att vänta på en DB-läsning. */
     rematchLocked?: string;
+    /** 'true' när re-matchen startats från Home → /competitions (en sparad
+     *  Competition Leaderboard). Till skillnad från Final Leaderboards
+     *  re-match är de andra deltagarna INTE anslutna — de får en
+     *  cross-device-inbjudan och joinar på egen enhet. Driver den 5-minuters
+     *  expiry-timern nedan + väntar-bannern. rematchLocked är alltid 'true'
+     *  tillsammans med denna (den låsta uppsättningen bär Start-gaten). */
+    competitionRematch?: string;
   }>();
   // Om ingen kod skickas (t.ex. om man öppnar lobby-tabben direkt) genereras en.
   // useMemo ser till att koden är stabil över re-renders.
@@ -1259,6 +1300,11 @@ export default function LobbyScreen() {
   // på Home släpper bara in spelare som redan finns i lobbyn.
   // Host har fortfarande "Delete this Game Lobby" som utväg.
   const isRematchLobby = rematchLocked === 'true';
+  // Competition re-match från Home (/competitions): en låst re-match där de
+  // inbjudna deltagarna joinar cross-device via inbjudan. Lägger till en
+  // 5-minuters expiry + en "väntar på spelare"-banner ovanpå den vanliga
+  // låsta-uppsättnings-logiken (isRematchLobby bär resten).
+  const isCompetitionRematch = competitionRematch === 'true';
   // 'single' / 'multiplayer' är de två andra lobbyType-värdena. Sedan
   // 2026-08-26 LÅSER de lobbyn på samma sätt som '1v1' gör:
   //   • 'single'      → statisk "Single player"-indikator, ingen Players-
@@ -1282,6 +1328,12 @@ export default function LobbyScreen() {
   // markera rätt spelare som "left" i leftPlayers-storen så övriga ser
   // status:en när de öppnar lobby:n.
   const ownPlayerIdRef = useRef<string | null>(null);
+  // Eget intjänat Player-HCP (§2 UI) från den synkrona profil-spegeln —
+  // visas på DENNA enhets egen spelarrad (host eller non-host). Lobbyn
+  // mountas färskt efter varje spel, så spegeln bär redan motorns senaste
+  // skrivning. Andra spelares intjänade HCP kräver cross-device-sync
+  // (uppskjutet) och faller därför tillbaka på startvärdet 99.
+  const selfHcp = getCachedProfile()?.hcp;
   // Markeras true när self-rad först ses i stored från DB. Används av
   // syncFromStore för att skilja "vår INSERT har inte propagerat än"
   // (false → injecta från prev) från "host har raderat oss via DB DELETE"
@@ -1612,6 +1664,11 @@ export default function LobbyScreen() {
           // i en ny lobby (opt-in) men bärs över vid Play Again.
           setRemoteAssistance(stored?.remoteAssistance ?? 'full');
           setMutualAssistanceEnabled(stored?.mutualAssistanceEnabled ?? false);
+          // Parent Control — seedas ENBART från host:ens profil-default.
+          // stored?.parentControlEnabled är alltid false (fältet persisteras
+          // inte till DB, samma mönster som spotify_answer_*), så vi läser det
+          // aldrig här — annars skulle en re-seed skriva över host:ens val.
+          setParentControlEnabled(profile?.parentControlEnabled ?? false);
           // Tillåt debounce-effekten att skriva till setLobbySettings nu när
           // alla initiala värden är satta. Utan denna guard kan debounce:n
           // hinna skriva med default-värden (spotifyEnabled=false) INNAN
@@ -1665,7 +1722,10 @@ export default function LobbyScreen() {
           // Guest alias: en INLOGGAD user som joinar via guest-formen
           // publicerar sitt kontonamn så host ser vem det är. Kedjat på
           // upsert:en så raden garanterat finns när UPDATE:n körs.
-          .then(() => publishOwnAccountAlias(roomCode, guestPlayerId))
+          .then(() => {
+            publishOwnAccountAlias(roomCode, guestPlayerId);
+            publishOwnHcpToLobby(roomCode, guestPlayerId);
+          })
           .catch(() => { /* loggas i lobbyPlayers */ });
         // Publicera enhetens fråge-historik för cross-player-exkludering.
         // Guest-join på en enhet med inloggad profil publicerar profilens
@@ -1796,11 +1856,17 @@ export default function LobbyScreen() {
           // claim sätter user_id + has_left=false; separat upsert skriver approved=true.
           claimCarryOverLobbyPlayer(roomCode, joinerId).catch(() => { /* loggas i lobbyPlayers */ });
           upsertOwnLobbyPlayer(roomCode, joiner)
-            .then(() => publishOwnAccountAlias(roomCode, joinerId))
+            .then(() => {
+              publishOwnAccountAlias(roomCode, joinerId);
+              publishOwnHcpToLobby(roomCode, joinerId);
+            })
             .catch(() => { /* loggas i lobbyPlayers */ });
         } else {
           upsertOwnLobbyPlayer(roomCode, joiner)
-            .then(() => publishOwnAccountAlias(roomCode, joinerId))
+            .then(() => {
+              publishOwnAccountAlias(roomCode, joinerId);
+              publishOwnHcpToLobby(roomCode, joinerId);
+            })
             .catch(() => { /* loggas i lobbyPlayers */ });
         }
         // Publicera enhetens fråge-historik för cross-player-exkludering
@@ -2461,6 +2527,10 @@ export default function LobbyScreen() {
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
   const [spotifyAnswerYear, setSpotifyAnswerYear] = useState(true);
   const [spotifyAnswerName, setSpotifyAnswerName] = useState(true);
+  // Parent Control — host-styrd. När på filtreras YT-items taggade
+  // parentControlled bort ur frågeurvalet (skickas som URL-param till quiz).
+  // Seedas från host:ens profil (parentControlEnabled); non-host speglar host.
+  const [parentControlEnabled, setParentControlEnabled] = useState(false);
   // Remote 1v1: EN gemensam hjälpnivå för båda spelarna (default Full).
   // Assistance är annars personligt, men i en duell där båda kör samma
   // frågesekvens var för sig blir olika nivåer inte jämförbart — därför KAN
@@ -3042,6 +3112,60 @@ export default function LobbyScreen() {
     }
   };
 
+  // "+ Add package"-modal: host väljer paket direkt ur HELA katalogen
+  // (allPackagesCatalog), oberoende av vad som är aktiverat i Profile. Slår host
+  // PÅ ett paket här görs det (a) tillgängligt i lobby-listan (enabledHostPackages)
+  // OCH (b) aktivt i lobbyn (selectedExtraPackages) — "får med till lobbyn". AV =
+  // tas bort ur båda. Lobby-scopat (inte skrivet till profilen) per Peters intent.
+  const [addPackageModalVisible, setAddPackageModalVisible] = useState(false);
+  const handleToggleCatalogPackage = (id: string) => {
+    if (enabledHostPackages.includes(id)) {
+      setEnabledHostPackages((prev) => prev.filter((p) => p !== id));
+      setSelectedExtraPackages((prev) => prev.filter((p) => p !== id));
+    } else {
+      setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    }
+  };
+
+  // ── Host-paket: coverage-graying + Game Era-lås (delad logik i hostPackages.ts) ──
+  // Aktivt paket → musikpoolen blir tema-only (quiz.tsx). Här i lobbyn:
+  //   (a) mixerboard-celler utan material i valt paket gråas ut (pkgGray*),
+  //   (b) Game Era låses till paketens innehålls-span (effectiveEraValues).
+  // Allt härleds ur selectedExtraPackages → auto-uppdaterar vid paket-toggle.
+  const anyPackageActive = useMemo(
+    () => hasActivePackage(selectedExtraPackages),
+    [selectedExtraPackages],
+  );
+  const packageCoverage = useMemo(
+    () => computePackageCoverage(selectedExtraPackages),
+    [selectedExtraPackages],
+  );
+  const packageEraRange = useMemo(
+    () => computePackageEraRange(selectedExtraPackages),
+    [selectedExtraPackages],
+  );
+  const packageEraLocked = anyPackageActive && packageEraRange !== null;
+  // En (kategori × källa)-cell gråas när paket aktivt men saknar material där.
+  const pkgGray = (cat: MainCategory, src: 'youtube' | 'hints'): boolean =>
+    anyPackageActive && !packageCoverage[cat][src];
+  // Kolumn-master gråas när HELA kolumnen (YT + Hints) saknar material.
+  const pkgGrayColumn = (cat: MainCategory): boolean =>
+    anyPackageActive && !packageCoverage[cat].youtube && !packageCoverage[cat].hints;
+  const pkgGraySpotify =
+    anyPackageActive &&
+    !packageCoverage.Music.spotify &&
+    !packageCoverage.Film.spotify &&
+    !packageCoverage.Sport.spotify;
+  // "All"-master gråas bara när HELA matrisen saknar material (alla kolumner grå).
+  const pkgGrayAllSources =
+    pkgGrayColumn('Music') && pkgGrayColumn('Film') && pkgGrayColumn('Sport');
+  // Effektivt Game Era-spann: paketets innehålls-span när låst, annars host:s
+  // slider-val. Används för display, lobby_settings-write, quiz-params + preview
+  // så non-host + spelet alltid får det låsta spannet (aldrig tomt pga era-miss).
+  const effectiveEraValues: [number, number] =
+    packageEraLocked && packageEraRange ? packageEraRange : [eraValues[0], eraValues[1]];
+
   // Switch som kräver att host:s manuellt tillagda guests försvinner (de
   // saknar egen mobil och kan inte spela på individual devices). Visar Alert
   // om sådana finns, raderar dem lokalt + i lobby_players-DB:n vid confirm,
@@ -3571,7 +3695,7 @@ export default function LobbyScreen() {
   // displayEra speglar realtids-värdet under drag och commitat värde
   // däremellan — så box "1990 – 2020" + youngest-player-warning uppdateras
   // live medan host drar utan att vi behöver toucha lib:ns prop.
-  const displayEra = dragEraValues ?? eraValues;
+  const displayEra = packageEraLocked ? effectiveEraValues : (dragEraValues ?? eraValues);
   const { warning: eraWarning } = checkEraAgainstPlayer(displayEra[1], players);
   // To-året kan inte gå under ERA_TO_MIN (1980) — visa gul varning vid golvet.
   const eraAtToFloor = displayEra[1] <= ERA_TO_MIN;
@@ -4269,12 +4393,37 @@ export default function LobbyScreen() {
       cancelled = true;
     };
   }, [isRematchLobby, roomCode]);
-  // Fallback till de faktiskt pre-seedade raderna när rums-raden saknar
-  // listan (0037 inte körd → registerActiveRoom:s fallback skrev rummet
-  // utan fälten). Lobbyn låses ändå visuellt; bara "alla på plats"-guarden
-  // degraderar till en no-op, vilket är rätt riktning att fela åt.
-  const lockedLineupCount =
-    rematchExpectedIds.length || players.filter((p) => !p.hasLeft).length;
+
+  // Competition re-match: 5-minuters livslängd. Ref-spegel av "alla på plats"
+  // så expiry-timeouten (satt en gång på mount) läser aktuellt läge vid fire.
+  const allRematchPresentRef = useRef(false);
+  useEffect(() => {
+    allRematchPresentRef.current =
+      !isCompetitionRematch ||
+      findMissingRematchPlayers(rematchExpectedIds, players).length === 0;
+  }, [isCompetitionRematch, rematchExpectedIds, players]);
+
+  useEffect(() => {
+    if (!hostMode || !isCompetitionRematch) return;
+    const timer = setTimeout(() => {
+      // Alla joinade i tid → låt lobbyn leva (host startar när de vill).
+      if (allRematchPresentRef.current) return;
+      // Riv rummet — deactivateRoom raderar rums-raden så waiting_invites
+      // cascade:as bort automatiskt (recipients JoinModal-sub tar bort dem).
+      void deactivateRoom(roomCode);
+      clearLobbyPlayers(roomCode);
+      clearLobbySettings(roomCode);
+      clearEjected(roomCode);
+      clearGameStarted(roomCode);
+      Alert.alert(
+        'Re-match request expired',
+        'Not everyone joined within 5 minutes, so the re-match was cancelled.',
+        [{ text: 'OK', onPress: () => router.replace('/') }],
+        { cancelable: false },
+      );
+    }, COMPETITION_REMATCH_TTL_MS);
+    return () => clearTimeout(timer);
+  }, [hostMode, isCompetitionRematch, roomCode]);
 
   const isRemoteLobby = gameMode === 'remote-1v1' && !singlePlayerDefault;
   // Gemensam hjälpnivå gäller bara när BÅDE lobbyn är remote OCH host slagit
@@ -4489,6 +4638,7 @@ export default function LobbyScreen() {
         if (!hostId) return;
         hostAliasPublishedRef.current = true;
         publishOwnAccountAlias(roomCode, hostId);
+        publishOwnHcpToLobby(roomCode, hostId);
       })
       .catch(() => { /* loggas i mockLobbyPlayers */ });
   }, [hostMode, roomCode, players]);
@@ -4515,8 +4665,10 @@ export default function LobbyScreen() {
         maxPlayers,
         region,
         answerResponseSeconds,
-        eraFrom: eraValues[0],
-        eraTo: eraValues[1],
+        // effectiveEraValues = paketets låsta span när paket aktivt, annars
+        // host:s slider-val. Non-host ärver det låsta spannet via denna sync.
+        eraFrom: effectiveEraValues[0],
+        eraTo: effectiveEraValues[1],
         roundsCount,
         selectedExtraPackages,
         youtubeEnabledCategories,
@@ -4525,6 +4677,7 @@ export default function LobbyScreen() {
         spotifyEnabled,
         spotifyAnswerYear,
         spotifyAnswerName,
+        parentControlEnabled,
         remoteAssistance,
         mutualAssistanceEnabled,
       }).catch(() => { /* loggas i mockLobbySettings */ });
@@ -4547,6 +4700,7 @@ export default function LobbyScreen() {
     spotifyEnabled,
     spotifyAnswerYear,
     spotifyAnswerName,
+    parentControlEnabled,
     remoteAssistance,
     mutualAssistanceEnabled,
   ]);
@@ -4614,6 +4768,11 @@ export default function LobbyScreen() {
       setSpotifyEnabled(stored.spotifyEnabled);
       setSpotifyAnswerYear(stored.spotifyAnswerYear);
       setSpotifyAnswerName(stored.spotifyAnswerName);
+      // Parent Control (read-only för non-host). OBS: fältet persisteras inte
+      // till DB → stored.parentControlEnabled är alltid false, så non-host
+      // visar av. Filtret körs ändå bara på host:ens enhet (host bygger och
+      // broadcastar frågesekvensen), så non-host-värdet är rent kosmetiskt.
+      setParentControlEnabled(stored.parentControlEnabled);
       // Remote 1v1: hostens gemensamma hjälpnivå + om den alls är påslagen
       // (read-only för non-host).
       setRemoteAssistance(stored.remoteAssistance);
@@ -4789,11 +4948,15 @@ export default function LobbyScreen() {
           // kolumnen är satt (och plockar sedan aldrig upp den igen —
           // spelaren är då redan i localIds). Konvergera den här istället.
           const nextAccountName = updated.accountPlayerName;
+          // HCP publiceras av spelaren själv strax efter deras upsert (samma
+          // konvergens-fönster som guest alias) → syncas här.
+          const nextHcp = updated.hcp;
           if (
             !!p.hasLeft === nextHasLeft &&
             !!p.approved === nextApproved &&
             !!p.spotifyConnected === nextSpotifyConnected &&
-            p.accountPlayerName === nextAccountName
+            p.accountPlayerName === nextAccountName &&
+            p.hcp === nextHcp
           )
             return p;
           changed = true;
@@ -4803,6 +4966,7 @@ export default function LobbyScreen() {
             approved: nextApproved,
             spotifyConnected: nextSpotifyConnected,
             accountPlayerName: nextAccountName,
+            hcp: nextHcp,
           };
         });
         return changed ? next : prev;
@@ -5445,8 +5609,10 @@ export default function LobbyScreen() {
       return;
     }
 
-    const eraFrom = eraValues[0];
-    const eraTo = eraValues[1];
+    // effectiveEraValues = paketets låsta span när paket aktivt (annars slider-val)
+    // → material-validering + params speglar exakt det spelet spelas med.
+    const eraFrom = effectiveEraValues[0];
+    const eraTo = effectiveEraValues[1];
     const ytCatsAll = youtubeEnabledCategories.length === 3;
     const matchesYtCat = (mc: MainCategory | null) =>
       ytCatsAll ? true : mc !== null && youtubeEnabledCategories.includes(mc);
@@ -5789,8 +5955,8 @@ export default function LobbyScreen() {
         {
           roundsCount,
           answerResponseSeconds,
-          eraFrom: eraValues[0],
-          eraTo: eraValues[1],
+          eraFrom: effectiveEraValues[0],
+          eraTo: effectiveEraValues[1],
           youtubeEnabledCategories,
           imagesEnabledCategories,
           selectedExtraPackages,
@@ -5949,16 +6115,14 @@ export default function LobbyScreen() {
         // Tidsgränsen per fråga från host:s profil (default 30 sek). Quiz
         // använder den för timer-bar:en + reveal-trigger.
         answerResponseSeconds: String(answerResponseSeconds),
-        // Game era — passa RAW eraValues (samma värde som lobbySettings-
-        // store håller och som non-host:s navigation läser via
-        // settingsStored). Critical för IndDev: båda enheter MÅSTE bygga
-        // identiskt gameQuestions-pool (samma `inEra`-filter).
-        // checkEraAgainstPlayer ger bara en informativ warning idag
-        // (ingen auto-clamp av display) — så host:s exakta val är det
-        // som går till fråge-poolen. Re-introduce clamping vid behov
-        // genom att skriva clamped till lobbySettings.
-        eraFrom: String(eraValues[0]),
-        eraTo: String(eraValues[1]),
+        // Game era — passa effectiveEraValues (= paketets låsta span när ett
+        // Host-paket är aktivt, annars host:s slider-val). SAMMA värde som
+        // lobbySettings-store håller och som non-host:s navigation läser via
+        // settingsStored, så båda enheter bygger identiskt gameQuestions-pool
+        // (samma `inEra`-filter) i IndDev. Era-låset garanterar att ett
+        // tema-paket aldrig kombineras med en era utan material.
+        eraFrom: String(effectiveEraValues[0]),
+        eraTo: String(effectiveEraValues[1]),
         // Per-source category-filter. quiz.tsx filtrerar YouTube-pool mot
         // youtubeEnabledCategories och image-pool mot imagesEnabledCategories.
         youtubeEnabledCategories: JSON.stringify(youtubeEnabledCategories),
@@ -5975,6 +6139,11 @@ export default function LobbyScreen() {
         spotifyEnabled: String(spotifyEnabled && spotifyConnected),
         spotifyAnswerYear: String(spotifyAnswerYear),
         spotifyAnswerName: String(spotifyAnswerName),
+        // Parent Control — när på filtrerar quiz.tsx bort YT-items taggade
+        // parentControlled ur frågeurvalet. Host bygger poolen (IndDev
+        // broadcastar sekvensen; PtP/Single spelar bara på host:s enhet), så
+        // det räcker att host:s nav bär flaggan.
+        parentControlEnabled: String(parentControlEnabled),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -6000,13 +6169,20 @@ export default function LobbyScreen() {
   // härleder medie-källa + kategori per rund baserat på aktuella lobby-inställningar.
   type GsSlot = { source: 'spotify' | 'youtube' | 'image' | 'none'; category: MainCategory | null };
   const gameSequencePreview = useMemo<GsSlot[]>(() => {
+    // Host-paket (tema-only): speglar quiz.tsx:s pool-filter så previewn matchar
+    // det spelet faktiskt spelas med. Aktivt paket → bara tema-taggade music-
+    // items; image-items bär inga paket-taggar → tom Hints-pool.
+    const activePkgTags = resolveActivePackageTags(selectedExtraPackages);
+    const pkgActive = activePkgTags.size > 0;
+    const inPkg = (gp: readonly string[] | undefined) => !pkgActive || itemInActivePackages(gp, activePkgTags);
     const ytFiltered = MUSIC_QUESTIONS.filter(q => {
+      if (!inPkg(q.genrePackages)) return false;
       if (q.contentSubject === 'song') return youtubeEnabledCategories.includes('Music');
       if (q.contentSubject === 'movie') return youtubeEnabledCategories.includes('Film');
       if (q.contentSubject === 'sport-event') return youtubeEnabledCategories.includes('Sport');
       return false;
     });
-    const imgFiltered = IMAGE_QUIZ_QUESTIONS.filter(q => {
+    const imgFiltered = pkgActive ? [] : IMAGE_QUIZ_QUESTIONS.filter(q => {
       const s = q.contentSubject;
       if (s === 'artist' || s === 'band') return imagesEnabledCategories.includes('Music');
       if (s === 'actor' || s === 'character') return imagesEnabledCategories.includes('Film');
@@ -6015,7 +6191,7 @@ export default function LobbyScreen() {
     });
     // Spotify bara i IndDev — PtP och Single Player kör utan Spotify DJ.
     const spotifyActive = spotifyEnabled && gameMode === 'individual-devices' && !singlePlayerDefault;
-    const spotifyPool = spotifyActive ? MUSIC_QUESTIONS.filter(q => q.spotifyTrackId) : [];
+    const spotifyPool = spotifyActive ? MUSIC_QUESTIONS.filter(q => q.spotifyTrackId && inPkg(q.genrePackages)) : [];
     // Ren YT-pool: ytFiltered (respekterar youtubeEnabledCategories) minus Spotify-items.
     const pureYtPool = spotifyActive ? ytFiltered.filter(q => !q.spotifyTrackId) : ytFiltered;
     const imagePool = imgFiltered;
@@ -6108,7 +6284,7 @@ export default function LobbyScreen() {
     }
 
     return slots;
-  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault]);
+  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault, selectedExtraPackages]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -6437,6 +6613,8 @@ export default function LobbyScreen() {
                 assistance={mutualAssistanceActive ? remoteAssistance : player.assistance}
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
+                hcp={player.type === 'guest' ? undefined : resolveDisplayHcp(player.id === ownPlayerIdRef.current ? (selfHcp ?? player.hcpOverride) : (player.hcp ?? player.hcpOverride))}
+                hcpNotDefined={player.type === 'guest'}
                 accountPlayerName={player.accountPlayerName}
                 turnNumber={
                   // Turnummer bara i PtP-MULTIPLAYER. Single kör PtP under
@@ -6499,6 +6677,8 @@ export default function LobbyScreen() {
                     assistance={mutualAssistanceActive ? remoteAssistance : player.assistance}
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
+                    hcp={player.type === 'guest' ? undefined : resolveDisplayHcp(player.id === ownPlayerIdRef.current ? (selfHcp ?? player.hcpOverride) : (player.hcp ?? player.hcpOverride))}
+                    hcpNotDefined={player.type === 'guest'}
                     accountPlayerName={player.accountPlayerName}
                     showApproveToggle={hostMode && !isRematchLobby && !player.hasLeft}
                     approved={false}
@@ -6701,9 +6881,15 @@ export default function LobbyScreen() {
             <Text style={styles.sectionLabel}>Game Mode</Text>
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
               <View style={[styles.modeOption, styles.modeOptionPassActive]}>
+                {/* Stängt hänglås till vänster ersätter det tidigare
+                    "(line-up locked)"-suffixet — kortar raden (Peter 2026-08-27)
+                    som annars svämmade över i PtP-läget. */}
+                <View style={styles.lockBadge} pointerEvents="none">
+                  <Text style={styles.lockBadgeText}>🔒</Text>
+                </View>
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
                   {singlePlayerDefault
-                    ? 'Replay — Single player (locked)'
+                    ? 'Replay — Single player'
                     : /* Namnge LÄGET, inte bara antalet (Peter 2026-08-26):
                          sedan Pass-the-Phone också kan re-matchas kan en
                          återvändande spelare annars inte se om de ska vänta
@@ -6714,7 +6900,7 @@ export default function LobbyScreen() {
                         gameMode === 'individual-devices'
                           ? 'Individual device'
                           : 'Pass-the-Phone'
-                      }, ${lockedLineupCount} players (line-up locked)`}
+                      }`}
                 </Text>
                 <View style={styles.freeBadge} pointerEvents="none">
                   <Text style={styles.freeBadgeText}>FREE</Text>
@@ -7021,15 +7207,15 @@ export default function LobbyScreen() {
                     </View>
                   )}
                   <Switch
-                    value={isSpotifyAvailable && spotifyEnabled}
-                    onValueChange={isSpotifyAvailable ? handleToggleSpotifyEnabled : undefined}
-                    disabled={!isSpotifyAvailable}
+                    value={isSpotifyAvailable && spotifyEnabled && !pkgGraySpotify}
+                    onValueChange={isSpotifyAvailable && !pkgGraySpotify ? handleToggleSpotifyEnabled : undefined}
+                    disabled={!isSpotifyAvailable || pkgGraySpotify}
                     trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                    thumbColor={isSpotifyAvailable ? '#FFF' : '#888'}
-                    ios_backgroundColor={isSpotifyAvailable && spotifyEnabled ? '#1DB954' : '#3C3C3C'}
+                    thumbColor={isSpotifyAvailable && !pkgGraySpotify ? '#FFF' : '#888'}
+                    ios_backgroundColor={isSpotifyAvailable && spotifyEnabled && !pkgGraySpotify ? '#1DB954' : '#3C3C3C'}
                     style={[
                       styles.sourceMatrixSwitch,
-                      !isSpotifyAvailable && { opacity: 0.4 },
+                      (!isSpotifyAvailable || pkgGraySpotify) && { opacity: 0.4 },
                     ]}
                   />
                 </View>
@@ -7124,11 +7310,11 @@ export default function LobbyScreen() {
                   <Switch
                     value={allEnabled}
                     onValueChange={hostMode ? handleToggleAllSources : undefined}
-                    disabled={!hostMode}
+                    disabled={!hostMode || pkgGrayAllSources}
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
                     ios_backgroundColor={allEnabled ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
+                    style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayAllSources) && { opacity: 0.45 }]}
                   />
                 </View>
                 <View style={styles.smLabelSourceCell}>
@@ -7171,19 +7357,19 @@ export default function LobbyScreen() {
                   <Switch
                     value={artistsAllOn}
                     onValueChange={hostMode ? handleToggleArtistsColumn : undefined}
-                    disabled={!hostMode}
+                    disabled={!hostMode || pkgGrayColumn('Music')}
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
                     ios_backgroundColor={artistsAllOn ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
+                    style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Music')) && { opacity: 0.45 }]}
                   />
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode || pkgGray('Music', 'youtube')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode || pkgGray('Music', 'hints')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -7193,14 +7379,14 @@ export default function LobbyScreen() {
                   <Text style={styles.sourceMatrixHeaderText}>Film</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={actorsAllOn} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={actorsAllOn} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode || pkgGrayColumn('Film')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Film')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode || pkgGray('Film', 'youtube')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode || pkgGray('Film', 'hints')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -7213,17 +7399,17 @@ export default function LobbyScreen() {
                   <Text style={styles.sourceMatrixHeaderText}>Sport</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
-                  <Switch value={athletesAllOn} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={athletesAllOn} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode || pkgGrayColumn('Sport')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Sport')) && { opacity: 0.45 }]} />
                 </View>
                 <View
                   onLayout={(e) => setSportCellCenter(e.nativeEvent.layout.x + e.nativeEvent.layout.width / 2)}
                   style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}
                 >
-                  <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode || pkgGray('Sport', 'youtube')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode || pkgGray('Sport', 'hints')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -7237,6 +7423,32 @@ export default function LobbyScreen() {
                 Spotify is not available in 1vs1 Games
               </Text>
             )}
+
+            {/* Parent Control — host-styrd, non-host read-only (disabled).
+                Sitter längst ner i Source Mixerboard, precis ovanför Customized
+                Host packages. När på filtrerar quiz.tsx bort YT-klipp taggade
+                parentControlled ur frågeurvalet. */}
+            <View style={styles.parentControlRow}>
+              <View style={[styles.regionLabelRow, { flex: 1 }]}>
+                <Text style={styles.sectionLabel}>Parent Control</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() => Alert.alert('Parent Control', 'When on, YouTube clips flagged as parent-controlled are removed from the question selection.')}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
+              <Switch
+                value={parentControlEnabled}
+                onValueChange={hostMode ? setParentControlEnabled : undefined}
+                disabled={!hostMode}
+                trackColor={{ false: '#3C3C3C', true: Colors.success }}
+                thumbColor="#FFF"
+                ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
+                style={[styles.connectionSwitch, !hostMode && { opacity: 0.6 }]}
+              />
+            </View>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
                 Basic-utbudet är alltid implicit aktivt (ingen synlig chip);
@@ -7338,10 +7550,9 @@ export default function LobbyScreen() {
                   }
                   if (isPackagesActive) return;
                   if (availablePackages.length === 0) {
-                    Alert.alert(
-                      'No Extra packages available',
-                      'New Extra Host packages are coming soon and will be included in your Premium subscription.',
-                    );
+                    // Inga paket aktiverade i Profile än → öppna "+ Add package"-
+                    // katalogen så host kan lägga till dem direkt i lobbyn.
+                    setAddPackageModalVisible(true);
                     return;
                   }
                   setSelectedExtraPackages(availablePackages.map((p) => p.id));
@@ -7554,6 +7765,18 @@ export default function LobbyScreen() {
                   });
                 })()}
 
+                {/* "+ Add package" — öppnar hela katalogen så host kan lägga
+                    till paket direkt i lobbyn även om inget aktiverats i Profile. */}
+                {hostMode && (
+                  <TouchableOpacity
+                    style={styles.addPackageCatalogBtn}
+                    onPress={() => setAddPackageModalVisible(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.addPackageCatalogBtnText}>+ Add package</Text>
+                  </TouchableOpacity>
+                )}
+
               </View>
               )}
             </View>
@@ -7632,7 +7855,14 @@ export default function LobbyScreen() {
                   change Game era not available for Guest user
                 </Text>
               )}
-              {hostMode && !isGuestHost && (
+              {/* Host-paket aktivt: era låst till paketets innehålls-span (samma
+                  låsta mönster som guest host) — ingen slider, bara info-not. */}
+              {packageEraLocked && !isGuestHost && (
+                <Text style={styles.guestHostNote}>
+                  Game era locked by selected package
+                </Text>
+              )}
+              {hostMode && !isGuestHost && !packageEraLocked && (
                 <View style={{ alignItems: 'center', position: 'relative', width: SLIDER_WIDTH, alignSelf: 'center' }}>
                   <MultiSlider
                     // values-propen hålls STABIL under drag (= committed
@@ -8056,6 +8286,21 @@ export default function LobbyScreen() {
 
         <View style={styles.bottomPad} />
       </ScrollView>
+
+      {/* Competition re-match: banner som visar vilka inbjudna vi väntar på.
+          Försvinner när alla joinat (då är Start Re-match upplåst). */}
+      {hostMode && isCompetitionRematch && (() => {
+        const missing = findMissingRematchPlayers(rematchExpectedIds, players);
+        if (missing.length === 0) return null;
+        return (
+          <View style={styles.compRematchWaitBanner}>
+            <Text style={styles.compRematchWaitText}>
+              Waiting for {describeMissingPlayers(missing)} to join — the re-match
+              is cancelled if everyone hasn&apos;t joined within 5 minutes.
+            </Text>
+          </View>
+        );
+      })()}
 
       {/* ── Start Game — sticky bottom-bar ──────────────────────────
           Ligger utanför ScrollView:n så den alltid är synlig oavsett
@@ -8759,6 +9004,76 @@ export default function LobbyScreen() {
               onPress={() => setHostDeleteSheetVisible(false)}
             >
               <Text style={styles.guestLeaveCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ── "+ Add package"-modal ─────────────────────────────────────
+          Host väljer paket direkt ur HELA katalogen (allPackagesCatalog),
+          oberoende av Profile-valet. PÅ = paketet blir tillgängligt i lobby-
+          listan OCH aktivt i lobbyn (handleToggleCatalogPackage). */}
+      <Modal
+        visible={addPackageModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setAddPackageModalVisible(false)}
+      >
+        <View style={styles.guestLeaveOverlay}>
+          <Pressable
+            style={styles.guestLeaveBackdrop}
+            onPress={() => setAddPackageModalVisible(false)}
+          />
+          <View style={styles.addPkgSheet}>
+            <Text style={styles.addPkgTitle}>Add packages</Text>
+            <Text style={styles.addPkgSubtitle}>
+              Turn on the packages you want in this lobby
+            </Text>
+            <ScrollView style={{ maxHeight: 320, alignSelf: 'stretch' }}>
+              {allPackagesCatalog.length === 0 ? (
+                <Text style={styles.noExtraPackagesText}>No packages available yet</Text>
+              ) : (
+                [...allPackagesCatalog]
+                  .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                  .map((pkg) => {
+                    const isOn = enabledHostPackages.includes(pkg.id);
+                    return (
+                      <View key={pkg.id} style={styles.purchasedPackageRow}>
+                        <View
+                          style={[
+                            styles.purchasedPackageBox,
+                            isOn && styles.purchasedPackageBoxActive,
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.purchasedPackageName,
+                              isOn && styles.purchasedPackageNameActive,
+                            ]}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {pkg.name}
+                          </Text>
+                        </View>
+                        <Switch
+                          value={isOn}
+                          onValueChange={() => handleToggleCatalogPackage(pkg.id)}
+                          trackColor={{ false: Colors.error, true: Colors.success }}
+                          thumbColor="#FFF"
+                          ios_backgroundColor={isOn ? Colors.success : Colors.error}
+                          style={styles.connectionSwitch}
+                        />
+                      </View>
+                    );
+                  })
+              )}
+            </ScrollView>
+            <Pressable
+              style={styles.addPkgDoneBtn}
+              onPress={() => setAddPackageModalVisible(false)}
+            >
+              <Text style={styles.addPkgDoneText}>Done</Text>
             </Pressable>
           </View>
         </View>
@@ -9852,6 +10167,24 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: 0.6,
   },
+  // Kant-skärande hänglås-badge i vänsterkanten av re-match-rutan — visuell
+  // "line-up locked"-signal som ersätter det gamla text-suffixet.
+  lockBadge: {
+    position: 'absolute',
+    top: -10,
+    left: Spacing.sm,
+    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.success,
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    zIndex: 10,
+    elevation: 4,
+  },
+  lockBadgeText: {
+    fontSize: 11,
+  },
   // Dämpad FREE-badge — appliceras tillsammans med modeOptionDimmed
   // när singlePlayerDefault är på, så badgen signalerar "låst" istället
   // för "tillgängligt gratis".
@@ -10485,6 +10818,13 @@ const styles = StyleSheet.create({
     // hamnar för nära Images-radens switch ovanför.
     marginTop: Spacing.md,
   },
+  // Parent Control-rad längst ner i Source Mixerboard (ovanför Customized
+  // Host packages). Extra luft ovanför så den lossnar från matrisen.
+  parentControlRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: Spacing.md,
+  },
   usePackagesLabel: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
@@ -10529,6 +10869,59 @@ const styles = StyleSheet.create({
   activatePackageBtnActive: {
     borderColor: '#F5A623',
     backgroundColor: Colors.primaryMuted,
+  },
+  // "+ Add package"-knapp under paketlistan — öppnar hela-katalogen-modalen.
+  addPackageCatalogBtn: {
+    marginTop: Spacing.sm,
+    alignSelf: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    backgroundColor: Colors.cardElevated,
+  },
+  addPackageCatalogBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.primary,
+  },
+  // "+ Add package"-modalens bottom-sheet — speglar guestLeaveSheet.
+  addPkgSheet: {
+    backgroundColor: Colors.card,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: Spacing.xl,
+    paddingBottom: Spacing.xxl,
+    gap: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+  },
+  addPkgTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+  },
+  addPkgSubtitle: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: Spacing.xs,
+  },
+  addPkgDoneBtn: {
+    marginTop: Spacing.md,
+    alignSelf: 'stretch',
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addPkgDoneText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: '#FFF',
   },
   // Yttre wrapper kring sub-rubriken, paketlistan och Buy CTA. Geometrin
   // (padding 3, gap 4, Radius.md, 1px Colors.border, Colors.background-bg)
@@ -11099,6 +11492,18 @@ const styles = StyleSheet.create({
   // Baren pinnas under ScrollView:n (sibling i SafeAreaView) så Start
   // Game alltid är synlig. Row-layout med logo 64 håller höjden nere
   // (~96 px totalt vs ~230 px för gamla stacked-layouten).
+  compRematchWaitBanner: {
+    backgroundColor: Colors.primaryMuted,
+    borderTopWidth: 1,
+    borderTopColor: Colors.primaryBorder,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+  },
+  compRematchWaitText: {
+    fontSize: FontSize.sm,
+    color: Colors.textPrimary,
+    textAlign: 'center',
+  },
   startStickyBar: {
     position: 'relative',
     borderTopWidth: 1,

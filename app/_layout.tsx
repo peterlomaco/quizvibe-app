@@ -98,6 +98,7 @@ export default function RootLayout() {
         <Stack.Screen name="store" />
         <Stack.Screen name="quiz" />
         <Stack.Screen name="my-matches" />
+        <Stack.Screen name="competitions" />
       </Stack>
       <BottomBanner />
     </GestureHandlerRootView>
