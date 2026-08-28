@@ -39,6 +39,10 @@ export interface MusicQuestion {
   youtubeClips: YoutubeClip[];
   /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
   spotifyTrackId?: string;
+  /** Svarsläge för YouTube-uppspelade song-items. 'name' = artist-namn-svar via
+   *  Letter Grid i stället för år (för klipp vars video avslöjar årtalet). Påverkar
+   *  BARA YouTube-uppspelningen; samma item som Spotify-fråga kör normal Year/Name. */
+  youtubeAnswerMethod?: 'name';
   /** actor-select: true = animerad film (frågar karaktärnamn), annars skådespelarnamn. */
   isAnimated?: boolean;
   /** actor-select: godkända svar (räcker att välja ett). */
@@ -4530,6 +4534,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen"
     ],
     "spotifyTrackId": "2Hx61KuedgBKOaJ1GfflJe",
+    "youtubeAnswerMethod": "name",
     "youtubeClips": [
       {
         "videoId": "khv8TygskVU",
@@ -5386,38 +5391,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "David Bowie",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'David Bowie - Let's Dance (Official Video) [HD]' pa artistens egen kanal — inget ar i titeln. Ersatte Topic-audion (statisk albumkonst)."
-      }
-    ]
-  },
-  {
-    "id": "corinne-hermes-si-la-vie-est-cadeau",
-    "displayName": "Si la vie est cadeau — Corinne Hermès",
-    "correctYear": 1983,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 64,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Eurovision"
-    ],
-    "inBaseCatalog": false,
-    "youtubeClips": [
-      {
-        "videoId": "F8y5xc8UodE",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
-        "license": "standard",
-        "notes": "ESC 1983 vinnare — Luxemburg."
       }
     ]
   },

@@ -174,6 +174,8 @@ export function CompetitionRematchActions({
         roundsCount: profile?.roundsDefault,
         answerResponseSeconds: profile?.answerResponseSeconds,
         region,
+        // Återanvänd senaste spelets inställningar (0043) över profil-defaults.
+        settings: saved.latestSettings,
       });
       if (!result.ok || !result.code) {
         Alert.alert(
@@ -193,6 +195,13 @@ export function CompetitionRematchActions({
           code: result.code,
           isHost: 'true',
           lobbyType: result.lobbyType ?? 'multiplayer',
+          // Parent Control bärs som param — persisteras aldrig i lobby_settings,
+          // så det kan inte följa med via den stored settings-bloben. Övriga
+          // inställningar (era/rundor/paket/…) återanvänds via lobby_settings
+          // som startCompetitionRematch redan skrivit.
+          ...(saved.latestSettings
+            ? { parentControl: String(saved.latestSettings.parentControlEnabled) }
+            : {}),
           ...(result.isMulti
             ? { rematchLocked: 'true', competitionRematch: 'true' }
             : {}),

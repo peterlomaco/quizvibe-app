@@ -2,6 +2,7 @@ import type {
   AggregateGamePlayer,
   AggregateSeriesGame,
 } from './aggregateLeaderboard';
+import { pickLatestGameSettings } from './competitionRematchSettings';
 import { supabase } from './supabase';
 
 /**
@@ -33,6 +34,26 @@ export interface SavedAggregateSummary {
   updatedAt: string;
 }
 
+/**
+ * Snapshot av ett Competition-spels tunbara inställningar (migration 0043).
+ * Persisteras per spel så en re-match/replay via Competitions-fliken kan seeda
+ * lobbyn med SAMMA setup som senaste spelet — i stället för host:ens
+ * profil-defaults. Speglar de fält en host faktiskt justerar; strukturella
+ * fält (gameMode/maxPlayers/singlePlayerDefault) härleds i stället av
+ * lobbytypen och sätts av buildRematchSettings.
+ */
+export interface AggregateGameSettings {
+  eraFrom: number;
+  eraTo: number;
+  roundsCount: number;
+  answerResponseSeconds: number;
+  youtubeEnabledCategories: string[];
+  imagesEnabledCategories: string[];
+  selectedExtraPackages: string[];
+  parentControlEnabled: boolean;
+  spotifyEnabled: boolean;
+}
+
 export interface SavedAggregate {
   id: string;
   name: string;
@@ -41,6 +62,10 @@ export interface SavedAggregate {
   createdBy: string;
   participants: { userId: string; playerName: string }[];
   games: AggregateSeriesGame[];
+  /** Inställningarna från det SENAST spelade spelet i serien (0043). Undefined
+   *  = ingen snapshot (äldre spel, gäst-blandat, eller migration ej körd) →
+   *  startCompetitionRematch faller tillbaka på profil-defaults. */
+  latestSettings?: AggregateGameSettings | null;
 }
 
 interface LeaderboardRow {
@@ -48,7 +73,13 @@ interface LeaderboardRow {
   name: string;
   created_by: string;
   aggregate_leaderboard_players?: { user_id: string; player_name: string }[];
-  aggregate_leaderboard_games?: { room_code: string; stats: AggregateGamePlayer[] }[];
+  aggregate_leaderboard_games?: {
+    room_code: string;
+    stats: AggregateGamePlayer[];
+    // Optional tills migration 0043 körts (tolerant read).
+    played_at?: string;
+    settings?: AggregateGameSettings | null;
+  }[];
 }
 
 const LEADERBOARD_SELECT =
@@ -69,6 +100,7 @@ function rowToSaved(row: LeaderboardRow): SavedAggregate {
       roomCode: g.room_code,
       players: g.stats ?? [],
     })),
+    latestSettings: pickLatestGameSettings(row.aggregate_leaderboard_games ?? []),
   };
 }
 
@@ -134,6 +166,28 @@ export async function recordAggregateGame(
   });
   if (error) {
     console.warn('[aggregateLeaderboards] recordGame failed:', error.message);
+  }
+}
+
+/**
+ * Sparar settings-snapshoten för ett bokfört spel (migration 0043). Anropas av
+ * host EFTER recordAggregateGame (spelraden måste finnas — RPC:n gör bara en
+ * UPDATE). Fire-and-forget: en saknad RPC (migration ej körd) eller ett
+ * nätverksfel degraderar till en warn — re-matchen faller då bara tillbaka på
+ * profil-defaults, aldrig ett trasigt flöde.
+ */
+export async function saveAggregateGameSettings(
+  leaderboardId: string,
+  roomCode: string,
+  settings: AggregateGameSettings,
+): Promise<void> {
+  const { error } = await supabase.rpc('set_aggregate_leaderboard_game_settings', {
+    p_leaderboard_id: leaderboardId,
+    p_room_code: roomCode,
+    p_settings: settings,
+  });
+  if (error) {
+    console.warn('[aggregateLeaderboards] saveGameSettings failed:', error.message);
   }
 }
 

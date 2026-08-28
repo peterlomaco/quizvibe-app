@@ -950,7 +950,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "ySOCalwr6Yo"
-        startSec: 5
+        startSec: 15
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
@@ -1060,21 +1060,6 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1982 vinnare — Tyskland."
-  - id: corinne-hermes-si-la-vie-est-cadeau
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Si la vie est cadeau — Corinne Hermès"
-    correctYear: 1983
-    probability: 64
-    wikimediaSearchHints: ["Corinne Hermès Si la vie est cadeau Eurovision 1983"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "F8y5xc8UodE"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "ESC 1983 vinnare — Luxemburg."
-    genrePackages: ["Eurovision"]
-    inBaseCatalog: false
   - id: bobbysocks-la-det-swinge
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "La det swinge — Bobbysocks!"

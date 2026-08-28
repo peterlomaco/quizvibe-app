@@ -52,6 +52,9 @@ interface ExportedMusicQuestion {
    *  Emittas bara när true (default false = alltid med). */
   parentControlled?: boolean;
   youtubeClips: ExportedYoutubeClip[];
+  /** Svarsläge för YouTube-uppspelade song-items. 'name' = artist-namn-svar via
+   *  Letter Grid (samma som Spotify/Name) i stället för år. Emittas bara när satt. */
+  youtubeAnswerMethod?: 'name';
   /** actor-select: true = animerad film (karaktärnamn), false/utelämnat = live-action (skådespelarnamn). */
   isAnimated?: boolean;
   /** actor-select: godkända svar (1–2 namn; spela räcker att välja ett). */
@@ -102,6 +105,10 @@ export interface MusicQuestion {
   youtubeClips: YoutubeClip[];
   /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
   spotifyTrackId?: string;
+  /** Svarsläge för YouTube-uppspelade song-items. 'name' = artist-namn-svar via
+   *  Letter Grid i stället för år (för klipp vars video avslöjar årtalet). Påverkar
+   *  BARA YouTube-uppspelningen; samma item som Spotify-fråga kör normal Year/Name. */
+  youtubeAnswerMethod?: 'name';
   /** actor-select: true = animerad film (frågar karaktärnamn), annars skådespelarnamn. */
   isAnimated?: boolean;
   /** actor-select: godkända svar (räcker att välja ett). */
@@ -176,6 +183,10 @@ async function main(): Promise<void> {
         ...(item.parentControlled ? { parentControlled: true } : {}),
         // Spotify track ID — bara om satt.
         ...(item.spotifyTrackId ? { spotifyTrackId: item.spotifyTrackId } : {}),
+        // YouTube-svarsläge ('name') — bara för timeline-items (song), aldrig actor-select.
+        ...(item.youtubeAnswerMethod && !isActorSelect
+          ? { youtubeAnswerMethod: item.youtubeAnswerMethod }
+          : {}),
         // actor-select-specifika fält — bara för filmfrågor.
         ...(isActorSelect ? {
           isAnimated: item.isAnimated ?? false,

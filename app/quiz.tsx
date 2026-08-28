@@ -41,6 +41,7 @@ import {
   getAggregateLeaderboard,
   recordAggregateGame,
   renameAggregateLeaderboard,
+  saveAggregateGameSettings,
   type SavedAggregateSummary,
 } from '@/src/utils/aggregateLeaderboards';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
@@ -191,6 +192,11 @@ interface TimelineQuestion {
   /** Spotify track ID — satt när frågan är en Spotify DJ-kandidat.
    *  Driver isSpotifyQuestion + djRotationPlan i quiz-screen:en. */
   spotifyTrackId?: string;
+  /** Svarsläge när frågan spelas via YouTube. 'name' = artist-namn-svar via
+   *  Letter Grid (samma block som Spotify/Name) i stället för år — för klipp
+   *  vars video avslöjar årtalet. Påverkar BARA YouTube-uppspelningen; som
+   *  Spotify-fråga körs normal Year/Name-alternering. Se isYoutubeNameQuestion. */
+  youtubeAnswerMethod?: 'name';
   /** Parent control-tagg. true = filtreras bort ur frågeurvalet när host har
    *  Parent Control påslaget (se inEraMusic-filtret). */
   parentControlled?: boolean;
@@ -318,6 +324,7 @@ const SEED_QUESTIONS: (TimelineQuestion | ActorSelectQuestion)[] = MUSIC_QUESTIO
     inBaseCatalog: q.inBaseCatalog,
     youtubeClips: q.youtubeClips,
     spotifyTrackId: q.spotifyTrackId,
+    youtubeAnswerMethod: q.youtubeAnswerMethod,
     parentControlled: q.parentControlled,
     itemHcp: q.itemHcp,
   };
@@ -2371,14 +2378,21 @@ export default function QuizScreen() {
     return gameQuestions.map((q, qIdx) => {
       if (q.type === 'actor-select') return 'Name';
       if (q.type === 'image') return 'Name';
-      // Spotify Name-frågor → 'Name' badge i GetReadyIntro-kön
-      if (q.type === 'timeline' && (q as { spotifyTrackId?: string }).spotifyTrackId) {
-        return resolveSpotifyAnswerType(qIdx) === 'name' ? 'Name' : 'Year';
+      if (q.type === 'timeline') {
+        // Spelas via Spotify (spotifyEnabled + spotifyTrackId) → Year/Name-alternering.
+        // ⚠ spotifyEnabled MÅSTE ingå: ett dual-item (spotifyTrackId + youtubeClips)
+        // med Spotify AV spelas via YouTube och ska INTE få Spotify-badgen — det var
+        // just den buggen (badge sa "Name", YT-uppspelning gav Year).
+        if (spotifyEnabled && (q as { spotifyTrackId?: string }).spotifyTrackId) {
+          return resolveSpotifyAnswerType(qIdx) === 'name' ? 'Name' : 'Year';
+        }
+        // Spelas via YouTube: hedra per-item youtubeAnswerMethod='name'.
+        if ((q as { youtubeAnswerMethod?: string }).youtubeAnswerMethod === 'name') return 'Name';
       }
       return 'Year';
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameQuestions, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
+  }, [gameQuestions, spotifyEnabled, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
 
   // Non-host override: bygg category + answerType från host:s auktoritativa fråge-sekvens
   // (broadcastAllQuestionIds) via ALL_QUESTIONS_MAP. Utan detta visar non-host felaktiga
@@ -2408,28 +2422,34 @@ export default function QuizScreen() {
       // Se answerTypeByQuestion ovan: ingen mainCategory-baserad Film-regel —
       // Film-timeline-frågor (utan correctNames) svaras med år.
       if (q.type === 'actor-select' || q.type === 'image') return 'Name';
-      if (q.type === 'timeline' && (q as { spotifyTrackId?: string }).spotifyTrackId) {
-        if (effectiveAnswerYear && effectiveAnswerName) {
-          // Räkna bara Spotify-frågor FÖRE denna position — exakt samma logik som
-          // host:s resolveSpotifyAnswerType (spotifyOrdinal / numPlayers).
-          // Att använda qIdx / qPerBlock ger fel svar eftersom qIdx räknar
-          // ALLA frågor, inte bara Spotify-frågorna.
-          let spotifyOrdinal = 0;
-          for (let i = 0; i < qIdx; i++) {
-            const qi = ALL_QUESTIONS_MAP.get(broadcastAllQuestionIds[i]);
-            if (qi?.type === 'timeline' && (qi as { spotifyTrackId?: string }).spotifyTrackId) {
-              spotifyOrdinal++;
+      if (q.type === 'timeline') {
+        // Spelas via Spotify → Year/Name-alternering (spotifyEnabled MÅSTE ingå,
+        // annars får ett dual-item med Spotify AV fel badge — se host-versionen ovan).
+        if (spotifyEnabled && (q as { spotifyTrackId?: string }).spotifyTrackId) {
+          if (effectiveAnswerYear && effectiveAnswerName) {
+            // Räkna bara Spotify-frågor FÖRE denna position — exakt samma logik som
+            // host:s resolveSpotifyAnswerType (spotifyOrdinal / numPlayers).
+            // Att använda qIdx / qPerBlock ger fel svar eftersom qIdx räknar
+            // ALLA frågor, inte bara Spotify-frågorna.
+            let spotifyOrdinal = 0;
+            for (let i = 0; i < qIdx; i++) {
+              const qi = ALL_QUESTIONS_MAP.get(broadcastAllQuestionIds[i]);
+              if (qi?.type === 'timeline' && (qi as { spotifyTrackId?: string }).spotifyTrackId) {
+                spotifyOrdinal++;
+              }
             }
+            const numPlayers = Math.max(1, turnOrder.length);
+            const spotifyRound = Math.floor(spotifyOrdinal / numPlayers);
+            return spotifyRound % 2 === 0 ? 'Year' : 'Name';
           }
-          const numPlayers = Math.max(1, turnOrder.length);
-          const spotifyRound = Math.floor(spotifyOrdinal / numPlayers);
-          return spotifyRound % 2 === 0 ? 'Year' : 'Name';
+          return effectiveAnswerName ? 'Name' : 'Year';
         }
-        return effectiveAnswerName ? 'Name' : 'Year';
+        // Spelas via YouTube: hedra per-item youtubeAnswerMethod='name'.
+        if ((q as { youtubeAnswerMethod?: string }).youtubeAnswerMethod === 'name') return 'Name';
       }
       return 'Year';
     });
-  }, [isHost, isRemote, broadcastAllQuestionIds, answerTypeByQuestion, broadcastHostSpotifyAnswerYear, broadcastHostSpotifyAnswerName, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
+  }, [isHost, isRemote, broadcastAllQuestionIds, answerTypeByQuestion, spotifyEnabled, broadcastHostSpotifyAnswerYear, broadcastHostSpotifyAnswerName, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -3227,9 +3247,23 @@ export default function QuizScreen() {
     : null;
   const isSpotifyNameQuestion = isSpotifyQuestion && currentSpotifyAnswerType === 'name';
 
+  // YouTube-uppspelad song-fråga med youtubeAnswerMethod='name': svaras med
+  // artist-namn (Letter Grid), inte år — för klipp vars video avslöjar årtalet.
+  // Gäller ENBART när frågan INTE är en Spotify-fråga (isSpotifyQuestion false):
+  // samma item som Spotify-fråga kör normal Year/Name-alternering oförändrat.
+  // Ingen DJ/album-art/overlay-maskineri — bara svarsblocket byts (som image).
+  const isYoutubeNameQuestion =
+    !isSpotifyQuestion &&
+    currentQ?.type === 'timeline' &&
+    currentQ.youtubeAnswerMethod === 'name';
+  // Samlad flagga: song-fråga som svaras med artist-namn via Letter Grid,
+  // oavsett om källan är Spotify (name-runda) eller YouTube (per-item-flagga).
+  // Driver svarsblock, canConfirm, scoring, badge, countdown-ord + reveal.
+  const isNameLetterQuestion = isSpotifyNameQuestion || isYoutubeNameQuestion;
+
   // Artistnamn extraherat från hint-fältet (format "Title — Artist").
   const derivedArtistName: string | null =
-    isSpotifyNameQuestion && currentQ?.type === 'timeline'
+    isNameLetterQuestion && currentQ?.type === 'timeline'
       ? (currentQ.hint?.split(' — ').pop()?.trim() ?? null)
       : null;
 
@@ -3286,7 +3320,7 @@ export default function QuizScreen() {
   // fält som inte finns på ImageQuestion-toppnivån (ligger i q.source) → tom
   // pool, alla distraktorer kom från generiska DISTRACTOR_POOL_NAMES. Fixat.
   useEffect(() => {
-    if (!isSpotifyNameQuestion || !derivedArtistName) {
+    if (!isNameLetterQuestion || !derivedArtistName) {
       setSpotifyNameVariant(null);
       return;
     }
@@ -3391,7 +3425,7 @@ export default function QuizScreen() {
       5,
     );
     setSpotifyNameVariant(variant);
-  }, [questionIndex, isSpotifyNameQuestion, currentAssistance, derivedArtistName, audienceSetForVariants]);
+  }, [questionIndex, isNameLetterQuestion, currentAssistance, derivedArtistName, audienceSetForVariants]);
 
   // Aktiv media-källa för aktuell fråga. Returneras `kind: 'none'` om
   // host stängt av alla källor eller frågan saknar curerade klipp —
@@ -4263,7 +4297,7 @@ export default function QuizScreen() {
   // DJ kan aldrig confirma (de svarar inte på Spotify-frågor).
   const canConfirm = isCurrentPlayerDJ
     ? false
-    : isSpotifyNameQuestion
+    : isNameLetterQuestion
       ? pendingNameOption !== null
       : isImageQuestion
         ? hintsReady
@@ -4420,7 +4454,7 @@ export default function QuizScreen() {
   // correct = opt.isCorrect (pre-baked från distractor-builderns rätt-flagga).
   const handleConfirmName = (opt: ImageNameOption) => {
     if (phaseRef.current !== 'question') return;
-    if (question.type !== 'image' && !isSpotifyNameQuestion) return;
+    if (question.type !== 'image' && !isNameLetterQuestion) return;
     const correct = opt.isCorrect;
     const pts = calculatePoints(correct, currentAssistance, 'name');
     const totalMs = responseSeconds * 1000;
@@ -5657,7 +5691,25 @@ export default function QuizScreen() {
         );
         return;
       }
-      void recordAggregateGame(leaderboardId, roomCode, contribution);
+      // Bokför spelet + snapshotta dess inställningar (0043) så en re-match
+      // via Competitions-fliken kan återanvända EXAKT samma setup som senaste
+      // spelet i stället för host:ens profil-defaults. Kedjat: settings-RPC:n
+      // gör bara en UPDATE, så spelraden måste finnas först. parentControl +
+      // paket tas från quiz-params (AUKTORITATIVT — de speglar host:s val;
+      // parentControl persisteras inte ens i lobby_settings).
+      void recordAggregateGame(leaderboardId, roomCode, contribution).then(() => {
+        void saveAggregateGameSettings(leaderboardId, roomCode, {
+          eraFrom,
+          eraTo,
+          roundsCount: totalRounds,
+          answerResponseSeconds: responseSeconds,
+          youtubeEnabledCategories,
+          imagesEnabledCategories,
+          selectedExtraPackages,
+          parentControlEnabled,
+          spotifyEnabled,
+        });
+      });
     });
     return () => {
       cancelled = true;
@@ -5671,6 +5723,17 @@ export default function QuizScreen() {
     params.roomCode,
     isHost,
     aggregateParticipantCount,
+    // Settings-snapshot (0043) — stabila vid leaderboard-fasen, med i deps
+    // för korrekthet.
+    eraFrom,
+    eraTo,
+    totalRounds,
+    responseSeconds,
+    youtubeEnabledCategories,
+    imagesEnabledCategories,
+    selectedExtraPackages,
+    parentControlEnabled,
+    spotifyEnabled,
   ]);
 
   // Sista rundans actions: starta nytt rum i Lobby (ev. med samma spelare) eller gå hem.
@@ -6002,6 +6065,12 @@ export default function QuizScreen() {
           // Låst uppsättning redan på LobbyScreens FÖRSTA frame, utan att
           // vänta på en DB-läsning av rums-raden.
           rematchLocked: String(reusePlayers),
+          // Parent Control kan togglas även av en guest host — bär med host:s
+          // val vid carry-over (persisteras aldrig i DB). Guest host har inga
+          // paket (seeden forcerar []), så carryPackages behövs inte här.
+          ...((keepSettings || reusePlayers)
+            ? { parentControl: String(parentControlEnabled) }
+            : {}),
         },
       });
       return;
@@ -6013,6 +6082,20 @@ export default function QuizScreen() {
         isHost: 'true',
         lobbyType,
         rematchLocked: String(reusePlayers),
+        // Carry-over av Parent Control + valda Host-paket via params (INTE bara
+        // via lobby_settings-blobben). Parent Control persisteras aldrig i DB
+        // (samma mönster som spotify_answer_*), så en re-seed skulle annars
+        // återgå till profil-defaulten. Paket-listan bär vi med här som
+        // AUKTORITATIV källa (host:s exakta in-game-val) så den inte kan tappas
+        // av en stale lobby_settings-rad eller profil-filtret i seeden. Skickas
+        // BARA vid carry-over (samma villkor som settings-blobben ovan); en
+        // fresh "Start New Game" utelämnar dem → seeden faller på profilen.
+        ...((keepSettings || reusePlayers)
+          ? {
+              parentControl: String(parentControlEnabled),
+              carryPackages: JSON.stringify(selectedExtraPackages),
+            }
+          : {}),
       },
     });
   };
@@ -8523,7 +8606,7 @@ export default function QuizScreen() {
         answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
         category={effectiveCategoryByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
-        finalWord={isImageQuestion || isActorSelectQuestion || isSpotifyNameQuestion ? 'Who' : isTimelineQuestion ? 'When' : undefined}
+        finalWord={isImageQuestion || isActorSelectQuestion || isNameLetterQuestion ? 'Who' : isTimelineQuestion ? 'When' : undefined}
         // Talad nedräkning följer samma grind som övriga ljudkällor — se
         // MorseAmbientSound ovan för varför isHost inte hör hemma här.
         silent={isAudioMutedForSelf}
@@ -9491,16 +9574,17 @@ export default function QuizScreen() {
                     highlightas; resterande förekomster (sällsynt) lämnas
                     orörda. */}
                 {(() => {
-                  // Spotify Name-frågor har fel bakat questionText ("Which Year…")
-                  // eftersom de är song-items. Visa rätt text för svarstypen.
-                  const displayQuestionText = isSpotifyNameQuestion
+                  // Name-svar-song-frågor (Spotify/Name ELLER YouTube-name) har fel
+                  // bakat questionText ("Which Year…") eftersom de är song-items.
+                  // Visa rätt text för svarstypen.
+                  const displayQuestionText = isNameLetterQuestion
                     ? 'What is the Name of this Artist/Band?'
                     : question.question;
                   const match = displayQuestionText.match(
                     /^(.*?)\b(Year|Name|City|Country)\b(.*)$/i,
                   );
-                  // Spotify-frågor: kompakt en-rad-format (mer plats åt prefix-rutor)
-                  const isSpotifyQ = isSpotifyQuestion || isSpotifyNameQuestion;
+                  // Spotify/Name-svar-frågor: kompakt en-rad-format (mer plats åt prefix-rutor)
+                  const isSpotifyQ = isSpotifyQuestion || isNameLetterQuestion;
                   const compactText = isSpotifyQ
                     ? { fontSize: 16, lineHeight: 22 }
                     : undefined;
@@ -9643,10 +9727,11 @@ export default function QuizScreen() {
                 )}
               </View>
             )}
-            {isSpotifyNameQuestion && spotifyNameVariant && !isCurrentPlayerDJ && (spotifyDJStarted || phase === 'reveal') ? (
-              // Spotify Name-fråga: gissa artistnamnet via Letter Grid.
-              // Döljs helt tills DJ aktiverat timern (spotifyDJStarted=true).
-              // reveal-grenen visas alltid (isTimedOut-hantering inuti komponenten).
+            {isNameLetterQuestion && spotifyNameVariant && !isCurrentPlayerDJ && (isYoutubeNameQuestion || spotifyDJStarted || phase === 'reveal') ? (
+              // Name-svar-song-fråga (Spotify/Name ELLER YouTube-name): gissa
+              // artistnamnet via Letter Grid. Spotify/Name döljs tills DJ aktiverat
+              // timern (spotifyDJStarted); YouTube-name visas direkt (isYoutubeNameQuestion)
+              // — det finns ingen DJ. reveal-grenen visas alltid (isTimedOut inuti komponenten).
               <View
                 pointerEvents={shouldLockForUnstable ? 'none' : 'auto'}
                 style={shouldLockForUnstable ? { opacity: 0.4 } : undefined}
@@ -9658,10 +9743,10 @@ export default function QuizScreen() {
                   confirmedName={confirmedNameOption}
                   isTimedOut={phase === 'reveal' && confirmedNameOption === null}
                   onNameSelect={setPendingNameOption}
-                  resetKey={`spotify-name-${questionIndex}-${currentAssistance}`}
+                  resetKey={`name-letter-${questionIndex}-${currentAssistance}`}
                 />
               </View>
-            ) : question.type === 'timeline' && !isCurrentPlayerDJ && !isSpotifyNameQuestion && (!isSpotifyQuestion || spotifyDJStarted || effectiveDJId === null) ? (
+            ) : question.type === 'timeline' && !isCurrentPlayerDJ && !isNameLetterQuestion && (!isSpotifyQuestion || spotifyDJStarted || effectiveDJId === null) ? (
               <TimelineSelector
                 key={`${questionIndex}-${currentAssistance}`}
                 assistance={currentAssistance}
@@ -9753,10 +9838,13 @@ export default function QuizScreen() {
               );
             })()}
             {phase === 'reveal' && question.type === 'timeline' && (() => {
-              // Name-svar (non-DJ): ImageAnswerBlock renderar inline reveal (badges per prefix-rad) → skippa kort
-              // DJ på Spotify/Name renderas av blocket ovanför
-              if (isSpotifyNameQuestion) return null;
-              if (!isSpotifyQuestion && !isSpotifyNameQuestion && selectedYear === null) return null;
+              // Name-svar (non-DJ): ImageAnswerBlock renderar inline reveal (badges per prefix-rad) → skippa kort.
+              // Gäller BÅDE Spotify/Name OCH YouTube-name (isNameLetterQuestion) — annars
+              // renderar YouTube-name-frågan en "Correct year"-ruta (selectedYear sätts av
+              // timeout-default) trots att svaret var artist-namnet. DJ på Spotify/Name
+              // renderas av blocket ovanför.
+              if (isNameLetterQuestion) return null;
+              if (!isSpotifyQuestion && selectedYear === null) return null;
 
               // confirmedCorrect sätts i handleConfirm och vid time-out — robust
               // mot att selectedYear nollställs av play_command-reset efter confirm.
@@ -9968,7 +10056,10 @@ export default function QuizScreen() {
                 ]}
                 onPress={() => {
                   if (!canConfirm || shouldLockForUnstable) return;
-                  if (isSpotifyNameQuestion && pendingNameOption) {
+                  // isNameLetterQuestion FÖRST: en YouTube-name-fråga är question.type
+                  // 'timeline' men svaras med namn (pendingNameOption), inte år — utan
+                  // denna gren skulle timeline-grenen nedan fånga den (pendingYear är null).
+                  if (isNameLetterQuestion && pendingNameOption) {
                     handleConfirmName(pendingNameOption);
                   } else if (question.type === 'image' && pendingNameOption) {
                     handleConfirmName(pendingNameOption);

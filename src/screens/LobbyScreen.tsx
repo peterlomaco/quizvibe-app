@@ -1217,6 +1217,23 @@ function BlinkingLabel({
 // rgba(255,255,255,0.14) = nästan osynlig på mörk bakgrund.
 const MATRIX_SWITCH_OFF = '#3A5068';
 
+/**
+ * Parsar `carryPackages`-URL-paramet (JSON-array av Host-paket-IDs som var
+ * aktiva i spelet som just spelades, satt av quiz.tsx:s goToNewLobby vid Play
+ * Again). Returnerar `undefined` om paramet saknas (= ej carry-over) eller är
+ * korrupt, så seeden faller tillbaka på lobby_settings/profil. En tom array
+ * ('[]') bevaras som ett giltigt "Generic"-val.
+ */
+function parseCarryPackages(raw: string | undefined): string[] | undefined {
+  if (raw === undefined) return undefined;
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'string') : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export default function LobbyScreen() {
   const {
     code,
@@ -1231,6 +1248,8 @@ export default function LobbyScreen() {
     lobbyType,
     rematchLocked,
     competitionRematch,
+    parentControl,
+    carryPackages,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
@@ -1269,6 +1288,16 @@ export default function LobbyScreen() {
      *  expiry-timern nedan + väntar-bannern. rematchLocked är alltid 'true'
      *  tillsammans med denna (den låsta uppsättningen bär Start-gaten). */
     competitionRematch?: string;
+    /** Play Again carry-over: host:s exakta Parent Control-val från spelet som
+     *  just spelades ('true'/'false'). Parent Control persisteras ALDRIG i
+     *  lobby_settings (ingen DB-kolumn), så seeden kan inte läsa det ur stored
+     *  — utan denna param skulle en re-match återgå till profil-defaulten.
+     *  Undefined = fresh lobby (ej carry-over) → seeden faller på profilen. */
+    parentControl?: string;
+    /** Play Again carry-over: JSON-array av host:s aktiva Host-paket från
+     *  spelet som just spelades. AUKTORITATIV källa (kringgår ev. stale
+     *  lobby_settings + profil-filtret i seeden). Undefined = ej carry-over. */
+    carryPackages?: string;
   }>();
   // Om ingen kod skickas (t.ex. om man öppnar lobby-tabben direkt) genereras en.
   // useMemo ser till att koden är stabil över re-renders.
@@ -1524,6 +1553,10 @@ export default function LobbyScreen() {
         // Single: alltid av (Spotify-kortet göms — DJ kräver en motspelare).
         setSpotifyEnabled(seedSinglePlayer ? false : stored?.spotifyEnabled ?? false);
         setEnabledHostPackages([]);
+        // Parent Control — carry-over-param (guest host kan också toggla den).
+        // Persisteras aldrig i DB, så param är enda carry-över-källan. Utan
+        // param (fresh guest-lobby) → av.
+        setParentControlEnabled(parentControl === 'true');
         setYoutubeEnabledCategories(defaultEnabledMainCategories());
         setImagesEnabledCategories(defaultEnabledMainCategories());
         // Släpp debounce-skrivningen till lobby_settings så non-hosts ser
@@ -1618,20 +1651,34 @@ export default function LobbyScreen() {
           const enabledIds = (profile?.enabledHostPackages ?? catalogIds).filter(
             (id) => catalogIds.includes(id),
           );
+          // Play Again-param: host:s exakta paket-val från spelet som just
+          // spelades (AUKTORITATIVT). Vinner över stored.selectedExtraPackages
+          // — kringgår både en stale lobby_settings-rad och profil-filtret
+          // (enabledIds), så ett paket som var AKTIVT i föregående spel aldrig
+          // tappas vid carry-over. Undefined = ej carry-over.
+          const carriedPackages = parseCarryPackages(carryPackages);
           if (stored) {
-            setSelectedExtraPackages(
-              premium
-                ? stored.selectedExtraPackages.filter((id) => enabledIds.includes(id))
-                : [],
-            );
+            // Klampa mot catalogIds (giltiga paket) + premium — INTE mot
+            // enabledIds. Ett carry-over-paket ska bäras med oavsett profilens
+            // enabledHostPackages (som bara styr fresh-lobby-utbudet).
+            const sourcePackages = carriedPackages ?? stored.selectedExtraPackages;
+            const nextPackages = premium
+              ? sourcePackages.filter((id) => catalogIds.includes(id))
+              : [];
+            setSelectedExtraPackages(nextPackages);
+            // Se till att carry-over-paketen även ERBJUDS i listan (annars
+            // aktivt men dolt). Union av profilens enabled + de aktiva.
+            setEnabledHostPackages([...new Set([...enabledIds, ...nextPackages])]);
             setSketchEnabled(stored.sketchEnabled);
             // 1v1 + single: Spotify är aldrig tillgängligt (kortet göms i
             // båda lobbytyperna) — forcera av så inget carry-over läcker in.
             setSpotifyEnabled(is1v1Lobby || seedSinglePlayer ? false : stored.spotifyEnabled);
           } else if (premium) {
             setSelectedExtraPackages(enabledIds);
+            setEnabledHostPackages(enabledIds);
+          } else {
+            setEnabledHostPackages(enabledIds);
           }
-          setEnabledHostPackages(enabledIds);
           // YouTube categories — prio: stored > profil > all 3.
           // Villkor: !== undefined (ej length > 0) så att [] (explicit av) respekteras.
           const seedYtCats =
@@ -1664,11 +1711,16 @@ export default function LobbyScreen() {
           // i en ny lobby (opt-in) men bärs över vid Play Again.
           setRemoteAssistance(stored?.remoteAssistance ?? 'full');
           setMutualAssistanceEnabled(stored?.mutualAssistanceEnabled ?? false);
-          // Parent Control — seedas ENBART från host:ens profil-default.
-          // stored?.parentControlEnabled är alltid false (fältet persisteras
-          // inte till DB, samma mönster som spotify_answer_*), så vi läser det
-          // aldrig här — annars skulle en re-seed skriva över host:ens val.
-          setParentControlEnabled(profile?.parentControlEnabled ?? false);
+          // Parent Control — carry-over-param VINNER (host:s exakta val från
+          // spelet som just spelades). stored?.parentControlEnabled är alltid
+          // false (fältet persisteras inte till DB, samma mönster som
+          // spotify_answer_*), så vi läser aldrig stored här. Utan param
+          // (fresh lobby) faller vi på host:ens profil-default.
+          const carriedParentControl =
+            parentControl === undefined ? undefined : parentControl === 'true';
+          setParentControlEnabled(
+            carriedParentControl ?? profile?.parentControlEnabled ?? false,
+          );
           // Tillåt debounce-effekten att skriva till setLobbySettings nu när
           // alla initiala värden är satta. Utan denna guard kan debounce:n
           // hinna skriva med default-värden (spotifyEnabled=false) INNAN
@@ -1889,7 +1941,7 @@ export default function LobbyScreen() {
       if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
     return () => { cancelled = true; };
-  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType]);
+  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType, parentControl, carryPackages]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.

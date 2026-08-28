@@ -17,7 +17,8 @@
 // fortsätter serien (ingen låsning, inga inbjudningar).
 
 import { attachSeriesToLeaderboard, markSeriesContinues } from './aggregateLeaderboard';
-import type { SavedAggregate } from './aggregateLeaderboards';
+import type { AggregateGameSettings, SavedAggregate } from './aggregateLeaderboards';
+import { buildRematchSettings } from './competitionRematchSettings';
 import { clearEjected } from './ejectedPlayers';
 import { clearLeftPlayers } from './leftPlayers';
 import { registerActiveRoom } from './mockActiveRooms';
@@ -31,14 +32,12 @@ import {
   type LobbySettings,
 } from './mockLobbySettings';
 import { clearGameStarted } from './mockStartedGames';
-import { defaultEnabledMainCategories } from './mainCategory';
 import { generateRoomCode } from './roomCode';
 import { addInvite } from './waitingInvites';
 
 // Host:s lobby-player_id — matchar SEED_PLAYERS[0].id i LobbyScreen (host:s
 // kort behåller '1' genom mergeProfileIntoHost).
 const HOST_PLAYER_ID = '1';
-const CURRENT_YEAR = new Date().getFullYear();
 
 export type CompetitionRematchLobbyType = 'single' | 'multiplayer';
 
@@ -54,6 +53,10 @@ export interface StartCompetitionRematchOptions {
   roundsCount?: number;
   answerResponseSeconds?: 30 | 45 | 60;
   region?: LobbySettings['region'];
+  /** Snapshot av senaste spelets inställningar (migration 0043). Återanvänds
+   *  över profil-defaults när den finns. Parent Control bärs separat som param
+   *  (se buildRematchSettings) eftersom det inte persisteras i lobby_settings. */
+  settings?: AggregateGameSettings | null;
 }
 
 export interface StartCompetitionRematchResult {
@@ -62,34 +65,6 @@ export interface StartCompetitionRematchResult {
   code?: string;
   lobbyType?: CompetitionRematchLobbyType;
   isMulti?: boolean;
-}
-
-function buildRematchSettings(
-  opts: StartCompetitionRematchOptions,
-  maxPlayers: 4 | 12,
-): LobbySettings {
-  const all = defaultEnabledMainCategories();
-  return {
-    // Individual Devices — de inbjudna spelar på egna enheter (remote join).
-    gameMode: 'individual-devices',
-    singlePlayerDefault: false,
-    maxPlayers,
-    region: opts.region ?? 'Global',
-    answerResponseSeconds: opts.answerResponseSeconds ?? 30,
-    eraFrom: opts.eraFrom ?? 1970,
-    eraTo: opts.eraTo ?? CURRENT_YEAR,
-    roundsCount: opts.roundsCount ?? 4,
-    selectedExtraPackages: [],
-    youtubeEnabledCategories: [...all],
-    imagesEnabledCategories: [...all],
-    sketchEnabled: false,
-    spotifyEnabled: false,
-    spotifyAnswerYear: true,
-    spotifyAnswerName: true,
-    parentControlEnabled: false,
-    remoteAssistance: 'full',
-    mutualAssistanceEnabled: false,
-  };
 }
 
 /**
@@ -159,11 +134,20 @@ export async function startCompetitionRematch(
   await attachSeriesToLeaderboard(saved.id, saved.games);
   await markSeriesContinues(code, saved.id);
 
-  if (isMulti) {
-    // Tvinga Individual Devices genom att skriva stored settings — host-seeden
-    // föredrar dem över profil-defaults, så vi rör inte den känsliga seed-
-    // logiken. Host kan ändå justera rundor/era/svarstid i lobbyn.
+  // Skriv stored settings så host-seeden föredrar dem över profil-defaults —
+  // det är så senaste spelets era/rundor/svarstid/käll-kategorier/Host-paket/
+  // Spotify återanvänds. Multi SKRIVER ALLTID (behöver dessutom tvingas till
+  // Individual Devices + sync till de inbjudna). Solo skriver BARA när en
+  // snapshot finns — utan snapshot lämnas lobbyn utan settings-rad så den
+  // single-seedar från host:ens profil precis som förr (noll regression).
+  // Solo forceras till single av lobbyType-paramet, så stored gameMode
+  // ignoreras. Parent Control bärs separat som URL-param (persisteras aldrig
+  // i lobby_settings).
+  if (isMulti || opts.settings) {
     await setLobbySettings(code, buildRematchSettings(opts, maxPlayers));
+  }
+
+  if (isMulti) {
     // Pre-seeda de inbjudnas rader (has_left=true → "inte på plats" tills join).
     await seedRematchInviteePlayers(code, seeded);
     // Cross-device-inbjudan till varje deltagare. alreadyFriend:true hoppar

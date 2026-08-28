@@ -1276,7 +1276,7 @@ items:
     parentControlled: true
     youtubeClips:
       - videoId: "EUVo8epKwv0"
-        startSec: 0
+        startSec: 10
         endSec: 30
         channelTitle: "OutKast"
         notes: "Official music video."
