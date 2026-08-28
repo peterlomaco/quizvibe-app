@@ -14877,17 +14877,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
+    "genrePackages": [
+      "Club Hits"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
     "spotifyTrackId": "1As4KC3YYpu89aBt7EqL2m",
     "youtubeClips": [
       {
-        "videoId": "MnyFWY0tFYc",
-        "startSec": 30,
+        "videoId": "qetW6R9Jxs4",
+        "startSec": 6,
         "endSec": 45,
-        "channelTitle": "Eric Prydz - Topic",
+        "channelTitle": "Eric Prydz",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-bytt 2026-08-28 (officiella musikvideon). parentControlled pga aerobics-motivet."
       }
     ]
   },
