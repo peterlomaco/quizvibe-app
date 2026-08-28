@@ -130,6 +130,7 @@ items:
     wikimediaSearchHints: ["Dr Dre The Next Episode 2001"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     spotifyTrackId: "4LwU4Vp6od3Sb08CsP99GC"
     youtubeClips:
       - videoId: "f0dkQGfha3A"
@@ -196,6 +197,7 @@ items:
     wikimediaSearchHints: ["50 Cent In da Club Get Rich or Die Tryin"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     spotifyTrackId: "7iL6o9tox1zgHpKUfh9vuC"
     youtubeClips:
       - videoId: "_VXUiAJi5KY"
@@ -1258,6 +1260,7 @@ items:
     wikimediaSearchHints: ["Eminem My Name Is 1999 Slim Shady LP hip hop"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     spotifyTrackId: "75IN3CtuZwTHTnZvYM4qnJ"
     # youtubeClips borttagna 2026-08-10: EAKfXCRmhq8 (Eminem, officiell kanal) har
     # embedding avstängd → "Video unavailable" i spelaren. Lever vidare som
@@ -1270,6 +1273,7 @@ items:
     wikimediaSearchHints: ["OutKast Ms. Jackson 2000 Stankonia hip hop"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     youtubeClips:
       - videoId: "EUVo8epKwv0"
         startSec: 0

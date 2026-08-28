@@ -1109,6 +1109,7 @@ items:
     wikimediaSearchHints: ["Sugarhill Gang Rapper's Delight 1979 hip hop"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     spotifyTrackId: "2XbwFs07dfm2MGQuYmRMZT"
   # === Tillägg 2026-08-11 (Peters lista) ===
   - id: marvin-gaye-tammi-terrell-aint-no-mountain-high-enough

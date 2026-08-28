@@ -301,6 +301,7 @@ items:
     wikimediaSearchHints: ["MC Hammer U Can't Touch This 1990"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     youtubeClips:
       - videoId: "q8WSdypJ4WA"
         startSec: 15
@@ -906,6 +907,7 @@ items:
     wikimediaSearchHints: ["Nas If I Ruled the World 1996 It Was Written"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     spotifyTrackId: "5PQmSHzWnlgG4EBuIqjac2"
     youtubeClips:
       - videoId: "o2gwGy1ZIMg"
@@ -2335,6 +2337,7 @@ items:
     wikimediaSearchHints: ["Cypress Hill Insane in the Brain Black Sunday"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     youtubeClips:
       - videoId: "RijB8wnJCN0"
         startSec: 0
@@ -2366,6 +2369,7 @@ items:
     wikimediaSearchHints: ["Snoop Doggy Dogg Whats My Name Doggystyle"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     youtubeClips:
       - videoId: "2soGJXQAQec"
         startSec: 0
@@ -2807,6 +2811,7 @@ items:
         channelTitle: "Sir Mix-A-Lot - Topic"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). Peters rad hade RHCP-klippet inklistrat av misstag; officiell Topic-audio uppsokt."
     genrePackages: ["hiphop"]
+    parentControlled: true
     inBaseCatalog: false
   - id: bon-jovi-always
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2885,6 +2890,7 @@ items:
         channelTitle: "BlackstreetVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1996 = albumet Another Level (MusicBrainz gav 1997)."
     genrePackages: ["hiphop"]
+    parentControlled: true
   - id: whitney-houston-i-have-nothing
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Have Nothing — Whitney Houston"

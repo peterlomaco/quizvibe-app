@@ -4164,6 +4164,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "hiphop"
     ],
+    "parentControlled": true,
     "spotifyTrackId": "2XbwFs07dfm2MGQuYmRMZT",
     "youtubeClips": []
   },
@@ -8416,6 +8417,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "hiphop"
     ],
     "inBaseCatalog": false,
+    "parentControlled": true,
     "youtubeClips": [
       {
         "videoId": "q8WSdypJ4WA",
@@ -8686,6 +8688,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "hiphop"
     ],
     "inBaseCatalog": false,
+    "parentControlled": true,
     "spotifyTrackId": "20XdEFyaUR9C7aDIdq2OAd",
     "youtubeClips": []
   },
@@ -9578,6 +9581,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "hiphop"
     ],
     "inBaseCatalog": false,
+    "parentControlled": true,
     "youtubeClips": [
       {
         "videoId": "-TsEFYY95mE",
@@ -10019,6 +10023,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "hiphop"
     ],
+    "parentControlled": true,
     "youtubeClips": [
       {
         "videoId": "RijB8wnJCN0",
@@ -10243,6 +10248,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "hiphop"
     ],
+    "parentControlled": true,
     "youtubeClips": [
       {
         "videoId": "2soGJXQAQec",
@@ -11464,6 +11470,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "hiphop"
     ],
+    "parentControlled": true,
     "youtubeClips": [
       {
         "videoId": "3KL9mRus19o",
@@ -11766,6 +11773,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "hiphop"
     ],
+    "parentControlled": true,
     "spotifyTrackId": "5PQmSHzWnlgG4EBuIqjac2",
     "youtubeClips": [
       {
@@ -13273,6 +13281,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "hiphop"
     ],
+    "parentControlled": true,
     "spotifyTrackId": "4LwU4Vp6od3Sb08CsP99GC",
     "youtubeClips": [
       {
@@ -13331,6 +13340,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "hiphop"
     ],
+    "parentControlled": true,
     "spotifyTrackId": "75IN3CtuZwTHTnZvYM4qnJ",
     "youtubeClips": []
   },
@@ -13876,6 +13886,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "hiphop"
     ],
+    "parentControlled": true,
     "youtubeClips": [
       {
         "videoId": "EUVo8epKwv0",
@@ -14575,6 +14586,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "hiphop"
     ],
+    "parentControlled": true,
     "spotifyTrackId": "7iL6o9tox1zgHpKUfh9vuC",
     "youtubeClips": [
       {
@@ -20346,6 +20358,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "hiphop"
     ],
     "inBaseCatalog": false,
+    "parentControlled": true,
     "youtubeClips": [
       {
         "videoId": "xpVfcZ0ZcFM",

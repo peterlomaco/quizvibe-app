@@ -195,6 +195,7 @@ items:
         channelTitle: "BEST ARTIST ALIVE OVO"
         notes: "Peter-kurerad 2026-08-27. Lyric video. startSec 3 angiven av Peter."
     genrePackages: ["hiphop"]
+    parentControlled: true
     inBaseCatalog: false
   - id: lil-nas-x-old-town-road
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
