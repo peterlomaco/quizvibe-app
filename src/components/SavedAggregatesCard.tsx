@@ -1,5 +1,11 @@
 import { useFocusEffect } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import {
@@ -11,15 +17,26 @@ import {
   type SavedAggregate,
 } from '../utils/aggregateLeaderboards';
 import { isAnonymousSession } from '../utils/auth';
+import {
+  groupHistory,
+  resolveGameForm,
+  type SortMode,
+} from '../utils/historyGrouping';
+import { CollapsibleGroup } from './CollapsibleGroup';
 import { CompetitionRematchActions } from './CompetitionRematchActions';
 import { finalizeRows, LeaderboardTable } from './LeaderboardTable';
+import { SegmentedControl } from './SegmentedControl';
 
 /**
  * Sparade Aggregate Leaderboards / Scores på Profile (migration 0037).
  *
- * Renderas inuti Player history, ovanför månadsgrupperna. Självgatande:
- * inget sparat (eller anonym session) → komponenten returnerar null och
- * Player history ser ut som förut.
+ * Renderas inuti Player history, ovanför månadsgrupperna, OCH på /competitions
+ * (Home:s Marathon-knapp). Självgatande: inget sparat (eller anonym session) →
+ * komponenten returnerar null.
+ *
+ * Listan är sorterbar (Host Name / Date) och två-nivå-collapsible: level 1 =
+ * host / månad, level 2 = spelform. Grupperingslogiken bor i historyGrouping.ts
+ * och delas med PlayerHistorySection så båda ytorna beter sig identiskt.
  *
  * Tabellen i detalj-modalen är SAMMA `LeaderboardTable` + `finalizeRows`
  * som slutskärmen använder, så en sparad serie ser identisk ut med hur den
@@ -32,6 +49,18 @@ import { finalizeRows, LeaderboardTable } from './LeaderboardTable';
  *   (öppnad från Home:s Competition-knapp). Profile-call-siten utelämnar den →
  *   bara Close, som förut.
  */
+const SORT_OPTIONS = [
+  { label: 'Host Name', value: 'host' },
+  { label: 'Date', value: 'date' },
+];
+
+function toggleSetKey(prev: Set<string>, key: string): Set<string> {
+  const next = new Set(prev);
+  if (next.has(key)) next.delete(key);
+  else next.add(key);
+  return next;
+}
+
 export function SavedAggregatesCard({
   showRematch = false,
 }: {
@@ -39,6 +68,13 @@ export function SavedAggregatesCard({
 } = {}) {
   const [items, setItems] = useState<SavedAggregate[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [sortMode, setSortMode] = useState<SortMode>('date');
+  const [expandedL1, setExpandedL1] = useState<Set<string>>(new Set());
+  const [expandedForms, setExpandedForms] = useState<Set<string>>(new Set());
+  // Default-expandera första gruppens första spelform EN gång per sortMode
+  // (så ett sort-byte re-defaultar, men focus-reloads inte över-skriver
+  // user:s toggling).
+  const initedSortRef = useRef<SortMode | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -89,34 +125,102 @@ export function SavedAggregatesCard({
     );
   }, [open]);
 
+  const groups = useMemo(
+    () =>
+      groupHistory(items, sortMode, {
+        getHostName: (it) =>
+          it.participants.find((p) => p.userId === it.createdBy)?.playerName,
+        getDateISO: (it) => it.updatedAt ?? it.createdAt,
+        getGameForm: (it) =>
+          resolveGameForm(
+            it.latestSettings?.gameMode,
+            it.latestSettings?.singlePlayerDefault,
+          ),
+      }),
+    [items, sortMode],
+  );
+
+  useEffect(() => {
+    if (groups.length === 0) return;
+    if (initedSortRef.current === sortMode) return;
+    initedSortRef.current = sortMode;
+    const first = groups[0];
+    const firstForm = first.forms[0];
+    setExpandedL1(new Set([first.l1Key]));
+    setExpandedForms(
+      firstForm ? new Set([`${first.l1Key}::${firstForm.formKey}`]) : new Set(),
+    );
+  }, [sortMode, groups]);
+
   if (items.length === 0) return null;
+
+  const renderRow = (item: SavedAggregate) => {
+    const games = item.games.length;
+    const others = item.participants.map((p) => p.playerName);
+    return (
+      <Pressable
+        key={item.id}
+        onPress={() => setOpenId(item.id)}
+        style={({ pressed }) => [styles.row, pressed && { opacity: 0.8 }]}
+      >
+        <View style={styles.rowText}>
+          <Text style={styles.rowName} numberOfLines={1}>
+            {item.name}
+          </Text>
+          <Text style={styles.rowMeta} numberOfLines={1}>
+            {aggregateLabel(item.participants.length)} · {games}{' '}
+            {games === 1 ? 'game' : 'games'}
+            {others.length > 1 ? ` · ${others.join(', ')}` : ''}
+          </Text>
+        </View>
+        <Text style={styles.chevron}>›</Text>
+      </Pressable>
+    );
+  };
 
   return (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>Marathon tables</Text>
-      {items.map((item) => {
-        const games = item.games.length;
-        const others = item.participants.map((p) => p.playerName);
-        return (
-          <Pressable
-            key={item.id}
-            onPress={() => setOpenId(item.id)}
-            style={({ pressed }) => [styles.row, pressed && { opacity: 0.8 }]}
-          >
-            <View style={styles.rowText}>
-              <Text style={styles.rowName} numberOfLines={1}>
-                {item.name}
-              </Text>
-              <Text style={styles.rowMeta} numberOfLines={1}>
-                {aggregateLabel(item.participants.length)} · {games}{' '}
-                {games === 1 ? 'game' : 'games'}
-                {others.length > 1 ? ` · ${others.join(', ')}` : ''}
-              </Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </Pressable>
-        );
-      })}
+      <SegmentedControl
+        options={SORT_OPTIONS}
+        value={sortMode}
+        onChange={(v) => setSortMode(v as SortMode)}
+      />
+      <View style={styles.groups}>
+        {groups.map((g) => {
+          const total = g.forms.reduce((sum, f) => sum + f.items.length, 0);
+          return (
+            <CollapsibleGroup
+              key={g.l1Key}
+              level={1}
+              label={g.l1Label}
+              summary={`${total} ${total === 1 ? 'marathon' : 'marathons'}`}
+              open={expandedL1.has(g.l1Key)}
+              onToggle={() => setExpandedL1((prev) => toggleSetKey(prev, g.l1Key))}
+            >
+              {g.forms.map((f) => {
+                const formKey = `${g.l1Key}::${f.formKey}`;
+                return (
+                  <CollapsibleGroup
+                    key={formKey}
+                    level={2}
+                    label={f.formLabel}
+                    summary={`${f.items.length} ${
+                      f.items.length === 1 ? 'marathon' : 'marathons'
+                    }`}
+                    open={expandedForms.has(formKey)}
+                    onToggle={() =>
+                      setExpandedForms((prev) => toggleSetKey(prev, formKey))
+                    }
+                  >
+                    <View style={styles.rowList}>{f.items.map(renderRow)}</View>
+                  </CollapsibleGroup>
+                );
+              })}
+            </CollapsibleGroup>
+          );
+        })}
+      </View>
 
       <Modal
         visible={open !== null}
@@ -173,6 +277,8 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
+  groups: { gap: Spacing.sm },
+  rowList: { gap: Spacing.sm },
   // Speglar MyMatchesScreens rad-vokabulär.
   row: {
     flexDirection: 'row',

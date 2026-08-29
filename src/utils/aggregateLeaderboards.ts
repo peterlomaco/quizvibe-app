@@ -3,6 +3,7 @@ import type {
   AggregateSeriesGame,
 } from './aggregateLeaderboard';
 import { pickLatestGameSettings } from './competitionRematchSettings';
+import type { GameMode } from './profileStorage';
 import { supabase } from './supabase';
 
 /**
@@ -52,6 +53,12 @@ export interface AggregateGameSettings {
   selectedExtraPackages: string[];
   parentControlEnabled: boolean;
   spotifyEnabled: boolean;
+  /** ⚠ ENBART för spelform-grupperingen i Marathon-listan (resolveGameForm).
+   *  Optional — äldre snapshots saknar dem → "Unknown mode". Läs dem ALDRIG i
+   *  buildRematchSettings: strukturella fält (gameMode/singlePlayerDefault/
+   *  maxPlayers) härleds alltid av lobbytypen, aldrig av snapshoten. */
+  gameMode?: GameMode;
+  singlePlayerDefault?: boolean;
 }
 
 export interface SavedAggregate {
@@ -66,12 +73,20 @@ export interface SavedAggregate {
    *  = ingen snapshot (äldre spel, gäst-blandat, eller migration ej körd) →
    *  startCompetitionRematch faller tillbaka på profil-defaults. */
   latestSettings?: AggregateGameSettings | null;
+  /** Serie-datum ur DB (0037-kolumnerna). Driver Date-sorteringen i Marathon-
+   *  listan. Optional — kolumnerna finns alltid, men äldre klient-cache eller
+   *  ofullständig rad → "Unknown date". */
+  updatedAt?: string;
+  createdAt?: string;
 }
 
 interface LeaderboardRow {
   id: string;
   name: string;
   created_by: string;
+  // Redan returnerade av select('*') — mappas nu (0037-kolumner).
+  updated_at?: string;
+  created_at?: string;
   aggregate_leaderboard_players?: { user_id: string; player_name: string }[];
   aggregate_leaderboard_games?: {
     room_code: string;
@@ -101,6 +116,8 @@ function rowToSaved(row: LeaderboardRow): SavedAggregate {
       players: g.stats ?? [],
     })),
     latestSettings: pickLatestGameSettings(row.aggregate_leaderboard_games ?? []),
+    updatedAt: row.updated_at,
+    createdAt: row.created_at,
   };
 }
 

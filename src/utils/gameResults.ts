@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { loadProfile } from './profileStorage';
+import { loadProfile, type GameMode } from './profileStorage';
 import type { PlayedMediaSource } from './mediaSource';
 
 /**
@@ -163,6 +163,17 @@ export interface HistoryEntry {
    *  ett 2-3-rundors spel med Hints påslaget serverar noll Hints-frågor och
    *  ska inte märkas "Hints". Tom array = ingen media alls (bör inte hända). */
   sources: PlayedMediaSource[];
+  /** Spelformen (spelläget) vid speltillfället — driver spelform-grupperingen
+   *  i Player history (resolveGameForm i historyGrouping.ts). ALLA tre fält
+   *  nedan är OPTIONAL med flit: poster skrivna innan detta fält lades till
+   *  (2026-08-29) saknar dem och grupperas under "Unknown mode" / "Unknown
+   *  host" — additivt, ingen HISTORY_Vx_RESET (som skulle wipe:a historiken). */
+  gameMode?: GameMode;
+  /** True = single player (flagga ovanpå gameMode). Se resolveGameForm. */
+  singlePlayerDefault?: boolean;
+  /** Host:ens namn vid speltillfället (turnOrder[0].name). För egna hostade
+   *  spel = eget playerName; i PtP-spectator-läget = host:ens namn. */
+  hostName?: string;
 }
 
 /**

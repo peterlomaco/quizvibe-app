@@ -5460,6 +5460,12 @@ export default function QuizScreen() {
         eraTo,
         selectedExtraPackages,
         sources: servedSources,
+        // Spelform + host för sorterings-/grupperings-vyerna i Player history.
+        // Remote är redan uteslutet ovan (!isRemote), så gameMode är här alltid
+        // pass-the-phone/individual-devices; single player fångas av flaggan.
+        gameMode,
+        singlePlayerDefault: isLocalSoloGame,
+        hostName: turnOrder[0]?.name,
       };
       try {
         await appendGameHistoryEntry(entry);
@@ -5733,6 +5739,12 @@ export default function QuizScreen() {
           selectedExtraPackages,
           parentControlEnabled,
           spotifyEnabled,
+          // ⚠ ENBART för spelform-grupperingen i Marathon-listan. Läses aldrig
+          // av buildRematchSettings (den härleder gameMode av lobbytypen).
+          // Denna gren är host-only + aldrig remote → single player fångas av
+          // turnOrder.length <= 1.
+          gameMode,
+          singlePlayerDefault: turnOrder.length <= 1,
         });
       });
     });

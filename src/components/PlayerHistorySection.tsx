@@ -1,75 +1,52 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useFocusEffect } from 'expo-router';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { loadGameHistory, type HistoryEntry } from '../utils/gameResults';
+import {
+  groupHistory,
+  resolveGameForm,
+  type SortMode,
+} from '../utils/historyGrouping';
 import { PLAYED_MEDIA_SOURCE_LABEL, PLAYED_MEDIA_SOURCE_ORDER } from '../utils/mediaSource';
+import { CollapsibleGroup } from './CollapsibleGroup';
 import { MyMatchesSection } from './MyMatchesSection';
 import { SavedAggregatesCard } from './SavedAggregatesCard';
+import { SegmentedControl } from './SegmentedControl';
 
-// Player history-sektionen visar en minimal lista över alla spel
-// användaren har spelat. Per spel: datum / totalpoäng / snittpoäng per
-// fråga / snitt-svarstid. Inget HCP-progressionsdiagram, rankings,
-// "highest scores" eller activity-grafer — Peter förenklade till bara
-// dessa fält 2026-05-18 så vi inte fakeshow:ar data som inte finns än.
+// Player history-sektionen visar en lista över alla spel användaren har
+// spelat, sorterbar (Host Name / Date) och två-nivå-collapsible: level 1 =
+// host / månad, level 2 = spelform. Grupperingslogiken bor i
+// historyGrouping.ts och delas med Marathon-listan (SavedAggregatesCard) så
+// båda ytorna beter sig identiskt.
 //
-// Persistensen läggs i src/utils/gameResults.ts (HistoryEntry).
-// One-shot wipe-migration körs i loadGameHistory:s `ensureHistoryReset` så
-// ev. stale-data från tidigare experiment-pipelines clearas automatiskt
-// vid första load efter förenklingen.
+// Persistensen läggs i src/utils/gameResults.ts (HistoryEntry). One-shot
+// wipe-migration körs i loadGameHistory:s `ensureHistoryReset`.
 
-interface MonthGroup {
-  /** YYYY-MM-key används som identifierare för expand-state. */
-  key: string;
-  /** "May 2026" — visas i månads-headern. */
-  label: string;
-  entries: HistoryEntry[];
-}
+const SORT_OPTIONS = [
+  { label: 'Host Name', value: 'host' },
+  { label: 'Date', value: 'date' },
+];
 
-function monthKeyForDate(iso: string): string {
-  // YYYY-MM från ISO. Date-parsing skyddar mot ev. variation i format —
-  // gameResults skriver ISO med dagsdel men header behöver bara år+månad.
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return 'unknown';
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-}
-
-function monthLabelForKey(key: string): string {
-  // 'YYYY-MM' → 'May 2026'. Använder Date(year, month-1, 1) så locale-
-  // formatteraren får rätt månad oavsett timezone.
-  const [y, m] = key.split('-').map(Number);
-  if (!y || !m) return key;
-  const d = new Date(y, m - 1, 1);
-  return d.toLocaleString('en', { month: 'long', year: 'numeric' });
-}
-
-function groupByMonth(sortedEntries: HistoryEntry[]): MonthGroup[] {
-  // Förutsätter att sortedEntries är sorted desc by date (senaste först),
-  // så group-ordningen blir automatiskt rätt (senaste månad först).
-  const groups: MonthGroup[] = [];
-  for (const entry of sortedEntries) {
-    const key = monthKeyForDate(entry.date);
-    const last = groups[groups.length - 1];
-    if (last && last.key === key) {
-      last.entries.push(entry);
-    } else {
-      groups.push({ key, label: monthLabelForKey(key), entries: [entry] });
-    }
-  }
-  return groups;
+function toggleSetKey(prev: Set<string>, key: string): Set<string> {
+  const next = new Set(prev);
+  if (next.has(key)) next.delete(key);
+  else next.add(key);
+  return next;
 }
 
 export function PlayerHistorySection() {
-  // Kollapsbart block — speglar Game connections-mönstret. Default
+  // Kollapsbart block — speglar Game connections-mönstret.
   // Default hopfälld — alla Profile-sektioner är ihopfällda vid besök (2026-06-01).
   const [expanded, setExpanded] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
-  // Per-månads expand-state. Initial-defaulten (= senaste månaden expanded)
-  // sätts en gång vid första load via didInitMonthExpansionRef-flaggan.
-  // Subsequent re-focuses respekterar user:s explicita toggling.
-  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
-  const didInitMonthExpansionRef = useRef(false);
+  const [sortMode, setSortMode] = useState<SortMode>('date');
+  const [expandedL1, setExpandedL1] = useState<Set<string>>(new Set());
+  const [expandedForms, setExpandedForms] = useState<Set<string>>(new Set());
+  // Default-expandera första gruppens första spelform EN gång per sortMode
+  // (ett sort-byte re-defaultar; focus-reloads respekterar user:s toggling).
+  const initedSortRef = useRef<SortMode | null>(null);
 
   // Re-load varje gång Profile får fokus så listan speglar senaste
   // append:en (Quiz → Final Leaderboard → Home → Profile).
@@ -78,31 +55,38 @@ export function PlayerHistorySection() {
       let active = true;
       loadGameHistory().then((list) => {
         if (!active) return;
+        // Sortera desc by date så leaf-ordningen blir nyast först oavsett
+        // grupperings-läge.
         const sorted = [...list].sort((a, b) => b.date.localeCompare(a.date));
         setHistory(sorted);
-        // Default-expand senaste månaden vid första load. Skyddas av ref
-        // så user:s explicit toggle (inkl. collapse av senaste månaden)
-        // inte över-skrivs av nästa focus-load.
-        if (!didInitMonthExpansionRef.current && sorted.length > 0) {
-          setExpandedMonths(new Set([monthKeyForDate(sorted[0].date)]));
-          didInitMonthExpansionRef.current = true;
-        }
       });
-      return () => { active = false; };
+      return () => {
+        active = false;
+      };
     }, []),
   );
 
+  const groups = useMemo(
+    () =>
+      groupHistory(history, sortMode, {
+        getHostName: (e) => e.hostName,
+        getDateISO: (e) => e.date,
+        getGameForm: (e) => resolveGameForm(e.gameMode, e.singlePlayerDefault),
+      }),
+    [history, sortMode],
+  );
 
-  const monthGroups = useMemo(() => groupByMonth(history), [history]);
-
-  const toggleMonth = (key: string) => {
-    setExpandedMonths((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
+  useEffect(() => {
+    if (groups.length === 0) return;
+    if (initedSortRef.current === sortMode) return;
+    initedSortRef.current = sortMode;
+    const first = groups[0];
+    const firstForm = first.forms[0];
+    setExpandedL1(new Set([first.l1Key]));
+    setExpandedForms(
+      firstForm ? new Set([`${first.l1Key}::${firstForm.formKey}`]) : new Set(),
+    );
+  }, [sortMode, groups]);
 
   return (
     <View style={styles.container}>
@@ -129,8 +113,6 @@ export function PlayerHistorySection() {
 
       {expanded && (
         <>
-          {/* HCP-skölden togs bort 2026-05-18 (introduceras i v2 när
-              HCP-progression byggs ut med riktig data). */}
           {/* Sparade Aggregate Leaderboards/Scores (0037). Självgatande —
               inget sparat eller anonym session → renderar null. */}
           <SavedAggregatesCard />
@@ -144,59 +126,77 @@ export function PlayerHistorySection() {
                 building history.
               </Text>
             ) : (
-              // Månads-grupperade rader med per-månads expand/collapse.
-              // Senaste månaden default-expanderad; övriga collapsed tills
-              // user tappar. Inom månad: spel-rader i samma flat-format
-              // som tidigare (datum + score + meta), separerade av divider.
-              <View style={styles.gameList}>
-                {monthGroups.map((group) => {
-                  const isOpen = expandedMonths.has(group.key);
-                  const correctSum = group.entries.reduce(
-                    (sum, e) => sum + e.correctAnswers,
-                    0,
-                  );
-                  const totalSum = group.entries.reduce(
-                    (sum, e) => sum + e.totalQuestions,
-                    0,
-                  );
-                  const avgPct =
-                    totalSum > 0 ? Math.round((correctSum / totalSum) * 100) : 0;
-                  return (
-                    <View key={group.key} style={styles.monthGroup}>
-                      <Pressable
-                        onPress={() => toggleMonth(group.key)}
-                        style={({ pressed }) => [
-                          styles.monthHeader,
-                          pressed && { opacity: 0.7 },
-                        ]}
-                        hitSlop={6}
+              <>
+                <SegmentedControl
+                  options={SORT_OPTIONS}
+                  value={sortMode}
+                  onChange={(v) => setSortMode(v as SortMode)}
+                />
+                {/* Två-nivå-nästling: level 1 = månad/host, level 2 = spelform.
+                    Inom spelform: spel-rader i samma flat-format som tidigare,
+                    separerade av divider. */}
+                <View style={styles.gameList}>
+                  {groups.map((group) => {
+                    const total = group.forms.reduce(
+                      (sum, f) => sum + f.items.length,
+                      0,
+                    );
+                    return (
+                      <CollapsibleGroup
+                        key={group.l1Key}
+                        level={1}
+                        label={group.l1Label}
+                        summary={`${total} ${total === 1 ? 'game' : 'games'}`}
+                        open={expandedL1.has(group.l1Key)}
+                        onToggle={() =>
+                          setExpandedL1((prev) => toggleSetKey(prev, group.l1Key))
+                        }
                       >
-                        <Text style={styles.monthLabel}>{group.label}</Text>
-                        <Text style={styles.monthSummary}>
-                          {group.entries.length} {group.entries.length === 1 ? 'game' : 'games'} · {avgPct}% avg
-                        </Text>
-                        <View style={styles.monthToggleBox}>
-                          <Text style={styles.monthToggleText}>
-                            {isOpen ? '−' : '+'}
-                          </Text>
-                        </View>
-                      </Pressable>
-                      {isOpen && (
-                        <View style={styles.monthEntries}>
-                          {group.entries.map((entry, i) => (
-                            <React.Fragment key={entry.id}>
-                              <GameHistoryRow entry={entry} />
-                              {i < group.entries.length - 1 && (
-                                <View style={styles.divider} />
-                              )}
-                            </React.Fragment>
-                          ))}
-                        </View>
-                      )}
-                    </View>
-                  );
-                })}
-              </View>
+                        {group.forms.map((form) => {
+                          const formKey = `${group.l1Key}::${form.formKey}`;
+                          const correctSum = form.items.reduce(
+                            (sum, e) => sum + e.correctAnswers,
+                            0,
+                          );
+                          const totalSum = form.items.reduce(
+                            (sum, e) => sum + e.totalQuestions,
+                            0,
+                          );
+                          const avgPct =
+                            totalSum > 0
+                              ? Math.round((correctSum / totalSum) * 100)
+                              : 0;
+                          return (
+                            <CollapsibleGroup
+                              key={formKey}
+                              level={2}
+                              label={form.formLabel}
+                              summary={`${form.items.length} ${
+                                form.items.length === 1 ? 'game' : 'games'
+                              } · ${avgPct}% avg`}
+                              open={expandedForms.has(formKey)}
+                              onToggle={() =>
+                                setExpandedForms((prev) =>
+                                  toggleSetKey(prev, formKey),
+                                )
+                              }
+                            >
+                              {form.items.map((entry, i) => (
+                                <React.Fragment key={entry.id}>
+                                  <GameHistoryRow entry={entry} />
+                                  {i < form.items.length - 1 && (
+                                    <View style={styles.divider} />
+                                  )}
+                                </React.Fragment>
+                              ))}
+                            </CollapsibleGroup>
+                          );
+                        })}
+                      </CollapsibleGroup>
+                    );
+                  })}
+                </View>
+              </>
             )}
           </View>
 
@@ -214,13 +214,13 @@ export function PlayerHistorySection() {
   );
 }
 
-// Per-spel-rad: tre-rad-layout.
+// Per-spel-rad: fyra-rad-layout.
 // 1. Datum + korrekthet ("3/4 (75%)", highlighted i primary blå)
 // 2. Game-time-settings: ålder, assistance-level, era-spann
 // 3. Avg response time
-// Settings-raden visar inställningar som faktiskt användes vid speltill-
-// fället (frozen i HistoryEntry) — viktigt för att tolka resultat över
-// tid när profilens defaults kan ha ändrats.
+// 4. Package + sources
+// Settings-raderna visar inställningar som faktiskt användes vid speltill-
+// fället (frozen i HistoryEntry) — viktigt för att tolka resultat över tid.
 const ASSISTANCE_LABEL: Record<HistoryEntry['assistance'], string> = {
   full: 'Full',
   standard: 'Standard',
@@ -233,19 +233,15 @@ function GameHistoryRow({ entry }: { entry: HistoryEntry }) {
       ? Math.round((entry.correctAnswers / entry.totalQuestions) * 100)
       : 0;
   // Paket-etikett: tom array → "Generic" (= bara basic-utbudet). När theme
-  // packages aktiveras i v1.1+ visas paket-ID:n joined med kommatecken
-  // (formatering kan bytas till human-readable labels när PURCHASED_PACKAGES
-  // har items att slå upp mot). Defensive fallback för stale entries utan
-  // fältet (kan hända om v4-reset inte hunnit köra på en testare:s device).
+  // packages aktiveras i v1.1+ visas paket-ID:n joined med kommatecken.
+  // Defensive fallback för stale entries utan fältet.
   const packages =
     !entry.selectedExtraPackages || entry.selectedExtraPackages.length === 0
       ? 'Generic'
       : entry.selectedExtraPackages.join(', ');
-  // Sources-etikett: källorna som FAKTISKT serverades i spelet (inte host:s
-  // toggle-läge), i appens kanoniska ordning Spotify → YouTube → Hints —
-  // samma ordning som källkorten i prisutdelnings-sekvensen. `entry.sources?.`
-  // skyddar rader skrivna innan v5-resetet hunnit köra (samma defensiva
-  // hållning som packages-raden ovan); "None" ska aldrig synas i praktiken.
+  // Sources-etikett: källorna som FAKTISKT serverades i spelet, i appens
+  // kanoniska ordning Spotify → YouTube → Hints. `entry.sources?.` skyddar
+  // rader skrivna innan v5-resetet hunnit köra; "None" ska aldrig synas.
   const sourceKeys = PLAYED_MEDIA_SOURCE_ORDER.filter((s) => entry.sources?.includes(s));
   const sourcesLabel =
     sourceKeys.length === 0
@@ -353,56 +349,6 @@ const styles = StyleSheet.create({
     marginVertical: Spacing.sm,
   },
 
-  // Månads-grupp (collapsible sub-block inom card). Tunna styles —
-  // gruppen ska kännas som en lättviktig list-divider, inte en egen
-  // boxed sektion. monthHeader är tappable för toggle, monthEntries
-  // renderas när expanded.
-  monthGroup: {
-    gap: Spacing.xs,
-  },
-  monthHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.separator,
-  },
-  monthLabel: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-  },
-  // Sammanfattning till höger om månads-labeln — visar antal spel +
-  // avg-korrekthet så user får snabb översikt utan att behöva
-  // expandera gruppen.
-  monthSummary: {
-    flex: 1,
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    fontVariant: ['tabular-nums'],
-  },
-  monthToggleBox: {
-    width: 22,
-    height: 22,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: Colors.borderStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  monthToggleText: {
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
-    lineHeight: 16,
-  },
-  // Inom månad: spel-rader stackade med samma divider-mönster som
-  // tidigare flat-list. paddingTop ger luft mellan månads-header och
-  // första spel-raden när expanded.
-  monthEntries: {
-    paddingTop: Spacing.sm,
-  },
   gameRow: {
     gap: 2,
   },
