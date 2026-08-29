@@ -305,8 +305,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "HuQ0ni6AlrU"
-        startSec: 0
-        endSec: 267
+        startSec: 6
+        endSec: 273
         channelTitle: "Pillow"
   - id: timbaland-onerepublic-apologize
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]

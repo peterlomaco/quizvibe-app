@@ -176,8 +176,8 @@ items:
     spotifyTrackId: "3Z2tPWiNiIpg8UMMoowHIk"
     youtubeClips:
       - videoId: "_cDNhqNv2HY"
-        startSec: 0
-        endSec: 30
+        startSec: 20
+        endSec: 50
         channelTitle: "CaptainCarlossi"
         notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   # 1986
@@ -1730,8 +1730,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "p3j2NYZ8FKs"
-        startSec: 0
-        endSec: 30
+        startSec: 30
+        endSec: 60
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = 1985 ars ominspelning (singel okt 1985), den som blev hit och den vi spelar. Bandets egen Bobby-O-version fran april 1984 floppade — samma undantagsresonemang som a-ha Take on Me. Albumet Please kom 1986."
   # --- 1986 ---

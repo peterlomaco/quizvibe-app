@@ -6670,8 +6670,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "p3j2NYZ8FKs",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 30,
+        "endSec": 60,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
       }
@@ -6727,8 +6727,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "_cDNhqNv2HY",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 20,
+        "endSec": 50,
         "channelTitle": "CaptainCarlossi",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
@@ -15978,8 +15978,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "HuQ0ni6AlrU",
-        "startSec": 0,
-        "endSec": 267,
+        "startSec": 6,
+        "endSec": 273,
         "channelTitle": "Pillow",
         "license": "standard"
       }
@@ -20975,8 +20975,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "4NRXx6U8ABQ",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 48,
+        "endSec": 63,
         "channelTitle": "TheWeekndVEVO",
         "license": "standard",
         "notes": "Officiell VEVO-musikvideo. Neon retro 80s-känsla."
