@@ -348,6 +348,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [playerNameStatus, setPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [invites, setInvites] = useState<WaitingInvite[]>([]);
+  // True medan ett accept-flöde pågår (removeInvite → navigera → stäng modal).
+  // removeInvite triggar en realtime DELETE → reload, som annars skulle
+  // setInvites([]) och blanka den fortfarande öppna modalen till "No invites
+  // yet" innan den hinner stänga. Guarden fryser listan tills modalen är borta.
+  const acceptInFlightRef = useRef(false);
   // Index på den code-cell som har fokus — driver vilken `mode` (letter/digit)
   // CodeKeyboard renderar samt vilken cell tap-knapparna skriver in i. null =
   // ingen code-cell fokuserad → custom keyboard döljs (system keyboard kan
@@ -496,6 +501,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // för att kunna visa rätt enabled/disabled-läge på "Join Waiting Invites".
   useEffect(() => {
     if (visible) {
+      acceptInFlightRef.current = false;
       loadInvites().then(setInvites);
     }
   }, [visible]);
@@ -531,6 +537,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         .filter((c) => c.topic === topic)
         .forEach((c) => supabase.removeChannel(c));
       const reload = () => {
+        // Under ett pågående accept-flöde: hoppa över reload så den öppna
+        // modalen inte blankas till "No invites yet" innan den hinner stänga.
+        if (acceptInFlightRef.current) return;
         loadInvites().then((updated) => {
           if (!cancelled) setInvites(updated);
         });
@@ -590,13 +599,21 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // sker separat via LobbyScreen:s pending→confirmed-watcher när den här
     // spelaren dyker upp i lobbyns players[]. addFriend dedupar case-
     // insensitivt så det är säkert att anropa ovillkorligt.
+    // Frys invite-listan innan removeInvite: dess realtime DELETE → reload
+    // skulle annars setInvites([]) och blanka den öppna modalen till
+    // "No invites yet". Guarden i reload:en hoppar över det medan detta är true.
+    acceptInFlightRef.current = true;
     await addFriend(invite.fromPlayerName, invite.fromAvatarId);
     await removeInvite(invite.id);
-    onClose();
+    // Navigera FÖRST — den transparenta modalen ligger ovanför nav-stacken (iOS)
+    // så /lobby-pushen körs bakom den. Stäng modalen EFTER att pushen hunnit
+    // landa (MODAL_SWAP_DELAY_MS) så den fadar direkt mot lobbyn istället för
+    // att blotta Home-skärmen under slide-in-transitionen.
     router.push({
       pathname: '/lobby',
       params: { code: invite.roomCode, isHost: 'false' },
     });
+    setTimeout(() => onClose(), MODAL_SWAP_DELAY_MS);
   };
 
   // "Deny" (Peter 2026-08-27) — tyst avböjning, ingen host-notifiering.
