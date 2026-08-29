@@ -123,6 +123,25 @@ export function defaultAggregateName(playerNames: string[]): string {
   return `${playerNames[0]} & ${playerNames.length - 1} more`;
 }
 
+/**
+ * Nästa "Marathon N" över host:s befintliga serie-namn. EN gemensam sekvens
+ * oavsett spelform (solo/multi) — matchar bara namn på exakt formen
+ * "Marathon N" (custom-döpta serier räknas inte). Enumeration av namnen sker
+ * hos anroparen (async RPC); denna funktion är ren så den kan testas i vitest.
+ */
+export function nextMarathonName(existingNames: string[]): string {
+  let max = 0;
+  const re = /^Marathon\s+(\d+)$/i;
+  for (const n of existingNames) {
+    const m = re.exec(n.trim());
+    if (m) {
+      const v = parseInt(m[1], 10);
+      if (Number.isFinite(v) && v > max) max = v;
+    }
+  }
+  return `Marathon ${max + 1}`;
+}
+
 export interface AggregateLeaderboardData {
   gamesPlayed: number;
   standings: AggregateStanding[];

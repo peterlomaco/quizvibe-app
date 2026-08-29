@@ -28,9 +28,9 @@ import {
   aggregateLabel,
   attachSeriesToLeaderboard,
   buildAggregateStandings,
-  defaultAggregateName,
   loadAggregateSeries,
   markSeriesContinues,
+  nextMarathonName,
   recordGameInSeries,
   type AggregateGamePlayer,
   type AggregateLeaderboardData,
@@ -39,11 +39,13 @@ import {
   createAggregateLeaderboard,
   findAggregateLeaderboardsFor,
   getAggregateLeaderboard,
+  listMyAggregateLeaderboards,
   recordAggregateGame,
   renameAggregateLeaderboard,
   saveAggregateGameSettings,
   type SavedAggregateSummary,
 } from '@/src/utils/aggregateLeaderboards';
+import { containsProfanity } from '@/src/utils/profanity';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { appendGameHistoryEntry, saveLatestResult, type GameResult, type HistoryEntry, type RoundResult } from '@/src/utils/gameResults';
@@ -152,12 +154,15 @@ import {
   Dimensions,
   Easing,
   Image,
+  KeyboardAvoidingView,
   Linking,
   Modal,
+  Platform,
   Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -1094,6 +1099,12 @@ type AggregatePickChoice =
   | { kind: 'attach'; id: string }
   | { kind: 'fresh' }
   | { kind: 'cancel' };
+
+// Två RN <Modal> kan inte vara presenterade samtidigt (modal-swap-fällan):
+// öppnar man den andra innan den första fade:at ut sväljs den tyst på iOS.
+// Används vid pick-list-modal ⇄ namn-modal-övergången i re-match-flödet.
+const MODAL_SWAP_DELAY_MS = 350;
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 type TurnOrderPlayer = {
   id: string;
@@ -5610,6 +5621,18 @@ export default function QuizScreen() {
   const [selectedAggregateId, setSelectedAggregateId] = useState<string | null>(
     null,
   );
+  // Namn-prompt för en NY Marathon (Peter 2026-08-29). Öppnas av
+  // ensureAggregateLeaderboardAttached på varje fresh-create; Save löser med
+  // namnet, Cancel med null (→ tillbaka till föregående stadie).
+  const [aggregateNamePromptVisible, setAggregateNamePromptVisible] =
+    useState(false);
+  const [aggregateNameText, setAggregateNameText] = useState('');
+  const [aggregateNameError, setAggregateNameError] = useState<string | null>(
+    null,
+  );
+  const aggregateNameResolveRef = useRef<
+    ((name: string | null) => void) | null
+  >(null);
   // Är DET HÄR spelet en fortsättning på en Competition-serie? Serien pekar
   // ut nästa rumkod när en re-match startas (`markSeriesContinues`), så en
   // träff här betyder "spelet kommer att räknas in i aggregatet". Används
@@ -6753,12 +6776,20 @@ export default function QuizScreen() {
     }
     if (userIds.length === 0) return true;
 
-    const names = turnOrder.map((p) => p.name);
     const soloSeries = userIds.length <= 1;
     const label = aggregateLabel(userIds.length);
 
+    // Default-namn: nästa "Marathon N" över host:s ALLA egna sparade serier
+    // (oavsett spelform/uppsättning — en gemensam sekvens). listMy... returnerar
+    // serier host DELTAR i; vi filtrerar på created_by för host:s EGNA.
+    const hostUserId = userIds[0]; // host är turnOrder[0] (id '1')
+    const mine = await listMyAggregateLeaderboards();
+    const defaultName = nextMarathonName(
+      mine.filter((s) => s.createdBy === hostUserId).map((s) => s.name),
+    );
+
     // Krav 3: frågan ställs BARA när alla i spelet redan har en sparad serie
-    // ihop. Finns ingen skapas den tyst.
+    // ihop. Finns ingen skapas den (numera efter namn-prompt).
     const existing = await findAggregateLeaderboardsFor(userIds);
     // ⚠ Spelet som just avslutades bokfördes lokalt INNAN serien fanns på
     //   servern (slutskärmens effekt körde före den här funktionen), så det
@@ -6779,8 +6810,7 @@ export default function QuizScreen() {
       setAggregateParticipantCount(saved?.participants.length ?? userIds.length);
       await pushLocalGames(id, merged);
     };
-    const createFresh = async () => {
-      const name = defaultAggregateName(names);
+    const createWithName = async (name: string) => {
       const id = await createAggregateLeaderboard(name, userIds);
       if (!id) return;
       const merged = await attachSeriesToLeaderboard(id, []);
@@ -6791,51 +6821,90 @@ export default function QuizScreen() {
       await pushLocalGames(id, merged);
     };
 
-    // Inget sparat med exakt den här uppsättningen → skapa tyst, ingen fråga.
+    // Namn-prompt: löser med det trimmade namnet på Save, null på Cancel.
+    // Fältet förfylls med defaultName varje gång så en återöppning börjar rent.
+    const promptName = (): Promise<string | null> =>
+      new Promise((resolve) => {
+        setAggregateNameText(defaultName);
+        setAggregateNameError(null);
+        aggregateNameResolveRef.current = resolve;
+        setAggregateNamePromptVisible(true);
+      });
+
+    // Inget sparat med denna uppsättning → skapa fresh, men NAMNGE alltid nu.
+    // Ingen tidigare stage → Cancel tar host tillbaka till slutskärmen (Yes/No
+    // kvar).
     if (existing.length === 0) {
-      await createFresh();
+      const name = await promptName();
+      if (name === null) return false;
+      await createWithName(name);
       return true;
     }
-    // Alert är callback-baserad — await:a valet så id:t hinner sättas innan
-    // inbjudan broadcastas.
-    const picked = await new Promise<'new' | 'existing'>((resolve) => {
-      Alert.alert(
-        `Add to existing ${label}?`,
-        soloSeries
-          ? 'You already have a saved Marathon Score. Add these games to it, or start a fresh one?'
-          : `You have played together before. Add these games to a saved ${label}, or start a fresh one?`,
-        [
-          { text: 'No, start fresh', style: 'cancel', onPress: () => resolve('new') },
-          { text: 'Yes', onPress: () => resolve('existing') },
-        ],
-        { cancelable: false },
-      );
-    });
-    if (picked === 'new') {
-      await createFresh();
-      return true;
+
+    // Det finns sparade serier → "Add to existing?"-Alert. Loop så att en
+    // namn-Cancel återvänder hit (= stadiet strax före "start fresh" trycktes).
+    while (true) {
+      // Alert är callback-baserad — await:a valet så id:t hinner sättas innan
+      // inbjudan broadcastas.
+      const picked = await new Promise<'new' | 'existing'>((resolve) => {
+        Alert.alert(
+          `Add to existing ${label}?`,
+          soloSeries
+            ? 'You already have a saved Marathon Score. Add these games to it, or start a fresh one?'
+            : `You have played together before. Add these games to a saved ${label}, or start a fresh one?`,
+          [
+            { text: 'No, start fresh', style: 'cancel', onPress: () => resolve('new') },
+            { text: 'Yes', onPress: () => resolve('existing') },
+          ],
+          { cancelable: false },
+        );
+      });
+      if (picked === 'new') {
+        // Alert är redan borta (native) → namn-prompt öppnar utan modal-swap.
+        const name = await promptName();
+        if (name === null) continue; // Cancel → åter till Alert
+        await createWithName(name);
+        return true;
+      }
+
+      // picked === 'existing' → pick-listan. Loop så en namn-Cancel återvänder
+      // till LISTAN (inte till Alert:en ovan).
+      // ⚠ Listan visas ALLTID, även vid exakt en träff (Peter 2026-08-26).
+      //   Tidigare auto-kopplades den enda träffen tyst — host fick då aldrig
+      //   se VILKEN serie spelet hamnade i, och hade ingen väg att ångra sig.
+      setSelectedAggregateId(null);
+      while (true) {
+        setPendingAggregatePick(existing);
+        const choice = await new Promise<AggregatePickChoice>((resolve) => {
+          aggregatePickResolveRef.current = resolve;
+        });
+        aggregatePickResolveRef.current = null;
+        if (choice.kind === 'attach') {
+          setPendingAggregatePick(null);
+          await attach(choice.id);
+          return true;
+        }
+        if (choice.kind === 'cancel') {
+          // Cancel: ingenting skapat/kopplat. Host tillbaka på slutskärmen.
+          setPendingAggregatePick(null);
+          return false;
+        }
+        // choice.kind === 'fresh' → swap pick-list-modal → namn-modal.
+        // ⚠ Två RN <Modal> kan inte vara uppe samtidigt (modal-swap-fällan):
+        //   dölj listan, vänta ut fade:n, öppna sedan namn-prompten.
+        setPendingAggregatePick(null);
+        await wait(MODAL_SWAP_DELAY_MS);
+        const name = await promptName();
+        if (name === null) {
+          // Cancel → åter till pick-listan (loopens topp re-visar den efter
+          // fade:n).
+          await wait(MODAL_SWAP_DELAY_MS);
+          continue;
+        }
+        await createWithName(name);
+        return true;
+      }
     }
-    // ⚠ Listan visas ALLTID, även vid exakt en träff (Peter 2026-08-26).
-    //   Tidigare auto-kopplades den enda träffen tyst — host fick då aldrig
-    //   se VILKEN serie spelet hamnade i, och hade ingen väg att ångra sig.
-    setSelectedAggregateId(null);
-    setPendingAggregatePick(existing);
-    const choice = await new Promise<AggregatePickChoice>((resolve) => {
-      aggregatePickResolveRef.current = resolve;
-    });
-    setPendingAggregatePick(null);
-    aggregatePickResolveRef.current = null;
-    if (choice.kind === 'attach') {
-      await attach(choice.id);
-      return true;
-    }
-    if (choice.kind === 'fresh') {
-      await createFresh();
-      return true;
-    }
-    // Cancel: ingenting skapat, ingenting kopplat. Host är tillbaka på
-    // slutskärmen med Yes/No-frågan kvar och kan välja om.
-    return false;
   };
 
   /** Byter namn på den sparade serien. Optimistisk lokal uppdatering så
@@ -6859,8 +6928,12 @@ export default function QuizScreen() {
     // oväntade call-paths.
     if (isGuestHostGame) return;
     // Andra tappet: inbjudan är redan utfärdad och godkänd (knappen är grå
-    // och otappbar medan väntan pågår) → skapa lobbyn.
+    // och otappbar medan väntan pågår) → NU (efter att alla accepterat) ställs
+    // "Add to existing?"/namn-frågan, sedan skapas lobbyn. Cancel i namn-
+    // prompten returnerar false → host stannar kvar med den upplysta Yes:en
+    // och kan tappa igen.
     if (rematchInvite) {
+      if (!(await ensureAggregateLeaderboardAttached())) return;
       proceedWithRematch(previousLocalMode);
       return;
     }
@@ -6870,15 +6943,15 @@ export default function QuizScreen() {
     //   vilseledande. Host får samma Store-fråga som på Home i stället.
     if (!(await ensureHostCreditsForNewGame({ allowGuestRestart: false })))
       return;
-    // Koppla serien till ett SPARAT aggregat innan inbjudan går ut, så id:t
-    // hinner med i play_again_lobby_ready till non-hosts.
-    // ⚠ MÅSTE ligga före broadcastPlayAgainInitiated — backar host ur i
-    //   listan får ingen inbjudan gå ut till non-hosts.
-    if (!(await ensureAggregateLeaderboardAttached())) return;
     // Varje förväntad approver måste godkänna på sin egen enhet. Yes gråas
     // ut med väntestatusen under sig och host tappar den igen när alla
     // godkänt. `rematchInvite` sätts BARA här — det är den enda vägen som
     // faktiskt skickar ut en inbjudan, och flaggan gömmer No-knappen.
+    // ⚠ Aggregat-frågan (Add to existing?/namn) ställs INTE här — den skulle
+    //   komma innan spelarna hunnit acceptera. Den körs i stället på andra
+    //   tappet ovan, efter att alla godkänt (Peter 2026-08-29). Aggregat-id:t
+    //   behövs först i play_again_lobby_ready (goToNewLobby), inte i
+    //   broadcastPlayAgainInitiated som bara tänder Accept-knappen.
     if (rematchExpectedApproverIds.length > 0 && syncChannelRef.current) {
       setRematchInvite(true);
       syncChannelRef.current
@@ -6886,10 +6959,11 @@ export default function QuizScreen() {
         .catch(() => {});
       return;
     }
-    // Ingen att vänta in → direkt vidare: single player, IndDev utan
-    // kvarvarande non-hosts, eller PtP där ingen följer leaderboarden på en
-    // egen enhet. Sätter MEDVETET inte rematchInvite, så No fortfarande går
-    // att välja om host backar ur längre fram i flödet.
+    // Ingen att vänta in → koppla/namnge serien och gå direkt vidare: single
+    // player, IndDev utan kvarvarande non-hosts, eller PtP där ingen följer
+    // leaderboarden på en egen enhet. Sätter MEDVETET inte rematchInvite, så
+    // No fortfarande går att välja om host backar ur i namn-prompten.
+    if (!(await ensureAggregateLeaderboardAttached())) return;
     proceedWithRematch(previousLocalMode);
   };
 
@@ -9047,6 +9121,90 @@ export default function QuizScreen() {
           </View>
         </Modal>
 
+        {/* Namn-prompt för en NY Marathon (Peter 2026-08-29). Öppnas av
+            ensureAggregateLeaderboardAttached på varje fresh-create; förfylls
+            med nästa "Marathon N". Save löser promisen med namnet, Cancel med
+            null (→ tillbaka till stadiet före "start fresh"). Speglar
+            RoundLeaderboards rename-sheet (KeyboardAvoidingView + TextInput). */}
+        <Modal
+          visible={aggregateNamePromptVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => {
+            setAggregateNamePromptVisible(false);
+            const r = aggregateNameResolveRef.current;
+            aggregateNameResolveRef.current = null;
+            r?.(null);
+          }}
+        >
+          <KeyboardAvoidingView
+            style={styles.playAgainModalOverlay}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          >
+            <View style={styles.playAgainModalCard}>
+              <Text style={styles.playAgainModalTitle}>
+                Please name this new {aggregateLabel(turnOrder.length)}
+              </Text>
+              <TextInput
+                style={styles.aggregateNameInput}
+                value={aggregateNameText}
+                onChangeText={(t) => {
+                  setAggregateNameText(t);
+                  if (aggregateNameError) setAggregateNameError(null);
+                }}
+                placeholder="e.g. Marathon 1"
+                placeholderTextColor={Colors.textDisabled}
+                maxLength={40}
+                returnKeyType="done"
+                autoFocus
+              />
+              {!!aggregateNameError && (
+                <Text style={styles.aggregateNameError}>
+                  {aggregateNameError}
+                </Text>
+              )}
+              <Pressable
+                onPress={() => {
+                  const next = aggregateNameText.trim();
+                  if (!next) {
+                    setAggregateNameError('Give it a name first.');
+                    return;
+                  }
+                  if (containsProfanity(next)) {
+                    setAggregateNameError('Please choose a different name.');
+                    return;
+                  }
+                  setAggregateNamePromptVisible(false);
+                  const r = aggregateNameResolveRef.current;
+                  aggregateNameResolveRef.current = null;
+                  r?.(next);
+                }}
+                style={({ pressed }) => [
+                  styles.aggregateConfirmBtn,
+                  pressed && { opacity: 0.85 },
+                ]}
+              >
+                <Text style={styles.aggregateConfirmBtnText}>Save</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  setAggregateNamePromptVisible(false);
+                  const r = aggregateNameResolveRef.current;
+                  aggregateNameResolveRef.current = null;
+                  r?.(null);
+                }}
+                style={({ pressed }) => [
+                  styles.playAgainModalCancel,
+                  { borderColor: 'transparent' },
+                  pressed && { opacity: 0.7 },
+                ]}
+              >
+                <Text style={styles.playAgainModalCancelText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+
         {/* ⚠ DORMANT sedan 2026-08-08 — öppnas bara av `handlePlayAgain`,
             som inte längre nås (host kör "Start New Game"-flödet där
             approval-statusen visas som grå Local Play + statusrad i
@@ -10517,6 +10675,22 @@ const styles = StyleSheet.create({
   aggregatePickMeta: {
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
+  },
+  aggregateNameInput: {
+    height: 48,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    backgroundColor: Colors.background,
+    color: Colors.textPrimary,
+    paddingHorizontal: Spacing.md,
+    fontSize: FontSize.md,
+    alignSelf: 'stretch',
+  },
+  aggregateNameError: {
+    fontSize: FontSize.sm,
+    color: Colors.error,
+    alignSelf: 'stretch',
   },
   playAgainModalCancel: {
     height: 48,

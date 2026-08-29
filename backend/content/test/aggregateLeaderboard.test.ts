@@ -25,6 +25,7 @@ const {
   aggregateLabel,
   attachSeriesToLeaderboard,
   defaultAggregateName,
+  nextMarathonName,
   buildAggregateStandings,
   clearAggregateSeries,
   loadAggregateSeries,
@@ -292,5 +293,29 @@ describe('defaultAggregateName', () => {
     const name = defaultAggregateName(many);
     expect(name.length).toBeLessThanOrEqual(40);
     expect(name).toContain('Alexandra-1');
+  });
+});
+
+describe('nextMarathonName', () => {
+  it('inga tidigare namn → Marathon 1', () => {
+    expect(nextMarathonName([])).toBe('Marathon 1');
+  });
+
+  it('befintlig Marathon 7 → Marathon 8', () => {
+    expect(nextMarathonName(['Marathon 7'])).toBe('Marathon 8');
+  });
+
+  it('högsta numret vinner, custom-namn ignoreras', () => {
+    expect(
+      nextMarathonName(['Marathon 3', 'Anna & Bo', 'Marathon 7']),
+    ).toBe('Marathon 8');
+  });
+
+  it('bara custom-namn → Marathon 1', () => {
+    expect(nextMarathonName(['Friday Quiz', 'Anna — solo'])).toBe('Marathon 1');
+  });
+
+  it('matchar case-insensitivt och trimmar', () => {
+    expect(nextMarathonName(['  marathon 4  '])).toBe('Marathon 5');
   });
 });
