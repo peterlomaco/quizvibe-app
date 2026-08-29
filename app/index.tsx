@@ -22,6 +22,7 @@ import {
   backspacePlayerNameDigits,
   backspacePlayerNameLetters,
   containsBlockedLetterSubstring,
+  containsReservedTakenSubstring,
   extractTakenGuestLetters,
   generatePlayerName,
   getPlayerNameDigits,
@@ -226,6 +227,9 @@ function validatePlayerName(name: string): 'available' | 'taken' | 'invalid' {
   // som substring i letters-sektionen — skyddar mot "QuizVibe", "Myquizvibe",
   // etc. Synkad med playerName.ts:s auto-gen-blocklist.
   if (containsBlockedLetterSubstring(trimmed)) return 'invalid';
+  // Reserverade konkurrent-varumärken ("Hitster"/"Sounder") → samma "taken"-
+  // meddelande som ett redan upptaget namn (Peters beslut 2026-08-29).
+  if (containsReservedTakenSubstring(trimmed)) return 'taken';
   if (TAKEN_PLAYER_NAMES.has(trimmed.toLowerCase())) return 'taken';
   return 'available';
 }

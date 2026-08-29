@@ -93,6 +93,7 @@ import {
   backspacePlayerNameDigits,
   backspacePlayerNameLetters,
   containsBlockedLetterSubstring,
+  containsReservedTakenSubstring,
   extractTakenGuestLetters,
   generatePlayerName,
   getPlayerNameDigits,
@@ -521,6 +522,9 @@ function validateAddPlayerName(name: string, existingNames?: Set<string>): 'avai
   if (containsProfanity(trimmed)) return 'invalid';
   // Reserverat: brand-namnet "quizvibe" (case-insensitive) får inte ingå.
   if (containsBlockedLetterSubstring(trimmed)) return 'invalid';
+  // Reserverade konkurrent-varumärken ("Hitster"/"Sounder") → samma "taken"-
+  // meddelande som ett redan upptaget namn (Peters beslut 2026-08-29).
+  if (containsReservedTakenSubstring(trimmed)) return 'taken';
   if (TAKEN_PLAYER_NAMES_LOBBY.has(trimmed.toLowerCase())) return 'taken';
   // Kollar mot befintliga spelare i lobbyn (case-insensitive).
   if (existingNames?.has(trimmed.toLowerCase())) return 'taken';

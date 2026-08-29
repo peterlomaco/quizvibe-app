@@ -62,6 +62,20 @@ export function containsBlockedLetterSubstring(value: string): boolean {
   return BLOCKED_LETTER_SUBSTRINGS.some((sub) => letters.includes(sub));
 }
 
+// Reserverade konkurrent-varumärken. Namn som innehåller dessa (case-insensitive
+// i letters-sektionen) avvisas med "taken"-statusen — samma meddelande som ett
+// redan upptaget namn (Peters beslut 2026-08-29). Skiljd från
+// BLOCKED_LETTER_SUBSTRINGS eftersom den ger 'invalid', denna ger 'taken'.
+const RESERVED_TAKEN_SUBSTRINGS = ['hitster', 'sounder'];
+
+// Returnerar true om letter-sektionen innehåller något reserverat konkurrent-
+// varumärke (case-insensitive). Anropas av validatePlayerName-vägarna → 'taken'.
+export function containsReservedTakenSubstring(value: string): boolean {
+  const letters = getPlayerNameLetters(value).toLowerCase();
+  if (letters.length === 0) return false;
+  return RESERVED_TAKEN_SUBSTRINGS.some((sub) => letters.includes(sub));
+}
+
 function randomDigits(count: number): string {
   let s = '';
   for (let i = 0; i < count; i++) {
