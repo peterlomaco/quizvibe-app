@@ -89,6 +89,23 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     // Alla ogiltiga → fallback till alla tre.
     expect([...s.imagesEnabledCategories].sort()).toEqual(['Film', 'Music', 'Sport']);
   });
+
+  it('honors an explicitly-empty images array (Hints turned off last game)', () => {
+    // Tom array = källan medvetet AV — får INTE substitueras med alla-3.
+    const hintsOff = { ...SNAPSHOT, imagesEnabledCategories: [] as string[] };
+    const s = buildRematchSettings({ ...PROFILE_DEFAULTS, settings: hintsOff }, 4);
+    expect(s.imagesEnabledCategories).toEqual([]);
+    // YouTube-kolumnen orörd.
+    expect(s.youtubeEnabledCategories).toEqual(['Music', 'Film']);
+  });
+
+  it('honors an explicitly-empty youtube array (YouTube turned off last game)', () => {
+    const ytOff = { ...SNAPSHOT, youtubeEnabledCategories: [] as string[] };
+    const s = buildRematchSettings({ ...PROFILE_DEFAULTS, settings: ytOff }, 4);
+    expect(s.youtubeEnabledCategories).toEqual([]);
+    // Hints-kolumnen orörd.
+    expect(s.imagesEnabledCategories).toEqual(['Sport']);
+  });
 });
 
 describe('pickLatestGameSettings — newest valid snapshot wins', () => {

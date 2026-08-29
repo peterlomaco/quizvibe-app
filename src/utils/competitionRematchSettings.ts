@@ -81,8 +81,14 @@ export function buildRematchSettings(
 ): LobbySettings {
   const all = defaultEnabledMainCategories();
   const last = opts.settings ?? null;
-  const ytCats = last?.youtubeEnabledCategories?.filter(isMainCat);
-  const imgCats = last?.imagesEnabledCategories?.filter(isMainCat);
+  // Läs den RÅA arrayen bredvid den filtrerade så vi kan skilja tre fall åt:
+  //   []            = källan medvetet AV → hedra (behåll tom)
+  //   ['Nope']→[]   = korrupt/okänt data (allt filtreras bort) → fallback alla-3
+  //   undefined     = ingen snapshot → fallback alla-3
+  const rawYt = last?.youtubeEnabledCategories;
+  const rawImg = last?.imagesEnabledCategories;
+  const ytCats = rawYt?.filter(isMainCat);
+  const imgCats = rawImg?.filter(isMainCat);
   return {
     // Individual Devices — de inbjudna spelar på egna enheter (remote join).
     gameMode: 'individual-devices',
@@ -99,8 +105,10 @@ export function buildRematchSettings(
     eraTo: last?.eraTo ?? opts.eraTo ?? CURRENT_YEAR,
     roundsCount: last?.roundsCount ?? opts.roundsCount ?? 4,
     selectedExtraPackages: last?.selectedExtraPackages ?? [],
-    youtubeEnabledCategories: ytCats && ytCats.length > 0 ? ytCats : [...all],
-    imagesEnabledCategories: imgCats && imgCats.length > 0 ? imgCats : [...all],
+    youtubeEnabledCategories:
+      rawYt?.length === 0 ? [] : ytCats && ytCats.length > 0 ? ytCats : [...all],
+    imagesEnabledCategories:
+      rawImg?.length === 0 ? [] : imgCats && imgCats.length > 0 ? imgCats : [...all],
     sketchEnabled: false,
     spotifyEnabled: last?.spotifyEnabled ?? false,
     spotifyAnswerYear: true,
