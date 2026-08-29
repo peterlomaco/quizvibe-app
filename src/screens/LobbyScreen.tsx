@@ -1259,6 +1259,7 @@ export default function LobbyScreen() {
     competitionRematch,
     parentControl,
     carryPackages,
+    seedGameMode,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
@@ -1307,6 +1308,12 @@ export default function LobbyScreen() {
      *  spelet som just spelades. AUKTORITATIV källa (kringgår ev. stale
      *  lobby_settings + profil-filtret i seeden). Undefined = ej carry-over. */
     carryPackages?: string;
+    /** Play Again carry-over: förra spelets gameMode ('pass-the-phone' |
+     *  'individual-devices'). Seedar `gameMode`-state SYNKRONT så PtP-confirm-
+     *  guarden i handleStartGame inte fyrar på en IndDev re-match innan den
+     *  async seeden (getLobbySettings/loadProfile) landat. Undefined = fresh
+     *  lobby (ej carry-over) → seeden faller på stored/profil. */
+    seedGameMode?: string;
   }>();
   // Om ingen kod skickas (t.ex. om man öppnar lobby-tabben direkt) genereras en.
   // useMemo ser till att koden är stabil över re-renders.
@@ -2392,7 +2399,32 @@ export default function LobbyScreen() {
   const [approveAllValue, setApproveAllValue] = useState<'no' | 'yes'>('no');
 
   // Game mode toggle (Pass-the-Phone vs Multiplayer Individual Devices)
-  const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
+  //
+  // ⚠ SYNKRON seed (inte plain 'pass-the-phone'). Seed-effekten är async
+  // (getLobbySettings/loadProfile), så med default-literal bar state:n
+  // 'pass-the-phone' tills den landade — och PtP-confirm-guarden i
+  // handleStartGame (som läser gameMode-STATE) fyrade på en IndDev re-match
+  // om host hann trycka Start Game innan seeden hunnit rätta läget (Peter).
+  // Samma mönster + skäl som singlePlayerDefault nedan.
+  //
+  // Till skillnad från singlePlayerDefault kan läget INTE härledas ur
+  // lobbyType ensamt (multiplayer säger inget om PtP vs IndDev) — carry-over-
+  // paramet `seedGameMode` bär förra spelets läge (= det som skrevs in i den
+  // carry-over:ade lobby_settings-raden som async seeden läser), så de kan
+  // aldrig divergera en frame isär. Stale 'remote-1v1' coercas till PtP precis
+  // som i seed-effekten. Fresh lobby (ingen param) → 'pass-the-phone', och
+  // async seeden rättar från stored/profil.
+  //
+  // gameMode FÖRBLIR muterbar state (host:s live PtP⇄IndDev-toggle + async
+  // seed skriver den) — den får INTE bli ett rent param-derivat som
+  // isSingleLobby, eftersom läget är en levande toggle i multiplayer-lobbyn.
+  const [gameMode, setGameMode] = useState<GameMode>(() => {
+    if (lobbyType === '1v1') return 'remote-1v1';
+    if (lobbyType === 'single') return 'pass-the-phone';
+    if (seedGameMode === 'individual-devices') return 'individual-devices';
+    if (seedGameMode === 'pass-the-phone') return 'pass-the-phone';
+    return 'pass-the-phone';
+  });
 
   // Host-badgens cross-fade-loop (Animated.Values deklareras längre upp).
   // Ligger här nere eftersom den tredje frasens TEXT beror på lobby-typ
