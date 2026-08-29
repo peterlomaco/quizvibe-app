@@ -123,7 +123,18 @@ export function CompetitionRematchActions({
     onClose();
     router.push({
       pathname: '/lobby',
-      params: { code: startedRequest.roomCode, isHost: 'false' },
+      params: {
+        code: startedRequest.roomCode,
+        isHost: 'false',
+        // En competition-rematch är ALLTID en låst re-match (multi-deltagar-
+        // aggregat), så deltagaren måste få samma lås-params som host — annars
+        // faller lobbyn till multiplayer-grenen och visar BÅDE PtP + IndDev
+        // i stället för den låsta re-match-indikatorn (Peter 2026-08-28).
+        // Läget (IndDev/PtP) kommer via lobby_settings-syncen.
+        lobbyType: 'multiplayer',
+        rematchLocked: 'true',
+        competitionRematch: 'true',
+      },
     });
   }, [isHost, startedRequest, onClose]);
 

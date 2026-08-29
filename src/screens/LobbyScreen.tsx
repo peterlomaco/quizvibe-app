@@ -70,7 +70,7 @@ import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
 import { createRemoteMatch, getMatchByRoomCode, getOwnUserId, hasRemote1v1RelationshipWith } from '../utils/remoteMatches';
 import { saveLobby } from '../utils/savedLobbies';
-import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
+import { defaultEnabledMainCategories, subjectToMainCategory, MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
 import { supabase } from '../utils/supabase';
@@ -1328,7 +1328,27 @@ export default function LobbyScreen() {
   // spelare), Start Game blockeras tills alla är tillbaka, och join-gaten
   // på Home släpper bara in spelare som redan finns i lobbyn.
   // Host har fortfarande "Delete this Game Lobby" som utväg.
-  const isRematchLobby = rematchLocked === 'true';
+  //
+  // Param:en `rematchLocked` ger första-frame-rendering för host + Final
+  // Leaderboards Play Again + competition-modalens auto-nav. Men param-LÖSA
+  // join-vägar (Home waiting-invite Accept + join-via-kod) navigerar UTAN den,
+  // så en cross-device-inbjuden competition-deltagare hamnade i multiplayer-
+  // grenen (BÅDE PtP + IndDev) i stället för den låsta re-match-indikatorn
+  // (Peter 2026-08-28). Fallback: läs `rooms.rematch_locked` ur rums-metan
+  // (satt atomiskt vid rums-skapandet, läsbar cross-device via Supabase).
+  const [metaRematchLocked, setMetaRematchLocked] = useState(false);
+  const isRematchLobby = rematchLocked === 'true' || metaRematchLocked;
+  useEffect(() => {
+    // Param redan auktoritativ → ingen DB-läsning behövs.
+    if (rematchLocked === 'true') return;
+    let cancelled = false;
+    void getRoomMeta(roomCode).then((meta) => {
+      if (!cancelled && meta?.rematchLocked) setMetaRematchLocked(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [rematchLocked, roomCode]);
   // Competition re-match från Home (/competitions): en låst re-match där de
   // inbjudna deltagarna joinar cross-device via inbjudan. Lägger till en
   // 5-minuters expiry + en "väntar på spelare"-banner ovanpå den vanliga
@@ -2731,6 +2751,14 @@ export default function LobbyScreen() {
       'Activation/deactivation only applicable by QuizVibe users Host',
     );
 
+  // Tap på den låsta Game Mode-indikatorn i en replay/re-match-lobby (single,
+  // PtP, IndDev eller 1vs1) — läget är fast, förklara varför (Peter 2026-08-28).
+  const lockedModeAlert = () =>
+    Alert.alert(
+      'Game mode locked',
+      'This game is a replay / rematch Marathon with Game mode settings fixed.',
+    );
+
   const handleToggleAllSources = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
@@ -3212,6 +3240,21 @@ export default function LobbyScreen() {
   // "All"-master gråas bara när HELA matrisen saknar material (alla kolumner grå).
   const pkgGrayAllSources =
     pkgGrayColumn('Music') && pkgGrayColumn('Film') && pkgGrayColumn('Sport');
+  // Paket LÅSER hela mixerboarden: en täckt cell visas grön + låst (kan ej stängas
+  // av), en otäckt cell visas grå/av + låst (green-lock tas bort). Host:s egna
+  // toggle-värde göms medan paket är aktivt — paketet dikterar källorna helt.
+  const smCellValue = (cat: MainCategory, src: 'youtube' | 'hints', actual: boolean): boolean =>
+    anyPackageActive ? packageCoverage[cat][src] : actual;
+  const smColValue = (cat: MainCategory, actual: boolean): boolean =>
+    anyPackageActive ? packageCoverage[cat].youtube || packageCoverage[cat].hints : actual;
+  // "All"-master är grön/låst bara när HELA matrisen täcks; annars grå/av (dimmad)
+  // — ett paket som bara täcker Music ska inte visa "All" som på.
+  const pkgAllCovered =
+    anyPackageActive &&
+    !pkgGrayColumn('Music') &&
+    !pkgGrayColumn('Film') &&
+    !pkgGrayColumn('Sport');
+  const smAllValue = anyPackageActive ? pkgAllCovered : allEnabled;
   // Effektivt Game Era-spann: paketets innehålls-span när låst, annars host:s
   // slider-val. Används för display, lobby_settings-write, quiz-params + preview
   // så non-host + spelet alltid får det låsta spannet (aldrig tomt pga era-miss).
@@ -6227,11 +6270,17 @@ export default function LobbyScreen() {
     const activePkgTags = resolveActivePackageTags(selectedExtraPackages);
     const pkgActive = activePkgTags.size > 0;
     const inPkg = (gp: readonly string[] | undefined) => !pkgActive || itemInActivePackages(gp, activePkgTags);
+    // Paket LÅSER källorna: covered YT-kategorier spelas alltid (grön+låst i
+    // mixerboarden), host:s toggle ignoreras. Speglar quiz.tsx:s effektiva val.
+    const cov = pkgActive ? computePackageCoverage(selectedExtraPackages) : null;
+    const effYtCats: MainCategory[] = cov
+      ? MAIN_CATEGORIES.filter((mc) => cov[mc].youtube)
+      : youtubeEnabledCategories;
     const ytFiltered = MUSIC_QUESTIONS.filter(q => {
       if (!inPkg(q.genrePackages)) return false;
-      if (q.contentSubject === 'song') return youtubeEnabledCategories.includes('Music');
-      if (q.contentSubject === 'movie') return youtubeEnabledCategories.includes('Film');
-      if (q.contentSubject === 'sport-event') return youtubeEnabledCategories.includes('Sport');
+      if (q.contentSubject === 'song') return effYtCats.includes('Music');
+      if (q.contentSubject === 'movie') return effYtCats.includes('Film');
+      if (q.contentSubject === 'sport-event') return effYtCats.includes('Sport');
       return false;
     });
     const imgFiltered = pkgActive ? [] : IMAGE_QUIZ_QUESTIONS.filter(q => {
@@ -6286,7 +6335,7 @@ export default function LobbyScreen() {
         Film: ['movie'],
         Sport: ['sport-event'],
       };
-      const ytCatEntries: YtCatEntry[] = (youtubeEnabledCategories as MainCategory[])
+      const ytCatEntries: YtCatEntry[] = effYtCats
         .map((cat) => ({
           cat,
           items: pureYtPool.filter((q) => subjectForCat[cat]?.includes(q.contentSubject ?? '')),
@@ -6524,8 +6573,10 @@ export default function LobbyScreen() {
           </View>
           {/* Share invite är host-only — bara host bjuder in nya spelare.
               Guest host: dold — friends-invites kräver registrerat konto;
-              guests delar rumkoden muntligt istället. */}
-          {hostMode && !isGuestHost && (
+              guests delar rumkoden muntligt istället.
+              Re-match/Replay: dold — uppsättningen är låst till förra spelets
+              spelare, så nya spelare kan inte bjudas in (Peter 2026-08-28). */}
+          {hostMode && !isGuestHost && !isRematchLobby && (
             <TouchableOpacity onPress={handleOpenShareModal} style={styles.shareBtn}>
               <Text style={styles.shareBtnText}>↑ Share invite to friends</Text>
             </TouchableOpacity>
@@ -6578,15 +6629,33 @@ export default function LobbyScreen() {
                 const COLS = 4;
                 // Single player: EN ruta. maxPlayers står kvar på 4 i state
                 // (DB-CHECK tillåter bara 2/4/12) — taket 1 är rent visuellt.
-                const capacity = isSingleLobby ? 1 : maxPlayers;
+                // Re-match/Replay: uppsättningen är LÅST till förra spelets
+                // spelare, så taket = exakt det antalet (t.ex. ett 2-spelars
+                // IndDev-spel visar 2 rutor, inte maxPlayers=12). Faller tillbaka
+                // på nuvarande spelarantal medan rematchExpectedIds laddas async,
+                // så ingen 12-rutors-flash (Peter 2026-08-28).
+                const rematchCapacity =
+                  rematchExpectedIds.length > 0
+                    ? rematchExpectedIds.length
+                    : players.filter((p) => !p.hasLeft).length || maxPlayers;
+                const capacity = isSingleLobby
+                  ? 1
+                  : isRematchLobby
+                    ? rematchCapacity
+                    : maxPlayers;
                 const renderBox = (i: number) => {
                   const isFilled = i < approvedCount;
                   const isBlinking = !isFilled && i < approvedCount + waitingCount;
                   // Sista rutan får "max N"-stacken — utom i 1vs1-lobbyn där
-                  // taket alltid är 2 och rutan bara visar siffran "2", och i
-                  // single-lobbyn där "max 1" bara är brus.
+                  // taket alltid är 2 och rutan bara visar siffran "2", i
+                  // single-lobbyn där "max 1" bara är brus, och i re-match/replay
+                  // där uppsättningen är LÅST till exakt antalet (då är rutan en
+                  // riktig spelarplats, inte ett tak att sträva mot).
                   const isLast =
-                    i === capacity - 1 && gameMode !== 'remote-1v1' && !isSingleLobby;
+                    i === capacity - 1 &&
+                    gameMode !== 'remote-1v1' &&
+                    !isSingleLobby &&
+                    !isRematchLobby;
                   const boxStyle = [
                     styles.approvedBox,
                     (isFilled || isBlinking) && styles.approvedBoxFilled,
@@ -6830,14 +6899,24 @@ export default function LobbyScreen() {
           <View style={[styles.section, { marginTop: Spacing.xs }]}>
             <Text style={styles.sectionLabel}>Game Mode</Text>
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-              <View style={[styles.modeOption, styles.modeOptionPassActive]}>
+              <TouchableOpacity
+                style={[styles.modeOption, styles.modeOptionPassActive]}
+                onPress={lockedModeAlert}
+                activeOpacity={0.7}
+              >
+                {/* Stängt hänglås — lobbytypen är LÅST (1vs1 väljs på Home och
+                    kan inte bytas här). Samma signal som single/re-match-rutan
+                    (Peter 2026-08-28). */}
+                <View style={styles.lockBadge} pointerEvents="none">
+                  <Text style={styles.lockBadgeText}>🔒</Text>
+                </View>
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
                   Remote play — 1vs1
                 </Text>
                 <View style={styles.freeBadge} pointerEvents="none">
                   <Text style={styles.freeBadgeText}>FREE</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
               <View style={{ flex: 1 }} />
             </View>
 
@@ -6932,7 +7011,11 @@ export default function LobbyScreen() {
           <View style={[styles.section, { marginTop: Spacing.xs }]}>
             <Text style={styles.sectionLabel}>Game Mode</Text>
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-              <View style={[styles.modeOption, styles.modeOptionPassActive]}>
+              <TouchableOpacity
+                style={[styles.modeOption, styles.modeOptionPassActive]}
+                onPress={lockedModeAlert}
+                activeOpacity={0.7}
+              >
                 {/* Stängt hänglås till vänster ersätter det tidigare
                     "(line-up locked)"-suffixet — kortar raden (Peter 2026-08-27)
                     som annars svämmade över i PtP-läget. */}
@@ -6957,7 +7040,7 @@ export default function LobbyScreen() {
                 <View style={styles.freeBadge} pointerEvents="none">
                   <Text style={styles.freeBadgeText}>FREE</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
             <Text style={styles.guestHostNote}>
               These are the players from the previous game. Use Start New Game
@@ -6974,14 +7057,24 @@ export default function LobbyScreen() {
           <View style={[styles.section, { marginTop: Spacing.xs }]}>
             <Text style={styles.sectionLabel}>Game Mode</Text>
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-              <View style={[styles.modeOption, styles.modeOptionPassActive]}>
+              <TouchableOpacity
+                style={[styles.modeOption, styles.modeOptionPassActive]}
+                onPress={lockedModeAlert}
+                activeOpacity={0.7}
+              >
+                {/* Stängt hänglås — läget är LÅST för lobbyns livstid (single
+                    väljs på Home / vid replay och kan inte bytas här). Samma
+                    signal som re-match-rutan (Peter 2026-08-28). */}
+                <View style={styles.lockBadge} pointerEvents="none">
+                  <Text style={styles.lockBadgeText}>🔒</Text>
+                </View>
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
                   Single player — 1 player
                 </Text>
                 <View style={styles.freeBadge} pointerEvents="none">
                   <Text style={styles.freeBadgeText}>FREE</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
               <View style={{ flex: 1 }} />
             </View>
             <Text style={styles.guestHostNote}>
@@ -7260,8 +7353,8 @@ export default function LobbyScreen() {
                   )}
                   <Switch
                     value={isSpotifyAvailable && spotifyEnabled && !pkgGraySpotify}
-                    onValueChange={isSpotifyAvailable && !pkgGraySpotify ? handleToggleSpotifyEnabled : undefined}
-                    disabled={!isSpotifyAvailable || pkgGraySpotify}
+                    onValueChange={isSpotifyAvailable && !anyPackageActive ? handleToggleSpotifyEnabled : undefined}
+                    disabled={!isSpotifyAvailable || anyPackageActive}
                     trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
                     thumbColor={isSpotifyAvailable && !pkgGraySpotify ? '#FFF' : '#888'}
                     ios_backgroundColor={isSpotifyAvailable && spotifyEnabled && !pkgGraySpotify ? '#1DB954' : '#3C3C3C'}
@@ -7360,13 +7453,13 @@ export default function LobbyScreen() {
                 </View>
                 <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
                   <Switch
-                    value={allEnabled}
+                    value={smAllValue}
                     onValueChange={hostMode ? handleToggleAllSources : undefined}
-                    disabled={!hostMode || pkgGrayAllSources}
+                    disabled={!hostMode || anyPackageActive}
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
-                    ios_backgroundColor={allEnabled ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayAllSources) && { opacity: 0.45 }]}
+                    ios_backgroundColor={smAllValue ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={[styles.sourceMatrixSwitch, (isGuestHost || (anyPackageActive && !pkgAllCovered)) && { opacity: 0.45 }]}
                   />
                 </View>
                 <View style={styles.smLabelSourceCell}>
@@ -7407,21 +7500,21 @@ export default function LobbyScreen() {
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
                   <Switch
-                    value={artistsAllOn}
+                    value={smColValue('Music', artistsAllOn)}
                     onValueChange={hostMode ? handleToggleArtistsColumn : undefined}
-                    disabled={!hostMode || pkgGrayColumn('Music')}
+                    disabled={!hostMode || anyPackageActive}
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
-                    ios_backgroundColor={artistsAllOn ? Colors.success : MATRIX_SWITCH_OFF}
+                    ios_backgroundColor={smColValue('Music', artistsAllOn) ? Colors.success : MATRIX_SWITCH_OFF}
                     style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Music')) && { opacity: 0.45 }]}
                   />
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode || pkgGray('Music', 'youtube')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'youtube')) && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode || pkgGray('Music', 'hints')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'hints')) && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -7431,14 +7524,14 @@ export default function LobbyScreen() {
                   <Text style={styles.sourceMatrixHeaderText}>Film</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={actorsAllOn} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode || pkgGrayColumn('Film')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Film')) && { opacity: 0.45 }]} />
+                  <Switch value={smColValue('Film', actorsAllOn)} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smColValue('Film', actorsAllOn) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Film')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode || pkgGray('Film', 'youtube')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'youtube')) && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode || pkgGray('Film', 'hints')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'hints')) && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -7451,17 +7544,17 @@ export default function LobbyScreen() {
                   <Text style={styles.sourceMatrixHeaderText}>Sport</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
-                  <Switch value={athletesAllOn} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode || pkgGrayColumn('Sport')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Sport')) && { opacity: 0.45 }]} />
+                  <Switch value={smColValue('Sport', athletesAllOn)} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smColValue('Sport', athletesAllOn) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Sport')) && { opacity: 0.45 }]} />
                 </View>
                 <View
                   onLayout={(e) => setSportCellCenter(e.nativeEvent.layout.x + e.nativeEvent.layout.width / 2)}
                   style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}
                 >
-                  <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode || pkgGray('Sport', 'youtube')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'youtube')) && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Sport', 'youtube', youtubeEnabledCategories.includes('Sport'))} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Sport', 'youtube', youtubeEnabledCategories.includes('Sport')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode || pkgGray('Sport', 'hints')} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'hints')) && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Sport', 'hints', imagesEnabledCategories.includes('Sport'))} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Sport', 'hints', imagesEnabledCategories.includes('Sport')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -10225,8 +10318,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -10,
     left: Spacing.sm,
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.success,
+    // Opak, DISTINKT bakgrund (cardElevated är ljusare än rutans interiör som
+    // renderas ~Colors.card) så badgen läses som en fylld pill i stället för att
+    // smälta in och se genomskinlig ut mot border-linjen den skär (Peter
+    // 2026-08-28).
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.primary,
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 5,

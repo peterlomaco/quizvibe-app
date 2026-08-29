@@ -1644,11 +1644,13 @@ export default function QuizScreen() {
     // är aktivt begränsar detta kategori-filtret till de kolumner paketet har
     // material i (host kan fortfarande välja bort en täckt kolumn). Utan paket =
     // host:s val orört. Tema-filtret ovan har redan restrikterat innehållet.
+    // Paket LÅSER källorna: covered YT-kategorier spelas ALLTID (i mixerboarden
+    // grön + låst), host:s stored toggle ignoreras medan paket är aktivt. Utan
+    // paket = host:s val orört.
     const effectiveYoutubeCategories = packageActive
       ? (() => {
           const cov = computePackageCoverage(selectedExtraPackages);
-          const covered = MAIN_CATEGORIES.filter((mc) => cov[mc].youtube);
-          return youtubeEnabledCategories.filter((c) => covered.includes(c));
+          return MAIN_CATEGORIES.filter((mc) => cov[mc].youtube);
         })()
       : youtubeEnabledCategories;
 
@@ -1656,7 +1658,7 @@ export default function QuizScreen() {
     // Era HÅRD: filtrera SEED_QUESTIONS på correctYear ∈ [eraFrom, eraTo].
     // Bygg music-pool när YT är aktivt ELLER Spotify är aktivt — Spotify DJ
     // är en separat toggle och ska fungera även när youtubeEnabledCategories=[].
-    const inEraMusic = (youtubeEnabled || spotifyEnabled)
+    const inEraMusic = (youtubeEnabled || spotifyEnabled || (packageActive && effectiveYoutubeCategories.length > 0))
       ? packagedMusic.filter(
           (q) =>
             // Parent Control: host har slagit på filtret → items taggade
