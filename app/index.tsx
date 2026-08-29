@@ -129,8 +129,8 @@ type RemoteBlockContext = 'join' | 'host';
 const MODAL_SWAP_DELAY_MS = 350;
 
 const REMOTE_BLOCK_NOTICE: Record<RemoteBlockContext, string> = {
-  join: 'This Room Code belongs to a Remote 1vs1 match. Remote duels can only be played between QuizVibe users — register a free account or log in to join.',
-  host: 'Remote 1vs1 matches can only be played between QuizVibe users. Register a free account or log in to host a 1vs1 match.',
+  join: 'This Room Code belongs to a Head-to-head match. Head-to-head duels can only be played between QuizVibe users — register a free account or log in to join.',
+  host: 'Head-to-head matches can only be played between QuizVibe users. Register a free account or log in to host an H2H match.',
 };
 
 function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
@@ -158,7 +158,7 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
  */
 const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolean | string }[] = [
   { label: 'Local play — Single, Pass-the-Phone, Individual devices', user: true, guest: true },
-  { label: 'Remote play — 1vs1 matches', user: true, guest: false },
+  { label: 'Head-to-head matches', user: true, guest: false },
   { label: 'Saved results & player history', user: true, guest: false },
   { label: 'Friends list & in-app invites', user: true, guest: false },
   { label: 'Choose Game era', user: true, guest: false },
@@ -645,7 +645,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           if (my.me.finishedAt != null) {
             Alert.alert(
               'Already played',
-              'You have already played your questions in this 1vs1 match. Check "1vs1" on the Home screen for the result.',
+              'You have already played your questions in this H2H match. Check "H2H" on the Home screen for the result.',
             );
             return;
           }

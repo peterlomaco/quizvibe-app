@@ -2201,17 +2201,17 @@ export default function QuizScreen() {
       const bailIfEnded = async (m: typeof match): Promise<boolean> => {
         if (!m || m.status === 'active') return false;
         let title = 'Match ended';
-        let body = 'This 1vs1 match is no longer active.';
+        let body = 'This H2H match is no longer active.';
         if (m.status === 'cancelled') {
           title = 'Lobby deleted by Host';
-          body = 'The Host has cancelled this 1vs1 match.';
+          body = 'The Host has cancelled this H2H match.';
         } else if (m.status === 'forfeited') {
           const myId = await getOwnUserId();
           const iWon = !!myId && m.winnerUserId === myId;
           title = iWon ? 'You won — walkover!' : 'Match ended';
           body = iWon
             ? 'Your opponent quit the match, so you win by walkover.'
-            : 'You quit this 1vs1 match — it cannot be resumed.';
+            : 'You quit this H2H match — it cannot be resumed.';
         } else if (m.questionIds && m.questionIds.length > 0) {
           // finished/void/expired_walkover MED sekvens: låt resume-seeden
           // ta över (allt besvarat → direkt leaderboard + resultatpanel).
@@ -7585,7 +7585,7 @@ export default function QuizScreen() {
   const handleRemoteForfeit = () => {
     Alert.alert(
       'Quit game?',
-      'You give up this 1vs1 match. Your opponent wins by walkover, and the match cannot be resumed.',
+      'You give up this H2H match. Your opponent wins by walkover, and the match cannot be resumed.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -7623,7 +7623,7 @@ export default function QuizScreen() {
   const handleRemoteSaveExit = () => {
     Alert.alert(
       'Save & Exit?',
-      'Your answers so far are saved. Resume this 1vs1 match within 48 hours via "1vs1 Matches" on the Home screen.',
+      'Your answers so far are saved. Resume this H2H match within 48 hours via "H2H Matches" on the Home screen.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -8381,7 +8381,7 @@ export default function QuizScreen() {
       <SafeAreaView style={styles.safe}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.md }}>
           <Text style={{ color: Colors.textPrimary, fontSize: FontSize.lg, fontWeight: '600' }}>
-            Preparing 1vs1 match
+            Preparing H2H match
           </Text>
           <SequentialDots color={Colors.warning} />
         </View>

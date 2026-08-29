@@ -3352,8 +3352,8 @@ export default function LobbyScreen() {
       );
       if (selfJoinedNonHosts.length > 1) {
         Alert.alert(
-          'Switch to Remote (1vs1)?',
-          'Remote 1vs1 allows only 1 opponent. All players will be removed from the lobby — invite ONE opponent again after switching.',
+          'Switch to Head-to-head?',
+          'Head-to-head allows only 1 opponent. All players will be removed from the lobby — invite ONE opponent again after switching.',
           [
             { text: 'Cancel', style: 'cancel' },
             {
@@ -3382,7 +3382,7 @@ export default function LobbyScreen() {
       }
       // ≤1 självansluten motståndare — behåll den; rensa ev. host-tillagda
       // guests via samma confirm-flöde som IndDev.
-      confirmAndRemoveGuests('Switch to Remote (1vs1)?', applyRemote);
+      confirmAndRemoveGuests('Switch to Head-to-head?', applyRemote);
       return;
     }
     // Vid byte till PtP: maxPlayers alltid 4 (PtP-cap). Om host godkänt fler
@@ -4417,7 +4417,7 @@ export default function LobbyScreen() {
       if (hostUserId && (await hasRemote1v1RelationshipWith(hostUserId, friend.playerName))) {
         Alert.alert(
           'Invitation limit reached',
-          `You already have an ongoing or pending 1vs1 invitation with ${friend.playerName}. Wait for it to finish or be answered before sending a new one.`,
+          `You already have an ongoing or pending H2H invitation with ${friend.playerName}. Wait for it to finish or be answered before sending a new one.`,
         );
         return;
       }
@@ -4559,8 +4559,8 @@ export default function LobbyScreen() {
       savedAt: new Date().toISOString(),
     });
     Alert.alert(
-      '1vs1 lobby saved',
-      'Find it under "1vs1" on the Home screen, with status Not started. The lobby stays open for 24 hours.',
+      'H2H lobby saved',
+      'Find it under "H2H" on the Home screen, with status Not started. The lobby stays open for 24 hours.',
       [{ text: 'OK', onPress: () => router.replace('/') }],
     );
   };
@@ -5371,7 +5371,7 @@ export default function LobbyScreen() {
           };
           setRemoteStartPrompt({
             message:
-              'Host has started the 1vs1 match. You have 48 hours to play your questions — now or later via "1vs1" on the Home screen.',
+              'Host has started the H2H match. You have 48 hours to play your questions — now or later via "H2H" on the Home screen.',
             playNow: goPlayNow,
           });
           return;
@@ -5584,8 +5584,8 @@ export default function LobbyScreen() {
   useEffect(() => {
     if (!remoteGuestBlockedDetected) return;
     Alert.alert(
-      'Remote 1vs1 Room',
-      'This Room Code belongs to a Remote 1vs1 match. Remote duels can only be played between QuizVibe users — register a free account or log in to join.',
+      'Head-to-head Room',
+      'This Room Code belongs to a Head-to-head match. Head-to-head duels can only be played between QuizVibe users — register a free account or log in to join.',
       [
         { text: 'OK', onPress: () => router.replace('/') },
         { text: 'Register or Login', onPress: () => router.replace('/?openAuth=join') },
@@ -5626,7 +5626,7 @@ export default function LobbyScreen() {
         if (!error && (count ?? 0) >= 4) {
           Alert.alert(
             'Invitation limit reached',
-            'You already have 4 unanswered 1vs1 invitations. Wait for an answer or for old invitations to expire before sending more.',
+            'You already have 4 unanswered H2H invitations. Wait for an answer or for old invitations to expire before sending more.',
           );
           return;
         }
@@ -5880,14 +5880,14 @@ export default function LobbyScreen() {
       if (isGuestHost) {
         Alert.alert(
           'QuizVibe account required',
-          'Remote 1vs1 matches can only be played between QuizVibe users. Register or sign in to host a 1vs1 match.',
+          'Head-to-head matches can only be played between QuizVibe users. Register or sign in to host an H2H match.',
         );
         return;
       }
       const activeApprovedNonHosts = approvedPlayers.filter((p) => !p.isHost && !p.hasLeft);
       if (activeApprovedNonHosts.length !== 1) {
         Alert.alert(
-          'Remote 1vs1 requires exactly 1 opponent',
+          'Head-to-head requires exactly 1 opponent',
           activeApprovedNonHosts.length === 0
             ? 'Invite and approve one opponent before starting the match.'
             : 'Remove players until exactly one approved opponent remains.',
@@ -5898,7 +5898,7 @@ export default function LobbyScreen() {
       if (remoteOpponent.addedByHost) {
         Alert.alert(
           'Own device required',
-          `${remoteOpponent.name} was added by the Host and has no device of their own. Remote 1vs1 opponents must join with their own device.`,
+          `${remoteOpponent.name} was added by the Host and has no device of their own. Head-to-head opponents must join with their own device.`,
         );
         return;
       }
@@ -5907,7 +5907,7 @@ export default function LobbyScreen() {
       if (remoteOpponent.type === 'guest') {
         Alert.alert(
           'QuizVibe account required',
-          `${remoteOpponent.name} joined as a Guest. Remote 1vs1 matches can only be played between QuizVibe users.`,
+          `${remoteOpponent.name} joined as a Guest. Head-to-head matches can only be played between QuizVibe users.`,
         );
         return;
       }
@@ -6114,7 +6114,7 @@ export default function LobbyScreen() {
             }
           } catch { /* tyst — pillen självkorrigerar vid nästa load */ }
         }
-        Alert.alert('Cannot start match', 'The 1vs1 match could not be created. Check your connection and try again.');
+        Alert.alert('Cannot start match', 'The H2H match could not be created. Check your connection and try again.');
         return;
       }
     }
@@ -6254,7 +6254,7 @@ export default function LobbyScreen() {
     if (remoteMatchId) {
       setRemoteStartPrompt({
         message:
-          'The 1vs1 match has been created. You have 48 hours to play your questions — now or later via "1vs1" on the Home screen.',
+          'The H2H match has been created. You have 48 hours to play your questions — now or later via "H2H" on the Home screen.',
         playNow: () => router.push(quizNav),
       });
       return;
@@ -6544,7 +6544,7 @@ export default function LobbyScreen() {
                   visar "1vs1 challenge", övriga "Single or multiplayer game". */}
               <Animated.View style={[styles.hostBadgeInner, styles.hostBadgeOverlay, { opacity: hostBadgeOp2 }]}>
                 <Text style={styles.hostBadgeTextGold}>
-                  {gameMode === 'remote-1v1' ? '1vs1 challenge' : 'Single or multiplayer game'}
+                  {gameMode === 'remote-1v1' ? 'H2H challenge' : 'Single or multiplayer game'}
                 </Text>
               </Animated.View>
             </View>
@@ -6915,7 +6915,7 @@ export default function LobbyScreen() {
                   <Text style={styles.lockBadgeText}>🔒</Text>
                 </View>
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
-                  Remote play — 1vs1
+                  Head-to-head
                 </Text>
                 <View style={styles.freeBadge} pointerEvents="none">
                   <Text style={styles.freeBadgeText}>FREE</Text>
@@ -6942,7 +6942,7 @@ export default function LobbyScreen() {
                 onPress={() =>
                   Alert.alert(
                     'Mutual assistance level',
-                    'Off: each player plays with their own personal assistance level.\n\nOn: both players get the SAME level — the one the Host picks below. In a 1vs1 match both answer the same questions on their own devices, so a shared level makes the duel directly comparable.\n\nFull: the full names are listed, just pick the right one.\nStandard: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
+                    'Off: each player plays with their own personal assistance level.\n\nOn: both players get the SAME level — the one the Host picks below. In an H2H match both answer the same questions on their own devices, so a shared level makes the duel directly comparable.\n\nFull: the full names are listed, just pick the right one.\nStandard: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
                   )
                 }
                 hitSlop={8}
@@ -6991,7 +6991,7 @@ export default function LobbyScreen() {
                 </View>
                 <Text style={styles.remoteAssistanceNote}>
                   {hostMode
-                    ? 'Applies to both players in this 1vs1 match.'
+                    ? 'Applies to both players in this H2H match.'
                     : 'Selected by the Host — applies to both players.'}
                 </Text>
               </>
@@ -7082,7 +7082,7 @@ export default function LobbyScreen() {
               <View style={{ flex: 1 }} />
             </View>
             <Text style={styles.guestHostNote}>
-              Multiplayer and Remote games are started from Start New Game on
+              Multiplayer and Head-to-head games are started from Start New Game on
               Home.
             </Text>
           </View>
@@ -7118,7 +7118,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Multiplayer mode',
-                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or 1vs1? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Remote Play".',
+                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or H2H? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Head-to-head".',
                     )
                   }
                   hitSlop={8}
@@ -7569,7 +7569,7 @@ export default function LobbyScreen() {
                 packages, så det inte läses som en bugg att raden saknas. */}
             {gameMode === 'remote-1v1' && (
               <Text style={styles.guestHostNote}>
-                Spotify is not available in 1vs1 Games
+                Spotify is not available in H2H Games
               </Text>
             )}
 
@@ -9065,7 +9065,7 @@ export default function LobbyScreen() {
                 ]}
                 onPress={() => { void handleSaveRemoteLobby(false); }}
               >
-                <Text style={styles.saveLobbyBtnText}>Save 1vs1 — Play later</Text>
+                <Text style={styles.saveLobbyBtnText}>Save H2H — Play later</Text>
               </Pressable>
             )}
 
@@ -9134,7 +9134,7 @@ export default function LobbyScreen() {
                 ]}
                 onPress={() => { void handleSaveRemoteLobby(true); }}
               >
-                <Text style={styles.saveLobbyBtnText}>Save 1vs1 — Play later</Text>
+                <Text style={styles.saveLobbyBtnText}>Save H2H — Play later</Text>
               </Pressable>
             )}
 
@@ -9417,7 +9417,7 @@ export default function LobbyScreen() {
           <View style={styles.guestLeaveBackdrop} pointerEvents="none" />
           {remoteStartPrompt && (
             <View style={styles.noApprovedCard}>
-              <Text style={styles.noApprovedTitle}>Remote Play started — 1vs1</Text>
+              <Text style={styles.noApprovedTitle}>Head-to-head started</Text>
               <Text style={styles.noApprovedMessage}>{remoteStartPrompt.message}</Text>
               <Text style={styles.remoteStartPlayLabel}>Play</Text>
               <View style={styles.remoteStartBtnRow}>

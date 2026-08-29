@@ -783,7 +783,7 @@ export function RoundLeaderboard({
                 : isLastRound
                   ? 'Final Leaderboard'
                   : 'Leaderboard'}
-              {remote1v1 ? ' - 1vs1' : ''}
+              {remote1v1 ? ' - H2H' : ''}
             </Text>
             {remote1v1 && <VersusIcon height={26} />}
             {liveBadge && <LiveBadge />}

@@ -1638,7 +1638,7 @@ export default function ProfileScreen() {
                     onPress={() =>
                       Alert.alert(
                         'Multiplayer mode',
-                        'This is your default for Multiplayer games.\n\nPass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nSingle player and Remote 1vs1 are picked per game on the Home screen — tap Start New Game and choose "Single Game" or "Remote Play".',
+                        'This is your default for Multiplayer games.\n\nPass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nSingle player and Head-to-head are picked per game on the Home screen — tap Start New Game and choose "Single Game" or "Head-to-head".',
                       )
                     }
                     hitSlop={8}

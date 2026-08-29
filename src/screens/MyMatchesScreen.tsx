@@ -440,17 +440,17 @@ export default function MyMatchesScreen() {
         {/* Rubrik + 1vs1-märket (två blå silhuetter förbundna av prickar)
             direkt efter — samma ikon som Home:s "1vs1"-knapp. */}
         <View style={styles.screenTitleRow}>
-          <Text style={styles.screenTitle}>1vs1 History</Text>
+          <Text style={styles.screenTitle}>H2H History</Text>
           <VersusIcon height={30} />
         </View>
         <Text style={styles.screenSubtitle}>
-          Remote duels — each player answers on their own device within 48 hours.
+          Head-to-head duels — each player answers on their own device within 48 hours.
         </Text>
 
         {loaded && visible.length === 0 && visibleSaved.length === 0 && (
           <Text style={styles.emptyText}>
-            No 1vs1 matches yet. Tap &quot;Start New Game&quot; on Home, choose
-            Remote Play (1vs1) and invite a friend to start your first duel.
+            No H2H matches yet. Tap &quot;Start New Game&quot; on Home, choose
+            Head-to-head and invite a friend to start your first duel.
           </Text>
         )}
 

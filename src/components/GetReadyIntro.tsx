@@ -853,7 +853,7 @@ export function GetReadyIntro({
               )}
               <View style={{ flex: 1 }}>
                 <Text style={styles.exitSheetHeaderName}>{currentPlayer.name}</Text>
-                <Text style={styles.exitSheetHeaderStatus}>1vs1 Match</Text>
+                <Text style={styles.exitSheetHeaderStatus}>H2H Match</Text>
               </View>
             </View>
 

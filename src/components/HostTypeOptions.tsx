@@ -152,10 +152,10 @@ export function HostTypeOptions({
         <HostTypeOptionRow
           accentColor={accentColor}
           icon={<VersusIcon height={50} />}
-          label="Remote Play"
+          label="Head-to-head"
           // Samma subtitel oavsett låst/olåst — "QuizVibe user"-badgen bär
           // kontokravet, subtiteln får beskriva vad läget ÄR.
-          subtitle="1vs1 — challenge friends remotely"
+          subtitle="H2H — challenge friends remotely"
           locked={remoteMode === 'locked'}
           badgeText={remoteMode === 'locked' ? 'QuizVibe user' : undefined}
           onPress={() => {

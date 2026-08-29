@@ -187,7 +187,7 @@ export function MyMatchesSection({
           pointerEvents none → taps går vidare till knappen. */}
       {!compact && (
         <View style={styles.titleOverlay} pointerEvents="none">
-          <Text style={styles.mainBtnTitle}>1vs1 History</Text>
+          <Text style={styles.mainBtnTitle}>H2H History</Text>
         </View>
       )}
       {/* Samma 1vs1-märke som Home:s "Remote Play"-val (blå silhuetter +
@@ -206,7 +206,7 @@ export function MyMatchesSection({
         ]}
       >
         <VersusIcon height={compact ? 22 : 30} />
-        {compact && <Text style={styles.compactLabel}>1vs1</Text>}
+        {compact && <Text style={styles.compactLabel}>H2H</Text>}
       </View>
       {/* Spacer i full variant → "New update" + pilen grupperas högerställt
           medan titeln ligger kvar centrerad. Compact använder
