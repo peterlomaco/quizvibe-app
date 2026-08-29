@@ -22,6 +22,10 @@ import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 import { TrophyIcon } from './TrophyIcon';
 import { isAnonymousSession } from '../utils/auth';
+import {
+  getCachedHomeRowVisible,
+  setCachedHomeRowVisible,
+} from '../utils/homeRowVisibility';
 import { listMyAggregateLeaderboards } from '../utils/aggregateLeaderboards';
 import {
   getPendingAcceptRequestLeaderboardIds,
@@ -36,12 +40,17 @@ export function CompetitionsButton({
   // Leaderboard-id:na där en re-match väntar på min accept — driver både
   // blink-signalen (längd > 0) och flash-guiden (skickas som focusAggregateIds).
   const [pendingIds, setPendingIds] = useState<string[]>([]);
+  // false tills mountens första reload klarat — innan dess litar vi på
+  // session-cachen så knappen renderas med rätt höjd direkt vid en re-mount
+  // i stället för att pop:a in (se homeRowVisibility.ts).
+  const [hydrated, setHydrated] = useState(false);
 
   const reload = useCallback(async () => {
     // Anon-sessioner har per definition inga sparade competitions.
     if (await isAnonymousSession()) {
       setCount(0);
       setPendingIds([]);
+      setHydrated(true);
       return;
     }
     const [saved, pending] = await Promise.all([
@@ -50,6 +59,7 @@ export function CompetitionsButton({
     ]);
     setCount(saved.length);
     setPendingIds(pending);
+    setHydrated(true);
   }, []);
 
   useFocusEffect(
@@ -69,7 +79,16 @@ export function CompetitionsButton({
   const hasUpdate = pendingIds.length > 0;
   const blink = useBlink(hasUpdate);
 
-  const visible = count > 0;
+  const dataVisible = count > 0;
+  // Innan mountens första reload klarat: rendera optimistiskt om cachen säger
+  // att knappen var synlig senast → ingen pop-in vid re-mount. Efter hydrering
+  // gäller riktig data (så en tömd rad kollapsar).
+  const visible = dataVisible || (!hydrated && getCachedHomeRowVisible('competitions'));
+
+  useEffect(() => {
+    if (hydrated) setCachedHomeRowVisible('competitions', dataVisible);
+  }, [hydrated, dataVisible]);
+
   useEffect(() => {
     onVisible?.(visible);
   }, [visible, onVisible]);

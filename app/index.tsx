@@ -1711,6 +1711,12 @@ export default function HomeScreen() {
   // handleCreateGame (registrerad) resp. guest-host-formen med
   // guestLobbyType satt (konsumeras av handleStartGameAsGuestHost via prop).
   const [hostTypeExpanded, setHostTypeExpanded] = useState<'none' | 'registered' | 'guest'>('none');
+  // In-flight-guard för registered "Start New Game"-flödet. Panelen kollapsas
+  // INTE längre synkront vid valet (det gav ett synligt layout-hopp innan
+  // /lobby pushats — se onSelect nedan), så den står kvar interaktiv under
+  // handleCreateGame:s async-gap. Ref:en stoppar en andra rad-tap från att
+  // fyra en andra handleCreateGame (dubbel registerActiveRoom + dubbel push).
+  const creatingGameRef = useRef(false);
   const [guestLobbyType, setGuestLobbyType] = useState<HostLobbyType>('multiplayer');
   // Guest-sektionens fold-state — bara relevant för inloggade users (Peter
   // 2026-08-27). Default false (ihopfälld) så "Start New Game"-guest-
@@ -2137,6 +2143,23 @@ export default function HomeScreen() {
         router.setParams({ openAuth: undefined });
       }
     }, [localParams.openAuth]),
+  );
+
+  // hostTypeExpanded kollapsas MEDVETET inte i registered-onSelect (se
+  // kommentaren där) för att undvika ett synligt layout-hopp innan /lobby
+  // pushats. Nollställ i stället här när Home tappar fokus — cleanup:en körs
+  // när lobbyn har täckt skärmen, så kollapsen sker off-screen. Krävs bara
+  // för native swipe-back till samma Home-instans; de vanliga retur-vägarna
+  // (BottomBanner "Home", lobby-delete) går via router.replace('/') = full
+  // re-mount → 'none' ändå. Cleanup:en är ofarlig vid unmount. Guest-pathen
+  // påverkas inte: den öppnar en modal (ingen route-blur) och behåller sin
+  // egen kollaps.
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setHostTypeExpanded('none');
+      };
+    }, []),
   );
 
   const [fontsLoaded] = useFonts({
@@ -2832,8 +2855,23 @@ export default function HomeScreen() {
                 <HostTypeOptions
                   accentColor={Colors.warning}
                   onSelect={(lobbyType) => {
-                    setHostTypeExpanded('none');
-                    void handleCreateGame(lobbyType);
+                    // Kollapsa INTE panelen här. setHostTypeExpanded('none')
+                    // skulle synkront återinföra Join-knappen + HomeExtrasRow
+                    // + guest-sektionen i layouten, och eftersom container:n
+                    // är flexGrow:1 + justifyContent:'space-between'
+                    // redistribueras hela kolumnen → synligt hopp INNAN
+                    // /lobby ens pushats (handleCreateGame await:ar credits +
+                    // registerActiveRoom först). Låt panelen stå kvar frusen
+                    // under async-gapet + push-slide-outen; den nollställs
+                    // off-screen i blur-cleanup:en (useFocusEffect nedan).
+                    if (creatingGameRef.current) return;
+                    creatingGameRef.current = true;
+                    void handleCreateGame(lobbyType).finally(() => {
+                      // Släpp guarden när flödet settlar — täcker både
+                      // success-pushen och credit-/registrerings-abort:en
+                      // (Alert + return utan navigation).
+                      creatingGameRef.current = false;
+                    });
                   }}
                 />
               )}

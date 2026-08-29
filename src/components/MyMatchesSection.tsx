@@ -39,6 +39,10 @@ import {
   type MyRemoteMatch,
 } from '../utils/remoteMatches';
 import { getSavedLobbies } from '../utils/savedLobbies';
+import {
+  getCachedHomeRowVisible,
+  setCachedHomeRowVisible,
+} from '../utils/homeRowVisibility';
 
 // Per-user-namespacad nyckel (samma mönster som friends/gameHistory) så
 // User A:s "sett"-snapshot inte tystar signalen för User B på samma device.
@@ -104,6 +108,10 @@ export function MyMatchesSection({
   const [savedCount, setSavedCount] = useState(0);
   const [seenSignature, setSeenSignature] = useState<string | null>(null);
   const seenKeyRef = useRef<string | null>(null);
+  // false tills mountens första reload klarat — dessförinnan litar vi på
+  // session-cachen så knappen renderas med rätt höjd direkt vid en re-mount
+  // i stället för att pop:a in (se homeRowVisibility.ts).
+  const [hydrated, setHydrated] = useState(false);
 
   const reload = useCallback(async () => {
     const [{ data: sessionData }, anon, mine, saved] = await Promise.all([
@@ -122,6 +130,11 @@ export function MyMatchesSection({
     const user = sessionData.session?.user as { id?: string } | undefined;
     setIsGuestSession(anon);
     setMatches(mine);
+    // Synligheten (matcher + sparade lobbies + guest-status) är nu känd —
+    // markera hydrerad så cachen tar över från det optimistiska render-läget.
+    // Läses av `show`-beräkningen nedan; seenSignature-logiken därunder kan
+    // early-return:a utan att påverka detta.
+    setHydrated(true);
 
     // Läs "sett"-snapshotten för aktuell user. Saknas user-id kan vi inte
     // namespace:a — då hoppar vi signalen helt (hellre ingen badge än en
@@ -199,12 +212,21 @@ export function MyMatchesSection({
 
   // Rapportera synlighet uppåt (HomeExtrasRow kollapsar raden när varken
   // Competition eller 1vs1 finns). Effekten måste ligga före return:en.
-  const isVisible = !(visible.length === 0 && visibleSavedCount === 0);
-  useEffect(() => {
-    onVisible?.(isVisible);
-  }, [isVisible, onVisible]);
+  const dataVisible = !(visible.length === 0 && visibleSavedCount === 0);
+  // Innan mountens första reload klarat: rendera optimistiskt om cachen säger
+  // att knappen var synlig senast → ingen pop-in vid re-mount. Efter hydrering
+  // gäller riktig data (så en tömd rad kollapsar).
+  const show = dataVisible || (!hydrated && getCachedHomeRowVisible('matches'));
 
-  if (visible.length === 0 && visibleSavedCount === 0) return null;
+  useEffect(() => {
+    if (hydrated) setCachedHomeRowVisible('matches', dataVisible);
+  }, [hydrated, dataVisible]);
+
+  useEffect(() => {
+    onVisible?.(show);
+  }, [show, onVisible]);
+
+  if (!show) return null;
 
   return (
     <TouchableOpacity

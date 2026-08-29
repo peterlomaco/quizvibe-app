@@ -14,12 +14,18 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Spacing } from '../theme';
+import { getCachedHomeRowVisible } from '../utils/homeRowVisibility';
 import { CompetitionsButton } from './CompetitionsButton';
 import { MyMatchesSection } from './MyMatchesSection';
 
 export function HomeExtrasRow() {
-  const [compVisible, setCompVisible] = useState(false);
-  const [matchVisible, setMatchVisible] = useState(false);
+  // Seed:a från senast kända synlighet så raden har rätt höjd redan frame 1
+  // vid en re-mount av Home (t.ex. router.replace('/') efter lobby-delete) —
+  // annars pop:ar knapparna in ~1s senare och skjuter Home-kolumnen (container
+  // = justifyContent:'space-between'). Barnen bekräftar/korrigerar via onVisible
+  // efter sin egen fetch. Se homeRowVisibility.ts.
+  const [compVisible, setCompVisible] = useState(() => getCachedHomeRowVisible('competitions'));
+  const [matchVisible, setMatchVisible] = useState(() => getCachedHomeRowVisible('matches'));
   const bothHidden = !compVisible && !matchVisible;
 
   return (
