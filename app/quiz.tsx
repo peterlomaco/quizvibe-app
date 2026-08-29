@@ -4292,19 +4292,25 @@ export default function QuizScreen() {
   }, [phase]);
 
   // "Kan användaren confirma just nu?" — discriminerad-union-helper.
-  // Musik: pendingYear satt. Bild: aktiv direkt när hints visas (hintsReady)
-  // så knappen pulsar från start — spelaren väljer svar och trycker sedan Confirm.
+  // Musik: pendingYear satt. Bild: aktiv så snart hints visas (hintsReady).
   // Klick utan valt svar gör ingenting (handleConfirmName-grenen checkar pendingNameOption).
   // DJ kan aldrig confirma (de svarar inte på Spotify-frågor).
+  //
+  // Confirm är LÅST tills nedräkningen/timern faktiskt startat (timerActive) —
+  // dvs. hela 2 s-bufferten är knappen inaktiv + opulserande. Förhindrar att
+  // spelaren svarar innan klockan börjat räkna (som annars gav elapsed=full →
+  // avatar-till-0 % + tidigare stall-i-reveal). (Peter 2026-08-29.)
   const canConfirm = isCurrentPlayerDJ
     ? false
-    : isSpotifyNameQuestion
-      ? pendingNameOption !== null
-      : isImageQuestion
-        ? hintsReady
-        : isActorSelectQuestion
-          ? pendingActorName !== null
-          : pendingYear !== null;
+    : !timerActive
+      ? false
+      : isSpotifyNameQuestion
+        ? pendingNameOption !== null
+        : isImageQuestion
+          ? hintsReady
+          : isActorSelectQuestion
+            ? pendingActorName !== null
+            : pendingYear !== null;
 
   // Confirm-knappens scale + glow-loop. Körs medan phase === 'question' OCH
   // ett svar är preliminärt valt (knappen är tappbar). Stoppas i andra faser så
@@ -6118,8 +6124,11 @@ export default function QuizScreen() {
           // Parent Control kan togglas även av en guest host — bär med host:s
           // val vid carry-over (persisteras aldrig i DB). Guest host har inga
           // paket (seeden forcerar []), så carryPackages behövs inte här.
+          // seedGameMode: förra spelets läge, seedas SYNKRONT i LobbyScreen så
+          // PtP-confirm-guarden inte fyrar på en IndDev re-match innan den
+          // async seeden landat (guest host kan köra IndDev, samma race).
           ...((keepSettings || reusePlayers)
-            ? { parentControl: String(parentControlEnabled) }
+            ? { parentControl: String(parentControlEnabled), seedGameMode: gameMode }
             : {}),
         },
       });
@@ -6140,10 +6149,14 @@ export default function QuizScreen() {
         // av en stale lobby_settings-rad eller profil-filtret i seeden. Skickas
         // BARA vid carry-over (samma villkor som settings-blobben ovan); en
         // fresh "Start New Game" utelämnar dem → seeden faller på profilen.
+        // seedGameMode: förra spelets läge (PtP/IndDev), seedas SYNKRONT i
+        // LobbyScreen så PtP-confirm-guarden i handleStartGame inte fyrar på en
+        // IndDev re-match innan den async seeden (getLobbySettings) landat.
         ...((keepSettings || reusePlayers)
           ? {
               parentControl: String(parentControlEnabled),
               carryPackages: JSON.stringify(selectedExtraPackages),
+              seedGameMode: gameMode,
             }
           : {}),
       },
