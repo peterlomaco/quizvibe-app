@@ -68,18 +68,18 @@ export default function CompetitionsScreen() {
       <TopUserBanner onBackPress={() => router.replace(backTo)} backLabel="Back" />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.titleRow}>
-          <Text style={styles.title}>Competitions</Text>
+          <Text style={styles.title}>Marathons</Text>
           <TrophyIcon height={28} />
         </View>
         <Text style={styles.subtitle}>
-          Your saved competition leaderboards. Open one to see the standings and
+          Your saved marathon tables. Open one to see the standings and
           start a re-match with the same players.
         </Text>
 
         {loaded && empty && (
           <Text style={styles.emptyText}>
-            No saved competitions yet. Finish a re-match from the Final
-            Leaderboard to save your first competition.
+            No saved marathons yet. Finish a re-match from the Final
+            Leaderboard to save your first marathon.
           </Text>
         )}
 

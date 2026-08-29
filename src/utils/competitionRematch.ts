@@ -1,5 +1,5 @@
 // Competition re-match — startar en ny lobby dedikerad till de registrerade
-// deltagarna i en sparad Competition Leaderboard (öppnad från Home →
+// deltagarna i en sparad Marathon table (öppnad från Home →
 // /competitions → gyllene Re-match/Replay-knapp).
 //
 // Till skillnad från Final Leaderboards re-match (goToNewLobby) är de andra

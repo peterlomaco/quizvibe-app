@@ -1282,7 +1282,7 @@ export default function LobbyScreen() {
      *  renderas redan på första framen, utan att vänta på en DB-läsning. */
     rematchLocked?: string;
     /** 'true' när re-matchen startats från Home → /competitions (en sparad
-     *  Competition Leaderboard). Till skillnad från Final Leaderboards
+     *  Marathon table). Till skillnad från Final Leaderboards
      *  re-match är de andra deltagarna INTE anslutna — de får en
      *  cross-device-inbjudan och joinar på egen enhet. Driver den 5-minuters
      *  expiry-timern nedan + väntar-bannern. rematchLocked är alltid 'true'

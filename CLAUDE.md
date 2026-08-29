@@ -2437,7 +2437,7 @@ Lägg alla framtida host-lobby-skapanden från quiz-skärmen bakom samma funnel 
 
 ## Aggregate Leaderboard — andra sidan på slutskärmen (2026-08-25)
 
-⚠ **UI-copyn heter "Competition Leaderboard" / "Competition Score"** (Peter 2026-08-26). Koden, filnamnen och HELA databasen (`aggregate_leaderboards`, `create_aggregate_leaderboard`, `aggregateLabel`, `SavedAggregatesCard` …) heter fortsatt `aggregate*` — migration 0037 är körd, och ett namnbyte där hade krävt en ny migration utan att ge användaren något. Sektionerna nedan använder kod-namnet. **Byt inte kod-identifierare för att "matcha" copyn**, och lägg inte till nya användarsynliga strängar med ordet "Aggregate" — etiketten byggs av `aggregateLabel()`.
+⚠ **UI-copyn heter "Marathon table" / "Marathon Score"** (Peter 2026-08-26; omdöpt från "Competition Leaderboard" / "Competition Score" 2026-08-29). Koden, filnamnen och HELA databasen (`aggregate_leaderboards`, `create_aggregate_leaderboard`, `aggregateLabel`, `SavedAggregatesCard`, `Competition*`-lagret …) heter fortsatt `aggregate*`/`Competition*` — migration 0037 är körd, och ett namnbyte där hade krävt en ny migration utan att ge användaren något. Sektionerna nedan använder kod-namnet. **Byt inte kod-identifierare för att "matcha" copyn**, och lägg inte till nya användarsynliga strängar med orden "Aggregate" eller "Competition" — etiketten byggs av `aggregateLabel()`.
 
 Har host kört **"Re-match with Aggregate Leaderboard?" → Yes** blir Final Leaderboard en **två-sidig pager**: sida 1 är ALLTID spelet som just spelats, sida 2 är **hela serien sammanslagen** — samma kolumner, samma sortering, alla spel adderade. Rubriken byter till "Aggregate Leaderboard" på sida 2.
 
@@ -2478,8 +2478,8 @@ Lämnar man MITT i spelet är delresultatet ingen giltig slutställning — man 
 
 Låst av fyra tester i [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts).
 
-⚠ **Avhopp mitt i spelet diskvalificerar HELA spelet ur Competition-serien** (Peter 2026-08-26) — varken lokalt eller server-side. `recordGameInSeries`-effekten early-returnar om någon i `gamePlayers` har `hasLeft`; då förblir `aggregate` `null`, och eftersom BARA den effekten sätter `aggregate` finns därmed ingen "Competition Leaderboard"-slide att välja på slutskärmen. Samma villkor styr båda, så de kan inte glida isär: står "Left the game" på någon rad — slidern finns inte.
-- **Popupen förklarar det direkt.** `${playerName} has left`-Alerten får en andra rad, *"Competition Leaderboard will not be updated with this game result."*, när avhoppet sker MITT i spelet OCH spelet faktiskt är en fortsättning på en serie (`partOfCompetitionSeriesRef` — träff när seriens `nextRoomCode === params.roomCode`, satt vid mount ur `loadAggregateSeries()`). Ett fristende spel (ingen serie än) får bara den vanliga raden — texten vore obegriplig annars. Avhopp EFTER slutsignalen påverkar inte serien och får ingen extra rad.
+⚠ **Avhopp mitt i spelet diskvalificerar HELA spelet ur Competition-serien** (Peter 2026-08-26) — varken lokalt eller server-side. `recordGameInSeries`-effekten early-returnar om någon i `gamePlayers` har `hasLeft`; då förblir `aggregate` `null`, och eftersom BARA den effekten sätter `aggregate` finns därmed ingen "Marathon table"-slide att välja på slutskärmen. Samma villkor styr båda, så de kan inte glida isär: står "Left the game" på någon rad — slidern finns inte.
+- **Popupen förklarar det direkt.** `${playerName} has left`-Alerten får en andra rad, *"Marathon table will not be updated with this game result."*, när avhoppet sker MITT i spelet OCH spelet faktiskt är en fortsättning på en serie (`partOfCompetitionSeriesRef` — träff när seriens `nextRoomCode === params.roomCode`, satt vid mount ur `loadAggregateSeries()`). Ett fristende spel (ingen serie än) får bara den vanliga raden — texten vore obegriplig annars. Avhopp EFTER slutsignalen påverkar inte serien och får ingen extra rad.
 - **Serien i sig lever vidare.** `nextRoomCode` konsumeras inte av det diskvalificerade spelet — nästa re-match skriver över den som vanligt via `markSeriesContinues`. Det är bara DET HÄR spelets bidrag som uteblir.
 - **Gäller PtP-spectatorn INTE** — `hasLeft` sätts aldrig i PtP (spelaren spelar vidare på host:s telefon, se playerLeftHandlerRef:s PtP-gren). Regeln är alltså i praktiken IndDev-only, trots att den är skriven lägesagnostiskt.
 
@@ -2487,7 +2487,7 @@ Låst av fyra tester i [backend/content/test/matchHighlights.test.ts](backend/co
 
 ### Namngivning: Score vs Leaderboard
 
-`aggregateLabel(participantCount)` i [aggregateLeaderboard.ts](src/utils/aggregateLeaderboard.ts): **en** deltagare → `"Competition Score"` (single player), flera → `"Competition Leaderboard"`. Uppsättningen är låst genom hela serien, så etiketten kan aldrig hoppa mitt i.
+`aggregateLabel(participantCount)` i [aggregateLeaderboard.ts](src/utils/aggregateLeaderboard.ts): **en** deltagare → `"Marathon Score"` (single player), flera → `"Marathon table"`. Uppsättningen är låst genom hela serien, så etiketten kan aldrig hoppa mitt i.
 ⚠ Slutskärmens FRÅGA kan inte använda den — serien finns inte än — och växlar därför på `isLocalSoloGame` via `RoundLeaderboard`s `replayTitle`-prop.
 
 ### Sparade serier på kontot (migration 0037)

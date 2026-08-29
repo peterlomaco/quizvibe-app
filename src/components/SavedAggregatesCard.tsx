@@ -93,7 +93,7 @@ export function SavedAggregatesCard({
 
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>Competition Leaderboards</Text>
+      <Text style={styles.cardTitle}>Marathon tables</Text>
       {items.map((item) => {
         const games = item.games.length;
         const others = item.participants.map((p) => p.playerName);

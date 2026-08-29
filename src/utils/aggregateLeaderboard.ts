@@ -90,8 +90,8 @@ export interface AggregateStanding {
 }
 
 /**
- * En serie med EN deltagare heter "Competition Score" (single player-varianten
- * "Replay & Competition score"), med flera "Competition Leaderboard". Peters
+ * En serie med EN deltagare heter "Marathon Score" (single player-varianten
+ * "Replay & Marathon score"), med flera "Marathon table". Peters
  * ordval — datamodellen är identisk.
  *
  * ⚠ Detta är UI-COPY. Tabeller, RPC:er och kod-identifierare heter
@@ -102,7 +102,7 @@ export interface AggregateStanding {
  * hoppa mitt i en serie.
  */
 export function aggregateLabel(participantCount: number): string {
-  return participantCount <= 1 ? 'Competition Score' : 'Competition Leaderboard';
+  return participantCount <= 1 ? 'Marathon Score' : 'Marathon table';
 }
 
 /**
@@ -116,7 +116,7 @@ export function aggregateLabel(participantCount: number): string {
  * Cappas till 40 tecken — samma gräns som DB-constraintet på `name`.
  */
 export function defaultAggregateName(playerNames: string[]): string {
-  if (playerNames.length === 0) return 'Competition';
+  if (playerNames.length === 0) return 'Marathon';
   if (playerNames.length === 1) return `${playerNames[0]} — solo`;
   const joined = playerNames.join(' & ');
   if (joined.length <= 40) return joined;

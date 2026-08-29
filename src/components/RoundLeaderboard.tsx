@@ -469,7 +469,7 @@ export function RoundLeaderboard({
   hideRemotePlay = false,
   onReplayYes,
   onReplayNo,
-  replayTitle = 'Re-match with Competition Leaderboard?',
+  replayTitle = 'Re-match with Marathon table?',
   aggregateName,
   onRenameAggregate,
   replayAnswered = false,

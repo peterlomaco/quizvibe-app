@@ -165,18 +165,18 @@ describe('summering', () => {
   });
 });
 
-describe('aggregateLabel — solo heter Score, flerspelar Leaderboard', () => {
-  it('en deltagare ger "Competition Score"', () => {
-    expect(aggregateLabel(1)).toBe('Competition Score');
+describe('aggregateLabel — solo heter Score, flerspelar table', () => {
+  it('en deltagare ger "Marathon Score"', () => {
+    expect(aggregateLabel(1)).toBe('Marathon Score');
   });
 
-  it('flera deltagare ger "Competition Leaderboard"', () => {
-    expect(aggregateLabel(2)).toBe('Competition Leaderboard');
-    expect(aggregateLabel(12)).toBe('Competition Leaderboard');
+  it('flera deltagare ger "Marathon table"', () => {
+    expect(aggregateLabel(2)).toBe('Marathon table');
+    expect(aggregateLabel(12)).toBe('Marathon table');
   });
 
   it('tom serie faller tillbaka på Score (en spelare är minimum)', () => {
-    expect(aggregateLabel(0)).toBe('Competition Score');
+    expect(aggregateLabel(0)).toBe('Marathon Score');
   });
 });
 

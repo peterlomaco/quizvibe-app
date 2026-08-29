@@ -1,4 +1,4 @@
-// Två-fas re-match för sparade Competition Leaderboards (migration 0041).
+// Två-fas re-match för sparade Marathon tables (migration 0041).
 //
 // Fas 1 (accept): host initierar → createRematchRequest. Övriga deltagare ser
 // "Accept re-match" och accepterar → acceptRematchRequest. Host väntar tills

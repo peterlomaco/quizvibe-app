@@ -89,7 +89,7 @@ export function CompetitionsButton({
       <View style={styles.iconGroup}>
         <TrophyIcon height={22} />
         <Text style={styles.label} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
-          Competition
+          Marathon
         </Text>
       </View>
       {hasUpdate && (

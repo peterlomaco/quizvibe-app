@@ -5250,7 +5250,7 @@ export default function QuizScreen() {
         Alert.alert(
           `${playerName} has left`,
           !gameOver && partOfCompetitionSeriesRef.current
-            ? 'Competition Leaderboard will not be updated with this game result.'
+            ? 'Marathon table will not be updated with this game result.'
             : undefined,
           [{ text: 'OK' }],
         );
@@ -5644,7 +5644,7 @@ export default function QuizScreen() {
     // saknar resultat ("Left the game"), så en aggregerad ställning byggd på
     // den vore missvisande för alla övriga. Eftersom `setAggregate` bara
     // anropas här förblir `aggregate` null, och då renderas ingen
-    // "Competition Leaderboard"-slide på slutskärmen — samma villkor styr
+    // "Marathon table"-slide på slutskärmen — samma villkor styr
     // båda, så de kan inte glida isär.
     //
     // Serien i sig lever vidare: `nextRoomCode` konsumeras inte, och nästa
@@ -6802,7 +6802,7 @@ export default function QuizScreen() {
       Alert.alert(
         `Add to existing ${label}?`,
         soloSeries
-          ? 'You already have a saved Competition Score. Add these games to it, or start a fresh one?'
+          ? 'You already have a saved Marathon Score. Add these games to it, or start a fresh one?'
           : `You have played together before. Add these games to a saved ${label}, or start a fresh one?`,
         [
           { text: 'No, start fresh', style: 'cancel', onPress: () => resolve('new') },
@@ -8732,8 +8732,8 @@ export default function QuizScreen() {
     // Frågans rubrik: solo aggregerar en SCORE (en spelare), flerspelar en
     // LEADERBOARD. Kan inte använda aggregateLabel() — serien finns inte än.
     const replayTitle = isLocalSoloGame
-      ? 'Replay & Competition score?'
-      : 'Re-match with Competition Leaderboard?';
+      ? 'Replay & Marathon score?'
+      : 'Re-match with Marathon table?';
     // "Start New Game" visas när det inte finns någon re-match-fråga att
     // besvara (guest host, eller ett obehörigt PtP-spel), och annars först
     // när host svarat No. Guest host får den BARA om enheten är inloggad —

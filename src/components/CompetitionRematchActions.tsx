@@ -1,4 +1,4 @@
-// Re-match/Replay-åtgärderna inuti en öppnad Competition Leaderboard
+// Re-match/Replay-åtgärderna inuti en öppnad Marathon table
 // (SavedAggregatesCard-modalen, ENDAST från Home → /competitions). Speglar
 // Final Leaderboards re-match men cross-device och i två faser (migration
 // 0041):
