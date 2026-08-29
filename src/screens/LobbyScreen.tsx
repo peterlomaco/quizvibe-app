@@ -1669,8 +1669,9 @@ export default function LobbyScreen() {
           //   • stored (Play Again + Keep settings) VINNER — inkl. ett
           //     medvetet tomt Generic-val — men klampas mot premium-status
           //     (utgången premium → []) och profilens enabledHostPackages.
-          //   • fresh lobby + premium → auto-aktivera alla enabled paket.
-          //   • ej premium → selection förblir [] (Generic).
+          //   • fresh lobby → selection förblir [] (Generic). Profilens
+          //     enabledHostPackages styr bara UTBUDET (availablePackages), inte
+          //     vad som är AKTIVT — host aktiverar själv via Activate/Select all.
           const catalogIds = PURCHASED_PACKAGES.map((p) => p.id);
           const enabledIds = (profile?.enabledHostPackages ?? catalogIds).filter(
             (id) => catalogIds.includes(id),
@@ -1698,7 +1699,9 @@ export default function LobbyScreen() {
             // båda lobbytyperna) — forcera av så inget carry-over läcker in.
             setSpotifyEnabled(is1v1Lobby || seedSinglePlayer ? false : stored.spotifyEnabled);
           } else if (premium) {
-            setSelectedExtraPackages(enabledIds);
+            // Fresh lobby öppnar på Generic — profilens enabled paket ERBJUDS
+            // i listan men aktiveras INTE automatiskt.
+            setSelectedExtraPackages([]);
             setEnabledHostPackages(enabledIds);
           } else {
             setEnabledHostPackages(enabledIds);
@@ -2049,19 +2052,13 @@ export default function LobbyScreen() {
         // over). Gated på lobbySeededRef så seed-effekten förblir
         // auktoritativ för initialt state.
         //   • premium tappad (lapse/expiry) → töm selection (Generic).
-        //   • premium köpt mid-session (Store-besök → tillbaka) →
-        //     auto-aktivera BARA om selection är tom.
+        //   • premium köpt mid-session → INGEN auto-aktivering. Paketen blir
+        //     tillgängliga (via availablePackages) men host aktiverar själv.
         if (hostMode) {
           const effPremium = isGuestHost ? false : premium;
           if (lobbySeededRef.current && prevPremiumRef.current !== null) {
-            const catIds = PURCHASED_PACKAGES.map((p) => p.id);
-            const enIds = (profile?.enabledHostPackages ?? catIds).filter((id) =>
-              catIds.includes(id),
-            );
             if (!effPremium && prevPremiumRef.current) {
               setSelectedExtraPackages([]);
-            } else if (effPremium && !prevPremiumRef.current) {
-              setSelectedExtraPackages((prev) => (prev.length === 0 ? enIds : prev));
             }
           }
           prevPremiumRef.current = effPremium;
