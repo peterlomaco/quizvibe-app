@@ -24,7 +24,7 @@ import { TrophyIcon } from './TrophyIcon';
 import { isAnonymousSession } from '../utils/auth';
 import { listMyAggregateLeaderboards } from '../utils/aggregateLeaderboards';
 import {
-  getPendingAcceptRequestCount,
+  getPendingAcceptRequestLeaderboardIds,
   subscribeToRematchRequests,
 } from '../utils/competitionRematchRequests';
 
@@ -33,21 +33,23 @@ export function CompetitionsButton({
 }: { onVisible?: (v: boolean) => void } = {}) {
   const pathname = usePathname();
   const [count, setCount] = useState(0);
-  const [pendingAccepts, setPendingAccepts] = useState(0);
+  // Leaderboard-id:na där en re-match väntar på min accept — driver både
+  // blink-signalen (längd > 0) och flash-guiden (skickas som focusAggregateIds).
+  const [pendingIds, setPendingIds] = useState<string[]>([]);
 
   const reload = useCallback(async () => {
     // Anon-sessioner har per definition inga sparade competitions.
     if (await isAnonymousSession()) {
       setCount(0);
-      setPendingAccepts(0);
+      setPendingIds([]);
       return;
     }
     const [saved, pending] = await Promise.all([
       listMyAggregateLeaderboards(),
-      getPendingAcceptRequestCount(),
+      getPendingAcceptRequestLeaderboardIds(),
     ]);
     setCount(saved.length);
-    setPendingAccepts(pending);
+    setPendingIds(pending);
   }, []);
 
   useFocusEffect(
@@ -64,7 +66,7 @@ export function CompetitionsButton({
     return unsub;
   }, [reload]);
 
-  const hasUpdate = pendingAccepts > 0;
+  const hasUpdate = pendingIds.length > 0;
   const blink = useBlink(hasUpdate);
 
   const visible = count > 0;
@@ -81,7 +83,14 @@ export function CompetitionsButton({
       onPress={() =>
         router.push({
           pathname: '/competitions',
-          params: { from: pathname || '/' },
+          params: {
+            from: pathname || '/',
+            // Flash-guide: peka ut exakt de Marathon-rader som väntar på min
+            // accept så /competitions kan blinka dem. Utelämnas när inget väntar.
+            ...(pendingIds.length > 0
+              ? { focusAggregateIds: pendingIds.join(',') }
+              : {}),
+          },
         })
       }
     >

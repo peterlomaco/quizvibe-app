@@ -104,6 +104,34 @@ export async function getPendingAcceptRequestCount(): Promise<number> {
   ).length;
 }
 
+/**
+ * Som getPendingAcceptRequestCount men returnerar leaderboard-id:na för de
+ * competitions där en re-match väntar på MIN accept. Driver flash-guiden:
+ * Home-knappen skickar id:na vidare till /competitions som `focusAggregateIds`
+ * så exakt den Marathon-raden (och gruppen ovanför) kan blinka "New update".
+ * Ett SavedAggregate.id ÄR aggregate_leaderboards.id = leaderboard_id, så
+ * id:na mappar rakt av mot listans rader.
+ */
+export async function getPendingAcceptRequestLeaderboardIds(): Promise<string[]> {
+  const me = await ownUserId();
+  if (!me) return [];
+  const { data, error } = await supabase
+    .from('competition_rematch_requests')
+    .select('leaderboard_id, accepted_user_ids, expires_at, status, host_user_id')
+    .eq('status', 'active')
+    .gt('expires_at', new Date().toISOString())
+    .neq('host_user_id', me);
+  if (error) {
+    console.warn('[rematchRequests] getPendingAcceptIds failed:', error.message);
+    return [];
+  }
+  return (
+    (data as { leaderboard_id: string; accepted_user_ids: string[] | null }[]) ?? []
+  )
+    .filter((r) => !(r.accepted_user_ids ?? []).includes(me))
+    .map((r) => r.leaderboard_id);
+}
+
 export async function createRematchRequest(
   leaderboardId: string,
 ): Promise<string | null> {

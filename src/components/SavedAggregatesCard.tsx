@@ -25,6 +25,7 @@ import {
 import { CollapsibleGroup } from './CollapsibleGroup';
 import { CompetitionRematchActions } from './CompetitionRematchActions';
 import { finalizeRows, LeaderboardTable } from './LeaderboardTable';
+import { NewUpdateBadge } from './NewUpdateBadge';
 import { SegmentedControl } from './SegmentedControl';
 
 /**
@@ -63,14 +64,22 @@ function toggleSetKey(prev: Set<string>, key: string): Set<string> {
 
 export function SavedAggregatesCard({
   showRematch = false,
+  focusIds,
 }: {
   showRematch?: boolean;
+  /** Flash-guide: leaderboard-id:n (= SavedAggregate.id) som ska blinka "New
+   *  update" och vars grupp/spelform auto-fälls ut. Sätts från /competitions
+   *  när Home:s "Accept re-match" tappas. */
+  focusIds?: string[];
 } = {}) {
   const [items, setItems] = useState<SavedAggregate[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('date');
   const [expandedL1, setExpandedL1] = useState<Set<string>>(new Set());
   const [expandedForms, setExpandedForms] = useState<Set<string>>(new Set());
+  // Flash-guide: id:n som blinkar (seedade en gång per focusIds-värde).
+  const [flashIds, setFlashIds] = useState<Set<string>>(new Set());
+  const appliedFocusRef = useRef<string | null>(null);
   // Default-expandera första gruppens första spelform EN gång per sortMode
   // (så ett sort-byte re-defaultar, men focus-reloads inte över-skriver
   // user:s toggling).
@@ -152,17 +161,51 @@ export function SavedAggregatesCard({
     );
   }, [sortMode, groups]);
 
+  // Flash-guide: fäll ut gruppen + spelformen som håller de utpekade raderna
+  // och blinka dem. Applicera en gång per focusIds-värde (focus-reloads ska
+  // inte återöppna grupper som user själv fällt ihop). Körs EFTER default-
+  // expand-effekten ovan så den mergar in målgrupperna i stället för att bli
+  // överskriven.
+  useEffect(() => {
+    if (!focusIds || focusIds.length === 0 || groups.length === 0) return;
+    const sig = focusIds.join(',');
+    if (appliedFocusRef.current === sig) return;
+    appliedFocusRef.current = sig;
+    const ids = new Set(focusIds);
+    setFlashIds(ids);
+    const l1ToOpen = new Set<string>();
+    const formsToOpen = new Set<string>();
+    for (const g of groups) {
+      for (const f of g.forms) {
+        if (f.items.some((it) => ids.has(it.id))) {
+          l1ToOpen.add(g.l1Key);
+          formsToOpen.add(`${g.l1Key}::${f.formKey}`);
+        }
+      }
+    }
+    if (l1ToOpen.size > 0) {
+      setExpandedL1((prev) => new Set([...prev, ...l1ToOpen]));
+      setExpandedForms((prev) => new Set([...prev, ...formsToOpen]));
+    }
+  }, [focusIds, groups]);
+
   if (items.length === 0) return null;
 
   const renderRow = (item: SavedAggregate) => {
     const games = item.games.length;
     const others = item.participants.map((p) => p.playerName);
+    const isFlash = flashIds.has(item.id);
     return (
       <Pressable
         key={item.id}
         onPress={() => setOpenId(item.id)}
-        style={({ pressed }) => [styles.row, pressed && { opacity: 0.8 }]}
+        style={({ pressed }) => [
+          styles.row,
+          isFlash && styles.rowFlash,
+          pressed && { opacity: 0.8 },
+        ]}
       >
+        {isFlash && <NewUpdateBadge pill active style={styles.rowFlashBadge} />}
         <View style={styles.rowText}>
           <Text style={styles.rowName} numberOfLines={1}>
             {item.name}
@@ -189,6 +232,9 @@ export function SavedAggregatesCard({
       <View style={styles.groups}>
         {groups.map((g) => {
           const total = g.forms.reduce((sum, f) => sum + f.items.length, 0);
+          const l1Flash = g.forms.some((f) =>
+            f.items.some((it) => flashIds.has(it.id)),
+          );
           return (
             <CollapsibleGroup
               key={g.l1Key}
@@ -197,9 +243,11 @@ export function SavedAggregatesCard({
               summary={`${total} ${total === 1 ? 'marathon' : 'marathons'}`}
               open={expandedL1.has(g.l1Key)}
               onToggle={() => setExpandedL1((prev) => toggleSetKey(prev, g.l1Key))}
+              badge={l1Flash ? <NewUpdateBadge active /> : undefined}
             >
               {g.forms.map((f) => {
                 const formKey = `${g.l1Key}::${f.formKey}`;
+                const formFlash = f.items.some((it) => flashIds.has(it.id));
                 return (
                   <CollapsibleGroup
                     key={formKey}
@@ -212,6 +260,7 @@ export function SavedAggregatesCard({
                     onToggle={() =>
                       setExpandedForms((prev) => toggleSetKey(prev, formKey))
                     }
+                    badge={formFlash ? <NewUpdateBadge active /> : undefined}
                   >
                     <View style={styles.rowList}>{f.items.map(renderRow)}</View>
                   </CollapsibleGroup>
@@ -240,6 +289,11 @@ export function SavedAggregatesCard({
                 (/competitions). Host initierar, deltagare accepterar, host
                 startar (två-fas, migration 0041). Profile-vyn utelämnar
                 showRematch → bara Close. */}
+            {/* Flash-guidens sista steg: blinka "New update" över accept-
+                åtgärden när modalen öppnats för en utpekad Marathon table. */}
+            {showRematch && open && flashIds.has(open.id) && (
+              <NewUpdateBadge pill active style={styles.modalFlashBadge} />
+            )}
             {showRematch && open && (
               <CompetitionRematchActions
                 saved={open}
@@ -292,6 +346,19 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
   rowText: { flex: 1 },
+  // Flash-guide: den utpekade raden får guld-kant + kant-skärande "New update".
+  rowFlash: {
+    borderColor: Colors.warning,
+  },
+  rowFlashBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.md,
+    zIndex: 2,
+  },
+  modalFlashBadge: {
+    alignSelf: 'center',
+  },
   rowName: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,

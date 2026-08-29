@@ -32,8 +32,16 @@ export default function CompetitionsScreen() {
   // `from` sätts av CompetitionsButton (Home '/') så Back tar spelaren
   // tillbaka dit hen kom ifrån. Whitelist:ad mappning (samma mönster som
   // MyMatchesScreen) — okända värden faller till Home.
-  const { from } = useLocalSearchParams<{ from?: string }>();
+  const { from, focusAggregateIds } = useLocalSearchParams<{
+    from?: string;
+    // Flash-guide: kommaseparerade leaderboard-id:n som CompetitionsButton
+    // pekar ut när Home-knappens "Accept re-match" tappas.
+    focusAggregateIds?: string;
+  }>();
   const backTo = from === '/profile' ? '/profile' : '/';
+  const focusIds = focusAggregateIds
+    ? focusAggregateIds.split(',').filter(Boolean)
+    : undefined;
 
   // Egen lättviktig laddning enbart för empty-state-texten (SavedAggregatesCard
   // laddar sitt eget innehåll och returnerar null när det är tomt).
@@ -83,7 +91,7 @@ export default function CompetitionsScreen() {
           </Text>
         )}
 
-        <SavedAggregatesCard showRematch />
+        <SavedAggregatesCard showRematch focusIds={focusIds} />
       </ScrollView>
     </SafeAreaView>
   );

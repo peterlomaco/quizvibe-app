@@ -26,7 +26,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect, usePathname } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Colors, FontSize, Radius, Spacing } from '../theme';
@@ -49,16 +49,34 @@ const SEEN_KEY_PREFIX = '@quizvibe/myMatches/seen/v1/';
  * intressant för spelaren ändrats: ny/borttagen match, status (active →
  * finished/cancelled/void), vem som spelat klart, eller resultatet.
  */
+/** Per-match-tupel `id:status:mitt-klar:motståndar-klar:resultat`. Match-id
+ *  (UUID) innehåller inga kolon, så första fältet kan läsas ut med split(':'). */
+function matchTuple(m: MyRemoteMatch): string {
+  return `${m.match.id}:${m.match.status}:${m.me.finishedAt ? 1 : 0}:${
+    m.opponent?.finishedAt ? 1 : 0
+  }:${m.match.result ?? ''}`;
+}
+
 function buildSignature(list: MyRemoteMatch[]): string {
+  return list.map(matchTuple).sort().join('|');
+}
+
+/**
+ * Match-id:na vars tillstånd ändrats sedan senaste "sett"-snapshot — driver
+ * flash-guiden (skickas som focusMatchIds till /my-matches så exakt de nya
+ * matcherna blinkar). `seen` === null (ej namespace:at) eller '' (inget sett
+ * förut) → allt räknas som nytt.
+ */
+function changedMatchIds(list: MyRemoteMatch[], seen: string | null): string[] {
+  if (!seen) return list.map((m) => m.match.id);
+  const seenById = new Map<string, string>();
+  for (const part of seen.split('|')) {
+    if (!part) continue;
+    seenById.set(part.split(':')[0], part);
+  }
   return list
-    .map(
-      (m) =>
-        `${m.match.id}:${m.match.status}:${m.me.finishedAt ? 1 : 0}:${
-          m.opponent?.finishedAt ? 1 : 0
-        }:${m.match.result ?? ''}`,
-    )
-    .sort()
-    .join('|');
+    .filter((m) => seenById.get(m.match.id) !== matchTuple(m))
+    .map((m) => m.match.id);
 }
 
 /**
@@ -121,18 +139,6 @@ export function MyMatchesSection({
     }
   }, []);
 
-  const handlePress = useCallback(
-    (signature: string) => {
-      // Markera allt som sett innan navigation så etiketten är borta när
-      // spelaren kommer tillbaka till Home.
-      setSeenSignature(signature);
-      const key = seenKeyRef.current;
-      if (key) void AsyncStorage.setItem(key, signature).catch(() => {});
-      router.push({ pathname: '/my-matches', params: { from: pathname || '/' } });
-    },
-    [pathname],
-  );
-
   useFocusEffect(
     useCallback(() => {
       void reload();
@@ -149,7 +155,10 @@ export function MyMatchesSection({
   // rena guests kan inte längre skapa matcher, men anon-sessioner från
   // FÖRE spärren kan ha kvar legacy-rader som annars hade renderat knappen
   // på Home. De löper ut på sin 48h-deadline och sveps av cron:en.
-  const visible = isGuestSession ? [] : matches;
+  const visible = useMemo(
+    () => (isGuestSession ? [] : matches),
+    [isGuestSession, matches],
+  );
   // Sparade lobbies är kontobundna (storen nycklas på playerName) — samma
   // guard som matcherna så en anon-session aldrig får ingången.
   const visibleSavedCount = isGuestSession ? 0 : savedCount;
@@ -162,6 +171,31 @@ export function MyMatchesSection({
 
   // Hooks måste köras före den villkorliga return:en nedan.
   const blink = useBlink(hasUpdate);
+
+  // Definieras EFTER `visible`/`hasUpdate` (TDZ) — flash-guiden behöver dem.
+  const handlePress = useCallback(
+    (signature: string) => {
+      // Vilka matcher är NYA sedan senast? Beräknas mot den ännu ej
+      // överskrivna snapshotten (setSeenSignature nedan markerar allt sett så
+      // Home-etiketten är borta när spelaren kommer tillbaka).
+      const changed = changedMatchIds(visible, seenSignature);
+      setSeenSignature(signature);
+      const key = seenKeyRef.current;
+      if (key) void AsyncStorage.setItem(key, signature).catch(() => {});
+      router.push({
+        pathname: '/my-matches',
+        params: {
+          from: pathname || '/',
+          // Skicka bara focus-id:n när det faktiskt finns en update — annars
+          // ska /my-matches öppnas utan flash.
+          ...(hasUpdate && changed.length > 0
+            ? { focusMatchIds: changed.join(',') }
+            : {}),
+        },
+      });
+    },
+    [pathname, visible, seenSignature, hasUpdate],
+  );
 
   // Rapportera synlighet uppåt (HomeExtrasRow kollapsar raden när varken
   // Competition eller 1vs1 finns). Effekten måste ligga före return:en.

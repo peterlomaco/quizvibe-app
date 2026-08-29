@@ -16,6 +16,7 @@ export function CollapsibleGroup({
   open,
   onToggle,
   children,
+  badge,
 }: {
   label: string;
   summary?: string;
@@ -23,6 +24,9 @@ export function CollapsibleGroup({
   open: boolean;
   onToggle: () => void;
   children: React.ReactNode;
+  /** Valfritt märke (t.ex. flash-guidens "New update") mellan summary och
+   *  +/−-boxen. */
+  badge?: React.ReactNode;
 }) {
   const isL1 = level === 1;
   return (
@@ -42,6 +46,7 @@ export function CollapsibleGroup({
         ) : (
           <View style={styles.spacer} />
         )}
+        {badge}
         <View style={isL1 ? styles.toggleBoxL1 : styles.toggleBoxL2}>
           <Text style={isL1 ? styles.toggleTextL1 : styles.toggleTextL2}>
             {open ? '−' : '+'}
