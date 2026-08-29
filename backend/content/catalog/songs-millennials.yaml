@@ -223,6 +223,21 @@ items:
         endSec: 45
         channelTitle: "Rick Astley"
         notes: "Peter-kurerad 2026-08-12 — ersatte Topic-audion (3BFTio5296w) med officiella musikvideon (4K Remaster) på artistens egen kanal."
+  - id: inner-circle-bad-boys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bad Boys — Inner Circle"
+    correctYear: 1987
+    probability: 82
+    region: ["global"]
+    spotifyTrackId: "1NojrDCqDLh4dWRZ7F589Q"
+    wikimediaSearchHints: ["Inner Circle Bad Boys"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "yVBB2upbVys"
+        startSec: 0
+        endSec: 15
+        channelTitle: "Inner Circle"
+        notes: "Peter-tillagd 2026-08-29. correctYear 1987 = Inner Circles originalrelease på albumet One Way (INTE 1993 års COPS-tema-hit). startSec ej finjusterad — verifiera i spelaren."
   # 1988
   - id: bobby-mcferrin-dont-worry-be-happy
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]

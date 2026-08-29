@@ -41,6 +41,7 @@ export const SPOTIFY_ALBUM_CONTEXT: Record<string, SpotifyAlbumContext> = {
   '1EZypwk0xcj64ZLAglhLs2': { position: 3, total: 12 },
   '1GUpCVoNqQoriLkftXc3S3': { position: 1, total: 20 },
   '1k1Bqnv2R0uJXQN4u6LKYt': { position: 2, total: 12 },
+  '1NojrDCqDLh4dWRZ7F589Q': { position: 1, total: 13 },
   '1oS8V9VCSuF0fgLQGMKXQY': { position: 10, total: 16 },
   '1p0RjMued7Tmm0o7CjzoHY': { position: 1, total: 1 },
   '1QbOvACeYanja5pbnJbAmk': { position: 1, total: 11 },

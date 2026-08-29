@@ -7264,6 +7264,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "inner-circle-bad-boys",
+    "displayName": "Bad Boys — Inner Circle",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "1NojrDCqDLh4dWRZ7F589Q",
+    "youtubeClips": [
+      {
+        "videoId": "yVBB2upbVys",
+        "startSec": 0,
+        "endSec": 15,
+        "channelTitle": "Inner Circle",
+        "license": "standard",
+        "notes": "Peter-tillagd 2026-08-29. correctYear 1987 = Inner Circles originalrelease på albumet One Way (INTE 1993 års COPS-tema-hit). startSec ej finjusterad — verifiera i spelaren."
+      }
+    ]
+  },
+  {
     "id": "johnny-logan-hold-me-now",
     "displayName": "Hold Me Now — Johnny Logan",
     "correctYear": 1987,
