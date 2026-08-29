@@ -3,13 +3,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import type { PurchasesOffering, PurchasesPackage } from 'react-native-purchases';
 import { TopUserBanner } from '../components/TopUserBanner';
 import {

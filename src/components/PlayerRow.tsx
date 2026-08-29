@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import Svg, { Path } from 'react-native-svg';
 import type { PeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';

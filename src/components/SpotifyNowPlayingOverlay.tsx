@@ -5,7 +5,8 @@
 // när Web API play/pause-kontroll återaktiveras.
 // ────────────────────────────────────────────────────────────────────────────────
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import Svg, { Line, Polygon, Rect } from 'react-native-svg';
 import { Colors, FontSize, Radius, Spacing } from '@/src/theme';
 import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';

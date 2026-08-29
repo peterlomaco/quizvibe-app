@@ -13,18 +13,16 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   SafeAreaView,
   StyleProp,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   TextStyle,
-  TouchableOpacity,
   View,
   ViewStyle,
 } from 'react-native';
+import { Pressable, Switch, TouchableOpacity } from '@/src/components/haptic';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { ApproveToggle } from '../components/ApproveToggle';
@@ -2604,9 +2602,7 @@ export default function LobbyScreen() {
   const handleDecrementRounds = useCallback(() => {
     setRoundsCount((prev) => {
       const next = Math.max(ROUNDS_MIN, prev - ROUNDS_STEP);
-      // Haptic-klick bara när värdet faktiskt ändras (vid range-floor
-      // skulle annars en "tom" tap fyra haptik utan visuell respons).
-      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // Haptiken fyras nu av den wrappade tryck-primitiven (se src/components/haptic).
       return next;
     });
   }, []);
@@ -2619,7 +2615,6 @@ export default function LobbyScreen() {
     }
     setRoundsCount((prev) => {
       const next = Math.min(stepperMax, prev + ROUNDS_STEP);
-      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return next;
     });
   }, [stepperMax, roundsCount, singlePlayerDefault, gameMode]);

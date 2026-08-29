@@ -158,14 +158,13 @@ import {
   Linking,
   Modal,
   Platform,
-  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 

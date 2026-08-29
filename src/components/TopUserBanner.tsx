@@ -1,6 +1,7 @@
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity } from '@/src/components/haptic';
 import { Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { getCachedProfile, loadProfile, type ProfileData } from '../utils/profileStorage';

@@ -9,16 +9,14 @@ import {
     KeyboardAvoidingView,
     Modal,
     Platform,
-    Pressable,
     SafeAreaView,
     ScrollView,
     StyleSheet,
-    Switch,
     Text,
     TextInput,
-    TouchableOpacity,
     View,
 } from 'react-native';
+import { Pressable, Switch, TouchableOpacity } from '@/src/components/haptic';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Avatar } from '../components/Avatar';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
@@ -388,9 +386,7 @@ export default function ProfileScreen() {
   const handleDecrementRounds = () => {
     setRoundsCount((prev) => {
       const next = Math.max(ROUNDS_MIN, prev - ROUNDS_STEP);
-      // Haptic-klick bara när värdet faktiskt ändras (vid range-floor
-      // skulle annars en "tom" tap fyra haptik utan visuell respons).
-      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // Haptiken fyras nu av den wrappade tryck-primitiven (se src/components/haptic).
       return next;
     });
   };
@@ -403,7 +399,6 @@ export default function ProfileScreen() {
     }
     setRoundsCount((prev) => {
       const next = Math.min(roundsMax, prev + ROUNDS_STEP);
-      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return next;
     });
   };

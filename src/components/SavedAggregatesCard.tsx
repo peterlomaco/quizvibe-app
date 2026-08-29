@@ -6,7 +6,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import {
   aggregateLabel,

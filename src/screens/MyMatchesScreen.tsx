@@ -42,14 +42,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   type LayoutChangeEvent,
   Modal,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 
 import { TopUserBanner } from '../components/TopUserBanner';
 import { BOTTOM_BANNER_HEIGHT } from '../components/BottomBanner';

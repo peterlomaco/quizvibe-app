@@ -20,11 +20,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { SavedAggregate } from '../utils/aggregateLeaderboards';

@@ -27,7 +27,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect, usePathname } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity } from '@/src/components/haptic';
 
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 import { VersusIcon } from './VersusIcon';

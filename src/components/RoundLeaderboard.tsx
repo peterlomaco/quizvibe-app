@@ -6,13 +6,13 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { HostTypeOptions, type HostLobbyType } from './HostTypeOptions';

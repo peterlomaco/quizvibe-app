@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { SequentialDots } from './SequentialDots';

@@ -1,6 +1,7 @@
 import { Colors, Radius, Spacing } from '@/src/theme';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity } from '@/src/components/haptic';
 import Svg, { Circle, Rect as SvgRect, Text as SvgText } from 'react-native-svg';
 import { VersusIcon } from '@/src/components/VersusIcon';
 

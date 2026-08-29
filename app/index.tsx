@@ -53,15 +53,14 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 // ─── Join Modal ───────────────────────────────────────────────────────────────

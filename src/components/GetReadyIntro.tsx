@@ -5,14 +5,13 @@ import {
   Dimensions,
   Image,
   Modal,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { MainCategory } from '../utils/mainCategory';
 import type { PlayedMediaSource } from '../utils/mediaSource';

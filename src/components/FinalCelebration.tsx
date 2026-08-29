@@ -6,12 +6,12 @@ import {
   Easing,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import Confetti from './Confetti';

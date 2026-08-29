@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import Svg, { Path } from 'react-native-svg';
 import { useFocusEffect } from 'expo-router';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';

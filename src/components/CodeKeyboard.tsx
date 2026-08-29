@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import { Colors, Radius, Spacing } from '../theme';
 import { DIGIT_CHARSET, LETTER_CHARSET } from '../utils/roomCode';
 

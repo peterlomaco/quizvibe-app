@@ -14,13 +14,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
-  Pressable,
   StyleSheet,
   Text,
   TextStyle,
   View,
   ViewStyle,
 } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import {
   Colors,
   FontSize,
