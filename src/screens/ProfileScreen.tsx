@@ -27,6 +27,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { HCPShield } from '../components/HCPShield';
+import { HostTypeOptions, type HostLobbyType } from '../components/HostTypeOptions';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeQAvatar } from '../components/QuizVibeQAvatar';
@@ -470,6 +471,10 @@ export default function ProfileScreen() {
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
   const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  // Lobbytyp-utfällning under "Start New Game" i logout-sheet:n — samma
+  // inline-väljare (Single Game / Multiplayer Game / Head-to-head) som Home:s
+  // "Start New Game" (Peter 2026-08-29). Kollapsas när sheet:en stängs.
+  const [hostTypeExpanded, setHostTypeExpanded] = useState(false);
   // Loading-state under server-anropet i handleConfirmDeleteAccount. Blockar
   // dubbel-tap på Delete Account-knappen + dimmer UI:t i sheet:en så user
   // ser att något händer.
@@ -1314,7 +1319,7 @@ export default function ProfileScreen() {
   // rensa stale mock-stores, tracka event och navigera till /lobby.
   // Inlinad här istället för delad utility tills en tredje call-site
   // dyker upp (då lyfter vi till en delad helper i src/utils/).
-  const handleCreateGame = async () => {
+  const handleCreateGame = async (lobbyType: HostLobbyType = 'multiplayer') => {
     const [freshProfile, freshHasPremium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
@@ -1334,17 +1339,20 @@ export default function ProfileScreen() {
       }
     }
     const code = generateRoomCode();
+    // Remote 1vs1 är alltid exakt 2 spelare. Sätts redan här (i stället för
+    // att vänta på LobbyScreen:s setRoomMaxPlayers-effekt) så kapacitets-
+    // kollen vid join är korrekt från första sekunden. Speglar Home:s
+    // handleCreateGame — se app/index.tsx.
+    const isRemote1v1 = lobbyType === '1v1';
     // Returvärdet MÅSTE kontrolleras — en tyst no-op ger en fantom-lobby
     // som joiners inte hittar ("Room not found"-buggen 2026-08-07).
     const roomRegistered = await registerActiveRoom(code, {
-      maxPlayers: freshProfile?.maxPlayers ?? 4,
+      maxPlayers: isRemote1v1 ? 2 : freshProfile?.maxPlayers ?? 4,
       hostIsPremium: freshHasPremium,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? '',
       gameStarted: false,
-      // Profile:s Create Game-genväg skapar alltid en standard-lobby;
-      // Remote 1vs1 väljs bara via Home:s HostTypeOptions-utfällning.
-      isRemote1v1: false,
+      isRemote1v1,
     });
     if (!roomRegistered) {
       Alert.alert(
@@ -1359,8 +1367,11 @@ export default function ProfileScreen() {
     clearEjected(code);
     clearGameStarted(code);
     track('room_code_created');
+    setHostTypeExpanded(false);
     setLogoutModalVisible(false);
-    router.push({ pathname: '/lobby', params: { code, isHost: 'true' } });
+    // lobbyType styr lobbyns förvalda läge ('single'/'multiplayer') resp.
+    // remote-läget ('1v1') — samma param som Home skickar.
+    router.push({ pathname: '/lobby', params: { code, isHost: 'true', lobbyType } });
   };
 
   return (
@@ -1371,7 +1382,7 @@ export default function ProfileScreen() {
           useFocusEffect så den uppdateras när vi navigerar tillbaka efter
           login/edit på andra skärmar. */}
       <TopUserBanner
-        onPress={() => setLogoutModalVisible(true)}
+        onPress={() => { setHostTypeExpanded(false); setLogoutModalVisible(true); }}
         onBackPress={() => guardedNavigate(() => router.replace('/'))}
       />
       <ScrollView
@@ -3054,12 +3065,12 @@ export default function ProfileScreen() {
         visible={logoutModalVisible}
         transparent
         animationType="fade"
-        onRequestClose={() => setLogoutModalVisible(false)}
+        onRequestClose={() => { setHostTypeExpanded(false); setLogoutModalVisible(false); }}
       >
         <View style={styles.logoutOverlay}>
           <Pressable
             style={styles.logoutBackdrop}
-            onPress={() => setLogoutModalVisible(false)}
+            onPress={() => { setHostTypeExpanded(false); setLogoutModalVisible(false); }}
           />
           <View style={styles.logoutSheet}>
             <View style={styles.logoutHeader}>
@@ -3082,21 +3093,40 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            {/* Create Game-genväg — gateas av credits-popupen i
-                handleCreateGame. Speglar Home:s primary "Create Game"-
-                knapp så användaren kan starta ett spel utan att gå
-                tillbaka till Home först. Primary-styling (blå bg + vit
-                text) så den läser som den tydliga CTA:n i menyn. */}
+            {/* Start New Game — fäller ut samma lobbytyp-väljare (Single
+                Game / Multiplayer Game / Head-to-head) som Home:s "Start New
+                Game" i stället för att skapa en standard-lobby direkt (Peter
+                2026-08-29). Credit-gaten körs i handleCreateGame när en
+                lobbytyp väljs; guardedNavigate ligger utanpå så osparade
+                profil-ändringar fångas på vägen ut. */}
             <Pressable
               style={({ pressed }) => [
                 styles.logoutCreateGameBtn,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => guardedNavigate(handleCreateGame)}
+              onPress={() => setHostTypeExpanded((prev) => !prev)}
             >
               <Text style={styles.logoutCreateGameBtnText}>Start New Game</Text>
             </Pressable>
+            {hostTypeExpanded && (
+              <HostTypeOptions
+                accentColor={Colors.warning}
+                onSelect={(lobbyType) => {
+                  // Kollapsa INTE panelen här — då blinkar meny-vyn förbi
+                  // medan handleCreateGame:s async-arbete (profil/premium/
+                  // rums-registrering) körs. handleCreateGame stänger själv
+                  // sheet:en + panelen precis före router.push, och lämnar
+                  // panelen utfälld om credit-gaten avbryter.
+                  guardedNavigate(() => handleCreateGame(lobbyType));
+                }}
+              />
+            )}
 
+            {/* Övriga sheet-knappar döljs medan lobbytyp-väljaren är utfälld
+                så valet står ensamt (speglar Home) och sheet:en inte svämmar
+                över på korta skärmar. */}
+            {!hostTypeExpanded && (
+              <>
             {/* Join Game — as registered user. Navigerar till Home med
                 ?openJoinRegistered=1 så Home auto-öppnar JoinModal i
                 'choose'-step med hideGuest:true (samma flöde som
@@ -3164,13 +3194,20 @@ export default function ProfileScreen() {
                 {deletingAccount ? 'Deleting…' : 'Delete Account'}
               </Text>
             </Pressable>
+              </>
+            )}
 
             <Pressable
               style={styles.logoutCancelBtn}
-              onPress={() => setLogoutModalVisible(false)}
+              onPress={() => {
+                // Utfälld väljare → kollapsa tillbaka till menyn; annars
+                // stäng hela sheet:en.
+                if (hostTypeExpanded) { setHostTypeExpanded(false); return; }
+                setLogoutModalVisible(false);
+              }}
               disabled={deletingAccount}
             >
-              <Text style={styles.logoutCancelText}>Cancel</Text>
+              <Text style={styles.logoutCancelText}>{hostTypeExpanded ? 'Back' : 'Cancel'}</Text>
             </Pressable>
           </View>
         </View>
