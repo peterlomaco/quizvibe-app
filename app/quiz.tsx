@@ -2692,6 +2692,13 @@ export default function QuizScreen() {
   const timerProgressAnim = useRef(new Animated.Value(1)).current;
   // Timern + flaggans mosaik aktiveras 2 s efter quiz-vyn visas.
   const [timerActive, setTimerActive] = useState(false);
+  // Mosaik-borttagningen ska FÖLJA timern till slutet oberoende av när svaret
+  // bekräftas. timerActive går false vid confirm (phase→awaiting) och skulle
+  // annars frysa mosaiken mitt i. Vi driver mosaiken från en egen flagga som
+  // sätts true när timern FAKTISKT startar (startTimer) — täcker normal
+  // uppspelning, buffer-confirm-vägen OCH IndDev-sync — och som bara nollställs
+  // vid frågebyte, aldrig av confirm. (Peter 2026-08-29.)
+  const [mosaicRunning, setMosaicRunning] = useState(false);
   useEffect(() => {
     if (phase !== 'question') {
       // Spotify-frågor: om non-host redan confirmat (phase='awaiting') och DJ:n
@@ -2742,6 +2749,13 @@ export default function QuizScreen() {
     const id = setTimeout(() => setTimerActive(true), 2000);
     return () => { clearTimeout(id); };
   }, [phase, questionIndex, responseSeconds, timerProgressAnim, isSpotifyQuestion, isHost, spotifyDJStarted]);
+  // Nollställ mosaik-flaggan vid frågebyte (buffer-start). Körs medan phase är
+  // intro/countdown — HintsQuizCard är då avmonterad, så ingen flash. startTimer
+  // sätter den true igen 2 s in i nästa fråga. Enda reset-punkten: confirm rör
+  // den ALDRIG, så mosaiken följer timern till slutet oavsett svarstidpunkt.
+  useEffect(() => {
+    setMosaicRunning(false);
+  }, [questionIndex]);
   // Hints visas direkt när quiz-vyn öppnas (ingen delay).
   // Flaggans mosaik har kvar sin 2 s delay via timerActive/mosaicActive.
   const hintsReady = phase === 'question' || phase === 'awaiting' || phase === 'reveal';
@@ -3491,6 +3505,9 @@ export default function QuizScreen() {
 
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
+    // Mosaiken följer timern från och med nu — nollställs först vid frågebyte,
+    // så ett confirm (timerActive→false) fryser den inte längre.
+    setMosaicRunning(true);
     // Non-host i IndDev: beräkna korrekt återstående tid baserat på host:s
     // timer_start_at om appen vaknade upp under countdown och vi missade
     // starten. Utan denna korrigering börjar timern alltid om från full
@@ -4370,7 +4387,14 @@ export default function QuizScreen() {
     // leaderboard-aggregat — heltals-derived `responseSeconds - timeLeft`
     // undviks medvetet eftersom den ger "x.00" i AVG/LAST-kolumnerna.
     const totalMs = responseSeconds * 1000;
-    const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
+    // Confirm under 2 s-bufferten (phase='question' men timerActive ännu false):
+    // startTimer() har inte kört → questionStartMsRef=0 → Date.now()-diff blir
+    // enorm och cap:as till responseSeconds (spelaren registreras som LÅNGSAMMAST
+    // trots att de svarade INNAN klockan startade). Behandla som elapsed 0.
+    const timerNotStarted = questionStartMsRef.current === 0;
+    const exactElapsedMs = timerNotStarted
+      ? 0
+      : Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
     setConfirmedTimeUsed(exactElapsedSec);
     // Frys stopwatch-displayen på EXAKT confirm-värdet. Tick-effekten ovan
@@ -4415,6 +4439,12 @@ export default function QuizScreen() {
       }
     }
     setPhase('awaiting');
+    // Confirm under bufferten: timern hann aldrig starta (timerActive false →
+    // setTimerActive(true)-timeouten rensas när phase blir 'awaiting'), så
+    // startTimer() skulle annars aldrig köra → timeLeft fastnar på
+    // responseSeconds → useEffect([timeLeft]) fyrar aldrig reveal → Next-knappen
+    // visas aldrig. Starta timern här så nedräkningen ändå löper till 0.
+    if (timerNotStarted) startTimer();
   };
 
   // YouTube-felhantering: kallas när MediaPlayer rapporterar embed-fel.
@@ -4442,7 +4472,11 @@ export default function QuizScreen() {
     const correct = opt.isCorrect;
     const pts = calculatePoints(correct, currentAssistance, 'name');
     const totalMs = responseSeconds * 1000;
-    const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
+    // Se handleConfirm: confirm under bufferten (questionStartMsRef=0) → elapsed 0.
+    const timerNotStarted = questionStartMsRef.current === 0;
+    const exactElapsedMs = timerNotStarted
+      ? 0
+      : Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
     setConfirmedTimeUsed(exactElapsedSec);
     const elapsedAtConfirm = Math.min(totalMs, Math.max(0, exactElapsedMs));
@@ -4477,6 +4511,8 @@ export default function QuizScreen() {
       }
     }
     setPhase('awaiting');
+    // Se handleConfirm: starta timern om confirm skedde innan den hann starta.
+    if (timerNotStarted) startTimer();
   };
 
   // Actor-select-Confirm: speglar handleConfirmName men för filmfrågor.
@@ -4487,7 +4523,11 @@ export default function QuizScreen() {
     const correct = question.correctNames.includes(name);
     const pts = calculatePoints(correct, currentAssistance, 'name');
     const totalMs = responseSeconds * 1000;
-    const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
+    // Se handleConfirm: confirm under bufferten (questionStartMsRef=0) → elapsed 0.
+    const timerNotStarted = questionStartMsRef.current === 0;
+    const exactElapsedMs = timerNotStarted
+      ? 0
+      : Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
     setConfirmedTimeUsed(exactElapsedSec);
     const elapsedAtConfirm = Math.min(totalMs, Math.max(0, exactElapsedMs));
@@ -4519,6 +4559,8 @@ export default function QuizScreen() {
       }
     }
     setPhase('awaiting');
+    // Se handleConfirm: starta timern om confirm skedde innan den hann starta.
+    if (timerNotStarted) startTimer();
   };
 
   // ── Navigations-handlers ────────────────────────────────────────────────
@@ -9467,7 +9509,7 @@ export default function QuizScreen() {
                   })()}
                   isRevealed={phase === 'reveal'}
                   hintsActive={hintsReady}
-                  mosaicActive={timerActive}
+                  mosaicActive={mosaicRunning}
                   hintsSeed={seedForRemoteQuestion(question.id)}
                 />
               </View>
