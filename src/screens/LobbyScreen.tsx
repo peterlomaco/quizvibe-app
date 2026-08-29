@@ -2393,8 +2393,9 @@ export default function LobbyScreen() {
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
 
   // Host-badgens cross-fade-loop (Animated.Values deklareras längre upp).
-  // Ligger här nere eftersom den tredje frasens TEXT beror på `gameMode`
-  // ("1vs1 challenge" i remote-lobbyn, annars "Single or multiplayer game").
+  // Ligger här nere eftersom den tredje frasens TEXT beror på lobby-typ
+  // ("H2H challenge" i remote-lobbyn, "Single mode" i single-lobbyn,
+  // annars "Multiplayer mode").
   useEffect(() => {
     if (!hostMode) return;
     const opacities = [hostBadgeOp0, hostBadgeOp1, hostBadgeOp2];
@@ -6541,10 +6542,16 @@ export default function LobbyScreen() {
                 <Text style={styles.hostBadgeTextGold}>Invite friends</Text>
               </Animated.View>
               {/* Index 2 (guld, overlay) — lägesberoende text: 1vs1-lobbyn
-                  visar "1vs1 challenge", övriga "Single or multiplayer game". */}
+                  visar "H2H challenge", single-lobbyn "Single mode", övriga
+                  "Multiplayer mode". Drivs av lobby-typ-state så texten är
+                  densamma vid första spelet och vid replay/rematch. */}
               <Animated.View style={[styles.hostBadgeInner, styles.hostBadgeOverlay, { opacity: hostBadgeOp2 }]}>
                 <Text style={styles.hostBadgeTextGold}>
-                  {gameMode === 'remote-1v1' ? 'H2H challenge' : 'Single or multiplayer game'}
+                  {gameMode === 'remote-1v1'
+                    ? 'H2H challenge'
+                    : isSingleLobby
+                    ? 'Single mode'
+                    : 'Multiplayer mode'}
                 </Text>
               </Animated.View>
             </View>
@@ -6579,8 +6586,10 @@ export default function LobbyScreen() {
               Guest host: dold — friends-invites kräver registrerat konto;
               guests delar rumkoden muntligt istället.
               Re-match/Replay: dold — uppsättningen är låst till förra spelets
-              spelare, så nya spelare kan inte bjudas in (Peter 2026-08-28). */}
-          {hostMode && !isGuestHost && !isRematchLobby && (
+              spelare, så nya spelare kan inte bjudas in (Peter 2026-08-28).
+              Single-lobby: dold — ett solospel har inga andra spelare att
+              bjuda in (Peter 2026-08-29). */}
+          {hostMode && !isGuestHost && !isRematchLobby && !isSingleLobby && (
             <TouchableOpacity onPress={handleOpenShareModal} style={styles.shareBtn}>
               <Text style={styles.shareBtnText}>↑ Share invite to friends</Text>
             </TouchableOpacity>
