@@ -872,7 +872,7 @@ export function RoundLeaderboard({
                 kolumnen är en egen horisontell ScrollView som äter gesten
                 där — därför måste vyn alltid gå att nå med ett tapp. */}
             <View style={styles.slideTabs}>
-              {['This game', `All ${aggregate?.gamesPlayed ?? 0} games`].map(
+              {['This game', `Marathon ${aggregate?.gamesPlayed ?? 0} games`].map(
                 (label, index) => (
                   <Pressable
                     key={label}
