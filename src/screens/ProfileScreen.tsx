@@ -851,15 +851,18 @@ export default function ProfileScreen() {
           // tom så detta resulterar i tom array idag. Legacy gen-paket-ids
           // strippas nedanför.
           enabledHostPackages: data.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
-          // Per-source categories — default all 3 (safe fallback).
-          youtubeEnabledCategories:
-            data.youtubeEnabledCategories && data.youtubeEnabledCategories.length > 0
-              ? data.youtubeEnabledCategories
-              : defaultEnabledMainCategories(),
-          imagesEnabledCategories:
-            data.imagesEnabledCategories && data.imagesEnabledCategories.length > 0
-              ? data.imagesEnabledCategories
-              : defaultEnabledMainCategories(),
+          // Per-source categories — default all 3 ENDAST när fältet saknas
+          // (aldrig konfigurerat). En tom array `[]` är ett MEDVETET val =
+          // hela källan AV (t.ex. Hints av, YouTube på) och måste bevaras —
+          // annars skriver denna augment tyst tillbaka alla 3 och ett nytt
+          // spel serverar Hints trots att profilen har dem av. Array.isArray
+          // hedrar även en legacy-`null` som "saknas".
+          youtubeEnabledCategories: Array.isArray(data.youtubeEnabledCategories)
+            ? data.youtubeEnabledCategories
+            : defaultEnabledMainCategories(),
+          imagesEnabledCategories: Array.isArray(data.imagesEnabledCategories)
+            ? data.imagesEnabledCategories
+            : defaultEnabledMainCategories(),
         };
         // Strippa eventuellt kvarvarande gen-paket-id:n (pkg-gen-elder,
         // pkg-gen-x, etc.) ur enabledHostPackages — gen-paket-konceptet
@@ -886,8 +889,11 @@ export default function ProfileScreen() {
           data.roundsDefault == null ||
           data.answerResponseSeconds == null ||
           packagesChanged ||
-          !data.youtubeEnabledCategories || data.youtubeEnabledCategories.length === 0 ||
-          !data.imagesEnabledCategories || data.imagesEnabledCategories.length === 0
+          // Endast SAKNAT fält (aldrig konfigurerat) är ofullständigt — en tom
+          // array är ett giltigt "källan av"-val och får INTE trigga en
+          // coerce-write tillbaka till alla 3.
+          !Array.isArray(data.youtubeEnabledCategories) ||
+          !Array.isArray(data.imagesEnabledCategories)
         );
         if (wasIncomplete) {
           saveProfile(augmented).catch(() => { /* silent — vyn fungerar ändå */ });

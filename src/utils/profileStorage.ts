@@ -438,14 +438,16 @@ async function loadProfileFresh(): Promise<ProfileData | null> {
       const supabaseImg = profile.imagesEnabledCategories;
       profile = {
         ...profile,
-        youtubeEnabledCategories:
-          supabaseYT && supabaseYT.length > 0
-            ? supabaseYT
-            : cached?.youtubeEnabledCategories,
-        imagesEnabledCategories:
-          supabaseImg && supabaseImg.length > 0
-            ? supabaseImg
-            : cached?.imagesEnabledCategories,
+        // En array från Supabase (även TOM = källan medvetet av) är
+        // auktoritativ. Bara null/undefined (kolumnen saknas, migration 0014
+        // ej applicerad) faller tillbaka på AS-cachen. Tidigare `length > 0`
+        // kastade en sparad tom array och kunde återuppliva alla 3 ur cachen.
+        youtubeEnabledCategories: Array.isArray(supabaseYT)
+          ? supabaseYT
+          : cached?.youtubeEnabledCategories,
+        imagesEnabledCategories: Array.isArray(supabaseImg)
+          ? supabaseImg
+          : cached?.imagesEnabledCategories,
         spotifyDefaultEnabled: cached?.spotifyDefaultEnabled,
         spotifyAnswerYear: cached?.spotifyAnswerYear,
         spotifyAnswerName: cached?.spotifyAnswerName,
