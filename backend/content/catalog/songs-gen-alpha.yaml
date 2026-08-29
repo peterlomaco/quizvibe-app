@@ -104,7 +104,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "RgKAFK5djSk"
-        startSec: 0
+        startSec: 7
         endSec: 238
         channelTitle: "Wiz Khalifa Music"
   # 2016
@@ -421,6 +421,11 @@ items:
         endSec: 51
         channelTitle: "SiaVEVO"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 21 angiven av Peter. Ersatte Topic-klippet HbzZPpWr4MI (solo-versionen); detta ar officiella lyric-videon ft. Sean Paul."
+      - videoId: "mY9fNwGE7YA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "7clouds"
+        notes: "Peter-kurerad 2026-08-29. Lyrics-klipp (7clouds) ft. Sean Paul. Titeln avslöjar inte årtalet."
     spotifyTrackId: "3S4px9f4lceWdKf0gWciFu"
   - id: imagine-dragons-believer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -993,6 +998,7 @@ items:
     correctYear: 2019
     probability: 78
     region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["KEiiNO Spirit in the Sky Norway Eurovision 2019"]
     answerMethods: ["timeline"]
     genrePackages: ["Eurovision"]

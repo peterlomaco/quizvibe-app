@@ -4956,12 +4956,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "d-ghe23_uwI",
-        "startSec": 2,
-        "endSec": 32,
-        "channelTitle": "Magnus Wennberg",
+        "videoId": "tUE0zbkmv0Q",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Zoinks Scoob",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-08-27. startSec 2 angiven av Peter. Ersatte 2GAaOyfMLfA (1982 vid tecken 11 = spoiler). Titeln har 1982 vid tecken 73 av 99 - bor kapas bort, men VERIFIERA."
+        "notes": "Peter-kurerad 2026-08-29. Ersatte d-ghe23_uwI. Titeln avslöjar inte årtalet."
       }
     ]
   },
@@ -7739,11 +7739,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "KH_kDfdwf8A",
-        "startSec": 0,
+        "startSec": 6,
         "endSec": 30,
         "channelTitle": "Thomas Di Leva",
         "license": "standard",
-        "notes": "Official video."
+        "notes": "Official video. startSec 0->6 (Peter 2026-08-29)."
       }
     ]
   },
@@ -11484,6 +11484,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Cardigans - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "dromhus-vill-ha-dig",
+    "displayName": "Vill ha dig — Drömhus",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% svenska"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "S1GitKiAHNs",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Drömhus",
+        "license": "standard",
+        "notes": "Officiell musikvideo. Peter-kurerad 2026-08-29. Titeln avslöjar inte årtalet."
       }
     ]
   },
@@ -19097,6 +19128,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SiaVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 21 angiven av Peter. Ersatte Topic-klippet HbzZPpWr4MI (solo-versionen); detta ar officiella lyric-videon ft. Sean Paul."
+      },
+      {
+        "videoId": "mY9fNwGE7YA",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "7clouds",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-29. Lyrics-klipp (7clouds) ft. Sean Paul. Titeln avslöjar inte årtalet."
       }
     ]
   },
@@ -19120,7 +19159,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "RgKAFK5djSk",
-        "startSec": 0,
+        "startSec": 7,
         "endSec": 238,
         "channelTitle": "Wiz Khalifa Music",
         "license": "standard"
@@ -20917,6 +20956,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "7B7O5jgFpWfc9orZw6FN4K",
     "youtubeClips": [
       {

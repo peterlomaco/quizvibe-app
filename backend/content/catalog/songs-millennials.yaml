@@ -492,6 +492,20 @@ items:
         endSec: 45
         channelTitle: "Los Del Río - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag gwWRjvwlLKg är en privat re-upload; Topic är rättsinnehavarens kanal."
+  - id: dromhus-vill-ha-dig
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Vill ha dig — Drömhus"
+    correctYear: 1996
+    probability: 70
+    wikimediaSearchHints: ["Drömhus Vill ha dig 1996 Swedish pop"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% svenska"]
+    youtubeClips:
+      - videoId: "S1GitKiAHNs"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Drömhus"
+        notes: "Officiell musikvideo. Peter-kurerad 2026-08-29. Titeln avslöjar inte årtalet."
   # === Content-expansion 2026-05-29: fler ikoniska 80-90-tals-låtar ===
   - id: journey-dont-stop-believin
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -936,11 +950,11 @@ items:
     wikimediaSearchHints: ["Chips Dag efter dag Eurovision 1982"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "d-ghe23_uwI"
-        startSec: 2
-        endSec: 32
-        channelTitle: "Magnus Wennberg"
-        notes: "Peter-kurerad 2026-08-27. startSec 2 angiven av Peter. Ersatte 2GAaOyfMLfA (1982 vid tecken 11 = spoiler). Titeln har 1982 vid tecken 73 av 99 - bor kapas bort, men VERIFIERA."
+      - videoId: "tUE0zbkmv0Q"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Zoinks Scoob"
+        notes: "Peter-kurerad 2026-08-29. Ersatte d-ghe23_uwI. Titeln avslöjar inte årtalet."
   - id: herreys-diggiloo-diggiley
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diggi-Loo Diggi-Ley — Herreys"
@@ -1323,10 +1337,10 @@ items:
     genrePackages: ["100% svenska"]
     youtubeClips:
       - videoId: "KH_kDfdwf8A"
-        startSec: 0
+        startSec: 6
         endSec: 30
         channelTitle: "Thomas Di Leva"
-        notes: "Official video."
+        notes: "Official video. startSec 0->6 (Peter 2026-08-29)."
   - id: ronny-ragge-de-e-sommar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "De e sommar — Ronny & Ragge"
