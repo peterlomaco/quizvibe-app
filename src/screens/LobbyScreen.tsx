@@ -1076,13 +1076,18 @@ function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
  * att riskera Pressable-event-fällan där ett syntetiskt event landar i ett
  * defaultat argument. Dismiss (Android back) räknas som Cancel.
  */
-function confirmAsync(title: string, message: string, confirmLabel: string): Promise<boolean> {
+function confirmAsync(
+  title: string,
+  message: string,
+  confirmLabel: string,
+  cancelLabel = 'Cancel',
+): Promise<boolean> {
   return new Promise((resolve) => {
     Alert.alert(
       title,
       message,
       [
-        { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+        { text: cancelLabel, style: 'cancel', onPress: () => resolve(false) },
         { text: confirmLabel, onPress: () => resolve(true) },
       ],
       { cancelable: true, onDismiss: () => resolve(false) },
@@ -5831,6 +5836,22 @@ export default function LobbyScreen() {
         ],
       );
       return;
+    }
+
+    // Spotify DJ — samma "är ni i samma rum?"-bekräftelse som PtP, men för
+    // IndDev där varje spelare hör Spotify på sin egen enhet. Guarderna ovan
+    // har redan garanterat IndDev + minst en godkänd motspelare, så
+    // spotifyEnabled ensamt räcker som villkor här. confirmAsync (await, ingen
+    // rekursion) körs före credit-blocket så en avbruten start aldrig kostar
+    // en credit.
+    if (spotifyEnabled) {
+      const proceed = await confirmAsync(
+        'Spotify activated',
+        'Are all players in the same room so you can hear each other Spotify songs when played on each device?',
+        'Yes',
+        'No',
+      );
+      if (!proceed) return;
     }
 
     // D-vii: blockera start om någon approved non-host har röd peer-
