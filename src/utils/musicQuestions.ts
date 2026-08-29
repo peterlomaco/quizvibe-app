@@ -39,10 +39,6 @@ export interface MusicQuestion {
   youtubeClips: YoutubeClip[];
   /** Spotify track ID — satt manuellt i YAML för Spotify DJ-läge. */
   spotifyTrackId?: string;
-  /** Svarsläge för YouTube-uppspelade song-items. 'name' = artist-namn-svar via
-   *  Letter Grid i stället för år (för klipp vars video avslöjar årtalet). Påverkar
-   *  BARA YouTube-uppspelningen; samma item som Spotify-fråga kör normal Year/Name. */
-  youtubeAnswerMethod?: 'name';
   /** actor-select: true = animerad film (frågar karaktärnamn), annars skådespelarnamn. */
   isAnimated?: boolean;
   /** actor-select: godkända svar (räcker att välja ett). */
@@ -4534,15 +4530,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen"
     ],
     "spotifyTrackId": "2Hx61KuedgBKOaJ1GfflJe",
-    "youtubeAnswerMethod": "name",
     "youtubeClips": [
       {
-        "videoId": "khv8TygskVU",
-        "startSec": 5,
+        "videoId": "dhR1ZR0r-kw",
+        "startSec": 0,
         "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
+        "channelTitle": "Tomas Ledin - Topic",
         "license": "standard",
-        "notes": "Melodifestivalen 1980 vinnare."
+        "notes": "Officiell studio-audio (Topic). Titeln avslöjar inte årtalet."
+      },
+      {
+        "videoId": "BK1FPU797_E",
+        "startSec": 0,
+        "endSec": 20,
+        "channelTitle": "Tomas Ledin - Topic",
+        "license": "standard",
+        "notes": "Officiell studio-audio (Topic). Titeln avslöjar inte årtalet."
       }
     ]
   },
@@ -18534,11 +18537,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "g5qU7p7yOY8",
-        "startSec": 0,
+        "startSec": 12,
         "endSec": 30,
         "channelTitle": "ArianaGrandeVevo",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 0->12 (Peter 2026-08-29)."
       }
     ]
   },

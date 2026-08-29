@@ -264,14 +264,6 @@ export const ContentItemSchema = z.object({
   // Spotify DJ-läget. Format: 22 tecken base62 (ex. "0GjEhVFGZW8afUYGChu3Rr").
   // Inkluderas INTE i image-items eller sport-events.
   spotifyTrackId: z.string().optional(),
-  // Svarsläge för YouTube-uppspelade song-items. Default (utelämnat) = 'timeline'
-  // (år-svar via TimelineSelector). 'name' = artist-namn-svar via Letter Grid,
-  // samma svarsblock som Spotify/Name. Använd på song-items vars kurerade YT-klipp
-  // AVSLÖJAR årtalet i videon/titeln (Year vore då orättvist) — spelaren gissar
-  // artisten i stället. Påverkar BARA YouTube-uppspelningen: samma item spelas som
-  // Spotify-fråga (om spotifyTrackId satt) med normal Year/Name-alternering.
-  // Gäller enbart timeline-items (song); ignoreras för actor-select/image.
-  youtubeAnswerMethod: z.enum(['name']).optional(),
   // Peak-recognition-fönster: åren då item:t var som mest känt. Driver
   // recognition-decay-funktionen tillsammans med `audience` (= generation).
   // - Musik: typiskt peakFrom = peakTo = produktionsåret (= correctYear).

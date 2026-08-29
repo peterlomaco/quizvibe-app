@@ -1098,10 +1098,10 @@ items:
     spotifyTrackId: "7HE1FnMtSsRotzIAQPXpr5"
     youtubeClips:
       - videoId: "g5qU7p7yOY8"
-        startSec: 0
+        startSec: 12
         endSec: 30
         channelTitle: "ArianaGrandeVevo"
-        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 0->12 (Peter 2026-08-29)."
   - id: ariana-grande-break-free
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Break Free — Ariana Grande feat. Zedd"
