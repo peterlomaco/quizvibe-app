@@ -52,6 +52,7 @@ function PlayAgainLoopBorder({
   bottomY,
   color,
   strokeWidth = 2,
+  fillColor = Colors.card,
 }: {
   width: number;
   /** Pressable:s höjd (touchable area). SVG positioneras absolute med
@@ -64,6 +65,9 @@ function PlayAgainLoopBorder({
   bottomY: number;
   color: string;
   strokeWidth?: number;
+  /** Interiörens fyllnadsfärg. Default Colors.card (mörk, matchar Home). Non-
+   *  host:s "Accept / Re-match" sätter den till gold → solid gold-knapp. */
+  fillColor?: string;
 }) {
   const cornerR = 14;
   const inset = strokeWidth / 2 + 1.5;
@@ -153,7 +157,7 @@ function PlayAgainLoopBorder({
       pointerEvents="none"
     >
       {/* Bg-fill FÖRST så den ligger bakom outline + chevron */}
-      <Path d={bgPath} fill={Colors.card} stroke="none" />
+      <Path d={bgPath} fill={fillColor} stroke="none" />
       <Path
         d={rectPath}
         stroke={color}
@@ -255,6 +259,8 @@ function PlayAgainButton({
   onPress,
   disabled,
   badge,
+  stacked,
+  filled,
   buttonHeight,
   bottomY,
 }: {
@@ -266,6 +272,15 @@ function PlayAgainButton({
   onPress?: () => void;
   disabled: boolean;
   badge?: string;
+  /** Solid-fylld knapp: interiören fylls med `color` (gold) och innehåll
+   *  (kantlinje, chevron, text) renderas i svart för kontrast — appens gold-
+   *  CTA-konvention (jfr Home:s "Start New Game"). Default = outline-läge
+   *  (mörk interiör, färgat innehåll). */
+  filled?: boolean;
+  /** Vertikalt staplat läge (non-host:s "Accept / Re-match" som ligger OVANFÖR
+   *  Home i en kolumn). Neutraliserar row-layoutens `flex: 1` så knappen tar
+   *  full bredd med explicit höjd i stället för att växa vertikalt. */
+  stacked?: boolean;
   /** Pressable:s höjd (touchable area). */
   buttonHeight: number;
   /** Y-koordinaten där rektangelns bottenkant + chevron-spetsen ligger
@@ -274,6 +289,9 @@ function PlayAgainButton({
 }) {
   const [width, setWidth] = React.useState(0);
   const twoLine = lines.length > 1;
+  // Solid-fylld gold-knapp → svart innehåll för kontrast; annars färgat
+  // innehåll på mörk interiör (outline-läge).
+  const contentColor = filled ? '#000' : color;
   const pulse = React.useRef(new Animated.Value(1)).current;
   React.useEffect(() => {
     if (disabled) {
@@ -290,22 +308,32 @@ function PlayAgainButton({
     return () => loop.stop();
   }, [disabled, pulse]);
   return (
-    <Animated.View style={{ flex: 1, transform: [{ scale: pulse }] }}>
+    <Animated.View
+      style={[
+        stacked ? { alignSelf: 'stretch' } : { flex: 1 },
+        { transform: [{ scale: pulse }] },
+      ]}
+    >
     <Pressable
       onPress={disabled ? undefined : onPress}
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       style={({ pressed }) => [
         styles.finalPlayAgainBtn,
+        stacked && { flex: 0, alignSelf: 'stretch' },
+        // Filled-läget (non-host:s "Accept / Re-match"): ingen loop-border/pil
+        // — bara en solid gold rounded-rect (Peter 2026-08-29).
+        filled && { backgroundColor: color, borderRadius: Radius.md },
         { height: buttonHeight },
         !disabled && pressed && { opacity: 0.85 },
       ]}
     >
-      {width > 0 && (
+      {!filled && width > 0 && (
         <PlayAgainLoopBorder
           width={width}
           buttonHeight={buttonHeight}
           bottomY={bottomY}
-          color={color}
+          color={contentColor}
+          fillColor={undefined}
           strokeWidth={2}
         />
       )}
@@ -315,7 +343,7 @@ function PlayAgainButton({
             key={idx}
             style={[
               twoLine ? styles.finalPlayAgainTextSmall : styles.finalPlayAgainText,
-              { color },
+              { color: contentColor },
             ]}
             numberOfLines={1}
             adjustsFontSizeToFit
@@ -327,10 +355,25 @@ function PlayAgainButton({
       </View>
       {badge && (
         <View
-          style={[styles.playAgainBadge, { backgroundColor: color }]}
+          style={[
+            styles.playAgainBadge,
+            // Filled-läget: gold kantlinje + mörk bakgrund + gold text
+            // (Peter 2026-08-29). Annars den klassiska solid-badgen (bg =
+            // knappens färg + svart text).
+            filled
+              ? styles.playAgainBadgeGold
+              : { backgroundColor: color },
+          ]}
           pointerEvents="none"
         >
-          <Text style={styles.playAgainBadgeText}>{badge}</Text>
+          <Text
+            style={[
+              styles.playAgainBadgeText,
+              filled && styles.playAgainBadgeTextGold,
+            ]}
+          >
+            {badge}
+          </Text>
         </View>
       )}
     </Pressable>
@@ -1132,87 +1175,80 @@ export function RoundLeaderboard({
           // de väntar på hostens inbjudan.
           // (`homeOnlyFooter`-propen är borttagen: PtP-åskådaren ska numera
           // få den dimmade "Accept / Re-match" som tänds när host bjuder in.)
+          // Home-knapp — helper så de tre footer-varianterna delar exakt
+          // samma rendering. `h` styr höjden (host-raden matchar Play again:s
+          // bottomY; övriga använder compact).
+          const homeButton = (h: number, columnStacked = false) => (
+            <Pressable
+              onPress={onGoHome}
+              style={({ pressed }) => [
+                styles.finalHomeBtn,
+                { height: h },
+                // I kolumn-läget (non-host:s Accept ovanför Home) neutraliseras
+                // row-layoutens flex: 1 så knappen inte växer vertikalt; full
+                // bredd kommer från parent:ens default alignItems 'stretch'.
+                columnStacked && { flex: 0, alignSelf: 'stretch' },
+                pressed && { opacity: 0.7 },
+              ]}
+            >
+              <QuizVibeQAvatar size={32} variant="wifi" />
+              <Text style={styles.finalHomeBtnText}>Home</Text>
+            </Pressable>
+          );
           if (
             hostUsesStartNewGame ||
             (guestHost && (isHost || !hostInitiatedPlayAgain)) ||
-            // Non-host i ett spel där re-match är omöjlig: bara Home. Den
-            // dimmade platshållaren skulle annars antyda att host kan bjuda
-            // in, vilket de inte kan.
-            (!isHost && rematchImpossible)
+            // Non-host INNAN host bjudit in (eller i ett spel där re-match är
+            // omöjlig): bara Home. Själva "Accept / Re-match"-knappen ska INTE
+            // synas alls förrän host tryckt Re-match och skickat inbjudan
+            // (Peter 2026-08-29) — ingen dimmad platshållare, ingen pil, ingen
+            // badge. hostInitiatedPlayAgain-broadcasten fäller in Accept-
+            // knappen (ovanför Home) i non-host-grenen nedan. rematchImpossible
+            // är belt-and-suspenders: host kan då aldrig bjuda in.
+            (!isHost && (!hostInitiatedPlayAgain || rematchImpossible))
           ) {
             return (
               <View style={styles.finalActions}>
-                <Pressable
-                  onPress={onGoHome}
-                  style={({ pressed }) => [
-                    styles.finalHomeBtn,
-                    { height: PLAY_AGAIN_BUTTON_HEIGHT_COMPACT },
-                    pressed && { opacity: 0.7 },
-                  ]}
-                >
-                  <QuizVibeQAvatar size={32} variant="wifi" />
-                  <Text style={styles.finalHomeBtnText}>Home</Text>
-                </Pressable>
+                {homeButton(PLAY_AGAIN_BUTTON_HEIGHT_COMPACT)}
               </View>
             );
           }
-          return (
-            <>
-            <View style={styles.finalActions}>
-              {/* Home-knapp — höjden = bottomY så Home:s underkant linjerar
-                  exakt med rektangel-outline-botten + chevron-spetsens y i
-                  Play Again-knappen. */}
-              <Pressable
-                onPress={onGoHome}
-                style={({ pressed }) => [
-                  styles.finalHomeBtn,
-                  { height: homeHeight },
-                  pressed && { opacity: 0.7 },
-                ]}
-              >
-                <QuizVibeQAvatar size={32} variant="wifi" />
-                <Text style={styles.finalHomeBtnText}>Home</Text>
-              </Pressable>
-              {isHost ? (
-                /* Host (eller Pass-the-Phone): Play again-knapp aktiv direkt.
-                   Loop-border + integrerad arrow-chevron längs nedre kanten. */
-                <PlayAgainButton
-                  lines={['Play again']}
-                  color={Colors.primary}
-                  onPress={onPlayAgain}
-                  disabled={false}
-                  buttonHeight={playAgainHeight}
-                  bottomY={bottomY}
-                />
-              ) : hostInitiatedPlayAgain ? (
-                /* Non-host efter host:s tap: "Approve" / "Re-match" på två
-                   rader så texten ryms inom button-bredden. Aktiv styling i
-                   GULD — host har "öppnat upp" knappen, så den lyser i
-                   warning/premium-färgen för att signalera "actionable" och
-                   skilja från host:s vanliga blå Play again. */
+          // Non-host EFTER host:s inbjudan: "Accept / Re-match" staplad
+          // OVANFÖR Home (Peter 2026-08-29) — inte längre sida vid sida. GULD +
+          // puls signalerar "actionable"; host har "öppnat upp" knappen.
+          if (!isHost) {
+            return (
+              <View style={styles.finalActionsColumn}>
                 <PlayAgainButton
                   lines={['Accept', 'Re-match']}
                   color={Colors.warning}
                   onPress={onApprovePlayAgain}
                   disabled={false}
-                  buttonHeight={playAgainHeight}
-                  bottomY={bottomY}
-                />
-              ) : (
-                /* Non-host innan host tappat: dämpad two-line + "Activated by
-                    Host"-badge kant-skärande i top-position. */
-                <PlayAgainButton
-                  lines={['Accept', 'Re-match']}
-                  color={Colors.textSecondary}
-                  onPress={undefined}
-                  disabled={true}
+                  stacked
+                  filled
                   badge="Activated by Host"
                   buttonHeight={playAgainHeight}
                   bottomY={bottomY}
                 />
-              )}
+                {homeButton(PLAY_AGAIN_BUTTON_HEIGHT_COMPACT, true)}
+              </View>
+            );
+          }
+          // Host (eller Pass-the-Phone): Home + Play again sida vid sida.
+          // Home:s höjd = bottomY så underkanten linjerar exakt med rektangel-
+          // outline-botten + chevron-spetsens y i Play Again-knappen.
+          return (
+            <View style={styles.finalActions}>
+              {homeButton(homeHeight)}
+              <PlayAgainButton
+                lines={['Play again']}
+                color={Colors.primary}
+                onPress={onPlayAgain}
+                disabled={false}
+                buttonHeight={playAgainHeight}
+                bottomY={bottomY}
+              />
             </View>
-            </>
           );
         })()
       ) : interimFooter ? (
@@ -1580,6 +1616,14 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     alignItems: 'flex-start',
   },
+  // Non-host:s footer när host bjudit in till re-match: "Accept / Re-match"
+  // staplad OVANFÖR Home i en kolumn (Peter 2026-08-29). Default alignItems
+  // 'stretch' ger båda knapparna full bredd; PlayAgainButton körs i `stacked`-
+  // läge så dess row-layout-`flex: 1` inte växer vertikalt.
+  finalActionsColumn: {
+    flexDirection: 'column',
+    gap: Spacing.sm,
+  },
   // "Start New Game"-blocket (knapp + ev. utfälld lobbytyp-panel). Marginal
   // nedåt skiljer det från Home/Play Again-raden när panelen är infälld.
   startNewGameWrap: {
@@ -1752,7 +1796,7 @@ const styles = StyleSheet.create({
   playAgainBadge: {
     position: 'absolute',
     top: -8,
-    alignSelf: 'center',
+    right: Spacing.lg,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -1763,5 +1807,15 @@ const styles = StyleSheet.create({
     color: Colors.background,
     letterSpacing: 0.4,
     textTransform: 'uppercase',
+  },
+  // "Activated by Host" på non-host:s filled Accept-knapp: gold kantlinje,
+  // mörk bakgrund, gold text (Peter 2026-08-29).
+  playAgainBadgeGold: {
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.warning,
+  },
+  playAgainBadgeTextGold: {
+    color: Colors.warning,
   },
 });
