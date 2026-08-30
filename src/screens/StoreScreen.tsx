@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
@@ -24,13 +25,21 @@ import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../th
 import { track } from '../utils/analytics';
 import { loadProfile, saveProfile } from '../utils/profileStorage';
 import {
-  claimFreePremium,
+  claimFreeMonth,
   formatPromoDate,
+  getFreeMonthUsed,
   getFreePremiumExpiry,
   hasActiveFreePremium,
   isOfferWindowOpen,
+  isPaidSubscriptionEnabled,
+  redeemVoucher,
+  refreshPromoGrants,
 } from '../utils/promoPremium';
-import { refreshPremiumMirror, setPremiumActive } from '../utils/subscriptionStorage';
+import {
+  hasPremiumSubscription,
+  refreshPremiumMirror,
+  setPremiumActive,
+} from '../utils/subscriptionStorage';
 
 // ─── Tier-data ────────────────────────────────────────────────────────────────
 // Tier-konstanter mappar mot App Store Connect-products via `productId`.
@@ -114,6 +123,12 @@ const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
   { premium: 'Invite 12 players per game (Individual device)', basic: 'Max 4 players' },
   { premium: 'All Extra Host packages included', basic: 'Generic content only' },
 ];
+
+// Peters copy (2026): en promo-/voucher-månad kan bara aktiveras när INGEN
+// premium är aktiv. Server avvisar annars med 'already_active'; klienten visar
+// detta. Delas av gratismånads-claim och voucher-inlösen.
+const ALREADY_ACTIVE_MESSAGE =
+  "You already have an active subscription. You can only activate a free month when you don't have any active subscription.";
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
@@ -204,42 +219,64 @@ export default function StoreScreen() {
     };
   }, []);
 
-  // ─── Free Premium launch promo ────────────────────────────────────────
-  // Två oberoende klockor (se src/utils/promoPremium.ts):
-  //   offerOpen   — erbjudandet är öppet ⇒ visa Free-kortet i stället för
-  //                 79 kr-kortet. Styrs av Peter via Supabase.
-  //   claimActive — DEN HÄR enhetens gratismånad är igång ⇒ visa ACTIVE-
-  //                 pillen utan knapp. Oberoende av offerOpen, så en
-  //                 pågående månad överlever att erbjudandet stängs.
-  //
-  // Skärmen läser INTE hasPremiumSubscription() — en betald prenumerant
-  // och en promo-user ska se olika saker, och promo-claimen är det enda
-  // Store kan agera på.
+  // ─── Free Premium launch promo + vouchers ─────────────────────────────
+  // Klockor/flaggor (se src/utils/promoPremium.ts):
+  //   offerOpen     — erbjudandet är öppet ⇒ visa Free-kortet. Styrs av Peter.
+  //   claimActive   — kontots gratis-/voucher-månad är igång ⇒ ACTIVE-pill.
+  //   freeMonthUsed — kontot har förbrukat sin engångs-gratismånad (server)
+  //                   ⇒ grå "Used"-knapp; voucher blir vägen till fler månader.
+  //   paidEnabled   — feature-flaggan för 79 kr-kortet. Default AV i v1.
+  //   premiumActive — hasPremiumSubscription() (paid ELLER promo). Behövs för
+  //                   "already active"-blocket. MEDVETEN, snäv avvikelse från
+  //                   "Store läser inte hasPremiumSubscription" — vi visar
+  //                   fortfarande promo-UI, men måste kunna blockera aktivering
+  //                   när premium redan är igång.
   const [offerOpen, setOfferOpen] = useState(false);
   const [claimActive, setClaimActive] = useState(false);
   const [promoExpiry, setPromoExpiry] = useState<Date | null>(null);
+  const [freeMonthUsed, setFreeMonthUsed] = useState(false);
+  const [paidEnabled, setPaidEnabled] = useState(false);
+  const [premiumActive, setPremiumActiveFlag] = useState(false);
   const [claiming, setClaiming] = useState(false);
+  const [voucherCode, setVoucherCode] = useState('');
+  const [redeeming, setRedeeming] = useState(false);
 
   const loadPromoState = async () => {
-    const [open, active, expiry] = await Promise.all([
+    const [open, active, expiry, used, paid, premium] = await Promise.all([
       isOfferWindowOpen(),
       hasActiveFreePremium(),
       getFreePremiumExpiry(),
+      getFreeMonthUsed(),
+      isPaidSubscriptionEnabled(),
+      hasPremiumSubscription(),
     ]);
-    return { open, active, expiry };
+    return { open, active, expiry, used, paid, premium };
+  };
+
+  const applyPromoState = (s: Awaited<ReturnType<typeof loadPromoState>>) => {
+    setOfferOpen(s.open);
+    setClaimActive(s.active);
+    setPromoExpiry(s.expiry);
+    setFreeMonthUsed(s.used);
+    setPaidEnabled(s.paid);
+    setPremiumActiveFlag(s.premium);
   };
 
   useEffect(() => {
     let cancelled = false;
-    loadPromoState().then(({ open, active, expiry }) => {
-      if (cancelled) return;
-      setOfferOpen(open);
-      setClaimActive(active);
-      setPromoExpiry(expiry);
-    });
+    // Pull kontots server-grant (annan enhet kan ha claimat/löst in) innan vi
+    // läser spegel-baserade flaggorna, så gray-out/ACTIVE är korrekt.
+    refreshPromoGrants()
+      .then(loadPromoState)
+      .then((s) => {
+        if (!cancelled) applyPromoState(s);
+      });
     return () => {
       cancelled = true;
     };
+    // Kör en gång vid mount — applyPromoState/loadPromoState är stabila nog
+    // (bara setState + rena läsare) att inte behöva vara i deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Lookup-tabell product-ID → RC PurchasesPackage. När RC har laddat
@@ -366,49 +403,121 @@ export default function StoreScreen() {
     );
   };
 
-  // Free Premium-kampanjen: startar (eller förnyar) en gratismånad. Inget
-  // IAP-anrop inblandat — inga pengar byter ägare, så StoreKit ska inte
-  // och får inte vara med. Det gör också att flödet funkar i Expo Go.
+  // Free Premium-kampanjen: aktiverar kontots engångs-gratismånad server-side
+  // (migration 0047). Inget IAP-anrop — inga pengar byter ägare, så StoreKit
+  // ska inte vara med, och flödet funkar i Expo Go.
   //
-  // Knappen som anropar detta renderas bara när offerOpen && !claimActive,
-  // så förnyelse kan aldrig ske i förtid.
+  // Blockeras när premium redan är aktiv (Peters regel) och när kontot redan
+  // förbrukat sin gratismånad. Servern enforce:ar båda; klienten mappar
+  // reason → Alert-copy.
   const handleClaimFreePremium = async () => {
-    const isRenewal = promoExpiry !== null;
-
-    setClaiming(true);
-    const claimed = await claimFreePremium();
-    if (!claimed) {
-      // Gratismånaden hör till ett konto, inte till telefonen — utan
-      // inloggad profil finns ingen att skriva den på. Bör inte kunna nås
-      // i praktiken (Store nås från inloggade menyer) men fail:ar synligt
-      // i stället för att låtsas lyckas.
-      setClaiming(false);
-      Alert.alert(
-        'Sign in required',
-        'Register or log in to your QuizVibe account to activate your free month.',
-      );
+    // Belt-and-suspenders: state kan vara stale mellan load och tap. Servern
+    // avvisar ändå, men detta ger direkt feedback utan round-trip.
+    if (premiumActive) {
+      Alert.alert('Already active', ALREADY_ACTIVE_MESSAGE);
       return;
     }
+
+    setClaiming(true);
+    const result = await claimFreeMonth();
+    if (!result.ok) {
+      setClaiming(false);
+      switch (result.reason) {
+        case 'already_active':
+          Alert.alert('Already active', ALREADY_ACTIVE_MESSAGE);
+          break;
+        case 'already_used':
+          Alert.alert(
+            'Free month already used',
+            "You've already used your free month on this account. Redeem a voucher code below for another month.",
+          );
+          break;
+        case 'not_registered':
+        case 'not_authenticated':
+          Alert.alert(
+            'Sign in required',
+            'Register or log in to your QuizVibe account to activate your free month.',
+          );
+          break;
+        default:
+          Alert.alert('Could not activate', 'Something went wrong. Please try again in a moment.');
+      }
+      // Håll UI:t i synk (t.ex. already_used ⇒ gray-out efter refresh).
+      await refreshPremiumMirror();
+      applyPromoState(await loadPromoState());
+      return;
+    }
+
     // Gratismånaden lever i promoPremiums egen nyckel och passerar aldrig
     // setPremiumActive, så den synkrona premium-spegeln måste räknas om
-    // explicit. Utan detta seedar nästa skärm-mount (Lobby/Profile) låst
-    // läge och blinkar om till Premium först när dess async läsning hinner.
+    // explicit. Utan detta seedar nästa skärm-mount (Lobby/Profile) låst läge.
     await refreshPremiumMirror();
-    const { open, active, expiry } = await loadPromoState();
-    setOfferOpen(open);
-    setClaimActive(active);
-    setPromoExpiry(expiry);
+    applyPromoState(await loadPromoState());
     setClaiming(false);
 
     track('free_premium_claimed', {
-      renewal: isRenewal,
-      expires_at: expiry?.toISOString() ?? null,
+      renewal: false, // förnyelser finns inte längre — alltid första gången
+      expires_at: result.until.toISOString(),
     });
 
-    const until = expiry ? formatPromoDate(expiry) : 'next month';
     Alert.alert(
       'QuizVibe Premium activated',
-      `Free until ${until}. No payment and no auto-renewal — come back and tap Free again when it ends to continue.`,
+      `Free until ${formatPromoDate(result.until)}. No payment and no auto-renewal.`,
+      [{ text: 'OK', onPress: handleBack }],
+    );
+  };
+
+  // Voucher-inlösen: individuell engångskod → en extra månad. Server förbrukar
+  // koden (engångs) och blockerar när premium redan är aktiv. Inget IAP —
+  // funkar i Expo Go, samma väg som gratismånaden.
+  const handleRedeemVoucher = async () => {
+    const code = voucherCode.trim();
+    if (!code) return;
+    if (premiumActive) {
+      Alert.alert('Already active', ALREADY_ACTIVE_MESSAGE);
+      return;
+    }
+
+    setRedeeming(true);
+    const result = await redeemVoucher(code);
+    if (!result.ok) {
+      setRedeeming(false);
+      switch (result.reason) {
+        case 'invalid_code':
+          Alert.alert('Invalid code', 'That voucher code was not recognised. Check it and try again.');
+          break;
+        case 'already_redeemed':
+          Alert.alert('Code already used', 'This voucher code has already been redeemed.');
+          break;
+        case 'expired':
+          Alert.alert('Code expired', 'This voucher code is no longer valid.');
+          break;
+        case 'already_active':
+          Alert.alert('Already active', ALREADY_ACTIVE_MESSAGE);
+          break;
+        case 'not_registered':
+        case 'not_authenticated':
+          Alert.alert(
+            'Sign in required',
+            'Register or log in to your QuizVibe account to redeem a voucher.',
+          );
+          break;
+        default:
+          Alert.alert('Could not redeem', 'Something went wrong. Please try again in a moment.');
+      }
+      return;
+    }
+
+    await refreshPremiumMirror();
+    applyPromoState(await loadPromoState());
+    setRedeeming(false);
+    setVoucherCode('');
+
+    track('voucher_redeemed', { expires_at: result.until.toISOString() });
+
+    Alert.alert(
+      'QuizVibe Premium activated',
+      `Voucher redeemed. Premium is active until ${formatPromoDate(result.until)}.`,
       [{ text: 'OK', onPress: handleBack }],
     );
   };
@@ -552,19 +661,35 @@ export default function StoreScreen() {
         ))}
       </View>
 
-      {/* Pris-tiers. Under launch-kampanjen (offerOpen) ersätts hela
-          betal-tiern av Free-kortet — 79 kr-kortet ska INTE synas alls.
-          När Peter stänger erbjudandet återgår detta till dagens vy. */}
+      {/* Pris-tiers. Under launch-kampanjen (offerOpen) visas Free-kortet;
+          det betalda 79 kr-kortet gatas på paidEnabled (feature-flagga,
+          default AV i v1 — förberett men inte submittat). När Peter stänger
+          kampanjen OCH slår på paidEnabled visas betal-kortet i stället. */}
       {offerOpen ? (
         <View style={styles.tierList}>
           <PromoTierCard
             expiry={promoExpiry}
             claimActive={claimActive}
+            freeMonthUsed={freeMonthUsed}
+            premiumActive={premiumActive}
             isClaiming={claiming}
             onClaim={handleClaimFreePremium}
           />
+          {/* Förberett: när paidEnabled slås på visas betal-kortet under
+              gratismånaden (efter att den förbrukats blir det köp-vägen). */}
+          {paidEnabled &&
+            SUBSCRIPTION_TIERS.map((tier) => (
+              <SubscriptionTierCard
+                key={tier.id}
+                tier={tier}
+                displayPrice={getDisplayPrice(tier.productId, tier.price)}
+                isPurchasing={purchasing === tier.id}
+                disabled={purchasing !== null}
+                onBuy={() => handleBuySubscription(tier)}
+              />
+            ))}
         </View>
-      ) : (
+      ) : paidEnabled ? (
         <View style={styles.tierList}>
           {SUBSCRIPTION_TIERS.map((tier) => (
             <SubscriptionTierCard
@@ -577,27 +702,65 @@ export default function StoreScreen() {
             />
           ))}
         </View>
+      ) : null}
+
+      {/* Voucher-inlösen. Individuella engångskoder Peter delar ut — vägen
+          till fler månader efter att gratismånaden förbrukats. Oberoende av
+          offerOpen (koder kan lösas in även efter kampanjen). Döljs medan
+          premium redan är aktivt — då finns inget att aktivera. */}
+      {!premiumActive && (
+        <View style={styles.voucherBox}>
+          <Text style={styles.voucherLabel}>Have a voucher code?</Text>
+          <View style={styles.voucherRow}>
+            <TextInput
+              style={styles.voucherInput}
+              value={voucherCode}
+              onChangeText={setVoucherCode}
+              placeholder="QVGIFT-XXXX"
+              placeholderTextColor={Colors.textSecondary}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              editable={!redeeming}
+              maxLength={32}
+            />
+            <Pressable
+              onPress={handleRedeemVoucher}
+              disabled={redeeming || voucherCode.trim().length === 0}
+              style={({ pressed }) => [
+                styles.voucherBtn,
+                pressed && { opacity: 0.85 },
+                (redeeming || voucherCode.trim().length === 0) && { opacity: 0.5 },
+              ]}
+            >
+              {redeeming ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <Text style={styles.voucherBtnText}>Redeem</Text>
+              )}
+            </Pressable>
+          </View>
+        </View>
       )}
 
       {offerOpen ? (
-        // "All subscriptions auto-renew" är faktiskt FEL under kampanjen
-        // och får inte shippa som-är — gratismånaden förnyas inte själv.
         <Text style={styles.autoRenewNote}>
-          Free for one month. No payment and no auto-renewal. Tap Free again
-          after it ends to continue.
+          Free for one month. No payment and no auto-renewal. Redeem a voucher
+          code above for another month.
         </Text>
       ) : (
         <>
-          <Text style={styles.autoRenewNote}>
-            All subscriptions auto-renew. Cancel anytime in your App Store
-            or Google Play account.
-          </Text>
-          {/* Erbjudandet är stängt men den här enheten har en gratismånad
-              kvar (grandfathering). Utan denna rad skulle de se en
-              Subscribe-CTA utan att förstå varför de redan har Premium. */}
+          {paidEnabled && (
+            <Text style={styles.autoRenewNote}>
+              All subscriptions auto-renew. Cancel anytime in your App Store
+              or Google Play account.
+            </Text>
+          )}
+          {/* Erbjudandet är stängt men kontot har en månad kvar
+              (grandfathering). Utan denna rad skulle de se en köp-CTA utan
+              att förstå varför de redan har Premium. */}
           {claimActive && promoExpiry && (
             <Text style={styles.autoRenewNote}>
-              Your free month is active until {formatPromoDate(promoExpiry)}.
+              Your Premium is active until {formatPromoDate(promoExpiry)}.
             </Text>
           )}
         </>
@@ -760,34 +923,35 @@ function CreditTierCard({
 // ─── Free Premium promo card ──────────────────────────────────────────────────
 
 // Launch-kampanjens kort. Speglar SubscriptionTierCard:s geometri men har
-// inget pris och ingen "/ month"-suffix — det finns ingen prenumeration att
-// förnya, bara en månad som tar slut.
+// inget pris — det finns ingen prenumeration, bara en engångs-gratismånad.
 //
-// Två lägen:
-//   claimActive=false → gold "Free"-knapp (samma accent som Subscribe).
-//   claimActive=true  → grön ACTIVE-pill, INGEN knapp. Månaden kan inte
-//                       startas om i förtid; knappen kommer tillbaka först
-//                       när den lapsat.
+// Tre lägen (prioritetsordning):
+//   premiumActive=true  → grön ACTIVE-pill, INGEN knapp (månad igång, eller
+//                         betald premium aktiv). Kan inte aktiveras på nytt.
+//   freeMonthUsed=true  → grå "Used"-knapp (förbrukad engångsmånad) + note
+//                         som pekar på voucher. Ingen ny gratismånad.
+//   annars              → gold "Free"-knapp.
 function PromoTierCard({
   expiry,
   claimActive,
+  freeMonthUsed,
+  premiumActive,
   isClaiming,
   onClaim,
 }: {
   expiry: Date | null;
   claimActive: boolean;
+  freeMonthUsed: boolean;
+  premiumActive: boolean;
   isClaiming: boolean;
   onClaim: () => void;
 }) {
   const accent = Colors.warning;
 
   return (
-    // Grön kort-styling FÖRST när månaden är igång — grönt betyder "aktiv"
-    // i resten av appen, och att måla kortet grönt innan man tryckt Free
-    // hade läst som att man redan hade det.
-    <View style={[styles.tierCard, claimActive && styles.tierCardActive]}>
-      {/* Ingen FREE-badge här — knappen säger redan "Free" och kortet är
-          det enda i sektionen, så badgen blev bara upprepning. */}
+    // Grön kort-styling när premium är aktivt — grönt betyder "aktiv" i resten
+    // av appen. Måla inte grönt innan man aktiverat.
+    <View style={[styles.tierCard, premiumActive && styles.tierCardActive]}>
       <View style={[styles.tierContent, { alignItems: 'flex-start' }]}>
         <View style={styles.tierLeft}>
           <Text style={styles.tierHeadline}>Single month</Text>
@@ -795,11 +959,21 @@ function PromoTierCard({
           {claimActive && expiry && (
             <Text style={styles.tierSubline}>Free until {formatPromoDate(expiry)}</Text>
           )}
+          {!premiumActive && freeMonthUsed && (
+            <Text style={styles.tierSubline}>
+              Free month already used — redeem a voucher below
+            </Text>
+          )}
         </View>
         <View style={[styles.tierRight, { alignItems: 'center' }]}>
-          {claimActive ? (
+          {premiumActive ? (
             <View style={styles.activePill}>
               <Text style={styles.activePillText}>ACTIVE</Text>
+            </View>
+          ) : freeMonthUsed ? (
+            // Förbrukad — grå, otryckbar. Voucher blir vägen till fler månader.
+            <View style={[styles.buyBtn, styles.usedBtn]}>
+              <Text style={styles.usedBtnText}>Used</Text>
             </View>
           ) : (
             <Pressable
@@ -1137,6 +1311,67 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.primary,
     textDecorationLine: 'underline',
+  },
+
+  // Förbrukad gratismånad — grå, otryckbar knapp (samma geometri som buyBtn).
+  usedBtn: {
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+  },
+  usedBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.textDisabled,
+    letterSpacing: 0.3,
+  },
+
+  // Voucher-inlösen
+  voucherBox: {
+    backgroundColor: Colors.card,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    gap: Spacing.sm,
+  },
+  voucherLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  voucherRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  voucherInput: {
+    flex: 1,
+    backgroundColor: Colors.cardElevated,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    fontSize: FontSize.md,
+    color: Colors.textPrimary,
+    letterSpacing: 1,
+  },
+  voucherBtn: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm + 2,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primary,
+    minWidth: 88,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  voucherBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
 
   bottomPad: { height: Spacing.xl },

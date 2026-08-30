@@ -8,8 +8,8 @@ import {
 } from '@/src/lib/iap';
 import { BottomBanner } from '@/src/components/BottomBanner';
 import { Colors } from '@/src/theme';
-import { refreshOfferConfig } from '@/src/utils/promoPremium';
-import { setPremiumActive } from '@/src/utils/subscriptionStorage';
+import { refreshOfferConfig, refreshPromoGrants } from '@/src/utils/promoPremium';
+import { refreshPremiumMirror, setPremiumActive } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -38,6 +38,12 @@ export default function RootLayout() {
     // utvärderas vid läsning i hasPremiumSubscription(), aldrig genom att
     // skriva till samma nyckel (den skulle wipas av raderna nedan).
     void refreshOfferConfig();
+
+    // Kontots server-grant (gratismånad/voucher, migration 0047) speglas
+    // lokalt så hasActiveFreePremium() blir korrekt vid nästa läsning. Rör
+    // INTE den betalda `KEY` — refreshPremiumMirror räknar bara om den
+    // synkrona spegeln via båda lagren. Best-effort.
+    void refreshPromoGrants().then(refreshPremiumMirror);
 
     (async () => {
       await configurePurchases();
@@ -74,6 +80,10 @@ export default function RootLayout() {
         // Real user-id — koppla RC till Supabase user för cross-device sync.
         // is_anonymous-check så vi inte associerar RC med en throw-away anon user.
         void configurePurchases(session.user.id);
+        // Hämta det inloggade kontots promo-/voucher-grant (per KONTO) och
+        // räkna om premium-spegeln så en gratismånad som lever på ett annat
+        // login syns direkt.
+        void refreshPromoGrants().then(refreshPremiumMirror);
       } else if (event === 'SIGNED_OUT') {
         void logOutPurchases();
       }
