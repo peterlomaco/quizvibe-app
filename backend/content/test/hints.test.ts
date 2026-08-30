@@ -49,7 +49,7 @@ describe('kön på svarsalternativ', () => {
   it('täcker person-items i den spelbara poolen', () => {
     // Icke-binära P21-värden ska MEDVETET sakna kön (se personGender.ts) —
     // frågan faller då tillbaka på subject-poolen istället för att låsas.
-    const KNOWN_NON_BINARY = new Set(['demi-lovato', 'miley-cyrus', 'dana-international']);
+    const KNOWN_NON_BINARY = new Set(['demi-lovato', 'miley-cyrus', 'dana-international', 'nemo']);
     const unknown = playablePersons.filter((q) => resolveGender(q.id) === null && !KNOWN_NON_BINARY.has(q.id));
     // Utan kön faller frågan tillbaka på subject-poolen (blandade alternativ),
     // så täckningen måste vara i stort sett total för att regeln ska bita.
@@ -182,6 +182,37 @@ describe('inga dubblerade bullets', () => {
     ];
     const resolved = resolveHints(collide, 'Någon Annan');
     expect(resolved).toHaveLength(1);
+  });
+
+  // Peter 2026-08-30: en trunkerad bullet vars stam är ett prefix av en annan
+  // (t.ex. Whitney Houstons "I Will Always Love…" bredvid "I Will Always Love
+  // You") får inte visas — den fullständiga raden behålls, den trunkerade sållas.
+  it('sållar trunkerad near-dupe vars stam är prefix av en fylligare rad', () => {
+    const collide = [
+      { id: 'a', type: 'song' as const, label: 'Song', value: '"I Will Always Love You" (1992)', priority: 5 as const },
+      { id: 'b', type: 'characteristic' as const, label: 'Sig', value: '"I Will Always Love You" spent a record 14 weeks at number one', priority: 5 as const },
+    ];
+    const texts = resolveHints(collide, 'Whitney Houston').map((r) => r.text);
+    expect(texts).toEqual(['"I Will Always Love You"']);
+  });
+
+  it('rör aldrig en fullständig (icke-trunkerad) bullet', () => {
+    const keep = [
+      { id: 'a', type: 'movie' as const, label: 'Film', value: '"Pretty Woman"', priority: 4 as const },
+      { id: 'b', type: 'movie' as const, label: 'Film', value: '"Pretty in Pink"', priority: 4 as const },
+    ];
+    const texts = resolveHints(keep, 'Någon Annan').map((r) => r.text);
+    expect(texts).toHaveLength(2);
+  });
+
+  it('Whitney Houston visar aldrig två "I Will Always Love"-rader', () => {
+    const lib = HINTS_LIBRARY['whitney-houston'];
+    expect(lib).toBeDefined();
+    for (let run = 0; run < 6; run++) {
+      const texts = resolveHints(selectHints(lib!, 15), 'Whitney Houston').map((r) => r.text);
+      const loveLines = texts.filter((t) => t.toLowerCase().includes('always love'));
+      expect(loveLines.length).toBeLessThanOrEqual(1);
+    }
   });
 });
 

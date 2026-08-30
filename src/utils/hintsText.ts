@@ -270,7 +270,57 @@ export function resolveHints(
     seen.add(key);
     out.push({ hint, text });
   }
-  return out;
+  return dropTruncatedNearDupes(out);
+}
+
+/**
+ * Reducerar en bullet till en jämförbar stam: utan citattecken, avslutande
+ * (årtal)-parentes och avslutande ellips/skiljetecken. `"I Will Always Love…"`
+ * och `"I Will Always Love You"` får då stammarna `i will always love` resp.
+ * `i will always love you` — den förra ett prefix av den senare.
+ */
+function dedupStem(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/"/g, '')
+    .replace(/\s*\([^)]*\)\s*$/, '')
+    .replace(/[…\s.,;:!?)]+$/, '')
+    .trim();
+}
+
+/** En rad som radanpassningen kortat med ellips (ev. följt av ett citattecken). */
+function isTruncatedLine(text: string): boolean {
+  return text.replace(/"+\s*$/, '').trimEnd().endsWith('…');
+}
+
+/**
+ * Sista sållet mot near-dupes (Peter 2026-08-30): en bullet som avkortats med
+ * ellips och vars stam är ett prefix av en annan bullet visar samma fakta —
+ * eller en oläsbar delmängd av den — två gånger. Whitney Houston fick t.ex.
+ * BÅDE `"I Will Always Love…"` och `"I Will Always Love You"`; MTV-pris-
+ * ledtrådar kollapsar till `"MTV Movie: Best…"` bredvid `"MTV Movie: Best Kiss"`.
+ * Den exakta-text-dedupen ovan missar dem eftersom slutsträngarna skiljer sig.
+ *
+ * Bara TRUNKERADE rader är borttagningsbara — en fullständig bullet rörs aldrig,
+ * så en komplett distinkt ledtråd kan aldrig försvinna. Vinner en trunkerad rad
+ * över en annan med samma stam behålls den icke-trunkerade (eller den med lägst
+ * index om båda är trunkerade).
+ */
+function dropTruncatedNearDupes(entries: ResolvedHint[]): ResolvedHint[] {
+  const stems = entries.map((e) => dedupStem(e.text));
+  return entries.filter((entry, i) => {
+    if (!isTruncatedLine(entry.text)) return true;
+    const s = stems[i];
+    if (s.length < 6) return true;
+    const isDup = entries.some((other, j) => {
+      if (j === i) return false;
+      const sf = stems[j];
+      if (sf.startsWith(s) && sf.length > s.length) return true; // en fylligare rad täcker denna
+      if (sf === s) return !isTruncatedLine(other.text) || j < i; // samma stam → behåll den bästa
+      return false;
+    });
+    return !isDup;
+  });
 }
 
 // ── Spelbarhets-gate (Peter 2026-08-27) ──────────────────────────────────────

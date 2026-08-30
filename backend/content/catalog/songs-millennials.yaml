@@ -675,12 +675,19 @@ items:
     probability: 90
     wikimediaSearchHints: ["Wham Last Christmas 1984"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
+    genrePackages: ["Christmas"]
     youtubeClips:
-      - videoId: "T0T9GyM28tg"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Wham! - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "E8gmARGvPlI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Wham!"
+        notes: "Peter-kurerad 2026-08-30 (ersatte T0T9GyM28tg)."
+      - videoId: "KhqNTjbQ71A"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Wham!"
+        notes: "Peter-kurerad 2026-08-30 (ersatte T0T9GyM28tg)."
   - id: springsteen-dancing-in-the-dark
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dancing in the Dark — Bruce Springsteen"

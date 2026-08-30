@@ -1861,11 +1861,12 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "C_3d6GntKbk"
-        startSec: 0
+        startSec: 14
         endSec: 30
         channelTitle: "ZaynVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Soft Hits"]
+    genrePackages: ["Soft & Ballads"]
+    inBaseCatalog: false
   - id: taylor-swift-the-fate-of-ophelia
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Fate of Ophelia — Taylor Swift"

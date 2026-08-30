@@ -4014,12 +4014,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "54OR1VDpfkBuOY5zZjhZAY",
     "youtubeClips": [
       {
-        "videoId": "fvzs2ozG-mc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "PRIVADO 80s",
+        "videoId": "CS9OO0S5w2k",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "Village People",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
+        "notes": "Peter-kurerad 2026-08-30 (ersatte fvzs2ozG-mc)."
       }
     ]
   },
@@ -6297,14 +6297,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Christmas"
+    ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
-        "videoId": "T0T9GyM28tg",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Wham! - Topic",
+        "videoId": "E8gmARGvPlI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Wham!",
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-08-30 (ersatte T0T9GyM28tg)."
+      },
+      {
+        "videoId": "KhqNTjbQ71A",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Wham!",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-30 (ersatte T0T9GyM28tg)."
       }
     ]
   },
@@ -9257,34 +9269,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Dr. Alban",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Dr. Alban - Sing Hallelujah (Official 4K Video)' — inget ar i titeln."
-      }
-    ]
-  },
-  {
-    "id": "dream-team-1992-barcelona",
-    "displayName": "Dream Team — Barcelona OS basket",
-    "correctYear": 1992,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ZE4FIP5kNK8",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Olympic Games",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '92' vid tecken 44. Officiella IOC-kanalen, ren titel."
       }
     ]
   },
@@ -19795,12 +19779,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft Hits"
+      "Soft & Ballads"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "C_3d6GntKbk",
-        "startSec": 0,
+        "startSec": 14,
         "endSec": 30,
         "channelTitle": "ZaynVEVO",
         "license": "standard",

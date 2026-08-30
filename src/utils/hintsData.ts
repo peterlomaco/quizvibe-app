@@ -709,7 +709,7 @@ const HINTS_LIBRARY_MANUAL: Record<string, HintLibrary> = {
       h('kn',    'characteristic', 'Known as',      '"The Voice" — for extraordinary vocal range',             4),
       h('merit', 'merit',          'Achievement',   '6 Grammy Awards, 30 Billboard Music Awards',             4),
       h('s6',    'song',           'Hit song',      '"I Will Always Love You" (1992)',                         5),
-      h('sig',   'characteristic', 'Signature',     '"I Will Always Love You" held #14 on Billboard for 14 weeks',5),
+      h('sig',   'characteristic', 'Signature',     'Record 14 weeks at #1',                                   5),
     ],
   },
 

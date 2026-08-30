@@ -434,11 +434,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "54OR1VDpfkBuOY5zZjhZAY"
     youtubeClips:
-      - videoId: "fvzs2ozG-mc"
-        startSec: 30
-        endSec: 45
-        channelTitle: "PRIVADO 80s"
-        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
+      - videoId: "CS9OO0S5w2k"
+        startSec: 10
+        endSec: 40
+        channelTitle: "Village People"
+        notes: "Peter-kurerad 2026-08-30 (ersatte fvzs2ozG-mc)."
   # === Content-expansion 2026-05-29: fler ikoniska 60-70-tals-låtar ===
   - id: the-doors-light-my-fire
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]

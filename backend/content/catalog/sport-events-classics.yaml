@@ -87,12 +87,9 @@ items:
     probability: 90
     wikimediaSearchHints: ["Dream Team 1992 Barcelona Olympics basketball"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "ZE4FIP5kNK8"
-        startSec: 0
-        endSec: 30
-        channelTitle: "Olympic Games"
-        notes: "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '92' vid tecken 44. Officiella IOC-kanalen, ren titel."
+    # YT-klipp borttaget 2026-08-30 (Peter). Klipp-löst = syns EJ i spelaren
+    # tills ersättning hittas.
+    youtubeClips: []
   - id: borg-mcenroe-wimbledon-1980
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Borg-McEnroe Wimbledon-final"
