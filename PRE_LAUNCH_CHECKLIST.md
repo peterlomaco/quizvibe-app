@@ -95,6 +95,13 @@ there). Most tests need **two devices** in an **Individual Devices** game with *
 - [ ] **EAS Update OTA into TestFlight** (flagged unverified in CLAUDE.md): from a TestFlight
       build, `eas update --branch production` with a trivial change, relaunch twice, confirm
       via `eas update:view` that the build fetched it.
+- [ ] 🔴 **After the Apple Individual→Organization conversion completes** (migration in progress —
+      `eas build` for iOS is blocked until it finishes): verify the new **Team ID** on
+      developer.apple.com and compare to `eas.json` → `submit.production.ios.appleTeamId`
+      (currently `34L99478S2`). If it changed, update `appleTeamId` **and** likely generate a
+      fresh App Store Connect API key under the org (update `ascApiKeyId` `79GB2TWXN3` /
+      `ascApiKeyIssuerId` / the `.secrets/*.p8` path). Otherwise `eas build` succeeds but
+      `eas submit` fails. Bundle ID, app record, and `ascAppId 6772559846` carry over unchanged.
 
 ### ✅ Already good (no action)
 - ASC API key (`.p8`) + `.secrets/` gitignored and untracked — no key exposure.
