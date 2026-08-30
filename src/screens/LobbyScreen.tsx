@@ -431,6 +431,9 @@ const JOIN_GRACE_NON_HOST_MS = 5000;
 // oavsett orsak — signalen visas bara när den är stabil. 1200 ms = en hel
 // BlinkingLabel-cykel, så en blink som visas hinner alltid läsas som avsedd.
 const WAITING_LABEL_DEBOUNCE_MS = 1200;
+// Låst-grå för Start Game-knappen medan seed-effekten ännu inte applicerat
+// carry-over-settings. Samma vokabulär som GetReadyIntro:s PLAY_LOCKED_COLOR.
+const START_LOCKED_GREY = '#6B7280';
 
 // Delad copy för single-player-approve-spärren så ALLA approve-vägar
 // (ApproveToggle, "Approve All"-mastern, join-popupens Approve och
@@ -1409,6 +1412,13 @@ export default function LobbyScreen() {
   // innan Promise.all resolvar och skapa en "stored"-post som sedan vinner
   // mot profil-defaults i if (!stored)-grenen.
   const lobbySeededRef = useRef(false);
+  // Re-render-bärande spegel av lobbySeededRef så Start Game-knappen kan
+  // låsas tills seed-effekten applicerat carry-over-settings. Utan detta
+  // kunde en snabb replay-tap fyra handleStartGame INNAN Promise.all-seeden
+  // hunnit sätta t.ex. youtubeEnabledCategories → quiz fick default-all-3
+  // källor och spelade "helt slumpmässigt" media trots att bara YT Music
+  // var valt. Ref:en är den synkrona sanningen vid tap; state:n driver UI.
+  const [lobbySeeded, setLobbySeeded] = useState(false);
   // Guard mot dubbel-navigation till /quiz när game_started detekteras.
   // Polling-effekten fyrar både via Realtime-tick OCH 2s-interval — utan
   // denna ref skulle vi anropa router.push flera gånger innan unmount.
@@ -1515,6 +1525,7 @@ export default function LobbyScreen() {
     selfEverInStoredRef.current = false;
     navigatedToQuizRef.current = false;
     lobbySeededRef.current = false;
+    setLobbySeeded(false);
     // Host: seed lobby-wide settings. Prio-ordning:
     //   1. lobby_settings (`stored`) — finns redan i DB om host nyss kom
     //      via "Play again + Keep settings"-flowet (quiz.tsx skrev över
@@ -1596,6 +1607,7 @@ export default function LobbyScreen() {
         // Släpp debounce-skrivningen till lobby_settings så non-hosts ser
         // de fasta värdena via sin settings-sync.
         lobbySeededRef.current = true;
+        setLobbySeeded(true);
       });
     } else if (hostMode) {
       Promise.all([loadProfile(), getLobbySettings(roomCode), hasPremiumSubscription()]).then(
@@ -1764,6 +1776,7 @@ export default function LobbyScreen() {
           // Promise.all resolvar — och skapa en "stored"-post som vinner
           // mot profil-defaults i if (!stored)-grenen ovan.
           lobbySeededRef.current = true;
+          setLobbySeeded(true);
         },
       );
     }
@@ -5687,6 +5700,12 @@ export default function LobbyScreen() {
   };
 
   const handleStartGame = async (ptpConfirmed = false) => {
+    // Seed-guard: en snabb replay-tap kan hinna fyra Start Game INNAN
+    // seed-effekten (Promise.all → getLobbySettings) applicerat carry-over-
+    // settings. Läser då de OSEEDADE default-kategorierna (all-3 källor) och
+    // spelar "helt slumpmässigt" media. Ref:en är synkron sanning vid tap;
+    // knappen är dessutom visuellt låst tills seeden klar. Bara host seedar.
+    if (hostMode && !lobbySeededRef.current) return;
     // Pool-preflight FÖRST — settings-issue ska upptäckas innan vi bryr
     // oss om spelar-state (approve/single-player-popups). Om host:s filter-
     // kombo (era + main-categories + source-toggles) ger noll matchande
@@ -8519,7 +8538,25 @@ export default function LobbyScreen() {
           style={[styles.startStickyBarGlow, { opacity: startGlow }]}
           pointerEvents="none"
         />
-        {hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
+        {hostMode && !lobbySeeded ? (
+          /* Seed-lås: carry-over-settings (t.ex. Music-only) appliceras av en
+             async seed-effekt (Promise.all → getLobbySettings). Håll Start
+             Game LÅST tills dess så en snabb replay-tap inte startar spelet
+             med de OSEDDA default-källorna (all-3) → "helt slumpmässigt" media.
+             Passiv, grå, ingen puls — läses som ett kort "förbereder", inte
+             en knapp. Fönstret är normalt sub-sekund. */
+          <View style={styles.startGameCompactWrap}>
+            <View style={styles.startGameCompactRow} pointerEvents="none">
+              <View style={styles.startGameWaitTextWrap}>
+                <Text style={styles.startGameWaitText}>Preparing lobby…</Text>
+                <SequentialDots color={Colors.textSecondary} />
+              </View>
+              <View style={styles.startGameCompactLogoWrap}>
+                <QuizVibePlayLogo size={64} color={START_LOCKED_GREY} />
+              </View>
+            </View>
+          </View>
+        ) : hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
          approvedPlayers.filter((p) => !p.isHost).length === 0 ? (
           /* Remote 1vs1 utan approved motståndare: Start Game ersätts av en
              HELT PASSIV väntetext (Peter 2026-08-07) — samma vokabulär som
