@@ -75,7 +75,7 @@ applied (the app depends on it) but not individually re-verified · `—` env no
 | 0044a_fk_indexes | ✅ 2026-08-30 | ✅ 2026-08-30 | |
 | 0044b_check_constraints | ✅ 2026-08-30 | ✅ 2026-08-30 | |
 | 0044c_policy_hardening | ✅ 2026-08-30 | ✅ 2026-08-30 | |
-| 0045_lobby_players_insert_hardening | ⬜ (held — test in staging) | — | |
+| 0045_lobby_players_insert_hardening | ✅ 2026-08-30 | ✅ 2026-08-30 | all 4 join flows verified on staging first |
 | 0046_subscription_entitlements | ⬜ (held — E1 foundation) | — | + deploy `functions/revenuecat-webhook` |
 
 > The `✅?` marks are best-effort: the app runs against prod, so it depends on
