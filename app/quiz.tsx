@@ -1157,6 +1157,66 @@ function AnswerSummaryRow({
   );
 }
 
+// B1-fix: 2-decimals svarstidsräknaren tickar 20×/sek. Låg den kvar som state
+// på QuizScreen re-renderades HELA det ~11,8k-rader stora trädet 20 gånger i
+// sekunden mitt under mediauppspelning + animationer. Här är tickandet isolerat
+// i ett React.memo-barn med egen lokal state, så bara denna lilla ruta ritas om
+// i den takten. Frozen-värdet (vid confirm) + nollställning (ny fråga) kommer
+// via `frozenMs`; live-tickandet sker lokalt när `live` är true.
+const AnswerStopwatch = React.memo(function AnswerStopwatch({
+  live,
+  startMsRef,
+  totalMs,
+  frozenMs,
+  stopwatchColor,
+  timerColor,
+  timerRingGlow,
+  iconSize,
+}: {
+  live: boolean;
+  startMsRef: React.MutableRefObject<number>;
+  totalMs: number;
+  frozenMs: number;
+  stopwatchColor: string;
+  timerColor: string;
+  timerRingGlow: Animated.Value;
+  iconSize: number;
+}) {
+  const [ms, setMs] = useState(frozenMs);
+  useEffect(() => {
+    if (!live) {
+      setMs(frozenMs);
+      return;
+    }
+    const tick = () => {
+      const elapsed = Date.now() - startMsRef.current;
+      setMs(Math.min(totalMs, Math.max(0, elapsed)));
+    };
+    tick();
+    const id = setInterval(tick, 50);
+    return () => clearInterval(id);
+  }, [live, frozenMs, totalMs, startMsRef]);
+  return (
+    <View style={styles.decimalTimerWrap}>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.decimalTimerHalo, { backgroundColor: timerColor, opacity: timerRingGlow }]}
+      />
+      <View style={[styles.decimalTimerBox, { borderColor: stopwatchColor }]}>
+        <View style={styles.decimalTimerIconWrap}>
+          <StopwatchIcon size={iconSize} color={stopwatchColor} />
+        </View>
+        <Text style={[styles.decimalTimerInt, { color: stopwatchColor }]}>
+          {String(Math.floor(ms / 1000)).padStart(2, '0')}
+        </Text>
+        <Text style={[styles.decimalTimerDec, { color: Colors.textSecondary }]}>
+          .{String(Math.floor((ms % 1000) / 10)).padStart(2, '0')}
+        </Text>
+      </View>
+    </View>
+  );
+});
+
 export default function QuizScreen() {
   const params = useLocalSearchParams<{
     assistance?: string;
@@ -1368,6 +1428,11 @@ export default function QuizScreen() {
   // istället för MediaPlayer och auto-advancerar till reveal efter 2.5 s.
   // Resetas per fråga via useEffect nedan.
   const [youtubeError, setYoutubeError] = useState(false);
+  // C1-fix: videoIds för klipp som fallerat på DENNA enhet under aktuell fråga.
+  // Ett item kan bära flera klipp (officiell video + lyrics); när det seed-valda
+  // klippet är borttaget/region-blockerat faller vi tillbaka på nästa klipp INNAN
+  // vi 0-poängar frågan. Resetas per fråga.
+  const [failedClipVideoIds, setFailedClipVideoIds] = useState<string[]>([]);
   // Antal rundor sätts av host i Lobby (slider 3–20, default 10). Fallback 5
   // om param saknas — t.ex. direkt-nav till /quiz utan att gå via Lobby.
   // SEED_QUESTIONS har 5 frågor i mock; för totalRounds > 5 cyklas listan via
@@ -2470,6 +2535,10 @@ export default function QuizScreen() {
   const [spotifyDJStarted, setSpotifyDJStarted] = useState(false);
   // DJ har tryckt "End DJ – handover to Host" i reveal-fasen → låser upp host:s Next-knapp.
   const [djHandedOver, setDjHandedOver] = useState(false);
+  // A1-fix: host har väntat för länge på DJ:ns handover i reveal (DJ tappade
+  // kontakt/quittade utan att trycka "End DJ", eller broadcasten tappades) →
+  // visa en manuell "Continue without DJ →"-escape så spelet aldrig fastnar.
+  const [djHandoverStuck, setDjHandoverStuck] = useState(false);
   // DJ har tryckt × på overlay → aktiverar steg 5 i guiden (utan att låsa upp host:s Next ännu).
   const [djDismissedOverlay, setDjDismissedOverlay] = useState(false);
   // ── FUTURE VERSION 2 — Automated API Flow (archived states) ─────────────────────
@@ -3455,6 +3524,27 @@ export default function QuizScreen() {
     [question, youtubeEnabled, gameMode, clipSeedBase],
   );
 
+  // Alla curerade klipp på aktuell fråga (film-trailer eller musik). Undefined
+  // för image-frågor. Driver C1-fallbacken nedan.
+  const currentQuestionClips =
+    question.type === 'timeline' || question.type === 'actor-select'
+      ? question.youtubeClips
+      : undefined;
+
+  // C1-fix: effektiv media-källa. Är det seed-valda klippet redan markerat som
+  // fallerat väljer vi första klipp på itemet som INTE fallerat, så ett trasigt
+  // klipp inte auto-0-poängar en fråga som fortfarande går att spela via sitt
+  // andra klipp. Rör inte det deterministiska förstavalet — bara fallback-läget
+  // divergerar per enhet, och det är strikt bättre än ett missat svar (samma
+  // låt/item, samma svarsår).
+  const effectiveMediaSource = useMemo(() => {
+    if (mediaSource.kind !== 'youtube') return mediaSource;
+    if (!currentQuestionClips || currentQuestionClips.length === 0) return mediaSource;
+    if (!failedClipVideoIds.includes(mediaSource.clip.videoId)) return mediaSource;
+    const next = currentQuestionClips.find((c) => !failedClipVideoIds.includes(c.videoId));
+    return next ? ({ kind: 'youtube', clip: next } as typeof mediaSource) : mediaSource;
+  }, [mediaSource, currentQuestionClips, failedClipVideoIds]);
+
   // D-iv: host:s player_id är alltid turnOrder[0] (Lobby-handleStartGame
   // bygger arrayen med host först). Används för default-audio-policyn
   // (host = on när override saknas).
@@ -3544,7 +3634,14 @@ export default function QuizScreen() {
     // styrs separat av Animated.Value ovan.
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) { clearInterval(timerRef.current); return 0; }
+        // A4: nulla ref:en vid self-clear så ett dött interval-id inte ligger
+        // kvar (defensivt mot en framtida ny timer mellan schemaläggning och
+        // self-clear). startTimer() clearar alltid först, så harmlöst idag.
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          timerRef.current = null;
+          return 0;
+        }
         return prev - 1;
       });
     }, 1000);
@@ -3617,6 +3714,13 @@ export default function QuizScreen() {
       recordRoundScore(0, false, responseSeconds, shouldLockForUnstableRef.current);
       setPhase('reveal');
     }
+    // A3: MEDVETET bara [timeLeft] i deps. Effekten ska fyra EXAKT när timern
+    // når 0, och `timeLeft` co-ändras varje tick så closuren (phase/question/
+    // responseSeconds/recordRoundScore) är färsk i det ögonblicket. Att lägga
+    // till de övriga skulle låta effekten re-fyra medan timeLeft===0 (t.ex. när
+    // phase byts till reveal) med risk för dubbelregistrering. `responseSeconds`
+    // ändras aldrig mid-question (response_time gäller nästa fråga).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft]);
 
   // Spegla Spotify DJ-state till refs så AppState-listener aldrig läser stale closures.
@@ -3957,13 +4061,15 @@ export default function QuizScreen() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSpotifyQuestion, phase, questionIndex]);
 
-  // Fas 1: vänta 240 s på DJ-broadcast innan synlig nedräkning startar.
+  // Fas 1: vänta på DJ-broadcast innan synlig nedräkning startar.
   // Om spotifyDJStarted blir true cleanas timeout bort.
-  // Total timeout: 240 s (fas 1, tyst) + 60 s (fas 2, synlig) = 300 s.
+  // A2-fix: fas 1 kortad 240 s → 45 s. 4 min tyst dödläge kändes hängt i ett
+  // partyspel; total timeout blir nu 45 s (tyst) + 60 s (synlig nedräkning)
+  // = 105 s innan auto-skip, med synlig feedback under hela fas 2.
   useEffect(() => {
     if (!isSpotifyQuestion || phase !== 'question' || spotifyDJStarted) return;
     setSpotifyWaitPhase('waiting');
-    const phase1 = setTimeout(() => setSpotifyWaitPhase('countdown'), 240_000);
+    const phase1 = setTimeout(() => setSpotifyWaitPhase('countdown'), 45_000);
     return () => clearTimeout(phase1);
   }, [isSpotifyQuestion, phase, questionIndex, spotifyDJStarted]);
 
@@ -3991,6 +4097,30 @@ export default function QuizScreen() {
     }, 2500);
     return () => clearTimeout(t);
   }, [spotifyTimeoutSeconds, spotifyWaitPhase]);
+
+  // A1-fix: host väntar på DJ:ns "End DJ"-handover i reveal. Om den aldrig
+  // anländer (DJ tappade kontakt / tog appen i bakgrunden / quittade utan att
+  // trycka "End DJ", eller broadcasten tappades) armas en manuell escape efter
+  // 12 s så host aldrig fastnar permanent. host styr redan tempot, så en
+  // manuell väg vidare är säker. Non-DJ-guessers påverkas inte — bara host.
+  useEffect(() => {
+    const waitingOnHandover =
+      isHost && phase === 'reveal' && isSpotifyQuestion && !isCurrentPlayerDJ && !djHandedOver;
+    if (!waitingOnHandover) {
+      if (djHandoverStuckTimerRef.current) {
+        clearTimeout(djHandoverStuckTimerRef.current);
+        djHandoverStuckTimerRef.current = null;
+      }
+      return;
+    }
+    djHandoverStuckTimerRef.current = setTimeout(() => setDjHandoverStuck(true), 12_000);
+    return () => {
+      if (djHandoverStuckTimerRef.current) {
+        clearTimeout(djHandoverStuckTimerRef.current);
+        djHandoverStuckTimerRef.current = null;
+      }
+    };
+  }, [isHost, phase, isSpotifyQuestion, isCurrentPlayerDJ, djHandedOver]);
 
   useEffect(() => {
     // Pulsa progress-barens opacity (1 → 0.55 → 1) när ≤5s kvar för att
@@ -4177,11 +4307,17 @@ export default function QuizScreen() {
   useEffect(() => {
     setScrolledToBottom(false);
     setYoutubeError(false);
+    setFailedClipVideoIds([]);
+    if (youtubeErrorTimerRef.current) {
+      clearTimeout(youtubeErrorTimerRef.current);
+      youtubeErrorTimerRef.current = null;
+    }
     // Spotify: nollställ DJ-state + timeout per fråga.
     setSpotifyDJOpenedApp(false);
     setSpotifyDJOpenedAppBroadcast(false);
     setSpotifyDJStarted(false);
     setDjHandedOver(false);
+    setDjHandoverStuck(false);
     setDjDismissedOverlay(false);
     setSpotifyWaitPhase(null);
     setSpotifyTimeoutSeconds(60);
@@ -4225,27 +4361,15 @@ export default function QuizScreen() {
   // fort spelaren confirmar (phase → 'awaiting') stoppas tick:n och displayen
   // fryses på exakt confirm-värdet (sätts explicit i handleConfirm). I
   // intro/countdown/reveal/leaderboard återställs till "30.00".
+  // B1: live-tickandet flyttat till AnswerStopwatch-barnet. Här nollställs bara
+  // baslinjen vid ny frågestart/buffert — confirm-frysningen sätts i
+  // handleConfirm/handleConfirmName. INTE vid 'awaiting'/'reveal' (då är
+  // decimalElapsedMs fryst på confirm-momentet och ska inte skrivas över).
   useEffect(() => {
-    const totalMs = responseSeconds * 1000;
-    if (phase !== 'question' || !timerActive) {
-      // Nollställ bara vid ny frågestart (intro/countdown) eller under
-      // 2-sekunders-bufferten (phase='question' men timerActive ännu false).
-      // INTE vid 'awaiting'/'reveal' — då är värdet fryst på confirm-momentet
-      // och ska inte skrivas över.
-      if (phase === 'intro' || phase === 'countdown' || (phase === 'question' && !timerActive)) {
-        setDecimalElapsedMs(0);
-      }
-      return;
+    if (phase === 'intro' || phase === 'countdown' || (phase === 'question' && !timerActive)) {
+      setDecimalElapsedMs(0);
     }
-    const tick = () => {
-      const elapsedMs = Date.now() - questionStartMsRef.current;
-      const clamped = Math.min(totalMs, Math.max(0, elapsedMs));
-      setDecimalElapsedMs(clamped);
-    };
-    tick();
-    const id = setInterval(tick, 50);
-    return () => clearInterval(id);
-  }, [phase, questionIndex, responseSeconds, timerActive]);
+  }, [phase, questionIndex, timerActive]);
 
   // Spara alla unika fråge-IDs i denna omgång när spelet är klart.
   // savedSeenRef förhindrar dubbelskrivning om effekten av någon anledning
@@ -4461,13 +4585,36 @@ export default function QuizScreen() {
   // är stabil per render, ref-pattern undviker stale-closure utan dep-array.
   const recordRoundScoreRef = useRef(recordRoundScore);
   recordRoundScoreRef.current = recordRoundScore;
+  // A4-fix: spåra reveal-skip-timern så den kan cleanas vid unmount/frågebyte
+  // istället för att fyra setPhase på en avmonterad/ny fråga.
+  const youtubeErrorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleYoutubeError = useCallback(() => {
     if (phase !== 'question') return;
     if (youtubeError) return;
+    // C1-fix: prova nästa curerade klipp på itemet innan vi 0-poängar frågan.
+    // Ett item med flera klipp (officiell video + lyrics) ska överleva ett
+    // borttaget/region-blockerat klipp — MediaPlayer remountar på videoId-byte.
+    if (
+      effectiveMediaSource.kind === 'youtube' &&
+      currentQuestionClips &&
+      currentQuestionClips.length > 1
+    ) {
+      const failedId = effectiveMediaSource.clip.videoId;
+      const nextFailed = failedClipVideoIds.includes(failedId)
+        ? failedClipVideoIds
+        : [...failedClipVideoIds, failedId];
+      const hasAlternate = currentQuestionClips.some((c) => !nextFailed.includes(c.videoId));
+      if (hasAlternate) {
+        setFailedClipVideoIds(nextFailed);
+        return; // stanna i question-fas; nytt klipp spelas
+      }
+    }
+    // Inga fler klipp att prova — ge upp: 0 poäng + hoppa till reveal.
     setYoutubeError(true);
     recordRoundScoreRef.current(0, false, responseSeconds);
-    setTimeout(() => setPhase('reveal'), 2500);
-  }, [phase, youtubeError, responseSeconds]);
+    if (youtubeErrorTimerRef.current) clearTimeout(youtubeErrorTimerRef.current);
+    youtubeErrorTimerRef.current = setTimeout(() => setPhase('reveal'), 2500);
+  }, [phase, youtubeError, responseSeconds, effectiveMediaSource, currentQuestionClips, failedClipVideoIds]);
 
   // Image-fråge-Confirm: speglar handleConfirm men för name-svar.
   // correct = opt.isCorrect (pre-baked från distractor-builderns rätt-flagga).
@@ -4793,9 +4940,16 @@ export default function QuizScreen() {
   const handleDJHandover = () => {
     setDjHandedOver(true);
     if (gameMode === 'individual-devices' && syncChannelRef.current && currentDJPlayer) {
-      syncChannelRef.current
-        .broadcastSpotifyDJHandover({ dj_player_id: currentDJPlayer.id })
-        .catch(() => {});
+      // A1-fix: skicka handovern 3× (direkt / +600 / +1800 ms). Supabase
+      // Realtime replayar aldrig, så en enda tappad frame lämnade host
+      // permanent frusen i reveal. Handovern är idempotent hos mottagaren.
+      const djId = currentDJPlayer.id;
+      const send = () => {
+        syncChannelRef.current?.broadcastSpotifyDJHandover({ dj_player_id: djId }).catch(() => {});
+      };
+      send();
+      djHandoverRetryTimersRef.current.forEach(clearTimeout);
+      djHandoverRetryTimersRef.current = [setTimeout(send, 600), setTimeout(send, 1800)];
     }
   };
 
@@ -7759,6 +7913,14 @@ export default function QuizScreen() {
   // Play-tap aldrig avbryter en pågående advance-omsändning eller tvärtom —
   // de två kan legitimt överlappa när host trycker Next och sedan Play snabbt.
   const questionAdvanceRetryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // A1-fix: dito för spotify_dj_handover. En enda fire-and-forget-sändning gick
+  // förlorad om mottagarens kanal hickade → host fastnade permanent i reveal.
+  // Handovern är idempotent (setDjHandedOver(true) upprepat är harmlöst) så
+  // 3× omsändning är säker. Egen ref för samma skäl som ovan.
+  const djHandoverRetryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // A1-fix: host-side timeout som armar "Continue without DJ"-escapen om DJ:ns
+  // handover aldrig anländer.
+  const djHandoverStuckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Senast processade advance på MOTTAGAR-sidan ('end' = spelet slut).
   // Nollställs aldrig manuellt: ett spel per quiz.tsx-mount, och Play Again
   // går via ny lobby → ny mount → ny ref.
@@ -7769,6 +7931,16 @@ export default function QuizScreen() {
       playCommandRetryTimersRef.current = [];
       questionAdvanceRetryTimersRef.current.forEach(clearTimeout);
       questionAdvanceRetryTimersRef.current = [];
+      djHandoverRetryTimersRef.current.forEach(clearTimeout);
+      djHandoverRetryTimersRef.current = [];
+      if (djHandoverStuckTimerRef.current) {
+        clearTimeout(djHandoverStuckTimerRef.current);
+        djHandoverStuckTimerRef.current = null;
+      }
+      if (youtubeErrorTimerRef.current) {
+        clearTimeout(youtubeErrorTimerRef.current);
+        youtubeErrorTimerRef.current = null;
+      }
     },
     [],
   );
@@ -9533,7 +9705,7 @@ export default function QuizScreen() {
               </View>
             ) : (
               <MediaPlayer
-                source={mediaSource}
+                source={effectiveMediaSource}
                 isPlaying={
                   phase === 'question' ||
                   phase === 'awaiting' ||
@@ -9718,29 +9890,21 @@ export default function QuizScreen() {
             </View>
 
             {/* 2-decimal countdown under timer-bar:en. Döljs för DJ på Spotify-
-                frågor — DJ svarar inte och har ingen svarstid att visa. */}
-            {!(isSpotifyQuestion && isCurrentPlayerDJ) && <View style={styles.decimalTimerWrap}>
-              <Animated.View
-                pointerEvents="none"
-                style={[
-                  styles.decimalTimerHalo,
-                  { backgroundColor: timerColor, opacity: timerRingGlow },
-                ]}
+                frågor — DJ svarar inte och har ingen svarstid att visa.
+                B1: tickandet är isolerat i AnswerStopwatch (self-ticking memo)
+                så det inte re-renderar hela quiz-trädet 20×/sek. */}
+            {!(isSpotifyQuestion && isCurrentPlayerDJ) && (
+              <AnswerStopwatch
+                live={phase === 'question' && timerActive}
+                startMsRef={questionStartMsRef}
+                totalMs={responseSeconds * 1000}
+                frozenMs={decimalElapsedMs}
+                stopwatchColor={stopwatchColor}
+                timerColor={timerColor}
+                timerRingGlow={timerRingGlow}
+                iconSize={qh(32)}
               />
-              <View style={[styles.decimalTimerBox, { borderColor: stopwatchColor }]}>
-                {/* Wrap-View med integer-höjd centrerar SVG:n vertikalt
-                    relativt den stora sekund-siffran (38 px lineHeight). */}
-                <View style={styles.decimalTimerIconWrap}>
-                  <StopwatchIcon size={qh(32)} color={stopwatchColor} />
-                </View>
-                <Text style={[styles.decimalTimerInt, { color: stopwatchColor }]}>
-                  {String(Math.floor(decimalElapsedMs / 1000)).padStart(2, '0')}
-                </Text>
-                <Text style={[styles.decimalTimerDec, { color: Colors.textSecondary }]}>
-                  .{String(Math.floor((decimalElapsedMs % 1000) / 10)).padStart(2, '0')}
-                </Text>
-              </View>
-            </View>}
+            )}
 
             <View style={styles.questionCard}>
               {/* Top-rad: Question-räkneverk vänster + Answering-pillen höger.
@@ -10334,9 +10498,25 @@ export default function QuizScreen() {
                   </TouchableOpacity>
                 </Animated.View>
               ) : null /* knappar ligger i scroll-zonen ovan */
+            ) : isHost && djHandoverStuck ? (
+              // A1-fix: DJ:ns handover kom aldrig → ge host en manuell väg vidare
+              // så spelet inte fastnar permanent i reveal.
+              <Animated.View style={nextTabPulseStyle}>
+                <TouchableOpacity
+                  style={rv.djHandoverBtn}
+                  onPress={isLastQuestion ? handleHostShowLeaderboard : handleHostAdvanceFromReveal}
+                  activeOpacity={0.85}
+                >
+                  <Text style={rv.djHandoverBtnText}>
+                    {isLastQuestion ? 'Continue without DJ — Final Leaderboard' : 'Continue without DJ  →'}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             ) : (
               <View style={rv.waitingForHostPill}>
-                <Text style={rv.waitingForHostPillText}>Waiting for DJ to handover to Host</Text>
+                <Text style={rv.waitingForHostPillText}>
+                  {isHost ? 'Waiting for DJ to end the track…' : 'Waiting for DJ to handover to Host'}
+                </Text>
                 <SequentialDots color={Colors.textSecondary} />
               </View>
             )

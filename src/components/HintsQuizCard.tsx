@@ -106,7 +106,10 @@ function splitDisplayName(name: string): string[] {
 
 // ── Huvud-komponent ─────────────────────────────────────────────────────────
 
-export function HintsQuizCard({
+// B1-perf: memoiserad så quiz-skärmens 1 Hz timeLeft-re-renders inte ritar om
+// hela hint-kortet. Alla props är primitiver eller stabila referenser (library
+// = question.hints per fråga), så shallow-compare bailar korrekt.
+function HintsQuizCardBase({
   library,
   displayName,
   resetKey,
@@ -526,3 +529,5 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
 });
+
+export const HintsQuizCard = React.memo(HintsQuizCardBase);
