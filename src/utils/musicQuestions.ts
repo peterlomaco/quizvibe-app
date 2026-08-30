@@ -1991,34 +1991,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "bowie-space-oddity",
-    "displayName": "Space Oddity — David Bowie",
-    "correctYear": 1969,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "tRNpjt29n6Y",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "David Bowie - Topic",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
     "id": "elvis-presley-suspicious-minds",
     "displayName": "Suspicious Minds — Elvis Presley",
     "correctYear": 1969,
@@ -10995,6 +10967,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Summer",
+      "100% svenska"
+    ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "7s8EmGKCWKHsKXhhEZBdaM",
     "youtubeClips": [
       {
@@ -12938,12 +12915,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "4bpqcGVSveDZ5E3rgr9v2y",
     "youtubeClips": [
       {
-        "videoId": "98ID_halfhs",
+        "videoId": "7mEEiPJXIAA",
         "startSec": 0,
         "endSec": 30,
-        "channelTitle": "SandraTornblad",
         "license": "standard",
-        "notes": "Musikvideo-re-upload av originalet (1999)."
+        "notes": "Peter-kurerad 2026-08-30 (ersatte 98ID_halfhs)."
       }
     ]
   },

@@ -1290,6 +1290,9 @@ items:
     probability: 80
     wikimediaSearchHints: ["Sven-Ingvars Sommar i Sverige 1994 Swedish dansband Byns enda blondin"]
     answerMethods: ["timeline"]
+    region: ["sweden"]
+    genrePackages: ["Summer", "100% svenska"]
+    inBaseCatalog: false
     spotifyTrackId: "7s8EmGKCWKHsKXhhEZBdaM"
     youtubeClips:
       - videoId: "PQuDXSXGkAg"

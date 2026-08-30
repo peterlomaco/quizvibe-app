@@ -544,19 +544,6 @@ items:
         endSec: 45
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-  - id: bowie-space-oddity
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Space Oddity — David Bowie"
-    correctYear: 1969
-    probability: 84
-    wikimediaSearchHints: ["David Bowie Space Oddity 1969"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "tRNpjt29n6Y"
-        startSec: 30
-        endSec: 45
-        channelTitle: "David Bowie - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: led-zeppelin-whole-lotta-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Whole Lotta Love — Led Zeppelin"

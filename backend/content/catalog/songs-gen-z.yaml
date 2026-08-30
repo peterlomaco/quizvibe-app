@@ -1163,13 +1163,14 @@ items:
     wikimediaSearchHints: ["Markoolio Swedish rapper singer Sommar och sol"]
     answerMethods: ["timeline"]
     genrePackages: ["Summer"]
+    inBaseCatalog: true
+    region: ["sweden"]
     spotifyTrackId: "4bpqcGVSveDZ5E3rgr9v2y"
     youtubeClips:
-      - videoId: "98ID_halfhs"
+      - videoId: "7mEEiPJXIAA"
         startSec: 0
         endSec: 30
-        channelTitle: "SandraTornblad"
-        notes: "Musikvideo-re-upload av originalet (1999)."
+        notes: "Peter-kurerad 2026-08-30 (ersatte 98ID_halfhs)."
 
   - id: backstreet-boys-everybody
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
