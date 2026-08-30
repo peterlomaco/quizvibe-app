@@ -1,6 +1,14 @@
 # Nightly validation av YouTube-klippen i backend/content/catalog/*.yaml
 # mot YouTube Data API v3.
 #
+# PASS/FAIL-signalen kommer från youtube-validate (backend/youtube/validate.ts),
+# som klassar per ITEM och inte per klipp:
+#   - DEAD     = inget spelbart klipp kvar för itemet   -> exit 1 (RÖTT)
+#   - DEGRADED = ett klipp borta men minst ett kvar      -> exit 0 (GRÖNT)
+# Ett item kan bära flera klipp (officiell video + lyrics) och spelas så länge
+# minst ett fungerar (pickMediaSource). Larmet ska gå när en FRÅGA slutar
+# fungera — inte när ETT klipp gör det.
+#
 # JOBBET GÅR RÖTT ENBART VID HÅRDA FEL — dvs klipp som faktiskt inte spelas
 # för våra spelare:
 #   - videoId raderad / privat
@@ -9,15 +17,23 @@
 #     SERVED_REGIONS (backend/youtube/client.ts — V1 = ['SE'])
 #
 # Mjuka anmärkningar (SD-upplösning, block i regioner vi inte levererar
-# till, made-for-kids) skrivs ut under NOTES men fäller INTE jobbet och
-# triggar ingen ersättningssökning.
+# till, made-for-kids) skrivs ut under NOTES men fäller INTE jobbet. Detsamma
+# gäller ej-verifierbara klipp (övergående API-fel efter retry) — ett API-hicka
+# rödfärgar aldrig cronen.
+#
+# autofix.ts (ersättningssökning + YAML-patch) körs ENBART på den manuella
+# workflow_dispatch-körningen med apply_fixes=true. Den schemalagda körningen
+# gör INGEN ersättningssökning (sparar sök-kvot) — den bara validerar.
 #
 # Bakgrund: t.o.m. 2026-08-10 räknades varje flagga som fel. Eftersom ~20
 # klipp permanent flaggas för SD eller BY/RU-block var jobbet rött VARJE
 # natt sedan 2026-05-22 — och när tre videor faktiskt raderades såg mejlet
-# exakt likadant ut som de 80 föregående. Larmet var värdelöst tills det
-# skilde på "trasigt" och "inte perfekt". Rör inte den uppdelningen utan
-# att tänka igenom vad ett rött mejl ska betyda.
+# exakt likadant ut som de 80 föregående. Sedan dess körde autofix.ts som
+# pass/fail-signal, men den klassade fortfarande per KLIPP: ett brutet klipp
+# på ett item med ett fungerande alternativ gav exit 1 trots att frågan gick
+# att spela. Därför är signalen nu item-nivå (validate.ts). Larmet var
+# värdelöst tills det skilde på "trasigt" och "inte perfekt". Rör inte den
+# uppdelningen utan att tänka igenom vad ett rött mejl ska betyda.
 #
 # VIKTIGT vid V2: när nordic/global öppnas MÅSTE SERVED_REGIONS utökas,
 # annars klassas block mot de nya marknaderna tyst som mjuka.
@@ -58,6 +74,11 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # apply_fixes=true-körningen committar + push:ar patchade YAML-filer. Default
+    # GITHUB_TOKEN är read-only i moderna repos → push:en 403:ar utan detta.
+    # Ofarligt för den vanliga validerings-körningen (som inte skriver något).
+    permissions:
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
@@ -73,21 +94,49 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Run youtube-autofix (validera + föreslå ersättningar)
-        id: autofix
+      - name: Run youtube-autofix (ENBART manuell apply — söker + patchar YAML)
+        # Körs BARA på workflow_dispatch med apply_fixes=true. autofix.ts söker
+        # ersättningskandidater (100 kvot-enheter/sökning) och patchar YAML med
+        # top-scored kandidat (poäng >= threshold, inga block-reasons). Skriver
+        # även youtube-autofix-report.json.
+        #
+        # `|| true`: autofix.ts exit:ar 1 om ett brutet klipp inte kunde
+        # ersättas, men den är INTE pass/fail-signalen här — det är
+        # youtube-validate-steget nedan (item-nivå). Utan `|| true` skulle ett
+        # misslyckat steg hoppa över commit-steget så patchade filer aldrig
+        # committades.
+        if: ${{ inputs.apply_fixes == true }}
         working-directory: backend
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        # autofix.ts exit:ar 1 om brutna klipp kvarstår efter ev. auto-patch,
-        # vilket markerar jobbet rött + triggar GitHub:s default-failure-mejl.
-        # Med apply_fixes=true patchas YAML automatiskt med top-scored kandidat
-        # (poäng >= threshold, inga block-reasons).
+        run: npx tsx youtube/autofix.ts --all --apply --threshold "${{ inputs.threshold || '5' }}" || true
+
+      - name: Committa auto-patchade filer (om apply_fixes=true och något ändrades)
+        if: ${{ inputs.apply_fixes == true }}
         run: |
-          ARGS="--all"
-          if [ "${{ inputs.apply_fixes }}" = "true" ]; then
-            ARGS="$ARGS --apply --threshold ${{ inputs.threshold || '5' }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet backend/content/catalog/; then
+            git add backend/content/catalog/
+            git commit -m "chore: auto-replace broken YouTube clips (autofix nightly)"
+            git push
+          else
+            echo "Inga YAML-ändringar att commita."
           fi
-          npx tsx youtube/autofix.ts $ARGS
+
+      - name: Run youtube-validate (item-nivå PASS/FAIL-signal)
+        # DETTA är pass/fail-signalen på BÅDE schemalagd och manuell körning.
+        # Rött ENBART när ett ITEM är DÖTT (inget spelbart klipp kvar); DEGRADED
+        # (ett av flera klipp borta) är grönt. På apply-körningen validerar den
+        # den redan patchade katalogen.
+        #
+        # Raw `npx tsx` (inte `npm run youtube-validate`) eftersom npm-scriptet
+        # kör `tsx --env-file=.env.local`, och .env.local finns inte i CI (den
+        # bär API-nyckeln lokalt). Nyckeln injiceras via env-blocket här istället.
+        working-directory: backend
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: npx tsx youtube/validate.ts --all
 
       - name: Run spotify-validate (döda track-ID:n → "Something went wrong" i appen)
         # Körs även om youtube-steget failade — de två validerar oberoende
@@ -106,10 +155,11 @@ jobs:
         # Detta steg jämför katalogens displayName mot track-sidans og:title +
         # music:musician_description.
         #
-        # RÖTT ENBART VID MISMATCH (varken titel eller artist matchar = säkert
-        # fel låt). TITLE/ARTIST-flaggor är oftast godartade (stavning,
-        # "- Radio Edit", feat-credits i artistlistan) och listas bara i
-        # rapporten — samma "trasigt vs inte perfekt"-uppdelning som
+        # RÖTT vid MISMATCH (varken titel eller artist matchar = säkert fel låt)
+        # OCH vid TITLE (rätt artist men fel låt — DJ:n får ändå fel låt i
+        # högtalaren). ARTIST-flaggor (titeln matchar men artist-strängen skiljer
+        # sig: stavning, feat-credits, ampersand) är oftast godartade och listas
+        # bara i rapporten — samma "trasigt vs inte perfekt"-uppdelning som
         # youtube-steget ovan. Rör inte den utan att tänka igenom vad ett rött
         # mejl ska betyda.
         if: always()
@@ -126,8 +176,9 @@ jobs:
           retention-days: 30
 
       - name: Ladda upp rapport som CI-artefakt
-        # Körs alltid — rapporten är värdefull både vid success (tom = alla OK)
-        # och failure (innehåller lista brutna klipp + föreslagna ersättningar).
+        # Genereras BARA av autofix.ts, dvs. på den manuella apply-körningen
+        # (if-no-files-found: ignore → tyst på schemalagda körningar där
+        # autofix inte kört). Innehåller brutna klipp + föreslagna ersättningar.
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -135,16 +186,3 @@ jobs:
           path: backend/output/youtube-autofix-report.json
           if-no-files-found: ignore
           retention-days: 30
-
-      - name: Committa auto-patchade filer (om apply_fixes=true och något ändrades)
-        if: ${{ inputs.apply_fixes == true }}
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet backend/content/catalog/; then
-            git add backend/content/catalog/
-            git commit -m "chore: auto-replace broken YouTube clips (autofix nightly)"
-            git push
-          else
-            echo "Inga YAML-ändringar att commita."
-          fi

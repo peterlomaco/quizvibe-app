@@ -23,6 +23,7 @@ import type { ContentItem, YoutubeClip } from '../content/schema';
 import {
   searchVideos,
   getVideoDetails,
+  getVideoDetailsWithRetry,
   getClipBlockReasons,
   getClipIssues,
   type YoutubeVideoDetails,
@@ -185,15 +186,30 @@ async function findBrokenClips(
   // Dedup videoIds och batch-hämta details
   const uniqIds = Array.from(new Set(allRefs.map((r) => r.clip.videoId)));
   const detailsMap = new Map<string, YoutubeVideoDetails>();
+  // videoIds vars batch-anrop misslyckades även efter en retry — övergående
+  // API-fel, INTE döda klipp. Hoppas över (markeras varken brutna eller
+  // söks ersättning för) så ett API-hicka inte triggar fantom-ersättningar.
+  const unverified = new Set<string>();
 
   for (let i = 0; i < uniqIds.length; i += VIDEOS_BATCH) {
     const batch = uniqIds.slice(i, i + VIDEOS_BATCH);
-    const list = await getVideoDetails({ videoIds: batch });
-    for (const d of list) detailsMap.set(d.videoId, d);
+    try {
+      const list = await getVideoDetailsWithRetry({ videoIds: batch });
+      for (const d of list) detailsMap.set(d.videoId, d);
+    } catch (err) {
+      console.warn(
+        `  ⚠ Kunde inte verifiera ${batch.length} klipp (övergående API-fel ` +
+          `efter retry) — hoppar över: ${(err as Error).message}`,
+      );
+      for (const id of batch) unverified.add(id);
+    }
   }
 
   // Klassificera varje ref
   for (const { filename, item, clip } of allRefs) {
+    // Ej-verifierbart klipp: API:t gick inte att nå. Vi vet inte om det lever,
+    // så det får varken flaggas brutet eller trigga ersättningssökning.
+    if (unverified.has(clip.videoId)) continue;
     const details = detailsMap.get(clip.videoId);
     if (!details) {
       refs.push({

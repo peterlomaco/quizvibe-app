@@ -22,7 +22,7 @@ import { pathToFileURL } from 'node:url';
 import { loadCatalog, findItemsById } from '../content/registry';
 import { ContentItem, YoutubeClip } from '../content/schema';
 import {
-  getVideoDetails,
+  getVideoDetailsWithRetry,
   getClipIssues,
   YoutubeVideoDetails,
 } from './client';
@@ -40,8 +40,11 @@ interface ClipReport {
    * 'missing'/'broken' = hårt fel, klippet spelas inte för våra spelare →
    * exit 1. 'warn' = bara mjuka anmärkningar (SD, block i icke-levererad
    * region) → rapporteras men fäller inte körningen. 'ok' = rent.
+   * 'unverified' = API:t gick inte att nå (övergående fel efter en retry) —
+   * vi VET inte om klippet fungerar, men ett API-hicka får aldrig klassas som
+   * dött. Räknas som spelbart i classifyItems och rapporteras separat.
    */
-  status: 'ok' | 'warn' | 'broken' | 'missing';
+  status: 'ok' | 'warn' | 'broken' | 'missing' | 'unverified';
   hardReasons: string[];
   softReasons: string[];
   details?: YoutubeVideoDetails;
@@ -66,7 +69,11 @@ export interface ItemReport {
   status: ItemStatus;
   /** Klipp som inte kan spelas för våra spelare. */
   failed: ClipReport[];
-  /** Klipp som fortfarande fungerar (inkl. sådana med mjuka anmärkningar). */
+  /**
+   * Klipp som fortfarande fungerar (inkl. sådana med mjuka anmärkningar) samt
+   * övergående ej-verifierbara ('unverified') — de får aldrig göra ett item
+   * dött, ett API-hicka ska inte fälla cronen.
+   */
   healthy: ClipReport[];
 }
 
@@ -131,15 +138,38 @@ async function validateBatch(refs: ClipReference[]): Promise<ClipReport[]> {
   // Dedup videoIds — samma klipp kan teoretiskt refereras från flera items
   const uniqIds = Array.from(new Set(refs.map((r) => r.clip.videoId)));
   const detailsMap = new Map<string, YoutubeVideoDetails>();
+  // videoIds vars batch-anrop misslyckades även efter en retry — övergående
+  // API-fel (5xx / quota / nätverk), INTE döda klipp. Får aldrig klassas som
+  // 'missing'/dött (då hade ett API-hicka rödfärgat hela cronen).
+  const unverified = new Set<string>();
 
   for (let i = 0; i < uniqIds.length; i += VIDEOS_LIST_BATCH_SIZE) {
     const batch = uniqIds.slice(i, i + VIDEOS_LIST_BATCH_SIZE);
-    const list = await getVideoDetails({ videoIds: batch });
-    for (const d of list) detailsMap.set(d.videoId, d);
+    try {
+      const list = await getVideoDetailsWithRetry({ videoIds: batch });
+      for (const d of list) detailsMap.set(d.videoId, d);
+    } catch (err) {
+      console.warn(
+        `  ⚠ Kunde inte verifiera ${batch.length} klipp (övergående API-fel ` +
+          `efter retry): ${(err as Error).message}`,
+      );
+      for (const id of batch) unverified.add(id);
+    }
   }
 
   const reports: ClipReport[] = [];
   for (const ref of refs) {
+    // Ej-verifierbara klipp: API:t gick inte att nå. Vi vet inte om klippet
+    // lever — men ett API-fel får inte förväxlas med en raderad video.
+    if (unverified.has(ref.clip.videoId)) {
+      reports.push({
+        ref,
+        status: 'unverified',
+        hardReasons: [],
+        softReasons: ['could not verify (transient API error)'],
+      });
+      continue;
+    }
     const details = detailsMap.get(ref.clip.videoId);
     if (!details) {
       reports.push({
@@ -183,6 +213,7 @@ function printReport(reports: ClipReport[]): void {
   const warn = reports.filter((r) => r.status === 'warn');
   const broken = reports.filter((r) => r.status === 'broken');
   const missing = reports.filter((r) => r.status === 'missing');
+  const unverified = reports.filter((r) => r.status === 'unverified');
 
   const items = classifyItems(reports);
   const dead = items.filter((i) => i.status === 'dead');
@@ -191,7 +222,8 @@ function printReport(reports: ClipReport[]): void {
   console.log(
     `\nValidated ${reports.length} clip(s) across ${items.length} item(s): ` +
       `${ok.length} OK, ${warn.length} notes, ` +
-      `${broken.length} broken, ${missing.length} missing.`,
+      `${broken.length} broken, ${missing.length} missing, ` +
+      `${unverified.length} unverified.`,
   );
   console.log(
     `Items: ${items.length - dead.length - degraded.length} playable, ` +
@@ -230,6 +262,20 @@ function printReport(reports: ClipReport[]): void {
         console.log(`    ${tag} ${r.ref.clip.videoId}: ${r.hardReasons.join(', ')}`);
       }
       console.log(`    kvar: ${i.healthy.map((r) => r.ref.clip.videoId).join(', ')}`);
+    }
+  }
+
+  // Ej-verifierbara klipp (övergående API-fel efter retry). Fäller INTE
+  // jobbet — vi vet inte om de är trasiga, och ett API-hicka ska inte
+  // rödfärga cronen. Kolla dem manuellt vid nästa körning om de kvarstår.
+  if (unverified.length) {
+    console.log(
+      '\n──────────── UNVERIFIED (transient API error, non-blocking) ─────',
+    );
+    for (const r of unverified) {
+      console.log(
+        `  [UNVERIFIED] ${r.ref.itemId} (${r.ref.filename}) → ${r.ref.clip.videoId}`,
+      );
     }
   }
 

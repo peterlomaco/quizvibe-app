@@ -161,6 +161,30 @@ export async function getVideoDetails(
   return data.items.map(parseVideoItem);
 }
 
+// Ett övergående fel (5xx, quota-403, 429, nätverksblink) betyder INTE att
+// klippet är dött — bara att API:t inte gick att nå just då. Ett dött klipp
+// yttrar sig aldrig som ett kast här: en raderad/privat video saknas tyst i
+// 200-svaret (detailsMap.get() → undefined), medan getVideoDetails BARA kastar
+// vid HTTP-fel eller nätverksfel. Alla kast är alltså infra-fel, inte döda
+// klipp. Försök därför en gång till med paus innan vi ger upp — samma mönster
+// som validate-spotify-tracks.ts / audit-spotify-track-identity.ts.
+//
+// Kastar vidare om även andra försöket misslyckas; anroparen i validerings-
+// pathen tolkar det som "kunde inte verifiera" (INTE dött) och rödfärgar aldrig
+// cronen på ett API-hicka.
+const VALIDATION_RETRY_DELAY_MS = 2_000;
+
+export async function getVideoDetailsWithRetry(
+  options: VideoDetailsOptions,
+): Promise<YoutubeVideoDetails[]> {
+  try {
+    return await getVideoDetails(options);
+  } catch {
+    await new Promise((r) => setTimeout(r, VALIDATION_RETRY_DELAY_MS));
+    return await getVideoDetails(options);
+  }
+}
+
 function parseVideoItem(v: YoutubeVideoItem): YoutubeVideoDetails {
   const reg = v.contentDetails?.regionRestriction;
   const rawDef = v.contentDetails?.definition;
