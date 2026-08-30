@@ -21,9 +21,10 @@
 // Transienta fetch-fel retry:as en gang och flaggas ALDRIG (listas som okanda).
 //
 // Output: konsol-summary + backend/output/spotify-track-identity.md
-// Exit-kod 1 vid MISMATCH OCH TITLE (se kommentaren vid process.exit nedan) -
-// bada innebar att DJ:n far fel lat. ARTIST-flaggor ar ofta godartade
-// (stavning/feat/ampersand) och far inte rodfarga nightly-cron:en.
+// Exit-kod 1 ENBART vid MISMATCH (se kommentaren vid process.exit nedan).
+// TITLE- och ARTIST-flaggor listas bara i rapporten och far INTE rodfarga
+// nightly-cron:en - de ar praktiskt taget alltid godartade stav-/formatvarianter
+// (CLAUDE.md: "Exit-koden ar 1 ENBART vid MISMATCH ... Ror inte den gransen").
 //
 // Kor: cd backend && npm run spotify-identity-audit
 
@@ -292,12 +293,21 @@ async function main(): Promise<void> {
     `\nOK: ${rows.length - bad.length - unknown.length}  Flaggade: ${bad.length}  Okanda: ${unknown.length}`,
   );
   console.log(`Rapport: ${outFile}`);
-  // Exit 1 pa MISMATCH (varken titel eller artist matchar = sakert fel lat)
-  // OCH pa TITLE (ratt artist men fel lat - DJ:n far anda fel lat i
-  // hogtalaren). ARTIST-flaggor (titeln matchar, artist-strangen skiljer:
-  // stavning, "- Radio Edit", feat-credits, ampersand) ar ofta godartade och
-  // far inte rodfarga nightly-cron:en - de listas bara i rapporten.
-  if (rows.some((r) => r.verdict === 'mismatch' || r.verdict === 'title')) {
+  // Exit 1 ENBART pa MISMATCH (varken titel eller artist matchar = sakert fel
+  // lat, t.ex. abba-waterloo som pekade pa Eurythmics 2026-08-19).
+  //
+  // ⚠ TITLE- och ARTIST-flaggor faller INTE jobbet (CLAUDE.md: "Exit-koden ar 1
+  // ENBART vid MISMATCH ... Ror inte den gransen"). Empiriskt (nightly 2026-08-30)
+  // ar praktiskt taget alla TITLE/ARTIST-traffar godartade stav-/formatvarianter
+  // som titel-matchning inte kan skilja fran akta fel lat: "Djingis Kan" vs
+  // "Djingis Khan", "Genom Eld och Vatten" vs "& Vatten", "Successchottis" vs
+  // "Succeshottis", feat-credits. Skulle de falla jobbet vore larmet rott varje
+  // natt och darmed vardelost - de listas bara i rapporten for manuell koll.
+  //
+  // (Split/normalisering + titleMatches ar fortfarande skarpta jamfort med foren:
+  //  battre artist-extraktion gor att ett AKTA fel-ID dar aven artisten skiljer
+  //  sig korrekt fangas som MISMATCH i stallet for att slinka igenom som falsk OK.)
+  if (rows.some((r) => r.verdict === 'mismatch')) {
     process.exit(1);
   }
 }
