@@ -5358,6 +5358,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "4cVHMHgmWgudD399ZdhQ3L",
     "youtubeClips": [
       {
         "videoId": "VbD_kBJc_gI",
@@ -6459,6 +6460,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "6FnuMo55jNECTDdS1nD5H0",
     "youtubeClips": [
       {
         "videoId": "opRRax4ph3E",
@@ -12686,6 +12688,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "1rqPSD8vhtf6jvw3uFTAsz",
     "youtubeClips": [
       {
         "videoId": "4No1oClTp_E",
@@ -16626,6 +16629,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "0GWGZA5mxo9nHuSyrj70uo",
     "youtubeClips": [
       {
         "videoId": "w74lkrIWebs",
@@ -18168,6 +18172,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "spotifyTrackId": "2Foc5Q5nqNiosCNqttzHof",
     "youtubeClips": [
       {
         "videoId": "5glDAaCaazc",
@@ -19428,6 +19433,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "sport"
     ],
+    "spotifyTrackId": "46NBoIAHrmR7qcUGCIFEjR",
     "youtubeClips": [
       {
         "videoId": "MoHnffhBwqs",
@@ -21640,6 +21646,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Club & Dance Hits"
     ],
+    "spotifyTrackId": "4uUG5RXrOk84mYEfFvj3cK",
     "youtubeClips": [
       {
         "videoId": "kXhBKjDKF84",
@@ -22514,6 +22521,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "6SvlfrQYzUsW5UQUpUpy26",
     "youtubeClips": [
       {
         "videoId": "J3oGYo_mekw",

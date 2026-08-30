@@ -51,6 +51,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Daft Punk Get Lucky Pharrell Williams Random Access Memories"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2Foc5Q5nqNiosCNqttzHof"
     youtubeClips:
       - videoId: "5glDAaCaazc"
         startSec: 0
@@ -931,6 +932,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["DARA Bangaranga Eurovision 2026 Bulgaria"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6SvlfrQYzUsW5UQUpUpy26"
     youtubeClips:
       - videoId: "J3oGYo_mekw"
         startSec: 5
@@ -1620,6 +1622,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["David Guetta I’m Good (Blue)"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4uUG5RXrOk84mYEfFvj3cK"
     youtubeClips:
       - videoId: "kXhBKjDKF84"
         startSec: 14

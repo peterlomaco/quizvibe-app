@@ -649,6 +649,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["David Bowie Let's Dance 1983"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4cVHMHgmWgudD399ZdhQ3L"
     youtubeClips:
       - videoId: "VbD_kBJc_gI"
         startSec: 0
@@ -1703,6 +1704,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["David Bowie Mick Jagger Dancing in the Street 1985 Live Aid"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6FnuMo55jNECTDdS1nD5H0"
     youtubeClips:
       - videoId: "opRRax4ph3E"
         startSec: 0
