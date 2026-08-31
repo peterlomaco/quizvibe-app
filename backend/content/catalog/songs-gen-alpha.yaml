@@ -1302,10 +1302,10 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "k2qgadSvNyU"
-        startSec: 0
+        startSec: 8
         endSec: 30
         channelTitle: "Dua Lipa"
-        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear = albumet Dua Lipa (juni 2017), inte singeln juli 2017."
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear = albumet Dua Lipa (juni 2017), inte singeln juli 2017. startSec 0→8 (2026-08-31, Peter — senarelagd start på inofficiella videon)."
   - id: zayn-dusk-till-dawn
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dusk Till Dawn — ZAYN feat. Sia"
