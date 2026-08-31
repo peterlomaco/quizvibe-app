@@ -36,6 +36,19 @@ export function hasActivePackage(selectedIds: readonly string[]): boolean {
   return resolveActivePackageTags(selectedIds).size > 0;
 }
 
+/**
+ * True om Spotify FÅR vara den enda aktiva källan för de valda paketen — dvs.
+ * ALLA aktiva paket har `allowSpotifyOnly` (rena musik-genre-paket). Blandas ett
+ * Sport/Football-paket in (som saknar Spotify-spår) → false, så host inte kan
+ * lämna det paketet utan spelbar källa. Tomt urval → false.
+ */
+export function packagesAllowSpotifyOnly(selectedIds: readonly string[]): boolean {
+  const active = selectedIds
+    .map((id) => PURCHASED_PACKAGES.find((p) => p.id === id))
+    .filter((p): p is (typeof PURCHASED_PACKAGES)[number] => !!p);
+  return active.length > 0 && active.every((p) => p.allowSpotifyOnly === true);
+}
+
 /** True om item:ets genrePackages matchar någon aktiv paket-tagg. */
 export function itemInActivePackages(
   genrePackages: readonly string[] | undefined,

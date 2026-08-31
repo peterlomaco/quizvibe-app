@@ -4,12 +4,16 @@ import {
   applyInactivityDecay,
   clampHcp,
   displayHcp,
+  emptyCategoryProgress,
   emptyHcpProgress,
   evaluateWindow,
   filterByItemHcp,
   HCP_START,
   HCP_WINDOW_SIZE,
   resolveDisplayHcp,
+  resolveDisplayTotalHcp,
+  totalHcp,
+  type CategoryProgress,
   type HcpProgress,
   type HcpWindow,
 } from '../../../src/utils/hcpEngine';
@@ -17,6 +21,20 @@ import {
 // Hjälpare: ett fönster med `nCorrect` rätt av `size` svar (resten fel).
 function win(nCorrect: number, size = HCP_WINDOW_SIZE): HcpWindow {
   return Array.from({ length: size }, (_, i) => i < nCorrect);
+}
+
+// Kategori-progress med explicit hcp + valfria fönster/klocka.
+function cat(hcp: number, windows?: Partial<CategoryProgress['windows']>, lastPlayedISO: string | null = null): CategoryProgress {
+  return {
+    hcp,
+    windows: { minimal: [], standard: [], full: [], ...windows },
+    lastPlayedISO,
+  };
+}
+
+// Full progress: Music styrs, Film/Sport default 99 (orörda).
+function progress(music: CategoryProgress, film = emptyCategoryProgress(), sport = emptyCategoryProgress()): HcpProgress {
+  return { categories: { Music: music, Film: film, Sport: sport } };
 }
 
 const ISO = '2026-01-01T00:00:00.000Z';
@@ -35,21 +53,41 @@ describe('displayHcp / clampHcp (§1.2.3 — avrunda uppåt)', () => {
   });
 });
 
-describe('emptyHcpProgress (§1.1 — alla startar på 99)', () => {
-  it('startar på HCP_START med tomma fönster', () => {
+describe('emptyHcpProgress (§1.1/§1.3 — alla kategorier startar på 99)', () => {
+  it('startar varje kategori på HCP_START med tomma fönster', () => {
     const p = emptyHcpProgress();
     expect(HCP_START).toBe(99);
-    expect(p.hcp).toBe(99);
-    expect(p.windows.full).toEqual([]);
-    expect(p.windows.standard).toEqual([]);
-    expect(p.windows.minimal).toEqual([]);
-    expect(p.lastPlayedISO).toBeNull();
+    for (const c of [p.categories.Music, p.categories.Film, p.categories.Sport]) {
+      expect(c.hcp).toBe(99);
+      expect(c.windows.full).toEqual([]);
+      expect(c.windows.standard).toEqual([]);
+      expect(c.windows.minimal).toEqual([]);
+      expect(c.lastPlayedISO).toBeNull();
+    }
+  });
+});
+
+describe('totalHcp / resolveDisplayTotalHcp (§1.3 — snitt av 3 kategorier)', () => {
+  it('total = snittet av de tre kategoriernas float-HCP', () => {
+    const p = progress(cat(40), cat(41), cat(42));
+    expect(totalHcp(p)).toBeCloseTo(41, 5);
+    expect(resolveDisplayTotalHcp(p)).toBe(41); // 41 ceil = 41
+  });
+  it('avrundar total uppåt', () => {
+    const p = progress(cat(40), cat(41), cat(41)); // snitt 40.6667
+    expect(resolveDisplayTotalHcp(p)).toBe(41);
+  });
+  it('null progress → 99', () => {
+    expect(resolveDisplayTotalHcp(null)).toBe(99);
+    expect(resolveDisplayTotalHcp(undefined)).toBe(99);
+  });
+  it('ny spelare (alla 99) → total 99', () => {
+    expect(resolveDisplayTotalHcp(emptyHcpProgress())).toBe(99);
   });
 });
 
 describe('evaluateWindow (§2.1 — trösklar per nivå)', () => {
   it('kräver ett FULLT fönster (20 svar) innan något steg', () => {
-    // 19 svar, alla fel → skulle annars ge +1, men fönstret är inte fullt.
     expect(evaluateWindow(win(0, 19), 'full')).toBe(0);
     expect(evaluateWindow(win(19, 19), 'full')).toBe(0);
   });
@@ -75,111 +113,101 @@ describe('evaluateWindow (§2.1 — trösklar per nivå)', () => {
   });
 });
 
-describe('applyGameResult (§2.1)', () => {
-  it('trimmar fönstret till senaste 20 svar', () => {
+describe('applyGameResult (§2.1 — per kategori)', () => {
+  it('trimmar den spelade kategorins fönster till senaste 20 svar', () => {
     let p = emptyHcpProgress();
-    // 25 svar → bara de sista 20 behålls.
-    p = applyGameResult(p, 'full', Array(25).fill(true), ISO);
-    expect(p.windows.full.length).toBe(HCP_WINDOW_SIZE);
-    expect(p.lastPlayedISO).toBe(ISO);
+    p = applyGameResult(p, 'Music', 'full', Array(25).fill(true), ISO);
+    expect(p.categories.Music.windows.full.length).toBe(HCP_WINDOW_SIZE);
+    expect(p.categories.Music.lastPlayedISO).toBe(ISO);
   });
 
-  it('rör bara den spelade nivåns fönster', () => {
+  it('rör bara den spelade kategorins (och nivåns) fönster', () => {
     let p = emptyHcpProgress();
-    p = applyGameResult(p, 'standard', [true, false], ISO);
-    expect(p.windows.standard.length).toBe(2);
-    expect(p.windows.full).toEqual([]);
-    expect(p.windows.minimal).toEqual([]);
+    p = applyGameResult(p, 'Music', 'standard', [true, false], ISO);
+    expect(p.categories.Music.windows.standard.length).toBe(2);
+    expect(p.categories.Music.windows.full).toEqual([]);
+    // Film + Sport helt orörda.
+    expect(p.categories.Film).toEqual(emptyCategoryProgress());
+    expect(p.categories.Sport).toEqual(emptyCategoryProgress());
   });
 
-  it('sänker HCP med 1 när ett fullt fönster ligger över tröskeln', () => {
-    // Seed: 19 rätt redan i fönstret, lägg ett rätt till → 20 rätt ≥ 18 → −1.
-    const seeded: HcpProgress = {
-      hcp: 99,
-      windows: { full: win(19, 19), standard: [], minimal: [] },
-      lastPlayedISO: null,
-    };
-    const next = applyGameResult(seeded, 'full', [true], ISO);
-    expect(next.hcp).toBe(98);
+  it('sänker kategorins HCP med 1 när ett fullt fönster ligger över tröskeln', () => {
+    const p = progress(cat(99, { full: win(19, 19) }));
+    const next = applyGameResult(p, 'Music', 'full', [true], ISO); // 20/20 ≥ 18 → −1
+    expect(next.categories.Music.hcp).toBe(98);
+    // Övriga kategorier oförändrade.
+    expect(next.categories.Film.hcp).toBe(99);
+    expect(next.categories.Sport.hcp).toBe(99);
   });
 
   it('kontinuerligt glidande: kan sänka igen nästa spel (ingen reset)', () => {
-    // Full window av idel rätt → −1 varje gång ett nytt rätt-svar kommer in.
-    let p: HcpProgress = {
-      hcp: 50,
-      windows: { full: win(20), standard: [], minimal: [] },
-      lastPlayedISO: null,
-    };
-    p = applyGameResult(p, 'full', [true], ISO); // fortfarande 20/20
-    expect(p.hcp).toBe(49);
-    p = applyGameResult(p, 'full', [true], ISO);
-    expect(p.hcp).toBe(48);
+    let p = progress(cat(50, { full: win(20) }));
+    p = applyGameResult(p, 'Music', 'full', [true], ISO);
+    expect(p.categories.Music.hcp).toBe(49);
+    p = applyGameResult(p, 'Music', 'full', [true], ISO);
+    expect(p.categories.Music.hcp).toBe(48);
   });
 
-  it('höjer HCP med 1 när ett fullt fönster ligger under tröskeln (max +1/spel)', () => {
-    const seeded: HcpProgress = {
-      hcp: 40,
-      windows: { minimal: win(0, 19), standard: [], full: [] },
-      lastPlayedISO: null,
-    };
-    const next = applyGameResult(seeded, 'minimal', [false], ISO); // 0/20 ≤ 8 → +1
-    expect(next.hcp).toBe(41);
+  it('höjer kategorins HCP med 1 när ett fullt fönster ligger under tröskeln (max +1/spel)', () => {
+    const p = progress(cat(40, { minimal: win(0, 19) }));
+    const next = applyGameResult(p, 'Music', 'minimal', [false], ISO); // 0/20 ≤ 8 → +1
+    expect(next.categories.Music.hcp).toBe(41);
   });
 
   it('klampar HCP till [1, 99]', () => {
-    const atFloor: HcpProgress = {
-      hcp: 1,
-      windows: { full: win(20), standard: [], minimal: [] },
-      lastPlayedISO: null,
-    };
-    expect(applyGameResult(atFloor, 'full', [true], ISO).hcp).toBe(1);
-    const atCap: HcpProgress = {
-      hcp: 99,
-      windows: { full: win(0, 19), standard: [], minimal: [] },
-      lastPlayedISO: null,
-    };
-    expect(applyGameResult(atCap, 'full', [false], ISO).hcp).toBe(99);
+    const atFloor = progress(cat(1, { full: win(20) }));
+    expect(applyGameResult(atFloor, 'Music', 'full', [true], ISO).categories.Music.hcp).toBe(1);
+    const atCap = progress(cat(99, { full: win(0, 19) }));
+    expect(applyGameResult(atCap, 'Music', 'full', [false], ISO).categories.Music.hcp).toBe(99);
   });
 });
 
-describe('applyInactivityDecay (§2.4 — +0.25 per hel vecka)', () => {
+describe('applyInactivityDecay (§2.4 — +0.25 per hel vecka, oberoende per kategori)', () => {
   const start = new Date('2026-01-01T00:00:00.000Z');
-  const base: HcpProgress = {
-    hcp: 40,
-    windows: { full: [], standard: [], minimal: [] },
-    lastPlayedISO: start.toISOString(),
-  };
+  const base = () => progress(cat(40, undefined, start.toISOString()));
 
-  it('no-op om aldrig spelat', () => {
-    const p = { ...base, lastPlayedISO: null };
-    expect(applyInactivityDecay(p, new Date('2026-06-01T00:00:00.000Z'))).toBe(p);
+  it('no-op om ingen kategori spelats', () => {
+    const p = emptyHcpProgress();
+    expect(applyInactivityDecay(p, new Date('2026-06-01T00:00:00.000Z'))).toEqual(p);
   });
 
   it('no-op om < 1 vecka passerat', () => {
     const now = new Date('2026-01-06T00:00:00.000Z'); // 5 dygn
-    expect(applyInactivityDecay(base, now).hcp).toBe(40);
+    expect(applyInactivityDecay(base(), now).categories.Music.hcp).toBe(40);
   });
 
-  it('+0.25 per hel 7-dagarsperiod', () => {
+  it('+0.25 per hel 7-dagarsperiod på DEN spelade kategorin, inte de andra', () => {
     const now = new Date('2026-01-22T00:00:00.000Z'); // 21 dygn = 3 veckor
-    const out = applyInactivityDecay(base, now);
-    expect(out.hcp).toBeCloseTo(40.75, 5);
+    const out = applyInactivityDecay(base(), now);
+    expect(out.categories.Music.hcp).toBeCloseTo(40.75, 5);
+    // Film/Sport har lastPlayedISO=null → orörda.
+    expect(out.categories.Film.hcp).toBe(99);
+    expect(out.categories.Sport.hcp).toBe(99);
   });
 
-  it('flyttar lastPlayedISO framåt med hela perioder (ej till now) så resten bevaras', () => {
+  it('decayar kategorier oberoende mot sina egna klockor', () => {
+    const p = progress(
+      cat(40, undefined, start.toISOString()),
+      cat(50, undefined, new Date('2026-01-15T00:00:00.000Z').toISOString()),
+    );
+    const now = new Date('2026-01-22T00:00:00.000Z');
+    const out = applyInactivityDecay(p, now);
+    expect(out.categories.Music.hcp).toBeCloseTo(40.75, 5); // 3 veckor
+    expect(out.categories.Film.hcp).toBeCloseTo(50.25, 5); // 1 vecka
+  });
+
+  it('flyttar kategorins lastPlayedISO framåt med hela perioder (ej till now)', () => {
     const now = new Date('2026-01-10T00:00:00.000Z'); // 9 dygn = 1 vecka + 2 dygn
-    const out = applyInactivityDecay(base, now);
-    expect(out.hcp).toBeCloseTo(40.25, 5);
-    // lastPlayed ska ha flyttats exakt 7 dygn framåt, inte 9.
-    expect(out.lastPlayedISO).toBe('2026-01-08T00:00:00.000Z');
-    // En andra körning direkt efteråt ska inte lägga till mer (resten < 1 vecka).
-    expect(applyInactivityDecay(out, now).hcp).toBeCloseTo(40.25, 5);
+    const out = applyInactivityDecay(base(), now);
+    expect(out.categories.Music.hcp).toBeCloseTo(40.25, 5);
+    expect(out.categories.Music.lastPlayedISO).toBe('2026-01-08T00:00:00.000Z');
+    expect(applyInactivityDecay(out, now).categories.Music.hcp).toBeCloseTo(40.25, 5);
   });
 
   it('klampar vid 99', () => {
-    const near: HcpProgress = { ...base, hcp: 98.5 };
-    const now = new Date('2026-03-01T00:00:00.000Z'); // många veckor
-    expect(applyInactivityDecay(near, now).hcp).toBe(99);
+    const near = progress(cat(98.5, undefined, start.toISOString()));
+    const now = new Date('2026-03-01T00:00:00.000Z');
+    expect(applyInactivityDecay(near, now).categories.Music.hcp).toBe(99);
   });
 });
 
@@ -211,7 +239,6 @@ describe('filterByItemHcp (§4.1 — progressiv relaxering)', () => {
   });
 
   it('relaxar golvet nedåt när för få items matchar playerHcp (99 → 79)', () => {
-    // Alla items på 80; spelare 99 → inga >=99/89 → relaxa till 79 → alla med.
     const pool = many(80, 30);
     const out = filterByItemHcp(pool, 99, 10);
     expect(out.length).toBe(30);
@@ -228,7 +255,6 @@ describe('filterByItemHcp (§4.1 — progressiv relaxering)', () => {
   });
 
   it('faller tillbaka på hela poolen om ens lågt golv ger för få', () => {
-    // Items på itemHcp 5 (under lägsta testade golvet ~9) → aldrig nog → hela.
     const pool = many(5, 20);
     const out = filterByItemHcp(pool, 99, 15);
     expect(out).toBe(pool);

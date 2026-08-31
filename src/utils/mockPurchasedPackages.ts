@@ -36,14 +36,19 @@ export interface MusicPackage {
   // (idag inga). Optional för bakåtkompat — köpta paket lämnar fältet
   // undefined.
   free?: boolean;
+  // True = Spotify FÅR vara den ENDA aktiva källan för paketet (host kan då
+  // stänga av både YT och Hints). Passar rena musik-genre-paket där allt
+  // innehåll finns på Spotify. Sätts INTE (=false) för t.ex. Sport/Football-
+  // paket, där sport-events saknar Spotify-spår → Spotify-only ger tom pool.
+  allowSpotifyOnly?: boolean;
 }
 
 // Första riktiga tema-paketen (2026-08-28). Båda är Music-only. `id` bär
 // `pkg-`-prefix (plockas INTE av LEGACY_GEN_PKG_IDS-strippningen som bara
 // matchar `pkg-gen-*`). `tags` speglar genrePackages-strängarna i katalogen.
 export const PURCHASED_PACKAGES: MusicPackage[] = [
-  { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'] },
-  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['hiphop'] },
+  { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'], allowSpotifyOnly: true },
+  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['hiphop'], allowSpotifyOnly: true },
 ];
 
 // ─── Generation-key (för audience-filter) ────────────────────────────

@@ -7,16 +7,19 @@
  * enhetstestas i backend-vitest. Persistensen (per-spelare-store + guest-
  * fallback) bor i hcpProgress.ts.
  *
- * MODELL (Peters beslut 2026-08-28):
+ * MODELL (Peters beslut 2026-08-28, kategori-uppdelning 2026-08-31):
  *  • §1.1  Skala 1–99, 1 = elit, 99 = nybörjare. ALLA nya spelare startar
  *          på HCP 99 (assistance/ålder-baserat start är avfärdat).
- *  • §2.1  Ett glidande fönster per assistance-nivå (senaste 20 svaren).
- *          När fönstret är fullt: viktad summa S ≥ upper → HCP −1, S ≤ lower
- *          → HCP +1, annars 0. Max ±1 per spel. Kontinuerligt glidande (INGEN
- *          reset) — en konsekvent stark spelare sjunker 1/spel tills fönstret
- *          slutar korsa tröskeln (jämvikten kommer från svårighetsfiltret +
- *          §2.2-viktningen när Item-HCP landar).
- *  • §2.4  Inaktivitets-decay: +0.25 per hel 7-dagarsperiod utan spel.
+ *  • §1.3  En spelare har FYRA HCP: Music, Film, Sport (var sin egen
+ *          progress + fönster) samt Total = SNITTET av de tre kategorierna
+ *          (härlett, aldrig lagrat). Varje HCP är dessutom kopplat till EN
+ *          region scope — se hcpProgress.ts (nyckel per region).
+ *  • §2.1  Ett glidande fönster per assistance-nivå (senaste 20 svaren) PER
+ *          kategori. När fönstret är fullt: viktad summa S ≥ upper → HCP −1,
+ *          S ≤ lower → HCP +1, annars 0. Max ±1 per spel och kategori.
+ *          Kontinuerligt glidande (INGEN reset).
+ *  • §2.4  Inaktivitets-decay: +0.25 per hel 7-dagarsperiod utan spel,
+ *          per kategori (var kategori har sin egen lastPlayedISO-klocka).
  *
  * ⚠ EJ IMPLEMENTERAT ÄNNU (kräver Item-HCP = probability-bootstrap, egen fas):
  *  • §2.2  Viktad HCP-Impact — varje rätt svars bidrag till fönstret skalas
@@ -26,19 +29,29 @@
  * Lägg inte till §2.2/§2.3 här förrän Item-HCP-datan finns på klienten.
  */
 import type { AssistanceLevel } from './hcp';
+import { MAIN_CATEGORIES, type MainCategory } from './mainCategory';
+
+// Kategorierna en spelares HCP delas upp i (= YouTube/Hints-huvudkategorierna).
+export const HCP_CATEGORIES = MAIN_CATEGORIES;
 
 // Sliding-window-state (§2.1): senaste svaren rätt/fel per assistance-nivå.
 // `true` = rätt, `false` = fel. Äldst först; trimmas till HCP_WINDOW_SIZE.
 export type HcpWindow = boolean[];
 
-// Hela HCP-progressen för EN registrerad spelare. Persisteras device-lokalt
-// per playerName (hcpProgress.ts, samma mönster som epochLedger.ts) — INTE i
-// profiles-raden (se profileStorage.ts `hcp`-fältets kommentar). `hcp` lagras
-// som flyttal (decay ger 0,25-steg); visningen avrundas uppåt (displayHcp).
-export interface HcpProgress {
+// Progress för EN kategori (Music/Film/Sport): float-HCP, fönster per nivå och
+// en egen decay-klocka. `hcp` lagras som flyttal (decay ger 0,25-steg);
+// visningen avrundas uppåt (displayHcp).
+export interface CategoryProgress {
   hcp: number;
   windows: Record<AssistanceLevel, HcpWindow>;
   lastPlayedISO: string | null;
+}
+
+// Hela HCP-progressen för EN registrerad spelare i EN region scope. Persisteras
+// device-lokalt per (region, playerName) i hcpProgress.ts — INTE i profiles-
+// raden. Total härleds som snittet av de tre kategorierna (totalHcp), lagras ej.
+export interface HcpProgress {
+  categories: Record<MainCategory, CategoryProgress>;
 }
 
 // §2.1 — fönstrets längd (senaste N svaren per nivå).
@@ -74,12 +87,23 @@ export function displayHcp(hcp: number): number {
   return clampHcp(Math.ceil(hcp));
 }
 
-/** Tomt progress-objekt seedat på HCP_START (§1.1 — alla startar på 99). */
-export function emptyHcpProgress(): HcpProgress {
+/** Tom kategori-progress seedad på HCP_START (§1.1 — alla startar på 99). */
+export function emptyCategoryProgress(): CategoryProgress {
   return {
     hcp: HCP_START,
     windows: { minimal: [], standard: [], full: [] },
     lastPlayedISO: null,
+  };
+}
+
+/** Tomt progress-objekt: tre kategorier var för sig seedade på HCP_START. */
+export function emptyHcpProgress(): HcpProgress {
+  return {
+    categories: {
+      Music: emptyCategoryProgress(),
+      Film: emptyCategoryProgress(),
+      Sport: emptyCategoryProgress(),
+    },
   };
 }
 
@@ -107,51 +131,84 @@ export function evaluateWindow(win: HcpWindow, level: AssistanceLevel): -1 | 0 |
 }
 
 /**
- * §2.1 — kör en avslutad spelomgång för EN spelare på EN assistance-nivå:
- * lägg in svaren i nivåns fönster, utvärdera, applicera max ±1, klampa [1,99],
- * stämpla lastPlayedISO. Rör bara den spelade nivåns fönster.
+ * §2.1 — kör en avslutad spelomgång för EN spelare på EN kategori + EN
+ * assistance-nivå: lägg in svaren i den kategorins nivå-fönster, utvärdera,
+ * applicera max ±1, klampa [1,99], stämpla kategorins lastPlayedISO. Rör bara
+ * den spelade kategorins (och nivåns) fönster — övriga kategorier orörda.
  */
 export function applyGameResult(
   progress: HcpProgress,
+  category: MainCategory,
   level: AssistanceLevel,
   answers: boolean[],
   nowISO: string,
 ): HcpProgress {
-  const win = appendToWindow(progress.windows[level], answers);
+  const cat = progress.categories[category];
+  const win = appendToWindow(cat.windows[level], answers);
   const delta = evaluateWindow(win, level);
-  return {
-    hcp: clampHcp(progress.hcp + delta),
-    windows: { ...progress.windows, [level]: win },
+  const nextCat: CategoryProgress = {
+    hcp: clampHcp(cat.hcp + delta),
+    windows: { ...cat.windows, [level]: win },
     lastPlayedISO: nowISO,
+  };
+  return {
+    categories: { ...progress.categories, [category]: nextCat },
   };
 }
 
-/**
- * §2.4 — inaktivitets-decay: +0.25 per HEL 7-dagarsperiod sedan senaste spel.
- * lastPlayedISO flyttas fram med periods×7d (INTE till `now`) så vecko-resten
- * bevaras och samma period aldrig räknas två gånger vid nästa load. No-op om
- * spelaren aldrig spelat (lastPlayedISO = null) eller < 1 vecka passerat.
- */
-export function applyInactivityDecay(progress: HcpProgress, now: Date): HcpProgress {
-  if (!progress.lastPlayedISO) return progress;
-  const last = new Date(progress.lastPlayedISO).getTime();
-  if (Number.isNaN(last)) return progress;
+// §2.4 — decay för EN kategori mot sin egen lastPlayedISO.
+function decayCategory(cat: CategoryProgress, now: Date): CategoryProgress {
+  if (!cat.lastPlayedISO) return cat;
+  const last = new Date(cat.lastPlayedISO).getTime();
+  if (Number.isNaN(last)) return cat;
   const periods = Math.floor((now.getTime() - last) / WEEK_MS);
-  if (periods < 1) return progress;
+  if (periods < 1) return cat;
   return {
-    ...progress,
-    hcp: clampHcp(progress.hcp + 0.25 * periods),
+    ...cat,
+    hcp: clampHcp(cat.hcp + 0.25 * periods),
     lastPlayedISO: new Date(last + periods * WEEK_MS).toISOString(),
   };
 }
 
 /**
- * Vilket HCP-tal en spelares sköld ska visa. Prefererar det sparade
- * (intjänade) värdet; faller annars tillbaka på HCP_START (§1.1 — alla
- * startar på 99). Alltid avrundat uppåt (displayHcp).
+ * §2.4 — inaktivitets-decay: +0.25 per HEL 7-dagarsperiod sedan senaste spel,
+ * OBEROENDE per kategori (varje kategori har sin egen lastPlayedISO). En
+ * kategori-klocka flyttas fram med periods×7d (INTE till `now`) så vecko-resten
+ * bevaras och samma period aldrig räknas två gånger vid nästa load. No-op för
+ * en kategori som aldrig spelats (lastPlayedISO = null) eller < 1 vecka passerat.
  */
-export function resolveDisplayHcp(storedHcp: number | undefined | null): number {
+export function applyInactivityDecay(progress: HcpProgress, now: Date): HcpProgress {
+  return {
+    categories: {
+      Music: decayCategory(progress.categories.Music, now),
+      Film: decayCategory(progress.categories.Film, now),
+      Sport: decayCategory(progress.categories.Sport, now),
+    },
+  };
+}
+
+/** Total-HCP (flyttal): snittet av de tre kategoriernas float-HCP (§1.3). */
+export function totalHcp(progress: HcpProgress): number {
+  const { Music, Film, Sport } = progress.categories;
+  return (Music.hcp + Film.hcp + Sport.hcp) / 3;
+}
+
+/**
+ * Vilket HCP-tal en KATEGORI-sköld ska visa. Prefererar det sparade
+ * (intjänade) värdet; faller annars tillbaka på HCP_START (§1.1). Alltid
+ * avrundat uppåt (displayHcp).
+ */
+export function resolveDisplayCategoryHcp(storedHcp: number | undefined | null): number {
   return displayHcp(typeof storedHcp === 'number' ? storedHcp : HCP_START);
+}
+
+// Bakåtkompatibelt alias — enskilt-skalär-läsare (ProfileScreen, lobby-kolumn)
+// behåller samma import/namn även efter kategori-uppdelningen.
+export const resolveDisplayHcp = resolveDisplayCategoryHcp;
+
+/** Vilket TOTAL-HCP en sköld ska visa. HCP_START-fallback för ohydrerad progress. */
+export function resolveDisplayTotalHcp(progress: HcpProgress | null | undefined): number {
+  return progress ? displayHcp(totalHcp(progress)) : HCP_START;
 }
 
 // §4.1 — hur långt ned golvet relaxas per steg när poolen blir för tunn.

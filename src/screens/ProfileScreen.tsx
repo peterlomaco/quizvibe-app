@@ -24,7 +24,7 @@ import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
-import { HCPShield } from '../components/HCPShield';
+import { HCPShieldCard } from '../components/HCPShield';
 import { HostTypeOptions, type HostLobbyType } from '../components/HostTypeOptions';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
@@ -360,7 +360,9 @@ export default function ProfileScreen() {
   // ev. inaktivitet redan innan nästa spel (motorn applicerar annars decayen
   // först vid nästa spelomgång). Fire-and-forget; speglar till profile.hcp.
   useEffect(() => {
-    void refreshOwnHcpDecay();
+    // Region scope HCP är kopplat till — spelarens egen content-breadth (V1
+    // alltid 'sweden'). Skölden nedan läser samma regions hcpByCategory-bundle.
+    void refreshOwnHcpDecay(getCachedProfile()?.region ?? 'sweden');
   }, []);
   const handleSelectMaxPlayers = (n: 4 | 12) => {
     if (n === 12 && gameMode !== 'individual-devices') {
@@ -481,6 +483,8 @@ export default function ProfileScreen() {
   // Profile default settings-blocket (avatar + playerName + setup + Save)
   // — samma kollapsbara mönster som Game connections och Player history.
   const [profileDefaultsExpanded, setProfileDefaultsExpanded] = useState(false);
+  // "+"-utfällning av per-kategori-HCP-sköldarna (Music/Film/Sport). Default av.
+  const [hcpCategoriesExpanded, setHcpCategoriesExpanded] = useState(false);
   // Host default settings-blocket (Game Mode → Number of Rounds) —
   // egen huvudrubrik mellan Profile defaults och Game connections, samma
   // kollapsbara mönster som de övriga top-level sektionerna.
@@ -1105,10 +1109,17 @@ export default function ProfileScreen() {
   const selectedAvatar = AVATARS.find((a) => a.id === selectedAvatarId);
   const age = birthYear !== null ? CURRENT_YEAR - birthYear : null;
   const assistanceLabel  = ASSISTANCE_OPTIONS.find((s) => s.id === assistance)?.label;
-  // Player-HCP-sköld (§2 UI). Läser det intjänade värdet ur profil-spegeln
-  // (motorn skriver profile.hcp efter varje spel); saknas det faller
-  // resolveDisplayHcp tillbaka på startvärdet 99 (§1.1 — alla startar på 99).
-  const hcpDisplay = resolveDisplayHcp(getCachedProfile()?.hcp);
+  // Player-HCP-sköldar (§1.3 UI). Läser den intjänade per-kategori-bundlen ur
+  // profil-spegeln (motorn skriver profile.hcpByCategory efter varje spel).
+  // Saknas den → 99 för alla (ny spelare / aldrig spelat). Total-sköld + tre
+  // sub-sköldar (Music/Film/Sport) visas alltid i Profile.
+  const hcpBundle = getCachedProfile()?.hcpByCategory;
+  const hcpShieldBundle = {
+    total: resolveDisplayHcp(hcpBundle?.total ?? getCachedProfile()?.hcp),
+    music: resolveDisplayHcp(hcpBundle?.music),
+    film: resolveDisplayHcp(hcpBundle?.film),
+    sport: resolveDisplayHcp(hcpBundle?.sport),
+  };
   const regionLabel = REGION_OPTIONS.find((r) => r.id === region)?.label;
   const answerResponseLabel = ANSWER_RESPONSE_OPTIONS.find(
     (o) => o.id === answerResponseSeconds,
@@ -1491,10 +1502,10 @@ export default function ProfileScreen() {
               {playerName}
             </Text>
 
-            {/* Player-HCP-sköld under avatar + namn (§2 UI). En registrerad
-                användare har alltid ett HCP (startar på 99). */}
+            {/* Total-HCP-sköld under avatar + namn (§1.3). Music/Film/Sport
+                fälls ut via "HCP per category"-raden under kolumnerna. */}
             <View style={styles.hcpShieldWrap}>
-              <HCPShield hcp={hcpDisplay} size={64} />
+              <HCPShieldCard hcp={hcpShieldBundle.total} size={64} label="Total" />
             </View>
           </View>
 
@@ -1575,8 +1586,34 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
 
+            {/* "HCP per category"-rad — under Assistance-dropdownen i höger-
+                kolumnen. "+"/"−"-toggle fäller ut Music/Film/Sport-sköldarna.
+                Rubriken i samma font som fält-labels ("Assistance level"). */}
+            <Pressable
+              onPress={() => setHcpCategoriesExpanded((v) => !v)}
+              hitSlop={8}
+              style={({ pressed }) => [styles.hcpCatHeaderRow, pressed && { opacity: 0.7 }]}
+            >
+              <View style={styles.hcpCatToggleBox}>
+                <Text style={styles.gameConnectionsChevron}>
+                  {hcpCategoriesExpanded ? '−' : '+'}
+                </Text>
+              </View>
+              <Text style={styles.fieldLabel}>HCP per category</Text>
+            </Pressable>
+
           </View>
           </View>
+
+          {/* Per-kategori-HCP (§1.3) — full-bredds-rad, utfälld via raden ovan.
+              Badge-färgen matchar GetReady/countdown-vyns kategori-badge (guld + svart). */}
+          {hcpCategoriesExpanded && (
+            <View style={styles.hcpSubRow}>
+              <HCPShieldCard hcp={hcpShieldBundle.music} size={56} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" />
+              <HCPShieldCard hcp={hcpShieldBundle.film} size={56} label="Film" badgeColor={Colors.warning} badgeTextColor="#000" />
+              <HCPShieldCard hcp={hcpShieldBundle.sport} size={56} label="Sport" badgeColor={Colors.warning} badgeTextColor="#000" />
+            </View>
+          )}
 
           {/* ── Save (inuti kortet) ─────────────────────────────── */}
           <Button
@@ -3957,7 +3994,7 @@ const styles = StyleSheet.create({
   // i förhållande till den högre högerkolumnen.
   columnsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: Spacing.lg,
   },
 
@@ -4000,6 +4037,32 @@ const styles = StyleSheet.create({
   hcpShieldWrap: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // "HCP per category"-rad: under Assistance-dropdownen i högerkolumnen.
+  hcpCatHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  // "+"/"−"-knapp som fäller ut kategori-sköldarna — samma stil som
+  // sektion-rubrikernas gameConnectionsToggleBox.
+  hcpCatToggleBox: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Full-bredds-rad med Music/Film/Sport-sköldarna under kolumnerna.
+  hcpSubRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-start',
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
 
   // Right column: competition setup

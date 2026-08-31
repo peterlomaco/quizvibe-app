@@ -62,6 +62,13 @@ interface LobbyPlayerRow {
   // publishOwnHcp (targeted UPDATE på egen rad) — ingår inte i playerToRow,
   // exakt samma mönster som account_player_name.
   hcp?: number | null;
+  // Per-kategori-HCP (migration 0050) — Total ligger i `hcp` ovan. Optional
+  // (icke-applicerad migration saknar kolumnerna). Skrivs BARA av publishOwnHcp
+  // (targeted UPDATE) — ingår inte i playerToRow. Sköldarnas "+"-utfällning
+  // (PlayerRow/leaderboard) läser dessa; NULL → kategori-sköld faller till 99.
+  hcp_music?: number | null;
+  hcp_film?: number | null;
+  hcp_sport?: number | null;
   // OBS: kolumnen `seen_question_ids` (migration 0026) ingår MEDVETET INTE
   // i denna row-shape eller i playerToRow — den skrivs enbart via
   // updateOwnSeenQuestionIds (targeted UPDATE) så host:s bulk-UPSERT aldrig
@@ -87,6 +94,9 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     spotifyConnected: row.spotify_verified ?? false,
     accountPlayerName: row.account_player_name ?? undefined,
     hcp: row.hcp ?? undefined,
+    hcpMusic: row.hcp_music ?? undefined,
+    hcpFilm: row.hcp_film ?? undefined,
+    hcpSport: row.hcp_sport ?? undefined,
     // Host-added guests har user_id=null i DB eftersom host saknar deras
     // auth-session vid upsert (setLobbyPlayers strippar dessutom user_id ur
     // non-host-payload:en). Self-joined guests sätter user_id=auth.uid() via
@@ -515,20 +525,23 @@ export async function publishOwnAccountName(
 }
 
 /**
- * Publicerar spelarens EGET intjänade display-HCP (1–99) till sin egen
- * lobby_players-rad (migration 0042) så övriga enheter kan visa det på
- * spelarkortet. Targeted UPDATE scoped på room_code + player_id + user_id
- * (samma mönster som publishOwnAccountName) — ingår ALDRIG i host:s bulk-
- * UPSERT, så en icke-applicerad migration ger bara ett console.warn.
- * No-op om hcp inte är ett tal (gäst / ännu ej progressad spelare → skölden
- * faller tillbaka på 99).
+ * Publicerar spelarens EGNA intjänade display-HCP (Total + per-kategori, 1–99)
+ * till sin egen lobby_players-rad (Total = migration 0042, kategorier = 0050)
+ * så övriga enheter kan visa dem på spelarkortet + "+"-utfällningen. Targeted
+ * UPDATE scoped på room_code + player_id + user_id (samma mönster som
+ * publishOwnAccountName) — ingår ALDRIG i host:s bulk-UPSERT.
+ *
+ * Tolerans för icke-applicerad 0050: försök skriva alla 4 kolumnerna; failar
+ * det (kategori-kolumnerna saknas) → console.warn + RETRY med bara `hcp` så
+ * Total ändå publiceras på det gamla schemat (kategori-sköldar faller till 99).
+ * No-op om Total inte är ett tal (gäst / ännu ej progressad spelare → 99).
  */
 export async function publishOwnHcp(
   code: string,
   playerId: string,
-  hcp: number,
+  bundle: { total: number; music: number; film: number; sport: number },
 ): Promise<void> {
-  if (!code || !playerId || typeof hcp !== 'number') return;
+  if (!code || !playerId || typeof bundle?.total !== 'number') return;
   const normalized = normalizeCode(code);
   await ensureAuthSession();
   const { data: userResp } = await supabase.auth.getUser();
@@ -536,12 +549,27 @@ export async function publishOwnHcp(
   if (!userId) return;
   const { error } = await supabase
     .from('lobby_players')
-    .update({ hcp })
+    .update({
+      hcp: bundle.total,
+      hcp_music: bundle.music,
+      hcp_film: bundle.film,
+      hcp_sport: bundle.sport,
+    })
     .eq('room_code', normalized)
     .eq('player_id', playerId)
     .eq('user_id', userId);
   if (error) {
-    console.warn('[lobbyPlayers] publishOwnHcp failed:', error.message);
+    // Kategori-kolumnerna saknas (0050 ej körd) → publicera bara Total.
+    console.warn('[lobbyPlayers] publishOwnHcp (categories) failed, retrying total only:', error.message);
+    const { error: totalErr } = await supabase
+      .from('lobby_players')
+      .update({ hcp: bundle.total })
+      .eq('room_code', normalized)
+      .eq('player_id', playerId)
+      .eq('user_id', userId);
+    if (totalErr) {
+      console.warn('[lobbyPlayers] publishOwnHcp (total) failed:', totalErr.message);
+    }
   }
 }
 

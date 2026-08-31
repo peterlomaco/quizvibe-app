@@ -23,6 +23,7 @@ import { containsProfanity } from '../utils/profanity';
 import {
   finalizeRows,
   LeaderboardTable,
+  type HcpCategoryChange,
 } from './LeaderboardTable';
 
 // Final Leaderboard bakgrunds-Q + pokal. Q-SVG:n är ~90% av skärmbredden så
@@ -403,6 +404,9 @@ export interface LeaderboardPlayer {
   id: string;
   name: string;
   emoji: string;
+  /** Vald profil-avatar (bild). Renderas som Avatar i tabellen/HCP-popupen;
+   *  saknas den faller Avatar tillbaka på emoji/brand-marken. */
+  avatarUri?: string;
   /** Optional: remote-motståndarens rad kan sakna dem (meta-raden hoppas
    *  då över istället för att visa "Age 0"). */
   assistance?: AssistanceLevel;
@@ -502,6 +506,7 @@ export function RoundLeaderboard({
   hostInitiatedPlayAgain = false,
   allRoundScoresHistory,
   hcpChanges,
+  hcpCategoryChanges,
   belowTable,
   remote1v1 = false,
   onStartNewGame,
@@ -569,6 +574,10 @@ export function RoundLeaderboard({
    *  den lokala spelaren (device-lokal progression). Undefined på interim-
    *  rundor + Aggregate-vyn → ingen HCP-rad. */
   hcpChanges?: Record<string, HcpChange>;
+  /** §1.3 — per-spelare per-kategori-HCP-FÖRÄNDRING (Total/Music/Film/Sport)
+   *  för "+"-utfällningen i Player-kolumnen. Bara spelare vars delta vi räknat
+   *  (self + PtP-deltagare). Undefined på interim/Aggregate → ingen "+". */
+  hcpCategoryChanges?: Record<string, HcpCategoryChange>;
   /** Extra sektion som renderas UNDER tabellen, inuti scroll-innehållet
    *  (dvs ovanför sticky-footern). Remote 1v1 skickar hit sin duell-panel
    *  ("Waiting for Player: X to play" / W-L-D-resultat) så spelarens eget
@@ -707,6 +716,7 @@ export function RoundLeaderboard({
           playerId: p.id,
           name: p.name,
           emoji: p.emoji,
+          avatarUri: p.avatarUri,
           age: p.age,
           assistance: p.assistance,
           points: s.points,
@@ -737,6 +747,7 @@ export function RoundLeaderboard({
         playerId: p.id,
         name: p.name,
         emoji: p.emoji,
+        avatarUri: p.avatarUri,
         age: p.age,
         assistance: p.assistance,
         points: totalsByPlayerId[p.id] ?? 0,
@@ -920,18 +931,18 @@ export function RoundLeaderboard({
                 }
               >
                 <View style={{ width: pageWidth }}>
-                  <LeaderboardTable entries={tableEntries} hcpChanges={hcpChanges} />
+                  <LeaderboardTable entries={tableEntries} hcpChanges={hcpChanges} hcpCategoryChanges={hcpCategoryChanges} />
                 </View>
                 <View style={{ width: pageWidth }}>
                   <LeaderboardTable entries={aggregateEntries!} />
                 </View>
               </ScrollView>
             ) : (
-              <LeaderboardTable entries={tableEntries} hcpChanges={hcpChanges} />
+              <LeaderboardTable entries={tableEntries} hcpChanges={hcpChanges} hcpCategoryChanges={hcpCategoryChanges} />
             )}
           </View>
         ) : (
-          <LeaderboardTable entries={tableEntries} hcpChanges={hcpChanges} />
+          <LeaderboardTable entries={tableEntries} hcpChanges={hcpChanges} hcpCategoryChanges={hcpCategoryChanges} />
         )}
 
       {/* Extra sektion under tabellen (Remote 1v1-duellpanelen). Ligger inuti

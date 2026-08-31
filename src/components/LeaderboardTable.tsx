@@ -1,8 +1,31 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from './RoundLeaderboard';
+import { Avatar } from './Avatar';
+import { HCPShieldCard } from './HCPShield';
 import { WifiOffIcon } from './WifiOffIcon';
+
+// Höjd på den utfällda per-kategori-sköld-raden (Total/Music/Film/Sport med
+// förändrings-badge). Samma värde i ALLA tre kolumnerna (spacer) så rader
+// ligger i linje.
+// Rad-höjd för spelar-raderna. Något högre än rubrikraden så långa PlayerNames
+// får plats på två rader (stats-kolumnerna hamnar då lägre/under namnet).
+const ROW_H = 74;
+const HEADER_H = 56;
+
+// Per-kategori-HCP-förändring efter spelet: nytt värde + delta (after − before).
+export interface HcpDelta {
+  after: number;
+  delta: number;
+}
+export interface HcpCategoryChange {
+  total: HcpDelta;
+  music: HcpDelta;
+  film: HcpDelta;
+  sport: HcpDelta;
+}
 
 /**
  * Sport-tabellen som visar en leaderboard (Player | Q ✓ ✗ 📶 AVG LAST Last5 | PTS).
@@ -36,6 +59,7 @@ export interface LeaderboardRow {
   playerId: string;
   name: string;
   emoji: string;
+  avatarUri?: string;
   age?: number;
   assistance?: AssistanceLevel;
   points: number;
@@ -94,15 +118,25 @@ export function finalizeRows(
 export function LeaderboardTable({
   entries,
   hcpChanges,
+  hcpCategoryChanges,
 }: {
   entries: LeaderboardRow[];
-  // §5 — nytt HCP + förändring från matchens start per spelare, t.ex.
-  // "HCP 42 (-1)". Bara rader som finns i mappen får en HCP-rad (i dag
-  // den lokala spelaren; andra spelares HCP kräver cross-device-sync).
-  // Utelämnad (Aggregate-vyn) → ingen HCP-rad.
+  // §5 — nytt Total-HCP + förändring från matchens start per spelare, t.ex.
+  // "HCP 42 (-1)". Visas under assistance/age. Bara rader som finns i mappen
+  // får en HCP-rad. Utelämnad (Aggregate-vyn) → ingen HCP-rad.
   hcpChanges?: Record<string, { before: number; after: number }>;
+  // §1.3 — per-kategori-HCP-förändring. Spelare som finns här får en "+" i
+  // Player-kolumnen som fäller ut en text-uppställning av förändringen
+  // (Total/Music/Film/Sport, 0 / -x / +y). Bara spelare vars per-kategori-
+  // delta denna enhet räknat (self + PtP-deltagare); IndDev-peers saknar den.
+  hcpCategoryChanges?: Record<string, HcpCategoryChange>;
 }) {
+  // Vilken rad som har sina kategori-sköldar utfällda (en i taget).
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const expandedEntry = expandedId ? entries.find((e) => e.playerId === expandedId) : undefined;
+  const expandedCat = expandedId ? hcpCategoryChanges?.[expandedId] : undefined;
   return (
+    <View>
         <View style={styles.lbTable}>
         {/* Vänster fixed kolumn: Position + Namn */}
         <View style={styles.lbLeftCol}>
@@ -117,11 +151,10 @@ export function LeaderboardTable({
             // §5 — HCP + förändring (after − before). Negativ = bättre.
             const hcp = hcpChanges?.[entry.playerId];
             const hcpDelta = hcp ? hcp.after - hcp.before : 0;
+            const catChange = hcpCategoryChanges?.[entry.playerId];
+            const isExpanded = expandedId === entry.playerId;
             return (
-              <View
-                key={entry.playerId}
-                style={[styles.lbCell, styles.lbLeftCell]}
-              >
+              <View key={entry.playerId} style={[styles.lbCell, styles.lbLeftCell]}>
                 {/* Avhoppare får ingen placeringssiffra — de deltog inte
                     i hela matchen och rankas därför inte. Texten renderas
                     ändå (tom) så `lbPos`:ens fasta bredd håller kolumnen
@@ -130,9 +163,9 @@ export function LeaderboardTable({
                 <Text style={styles.lbPos}>
                   {entry.hasLeft ? '' : index + 1}
                 </Text>
+                <Avatar uri={entry.avatarUri} emoji={entry.emoji} name={entry.name} size={26} useBrandFallback />
                 <View style={styles.lbNameStack}>
-                  <Text style={styles.lbName} numberOfLines={1}>
-                    {entry.emoji ? `${entry.emoji} ` : ''}
+                  <Text style={styles.lbName} numberOfLines={2}>
                     {entry.name}
                   </Text>
                   {meta.length > 0 && (
@@ -141,10 +174,24 @@ export function LeaderboardTable({
                     </Text>
                   )}
                   {hcp && (
-                    <Text style={styles.lbNameHcp} numberOfLines={1}>
-                      HCP {hcp.after}
-                      {hcpDelta !== 0 ? ` (${hcpDelta > 0 ? '+' : ''}${hcpDelta})` : ''}
-                    </Text>
+                    <View style={styles.lbHcpLine}>
+                      <Text style={styles.lbNameHcp} numberOfLines={1}>
+                        HCP {hcp.after}
+                        {hcpDelta !== 0 ? ` (${hcpDelta > 0 ? '+' : ''}${hcpDelta})` : ''}
+                      </Text>
+                      {/* "+"-knappen sitter direkt efter HCP-texten (inte som
+                          en bred syskon-cell som skulle bredda Player-kolumnen
+                          och trycka resultatet åt höger). */}
+                      {catChange && !entry.hasLeft && (
+                        <Pressable
+                          onPress={() => setExpandedId((cur) => (cur === entry.playerId ? null : entry.playerId))}
+                          hitSlop={8}
+                          style={styles.lbHcpExpandBtn}
+                        >
+                          <Text style={styles.lbHcpExpandText}>{isExpanded ? '−' : '+'}</Text>
+                        </Pressable>
+                      )}
+                    </View>
                   )}
                 </View>
               </View>
@@ -262,6 +309,45 @@ export function LeaderboardTable({
           ))}
         </View>
       </View>
+
+      {/* Utfälld spelares per-kategori-sköldar — separat popup (rör aldrig
+          tabellens kolumner; alla fyra sköldar får gott om plats). */}
+      <Modal
+        visible={!!expandedEntry && !!expandedCat}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setExpandedId(null)}
+      >
+        <Pressable style={styles.lbHcpModalBackdrop} onPress={() => setExpandedId(null)}>
+          {/* Inre Pressable med no-op onPress fångar tappet så backdrop-
+              stängningen inte fyrar när man tappar på själva kortet. */}
+          <Pressable style={styles.lbHcpModalCard} onPress={() => {}}>
+            {expandedEntry && expandedCat && (
+              <>
+                <View style={styles.lbHcpModalTitleRow}>
+                  <Avatar uri={expandedEntry.avatarUri} emoji={expandedEntry.emoji} name={expandedEntry.name} size={30} useBrandFallback />
+                  <View style={styles.lbHcpModalTitleStack}>
+                    <Text style={styles.lbHcpModalName} numberOfLines={1}>
+                      {expandedEntry.name}
+                    </Text>
+                    <Text style={styles.lbHcpModalSub}>HCP Progression</Text>
+                  </View>
+                </View>
+                <View style={styles.lbHcpModalRow}>
+                  <HCPShieldCard hcp={expandedCat.total.after} size={48} label="Total" deltaBadge={expandedCat.total.delta} />
+                  <HCPShieldCard hcp={expandedCat.music.after} size={48} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.music.delta} />
+                  <HCPShieldCard hcp={expandedCat.film.after} size={48} label="Film" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.film.delta} />
+                  <HCPShieldCard hcp={expandedCat.sport.after} size={48} label="Sport" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.sport.delta} />
+                </View>
+                <Pressable style={styles.lbHcpModalClose} onPress={() => setExpandedId(null)}>
+                  <Text style={styles.lbHcpModalCloseText}>Close</Text>
+                </Pressable>
+              </>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </View>
   );
 }
 
@@ -276,13 +362,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   lbCell: {
-    height: 56,
+    height: ROW_H,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },
   lbHeaderCell: {
+    height: HEADER_H,
     backgroundColor: Colors.cardElevated,
   },
   lbHeaderText: {
@@ -337,13 +424,101 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.primary,
     letterSpacing: 0,
+  },
+  // HCP-text + "+"-knapp på SAMMA rad, under playername/meta.
+  lbHcpLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     marginTop: 1,
+  },
+  // "+"/"−"-knapp i Player-cellen som fäller ut kategori-sköldarna.
+  lbHcpExpandBtn: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.cardElevated,
+    marginLeft: 2,
+  },
+  lbHcpExpandText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: Colors.textSecondary,
+    lineHeight: 15,
+  },
+  // Popup med den utfällda spelarens kategori-sköldar (Total/Music/Film/Sport).
+  lbHcpModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.lg,
+  },
+  lbHcpModalCard: {
+    width: '100%',
+    maxWidth: 380,
+    backgroundColor: Colors.card,
+    borderWidth: 2,
+    borderColor: Colors.warning,
+    borderRadius: Radius.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    gap: Spacing.lg,
+    alignItems: 'center',
+  },
+  lbHcpModalTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    alignSelf: 'stretch',
+  },
+  // Namn på rad 1, "HCP Progression" på rad 2.
+  lbHcpModalTitleStack: {
+    flexShrink: 1,
+    flexDirection: 'column',
+  },
+  lbHcpModalName: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+  },
+  lbHcpModalSub: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
+  },
+  lbHcpModalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    alignSelf: 'stretch',
+  },
+  lbHcpModalClose: {
+    marginTop: Spacing.xs,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    backgroundColor: Colors.cardElevated,
+  },
+  lbHcpModalCloseText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.primary,
   },
   lbMidScroll: {
     flex: 1,
   },
   lbMidRow: {
-    height: 56,
+    height: ROW_H,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,

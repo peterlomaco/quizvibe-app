@@ -341,12 +341,27 @@ export interface PlayerScoreRecordedPayload {
  * ("HCP 42 (-1)") syns för alla spelare på alla enheter. `before`/`after` är
  * DISPLAY-HCP (avrundat uppåt). Idempotent: mottagaren nycklar på player_id.
  */
+export interface HcpCatDelta {
+  /** Nytt display-HCP (1–99). */
+  after: number;
+  /** Förändring after − before (0 / -x / +y). */
+  delta: number;
+}
 export interface PlayerHcpChangedPayload {
   /** Lobby_players.player_id för spelaren vars HCP räknades om. */
   player_id: string;
   /** Display-HCP före/efter denna omgång (1–99). */
   before: number;
   after: number;
+  /** §1.3 — per-kategori nytt värde + förändring, så alla enheter kan visa
+   *  varandras kategori-sköldar + delta i leaderboarden. Optional (äldre
+   *  klienter/Total-only-fall utelämnar). */
+  categories?: {
+    total: HcpCatDelta;
+    music: HcpCatDelta;
+    film: HcpCatDelta;
+    sport: HcpCatDelta;
+  };
 }
 
 /**
@@ -804,12 +819,28 @@ function vPlayerScoreRecorded(raw: unknown): PlayerScoreRecordedPayload | null {
   };
 }
 
+function vHcpCatDelta(raw: unknown): HcpCatDelta | null {
+  if (!isObj(raw) || !num(raw.after) || !num(raw.delta)) return null;
+  if (raw.after < 1 || raw.after > 99) return null;
+  return { after: raw.after, delta: raw.delta };
+}
 function vPlayerHcpChanged(raw: unknown): PlayerHcpChangedPayload | null {
   if (!isObj(raw) || !str(raw.player_id) || !num(raw.before) || !num(raw.after))
     return null;
   if (raw.before < 1 || raw.before > 99 || raw.after < 1 || raw.after > 99)
     return null;
-  return { player_id: raw.player_id, before: raw.before, after: raw.after };
+  const out: PlayerHcpChangedPayload = { player_id: raw.player_id, before: raw.before, after: raw.after };
+  // Kategori-delen är optional — validera den om den finns, annars droppa den
+  // (Total-förändringen fungerar ändå).
+  const c = isObj(raw.categories) ? raw.categories : null;
+  if (c) {
+    const total = vHcpCatDelta(c.total);
+    const music = vHcpCatDelta(c.music);
+    const film = vHcpCatDelta(c.film);
+    const sport = vHcpCatDelta(c.sport);
+    if (total && music && film && sport) out.categories = { total, music, film, sport };
+  }
+  return out;
 }
 
 /**

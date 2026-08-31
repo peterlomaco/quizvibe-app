@@ -115,3 +115,38 @@ export function itemMatchesEnabledCategories(
   if (genrePackages?.includes('music') && enabled.includes('Music')) return true;
   return false;
 }
+
+/**
+ * Vilken kategori-badge ett item ska VISA givet host:s aktiva filter — inte
+ * nödvändigtvis dess bas-kategori.
+ *
+ * Historik (Peter 2026-08-31): tidigare visade badgen ALLTID bas-kategorin, så
+ * en sport-taggad musiklåt (`genrePackages: ["sport"]`, mainCategory=Music) som
+ * bara ingår i ett Sport-only-spel via crossover-regeln visade "Music". Med
+ * Music bortfiltrerat kändes det som en bugg — spelaren valde Sport och fick en
+ * "Music"-badge. Regeln nu: itemet visar den kategori det SURFADES under.
+ *
+ *   • Bas-kategorin är bland de aktiverade  → visa bas-kategorin (oförändrat i
+ *     ett spel där alla kategorier är på — då är basen alltid aktiverad).
+ *   • Bas-kategorin är BORTFILTRERAD men itemet kom in via en crossover-tagg
+ *     som matchar en aktiverad kategori → visa den matchade kategorin.
+ *
+ * Spegling av `itemMatchesEnabledCategories` — samma prioritet (sport→film→music)
+ * på crossover-fallbacken. `enabled` = source-relevanta kategorier (YouTube-
+ * frågor: youtubeEnabledCategories; Hints/image: imagesEnabledCategories).
+ */
+export function displayCategoryForItem(
+  mainCategory: MainCategory | null,
+  enabled: readonly MainCategory[],
+  genrePackages?: readonly string[],
+): MainCategory | null {
+  // Bas-kategorin vinner när den faktiskt är påslagen.
+  if (mainCategory !== null && enabled.includes(mainCategory)) return mainCategory;
+  // Annars surfades itemet via en crossover-tagg → visa den matchade kategorin.
+  if (genrePackages?.includes('sport') && enabled.includes('Sport')) return 'Sport';
+  if (genrePackages?.includes('film') && enabled.includes('Film')) return 'Film';
+  if (genrePackages?.includes('music') && enabled.includes('Music')) return 'Music';
+  // Ingen match (t.ex. Spotify-låt som kringgår kategori-filtret, eller null
+  // mainCategory) → fall tillbaka på bas-kategorin.
+  return mainCategory;
+}
