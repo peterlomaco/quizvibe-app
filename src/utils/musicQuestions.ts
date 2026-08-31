@@ -22470,11 +22470,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "4okV0gcEkY1BlqQNDvaQCw",
     "youtubeClips": [
       {
         "videoId": "81EOq-abbOw",
-        "startSec": 0,
+        "startSec": 8,
         "endSec": 30,
         "channelTitle": "Bolaget",
         "license": "standard"

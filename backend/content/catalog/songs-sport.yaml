@@ -171,13 +171,15 @@ items:
     # släppt 2026-06-03 (Warner Music). 1994 var en felaktig gissning vid tillägget.
     correctYear: 2026
     probability: 78
+    region: ["sweden"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Bolaget Det ligger nåt i luften Sverige fotboll"]
     answerMethods: ["timeline"]
     genrePackages: ["sport", "football"]
     spotifyTrackId: "4okV0gcEkY1BlqQNDvaQCw"
     youtubeClips:
       - videoId: "81EOq-abbOw"
-        startSec: 0
+        startSec: 8
         endSec: 30
         channelTitle: "Bolaget"
   - id: brandsta-all-in-for-sverige
