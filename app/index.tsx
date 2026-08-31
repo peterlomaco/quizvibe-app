@@ -156,11 +156,13 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
  * spel.
  */
 const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolean | string }[] = [
-  { label: 'Local play — Single, Pass-the-Phone, Individual devices', user: true, guest: true },
+  { label: 'Single & Multiplayer Game', user: true, guest: true },
   { label: 'Head-to-head matches', user: true, guest: false },
   { label: 'Saved results & player history', user: true, guest: false },
   { label: 'Friends list & in-app invites', user: true, guest: false },
   { label: 'Choose Game era', user: true, guest: false },
+  { label: 'Select categories and source (Source mixerboard)', user: true, guest: false },
+  { label: 'Spotify, YouTube and Hints', user: true, guest: true },
   { label: 'Host games per day', user: '4 free', guest: 'Trial' },
   { label: 'Replay & Marathon table', user: true, guest: false },
   { label: 'Premium option', user: true, guest: false },
@@ -4185,13 +4187,30 @@ export default function HomeScreen() {
         transparent
         onRequestClose={() => setCompareInfoVisible(false)}
       >
-        <Pressable style={modal.overlay} onPress={() => setCompareInfoVisible(false)}>
-          {/* Tap inuti sheet:en ska INTE stänga — egen Pressable som
-              sväljer trycket. */}
-          <Pressable style={modal.sheet} onPress={() => {}}>
+        {/* Backdrop som ABSOLUT SYSKON (inte en Pressable som wrappar
+            sheet:en) — en Pressable runt sheet:en fångar ScrollView:ns
+            pan-gest så listan inte går att scrolla. Med backdrop bakom +
+            plain View-sheet scrollar ScrollView:n fritt, och tap utanför
+            sheet:en (dimmade ytan) stänger fortfarande. Samma mönster som
+            JoinModal (overlay → View sheet). */}
+        <View style={modal.overlay}>
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setCompareInfoVisible(false)}
+          />
+          {/* DEFINITE höjd (height, inte maxHeight) så ScrollView:n får en
+              bunden förälder att fylla. Med bara maxHeight på sheet:en +
+              flexShrink på ScrollView:n kollapsar listan mot 0 (sheet-höjd
+              beror på barnen, barnens höjd beror på sheet:en = cirkulärt).
+              85 % av skärmen ger en tydlig lista + plats åt titel/Close. */}
+          <View style={[modal.sheet, { height: '85%' }]}>
             <Text style={modal.title}>QuizVibe user vs Guest</Text>
             <Text style={modal.subtitle}>Registration is free.</Text>
-            <ScrollView style={{ flexShrink: 1 }} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ paddingBottom: Spacing.md }}
+              showsVerticalScrollIndicator
+            >
               <View style={styles.compareHeaderRow}>
                 <View style={styles.compareLabelCell} />
                 <Text style={[styles.compareColHead, styles.compareColHeadUser]}>USER</Text>
@@ -4228,8 +4247,8 @@ export default function HomeScreen() {
             <TouchableOpacity onPress={() => setCompareInfoVisible(false)} style={modal.cancelBtn}>
               <Text style={modal.cancelText}>Close</Text>
             </TouchableOpacity>
-          </Pressable>
-        </Pressable>
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
