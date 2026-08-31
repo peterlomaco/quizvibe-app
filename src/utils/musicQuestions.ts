@@ -13823,6 +13823,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "08oSaHoJ7jrFv1kd74ZRT2",
     "youtubeClips": [
       {
@@ -15254,6 +15255,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "sport",
+      "football"
+    ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "Z8iQiYSMXi4",
@@ -19955,11 +19961,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "k2qgadSvNyU",
-        "startSec": 0,
+        "startSec": 8,
         "endSec": 30,
         "channelTitle": "Dua Lipa",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear = albumet Dua Lipa (juni 2017), inte singeln juli 2017."
+        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear = albumet Dua Lipa (juni 2017), inte singeln juli 2017. startSec 0→8 (2026-08-31, Peter — senarelagd start på inofficiella videon)."
       }
     ]
   },
@@ -22554,6 +22560,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "5AGNs0W1DKuYWzGa9ilP1K",
     "youtubeClips": [
       {

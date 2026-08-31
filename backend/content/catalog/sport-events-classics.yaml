@@ -335,6 +335,8 @@ items:
     displayName: "Zlatans häl-mål mot Italien EM-04"
     correctYear: 2004
     probability: 88
+    region: ["sweden"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Zlatan Ibrahimovic 2004 Euro Italy backheel goal"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -343,6 +345,7 @@ items:
         endSec: 30
         channelTitle: "TV4 Sport"
         notes: "Peter-kurerad 2026-08-25. Rattsinnehavarens egen kanal. SD (bara en note i youtube-validate). Titeln ar 69 tecken med '2004' vid tecken 53 - bor kapas bort i spelaren; Peters egen matning 2026-08-13 visade att tecken 54 inte syns."
+    genrePackages: ["sport", "football"]
   - id: tre-kronor-os-turin-2006
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tre Kronor OS-guld Turin"

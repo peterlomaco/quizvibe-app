@@ -48,6 +48,8 @@ items:
     displayName: "Mera mål — Markoolio"
     correctYear: 2000
     probability: 80
+    region: ["sweden"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Markoolio Mera mål EM 2000"]
     answerMethods: ["timeline"]
     spotifyTrackId: "08oSaHoJ7jrFv1kd74ZRT2"
@@ -125,6 +127,8 @@ items:
     displayName: "Gul och blå — Edivibz"
     correctYear: 2026
     probability: 76
+    region: ["sweden"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Edivibz Gul och blå Sverige fotboll"]
     answerMethods: ["timeline"]
     genrePackages: ["sport", "football"]
