@@ -1,8 +1,10 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import * as WebBrowser from 'expo-web-browser';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Keyboard,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -40,6 +42,11 @@ import {
   refreshPremiumMirror,
   setPremiumActive,
 } from '../utils/subscriptionStorage';
+
+// Extra bottenmarginal mellan det fokuserade voucher-fältet och tangentbordet
+// (läggs ovanpå iOS automatiska keyboard-inset). ~24pt = luftigt utan att
+// tvinga onödig scroll.
+const KEYBOARD_MARGIN = 48;
 
 // ─── Tier-data ────────────────────────────────────────────────────────────────
 // Tier-konstanter mappar mot App Store Connect-products via `productId`.
@@ -241,6 +248,14 @@ export default function StoreScreen() {
   const [voucherCode, setVoucherCode] = useState('');
   const [redeeming, setRedeeming] = useState(false);
 
+  // Keyboard-avoidance för voucher-fältet. iOS automaticallyAdjustKeyboardInsets
+  // scrollar fältet FLUSH mot tangentbordet; för att lägga till marginal puttar
+  // vi scrollen +KEYBOARD_MARGIN i keyboardDidShow (efter att auto-scroll
+  // landat). contentInset komponerar inte på New Architecture — därför denna väg.
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollYRef = useRef(0);
+  const voucherFocusedRef = useRef(false);
+
   const loadPromoState = async () => {
     const [open, active, expiry, used, paid, premium] = await Promise.all([
       isOfferWindowOpen(),
@@ -277,6 +292,24 @@ export default function StoreScreen() {
     // Kör en gång vid mount — applyPromoState/loadPromoState är stabila nog
     // (bara setState + rena läsare) att inte behöva vara i deps.
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Lyfter voucher-fältet KEYBOARD_MARGIN över tangentbordet. keyboardDidShow
+  // fyrar EFTER att iOS auto-scroll (automaticallyAdjustKeyboardInsets) landat,
+  // så en relativ +margin-nudge sätter sig utan att fightas tillbaka (fältet är
+  // redan synligt → auto-scroll drar inte ned det igen). RAF säkrar att vi läser
+  // scrollYRef efter auto-scrollens onScroll. Bara när voucher-fältet har fokus.
+  useEffect(() => {
+    const sub = Keyboard.addListener('keyboardDidShow', () => {
+      if (!voucherFocusedRef.current) return;
+      requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({
+          y: scrollYRef.current + KEYBOARD_MARGIN,
+          animated: true,
+        });
+      });
+    });
+    return () => sub.remove();
   }, []);
 
   // Lookup-tabell product-ID → RC PurchasesPackage. När RC har laddat
@@ -642,6 +675,18 @@ export default function StoreScreen() {
     </View>
   );
 
+  // ── Härledda visnings-tillstånd (Peter 2026-08-31) ───────────────────
+  // Free-kortet är fortfarande claimbart (tillstånd A, under kampanj).
+  const canClaimFree = offerOpen && !freeMonthUsed && !premiumActive;
+  // Betal-kortet visas — speglar EXAKT de två render-grenarna nedan så inget
+  // beteende ändras, men återanvänds för auto-renewal-disclosuren.
+  const showPaidCard =
+    paidEnabled && ((offerOpen && freeMonthUsed && !premiumActive) || !offerOpen);
+  // Voucher-fältet: free använt ELLER free ej claimbart (kampanj stängd),
+  // aldrig medan premium är aktivt (Peters kant-beslut). Under kampanjen med
+  // free fortfarande valbar ⇒ dolt tills free använts.
+  const showVoucher = !premiumActive && (freeMonthUsed || !offerOpen);
+
   const subscriptionSection = (
     <View style={styles.section}>
       {/* Skärmens topprubrik sedan headern togs bort — screenTitle-storlek
@@ -674,10 +719,24 @@ export default function StoreScreen() {
             premiumActive={premiumActive}
             isClaiming={claiming}
             onClaim={handleClaimFreePremium}
+            showVoucher={showVoucher}
+            voucherCode={voucherCode}
+            onVoucherChange={setVoucherCode}
+            onRedeem={handleRedeemVoucher}
+            redeeming={redeeming}
+            onVoucherFocusChange={(f) => {
+              voucherFocusedRef.current = f;
+            }}
           />
-          {/* Förberett: när paidEnabled slås på visas betal-kortet under
-              gratismånaden (efter att den förbrukats blir det köp-vägen). */}
-          {paidEnabled &&
+          {/* Betal-kortet får INTE gå att aktivera förrän kontot förbrukat sin
+              gratismånad (Peter 2026-08-31). Gaten: paidEnabled (feature-flagga)
+              + freeMonthUsed (server, per konto) + !premiumActive (ingen köp-CTA
+              medan en gratis-/voucher-månad är igång — ingen månadskostnad under
+              fri-perioden). Ny user: freeMonthUsed=false ⇒ bara Free-kortet.
+              ⚠ APPLE-REVIEW: en fresh granskar-konto har freeMonthUsed=false ⇒
+              ser inte köpet. Demo-kontot i PROD MÅSTE ha free_month_used=true +
+              ingen aktiv premium, annars nekas IAP:n som onåbar (Guideline 2.1). */}
+          {showPaidCard &&
             SUBSCRIPTION_TIERS.map((tier) => (
               <SubscriptionTierCard
                 key={tier.id}
@@ -689,7 +748,7 @@ export default function StoreScreen() {
               />
             ))}
         </View>
-      ) : paidEnabled ? (
+      ) : showPaidCard ? (
         <View style={styles.tierList}>
           {SUBSCRIPTION_TIERS.map((tier) => (
             <SubscriptionTierCard
@@ -704,66 +763,36 @@ export default function StoreScreen() {
         </View>
       ) : null}
 
-      {/* Voucher-inlösen. Individuella engångskoder Peter delar ut — vägen
-          till fler månader efter att gratismånaden förbrukats. Oberoende av
-          offerOpen (koder kan lösas in även efter kampanjen). Döljs medan
-          premium redan är aktivt — då finns inget att aktivera. */}
-      {!premiumActive && (
-        <View style={styles.voucherBox}>
-          <Text style={styles.voucherLabel}>Have a voucher code?</Text>
-          <View style={styles.voucherRow}>
-            <TextInput
-              style={styles.voucherInput}
-              value={voucherCode}
-              onChangeText={setVoucherCode}
-              placeholder="QVGIFT-XXXX"
-              placeholderTextColor={Colors.textSecondary}
-              autoCapitalize="characters"
-              autoCorrect={false}
-              editable={!redeeming}
-              maxLength={32}
-            />
-            <Pressable
-              onPress={handleRedeemVoucher}
-              disabled={redeeming || voucherCode.trim().length === 0}
-              style={({ pressed }) => [
-                styles.voucherBtn,
-                pressed && { opacity: 0.85 },
-                (redeeming || voucherCode.trim().length === 0) && { opacity: 0.5 },
-              ]}
-            >
-              {redeeming ? (
-                <ActivityIndicator size="small" color="#FFF" />
-              ) : (
-                <Text style={styles.voucherBtnText}>Redeem</Text>
-              )}
-            </Pressable>
-          </View>
-        </View>
+      {/* Voucher fristående BARA post-kampanj — under kampanjen bäddas det in i
+          Single month-kortet (PromoTierCard). Utan detta försvinner voucher-
+          vägen när kampanjen stängts (showVoucher = freeMonthUsed || !offerOpen,
+          och Single month-kortet renderas inte då). */}
+      {showVoucher && !offerOpen && (
+        <VoucherBox
+          voucherCode={voucherCode}
+          onChangeText={setVoucherCode}
+          onRedeem={handleRedeemVoucher}
+          redeeming={redeeming}
+          onFocusChange={(f) => {
+            voucherFocusedRef.current = f;
+          }}
+        />
       )}
 
-      {offerOpen ? (
+      {/* Free-note — bara tillstånd A (Single month-kortet visar "Free"-knapp,
+          inget voucher/paid). Auto-renewal-noten bor numera inne i Monthly
+          subscription-kortet och voucher-noten inne i voucher-boxen. */}
+      {canClaimFree && (
         <Text style={styles.autoRenewNote}>
-          Free for one month. No payment and no auto-renewal. Redeem a voucher
-          code above for another month.
+          Free for one month. No payment and no auto-renewal.
         </Text>
-      ) : (
-        <>
-          {paidEnabled && (
-            <Text style={styles.autoRenewNote}>
-              All subscriptions auto-renew. Cancel anytime in your App Store
-              or Google Play account.
-            </Text>
-          )}
-          {/* Erbjudandet är stängt men kontot har en månad kvar
-              (grandfathering). Utan denna rad skulle de se en köp-CTA utan
-              att förstå varför de redan har Premium. */}
-          {claimActive && promoExpiry && (
-            <Text style={styles.autoRenewNote}>
-              Your Premium is active until {formatPromoDate(promoExpiry)}.
-            </Text>
-          )}
-        </>
+      )}
+      {/* Grandfathering: kampanjen stängd men kontot har en månad kvar.
+          Under kampanjen visar PromoTierCard "Free until …" i stället. */}
+      {!offerOpen && claimActive && promoExpiry && (
+        <Text style={styles.autoRenewNote}>
+          Your Premium is active until {formatPromoDate(promoExpiry)}.
+        </Text>
       )}
 
       {/* Restore Purchases — Apple App Store-krav. Användare som
@@ -785,6 +814,29 @@ export default function StoreScreen() {
           <Text style={styles.restoreBtnText}>Restore Purchases</Text>
         )}
       </Pressable>
+
+      {/* Privacy Policy + Terms of Use — Apple Guideline 3.1.2 kräver
+          funktionella länkar till båda intill köp-/prenumerations-UI:t.
+          Öppnas in-app via expo-web-browser (samma mönster som Profile →
+          Legal). Renderas alltid i subscription-sektionen, oavsett om
+          kampanjen är öppen eller det betalda kortet visas. */}
+      <View style={styles.legalLinksRow}>
+        <Pressable
+          onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/privacy/')}
+          hitSlop={8}
+          style={({ pressed }) => pressed && { opacity: 0.7 }}
+        >
+          <Text style={styles.legalLink}>Privacy Policy</Text>
+        </Pressable>
+        <Text style={styles.legalLinkSeparator}>·</Text>
+        <Pressable
+          onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/terms/')}
+          hitSlop={8}
+          style={({ pressed }) => pressed && { opacity: 0.7 }}
+        >
+          <Text style={styles.legalLink}>Terms of Use</Text>
+        </Pressable>
+      </View>
     </View>
   );
 
@@ -794,9 +846,20 @@ export default function StoreScreen() {
           Back kör handleBack ovan (router.back() med Home-tab-fallback). */}
       <TopUserBanner onBackPress={handleBack} backLabel="Back" />
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        onScroll={(e) => {
+          scrollYRef.current = e.nativeEvent.contentOffset.y;
+        }}
+        scrollEventThrottle={16}
+        // iOS scrollar det fokuserade voucher-fältet flush ovanför tangentbordet;
+        // keyboardDidShow-effekten ovan lägger sedan till KEYBOARD_MARGIN luft.
+        // persistTaps "handled" gör att Redeem-tappet registreras medan
+        // keyboardet är uppe.
+        automaticallyAdjustKeyboardInsets
+        keyboardShouldPersistTaps="handled"
       >
         {/* Skärm-headern ("Add QuizVibe Premium" + undertext) togs bort
             2026-08-07 (Peter) — "QuizVibe membership plans" är nu skärmens
@@ -920,6 +983,64 @@ function CreditTierCard({
   );
 }
 
+// ─── Voucher-inlösen ──────────────────────────────────────────────────────────
+// Delas av Single month-kortet (embedded — under den grå "already used"-texten)
+// och en fristående render post-kampanj (då Single month-kortet inte finns).
+function VoucherBox({
+  voucherCode,
+  onChangeText,
+  onRedeem,
+  redeeming,
+  embedded,
+  onFocusChange,
+}: {
+  voucherCode: string;
+  onChangeText: (v: string) => void;
+  onRedeem: () => void;
+  redeeming: boolean;
+  embedded?: boolean;
+  onFocusChange?: (focused: boolean) => void;
+}) {
+  return (
+    <View style={embedded ? styles.voucherEmbedded : styles.voucherBox}>
+      <Text style={styles.voucherLabel}>Have a voucher code?</Text>
+      <View style={styles.voucherRow}>
+        <TextInput
+          style={styles.voucherInput}
+          value={voucherCode}
+          onChangeText={onChangeText}
+          onFocus={() => onFocusChange?.(true)}
+          onBlur={() => onFocusChange?.(false)}
+          placeholder="QVGIFT-XXXX"
+          placeholderTextColor={Colors.textSecondary}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          editable={!redeeming}
+          maxLength={32}
+        />
+        <Pressable
+          onPress={onRedeem}
+          disabled={redeeming || voucherCode.trim().length === 0}
+          style={({ pressed }) => [
+            styles.voucherBtn,
+            pressed && { opacity: 0.85 },
+            (redeeming || voucherCode.trim().length === 0) && { opacity: 0.5 },
+          ]}
+        >
+          {redeeming ? (
+            <ActivityIndicator size="small" color="#FFF" />
+          ) : (
+            <Text style={styles.voucherBtnText}>Redeem</Text>
+          )}
+        </Pressable>
+      </View>
+      <Text style={styles.voucherNote}>
+        Redeem a voucher code above for another free month.
+      </Text>
+    </View>
+  );
+}
+
 // ─── Free Premium promo card ──────────────────────────────────────────────────
 
 // Launch-kampanjens kort. Speglar SubscriptionTierCard:s geometri men har
@@ -938,6 +1059,12 @@ function PromoTierCard({
   premiumActive,
   isClaiming,
   onClaim,
+  showVoucher,
+  voucherCode,
+  onVoucherChange,
+  onRedeem,
+  redeeming,
+  onVoucherFocusChange,
 }: {
   expiry: Date | null;
   claimActive: boolean;
@@ -945,6 +1072,12 @@ function PromoTierCard({
   premiumActive: boolean;
   isClaiming: boolean;
   onClaim: () => void;
+  showVoucher: boolean;
+  voucherCode: string;
+  onVoucherChange: (v: string) => void;
+  onRedeem: () => void;
+  redeeming: boolean;
+  onVoucherFocusChange?: (focused: boolean) => void;
 }) {
   const accent = Colors.warning;
 
@@ -996,6 +1129,18 @@ function PromoTierCard({
           )}
         </View>
       </View>
+      {/* Voucher-fältet inbäddat i kortet, direkt under den grå "already
+          used"-texten (Peter 2026-08-31). */}
+      {showVoucher && (
+        <VoucherBox
+          embedded
+          voucherCode={voucherCode}
+          onChangeText={onVoucherChange}
+          onRedeem={onRedeem}
+          redeeming={redeeming}
+          onFocusChange={onVoucherFocusChange}
+        />
+      )}
     </View>
   );
 }
@@ -1070,6 +1215,12 @@ function SubscriptionTierCard({
           </Pressable>
         </View>
       </View>
+      {/* Auto-renewal-disclosure inbäddad längst ner i kortet (Peter
+          2026-08-31) — intill det köpbara abonnemanget per Apple 3.1.2. */}
+      <Text style={styles.tierFootnote}>
+        All subscriptions auto-renew. Cancel anytime in your App Store or
+        Google Play account.
+      </Text>
     </View>
   );
 }
@@ -1313,6 +1464,25 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 
+  // Privacy Policy · Terms of Use — App Store 3.1.2. Diskret rad under
+  // Restore Purchases; länk-stil så den inte konkurrerar med köp-CTA:erna.
+  legalLinksRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  legalLink: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    textDecorationLine: 'underline',
+  },
+  legalLinkSeparator: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+  },
+
   // Förbrukad gratismånad — grå, otryckbar knapp (samma geometri som buyBtn).
   usedBtn: {
     backgroundColor: Colors.cardElevated,
@@ -1372,6 +1542,31 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: '#FFFFFF',
     letterSpacing: 0.3,
+  },
+  // Voucher inbäddad i Single month-kortet — ingen egen kortbakgrund, bara en
+  // hairline-separator mot texten ovanför.
+  voucherEmbedded: {
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    gap: Spacing.sm,
+  },
+  voucherNote: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    lineHeight: 16,
+  },
+  // Auto-renewal-not inbäddad längst ner i Monthly subscription-kortet.
+  tierFootnote: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    fontStyle: 'italic',
+    lineHeight: 16,
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
   },
 
   bottomPad: { height: Spacing.xl },
