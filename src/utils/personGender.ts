@@ -34,8 +34,24 @@ export const PERSON_GENDER_MANUAL: Record<string, PersonGender> = {
   'ngolo-kante': 'male',
   'sergio-aguero': 'male',
 
+  // Sökningen fångade en TV-serie med samma namn ("Olivia Newton-John",
+  // Q28224394, "television series") i stället för personen (Q185165,
+  // "British–Australian singer (1948–2022)") — bekräftat manuellt 2026-08-27.
+  'olivia-newton-john': 'female',
+
+  // En-namns-/tvetydiga artister vars sökning inte kunde disambigueras av
+  // scriptets födelseårs-kontroll — könet är otvetydigt (bekräftat manuellt
+  // 2026-08-30). Nemo (Schweiz, ESC 2024) är MEDVETET utelämnad: öppet
+  // icke-binär → ska sakna kön (se not nedan + test-exkludering).
+  'frans': 'male',      // Frans Jeppsson Wall (SE, ESC 2016)
+  'lena': 'female',     // Lena Meyer-Landrut (DE, ESC 2010)
+  'psy': 'male',        // Park Jae-sang (KR, "Gangnam Style")
+  'ruslana': 'female',  // Ruslana Lyzhychko (UA, ESC 2004)
+  'snow': 'male',       // Darrin O'Brien ("Informer")
+  'zayn': 'male',       // Zayn Malik
+
   // ⚠ Lägg INTE in items vars P21 är icke-binär (Miley Cyrus, Demi Lovato,
-  // Sam Smith). De ska sakna kön här → ingen låsning, subject-poolen gäller.
+  // Sam Smith, Nemo). De ska sakna kön här → ingen låsning, subject-poolen gäller.
 };
 
 const MERGED: Record<string, PersonGender> = {

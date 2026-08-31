@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import {
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 
 // ─── Data (mock tills backend finns) ──────────────────────────────────────────

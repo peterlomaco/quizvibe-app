@@ -217,14 +217,32 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
     tickTimers.current.forEach(clearTimeout);
     tickTimers.current = [];
 
-    const addTimer = (fn: () => void, delay: number) => {
-      const id = setTimeout(fn, delay);
+    // ⚠ Varje steg schemaläggs mot ett ABSOLUT offset från t0, aldrig som en
+    // relativ delay från föregående callback. Kedjan är 11 sekventiella
+    // timers, och `setTimeout(fn, D)` re-ankrar till när föregående callback
+    // FAKTISKT kördes — lateness blir därmed strikt additiv och återhämtas
+    // aldrig. Blockeras JS-tråden i snitt d ms vid varje schemaläggnings-
+    // punkt hamnar onComplete 11 × d för sent, utan övre gräns. Det slog mot
+    // en nyss mountad non-host i IndDev, där AsyncStorage-resolves och
+    // gameQuestions-omräkningar landade mitt i nedräkningen: enheten gick in
+    // i question-fasen sent och dess YouTube-WebView började boota sent, dvs
+    // hörbar eftersläpning mot host. Med absolut ankare självkorrigerar varje
+    // timer och ett sent steg påverkar inte nästa.
+    //
+    // Det nominella schemat är OFÖRÄNDRAT (700 / 1880 / 2000 / … / 7200 /
+    // 8200 för startFrom=5) — bara driften försvinner. Blockeras tråden
+    // längre än en tick hinner flera steg fyra i samma frame och siffror
+    // hoppar; det är korrekt för en deadline-ankrad nedräkning.
+    const t0 = Date.now();
+    const addTimerAt = (fn: () => void, offsetMs: number) => {
+      const id = setTimeout(fn, Math.max(0, offsetMs - (Date.now() - t0)));
       tickTimers.current.push(id);
     };
 
-    // Schemalägg nästa nedräkningssteg rekursivt.
-    const scheduleTick = (current: number, delay: number) => {
-      addTimer(() => {
+    // Schemalägg nästa nedräkningssteg rekursivt. `voiceAt` = absolut offset
+    // från t0 för röst-steget; det visuella steget ligger VOICE_LEAD_MS efter.
+    const scheduleTick = (current: number, voiceAt: number) => {
+      addTimerAt(() => {
         const next = current <= 1 ? 0 : current - 1;
 
         // Tala VOICE_LEAD_MS ms INNAN det visuella uppdateras (bara host).
@@ -239,29 +257,29 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
         }
 
         // Visuell uppdatering efter röst-förspranget.
-        addTimer(() => {
+        addTimerAt(() => {
           setCount(next);
           if (next === 0) {
-            addTimer(() => onCompleteRef.current(), 1000);
+            addTimerAt(() => onCompleteRef.current(), voiceAt + VOICE_LEAD_MS + 1000);
           } else {
-            scheduleTick(next, TICK_MS - VOICE_LEAD_MS);
+            scheduleTick(next, voiceAt + TICK_MS);
           }
-        }, VOICE_LEAD_MS);
-      }, delay);
+        }, voiceAt + VOICE_LEAD_MS);
+      }, voiceAt);
     };
 
     // Starta: om startFrom självt ska talas, tala det 120 ms tidigt (580 ms
     // in i initial-pausen) och visa det visuellt som vanligt vid 700 ms.
     if (!silent && startFrom <= voiceFrom) {
-      addTimer(() => {
+      addTimerAt(() => {
         try {
           Speech.speak(String(startFrom), { language: 'en-US', pitch: 0.01, rate: 0.42 });
         } catch (_) {}
       }, 700 - VOICE_LEAD_MS);
     }
-    addTimer(() => {
+    addTimerAt(() => {
       setCount(startFrom);
-      scheduleTick(startFrom, TICK_MS - VOICE_LEAD_MS);
+      scheduleTick(startFrom, 700 + TICK_MS - VOICE_LEAD_MS);
     }, 700);
 
     return () => {

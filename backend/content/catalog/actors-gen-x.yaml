@@ -677,3 +677,134 @@ items:
     region: ["unknown-region"]
     wikimediaSearchHints: ["Paul Rudd actor Ant-Man Friends Anchorman"]
     answerMethods: ["timeline", "name-letters"]
+  # === Batch 2026-08-27 — kompletterar film-gapet (correctNames i movies-katalogen saknade Hints-entry) ===
+  - id: harrison-ford
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Harrison Ford"
+    correctYear: 1942
+    peakFrom: 1977
+    peakTo: 2008
+    probability: 92
+    region: ["global"]
+    wikimediaSearchHints: ["Harrison Ford actor Star Wars Indiana Jones"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: mark-hamill
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mark Hamill"
+    correctYear: 1951
+    peakFrom: 1977
+    peakTo: 1983
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Mark Hamill actor Star Wars Luke Skywalker"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sylvester-stallone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sylvester Stallone"
+    correctYear: 1946
+    peakFrom: 1976
+    peakTo: 2010
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Sylvester Stallone actor Rocky Rambo"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: val-kilmer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Val Kilmer"
+    correctYear: 1959
+    peakFrom: 1986
+    peakTo: 2005
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Val Kilmer actor Top Gun Batman"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: john-candy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "John Candy"
+    correctYear: 1950
+    peakFrom: 1983
+    peakTo: 1993
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["John Candy actor comedian Cool Runnings Uncle Buck"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: richard-dreyfuss
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Richard Dreyfuss"
+    correctYear: 1947
+    peakFrom: 1975
+    peakTo: 1985
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Richard Dreyfuss actor Jaws Close Encounters"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: roy-scheider
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Roy Scheider"
+    correctYear: 1932
+    peakFrom: 1971
+    peakTo: 1979
+    probability: 74
+    region: ["global"]
+    wikimediaSearchHints: ["Roy Scheider actor Jaws French Connection"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sam-neill
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sam Neill"
+    correctYear: 1947
+    peakFrom: 1993
+    peakTo: 2005
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Sam Neill actor Jurassic Park"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: linda-hamilton
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Linda Hamilton"
+    correctYear: 1956
+    peakFrom: 1984
+    peakTo: 1991
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Linda Hamilton actress Terminator"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: michael-j-fox
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Michael J. Fox"
+    correctYear: 1961
+    peakFrom: 1985
+    peakTo: 1991
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Michael J Fox actor Back to the Future"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: olivia-newton-john
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Olivia Newton-John"
+    correctYear: 1948
+    peakFrom: 1971
+    peakTo: 1994
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Olivia Newton-John singer actress Grease"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: henry-thomas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Henry Thomas"
+    correctYear: 1971
+    peakFrom: 1982
+    peakTo: 1990
+    probability: 68
+    region: ["global"]
+    wikimediaSearchHints: ["Henry Thomas actor E.T. the Extra-Terrestrial"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jason-statham
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jason Statham"
+    correctYear: 1967
+    peakFrom: 1998
+    peakTo: 2020
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Jason Statham actor Snatch"]
+    answerMethods: ["timeline", "name-letters"]

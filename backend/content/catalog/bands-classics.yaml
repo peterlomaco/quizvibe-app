@@ -417,3 +417,925 @@ items:
     peakTo: 2026
     wikimediaSearchHints: ["Måneskin Italian rock band Eurovision 2021"]
     answerMethods: ["name-letters"]
+  - id: 2-unlimited
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "2 Unlimited"
+    correctYear: 1991
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Hits"]
+    wikimediaSearchHints: ["2 Unlimited"]
+    answerMethods: ["name-letters"]
+  - id: 4-non-blondes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "4 Non Blondes"
+    correctYear: 1989
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["4 Non Blondes"]
+    answerMethods: ["name-letters"]
+  - id: all-4-one
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "All-4-One"
+    correctYear: 1993
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Love & Peace", "Soft & Ballads"]
+    wikimediaSearchHints: ["All-4-One"]
+    answerMethods: ["name-letters"]
+  - id: antique
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Antique"
+    correctYear: 1999
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Antique"]
+    answerMethods: ["name-letters"]
+  - id: aqua
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Aqua"
+    correctYear: 1989
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Eurodance & pop"]
+    wikimediaSearchHints: ["Aqua"]
+    answerMethods: ["name-letters"]
+  - id: bananarama
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bananarama"
+    correctYear: 1979
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Summer"]
+    wikimediaSearchHints: ["Bananarama"]
+    answerMethods: ["name-letters"]
+  - id: blink-182
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "blink-182"
+    correctYear: 1992
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Hits"]
+    wikimediaSearchHints: ["blink-182"]
+    answerMethods: ["name-letters"]
+  - id: blondie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Blondie"
+    correctYear: 1974
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Blondie"]
+    answerMethods: ["name-letters"]
+  - id: bloodhound-gang
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bloodhound Gang"
+    correctYear: 1988
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Bloodhound Gang"]
+    answerMethods: ["name-letters"]
+  - id: blur
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Blur"
+    correctYear: 1988
+    probability: 65
+    region: ["global"]
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["Blur"]
+    answerMethods: ["name-letters"]
+  - id: bobbysocks
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bobbysocks!"
+    correctYear: 1983
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Bobbysocks"]
+    answerMethods: ["name-letters"]
+  - id: bon-jovi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bon Jovi"
+    correctYear: 1983
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Bon Jovi"]
+    answerMethods: ["name-letters"]
+  - id: boney-m
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Boney M."
+    correctYear: 1975
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Boney M."]
+    answerMethods: ["name-letters"]
+  - id: boyz-ii-men
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Boyz II Men"
+    correctYear: 1988
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Boyz II Men"]
+    answerMethods: ["name-letters"]
+  - id: brotherhood-of-man
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Brotherhood of Man"
+    correctYear: 1969
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Brotherhood of Man"]
+    answerMethods: ["name-letters"]
+  - id: bts
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "BTS"
+    correctYear: 2013
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["BTS"]
+    answerMethods: ["name-letters"]
+  - id: bucks-fizz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bucks Fizz"
+    correctYear: 1981
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Bucks Fizz"]
+    answerMethods: ["name-letters"]
+  - id: chic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Chic"
+    correctYear: 1976
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Chic"]
+    answerMethods: ["name-letters"]
+  - id: cypress-hill
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Cypress Hill"
+    correctYear: 1986
+    probability: 65
+    region: ["global"]
+    genrePackages: ["hiphop"]
+    wikimediaSearchHints: ["Cypress Hill"]
+    answerMethods: ["name-letters"]
+  - id: dario-g
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dario G"
+    probability: 65
+    region: ["global"]
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["Dario G"]
+    answerMethods: ["name-letters"]
+  - id: deep-purple
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Deep Purple"
+    correctYear: 1968
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Deep Purple"]
+    answerMethods: ["name-letters"]
+  - id: def-leppard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Def Leppard"
+    correctYear: 1977
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["rock"]
+    wikimediaSearchHints: ["Def Leppard"]
+    answerMethods: ["name-letters"]
+  - id: destinys-child
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Destiny's Child"
+    correctYear: 1990
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Hits"]
+    wikimediaSearchHints: ["Destiny's Child"]
+    answerMethods: ["name-letters"]
+  - id: dire-straits
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dire Straits"
+    correctYear: 1977
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Dire Straits"]
+    answerMethods: ["name-letters"]
+  - id: dnce
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "DNCE"
+    correctYear: 2015
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["DNCE"]
+    answerMethods: ["name-letters"]
+  - id: eiffel-65
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Eiffel 65"
+    correctYear: 1997
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Eiffel 65"]
+    answerMethods: ["name-letters"]
+  - id: everything-but-the-girl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Everything but the Girl"
+    correctYear: 1982
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Love & Peace"]
+    wikimediaSearchHints: ["Everything but the Girl"]
+    answerMethods: ["name-letters"]
+  - id: foreigner
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Foreigner"
+    correctYear: 1976
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Foreigner"]
+    answerMethods: ["name-letters"]
+  - id: fugees
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Fugees"
+    correctYear: 1990
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Fugees"]
+    answerMethods: ["name-letters"]
+  - id: glass-animals
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Glass Animals"
+    correctYear: 2012
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Glass Animals"]
+    answerMethods: ["name-letters"]
+  - id: gnarls-barkley
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gnarls Barkley"
+    correctYear: 2003
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Gnarls Barkley"]
+    answerMethods: ["name-letters"]
+  - id: goo-goo-dolls
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Goo Goo Dolls"
+    correctYear: 1986
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Hits"]
+    wikimediaSearchHints: ["Goo Goo Dolls"]
+    answerMethods: ["name-letters"]
+  - id: gorillaz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gorillaz"
+    correctYear: 1998
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Gorillaz"]
+    answerMethods: ["name-letters"]
+  - id: hanson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hanson"
+    correctYear: 1992
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Hits"]
+    wikimediaSearchHints: ["Hanson"]
+    answerMethods: ["name-letters"]
+  - id: imagine-dragons
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Imagine Dragons"
+    correctYear: 2008
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Imagine Dragons"]
+    answerMethods: ["name-letters"]
+  - id: inner-circle
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Inner Circle"
+    correctYear: 1968
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Summer"]
+    wikimediaSearchHints: ["Inner Circle"]
+    answerMethods: ["name-letters"]
+  - id: kaj
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "KAJ"
+    correctYear: 2009
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["KAJ"]
+    answerMethods: ["name-letters"]
+  - id: kalush-orchestra
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kalush Orchestra"
+    correctYear: 2021
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Kalush Orchestra"]
+    answerMethods: ["name-letters"]
+  - id: kaoma
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kaoma"
+    correctYear: 1989
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Summer"]
+    wikimediaSearchHints: ["Kaoma"]
+    answerMethods: ["name-letters"]
+  - id: keiino
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "KEiiNO"
+    correctYear: 2018
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["KEiiNO"]
+    answerMethods: ["name-letters"]
+  - id: la-bouche
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "La Bouche"
+    correctYear: 1994
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Eurodance & pop"]
+    wikimediaSearchHints: ["La Bouche"]
+    answerMethods: ["name-letters"]
+  - id: lmfao
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "LMFAO"
+    correctYear: 2006
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["LMFAO"]
+    answerMethods: ["name-letters"]
+  - id: londonbeat
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Londonbeat"
+    correctYear: 1988
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Londonbeat"]
+    answerMethods: ["name-letters"]
+  - id: los-del-rio
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Los del Río"
+    correctYear: 1962
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Los del Río"]
+    answerMethods: ["name-letters"]
+  - id: lynyrd-skynyrd
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Lynyrd Skynyrd"
+    correctYear: 1964
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Lynyrd Skynyrd"]
+    answerMethods: ["name-letters"]
+  - id: men-at-work
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Men at Work"
+    correctYear: 1978
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Men at Work"]
+    answerMethods: ["name-letters"]
+  - id: milli-vanilli
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Milli Vanilli"
+    correctYear: 1988
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Milli Vanilli"]
+    answerMethods: ["name-letters"]
+  - id: modern-talking
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Modern Talking"
+    correctYear: 1983
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Modern Talking"]
+    answerMethods: ["name-letters"]
+  - id: mr-big
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mr. Big"
+    correctYear: 1988
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Love & Peace", "Power Ballads"]
+    wikimediaSearchHints: ["Mr. Big"]
+    answerMethods: ["name-letters"]
+  - id: mr-president
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mr. President"
+    correctYear: 1991
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Summer"]
+    wikimediaSearchHints: ["Mr. President"]
+    answerMethods: ["name-letters"]
+  - id: mungo-jerry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mungo Jerry"
+    correctYear: 1969
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Summer"]
+    wikimediaSearchHints: ["Mungo Jerry"]
+    answerMethods: ["name-letters"]
+  - id: new-order
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "New Order"
+    correctYear: 1980
+    probability: 65
+    region: ["global"]
+    genrePackages: ["sport"]
+    wikimediaSearchHints: ["New Order"]
+    answerMethods: ["name-letters"]
+  - id: nickelback
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Nickelback"
+    correctYear: 1995
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Nickelback"]
+    answerMethods: ["name-letters"]
+  - id: nirvana
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Nirvana"
+    correctYear: 1987
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Nirvana"]
+    answerMethods: ["name-letters"]
+  - id: no-doubt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "No Doubt"
+    correctYear: 1986
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["No Doubt"]
+    answerMethods: ["name-letters"]
+  - id: no-mercy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "No Mercy"
+    correctYear: 1996
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Love & Peace"]
+    wikimediaSearchHints: ["No Mercy"]
+    answerMethods: ["name-letters"]
+  - id: o-zone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "O-Zone"
+    correctYear: 1999
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["O-Zone"]
+    answerMethods: ["name-letters"]
+  - id: oasis
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Oasis"
+    correctYear: 1991
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Oasis"]
+    answerMethods: ["name-letters"]
+  - id: olsen-brothers
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Olsen Brothers"
+    correctYear: 1972
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Olsen Brothers"]
+    answerMethods: ["name-letters"]
+  - id: one-direction
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "One Direction"
+    correctYear: 2010
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["One Direction"]
+    answerMethods: ["name-letters"]
+  - id: onerepublic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "OneRepublic"
+    correctYear: 2009
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Film"]
+    wikimediaSearchHints: ["OneRepublic"]
+    answerMethods: ["name-letters"]
+  - id: outkast
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "OutKast"
+    correctYear: 1992
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["OutKast"]
+    answerMethods: ["name-letters"]
+  - id: pet-shop-boys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Pet Shop Boys"
+    correctYear: 1981
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Pet Shop Boys"]
+    answerMethods: ["name-letters"]
+  - id: planet-funk
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Planet Funk"
+    probability: 65
+    region: ["global"]
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["Planet Funk"]
+    answerMethods: ["name-letters"]
+  - id: r-e-m
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "R.E.M."
+    correctYear: 1980
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["R.E.M."]
+    answerMethods: ["name-letters"]
+  - id: r-i-o
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "R.I.O."
+    correctYear: 2007
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Summer"]
+    wikimediaSearchHints: ["R.I.O."]
+    answerMethods: ["name-letters"]
+  - id: radiohead
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Radiohead"
+    correctYear: 1985
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Punk & Rock"]
+    wikimediaSearchHints: ["Radiohead"]
+    answerMethods: ["name-letters"]
+  - id: red-hot-chili-peppers
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Red Hot Chili Peppers"
+    correctYear: 1982
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Punk & Rock", "Mega Hits"]
+    wikimediaSearchHints: ["Red Hot Chili Peppers"]
+    answerMethods: ["name-letters"]
+  - id: riva
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Riva"
+    correctYear: 1988
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Riva"]
+    answerMethods: ["name-letters"]
+  - id: savage-garden
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Savage Garden"
+    correctYear: 1994
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Soft & Ballads"]
+    wikimediaSearchHints: ["Savage Garden"]
+    answerMethods: ["name-letters"]
+  - id: scooter
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Scooter"
+    correctYear: 1993
+    probability: 65
+    region: ["global"]
+    genrePackages: ["sport"]
+    wikimediaSearchHints: ["Scooter"]
+    answerMethods: ["name-letters"]
+  - id: scorpions
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Scorpions"
+    correctYear: 1965
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Scorpions"]
+    answerMethods: ["name-letters"]
+  - id: secret-garden
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Secret Garden"
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Secret Garden"]
+    answerMethods: ["name-letters"]
+  - id: shakespears-sister
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Shakespears Sister"
+    correctYear: 1988
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Shakespears Sister"]
+    answerMethods: ["name-letters"]
+  - id: smash-mouth
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Smash Mouth"
+    correctYear: 1994
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Punk & Rock"]
+    wikimediaSearchHints: ["Smash Mouth"]
+    answerMethods: ["name-letters"]
+  - id: snap
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Snap!"
+    correctYear: 1989
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Snap!"]
+    answerMethods: ["name-letters"]
+  - id: spin-doctors
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Spin Doctors"
+    correctYear: 1990
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Spin Doctors"]
+    answerMethods: ["name-letters"]
+  - id: starship
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Starship"
+    correctYear: 1985
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Starship"]
+    answerMethods: ["name-letters"]
+  - id: steppenwolf
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Steppenwolf"
+    correctYear: 1967
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Steppenwolf"]
+    answerMethods: ["name-letters"]
+  - id: sugarhill-gang
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sugarhill Gang"
+    correctYear: 1973
+    probability: 65
+    region: ["global"]
+    genrePackages: ["hiphop"]
+    wikimediaSearchHints: ["The Sugarhill Gang"]
+    answerMethods: ["name-letters"]
+  - id: survivor
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Survivor"
+    correctYear: 1978
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Survivor"]
+    answerMethods: ["name-letters"]
+  - id: talk-talk
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Talk Talk"
+    correctYear: 1981
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Talk Talk"]
+    answerMethods: ["name-letters"]
+  - id: teach-in
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Teach-In"
+    correctYear: 1970
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Teach-In"]
+    answerMethods: ["name-letters"]
+  - id: the-archies
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Archies"
+    correctYear: 1968
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Archies"]
+    answerMethods: ["name-letters"]
+  - id: the-b-52s
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The B-52's"
+    correctYear: 1976
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The B-52's"]
+    answerMethods: ["name-letters"]
+  - id: the-beach-boys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Beach Boys"
+    correctYear: 1961
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Beach Boys"]
+    answerMethods: ["name-letters"]
+  - id: the-black-eyed-peas
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Black Eyed Peas"
+    correctYear: 1995
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Black Eyed Peas"]
+    answerMethods: ["name-letters"]
+  - id: the-chainsmokers
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Chainsmokers"
+    correctYear: 2012
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Chainsmokers"]
+    answerMethods: ["name-letters"]
+  - id: the-cranberries
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Cranberries"
+    correctYear: 1989
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Cranberries"]
+    answerMethods: ["name-letters"]
+  - id: the-everly-brothers
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Everly Brothers"
+    correctYear: 1957
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Everly Brothers"]
+    answerMethods: ["name-letters"]
+  - id: the-human-league
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Human League"
+    correctYear: 1977
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Human League"]
+    answerMethods: ["name-letters"]
+  - id: the-killers
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Killers"
+    correctYear: 2001
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Killers"]
+    answerMethods: ["name-letters"]
+  - id: the-offspring
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Offspring"
+    correctYear: 1984
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Punk & Rock"]
+    wikimediaSearchHints: ["The Offspring"]
+    answerMethods: ["name-letters"]
+  - id: the-rasmus
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Rasmus"
+    correctYear: 1994
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Rasmus"]
+    answerMethods: ["name-letters"]
+  - id: the-rolling-stones
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Rolling Stones"
+    correctYear: 1962
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Rolling Stones"]
+    answerMethods: ["name-letters"]
+  - id: the-verve
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Verve"
+    correctYear: 1990
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Verve"]
+    answerMethods: ["name-letters"]
+  - id: the-white-stripes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The White Stripes"
+    correctYear: 1997
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The White Stripes"]
+    answerMethods: ["name-letters"]
+  - id: the-who
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Who"
+    correctYear: 1964
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["The Who"]
+    answerMethods: ["name-letters"]
+  - id: tlc
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "TLC"
+    correctYear: 1991
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Soft & Ballads"]
+    wikimediaSearchHints: ["TLC"]
+    answerMethods: ["name-letters"]
+  - id: toto
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Toto"
+    correctYear: 1977
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Toto"]
+    answerMethods: ["name-letters"]
+  - id: usa-for-africa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "USA for Africa"
+    correctYear: 1985
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["USA for Africa"]
+    answerMethods: ["name-letters"]
+  - id: van-halen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Van Halen"
+    correctYear: 1972
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["rock"]
+    wikimediaSearchHints: ["Van Halen"]
+    answerMethods: ["name-letters"]
+  - id: vengaboys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Vengaboys"
+    correctYear: 1997
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Club & Dance Hits"]
+    wikimediaSearchHints: ["Vengaboys"]
+    answerMethods: ["name-letters"]
+  - id: village-people
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Village People"
+    correctYear: 1977
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Village People"]
+    answerMethods: ["name-letters"]
+  - id: whitesnake
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Whitesnake"
+    correctYear: 1978
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Whitesnake"]
+    answerMethods: ["name-letters"]
+  - id: yes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Yes"
+    correctYear: 1968
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Yes"]
+    answerMethods: ["name-letters"]
+  - id: zombie-nation
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Zombie Nation"
+    correctYear: 1999
+    probability: 65
+    region: ["global"]
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["Zombie Nation"]
+    answerMethods: ["name-letters"]
+  - id: zz-top
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "ZZ Top"
+    correctYear: 1969
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["rock"]
+    wikimediaSearchHints: ["ZZ Top"]
+    answerMethods: ["name-letters"]

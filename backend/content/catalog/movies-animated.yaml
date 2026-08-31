@@ -131,12 +131,12 @@ items:
     wikimediaSearchHints: ["Aladdin 1992 Disney animated film Genie Robin Williams Agrabah"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "XBrfbWtmvWs"
+      - videoId: "GacgWYqL-Bc"
         startSec: 10
-        endSec: 25
-        channelTitle: "FT Depot"
-        notes: "Original teatral 1992-trailer — Aladdin + Agrabah + Genie (Robin Williams) etableras."
-
+        endSec: 40
+        channelTitle: "Marcus R"
+        notes: "Peter-kurerad 2026-08-27. Ersatte XBrfbWtmvWs vars titel hade 1992 vid tecken 9 av 53 = spoiler. Svenskt tal."
+    region: ["sweden"]
   - id: mulan-1998
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mulan"

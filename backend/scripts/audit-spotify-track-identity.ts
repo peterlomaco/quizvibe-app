@@ -21,8 +21,10 @@
 // Transienta fetch-fel retry:as en gang och flaggas ALDRIG (listas som okanda).
 //
 // Output: konsol-summary + backend/output/spotify-track-identity.md
-// Exit-kod 1 ENBART vid MISMATCH (se kommentaren vid process.exit nedan) -
-// TITLE/ARTIST ar ofta godartade och far inte rodfarga nightly-cron:en.
+// Exit-kod 1 ENBART vid MISMATCH (se kommentaren vid process.exit nedan).
+// TITLE- och ARTIST-flaggor listas bara i rapporten och far INTE rodfarga
+// nightly-cron:en - de ar praktiskt taget alltid godartade stav-/formatvarianter
+// (CLAUDE.md: "Exit-koden ar 1 ENBART vid MISMATCH ... Ror inte den gransen").
 //
 // Kor: cd backend && npm run spotify-identity-audit
 
@@ -123,21 +125,62 @@ function artistMatches(catalogArtist: string, spotifyArtists: string): boolean {
   return spotifyArtists.split(/[,·]/).some((a) => matches(catalogArtist, a));
 }
 
+/**
+ * Titel-matchning ar RIKTAD och strikt: Spotifys og:title far bara vara langre
+ * (version-/remaster-suffix normalizern kanske missar), men katalogtiteln maste
+ * rymmas i den som en hel ord-sekvens. Vi tillater INTE det omvanda
+ * (katalogtiteln innehaller Spotify-titeln) - det lat en fororenad
+ * "Titel - Artist"-strang svalja en kort Spotify-titel och ge falskt OK.
+ */
+function titleMatches(catalogTitle: string, spotifyTitle: string): boolean {
+  const c = normalize(catalogTitle);
+  const s = normalize(spotifyTitle);
+  if (!c || !s) return false;
+  if (c === s) return true;
+  // Ord-gransat: katalogens tokens maste finnas som sammanhangande hela ord i
+  // Spotify-titeln (inte som godtycklig delstrang).
+  return ` ${s} `.includes(` ${c} `);
+}
+
+/**
+ * Splittar "Titel - Artist" pa SISTA dash-separatorn. Separatorn ar oftast
+ * spaced em-dash, men hyphen/en-dash och avvikande mellanrum forekommer och
+ * gjorde tidigare catalogArtist=null (artist-kollen hoppades over OCH
+ * catalogTitle blev hela strangen -> falskt OK). Em/en-dash far sakna
+ * mellanrum; plain hyphen kraver omgivande blanksteg sa vi inte klyver ett
+ * bindestreck INUTI titeln ("Jean-Michel Jarre", "Ding-Dong Song").
+ */
+function splitTitleArtist(displayName: string): {
+  title: string;
+  artist: string | null;
+} {
+  const sep = /\s*[—–]\s*|\s+-\s+/g;
+  let last: { index: number; length: number } | null = null;
+  for (const m of displayName.matchAll(sep)) {
+    last = { index: m.index, length: m[0].length };
+  }
+  if (!last) return { title: displayName.trim(), artist: null };
+  const title = displayName.slice(0, last.index).trim();
+  const artist = displayName.slice(last.index + last.length).trim();
+  return { title: title || displayName.trim(), artist: artist || null };
+}
+
 async function main(): Promise<void> {
   const catalog = loadCatalog();
   const refs: Omit<Row, 'spotifyTitle' | 'spotifyArtist' | 'verdict' | 'error'>[] = [];
   for (const [file, content] of catalog.files) {
     for (const item of content.items) {
       if (!item.spotifyTrackId) continue;
-      // displayName-formatet ar "Titel - Artist" (em-dash).
-      const parts = item.displayName.split(' — ');
+      // displayName-formatet ar "Titel - Artist"; splittas tolerant mot
+      // dash-varianter (em/en-dash, spaced hyphen) sa artisten alltid tas ut.
+      const { title, artist } = splitTitleArtist(item.displayName);
       refs.push({
         file,
         itemId: item.id,
         displayName: item.displayName,
         trackId: item.spotifyTrackId,
-        catalogTitle: parts.length > 1 ? parts.slice(0, -1).join(' — ') : item.displayName,
-        catalogArtist: parts.length > 1 ? parts[parts.length - 1] : null,
+        catalogTitle: title,
+        catalogArtist: artist,
       });
     }
   }
@@ -168,7 +211,7 @@ async function main(): Promise<void> {
       if (!row.spotifyTitle) {
         row.error = 'meta-taggar saknas pa track-sidan';
       } else {
-        const titleOk = matches(ref.catalogTitle, row.spotifyTitle);
+        const titleOk = titleMatches(ref.catalogTitle, row.spotifyTitle);
         const artistOk =
           !ref.catalogArtist || !row.spotifyArtist
             ? true
@@ -250,10 +293,23 @@ async function main(): Promise<void> {
     `\nOK: ${rows.length - bad.length - unknown.length}  Flaggade: ${bad.length}  Okanda: ${unknown.length}`,
   );
   console.log(`Rapport: ${outFile}`);
-  // Exit 1 BARA pa MISMATCH (varken titel eller artist matchar = sakert fel
-  // lat). TITLE/ARTIST ar ofta godartade (stavning, "- Radio Edit", feat-
-  // credits) och far inte rodfarga nightly-cron:en - de listas i rapporten.
-  if (rows.some((r) => r.verdict === 'mismatch')) process.exit(1);
+  // Exit 1 ENBART pa MISMATCH (varken titel eller artist matchar = sakert fel
+  // lat, t.ex. abba-waterloo som pekade pa Eurythmics 2026-08-19).
+  //
+  // ⚠ TITLE- och ARTIST-flaggor faller INTE jobbet (CLAUDE.md: "Exit-koden ar 1
+  // ENBART vid MISMATCH ... Ror inte den gransen"). Empiriskt (nightly 2026-08-30)
+  // ar praktiskt taget alla TITLE/ARTIST-traffar godartade stav-/formatvarianter
+  // som titel-matchning inte kan skilja fran akta fel lat: "Djingis Kan" vs
+  // "Djingis Khan", "Genom Eld och Vatten" vs "& Vatten", "Successchottis" vs
+  // "Succeshottis", feat-credits. Skulle de falla jobbet vore larmet rott varje
+  // natt och darmed vardelost - de listas bara i rapporten for manuell koll.
+  //
+  // (Split/normalisering + titleMatches ar fortfarande skarpta jamfort med foren:
+  //  battre artist-extraktion gor att ett AKTA fel-ID dar aven artisten skiljer
+  //  sig korrekt fangas som MISMATCH i stallet for att slinka igenom som falsk OK.)
+  if (rows.some((r) => r.verdict === 'mismatch')) {
+    process.exit(1);
+  }
 }
 
 main().catch((err) => {

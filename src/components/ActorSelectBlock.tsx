@@ -11,7 +11,8 @@
 //   • reveal    → correct grön, spelarens fel röd, timeout alla röda
 
 import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { createSeededRng } from '@/src/utils/seededRandom';
 

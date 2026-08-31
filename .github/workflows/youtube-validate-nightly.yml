@@ -155,13 +155,14 @@ jobs:
         # Detta steg jämför katalogens displayName mot track-sidans og:title +
         # music:musician_description.
         #
-        # RÖTT vid MISMATCH (varken titel eller artist matchar = säkert fel låt)
-        # OCH vid TITLE (rätt artist men fel låt — DJ:n får ändå fel låt i
-        # högtalaren). ARTIST-flaggor (titeln matchar men artist-strängen skiljer
-        # sig: stavning, feat-credits, ampersand) är oftast godartade och listas
-        # bara i rapporten — samma "trasigt vs inte perfekt"-uppdelning som
-        # youtube-steget ovan. Rör inte den utan att tänka igenom vad ett rött
-        # mejl ska betyda.
+        # RÖTT ENBART vid MISMATCH (varken titel eller artist matchar = säkert
+        # fel låt). TITLE- och ARTIST-flaggor (rätt låt men stav-/formatvariant:
+        # "Djingis Kan"/"Djingis Khan", "och"/"&", diakriter, feat-credits) listas
+        # bara i rapporten och fäller INTE jobbet — titel-matchning kan inte skilja
+        # dem från äkta fel låt, och ~alla träffar är godartade (nightly 2026-08-30:
+        # 8 flaggor, 0 äkta fel). Samma "trasigt vs inte perfekt"-uppdelning som
+        # youtube-steget. CLAUDE.md: "Exit-koden är 1 ENBART vid MISMATCH ... Rör
+        # inte den gränsen."
         if: always()
         working-directory: backend
         run: npm run spotify-identity-audit

@@ -14,22 +14,37 @@
  * skulle returnera gör att call-sites kan stanna oförändrade när mock:en
  * byts ut mot riktigt backend.
  *
- * V1-scope (2026-05-27): inga themed packages än (Hip Hop / Rock /
- * Film & Actors-mfl. parkerade till v1.1+). Tidigare auto-tilldelade
- * generations-paket ("Play as Gen X" etc.) togs bort 2026-05-27 — Peter
- * beslutade att gen-konceptet inte är aktuellt i V1. PURCHASED_PACKAGES
- * är därmed tom genom hela V1-launch.
+ * Tema-paket (2026-08-28): Melodifestivalen + Hip Hop är de FÖRSTA riktiga,
+ * funktionella paketen. Ett aktivt paket gör spelet tema-only (musikpoolen
+ * restrikteras till paketets `tags` = katalogens genrePackages), gråar ut
+ * mixerboard-celler utan material och LÅSER Game Era till paketets span. All
+ * runtime-logik ligger i `hostPackages.ts` (delad av Lobby + quiz.tsx).
+ * Exklusivitet styrs per item av katalogens `inBaseCatalog`: true = spelas i
+ * BÅDE generiska spel och paketet; false = paket-exklusiv (export-music-
+ * questions.ts emitterar numera false-items i stället för att droppa dem).
+ * Rock / Film & Actors m.fl. är fortsatt parkerade till v1.1+.
  */
 export interface MusicPackage {
   id: string;
   name: string;
+  // De genrePackages-taggar (i katalogens `genrePackages`) som paketet
+  // omfattar. Matchning mot innehåll sker via `tags`, INTE via `id`, så vi
+  // slipper case-problem (id 'pkg-hiphop' vs katalog-tagg 'hiphop', name
+  // 'Hip Hop'). Ett paket kan omfatta flera taggar.
+  tags: string[];
   // True = paketet ingår gratis. Reserverat för framtida gratis-paket
   // (idag inga). Optional för bakåtkompat — köpta paket lämnar fältet
   // undefined.
   free?: boolean;
 }
 
-export const PURCHASED_PACKAGES: MusicPackage[] = [];
+// Första riktiga tema-paketen (2026-08-28). Båda är Music-only. `id` bär
+// `pkg-`-prefix (plockas INTE av LEGACY_GEN_PKG_IDS-strippningen som bara
+// matchar `pkg-gen-*`). `tags` speglar genrePackages-strängarna i katalogen.
+export const PURCHASED_PACKAGES: MusicPackage[] = [
+  { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'] },
+  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['hiphop'] },
+];
 
 // ─── Generation-key (för audience-filter) ────────────────────────────
 // Type + birth-year-mapper används av audienceFilter.ts för att härleda

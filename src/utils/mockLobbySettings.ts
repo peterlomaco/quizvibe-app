@@ -62,6 +62,12 @@ export interface LobbySettings {
   // Spotify-svarstyper (tolerant fallback via ?? true — ingen DB-migration krävs för V1).
   spotifyAnswerYear: boolean;
   spotifyAnswerName: boolean;
+  // Parent Control: när host slår på filtret sorteras YT-items taggade
+  // parentControlled bort ur frågeurvalet. Tolerant fallback via ?? false —
+  // ingen DB-migration krävs för V1 (skrivs INTE i settingsToRow, samma
+  // mönster som spotify_answer_*). Källa i praktiken: host:ens profil-default
+  // (LobbyScreen seedar från profile.parentControlEnabled) + lokal toggle.
+  parentControlEnabled: boolean;
   // Remote 1v1: gemensam hjälpnivå för BÅDA spelarna. Default 'full'.
   // Gäller BARA när mutualAssistanceEnabled är true — annars kör varje spelare
   // sin egen personliga nivå (samma modell som i lokala lägen).
@@ -104,6 +110,9 @@ interface LobbySettingsRow {
   // Spotify-svarstyper. Optional tills kolumnerna lagts till (tolerant read via ?? true).
   spotify_answer_year?: boolean;
   spotify_answer_name?: boolean;
+  // Parent Control. Optional — kolumnen finns inte i DB (ingen migration).
+  // Tolerant read via ?? false; skrivs INTE i settingsToRow.
+  parent_control_enabled?: boolean;
   // Optional tills migration 0033_lobby_settings_remote_assistance.sql körts
   // (tolerant read → 'full' som default).
   remote_assistance?: string | null;
@@ -160,6 +169,8 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     // Tolerant: kolumner kanske inte finns ännu → default true (båda aktiva).
     spotifyAnswerYear: row.spotify_answer_year ?? true,
     spotifyAnswerName: row.spotify_answer_name ?? true,
+    // Tolerant: kolumnen saknas i DB → default false (Parent Control av).
+    parentControlEnabled: row.parent_control_enabled ?? false,
     // Tolerant: kolumnen saknas pre-migration 0033 → 'full' (produktdefault).
     remoteAssistance: isRemoteAssistance(row.remote_assistance)
       ? row.remote_assistance

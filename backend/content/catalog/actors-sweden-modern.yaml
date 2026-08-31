@@ -229,3 +229,14 @@ items:
     probability: 70
     wikimediaSearchHints: ["Nour El Refai Swedish comedian actress"]
     answerMethods: ["timeline", "name-letters"]
+  # === Batch 2026-08-27 — flyttad från deferred/parked-actors-global.yaml
+  # (correctNames i movies-katalogen saknade Hints-entry: Borg vs McEnroe) ===
+  - id: sverrir-gudnason
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sverrir Gudnason"
+    correctYear: 1978
+    peakFrom: 2001
+    peakTo: 2026
+    probability: 76
+    wikimediaSearchHints: ["Sverrir Gudnason Swedish actor Borg vs McEnroe"]
+    answerMethods: ["timeline", "name-letters"]

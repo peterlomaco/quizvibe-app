@@ -5,7 +5,7 @@ description: QuizVibe is a mobile app for social music, film and sport quizzes, 
 
 # QuizVibe
 
-**A mobile app for social music, film and sport quizzes, where friends and family compete against each other — on the same phone, on separate devices, or in a remote duel.**
+**A mobile app for social music, film and sport quizzes, where friends and family compete against each other — on the same phone, on separate devices, or in a head-to-head duel.**
 
 ---
 
@@ -14,7 +14,7 @@ description: QuizVibe is a mobile app for social music, film and sport quizzes, 
 - **Single player** — practise on your own
 - **Pass-the-Phone** — share one device and take turns
 - **Individual devices** — everyone answers on their own phone in the same room
-- **Remote 1vs1** — challenge a friend and answer whenever it suits you
+- **Head-to-head** — challenge a friend and answer whenever it suits you
 
 ## Built so everyone has a chance
 

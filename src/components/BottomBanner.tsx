@@ -1,6 +1,7 @@
 import { router, usePathname } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 import { ShoppingCartIcon } from './ShoppingCartIcon';
@@ -10,7 +11,7 @@ import { supabase } from '../utils/supabase';
 
 export const BOTTOM_BANNER_HEIGHT = 52;
 
-const SHOW_ON = ['/', '/profile', '/store', '/my-matches'];
+const SHOW_ON = ['/', '/profile', '/store', '/my-matches', '/competitions'];
 
 interface TabItemProps {
   icon: React.ReactNode;

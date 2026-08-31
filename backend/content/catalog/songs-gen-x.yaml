@@ -119,7 +119,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "DEbi_YjpA-Y"
-        startSec: 30
+        startSec: 15
         endSec: 45
         channelTitle: "RHINO"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (3)."
@@ -132,12 +132,12 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "3Dy4REq8O09IlgiwuHQ3sk"
     youtubeClips:
-      - videoId: "9y-8ZiAJiQo"
-        startSec: 15
+      - videoId: "Sj_9CiNkkn4"
+        startSec: 0
         endSec: 30
-        channelTitle: "ABBA - Topic"
-        notes: "Officiell album-audio via YouTube Topic. Eurovision-låten."
-    genrePackages: ["Eurovision"]
+        channelTitle: "AbbaVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Officiell musikvideo; ersatte Topic-audion 9y-8ZiAJiQo. Titeln namner inte Eurovision/artal."
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   # Bohemian Rhapsody flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # Hotel California flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: bee-gees-stayin-alive
@@ -147,7 +147,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Bee Gees Stayin Alive Saturday Night Fever"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "5cP52DlDN9yryuZVQDg3iq"
+    spotifyTrackId: "4UDmDIqJIbrW0hMBQMFOsM"
     youtubeClips:
       - videoId: "I_izvAbhExY"
         startSec: 30
@@ -162,11 +162,16 @@ items:
     wikimediaSearchHints: ["Chic Le Freak 1978"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "7PC-AcrHEKU"
-        startSec: 0
-        endSec: 15
-        channelTitle: "Chic - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "aXgSHL7efKg"
+        startSec: 2
+        endSec: 32
+        channelTitle: "RHINO"
+        notes: "Peter-kurerad 2026-08-27. Officiella musikvideon (RHINO = rattsinnehavare). startSec 2 angiven av Peter."
+      - videoId: "4jEgM53SRbI"
+        startSec: 4
+        endSec: 34
+        channelTitle: "Justified Melody"
+        notes: "Peter-kurerad 2026-08-27. Lyrics. startSec 4 angiven av Peter. Peters egna 3Mdh3IrLV0c gick INTE att badda in (embeddable=false)."
   - id: queen-another-one-bites-the-dust
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Another One Bites the Dust — Queen"
@@ -373,6 +378,34 @@ items:
         endSec: 45
         channelTitle: "ABBA - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ABBA studio-version, ej film-soundtrack)."
+  - id: abba-gimme-gimme-gimme
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gimme! Gimme! Gimme! (A Man After Midnight) — ABBA"
+    correctYear: 1979
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["ABBA Gimme Gimme Gimme A Man After Midnight"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XEjLoHdbVeE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "AbbaVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: abba-take-a-chance-on-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Take a Chance on Me — ABBA"
+    correctYear: 1977
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["ABBA Take a Chance on Me The Album"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-crgQGdpZR0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "AbbaVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 1977 = albumet ABBA: The Album (12 dec 1977), verifierat mot MusicBrainz. Singeln kom 14 jan 1978 - GRANSFALL, manga spelare gissar 1978."
   - id: queen-we-will-rock-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Will Rock You — Queen"
@@ -399,12 +432,13 @@ items:
     probability: 90
     wikimediaSearchHints: ["Village People YMCA 1978"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "54OR1VDpfkBuOY5zZjhZAY"
     youtubeClips:
-      - videoId: "fvzs2ozG-mc"
-        startSec: 30
-        endSec: 45
-        channelTitle: "PRIVADO 80s"
-        notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
+      - videoId: "CS9OO0S5w2k"
+        startSec: 10
+        endSec: 40
+        channelTitle: "Village People"
+        notes: "Peter-kurerad 2026-08-30 (ersatte fvzs2ozG-mc)."
   # === Content-expansion 2026-05-29: fler ikoniska 60-70-tals-låtar ===
   - id: the-doors-light-my-fire
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -510,19 +544,6 @@ items:
         endSec: 45
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-  - id: bowie-space-oddity
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Space Oddity — David Bowie"
-    correctYear: 1969
-    probability: 84
-    wikimediaSearchHints: ["David Bowie Space Oddity 1969"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "tRNpjt29n6Y"
-        startSec: 30
-        endSec: 45
-        channelTitle: "David Bowie - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: led-zeppelin-whole-lotta-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Whole Lotta Love — Led Zeppelin"
@@ -556,12 +577,13 @@ items:
     probability: 84
     wikimediaSearchHints: ["John Denver Take Me Home Country Roads 1971"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1QbOvACeYanja5pbnJbAmk"
     youtubeClips:
-      - videoId: "6N2b14J-5tA"
-        startSec: 30
-        endSec: 45
-        channelTitle: "John Denver - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "uu7j_xljCRY"
+        startSec: 0
+        endSec: 30
+        channelTitle: "7clouds"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   - id: bob-marley-no-woman-no-cry
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "No Woman, No Cry — Bob Marley & The Wailers"
@@ -750,12 +772,17 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "2Hx61KuedgBKOaJ1GfflJe"
     youtubeClips:
-      - videoId: "khv8TygskVU"
-        startSec: 5
+      - videoId: "dhR1ZR0r-kw"
+        startSec: 0
         endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "Melodifestivalen 1980 vinnare."
-    genrePackages: ["Eurovision"]
+        channelTitle: "Tomas Ledin - Topic"
+        notes: "Officiell studio-audio (Topic). Titeln avslöjar inte årtalet."
+      - videoId: "BK1FPU797_E"
+        startSec: 0
+        endSec: 20
+        channelTitle: "Tomas Ledin - Topic"
+        notes: "Officiell studio-audio (Topic). Titeln avslöjar inte årtalet."
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: tomas-ledin-hon-gor-allt
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hon gör allt för att göra mig lycklig — Tomas Ledin"
@@ -800,6 +827,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1971 vinnare — Monaco."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: vicky-leandros-apres-toi
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Après toi — Vicky Leandros"
@@ -814,6 +842,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1972 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: anne-marie-david-tu-te-reconnaitras
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tu te reconnaîtras — Anne-Marie David"
@@ -828,6 +857,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1973 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: teach-in-ding-a-dong
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ding-a-dong — Teach-In"
@@ -842,6 +872,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1975 vinnare — Nederländerna."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: brotherhood-of-man-save-your-kisses
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Save Your Kisses for Me — Brotherhood of Man"
@@ -856,6 +887,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1976 vinnare — Storbritannien."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: marie-myriam-loiseau-et-lenfant
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "L'Oiseau et l'Enfant — Marie Myriam"
@@ -870,6 +902,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1977 vinnare — Frankrike."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: izhar-cohen-a-ba-ni-bi
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A-Ba-Ni-Bi — Izhar Cohen & The Alphabeta"
@@ -884,6 +917,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1978 vinnare — Israel."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: milk-and-honey-hallelujah
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hallelujah — Milk & Honey"
@@ -898,6 +932,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1979 vinnare — Israel."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: johnny-logan-whats-another-year
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What's Another Year — Johnny Logan"
@@ -912,6 +947,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1980 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: lill-lindfors-en-san-karl
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "En sån karl — Lill Lindfors"
@@ -963,11 +999,12 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "1oS8V9VCSuF0fgLQGMKXQY"
     youtubeClips:
-      - videoId: "uhYOEoQyqT4"
-        startSec: 0
-        endSec: 30
-        channelTitle: "Universal Music Sweden"
-        notes: "Officiell UMG Sweden. Melodifestivalen 1973 (7:a plats)."
+      - videoId: "nSRoORVsr-Q"
+        startSec: 6
+        endSec: 36
+        channelTitle: "Lasse Berghagen - Topic"
+        notes: "Peter-kurerad 2026-08-27. startSec 6 angiven av Peter. Ersatte uhYOEoQyqT4 vars titel 'Lasse Berghagen - Ding Dong (1973)' ar 34 tecken med aret vid 29 = spoiler."
+    genrePackages: ["Melodifestivalen"]
   - id: streaplers-vad-har-du-under-blusen-rut
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vad har du under blusen Rut — Streaplers"
@@ -1064,6 +1101,7 @@ items:
     wikimediaSearchHints: ["Sugarhill Gang Rapper's Delight 1979 hip hop"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     spotifyTrackId: "2XbwFs07dfm2MGQuYmRMZT"
   # === Tillägg 2026-08-11 (Peters lista) ===
   - id: marvin-gaye-tammi-terrell-aint-no-mountain-high-enough
@@ -1074,7 +1112,12 @@ items:
     wikimediaSearchHints: ["Marvin Gaye Tammi Terrell Ain't No Mountain High Enough 1967"]
     answerMethods: ["timeline"]
     spotifyTrackId: "7tqhbajSfrz2F7E1Z75ASX"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "IC5PL0XImjw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Doc Rudy | Soul Studios"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   - id: the-who-behind-blue-eyes
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Behind Blue Eyes — The Who"
@@ -1162,3 +1205,54 @@ items:
         channelTitle: "KC and the Sunshine Band - Topic"
         notes: "Ersatte Peters lank O0_H3F84Yjk 2026-08-14: den hade '1975' i videotiteln (= svaret), var SD och embed-blockerad i 2 regioner utan servad region. Detta ar officiell Topic-audio, HD, ren titel utan arsangivelse. OBS statisk albumkonst — byt garna till en officiell video om en oblockerad hittas."
     notes: "correctYear = 1975 (bade det sjalvbetitlade albumet och singeln)."
+  # === Tillagg 2026-08-25 (Peters "YT och Spotify lista") ===
+  - id: dusty-springfield-son-of-a-preacher-man
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Son of a Preacher Man — Dusty Springfield"
+    correctYear: 1968
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Dusty Springfield Son of a Preacher Man"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7odHgoLFi3GQ90E9PeraI3"
+    youtubeClips:
+      - videoId: "b4pYANUAJAI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "The Ed Sullivan Show"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: bill-withers-aint-no-sunshine
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ain't No Sunshine — Bill Withers"
+    correctYear: 1971
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Bill Withers Aint No Sunshine Just As I Am"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    spotifyTrackId: "1k1Bqnv2R0uJXQN4u6LKYt"
+    youtubeClips: []
+  - id: bruce-springsteen-the-river
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The River — Bruce Springsteen"
+    correctYear: 1980
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Bruce Springsteen The River"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7HrzErXq3TsKOY1gmdIShB"
+    youtubeClips: []
+  - id: nancy-sinatra-these-boots-are-made-for-walkin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "These Boots Are Made for Walkin' — Nancy Sinatra"
+    correctYear: 1966
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Nancy Sinatra These Boots Are Made for Walkin"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9Qp_SrTgBBs"
+        startSec: 0
+        endSec: 30
+        channelTitle: "NancySinatraVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\". correctYear 1966 enligt MusicBrainz tidigaste release + albumet Boots (mars 1966)."

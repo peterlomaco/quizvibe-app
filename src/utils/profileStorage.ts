@@ -60,17 +60,22 @@ export interface ProfileData {
   // (sätts av Lobby-seedningen, sparas normalt inte som profil-default).
   // Optional för bakåtkompatibilitet — defaultas till 4 i UI.
   maxPlayers?: 2 | 4 | 12;
-  // Default game mode (host-default). 'pass-the-phone' = en delad enhet
-  // (gratis), 'individual-devices' = parallellt spel (kräver Premium).
-  // Optional för bakåtkompatibilitet — defaultas till 'pass-the-phone' i UI.
+  // Default game mode för MULTIPLAYER-spel (host-default). 'pass-the-phone'
+  // = en delad enhet, 'individual-devices' = parallellt spel. Single player
+  // och Remote 1vs1 är INTE host-defaults — de väljs per spel via
+  // "Start New Game" på Home. Optional för bakåtkompatibilitet — defaultas
+  // till 'pass-the-phone' i UI.
   gameMode?: GameMode;
-  // Om checkad låser host-default till Individual Devices och Pass-the-Phone
-  // visas dämpad/grå i Profile:s Game Mode-toggle. Optional för
-  // bakåtkompatibilitet — defaultas till false i UI.
+  // ⚠ LEGACY sedan 2026-08-26: Single player är inte längre en host-default.
+  // Profile skriver alltid false (och coercar ett stale true vid load), men
+  // fältet är kvar eftersom DB-kolumnen finns och Lobby:s seed läser
+  // motsvarande värde ur lobby_settings vid carry-over (Replay).
   singlePlayerDefault?: boolean;
-  // Default antal rundor per spel (host-default). Stegrar i 2 (jämn lap-tal),
+  // Default antal rundor per MULTIPLAYER-spel (host-default). Stegrar i 2,
   // capas av gameMode i Lobby (Pass-the-Phone max 4, Individual Devices max
-  // 20). Optional för bakåtkompatibilitet — defaultas till ROUNDS_DEFAULT i UI.
+  // 20 med Premium). En Single player-lobby ignorerar detta och startar
+  // alltid på 4. Optional för bakåtkompatibilitet — defaultas till
+  // ROUNDS_DEFAULT i UI.
   roundsDefault?: number;
   // Lista över paket-id:n som användaren har aktiverat i sin Profile för
   // att vara valbara i Lobby (host-vyn). Paket som inte finns i denna lista
@@ -85,6 +90,11 @@ export interface ProfileData {
   // Om Spotify DJ-läget är aktiverat som standard-val i Host defaults.
   // Optional — defaultas till false om saknas.
   spotifyDefaultEnabled?: boolean;
+  // Parent Control (barnvänligt urval). När true filtreras YT-items taggade
+  // parentControlled bort ur frågeurvalet i alla spel där denna profil är host.
+  // AsyncStorage-ONLY (ingen DB-kolumn — samma mönster som spotifyDefaultEnabled).
+  // Default false om saknas.
+  parentControlEnabled?: boolean;
   // Spotify-svarstyper. Båda true = alternerar per frågeindex (Year / Name).
   // Minst en måste vara true när Spotify är aktiverat.
   spotifyAnswerYear?: boolean;   // default true
@@ -94,6 +104,19 @@ export interface ProfileData {
   // OAuth-verifieringen — ingen DB-kolumn, lever enbart i AsyncStorage-cachen.
   // Default false. Seedar lobby_players.spotify_verified vid join/host.
   spotifyAppConfirmed?: boolean;
+  // Player HCP (Dynamic Handicap System). Skala 1–99, 1 = elit, 99 = nybörjare
+  // (se src/utils/hcp.ts). Aktuellt intjänat värde per registrerad profil;
+  // sköldarna faller tillbaka på calculateInitialHCP(age, assistance) tills
+  // justeringsmotorn (Phase D) skrivit ett riktigt värde här.
+  //
+  // ⚠ AsyncStorage-ONLY (som spotify*-fälten) — MEDVETET ingen DB-kolumn ännu.
+  // (a) En upsert som nämner en okörd kolumn failar HELA profiles-skrivningen
+  // (samma klass som sketch_enabled/spotify_answer_*), och (b) HCP-progressens
+  // INDATA (sliding-fönstren) är device-lokala, så att spegla enbart det
+  // härledda värdet cross-device utan fönster-historiken ger inkonsekventa
+  // justeringar. Promotera till en profiles-kolumn (egen migration) först när
+  // cross-device-HCP faktiskt behövs. Optional för bakåtkompat.
+  hcp?: number;
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -415,18 +438,23 @@ async function loadProfileFresh(): Promise<ProfileData | null> {
       const supabaseImg = profile.imagesEnabledCategories;
       profile = {
         ...profile,
-        youtubeEnabledCategories:
-          supabaseYT && supabaseYT.length > 0
-            ? supabaseYT
-            : cached?.youtubeEnabledCategories,
-        imagesEnabledCategories:
-          supabaseImg && supabaseImg.length > 0
-            ? supabaseImg
-            : cached?.imagesEnabledCategories,
+        // En array från Supabase (även TOM = källan medvetet av) är
+        // auktoritativ. Bara null/undefined (kolumnen saknas, migration 0014
+        // ej applicerad) faller tillbaka på AS-cachen. Tidigare `length > 0`
+        // kastade en sparad tom array och kunde återuppliva alla 3 ur cachen.
+        youtubeEnabledCategories: Array.isArray(supabaseYT)
+          ? supabaseYT
+          : cached?.youtubeEnabledCategories,
+        imagesEnabledCategories: Array.isArray(supabaseImg)
+          ? supabaseImg
+          : cached?.imagesEnabledCategories,
         spotifyDefaultEnabled: cached?.spotifyDefaultEnabled,
         spotifyAnswerYear: cached?.spotifyAnswerYear,
         spotifyAnswerName: cached?.spotifyAnswerName,
         spotifyAppConfirmed: cached?.spotifyAppConfirmed,
+        // AsyncStorage-only (ingen DB-kolumn) — alltid från cache.
+        parentControlEnabled: cached?.parentControlEnabled,
+        hcp: cached?.hcp,
       };
     }
     const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
@@ -537,6 +565,8 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     spotifyAnswerYear: cache?.spotifyAnswerYear,
     spotifyAnswerName: cache?.spotifyAnswerName,
     spotifyAppConfirmed: cache?.spotifyAppConfirmed,
+    parentControlEnabled: cache?.parentControlEnabled,
+    hcp: cache?.hcp,
   };
 
   // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha
@@ -585,6 +615,27 @@ export async function playerNameExists(playerName: string): Promise<boolean> {
   });
   if (error) {
     console.warn('[profileStorage] player_name_exists failed:', error.message);
+    return false;
+  }
+  return data === true;
+}
+
+/**
+ * Kollar om en email redan är registrerad — driver email-uniqueness-checken
+ * i Register-formens Check-knapp. Returnerar bara en boolean; ingen profil-
+ * data läcker. Case-insensitiv (RPC lower():ar auth.users.email).
+ *
+ * ⚠ Detta är en email-enumereringsvektor (se migration 0040 för rationale +
+ * Peters beslut). Fail-open (false = "ledigt") vid nätverksfel så lokal
+ * format-validering + Register-submitens signUp avgör — matchar
+ * playerNameExists-beteendet.
+ */
+export async function emailExists(email: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('email_exists', {
+    p_email: email,
+  });
+  if (error) {
+    console.warn('[profileStorage] email_exists failed:', error.message);
     return false;
   }
   return data === true;

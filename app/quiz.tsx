@@ -8,7 +8,6 @@ import { MediaPlayer } from '@/src/components/MediaPlayer';
 import {
   generateOpponentRoundScore,
   generateOpponentTimeUsed,
-  MOCK_OPPONENT_HCP_BEFORE,
   MOCK_OPPONENTS,
   RoundLeaderboard,
   type HcpChange,
@@ -21,13 +20,37 @@ import FinalCelebration from '@/src/components/FinalCelebration';
 import { RemoteMatchResultPanel } from '@/src/components/RemoteMatchResultPanel';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
-import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload, type QuestionAdvancePayload } from '@/src/lib/realtime/syncChannel';
+import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload, type PlayerHcpChangedPayload, type QuestionAdvancePayload } from '@/src/lib/realtime/syncChannel';
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
+import {
+  aggregateLabel,
+  attachSeriesToLeaderboard,
+  buildAggregateStandings,
+  loadAggregateSeries,
+  markSeriesContinues,
+  nextMarathonName,
+  recordGameInSeries,
+  type AggregateGamePlayer,
+  type AggregateLeaderboardData,
+} from '@/src/utils/aggregateLeaderboard';
+import {
+  createAggregateLeaderboard,
+  findAggregateLeaderboardsFor,
+  getAggregateLeaderboard,
+  listMyAggregateLeaderboards,
+  recordAggregateGame,
+  renameAggregateLeaderboard,
+  saveAggregateGameSettings,
+  type SavedAggregateSummary,
+} from '@/src/utils/aggregateLeaderboards';
+import { containsProfanity } from '@/src/utils/profanity';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { appendGameHistoryEntry, saveLatestResult, type GameResult, type HistoryEntry, type RoundResult } from '@/src/utils/gameResults';
+import { recordGameResultForName, recordSelfGameResult } from '@/src/utils/hcpProgress';
+import { filterByItemHcp, HCP_START } from '@/src/utils/hcpEngine';
 import {
   finalizePlayer,
   forfeitRemoteMatch,
@@ -41,7 +64,13 @@ import {
   upsertAnswer,
 } from '@/src/utils/remoteMatches';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
-import { pickMediaSource, type YoutubeClip } from '@/src/utils/mediaSource';
+import {
+  collectPlayedSources,
+  pickMediaSource,
+  PLAYED_MEDIA_SOURCE_ORDER,
+  type PlayedMediaSource,
+  type YoutubeClip,
+} from '@/src/utils/mediaSource';
 import {
   QUIZ_IMAGE_CARD_H,
   QUIZ_MEDIA_H,
@@ -49,7 +78,7 @@ import {
   qh,
 } from '@/src/utils/quizLayout';
 import { deactivateRoom, registerActiveRoom } from '@/src/utils/mockActiveRooms';
-import { clearLobbyPlayers, setLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
+import { clearLobbyPlayers, getLobbyPlayerUserIds, setLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import {
   clearLobbySettings,
   getLobbySettings,
@@ -59,10 +88,11 @@ import {
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
-import { isMainCategory, subjectToMainCategory, itemMatchesEnabledCategories, type MainCategory } from '@/src/utils/mainCategory';
+import { isMainCategory, subjectToMainCategory, itemMatchesEnabledCategories, MAIN_CATEGORIES, type MainCategory } from '@/src/utils/mainCategory';
 import { buildMatchHighlights } from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
+import { resolveActivePackageTags, itemInActivePackages, computePackageCoverage } from '@/src/utils/hostPackages';
 import {
   computeDJRotationPlan,
   getDJForQuestionIndex,
@@ -77,7 +107,11 @@ import { getSpotifyArtistMeta, type SpotifyArtistMeta } from '@/src/utils/spotif
 import { SPOTIFY_ALBUM_CONTEXT } from '@/src/utils/spotifyAlbumContext';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { generatePlayerName } from '@/src/utils/playerName';
-import { loadProfile, type ProfileData } from '@/src/utils/profileStorage';
+import {
+  getCachedProfile,
+  loadProfile,
+  type ProfileData,
+} from '@/src/utils/profileStorage';
 import { recordQuestionAnswer } from '@/src/utils/questionStats';
 import {
   IMAGE_QUIZ_QUESTIONS,
@@ -90,6 +124,7 @@ import {
 import { buildImageVariant } from '@/src/utils/imageQuestionBuilder';
 import { createSeededRng } from '@/src/utils/seededRandom';
 import { HINTS_LIBRARY, inferGender, inferNationality, inferSport, type HintLibrary } from '@/src/utils/hintsData';
+import { meetsHintsThreshold } from '@/src/utils/hintsText';
 import { buildHintsDistractorPool } from '@/src/utils/hintsDistractorPool';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
@@ -119,15 +154,17 @@ import {
   Dimensions,
   Easing,
   Image,
+  KeyboardAvoidingView,
   Linking,
   Modal,
-  Pressable,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TextInput,
   View,
 } from 'react-native';
+import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 
@@ -150,12 +187,21 @@ interface TimelineQuestion {
    *  crossover-filter: sport-musik (subject=song → mainCategory='Music') surfar
    *  ÄVEN under Sport-toggeln. Se itemMatchesEnabledCategories. */
   genrePackages?: readonly string[];
+  /** false = paket-exklusiv (spelas bara när matchande Host-paket aktivt).
+   *  Utelämnat = default true = med i baspoolen. Driver tema-pool-filtret. */
+  inBaseCatalog?: boolean;
   // Pre-curerade YouTube-klipp för frågan. Optional — items utan klipp
   // renderar `NoSourcePlayer`-placeholder via pickMediaSource.
   youtubeClips?: YoutubeClip[];
   /** Spotify track ID — satt när frågan är en Spotify DJ-kandidat.
    *  Driver isSpotifyQuestion + djRotationPlan i quiz-screen:en. */
   spotifyTrackId?: string;
+  /** Parent control-tagg. true = filtreras bort ur frågeurvalet när host har
+   *  Parent Control påslaget (se inEraMusic-filtret). */
+  parentControlled?: boolean;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Driver HCP-frågefiltret
+   *  (item valbart om itemHcp >= spelarens HCP, relaxas om poolen blir tunn). */
+  itemHcp: number;
 }
 
 interface ImageQuestion {
@@ -190,6 +236,8 @@ interface ImageQuestion {
   hints?: HintLibrary;
   /** Profession-etikett härledd från contentSubject ('Actor' | 'Artist' | 'Athlete' | 'Band'). */
   profession?: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Se TimelineQuestion. */
+  itemHcp: number;
 }
 
 interface ActorSelectQuestion {
@@ -211,7 +259,13 @@ interface ActorSelectQuestion {
   /** Filmens releasår — används för era-filtrering (inte för scoring). */
   correctYear?: number;
   genrePackages?: readonly string[];
+  /** false = paket-exklusiv (spelas bara när matchande Host-paket aktivt). */
+  inBaseCatalog?: boolean;
   youtubeClips?: YoutubeClip[];
+  /** Parent control-tagg. true = filtreras bort när host har Parent Control på. */
+  parentControlled?: boolean;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Se TimelineQuestion. */
+  itemHcp: number;
 }
 
 type QuizQuestion = TimelineQuestion | ImageQuestion | ActorSelectQuestion;
@@ -248,7 +302,10 @@ const SEED_QUESTIONS: (TimelineQuestion | ActorSelectQuestion)[] = MUSIC_QUESTIO
       distractorNames: q.distractorNames ?? [],
       correctYear: q.correctYear,
       genrePackages: q.genrePackages,
+      inBaseCatalog: q.inBaseCatalog,
       youtubeClips: q.youtubeClips,
+      parentControlled: q.parentControlled,
+      itemHcp: q.itemHcp,
     };
     return actorQ;
   }
@@ -263,8 +320,11 @@ const SEED_QUESTIONS: (TimelineQuestion | ActorSelectQuestion)[] = MUSIC_QUESTIO
     correctYear: q.correctYear!,
     hint: q.displayName,
     genrePackages: q.genrePackages,
+    inBaseCatalog: q.inBaseCatalog,
     youtubeClips: q.youtubeClips,
     spotifyTrackId: q.spotifyTrackId,
+    parentControlled: q.parentControlled,
+    itemHcp: q.itemHcp,
   };
   return tq;
 });
@@ -284,13 +344,14 @@ function professionFromSubject(subject: string | undefined): string {
 // Items med hints-data i HINTS_LIBRARY får library attachad vid konvertering.
 // Region-filter via EXAKT samma regel och samma datakälla som SEED_QUESTIONS:
 // katalogens `region`, numera exporterad även för bild-items (migration
-// 2026-08-11). Items med färre än 10 hints visas ej — de saknar tillräckliga
-// ledtrådar för en meningsfull fråga.
-const MIN_HINTS_REQUIRED = 10;
+// 2026-08-11). Spelbarhets-gaten (meetsHintsThreshold, hintsText.ts) kräver
+// antingen ≥10 råa ledtrådar ELLER ≥5 grupperade topp-nivå-bullets — samma
+// regel som export-image-questions.ts, belt-and-suspenders mot en icke-
+// omkörd export.
 const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
   .filter((q) =>
     isItemInRegionScope(q.region, PLAYER_COUNTRY) &&
-    (HINTS_LIBRARY[q.id]?.hints.length ?? 0) >= MIN_HINTS_REQUIRED,
+    meetsHintsThreshold(HINTS_LIBRARY[q.id], q.displayName),
   )
   .map((q, i, arr) => ({
     type: 'image',
@@ -307,6 +368,7 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
     source: q,
     hints: HINTS_LIBRARY[q.id],
     profession: professionFromSubject(q.contentSubject),
+    itemHcp: q.itemHcp,
   }),
 );
 
@@ -682,6 +744,23 @@ const SELECTOR_TOP = 22;      // 10px under tick-toppen
 const SELECTOR_BOTTOM = 64;   // 10px över tick-botten
 const SELECTOR_H = SELECTOR_BOTTOM - SELECTOR_TOP; // = 42px
 
+// Reveal-fasens Next-knapp är låst i N sekunder efter att svarstiden tagit
+// slut — knappen räknar ned N → 1 och blir först därefter tryckbar med
+// "Next"-texten. Ger alla spelare tid att läsa facit innan host kan klicka
+// vidare (Peter 2026-08-24).
+const REVEAL_NEXT_LOCK_SECONDS = 5;
+
+// ── IndDev: readiness-gate på host:s Play-knapp (fråga 0) ──────────────────
+// MIN_GREY är ren UX — den garanterar en läsbar grå→guld-beat även när alla
+// peers redan hunnit hälsa, i stället för en flimrande omfärgning.
+// TIMEOUT är korrekthets-escapen: en spelare som joinade lobbyn men sedan
+// bakgrundade appen får ALDRIG låsa host permanent.
+// ⚠ Korrektheten ligger i peer-hälsningarna (allPeersAnnounced), INTE i
+// MIN_GREY. Tar man bort readiness-villkoret och behåller bara klockan är
+// man tillbaka på en blind fördröjning som inte vet något om någon.
+const START_GATE_MIN_GREY_MS = 1000;
+const START_GATE_TIMEOUT_MS = 8000;
+
 // Energisk färg för svarsrutan (används oavsett assistance-nivå)
 const BOX_COLOR = '#F5A623';       // gyllene
 const BOX_BG = 'rgba(26,48,80,0.92)'; // mörkare navy – tydligt distinkt mot bakgrund #0B1220
@@ -1001,6 +1080,25 @@ const tl = StyleSheet.create({
 
 // ─── Main Quiz Screen ─────────────────────────────────────────────────────────
 
+/**
+ * Utfallet av "Add to existing Aggregate Leaderboard/Score"-listan.
+ *
+ * `cancel` är MEDVETET skilt från `fresh`: Cancel tar host tillbaka till
+ * slutskärmen med Yes/No-frågan kvar utan att skapa något, medan `fresh`
+ * startar re-matchen som en frisstående serie. Utan båda hade listan saknat
+ * en väg framåt (Peter 2026-08-26).
+ */
+type AggregatePickChoice =
+  | { kind: 'attach'; id: string }
+  | { kind: 'fresh' }
+  | { kind: 'cancel' };
+
+// Två RN <Modal> kan inte vara presenterade samtidigt (modal-swap-fällan):
+// öppnar man den andra innan den första fade:at ut sväljs den tyst på iOS.
+// Används vid pick-list-modal ⇄ namn-modal-övergången i re-match-flödet.
+const MODAL_SWAP_DELAY_MS = 350;
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
 type TurnOrderPlayer = {
   id: string;
   name: string;
@@ -1059,6 +1157,66 @@ function AnswerSummaryRow({
   );
 }
 
+// B1-fix: 2-decimals svarstidsräknaren tickar 20×/sek. Låg den kvar som state
+// på QuizScreen re-renderades HELA det ~11,8k-rader stora trädet 20 gånger i
+// sekunden mitt under mediauppspelning + animationer. Här är tickandet isolerat
+// i ett React.memo-barn med egen lokal state, så bara denna lilla ruta ritas om
+// i den takten. Frozen-värdet (vid confirm) + nollställning (ny fråga) kommer
+// via `frozenMs`; live-tickandet sker lokalt när `live` är true.
+const AnswerStopwatch = React.memo(function AnswerStopwatch({
+  live,
+  startMsRef,
+  totalMs,
+  frozenMs,
+  stopwatchColor,
+  timerColor,
+  timerRingGlow,
+  iconSize,
+}: {
+  live: boolean;
+  startMsRef: React.MutableRefObject<number>;
+  totalMs: number;
+  frozenMs: number;
+  stopwatchColor: string;
+  timerColor: string;
+  timerRingGlow: Animated.Value;
+  iconSize: number;
+}) {
+  const [ms, setMs] = useState(frozenMs);
+  useEffect(() => {
+    if (!live) {
+      setMs(frozenMs);
+      return;
+    }
+    const tick = () => {
+      const elapsed = Date.now() - startMsRef.current;
+      setMs(Math.min(totalMs, Math.max(0, elapsed)));
+    };
+    tick();
+    const id = setInterval(tick, 50);
+    return () => clearInterval(id);
+  }, [live, frozenMs, totalMs, startMsRef]);
+  return (
+    <View style={styles.decimalTimerWrap}>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.decimalTimerHalo, { backgroundColor: timerColor, opacity: timerRingGlow }]}
+      />
+      <View style={[styles.decimalTimerBox, { borderColor: stopwatchColor }]}>
+        <View style={styles.decimalTimerIconWrap}>
+          <StopwatchIcon size={iconSize} color={stopwatchColor} />
+        </View>
+        <Text style={[styles.decimalTimerInt, { color: stopwatchColor }]}>
+          {String(Math.floor(ms / 1000)).padStart(2, '0')}
+        </Text>
+        <Text style={[styles.decimalTimerDec, { color: Colors.textSecondary }]}>
+          .{String(Math.floor((ms % 1000) / 10)).padStart(2, '0')}
+        </Text>
+      </View>
+    </View>
+  );
+});
+
 export default function QuizScreen() {
   const params = useLocalSearchParams<{
     assistance?: string;
@@ -1091,6 +1249,9 @@ export default function QuizScreen() {
      *  (enforced av Lobby/Profile-validering). */
     spotifyAnswerYear?: string;
     spotifyAnswerName?: string;
+    /** 'true' om host har Parent Control påslaget — YT-items taggade
+     *  parentControlled filtreras då bort ur frågeurvalet. Default 'false'. */
+    parentControlEnabled?: string;
     /** 'true' om spelets host är en guest (lobbyn skapad via "Start Game as
      *  Guest"). Sätts på ALLA enheter (host-path + non-host-path) — döljer
      *  Play Again på final leaderboard och skippar Player history-skrivning. */
@@ -1116,18 +1277,27 @@ export default function QuizScreen() {
   const isHost = (params.isHost ?? 'true') === 'true';
   // True när spelets HOST är en guest (oavsett vilken enhet detta är —
   // på non-host-enheter betyder flaggan "spelets host är guest", inte
-  // "jag är host"). Guest-hostade spel skriver ingen Player history och
-  // har max 1 Play Again-replay (räknas via guestReplaysUsed nedan).
+  // "jag är host"). Guest-hostade spel skriver ingen Player history och har
+  // sedan 2026-08-26 VARKEN re-match eller replay: slutskärmen visar bara
+  // "Start New Game" (om enheten är inloggad), annars bara Home.
   const isGuestHostGame = params.guestHost === 'true';
-  // Förbrukade replays (0 = första spelet → Play Again visas; >=1 = detta
-  // ÄR replayn → Final Leaderboard visar bara Home). Bara satt på host-
-  // enheten; non-host styrs istället av hostInitiatedPlayAgain-broadcasten.
+  // ⚠ VESTIGIAL för lokala spel sedan 1-replay-taket togs bort (2026-08-26).
+  // Kedjan Home-form → lobby → quiz → goToNewLobby bärs fortfarande, och
+  // REMOTE använder propen aktivt: slutskärmen skickar guestHost={true} +
+  // guestReplaysUsed={1} som literaler för att tvinga fram Home-only-footern.
+  // Riv den inte utan att först flytta remote till en egen flagga.
   const guestReplaysUsed = parseInt(params.guestReplays ?? '0', 10) || 0;
   // Remote 1v1: server-side match-id (remote_matches). Solo-session —
   // frågesekvensen är auktoritativ i DB (question_ids), varje svar skrivs
   // till remote_match_answers och slutresultatet finaliseras via RPC.
   const remoteMatchId = params.remoteMatchId ?? null;
   const isRemote = gameMode === 'remote-1v1' && !!remoteMatchId;
+  // Bas för clipSeed (se pickMediaSource): styr vilket klipp som väljs på items
+  // med flera. MÅSTE vara delad av alla enheter i spelet och skilja sig mellan
+  // spel. remoteMatchId respektive roomCode uppfyller båda — roomCode nygenereras
+  // vid varje Create Game/Play Again. Saknas de (direktnavigering i dev) blir
+  // seeden undefined och pickMediaSource faller på Math.random.
+  const clipSeedBase = remoteMatchId ?? params.roomCode ?? null;
   // Remote 1v1: BÅDA deltagarnas åldrar (ur match-snapshotten). Behövs eftersom
   // `turnOrder` i remote bara innehåller spelaren själv — utan detta bygger de
   // två enheterna olika audience-set (= olika distraktor-pool) och därmed olika
@@ -1169,6 +1339,9 @@ export default function QuizScreen() {
     gameMode === 'individual-devices';
   const spotifyAnswerYear = (params.spotifyAnswerYear ?? 'true') === 'true';
   const spotifyAnswerName = (params.spotifyAnswerName ?? 'true') === 'true';
+  // Parent Control — host:ens val (Profile/Lobby-switch). När på filtreras
+  // YT-items taggade parentControlled bort ur frågeurvalet (se inEraMusic).
+  const parentControlEnabled = (params.parentControlEnabled ?? 'false') === 'true';
 
   // Deterministisk svarstyp per Spotify-fråga baserat på Spotify-frågens ordinalposition.
   // Båda aktiva → alternerande per "Spotify-runda" = turnOrder.length Spotify-frågor.
@@ -1255,6 +1428,11 @@ export default function QuizScreen() {
   // istället för MediaPlayer och auto-advancerar till reveal efter 2.5 s.
   // Resetas per fråga via useEffect nedan.
   const [youtubeError, setYoutubeError] = useState(false);
+  // C1-fix: videoIds för klipp som fallerat på DENNA enhet under aktuell fråga.
+  // Ett item kan bära flera klipp (officiell video + lyrics); när det seed-valda
+  // klippet är borttaget/region-blockerat faller vi tillbaka på nästa klipp INNAN
+  // vi 0-poängar frågan. Resetas per fråga.
+  const [failedClipVideoIds, setFailedClipVideoIds] = useState<string[]>([]);
   // Antal rundor sätts av host i Lobby (slider 3–20, default 10). Fallback 5
   // om param saknas — t.ex. direkt-nav till /quiz utan att gå via Lobby.
   // SEED_QUESTIONS har 5 frågor i mock; för totalRounds > 5 cyklas listan via
@@ -1291,9 +1469,12 @@ export default function QuizScreen() {
       return ['Music', 'Film', 'Sport'];
     }
   }, [params.imagesEnabledCategories]);
-  // Deriverade source-flags: YouTube aktiv om min 1 kategori vald, Images alltid aktiv.
+  // Deriverade source-flags: en källa är aktiv när minst en kategori valts.
+  // (imagesEnabled var tidigare hårdkodad `true` — det var vad som gjorde
+  // Player history:s Sources-etikett fel. Poolgaten nedan var oberörd:
+  // kategori-filtret ger redan [] för en tom imagesEnabledCategories.)
   const youtubeEnabled = youtubeEnabledCategories.length > 0;
-  const imagesEnabled = true;
+  const imagesEnabled = imagesEnabledCategories.length > 0;
   // Theme packages aktiva vid spelstart (host:s lobby-val, JSON-stringifierad
   // array av paket-IDs). Tom array = Generic. Default tom vid direkt-nav
   // utan Lobby. Behövs i HistoryEntry vid game-completion så Player history
@@ -1319,6 +1500,45 @@ export default function QuizScreen() {
       return [];
     }
   }, [params.players]);
+
+  // ── Pass-the-Phone: non-host som live-spectator ──────────────────────
+  // I PtP svarar ALLA på host:ens telefon. Non-host:s egen enhet spelar
+  // inte — den följer bara leaderboarden via host:s score-broadcasts.
+  //
+  // `syncActive` öppnar quiz_sync-kanalen även i PtP, men BARA fem event
+  // används där: player_score_recorded (live-tabellen), question_advance
+  // (progress + "spelet är slut"), game_sequence_init (frågesekvens),
+  // host_active_ping (självläkning) och lobby_deleted /
+  // play_again_lobby_ready (host lämnade → Home).
+  //
+  // ⚠ syncActive får INTE blint ersätta övriga gameMode-checkar i filen.
+  // Timers, unstable-overlay, Spotify, inactivity och host-disconnect-grace
+  // är fortsatt strikt Individual Devices.
+  //
+  // ptpMultiDevice är en över-approximation: host-tillagda gäster utan egen
+  // enhet räknas in, så en PtP-host kan prenumerera på en kanal ingen
+  // lyssnar på. Kostnaden är en Realtime-kanal + 10s heartbeat.
+  const isPtPSpectator = gameMode === 'pass-the-phone' && !isHost;
+  // Wifi-kolumnen i leaderboarden härleds ur "hur många frågor ligger
+  // spelaren efter ledaren" — en giltig proxy för tappad uppkoppling ENDAST
+  // när alla spelare förväntas svara på varje fråga. Det gäller bara
+  // Individual Devices; se liveLeaderboard nedan.
+  const connectionErrorsApplicable = gameMode === 'individual-devices';
+  const ptpMultiDevice = gameMode === 'pass-the-phone' && turnOrder.length > 1;
+  const syncActive = gameMode === 'individual-devices' || ptpMultiDevice;
+  // Sätts av det avslutande question_advance (next_question_index === null)
+  // eller av host_active_ping med phase 'leaderboard'. Spectatorns egen
+  // questionIndex/totalQuestions kan inte ensam avgöra att spelet är slut,
+  // och utan detta renderas Final Leaderboard som en INTERIM-vy.
+  const [spectatorGameOver, setSpectatorGameOver] = useState(false);
+  // Host:s fråge-sekvens (alla fråge-IDs i host:s spel-ordning) — mottaget via
+  // game_sequence_init / play_command / question_advance. Non-host använder den
+  // för att beräkna korrekta media-source-ikoner i GetReady-kön
+  // (mediaSourceByQuestion är annars baserad på lokal shuffle-ordning som
+  // skiljer sig från host:s), och PtP-spectatorn för att få rätt totalQuestions.
+  // Deklareras HÄR (inte vid effectiveMediaSourceByQuestion som förut) eftersom
+  // totalQuestions nedan läser den.
+  const [broadcastAllQuestionIds, setBroadcastAllQuestionIds] = useState<string[] | null>(null);
 
   // ── Remote 1v1: auktoritativ frågesekvens från remote_matches ────────
   // null tills init-effekten (efter gameQuestionsRef) hämtat/persisterat
@@ -1473,15 +1693,50 @@ export default function QuizScreen() {
     // Audience-set byggs en gång och delas mellan båda pools.
     const audienceSet = buildAudienceSet(turnOrder);
 
+    // ── Host-paket (tema-only) ─────────────────────────────────────────
+    // Aktivt paket → musikpoolen restrikteras till paketets taggar (inkluderar
+    // både inBaseCatalog true/false tema-items, utesluter all icke-tema-musik).
+    // Inget paket → exkludera paket-exklusiva (inBaseCatalog===false) items ur
+    // baspoolen (oförändrat beteende). Image/Hints-poolen bär inga paket-taggar
+    // (image-exporten emitterar dem inte), så när ett Music-paket är aktivt
+    // exkluderas hela image-poolen (tema-only) — Lobby gråar redan ut Hints.
+    // eraFrom/eraTo levereras redan som paketets span från Lobby (era-lås).
+    const activePackageTags = resolveActivePackageTags(selectedExtraPackages);
+    const packageActive = activePackageTags.size > 0;
+    const packagedMusic = SEED_QUESTIONS.filter((q) =>
+      packageActive
+        ? itemInActivePackages(q.genrePackages, activePackageTags)
+        : q.inBaseCatalog !== false,
+    );
+    const packagedImages: ImageQuestion[] = packageActive ? [] : IMAGE_SEED_QUESTIONS;
+    // Effektiva YouTube-kategorier: host:s toggles ∩ paketens täckning. När paket
+    // är aktivt begränsar detta kategori-filtret till de kolumner paketet har
+    // material i (host kan fortfarande välja bort en täckt kolumn). Utan paket =
+    // host:s val orört. Tema-filtret ovan har redan restrikterat innehållet.
+    // Paket LÅSER källorna: covered YT-kategorier spelas ALLTID (i mixerboarden
+    // grön + låst), host:s stored toggle ignoreras medan paket är aktivt. Utan
+    // paket = host:s val orört.
+    const effectiveYoutubeCategories = packageActive
+      ? (() => {
+          const cov = computePackageCoverage(selectedExtraPackages);
+          return MAIN_CATEGORIES.filter((mc) => cov[mc].youtube);
+        })()
+      : youtubeEnabledCategories;
+
     // ── Music-pool ────────────────────────────────────────────────────
     // Era HÅRD: filtrera SEED_QUESTIONS på correctYear ∈ [eraFrom, eraTo].
     // Bygg music-pool när YT är aktivt ELLER Spotify är aktivt — Spotify DJ
     // är en separat toggle och ska fungera även när youtubeEnabledCategories=[].
-    const inEraMusic = (youtubeEnabled || spotifyEnabled)
-      ? SEED_QUESTIONS.filter(
-          (q) => q.correctYear !== undefined
-            ? q.correctYear >= eraFrom && q.correctYear <= eraTo
-            : true,
+    const inEraMusic = (youtubeEnabled || spotifyEnabled || (packageActive && effectiveYoutubeCategories.length > 0))
+      ? packagedMusic.filter(
+          (q) =>
+            // Parent Control: host har slagit på filtret → items taggade
+            // parentControlled sorteras bort ur HELA YT-urvalet (både pure-
+            // YouTube- och Spotify-poolen härleds från denna array).
+            (!parentControlEnabled || !q.parentControlled) &&
+            (q.correctYear !== undefined
+              ? q.correctYear >= eraFrom && q.correctYear <= eraTo
+              : true),
         )
       : [];
     // Audience MJUK: filtrera era-träffarna ytterligare. MUSIC_QUESTIONS har
@@ -1511,7 +1766,7 @@ export default function QuizScreen() {
       'artist', 'band', 'actor', 'character', 'athlete', 'celebrity', 'cultural-person',
     ]);
     const inEraImages = imagesEnabled
-      ? IMAGE_SEED_QUESTIONS.filter((q) => {
+      ? packagedImages.filter((q) => {
           if (q.peakFrom !== undefined && q.peakTo !== undefined) {
             // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
             return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
@@ -1545,16 +1800,32 @@ export default function QuizScreen() {
     //   Personbilder (artist/band/actor/athlete — non-null mainCategory) är
     //   juridiskt parkerade och aldrig inkluderade oavsett toggles.
     const isAllYoutubeCats =
-      youtubeEnabledCategories.length === 3 &&
-      youtubeEnabledCategories.includes('Music') &&
-      youtubeEnabledCategories.includes('Film') &&
-      youtubeEnabledCategories.includes('Sport');
+      effectiveYoutubeCategories.length === 3 &&
+      effectiveYoutubeCategories.includes('Music') &&
+      effectiveYoutubeCategories.includes('Film') &&
+      effectiveYoutubeCategories.includes('Sport');
+    // ── §4.1 HCP-frågefilter ────────────────────────────────────────────
+    // Spelaren får items vars Item-HCP (= probability) >= sitt HCP, relaxat
+    // nedåt om poolen blir för tunn (se filterByItemHcp). Gäller BARA Single
+    // Player + Pass-the-Phone (individanpassat per §4.1). IndDev delar host:s
+    // identiska sekvens (ej individanpassad); remote (server-sekvens) + guest-
+    // hostade spel (anonyma, grundar inget HCP) filtreras inte. Filtret läser
+    // DENNA enhets spelar-HCP ur profil-spegeln.
+    const applyHcp =
+      gameMode !== 'individual-devices' && !isRemote && !isGuestHostGame;
+    const playerHcpForFilter = getCachedProfile()?.hcp ?? HCP_START;
+    // Tuning-knopp: hur många items en pool minst måste behålla innan HCP-
+    // golvet relaxas. Högre = mildare filter + mer variation över spel; lägre
+    // = hårdare svårighetsstyrning men tunnare pool (fler reprisrisk).
+    const HCP_FILTER_MIN_POOL = 30;
+    const applyItemHcp = (pool: QuizQuestion[]): QuizQuestion[] =>
+      applyHcp ? filterByItemHcp(pool, playerHcpForFilter, HCP_FILTER_MIN_POOL) : pool;
     const youtubePool = isAllYoutubeCats
       ? youtubePoolPreCategory
       : youtubePoolPreCategory.filter((q) =>
           itemMatchesEnabledCategories(
             q.mainCategory,
-            youtubeEnabledCategories,
+            effectiveYoutubeCategories,
             q.type === 'timeline' ? q.genrePackages : undefined,
           ),
         );
@@ -1566,24 +1837,24 @@ export default function QuizScreen() {
       imagesEnabledCategories.includes('Music') &&
       imagesEnabledCategories.includes('Film') &&
       imagesEnabledCategories.includes('Sport');
-    const imagePool: QuizQuestion[] = isAllImageCats
+    const imagePool: QuizQuestion[] = applyItemHcp(isAllImageCats
       ? imagePoolPreCategory
       : imagePoolPreCategory.filter((q) => {
           const mc = q.mainCategory;
           return isAllImageCats ? true : mc !== null && imagesEnabledCategories.includes(mc);
-        });
+        }));
 
     // ── Spotify-pool (separat tredje pool) ──────────────────────────────
     // Byggs från pre-category-poolen (youtubePoolPreCategory) för att vara
     // oberoende av youtubeEnabledCategories — Spotify DJ ska fungera även
     // när YT Music är avstängt (youtubeEnabledCategories=[] eller Music saknas).
-    const spotifyPool: QuizQuestion[] = spotifyEnabled
+    const spotifyPool: QuizQuestion[] = applyItemHcp(spotifyEnabled
       ? youtubePoolPreCategory.filter((q) => q.type === 'timeline' && q.spotifyTrackId)
-      : [];
+      : []);
     // Ren YouTube-pool: category-filtrad pool minus Spotify-items.
     // När Spotify är AV: filtrera bort Spotify-only items (har spotifyTrackId men
     // tomma youtubeClips) — de kan inte spelas utan Spotify-appen.
-    const pureYoutubePool: QuizQuestion[] = spotifyEnabled
+    const pureYoutubePool: QuizQuestion[] = applyItemHcp(spotifyEnabled
       ? youtubePool.filter((q) => !(q.type === 'timeline' && q.spotifyTrackId))
       : youtubePool.filter(
           (q) =>
@@ -1592,7 +1863,7 @@ export default function QuizScreen() {
               q.spotifyTrackId &&
               (!q.youtubeClips || q.youtubeClips.length === 0)
             ),
-        );
+        ));
 
     const playerCount = Math.max(1, turnOrder.length);
     const hasSpotify = spotifyPool.length > 0;
@@ -1930,7 +2201,7 @@ export default function QuizScreen() {
       return shuffleArray(SEED_QUESTIONS);
     }
     return mixed;
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt, parentControlEnabled, selectedExtraPackages]);
 
   // Det FAKTISKA antalet frågor: aldrig fler än poolen faktiskt levererade.
   //
@@ -1939,7 +2210,14 @@ export default function QuizScreen() {
   // alltså runt och visade samma fråga två gånger i SAMMA spel. Ett något kortare
   // spel är ärligare än en repris. Remote 1v1 clampade redan mot sin sekvens;
   // det här ger övriga lägen samma skydd.
-  const totalQuestions = Math.max(1, Math.min(requestedQuestions, gameQuestions.length));
+  //
+  // PtP-spectatorn undantas från clampen: dess lokala `gameQuestions` är en
+  // HELT annan slumpad pool än host:ens (den spelar aldrig ur den), så clampen
+  // skulle ge ett godtyckligt kortare spel. Host:s sekvenslängd kommer i
+  // stället via broadcastAllQuestionIds (game_sequence_init / question_advance).
+  const totalQuestions = isPtPSpectator
+    ? Math.max(1, broadcastAllQuestionIds?.length ?? requestedQuestions)
+    : Math.max(1, Math.min(requestedQuestions, gameQuestions.length));
 
   // Synkron ref som alltid pekar på aktuell gameQuestions — används av
   // game_sequence_init-broadcasten utan att göra subscription-effekten
@@ -1981,17 +2259,17 @@ export default function QuizScreen() {
       const bailIfEnded = async (m: typeof match): Promise<boolean> => {
         if (!m || m.status === 'active') return false;
         let title = 'Match ended';
-        let body = 'This 1vs1 match is no longer active.';
+        let body = 'This H2H match is no longer active.';
         if (m.status === 'cancelled') {
           title = 'Lobby deleted by Host';
-          body = 'The Host has cancelled this 1vs1 match.';
+          body = 'The Host has cancelled this H2H match.';
         } else if (m.status === 'forfeited') {
           const myId = await getOwnUserId();
           const iWon = !!myId && m.winnerUserId === myId;
           title = iWon ? 'You won — walkover!' : 'Match ended';
           body = iWon
             ? 'Your opponent quit the match, so you win by walkover.'
-            : 'You quit this 1vs1 match — it cannot be resumed.';
+            : 'You quit this H2H match — it cannot be resumed.';
         } else if (m.questionIds && m.questionIds.length > 0) {
           // finished/void/expired_walkover MED sekvens: låt resume-seeden
           // ta över (allt besvarat → direkt leaderboard + resultatpanel).
@@ -2102,12 +2380,6 @@ export default function QuizScreen() {
     });
   }, [gameQuestions, youtubeEnabled, gameMode, spotifyEnabled]);
 
-  // Host:s fråge-sekvens (alla fråge-IDs i host:s spel-ordning) — mottaget via
-  // play_command.all_question_ids. Non-host använder detta för att beräkna
-  // korrekta media-source-ikoner i GetReady-kön (mediaSourceByQuestion är annars
-  // baserad på lokal shuffle-ordning som skiljer sig från host:s).
-  // Deklareras här (innan effectiveMediaSourceByQuestion-memo:t som refererar det).
-  const [broadcastAllQuestionIds, setBroadcastAllQuestionIds] = useState<string[] | null>(null);
   // Host:s spotifyAnswerYear/Name-inställningar, broadcastade till non-host via
   // game_sequence_init / play_command / question_advance så GetReady-kön kan visa
   // rätt Year/Name-badge för kommande Spotify-frågor utan att använda non-hostens
@@ -2177,14 +2449,16 @@ export default function QuizScreen() {
     return gameQuestions.map((q, qIdx) => {
       if (q.type === 'actor-select') return 'Name';
       if (q.type === 'image') return 'Name';
-      // Spotify Name-frågor → 'Name' badge i GetReadyIntro-kön
-      if (q.type === 'timeline' && (q as { spotifyTrackId?: string }).spotifyTrackId) {
+      // Spotify Name-frågor → 'Name' badge i GetReadyIntro-kön.
+      // ⚠ spotifyEnabled MÅSTE ingå: ett dual-item (spotifyTrackId + youtubeClips)
+      // med Spotify AV spelas via YouTube och ska då ALLTID vara Year, aldrig Name.
+      if (q.type === 'timeline' && spotifyEnabled && (q as { spotifyTrackId?: string }).spotifyTrackId) {
         return resolveSpotifyAnswerType(qIdx) === 'name' ? 'Name' : 'Year';
       }
       return 'Year';
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameQuestions, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
+  }, [gameQuestions, spotifyEnabled, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
 
   // Non-host override: bygg category + answerType från host:s auktoritativa fråge-sekvens
   // (broadcastAllQuestionIds) via ALL_QUESTIONS_MAP. Utan detta visar non-host felaktiga
@@ -2214,7 +2488,9 @@ export default function QuizScreen() {
       // Se answerTypeByQuestion ovan: ingen mainCategory-baserad Film-regel —
       // Film-timeline-frågor (utan correctNames) svaras med år.
       if (q.type === 'actor-select' || q.type === 'image') return 'Name';
-      if (q.type === 'timeline' && (q as { spotifyTrackId?: string }).spotifyTrackId) {
+      // Spelas via Spotify → Year/Name-alternering (spotifyEnabled MÅSTE ingå,
+      // annars får ett dual-item med Spotify AV fel badge — se host-versionen ovan).
+      if (q.type === 'timeline' && spotifyEnabled && (q as { spotifyTrackId?: string }).spotifyTrackId) {
         if (effectiveAnswerYear && effectiveAnswerName) {
           // Räkna bara Spotify-frågor FÖRE denna position — exakt samma logik som
           // host:s resolveSpotifyAnswerType (spotifyOrdinal / numPlayers).
@@ -2235,7 +2511,7 @@ export default function QuizScreen() {
       }
       return 'Year';
     });
-  }, [isHost, isRemote, broadcastAllQuestionIds, answerTypeByQuestion, broadcastHostSpotifyAnswerYear, broadcastHostSpotifyAnswerName, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
+  }, [isHost, isRemote, broadcastAllQuestionIds, answerTypeByQuestion, spotifyEnabled, broadcastHostSpotifyAnswerYear, broadcastHostSpotifyAnswerName, spotifyAnswerYear, spotifyAnswerName, gameMode, turnOrder.length]);
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -2259,6 +2535,10 @@ export default function QuizScreen() {
   const [spotifyDJStarted, setSpotifyDJStarted] = useState(false);
   // DJ har tryckt "End DJ – handover to Host" i reveal-fasen → låser upp host:s Next-knapp.
   const [djHandedOver, setDjHandedOver] = useState(false);
+  // A1-fix: host har väntat för länge på DJ:ns handover i reveal (DJ tappade
+  // kontakt/quittade utan att trycka "End DJ", eller broadcasten tappades) →
+  // visa en manuell "Continue without DJ →"-escape så spelet aldrig fastnar.
+  const [djHandoverStuck, setDjHandoverStuck] = useState(false);
   // DJ har tryckt × på overlay → aktiverar steg 5 i guiden (utan att låsa upp host:s Next ännu).
   const [djDismissedOverlay, setDjDismissedOverlay] = useState(false);
   // ── FUTURE VERSION 2 — Automated API Flow (archived states) ─────────────────────
@@ -2444,6 +2724,16 @@ export default function QuizScreen() {
   const [phase, setPhase] = useState<'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard'>(
     turnOrder.length > 0 ? 'intro' : 'question',
   );
+  // Ambient-slingan från lobbyn tonas ut vid navigationen till quiz. Peter vill
+  // ha ~5 s tystnad i Get Ready-vyn innan slingan tas upp igen (2026-08-28).
+  // Sätts EN gång vid quiz-mount, så efterföljande intro-vyer mellan rundor
+  // spelar direkt (flaggan är då redan true). MorseAmbientSound skapar ingen
+  // AudioContext så länge active=false, så de 5 sekunderna är helt tysta.
+  const [ambientReady, setAmbientReady] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setAmbientReady(true), 5000);
+    return () => clearTimeout(t);
+  }, []);
   // Synkron mirror av phase-state. Uppdateras vid varje render (ingen delay).
   // Används av confirm-handlers för att undvika stale-closure-race mot
   // useEffect([timeLeft]) — om setPhase('awaiting') anropats men React inte
@@ -2470,6 +2760,13 @@ export default function QuizScreen() {
   const timerProgressAnim = useRef(new Animated.Value(1)).current;
   // Timern + flaggans mosaik aktiveras 2 s efter quiz-vyn visas.
   const [timerActive, setTimerActive] = useState(false);
+  // Mosaik-borttagningen ska FÖLJA timern till slutet oberoende av när svaret
+  // bekräftas. timerActive går false vid confirm (phase→awaiting) och skulle
+  // annars frysa mosaiken mitt i. Vi driver mosaiken från en egen flagga som
+  // sätts true när timern FAKTISKT startar (startTimer) — täcker normal
+  // uppspelning, buffer-confirm-vägen OCH IndDev-sync — och som bara nollställs
+  // vid frågebyte, aldrig av confirm. (Peter 2026-08-29.)
+  const [mosaicRunning, setMosaicRunning] = useState(false);
   useEffect(() => {
     if (phase !== 'question') {
       // Spotify-frågor: om non-host redan confirmat (phase='awaiting') och DJ:n
@@ -2520,6 +2817,13 @@ export default function QuizScreen() {
     const id = setTimeout(() => setTimerActive(true), 2000);
     return () => { clearTimeout(id); };
   }, [phase, questionIndex, responseSeconds, timerProgressAnim, isSpotifyQuestion, isHost, spotifyDJStarted]);
+  // Nollställ mosaik-flaggan vid frågebyte (buffer-start). Körs medan phase är
+  // intro/countdown — HintsQuizCard är då avmonterad, så ingen flash. startTimer
+  // sätter den true igen 2 s in i nästa fråga. Enda reset-punkten: confirm rör
+  // den ALDRIG, så mosaiken följer timern till slutet oavsett svarstidpunkt.
+  useEffect(() => {
+    setMosaicRunning(false);
+  }, [questionIndex]);
   // Hints visas direkt när quiz-vyn öppnas (ingen delay).
   // Flaggans mosaik har kvar sin 2 s delay via timerActive/mosaicActive.
   const hintsReady = phase === 'question' || phase === 'awaiting' || phase === 'reveal';
@@ -2545,6 +2849,35 @@ export default function QuizScreen() {
     }
     return result;
   }, [turnOrder, currentPlayerIndex, totalQuestions, questionIndex]);
+
+  // Kö-spelarnas runda och fråge-nummer räknas på den absoluta
+  // question-positionen där just den spelaren faktiskt får sin tur
+  // (questionIndex + 1 + i, 0-baserat). Cap:a på totalQuestions så
+  // wrap-around-spelare i sista rundan som aldrig hinner spela försvinner
+  // från listan helt — annars hade vi visat siffror som overshootar.
+  // Alla tre arrays slicas parallellt så indexen håller ihop.
+  //
+  // Hoistad ur intro-grenen 2026-08-25 så PtP-spectator-vyn kan skicka
+  // exakt samma kö till GetReadyIntro — "precis som på host enheten".
+  const introQueueData = useMemo(() => {
+    const players = Math.max(1, turnOrder.length);
+    const withCounts = queue
+      .map((p, i) => {
+        const absoluteQuestion0 = questionIndex + 1 + i; // 0-baserat
+        return {
+          player: p,
+          round: Math.floor(absoluteQuestion0 / players) + 1,
+          question: absoluteQuestion0 + 1, // 1-baserat
+          withinBudget: absoluteQuestion0 < totalQuestions,
+        };
+      })
+      .filter((entry) => entry.withinBudget);
+    return {
+      players: withCounts.map((e) => e.player),
+      roundNumbers: withCounts.map((e) => e.round),
+      questionNumbers: withCounts.map((e) => e.question),
+    };
+  }, [queue, questionIndex, totalQuestions, turnOrder.length]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   // Låst korrekthetsbedömning från handleConfirm — används i reveal-kortet
@@ -2595,6 +2928,22 @@ export default function QuizScreen() {
   // GetReadyIntro och final i RoundLeaderboard). Alla approved klienter
   // (inkl. host) håller samma state — sync via `player_left`-broadcast.
   const [leftPlayerIds, setLeftPlayerIds] = useState<Set<string>>(new Set());
+  // ⚠ Två set, för att TIDPUNKTEN för avhoppet spelar roll (Peter 2026-08-26):
+  //
+  //   leftPlayerIds      → VEM SOM HELST som lämnat, när som helst. Driver
+  //                        re-match-gaten (`allPreviousPlayersActive`): den
+  //                        som gått kan inte godkänna, oavsett när de gick.
+  //   leftDuringGameIds  → bara de som lämnade MEDAN spelet pågick. Driver
+  //                        den visuella markören ("Left the game" i stället
+  //                        för statistikraden).
+  //
+  // Skillnaden: lämnar man mitt i spelet är delresultatet ingen giltig
+  // slutställning — man svarade aldrig på resten — så markören ska följa med
+  // ända till slutskärmen. Lämnar man EFTER att spelet tagit slut är
+  // siffrorna redan färdiga och ska stå kvar som vanligt.
+  const [leftDuringGameIds, setLeftDuringGameIds] = useState<Set<string>>(
+    new Set(),
+  );
   // Per-spelare confirm-time för PÅGÅENDE fråga. Nyckel = lobby_players.player_id,
   // värde = sekunder från fråge-start till confirm. Driver avatar-markörer på
   // timer-bar:en i Individual Devices — confirmade spelares avatar fryses vid
@@ -2608,6 +2957,22 @@ export default function QuizScreen() {
     track('game_started', { assistance: fallbackAssistance });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── "Settled"-flaggor för readiness-handskakningen (se player_ready) ─────
+  // Non-host:s tunga mount-arbete är asynkront och landar oförutsägbart. Varje
+  // resolve triggar dessutom en omräkning av gameQuestions-memon (~970 items,
+  // flera filter/shuffle-pass) plus en re-render av hela quiz-trädet. Landar
+  // de MITT I nedräkningen drar CountdownIntro:s kedjade setTimeout:ar iväg
+  // additivt (den re-ankrar varje tick till när föregående callback faktiskt
+  // kördes — lateness återhämtas aldrig), och enheten går in i question-fasen
+  // sent. Först DÄR mountas YouTube-spelaren, så förseningen läggs ovanpå
+  // WebView-boot + tre nätverksrundor innan första ljudet hörs.
+  //
+  // Flaggorna gör arbetet observerbart så host kan vänta in det. `false` som
+  // start är rätt fail-läge: host:s escape-timeout släpper knappen ändå.
+  const [seenDataLoaded, setSeenDataLoaded] = useState(false);
+  const [epochLedgerLoaded, setEpochLedgerLoaded] = useState(false);
+  const [audioOverridesLoaded, setAudioOverridesLoaded] = useState(false);
 
   // Ladda egna tidigare sedda fråge-IDs från AsyncStorage. Sker asynkront
   // men klart innan spelaren hinner trycka Play i GetReadyIntro (~50 ms).
@@ -2636,8 +3001,15 @@ export default function QuizScreen() {
       }
     }
     let seenBroadcastTimers: ReturnType<typeof setTimeout>[] = [];
-    loadEpochLedger().then(setEpochDebt).catch(() => {});
-    Promise.all([loadSeenQuestionIds(), loadLastSessionIds()]).then(([seen, last]) => {
+    loadEpochLedger()
+      .then(setEpochDebt)
+      .catch(() => {})
+      // Flaggan sätts även vid fel — den betyder "vi väntar inte längre på
+      // den här läsningen", inte "den lyckades". Annars kan ett AsyncStorage-
+      // fel låsa host bakom escape-timeouten i onödan.
+      .finally(() => setEpochLedgerLoaded(true));
+    Promise.all([loadSeenQuestionIds(), loadLastSessionIds()])
+      .then(([seen, last]) => {
       setSeenQuestionIds(seen);
       setLastSessionIds(last);
       if (
@@ -2660,7 +3032,9 @@ export default function QuizScreen() {
           setTimeout(send, 4500),
         ];
       }
-    });
+      })
+      .catch(() => {})
+      .finally(() => setSeenDataLoaded(true));
     return () => seenBroadcastTimers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -2695,13 +3069,23 @@ export default function QuizScreen() {
         emoji: p.emoji ?? '👤',
         assistance: p.assistance ?? fallbackAssistance,
         age: p.age ?? age,
-        isYou: i === 0,
+        // isHost är index-baserad (turnOrder[0] ÄR host). isYou måste
+        // däremot följa selfPlayerId — på en icke-host-enhet (IndDev eller
+        // PtP-spectator) markerade i === 0 annars HOST som "du".
+        isYou: selfPlayerId ? p.id === selfPlayerId : i === 0,
         isHost: i === 0,
-        hasLeft: leftPlayerIds.has(p.id),
+        hasLeft: leftDuringGameIds.has(p.id),
       }));
     }
     return [youPlayer, ...MOCK_OPPONENTS];
-  }, [turnOrder, youPlayer, fallbackAssistance, age, leftPlayerIds]);
+  }, [
+    turnOrder,
+    youPlayer,
+    fallbackAssistance,
+    age,
+    leftDuringGameIds,
+    selfPlayerId,
+  ]);
 
   // Aggregera per-spelare-totals direkt från allRoundScoresHistory så
   // leaderboarden alltid speglar exakt vilka som faktiskt har scoreats —
@@ -2760,15 +3144,25 @@ export default function QuizScreen() {
         avgResponseSeconds,
         lastResponseSeconds,
         lastFiveResults,
-        hasLeft: leftPlayerIds.has(p.id),
+        hasLeft: leftDuringGameIds.has(p.id),
       };
     });
     // connectionErrors = antal frågor spelaren missat jämfört med den som
     // spelat flest. Om A spelat 3 och B spelat 2 → B får 1 i wifi-kolumnen.
+    //
+    // ⚠ Heuristiken förutsätter att ALLA spelare svarar på VARJE fråga, vilket
+    // bara gäller Individual Devices. I Pass-the-Phone turas spelarna om, så
+    // den som ännu inte haft sin tur ligger per definition efter ledaren och
+    // fick felaktigt en wifi-siffra som dessutom kom och gick mellan frågorna
+    // (Peter 2026-08-25). Single player och remote 1v1 saknar samma garanti.
+    // Utanför IndDev är kolumnen därför alltid 0 — bara den spelare som
+    // faktiskt svarar påverkar sin egen rad.
     const maxRounds = entries.reduce((m, e) => Math.max(m, e.playedRounds), 0);
     const entriesWithErrors = entries.map((e) => ({
       ...e,
-      connectionErrors: Math.max(0, maxRounds - e.playedRounds),
+      connectionErrors: connectionErrorsApplicable
+        ? Math.max(0, maxRounds - e.playedRounds)
+        : 0,
     }));
     return entriesWithErrors.sort((a, b) => {
       // 1. Pts desc — flest poäng vinner
@@ -2783,7 +3177,13 @@ export default function QuizScreen() {
       //    svara (även fel) har lägre avg och ska därför ranka högre.
       return a.avgResponseSeconds - b.avgResponseSeconds;
     });
-  }, [gamePlayers, gameTotals, allRoundScoresHistory, leftPlayerIds]);
+  }, [
+    gamePlayers,
+    gameTotals,
+    allRoundScoresHistory,
+    leftDuringGameIds,
+    connectionErrorsApplicable,
+  ]);
 
   // Per-spelare-facit för PÅGÅENDE fråga (Individual Devices). Deriveras ur
   // allRoundScoresHistory joinat på `questionIndex` — peer-svar ankommer via
@@ -2816,11 +3216,21 @@ export default function QuizScreen() {
         byPlayer.set(s.playerId, s);
       });
     });
-    if (byPlayer.size === 0) return null;
+    // DJ:n på en Spotify-fråga svarar aldrig och registrerar därför ingen
+    // RoundScore — visas i en egen "DJ"-sektion i stället för under Wrong.
+    // Slås upp i turnOrder på effectiveDJId så vi får full spelardata
+    // (avatarUri). Explicit skip nedan är belt-and-suspenders mot en
+    // ev. stale/legacy score som ändå råkat attribueras till DJ:n.
+    const dj: TurnOrderPlayer | null =
+      isSpotifyQuestion && effectiveDJId
+        ? (turnOrder.find((p) => p.id === effectiveDJId && !leftPlayerIds.has(p.id)) ?? null)
+        : null;
+    if (byPlayer.size === 0 && !dj) return null;
     const correct: { player: TurnOrderPlayer; score: RoundScore }[] = [];
     const wrong: { player: TurnOrderPlayer; score: RoundScore }[] = [];
     turnOrder.forEach((p) => {
       if (leftPlayerIds.has(p.id)) return;
+      if (dj && p.id === dj.id) return; // DJ visas i egen sektion, aldrig under Wrong
       const score = byPlayer.get(p.id);
       if (!score) return;
       (score.correct ? correct : wrong).push({ player: p, score });
@@ -2829,9 +3239,9 @@ export default function QuizScreen() {
     // leaderboardens avg-kolumn använder.
     correct.sort((a, b) => a.score.timeUsed - b.score.timeUsed);
     wrong.sort((a, b) => a.score.timeUsed - b.score.timeUsed);
-    if (correct.length === 0 && wrong.length === 0) return null;
-    return { correct, wrong };
-  }, [gameMode, turnOrder, allRoundScoresHistory, questionIndex, leftPlayerIds]);
+    if (correct.length === 0 && wrong.length === 0 && !dj) return null;
+    return { correct, wrong, dj };
+  }, [gameMode, turnOrder, allRoundScoresHistory, questionIndex, leftPlayerIds, isSpotifyQuestion, effectiveDJId]);
 
   const timerRef = useRef<any>(null);
   // pulseAnim driver opacity:n på timer-progress-baren när tiden
@@ -2861,6 +3271,10 @@ export default function QuizScreen() {
   // 2026-08-14). Egna Animated.Values så DJ-knapparna ovan förblir dämpade.
   const nextCtaPulse = useRef(new Animated.Value(1)).current;
   const nextCtaGlow = useRef(new Animated.Value(0.2)).current;
+  // Sekunder kvar av Next-knappens lås i reveal-fasen. 0 = upplåst (knappen
+  // visar "Next"/"Final Leaderboard" och går att trycka); > 0 renderas som
+  // siffra i knappen och blockerar tap. Se REVEAL_NEXT_LOCK_SECONDS.
+  const [revealNextCountdown, setRevealNextCountdown] = useState(0);
   // Glow + scale-pulse på DJ:ns "Start track in Spotify"-CTA — Spotify-grön
   // halo bakom knappen (animated opacity) + 1 ↔ 1.05 scale. Loopen körs
   // kontinuerligt; knappen är ändå bara monterad vid djStep=0 (samma
@@ -2898,7 +3312,11 @@ export default function QuizScreen() {
   const isImageQuestion = question.type === 'image';
   const isActorSelectQuestion = question.type === 'actor-select';
   const isTimelineQuestion = question.type === 'timeline';
-  const isLastQuestion = questionIndex === totalQuestions - 1;
+  // `spectatorGameOver` sätts BARA på en PtP-spectator-enhet (avslutande
+  // question_advance / host_active_ping med phase 'leaderboard'), så blast-
+  // radius är noll för övriga lägen. Utan den renderas Final Leaderboard som
+  // en INTERIM-vy: död "Next Round →"-knapp och ingen prisutdelnings-sekvens.
+  const isLastQuestion = questionIndex === totalQuestions - 1 || spectatorGameOver;
 
   // Svarstyp för pågående Spotify-fråga. Non-host använder broadcastad typ från host;
   // host (eller PtP) beräknar deterministiskt via resolveSpotifyAnswerType med Spotify-ordinal.
@@ -3014,6 +3432,8 @@ export default function QuizScreen() {
           // ImageQuizQuestion kräver fältet. 'global' = neutralt/bredast.
           region: ['global'],
           questionText: '',
+          // Distraktor-källa, filtreras aldrig av HCP — 100 = neutral default.
+          itemHcp: 100,
         },
         type: cand.meta.type,
         country: cand.meta.country,
@@ -3059,6 +3479,8 @@ export default function QuizScreen() {
       // region-filtret, men fältet krävs av typen.
       region: ['global'],
       questionText: '',
+      // Syntetiskt item, filtreras aldrig av HCP — 100 = neutral default.
+      itemHcp: 100,
     };
     const variant = buildImageVariant(
       syntheticItem,
@@ -3088,10 +3510,40 @@ export default function QuizScreen() {
               ? question.youtubeClips
               : undefined,
         },
-        { youtubeEnabled, gameMode },
+        {
+          youtubeEnabled,
+          gameMode,
+          // Items med FLERA klipp (officiell video + lyrics) väljs slumpmässigt,
+          // men valet måste bli identiskt på alla enheter i samma spel: i IndDev
+          // renderar varje enhet sin egen media, och remote har ingen sync-kanal.
+          // remoteMatchId/roomCode delas av alla i spelet och byts mellan spel —
+          // alltså samma klipp för alla nu, annat klipp nästa gång.
+          clipSeed: clipSeedBase ? `${clipSeedBase}:${question.id}` : undefined,
+        },
       ),
-    [question, youtubeEnabled, gameMode],
+    [question, youtubeEnabled, gameMode, clipSeedBase],
   );
+
+  // Alla curerade klipp på aktuell fråga (film-trailer eller musik). Undefined
+  // för image-frågor. Driver C1-fallbacken nedan.
+  const currentQuestionClips =
+    question.type === 'timeline' || question.type === 'actor-select'
+      ? question.youtubeClips
+      : undefined;
+
+  // C1-fix: effektiv media-källa. Är det seed-valda klippet redan markerat som
+  // fallerat väljer vi första klipp på itemet som INTE fallerat, så ett trasigt
+  // klipp inte auto-0-poängar en fråga som fortfarande går att spela via sitt
+  // andra klipp. Rör inte det deterministiska förstavalet — bara fallback-läget
+  // divergerar per enhet, och det är strikt bättre än ett missat svar (samma
+  // låt/item, samma svarsår).
+  const effectiveMediaSource = useMemo(() => {
+    if (mediaSource.kind !== 'youtube') return mediaSource;
+    if (!currentQuestionClips || currentQuestionClips.length === 0) return mediaSource;
+    if (!failedClipVideoIds.includes(mediaSource.clip.videoId)) return mediaSource;
+    const next = currentQuestionClips.find((c) => !failedClipVideoIds.includes(c.videoId));
+    return next ? ({ kind: 'youtube', clip: next } as typeof mediaSource) : mediaSource;
+  }, [mediaSource, currentQuestionClips, failedClipVideoIds]);
 
   // D-iv: host:s player_id är alltid turnOrder[0] (Lobby-handleStartGame
   // bygger arrayen med host först). Används för default-audio-policyn
@@ -3142,6 +3594,9 @@ export default function QuizScreen() {
 
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
+    // Mosaiken följer timern från och med nu — nollställs först vid frågebyte,
+    // så ett confirm (timerActive→false) fryser den inte längre.
+    setMosaicRunning(true);
     // Non-host i IndDev: beräkna korrekt återstående tid baserat på host:s
     // timer_start_at om appen vaknade upp under countdown och vi missade
     // starten. Utan denna korrigering börjar timern alltid om från full
@@ -3179,7 +3634,14 @@ export default function QuizScreen() {
     // styrs separat av Animated.Value ovan.
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) { clearInterval(timerRef.current); return 0; }
+        // A4: nulla ref:en vid self-clear så ett dött interval-id inte ligger
+        // kvar (defensivt mot en framtida ny timer mellan schemaläggning och
+        // self-clear). startTimer() clearar alltid först, så harmlöst idag.
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          timerRef.current = null;
+          return 0;
+        }
         return prev - 1;
       });
     }, 1000);
@@ -3203,6 +3665,16 @@ export default function QuizScreen() {
       return;
     }
     if (phase === 'question') {
+      // Spotify DJ svarar aldrig på sin egen fråga (canConfirm=false) — ingen
+      // runda och ingen score ska registreras. Utan post attribueras frågan
+      // aldrig till DJ:n på NÅGON enhet (den skulle annars broadcastats
+      // vidare), så DJ:n hamnar varken i reveal-facitets "Wrong" (visas i
+      // egen "DJ"-sektion) eller i leaderboardens Q-räkning. Gå bara vidare
+      // till reveal så DJ-handover-flödet kan visas.
+      if (isSpotifyQuestion && isCurrentPlayerDJ) {
+        setPhase('reveal');
+        return;
+      }
       // Time ran out utan Confirm — registrera ronden som missad (0 poäng,
       // inget giltigt svar) och gå direkt till reveal.
       if (question.type === 'timeline') {
@@ -3242,6 +3714,13 @@ export default function QuizScreen() {
       recordRoundScore(0, false, responseSeconds, shouldLockForUnstableRef.current);
       setPhase('reveal');
     }
+    // A3: MEDVETET bara [timeLeft] i deps. Effekten ska fyra EXAKT när timern
+    // når 0, och `timeLeft` co-ändras varje tick så closuren (phase/question/
+    // responseSeconds/recordRoundScore) är färsk i det ögonblicket. Att lägga
+    // till de övriga skulle låta effekten re-fyra medan timeLeft===0 (t.ex. när
+    // phase byts till reveal) med risk för dubbelregistrering. `responseSeconds`
+    // ändras aldrig mid-question (response_time gäller nästa fråga).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft]);
 
   // Spegla Spotify DJ-state till refs så AppState-listener aldrig läser stale closures.
@@ -3428,6 +3907,18 @@ export default function QuizScreen() {
   // och delar denna enhet (en spelare i taget). Direkt-nav till /quiz utan
   // turnOrder simulerar fortfarande mock-motspelare för gameplay-testning.
   const recordRoundScore = (yourPoints: number, yourCorrect: boolean, yourTimeUsed: number, connectionError?: boolean) => {
+    // PtP-spectatorn spelar inte — dess poäng kommer via host:s broadcasts.
+    // Belt-and-suspenders: enhetens phase når aldrig 'question', så varken
+    // timeout-vägen eller någon handleConfirm* kan fyra här. Utan guarden
+    // skulle en framtida ändring kunna injicera en fantom-post (0 pts) under
+    // spelarens id OCH broadcasta den tillbaka till host.
+    if (isPtPSpectator) return;
+    // Spotify DJ:n svarar aldrig på sin egen fråga (canConfirm=false) — ingen
+    // RoundScore ska attribueras till DJ:n. Belt-and-suspenders utöver
+    // timeout-effektens tidiga return: skulle någon annan väg anropa hit får
+    // DJ:n ändå ingen post (som annars broadcastats till alla enheter och
+    // dykt upp i både leaderboard och reveal-facit).
+    if (isSpotifyQuestion && isCurrentPlayerDJ) return;
     // Förhindra double-scoring per fråga (race: handleConfirm* + useEffect([timeLeft])).
     if (hasRecordedScoreForCurrentQuestionRef.current) return;
     hasRecordedScoreForCurrentQuestionRef.current = true;
@@ -3497,10 +3988,16 @@ export default function QuizScreen() {
         timeUsedSeconds: yourTimeUsed,
       });
     }
-    // Broadcast score till andra IndDev-enheter så deras leaderboard
-    // uppdateras med vår post. broadcast.self: false gör att vi aldrig
-    // tar emot vårt eget event — ingen double-count-risk.
-    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+    // Broadcast score till andra enheter så deras leaderboard uppdateras med
+    // vår post. broadcast.self: false gör att vi aldrig tar emot vårt eget
+    // event — ingen double-count-risk.
+    //
+    // Gäller BÅDE Individual Devices och Pass-the-Phone: i PtP är
+    // activePlayerId den roterande spelaren (inte host), så non-host:s
+    // spectator-enhet får sin EGEN rad ifylld i realtid. Se
+    // playerScoreRecordedHandlerRef för varför självfiltret där måste
+    // stängas av på en spectator.
+    if (syncActive && syncChannelRef.current) {
       const scorePayload: PlayerScoreRecordedPayload = {
         player_id: activePlayerId,
         question_index: questionIndex,
@@ -3564,13 +4061,15 @@ export default function QuizScreen() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSpotifyQuestion, phase, questionIndex]);
 
-  // Fas 1: vänta 240 s på DJ-broadcast innan synlig nedräkning startar.
+  // Fas 1: vänta på DJ-broadcast innan synlig nedräkning startar.
   // Om spotifyDJStarted blir true cleanas timeout bort.
-  // Total timeout: 240 s (fas 1, tyst) + 60 s (fas 2, synlig) = 300 s.
+  // A2-fix: fas 1 kortad 240 s → 45 s. 4 min tyst dödläge kändes hängt i ett
+  // partyspel; total timeout blir nu 45 s (tyst) + 60 s (synlig nedräkning)
+  // = 105 s innan auto-skip, med synlig feedback under hela fas 2.
   useEffect(() => {
     if (!isSpotifyQuestion || phase !== 'question' || spotifyDJStarted) return;
     setSpotifyWaitPhase('waiting');
-    const phase1 = setTimeout(() => setSpotifyWaitPhase('countdown'), 240_000);
+    const phase1 = setTimeout(() => setSpotifyWaitPhase('countdown'), 45_000);
     return () => clearTimeout(phase1);
   }, [isSpotifyQuestion, phase, questionIndex, spotifyDJStarted]);
 
@@ -3598,6 +4097,30 @@ export default function QuizScreen() {
     }, 2500);
     return () => clearTimeout(t);
   }, [spotifyTimeoutSeconds, spotifyWaitPhase]);
+
+  // A1-fix: host väntar på DJ:ns "End DJ"-handover i reveal. Om den aldrig
+  // anländer (DJ tappade kontakt / tog appen i bakgrunden / quittade utan att
+  // trycka "End DJ", eller broadcasten tappades) armas en manuell escape efter
+  // 12 s så host aldrig fastnar permanent. host styr redan tempot, så en
+  // manuell väg vidare är säker. Non-DJ-guessers påverkas inte — bara host.
+  useEffect(() => {
+    const waitingOnHandover =
+      isHost && phase === 'reveal' && isSpotifyQuestion && !isCurrentPlayerDJ && !djHandedOver;
+    if (!waitingOnHandover) {
+      if (djHandoverStuckTimerRef.current) {
+        clearTimeout(djHandoverStuckTimerRef.current);
+        djHandoverStuckTimerRef.current = null;
+      }
+      return;
+    }
+    djHandoverStuckTimerRef.current = setTimeout(() => setDjHandoverStuck(true), 12_000);
+    return () => {
+      if (djHandoverStuckTimerRef.current) {
+        clearTimeout(djHandoverStuckTimerRef.current);
+        djHandoverStuckTimerRef.current = null;
+      }
+    };
+  }, [isHost, phase, isSpotifyQuestion, isCurrentPlayerDJ, djHandedOver]);
 
   useEffect(() => {
     // Pulsa progress-barens opacity (1 → 0.55 → 1) när ≤5s kvar för att
@@ -3687,7 +4210,18 @@ export default function QuizScreen() {
 
   // Next-tab:ens kraftigare pulse: scale + halo-opacity i parallell så
   // knappen både växer och "andas" ljus. Samma stabila-style-krav som ovan.
+  //
+  // Pausad medan 5-sekunderslåset räknar ned — en pulserande knapp läses som
+  // "tryck här", och det är precis vad den INTE går att göra då. Värdena
+  // nollställs så knappen står stilla i sitt vilo-läge tills den låses upp.
   useEffect(() => {
+    if (revealNextCountdown > 0) {
+      nextCtaPulse.stopAnimation();
+      nextCtaPulse.setValue(1);
+      nextCtaGlow.stopAnimation();
+      nextCtaGlow.setValue(0);
+      return;
+    }
     const loop = Animated.loop(
       Animated.sequence([
         Animated.parallel([
@@ -3702,13 +4236,38 @@ export default function QuizScreen() {
     );
     loop.start();
     return () => loop.stop();
-  }, [nextCtaPulse, nextCtaGlow]);
+  }, [nextCtaPulse, nextCtaGlow, revealNextCountdown]);
 
   const nextCtaPulseStyle = useMemo(
     () => ({ transform: [{ scale: nextCtaPulse }] }),
     [nextCtaPulse],
   );
   const nextCtaGlowStyle = useMemo(() => ({ opacity: nextCtaGlow }), [nextCtaGlow]);
+
+  // Next-knappens 5-sekunderslås. Startar om vid varje reveal-entry (deps
+  // inkluderar questionIndex så en ny fråga alltid ger ett färskt lås även
+  // om phase-strängen råkar vara samma vid en heal/re-render). Intervallet
+  // self-clearar på 0; cleanup river det vid fasbyte/unmount.
+  useEffect(() => {
+    if (phase !== 'reveal') {
+      setRevealNextCountdown(0);
+      return;
+    }
+    setRevealNextCountdown(REVEAL_NEXT_LOCK_SECONDS);
+    const id = setInterval(() => {
+      setRevealNextCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(id);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [phase, questionIndex]);
+
+  // True medan låset räknar ned — stänger av både tap och pulsen nedan.
+  const isNextCtaLocked = revealNextCountdown > 0;
 
   // DJ-start-CTA:ns glow + pulse (se deklarationskommentaren vid djStartPulse).
   useEffect(() => {
@@ -3748,11 +4307,17 @@ export default function QuizScreen() {
   useEffect(() => {
     setScrolledToBottom(false);
     setYoutubeError(false);
+    setFailedClipVideoIds([]);
+    if (youtubeErrorTimerRef.current) {
+      clearTimeout(youtubeErrorTimerRef.current);
+      youtubeErrorTimerRef.current = null;
+    }
     // Spotify: nollställ DJ-state + timeout per fråga.
     setSpotifyDJOpenedApp(false);
     setSpotifyDJOpenedAppBroadcast(false);
     setSpotifyDJStarted(false);
     setDjHandedOver(false);
+    setDjHandoverStuck(false);
     setDjDismissedOverlay(false);
     setSpotifyWaitPhase(null);
     setSpotifyTimeoutSeconds(60);
@@ -3796,27 +4361,15 @@ export default function QuizScreen() {
   // fort spelaren confirmar (phase → 'awaiting') stoppas tick:n och displayen
   // fryses på exakt confirm-värdet (sätts explicit i handleConfirm). I
   // intro/countdown/reveal/leaderboard återställs till "30.00".
+  // B1: live-tickandet flyttat till AnswerStopwatch-barnet. Här nollställs bara
+  // baslinjen vid ny frågestart/buffert — confirm-frysningen sätts i
+  // handleConfirm/handleConfirmName. INTE vid 'awaiting'/'reveal' (då är
+  // decimalElapsedMs fryst på confirm-momentet och ska inte skrivas över).
   useEffect(() => {
-    const totalMs = responseSeconds * 1000;
-    if (phase !== 'question' || !timerActive) {
-      // Nollställ bara vid ny frågestart (intro/countdown) eller under
-      // 2-sekunders-bufferten (phase='question' men timerActive ännu false).
-      // INTE vid 'awaiting'/'reveal' — då är värdet fryst på confirm-momentet
-      // och ska inte skrivas över.
-      if (phase === 'intro' || phase === 'countdown' || (phase === 'question' && !timerActive)) {
-        setDecimalElapsedMs(0);
-      }
-      return;
+    if (phase === 'intro' || phase === 'countdown' || (phase === 'question' && !timerActive)) {
+      setDecimalElapsedMs(0);
     }
-    const tick = () => {
-      const elapsedMs = Date.now() - questionStartMsRef.current;
-      const clamped = Math.min(totalMs, Math.max(0, elapsedMs));
-      setDecimalElapsedMs(clamped);
-    };
-    tick();
-    const id = setInterval(tick, 50);
-    return () => clearInterval(id);
-  }, [phase, questionIndex, responseSeconds, timerActive]);
+  }, [phase, questionIndex, timerActive]);
 
   // Spara alla unika fråge-IDs i denna omgång när spelet är klart.
   // savedSeenRef förhindrar dubbelskrivning om effekten av någon anledning
@@ -3840,7 +4393,10 @@ export default function QuizScreen() {
     // finns här om de senare loggar in/hostar på samma enhet. Egen profil
     // skippas internt (skrivs av addSessionRecord nedan). Guests utan konto
     // filtreras bort — deras historik kan inte valideras.
-    if (gameMode !== 'individual-devices' && turnOrder.length > 1) {
+    // ⚠ isHost-gate: rationalen ovan ("alla spelade på DENNA enhet") gäller
+    // bara host:ens telefon. En PtP-spectator ska inte skriva andra spelares
+    // historik till sin egen enhet — de spelade aldrig här.
+    if (isHost && gameMode !== 'individual-devices' && turnOrder.length > 1) {
       const registeredNames = turnOrder
         .filter((p) => p.type === 'registered' && p.name)
         .map((p) => p.name);
@@ -3859,19 +4415,25 @@ export default function QuizScreen() {
   }, [phase]);
 
   // "Kan användaren confirma just nu?" — discriminerad-union-helper.
-  // Musik: pendingYear satt. Bild: aktiv direkt när hints visas (hintsReady)
-  // så knappen pulsar från start — spelaren väljer svar och trycker sedan Confirm.
+  // Musik: pendingYear satt. Bild: aktiv så snart hints visas (hintsReady).
   // Klick utan valt svar gör ingenting (handleConfirmName-grenen checkar pendingNameOption).
   // DJ kan aldrig confirma (de svarar inte på Spotify-frågor).
+  //
+  // Confirm är LÅST tills nedräkningen/timern faktiskt startat (timerActive) —
+  // dvs. hela 2 s-bufferten är knappen inaktiv + opulserande. Förhindrar att
+  // spelaren svarar innan klockan börjat räkna (som annars gav elapsed=full →
+  // avatar-till-0 % + tidigare stall-i-reveal). (Peter 2026-08-29.)
   const canConfirm = isCurrentPlayerDJ
     ? false
-    : isSpotifyNameQuestion
-      ? pendingNameOption !== null
-      : isImageQuestion
-        ? hintsReady
-        : isActorSelectQuestion
-          ? pendingActorName !== null
-          : pendingYear !== null;
+    : !timerActive
+      ? false
+      : isSpotifyNameQuestion
+        ? pendingNameOption !== null
+        : isImageQuestion
+          ? hintsReady
+          : isActorSelectQuestion
+            ? pendingActorName !== null
+            : pendingYear !== null;
 
   // Confirm-knappens scale + glow-loop. Körs medan phase === 'question' OCH
   // ett svar är preliminärt valt (knappen är tappbar). Stoppas i andra faser så
@@ -3954,7 +4516,14 @@ export default function QuizScreen() {
     // leaderboard-aggregat — heltals-derived `responseSeconds - timeLeft`
     // undviks medvetet eftersom den ger "x.00" i AVG/LAST-kolumnerna.
     const totalMs = responseSeconds * 1000;
-    const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
+    // Confirm under 2 s-bufferten (phase='question' men timerActive ännu false):
+    // startTimer() har inte kört → questionStartMsRef=0 → Date.now()-diff blir
+    // enorm och cap:as till responseSeconds (spelaren registreras som LÅNGSAMMAST
+    // trots att de svarade INNAN klockan startade). Behandla som elapsed 0.
+    const timerNotStarted = questionStartMsRef.current === 0;
+    const exactElapsedMs = timerNotStarted
+      ? 0
+      : Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
     setConfirmedTimeUsed(exactElapsedSec);
     // Frys stopwatch-displayen på EXAKT confirm-värdet. Tick-effekten ovan
@@ -3999,6 +4568,12 @@ export default function QuizScreen() {
       }
     }
     setPhase('awaiting');
+    // Confirm under bufferten: timern hann aldrig starta (timerActive false →
+    // setTimerActive(true)-timeouten rensas när phase blir 'awaiting'), så
+    // startTimer() skulle annars aldrig köra → timeLeft fastnar på
+    // responseSeconds → useEffect([timeLeft]) fyrar aldrig reveal → Next-knappen
+    // visas aldrig. Starta timern här så nedräkningen ändå löper till 0.
+    if (timerNotStarted) startTimer();
   };
 
   // YouTube-felhantering: kallas när MediaPlayer rapporterar embed-fel.
@@ -4010,13 +4585,36 @@ export default function QuizScreen() {
   // är stabil per render, ref-pattern undviker stale-closure utan dep-array.
   const recordRoundScoreRef = useRef(recordRoundScore);
   recordRoundScoreRef.current = recordRoundScore;
+  // A4-fix: spåra reveal-skip-timern så den kan cleanas vid unmount/frågebyte
+  // istället för att fyra setPhase på en avmonterad/ny fråga.
+  const youtubeErrorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleYoutubeError = useCallback(() => {
     if (phase !== 'question') return;
     if (youtubeError) return;
+    // C1-fix: prova nästa curerade klipp på itemet innan vi 0-poängar frågan.
+    // Ett item med flera klipp (officiell video + lyrics) ska överleva ett
+    // borttaget/region-blockerat klipp — MediaPlayer remountar på videoId-byte.
+    if (
+      effectiveMediaSource.kind === 'youtube' &&
+      currentQuestionClips &&
+      currentQuestionClips.length > 1
+    ) {
+      const failedId = effectiveMediaSource.clip.videoId;
+      const nextFailed = failedClipVideoIds.includes(failedId)
+        ? failedClipVideoIds
+        : [...failedClipVideoIds, failedId];
+      const hasAlternate = currentQuestionClips.some((c) => !nextFailed.includes(c.videoId));
+      if (hasAlternate) {
+        setFailedClipVideoIds(nextFailed);
+        return; // stanna i question-fas; nytt klipp spelas
+      }
+    }
+    // Inga fler klipp att prova — ge upp: 0 poäng + hoppa till reveal.
     setYoutubeError(true);
     recordRoundScoreRef.current(0, false, responseSeconds);
-    setTimeout(() => setPhase('reveal'), 2500);
-  }, [phase, youtubeError, responseSeconds]);
+    if (youtubeErrorTimerRef.current) clearTimeout(youtubeErrorTimerRef.current);
+    youtubeErrorTimerRef.current = setTimeout(() => setPhase('reveal'), 2500);
+  }, [phase, youtubeError, responseSeconds, effectiveMediaSource, currentQuestionClips, failedClipVideoIds]);
 
   // Image-fråge-Confirm: speglar handleConfirm men för name-svar.
   // correct = opt.isCorrect (pre-baked från distractor-builderns rätt-flagga).
@@ -4026,7 +4624,11 @@ export default function QuizScreen() {
     const correct = opt.isCorrect;
     const pts = calculatePoints(correct, currentAssistance, 'name');
     const totalMs = responseSeconds * 1000;
-    const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
+    // Se handleConfirm: confirm under bufferten (questionStartMsRef=0) → elapsed 0.
+    const timerNotStarted = questionStartMsRef.current === 0;
+    const exactElapsedMs = timerNotStarted
+      ? 0
+      : Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
     setConfirmedTimeUsed(exactElapsedSec);
     const elapsedAtConfirm = Math.min(totalMs, Math.max(0, exactElapsedMs));
@@ -4061,6 +4663,8 @@ export default function QuizScreen() {
       }
     }
     setPhase('awaiting');
+    // Se handleConfirm: starta timern om confirm skedde innan den hann starta.
+    if (timerNotStarted) startTimer();
   };
 
   // Actor-select-Confirm: speglar handleConfirmName men för filmfrågor.
@@ -4071,7 +4675,11 @@ export default function QuizScreen() {
     const correct = question.correctNames.includes(name);
     const pts = calculatePoints(correct, currentAssistance, 'name');
     const totalMs = responseSeconds * 1000;
-    const exactElapsedMs = Math.max(0, Date.now() - questionStartMsRef.current);
+    // Se handleConfirm: confirm under bufferten (questionStartMsRef=0) → elapsed 0.
+    const timerNotStarted = questionStartMsRef.current === 0;
+    const exactElapsedMs = timerNotStarted
+      ? 0
+      : Math.max(0, Date.now() - questionStartMsRef.current);
     const exactElapsedSec = Math.min(responseSeconds, exactElapsedMs / 1000);
     setConfirmedTimeUsed(exactElapsedSec);
     const elapsedAtConfirm = Math.min(totalMs, Math.max(0, exactElapsedMs));
@@ -4103,6 +4711,8 @@ export default function QuizScreen() {
       }
     }
     setPhase('awaiting');
+    // Se handleConfirm: starta timern om confirm skedde innan den hann starta.
+    if (timerNotStarted) startTimer();
   };
 
   // ── Navigations-handlers ────────────────────────────────────────────────
@@ -4110,6 +4720,29 @@ export default function QuizScreen() {
   // Från Reveal: visa leaderboard
   const handleShowLeaderboard = () => {
     setPhase('leaderboard');
+  };
+
+  // ── PtP-spectator: håll tillbaka poängen tills host går vidare ────────
+  // Host broadcastar `player_score_recorded` direkt när svaret bekräftas
+  // (eller tiden går ut), alltså MITT i reveal-fasen på host:ens telefon.
+  // Uppdaterades spectatorns tabell då skulle den avslöja utfallet innan
+  // spelarna i rummet hunnit se det på host-enheten (Peter 2026-08-25).
+  //
+  // Posterna buffras därför här och töms först när host trycker Next
+  // (`question_advance`) — och på sista frågan när host trycker Final
+  // Leaderboard (`question_advance` med next_question_index: null), alltså
+  // precis innan slutskärmen renderas.
+  //
+  // Buffring på MOTTAGAR-sidan (inte fördröjd sändning hos host) är med
+  // flit: host:s befintliga pending-/retry-maskineri för tappade broadcasts
+  // förblir orört, och inget kan gå förlorat om kanalen hickar mellan svar
+  // och Next.
+  const pendingSpectatorScoresRef = useRef<RoundScore[]>([]);
+  const flushSpectatorScores = () => {
+    const queued = pendingSpectatorScoresRef.current;
+    if (queued.length === 0) return;
+    pendingSpectatorScoresRef.current = [];
+    setAllRoundScoresHistory((prev) => [...prev, ...queued.map((sc) => [sc])]);
   };
 
   // D-iii: non-host:s Retry-knapp i ConnectionUnstableOverlay. Rensar
@@ -4307,10 +4940,39 @@ export default function QuizScreen() {
   const handleDJHandover = () => {
     setDjHandedOver(true);
     if (gameMode === 'individual-devices' && syncChannelRef.current && currentDJPlayer) {
-      syncChannelRef.current
-        .broadcastSpotifyDJHandover({ dj_player_id: currentDJPlayer.id })
-        .catch(() => {});
+      // A1-fix: skicka handovern 3× (direkt / +600 / +1800 ms). Supabase
+      // Realtime replayar aldrig, så en enda tappad frame lämnade host
+      // permanent frusen i reveal. Handovern är idempotent hos mottagaren.
+      const djId = currentDJPlayer.id;
+      const send = () => {
+        syncChannelRef.current?.broadcastSpotifyDJHandover({ dj_player_id: djId }).catch(() => {});
+      };
+      send();
+      djHandoverRetryTimersRef.current.forEach(clearTimeout);
+      djHandoverRetryTimersRef.current = [setTimeout(send, 600), setTimeout(send, 1800)];
     }
+  };
+
+  // Skicka question_advance tre gånger (direkt / +600 / +1800 ms) med IDENTISK
+  // payload. Samma skäl som play_command: Supabase Realtime replayar aldrig,
+  // så en enda sändning är förlorad för gott om mottagarens kanal hickar just
+  // då — och en missad advance lämnar enheten i FÖRRA frågans fas.
+  //
+  // ⚠ Säkert ENBART tack vare dedupe-guarden överst i questionAdvanceHandler-
+  // Ref. Handlern är inte idempotent av sig själv (roterar currentPlayerIndex
+  // i PtP, tvingar phase→'intro'). Ta aldrig bort guarden och lämna kvar de
+  // här retries.
+  const broadcastQuestionAdvanceWithRetries = (payload: QuestionAdvancePayload) => {
+    if (!syncActive || !syncChannelRef.current) return;
+    const send = () => {
+      syncChannelRef.current?.broadcastQuestionAdvance(payload).catch(() => {});
+    };
+    send();
+    questionAdvanceRetryTimersRef.current.forEach(clearTimeout);
+    questionAdvanceRetryTimersRef.current = [
+      setTimeout(send, 600),
+      setTimeout(send, 1800),
+    ];
   };
 
   // Host hoppar över en Spotify-fråga (DJ startar ej, eller host väljer Skip).
@@ -4320,17 +4982,13 @@ export default function QuizScreen() {
     hasRecordedScoreForCurrentQuestionRef.current = true;
     setSpotifyWaitPhase('skipped');
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    // Broadcast till non-hosts i IndDev så även de går till nästa fråga.
-    if (gameMode === 'individual-devices' && syncChannelRef.current) {
-      syncChannelRef.current
-        .broadcastQuestionAdvance({
-          next_question_index: questionIndex + 1,
-          all_question_ids: gameQuestionsRef.current.map((q) => q.id),
-          spotify_answer_year: spotifyAnswerYear,
-          spotify_answer_name: spotifyAnswerName,
-        })
-        .catch(() => {});
-    }
+    // Broadcast till non-hosts så även de går till nästa fråga.
+    broadcastQuestionAdvanceWithRetries({
+      next_question_index: questionIndex + 1,
+      all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+      spotify_answer_year: spotifyAnswerYear,
+      spotify_answer_name: spotifyAnswerName,
+    });
     setTimeout(() => { handleAdvanceToNextRoundRef.current?.(); }, 800);
   };
 
@@ -4339,23 +4997,48 @@ export default function QuizScreen() {
   // Broadcast skickas efter samma fördröjning så host + non-host synkar.
   const handleHostStartFromGetReady = () => {
     // Beräkna exakt när non-host:s timer kommer att starta:
-    // countdown: 700 ms initial paus + 5 × 1300 ms tick (5→4→3→2→1→0) +
-    // 1000 ms "?"-display = 7200 ms. Plus timerActive-delay 2000 ms = 10200 ms.
-    // +300 ms marginal för JS-timer-drift → 10500 ms.
+    // countdown: 700 ms initial paus + 5 × 1300 ms tick (5→4→3→2→1→0) = 7200 ms
+    // när "?" VISAS, + 1000 ms "?"-display → onComplete vid **8200 ms**.
+    // Plus timerActive-delay 2000 ms = 10200 ms, +300 ms marginal → 10500 ms.
+    // ⚠ 7200 är när "?" dyker upp, INTE när nedräkningen är klar — den gamla
+    // kommentaren räknade 7200+2000=10200 och råkade landa rätt av fel skäl.
+    // Ändra inte 10500 utan att räkna om mot CountdownIntro:s offset-tabell.
     const timerStartAt = Date.now() + 10500;
     setPhase('countdown');
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
-      syncChannelRef.current
-        .broadcastPlayCommand({
-          question_index: questionIndex,
-          question_id: currentQ?.id ?? '',
-          all_question_ids: gameQuestions.map((q) => q.id),
-          timer_start_at: timerStartAt,
-          spotify_answer_year: spotifyAnswerYear,
-          spotify_answer_name: spotifyAnswerName,
-          dj_player_id: currentDJPlayer?.id,
-        })
-        .catch(() => {});
+      // Skicka IDENTISK payload tre gånger: direkt + 600 ms + 1800 ms.
+      // Supabase Realtime replayar aldrig till en sen subscriber, så en enda
+      // sändning går förlorad för gott om mottagarens kanal hickar just då.
+      // Speglar game_sequence_init:s 800/2500/5000-mönster, men tätare —
+      // play_command är tidskritisk medan sekvensen inte är det.
+      //
+      // ⚠ timer_start_at får ALDRIG räknas om per sändning. Den är en ABSOLUT
+      // wall-clock-stämpel som non-host läser in i hostTimerStartAtRef; ett
+      // omräknat värde skulle skjuta en sen mottagares timer 600/1800 ms
+      // framåt och desynka den från host.
+      //
+      // Dubbletter är idempotenta hos mottagaren: isNewQuestion blir false
+      // för samma question_index → det destruktiva blocket hoppas, svars-
+      // state-resetten är gatad på phase==='intro', och setPhase returnerar
+      // current utanför intro (React bailar → CountdownIntro remountas inte).
+      const payload = {
+        question_index: questionIndex,
+        question_id: currentQ?.id ?? '',
+        all_question_ids: gameQuestions.map((q) => q.id),
+        timer_start_at: timerStartAt,
+        spotify_answer_year: spotifyAnswerYear,
+        spotify_answer_name: spotifyAnswerName,
+        dj_player_id: currentDJPlayer?.id,
+      };
+      const send = () => {
+        syncChannelRef.current?.broadcastPlayCommand(payload).catch(() => {});
+      };
+      send();
+      playCommandRetryTimersRef.current.forEach(clearTimeout);
+      playCommandRetryTimersRef.current = [
+        setTimeout(send, 600),
+        setTimeout(send, 1800),
+      ];
     }
   };
   // Host:s Next-tap i reveal: trigga lokal handleAdvance + broadcast.
@@ -4364,30 +5047,27 @@ export default function QuizScreen() {
   // existing Next-tab-callback (denna funktion täcker bara non-last-fallet).
   const handleHostAdvanceFromReveal = () => {
     handleAdvanceToNextRound();
-    if (gameMode === 'individual-devices' && syncChannelRef.current) {
-      syncChannelRef.current
-        .broadcastQuestionAdvance({
-          next_question_index: questionIndex + 1,
-          all_question_ids: gameQuestionsRef.current.map((q) => q.id),
-          spotify_answer_year: spotifyAnswerYear,
-          spotify_answer_name: spotifyAnswerName,
-        })
-        .catch(() => {});
-    }
+    // syncActive (inte bara IndDev): PtP-spectatorn följer sin progress —
+    // och därmed "Now answering" + Question N of M — enbart via detta event.
+    broadcastQuestionAdvanceWithRetries({
+      next_question_index: questionIndex + 1,
+      all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+      spotify_answer_year: spotifyAnswerYear,
+      spotify_answer_name: spotifyAnswerName,
+    });
   };
   // Host:s Final Leaderboard-tap.
   const handleHostShowLeaderboard = () => {
     handleShowLeaderboard();
-    if (gameMode === 'individual-devices' && syncChannelRef.current) {
-      syncChannelRef.current
-        .broadcastQuestionAdvance({
-          next_question_index: null,
-          all_question_ids: gameQuestionsRef.current.map((q) => q.id),
-          spotify_answer_year: spotifyAnswerYear,
-          spotify_answer_name: spotifyAnswerName,
-        })
-        .catch(() => {});
-    }
+    // next_question_index: null = "spelet är slut". Det är ENDA signalen som
+    // tar PtP-spectatorn till Final Leaderboard (host_active_ping är bara
+    // skyddsnät), så den måste gå ut även i PtP.
+    broadcastQuestionAdvanceWithRetries({
+      next_question_index: null,
+      all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+      spotify_answer_year: spotifyAnswerYear,
+      spotify_answer_name: spotifyAnswerName,
+    });
   };
   // D-iv: host togglar audio för en spelare via GetReady-modalen.
   // Trippelt parallellt: optimistisk lokal state (UI uppdateras direkt),
@@ -4437,8 +5117,20 @@ export default function QuizScreen() {
   // host_active_ping (throttlat till max 1/5s — fortsatta taps inom
   // fönstret skippar broadcast men resetar fortfarande egna ref:en så
   // host:s lokala countdown inte triggar oönskat).
+  //
+  // ⚠ Den här pingen kan INTE ersätta readiness-gaten/mount-hälsningen som
+  // fix för "non-host följer inte med till fråga 1", trots att mottagarens
+  // hostActivePing-handler har en intro→countdown-catch-up. Två skäl:
+  //   (1) onTouchStart fyrar på touch-DOWN, medan `phase` (läst ur render-
+  //       closuren nedan) fortfarande är 'intro' — pingen bär alltså
+  //       phase:'intro' och healar ingenting.
+  //   (2) samma tap konsumerar 5000 ms-throttlen, så ingen ping går ut under
+  //       countdown heller. Den fastnade spelaren healas först när host råkar
+  //       peka på skärmen under 'question' — mitt i frågan.
   const signalHostActivity = useCallback(() => {
-    if (gameMode !== 'individual-devices' || !isHost) return;
+    // syncActive (inte bara IndDev): i PtP är pingen spectatorns skyddsnät
+    // mot ett tappat question_advance — den bär både questionIndex och phase.
+    if (!syncActive || !isHost) return;
     const now = Date.now();
     lastHostActivityRef.current = now;
     if (now - lastPingEmittedRef.current < 5000) return;
@@ -4457,7 +5149,7 @@ export default function QuizScreen() {
         phase,
       })
       .catch(() => {});
-  }, [gameMode, isHost, selfPlayerId, questionIndex, phase]);
+  }, [syncActive, isHost, selfPlayerId, questionIndex, phase]);
 
   // D-v: shutdown vid 10 min host-inaktivitet. Host river rummet
   // (deactivateRoom + clear all stores) så stale data inte ärver in
@@ -4520,6 +5212,22 @@ export default function QuizScreen() {
   // samma transition-funktioner som host (lokalt) — de är idempotenta.
   useEffect(() => {
     playCommandHandlerRef.current = (qIdx, qId, allIds, timerStartAt) => {
+      // ── PtP-spectator: plocka bara sekvensen + index, rör inte fasen ──
+      // play_command broadcastas inte i PtP under normalt spel, men host:s
+      // onPlayerRejoined-handler re-broadcastar den när någon hälsar medan
+      // host är i countdown/question. Den är därmed en SNABB bärare av
+      // all_question_ids (= kategori-ikoner + badges) för en åskådare som
+      // just anslutit. Resten av handlern nedan hör till IndDev-spelare:
+      // fas-transition till 'countdown', timer-stämplar och nollställning
+      // av svars-state — allt sådant är meningslöst eller skadligt här.
+      if (isPtPSpectator) {
+        if (allIds && allIds.length > 0) setBroadcastAllQuestionIds(allIds);
+        setQuestionIndex((prev) => (prev === qIdx ? prev : qIdx));
+        if (turnOrder.length > 0) {
+          setCurrentPlayerIndex(qIdx % turnOrder.length);
+        }
+        return;
+      }
       // D-iii sticky-gate: om spelaren är låst i unstable-overlay (sticky
       // ELLER live-unstable) → IGNORERA play_command. Spelaren kvarstår i
       // sin nuvarande fas + overlay tills de explicit tappar Retry. Detta
@@ -4610,11 +5318,35 @@ export default function QuizScreen() {
         spotify_answer_year: say,
         spotify_answer_name: san,
       } = payload;
+      // ⚠ DEDUPE — KRÄVS av trippelsändningen (0/600/1800 ms) och måste ligga
+      // FÖRST. Till skillnad från play_command är den här handlern INTE
+      // idempotent: `handleAdvanceToNextRound` roterar `currentPlayerIndex`
+      // med en updater-funktion i Pass-the-Phone (spectatorn skulle hoppa
+      // över en spelare per dubblett) och avslutar med `setPhase('intro')`.
+      // Trycker host Play inom 1800 ms efter Next hinner en sen retry alltså
+      // kasta ut en non-host ur countdown tillbaka till GetReady — exakt den
+      // bugg presence-handskakningen just löste. Den nollställer dessutom
+      // `hasRecordedScoreForCurrentQuestionRef` (åter-armerar scoring-latchen)
+      // och wipe:ar svars-state.
+      //
+      // Nyckeln sätts SYNKRONT här, inte via questionIndexRef (som är en
+      // render-spegel och kan vara stale om två sändningar hinner ankomma
+      // före nästa render).
+      const advanceKey = nextIdx === null ? 'end' : nextIdx;
+      if (lastHandledAdvanceRef.current === advanceKey) return;
+      lastHandledAdvanceRef.current = advanceKey;
       // Uppdatera auktoritativ frågesekvens om host skickade med den.
       if (allIds && allIds.length > 0) setBroadcastAllQuestionIds(allIds);
       if (say !== undefined) setBroadcastHostSpotifyAnswerYear(say);
       if (san !== undefined) setBroadcastHostSpotifyAnswerName(san);
+      // Host har gått vidare → nu (och först nu) får spectatorns tabell
+      // visa utfallet på frågan som just spelades.
+      if (isPtPSpectator) flushSpectatorScores();
       if (nextIdx === null) {
+        // "Spelet är slut". PtP-spectatorns egen questionIndex/totalQuestions
+        // kan inte ensam avgöra det (den spelar aldrig ur sin lokala pool),
+        // och utan flaggan renderas Final Leaderboard som en INTERIM-vy.
+        if (isPtPSpectator) setSpectatorGameOver(true);
         handleShowLeaderboard();
       } else {
         // Passa canonical-indexet från broadcast så B alignar även när
@@ -4629,14 +5361,82 @@ export default function QuizScreen() {
     // själv har redan navigerat till '/' innan broadcast skickas, så de
     // ser aldrig sin egen "Has left"-rad.
     playerLeftHandlerRef.current = (playerId, playerName) => {
+      // Gemensamt för båda lägen: hade re-match-inbjudan redan gått ut har
+      // spelaren SETT den gyllene Accept-knappen och valt Home i stället —
+      // det är ett aktivt nej. Utan popupen skulle re-match-blocket bara
+      // försvinna under host:s fingrar (borttagningen nedan gör
+      // `allPreviousPlayersActive` falsk → frågan retras) och host stå kvar
+      // utan förklaring.
+      //
+      // Ingen state-hantering krävs för själva bytet: när host tryckt OK har
+      // render:n redan svängt om till den grå raden + "Start New Game".
+      // Alerten ligger modalt ovanpå under tiden.
+      const deniedRematch = isHost && rematchInviteRef.current;
+      if (deniedRematch && !rematchDeniedAlertedRef.current) {
+        rematchDeniedAlertedRef.current = true;
+        Alert.alert(
+          'Re-match not possible',
+          'At least one player has denied the re-match.',
+          [{ text: 'OK' }],
+        );
+      }
+      // Pass-the-Phone: eventet betyder att en ÅSKÅDAR-ENHET lämnade, inte
+      // att spelaren slutade spela — de sitter kvar vid bordet och spelar
+      // vidare på host:s telefon. Ta därför BARA bort dem ur approver-setet
+      // och returnera:
+      //   • setLeftPlayerIds driver gamePlayers[].hasLeft, liveLeaderboard
+      //     och turnOrder-filtret för timer-barens avatarer — hade markerat
+      //     en spelare mitt i spelet som borta.
+      //   • Alerten "X has left" hade varit direkt felaktig.
+      // Det här är dessutom ENDA vägen ut ur ptpSpectatorIds: watchdogen får
+      // aldrig röra setet (tystnad ≠ ja), så bara ett medvetet Home-/Leave-
+      // tapp släpper host vidare.
+      if (gameMode === 'pass-the-phone') {
+        setPtpSpectatorIds((prev) => {
+          if (!prev.has(playerId)) return prev;
+          const next = new Set(prev);
+          next.delete(playerId);
+          return next;
+        });
+        return;
+      }
       setLeftPlayerIds((prev) => {
         if (prev.has(playerId)) return prev;
         const next = new Set(prev);
         next.add(playerId);
         return next;
       });
-      if (isHost) {
-        Alert.alert(`${playerName} has left`, undefined, [{ text: 'OK' }]);
+      // Bara ett avhopp MEDAN spelet pågick ger den visuella markören. Efter
+      // slutsignalen är siffrorna färdiga och raden ska stå kvar orörd.
+      // `phase`/`isLastQuestion` är aktuella här — de ligger i effektens
+      // dep-array, så handlern registreras om när de ändras.
+      const gameOver = phase === 'leaderboard' && isLastQuestion;
+      if (!gameOver) {
+        setLeftDuringGameIds((prev) => {
+          if (prev.has(playerId)) return prev;
+          const next = new Set(prev);
+          next.add(playerId);
+          return next;
+        });
+      }
+      // ⚠ Inte NÄR re-match-inbjudan är ute — då har vi redan visat
+      // "Re-match not possible" ovan, och två staplade Alerts på iOS gör att
+      // den ena kan sväljas. "X has left" hör dessutom hemma MITT i spelet;
+      // på slutskärmen är avhoppets konsekvens (ingen re-match) det som
+      // faktiskt är händelsen.
+      if (isHost && !deniedRematch) {
+        // Avhopp under pågående spel diskvalificerar spelet från
+        // Competition-serien (se recording-effekten) — säg det direkt, i
+        // stället för att host upptäcker en saknad slide på slutskärmen.
+        // Bara när spelet FAKTISKT ingår i en serie; annars vore raden
+        // obegriplig.
+        Alert.alert(
+          `${playerName} has left`,
+          !gameOver && partOfCompetitionSeriesRef.current
+            ? 'Marathon table will not be updated with this game result.'
+            : undefined,
+          [{ text: 'OK' }],
+        );
       }
     };
     // Mottagare av player_answer_confirmed: uppdatera per-spelare-confirm-
@@ -4655,48 +5455,104 @@ export default function QuizScreen() {
     responseSecondsChangedHandlerRef.current = (seconds) => {
       setResponseSeconds(seconds);
     };
-    // Mottagare av player_score_recorded: en annan IndDev-spelare har
-    // svarat. Lägg in deras RoundScore i lokal allRoundScoresHistory
-    // så liveLeaderboard + final leaderboard visar komplett bild.
+    // Mottagare av player_hcp_changed: en annan IndDev-enhet har räknat om
+    // sitt Player-HCP vid game-end. Merge:a deltat i playerHcpChanges så §5-
+    // raden ("HCP 42 (-1)") visas för alla spelare på alla enheter. Idempotent
+    // (nycklar på player_id) → säkert vid retry-broadcasts.
+    playerHcpChangedHandlerRef.current = (payload) => {
+      setPlayerHcpChanges((prev) => ({
+        ...prev,
+        [payload.player_id]: { before: payload.before, after: payload.after },
+      }));
+    };
+    // Mottagare av player_score_recorded: någon annan enhet har registrerat
+    // ett svar. Lägg in deras RoundScore i lokal allRoundScoresHistory så
+    // liveLeaderboard + final leaderboard visar komplett bild.
     playerScoreRecordedHandlerRef.current = (payload) => {
       // Ignorera egna scores (broadcast.self: false garanterar detta, men
       // defensiv guard mot edge-case om selfPlayerId ändrar sig).
-      if (payload.player_id === selfPlayerId) return;
+      //
+      // ⚠ UNDANTAG för PtP-spectatorn: där svarade spelaren på HOST:ens
+      // telefon, så host broadcastar posten under SPECTATORNS player_id.
+      // Den finns alltså inte lokalt — filtret skulle kasta bort spelarens
+      // egen rad och lämna dem på 0 poäng i sin egen tabell.
+      if (!isPtPSpectator && payload.player_id === selfPlayerId) return;
       // Deduplication: samma spelare + samma frågeindex = samma broadcast.
       const key = `${payload.player_id}_${payload.question_index}`;
       if (receivedRemoteScoreKeysRef.current.has(key)) return;
       receivedRemoteScoreKeysRef.current.add(key);
-      setAllRoundScoresHistory((prev) => [
-        ...prev,
-        [{
-          playerId: payload.player_id,
-          points: payload.points,
-          correct: payload.correct,
-          timeUsed: payload.time_used,
-          // Bevaras (användes tidigare bara till dedup-nyckeln ovan) så
-          // match highlights kan joina peer-svar mot rätt fråga. Posten
-          // appendas i ankomstordning, så detta är ENDA kopplingen till
-          // vilken fråga svaret gällde.
-          questionIndex: payload.question_index,
-        }],
-      ]);
+      const incoming: RoundScore = {
+        playerId: payload.player_id,
+        points: payload.points,
+        correct: payload.correct,
+        timeUsed: payload.time_used,
+        // Bevaras (användes tidigare bara till dedup-nyckeln ovan) så
+        // match highlights kan joina peer-svar mot rätt fråga. Posten
+        // appendas i ankomstordning, så detta är ENDA kopplingen till
+        // vilken fråga svaret gällde.
+        questionIndex: payload.question_index,
+      };
+      // PtP-spectator: buffra tills host går vidare — se
+      // flushSpectatorScores för varför.
+      if (isPtPSpectator) {
+        pendingSpectatorScoresRef.current.push(incoming);
+        return;
+      }
+      setAllRoundScoresHistory((prev) => [...prev, [incoming]]);
     };
   });
 
   // Spara det avslutade spelet till AsyncStorage (görs när final leaderboard visas).
   // Player history (i Fas 5) kan sedan hämta denna data.
   const saveFinalGame = async () => {
+    // ── PtP-spectator: bygg underlaget ur host:s score-broadcasts ────────
+    // Spelaren svarade på HOST:ens telefon, så `rounds` (fylls bara av
+    // handleConfirm*) är tom här och `totalPoints` pekar på HOST:ens summa
+    // (gameTotals[hostId]). Båda måste ersättas, annars sparas ett spel med
+    // fel poäng och noll frågor.
+    //
+    // Detta stänger den dokumenterade luckan: en registrerad spelare som
+    // deltog i ett PtP-spel på någon annans enhet fick tidigare aldrig
+    // spelet i sin egen Player history.
+    const selfScores = isPtPSpectator
+      ? allRoundScoresHistory.flat().filter((sc) => sc.playerId === selfPlayerId)
+      : null;
+    // RoundResult saknar årtal på spectatorn — vi vet bara rätt/fel + tid.
+    // 0/0 är samma konvention som bildfrågor redan använder, och HistoryEntry
+    // läser bara `correct`, `timeUsed` och antalet.
+    const effectiveRounds: RoundResult[] =
+      selfScores !== null
+        ? selfScores.map((sc, i) => ({
+            questionNumber: (sc.questionIndex ?? i) + 1,
+            category: '',
+            question: '',
+            correctYear: 0,
+            selectedYear: 0,
+            correct: sc.correct,
+            points: sc.points,
+            timeUsed: sc.timeUsed,
+          }))
+        : rounds;
+    const effectiveTotalPoints =
+      selfScores !== null ? gameTotals[selfPlayerId] ?? 0 : totalPoints;
+    // Spectatorns egen assistance ligger per spelare i turnOrder — params
+    // hårdkodar 'standard'/'32' på non-host-vägen från Lobby.
+    const effectiveAssistance: AssistanceLevel =
+      (isPtPSpectator
+        ? turnOrder.find((pl) => pl.id === selfPlayerId)?.assistance
+        : undefined) ?? fallbackAssistance;
+
     // TODO (Fas 6): beräkna riktig HCP-förändring från totalPoints + assistance + ålder
     const hcpBefore = 99;
-    const hcpDelta = Math.round(totalPoints / 500); // tillfällig: 1 HCP-poäng per 500 pts
+    const hcpDelta = Math.round(effectiveTotalPoints / 500); // tillfällig: 1 HCP-poäng per 500 pts
     const hcpAfter = Math.max(1, hcpBefore - hcpDelta);
 
     const result: GameResult = {
       id: `g-${Date.now()}`,
       date: new Date().toISOString(),
-      totalPoints,
-      rounds,
-      assistance: fallbackAssistance,
+      totalPoints: effectiveTotalPoints,
+      rounds: effectiveRounds,
+      assistance: effectiveAssistance,
       hcpBefore,
       hcpAfter,
     };
@@ -4719,28 +5575,69 @@ export default function QuizScreen() {
     // Remote 1v1 skrivs INTE heller hit — server-tabellerna (remote_matches)
     // är remote-historikkällan (visas i "1vs1 Duels"-blocket i Player
     // History); en AsyncStorage-append hade dubbelräknat spelet.
-    if (rounds.length > 0 && !isGuestHostGame && !isRemote) {
-      const totalTime = rounds.reduce((sum, r) => sum + (r.timeUsed ?? 0), 0);
-      const correctAnswers = rounds.filter((r) => r.correct).length;
+    if (effectiveRounds.length > 0 && !isGuestHostGame && !isRemote) {
+      const totalTime = effectiveRounds.reduce((sum, r) => sum + (r.timeUsed ?? 0), 0);
+      const correctAnswers = effectiveRounds.filter((r) => r.correct).length;
       const profile = await loadProfile();
       const birthYear = profile?.birthYear;
       const age =
         typeof birthYear === 'number'
           ? new Date().getFullYear() - birthYear
           : 0;
+      // ── Källor som FAKTISKT serverades ────────────────────────────────
+      // Lobby-togglarna duger INTE som underlag: Hints-kvoten är
+      // floor(totalRounds / 4), så ett 2-3-rundors spel med Hints påslaget
+      // serverar noll Hints-frågor. Vi läser samma sanningskälla som Game
+      // Summary:s källkort och tar bara de index spelaren faktiskt spelade —
+      // i PtP-spectator-läget är effectiveRounds en DELMÄNGD av matchens
+      // frågor (varje spelare får olika frågor i PtP).
+      //
+      // ⚠ effectiveMediaSourceByQuestion läses ur render-closuren
+      // (saveFinalGame är ingen useCallback). Det är AVSIKTLIGT: seen-ids-
+      // effekten sätter seenQuestionIds i samma commit, vilket re-memoar
+      // gameQuestions med en NY shuffle. Closure-värdet är sekvensen som
+      // faktiskt spelades. Gör inte om detta till en ref-läsning.
+      const playedIndices = effectiveRounds.map((r) => r.questionNumber - 1);
+      const servedSources: PlayedMediaSource[] = (() => {
+        const fromHost = collectPlayedSources(effectiveMediaSourceByQuestion, playedIndices);
+        if (fromHost.length > 0) return fromHost;
+        // Fallback 1 — host:s sekvens hann aldrig fram (broadcastAllQuestionIds
+        // null). Vid leaderboard-tid SKA den vara satt, så detta är rent
+        // skyddsnät. Lokal sekvens har ANNAN ordning → per-index-mappning är
+        // meningslös, men samma toggles + pooler ger samma käll-MIX.
+        const local = mediaSourceByQuestion.slice(0, totalQuestions);
+        const fromLocal = collectPlayedSources(
+          local,
+          local.map((_, i) => i),
+        );
+        if (fromLocal.length > 0) return fromLocal;
+        // Fallback 2 — inget mediaunderlag alls. Toggle-läget är sämre data
+        // men raden ska aldrig degradera till "None".
+        return PLAYED_MEDIA_SOURCE_ORDER.filter(
+          (src) =>
+            (src === 'spotify' && spotifyEnabled) ||
+            (src === 'youtube' && youtubeEnabled) ||
+            (src === 'image' && imagesEnabled),
+        );
+      })();
       const entry: HistoryEntry = {
         id: result.id,
         date: result.date,
         correctAnswers,
-        totalQuestions: rounds.length,
-        avgResponseSeconds: totalTime / rounds.length,
+        totalQuestions: effectiveRounds.length,
+        avgResponseSeconds: totalTime / effectiveRounds.length,
         age,
-        assistance: fallbackAssistance,
+        assistance: effectiveAssistance,
         eraFrom,
         eraTo,
         selectedExtraPackages,
-        youtubeEnabled,
-        imagesEnabled,
+        sources: servedSources,
+        // Spelform + host för sorterings-/grupperings-vyerna i Player history.
+        // Remote är redan uteslutet ovan (!isRemote), så gameMode är här alltid
+        // pass-the-phone/individual-devices; single player fångas av flaggan.
+        gameMode,
+        singlePlayerDefault: isLocalSoloGame,
+        hostName: turnOrder[0]?.name,
       };
       try {
         await appendGameHistoryEntry(entry);
@@ -4754,20 +5651,82 @@ export default function QuizScreen() {
   // Kör när sista rundans leaderboard visas: beräkna HCP-förändringar + spara spel
   useEffect(() => {
     if (phase === 'leaderboard' && isLastQuestion) {
-      // Beräkna HCP-förändring för alla spelare.
-      // Formel (placeholder till Fas 6): delta = round(totalPoints / 500)
-      const changes: Record<string, HcpChange> = {};
+      // §2/§5 — HCP-motorn vid game-end. Grundar INGET HCP: guest-hostade spel
+      // (anonyma), remote (server-side finalize) och PtP-spectator (spelaren
+      // svarade inte på denna enhet).
+      //
+      // • Pass-the-Phone: ALLA svarar på DENNA enhet, så vi uppdaterar VARJE
+      //   registrerad deltagare (self via profil-speglingen, övriga per namn)
+      //   och visar allas §5-delta.
+      // • Individual Devices / Single: bara self (peers svarar på sina egna
+      //   enheter); i IndDev broadcastas self:s delta så alla enheters
+      //   leaderboard visar hela bilden.
+      //
+      // ⚠ Fönster-gaten (§2.1): HCP rör sig först när nivåns fönster har 20
+      // svar (~5 spel à 4 rundor) — ett enstaka testspel ändrar inte siffran.
+      if (!isGuestHostGame && !isRemote && !isPtPSpectator) {
+        const flat = allRoundScoresHistory.flat();
+        const answersFor = (pid: string): boolean[] =>
+          flat
+            .filter((s) => s.playerId === pid)
+            .sort((a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0))
+            .map((s) => s.correct);
 
-      // Iterera över alla gamePlayers (turnOrder i pass-the-phone, mocks
-      // vid direkt-nav). gameTotals har redan per-id summorna från history.
-      gamePlayers.forEach((p) => {
-        const total = gameTotals[p.id] ?? 0;
-        const delta = Math.round(total / 500);
-        const before = p.isHost ? 99 : MOCK_OPPONENT_HCP_BEFORE[p.id] ?? 99;
-        changes[p.id] = { before, after: Math.max(1, before - delta) };
-      });
+        if (gameMode === 'pass-the-phone') {
+          void (async () => {
+            const changes: Record<string, HcpChange> = {};
+            for (const p of turnOrder) {
+              if (p.type === 'guest') continue;
+              const answers = answersFor(p.id);
+              if (answers.length === 0) continue;
+              const level: AssistanceLevel = p.assistance ?? fallbackAssistance;
+              changes[p.id] =
+                p.id === selfPlayerId
+                  ? await recordSelfGameResult(level, answers)
+                  : await recordGameResultForName(p.name, level, answers);
+            }
+            if (Object.keys(changes).length > 0) {
+              setPlayerHcpChanges((prev) => ({ ...prev, ...changes }));
+              // PtP multi-device: dela deltana med ev. spectator som följer
+              // leaderboarden på egen enhet (samma parity som score-broadcasten).
+              if (syncChannelRef.current) {
+                for (const [pid, ch] of Object.entries(changes)) {
+                  const payload: PlayerHcpChangedPayload = {
+                    player_id: pid,
+                    before: ch.before,
+                    after: ch.after,
+                  };
+                  const send = () =>
+                    syncChannelRef.current?.broadcastPlayerHcpChanged(payload).catch(() => {});
+                  send();
+                  setTimeout(send, 800);
+                  setTimeout(send, 2000);
+                }
+              }
+            }
+          })();
+        } else {
+          const selfEntry = turnOrder.find((p) => p.id === selfPlayerId);
+          const selfAnswers = selfPlayerId ? answersFor(selfPlayerId) : [];
+          if (selfEntry?.type !== 'guest' && selfAnswers.length > 0) {
+            const level: AssistanceLevel = selfEntry?.assistance ?? fallbackAssistance;
+            void recordSelfGameResult(level, selfAnswers).then(({ before, after }) => {
+              setPlayerHcpChanges((prev) => ({ ...prev, [selfPlayerId]: { before, after } }));
+              // IndDev: dela self:s delta med peers så allas leaderboard visar
+              // det (retries mot tappade broadcasts; mottagaren är idempotent).
+              if (gameMode === 'individual-devices' && syncChannelRef.current) {
+                const payload: PlayerHcpChangedPayload = { player_id: selfPlayerId, before, after };
+                const send = () =>
+                  syncChannelRef.current?.broadcastPlayerHcpChanged(payload).catch(() => {});
+                send();
+                setTimeout(send, 800);
+                setTimeout(send, 2000);
+              }
+            });
+          }
+        }
+      }
 
-      setPlayerHcpChanges(changes);
       saveFinalGame();
       // Remote 1v1: finalisera egen spelarrad server-side. Sista finishern
       // triggar atomisk vinnarberäkning i RPC:n (radlås — ingen klient-race).
@@ -4796,6 +5755,196 @@ export default function QuizScreen() {
     }
   }, [phase, isLastQuestion]);
 
+  // ── Aggregate Leaderboard ───────────────────────────────────────────────
+  // Slutskärmen visar ALLTID spelet som just spelats. Har host kört
+  // "Re-match with Aggregate Leaderboard?" finns dessutom en andra sida med
+  // hela serien sammanslagen — se src/utils/aggregateLeaderboard.ts för hur
+  // kedjan hålls ihop (rumkod, inte ett synkat series-id).
+  //
+  // Remote 1v1 har ingen re-match och alltså aldrig en serie; utan rumkod
+  // (direkt-nav i dev) finns inget att nyckla på.
+  const aggregateApplicable = isLastQuestion && !isRemote && !!params.roomCode;
+  const [aggregate, setAggregate] = useState<AggregateLeaderboardData | null>(
+    null,
+  );
+  // Id på den SERVER-sparade serien (0037), när alla spelare är QuizVibe-
+  // users. null = serien lever bara lokalt; flikarna fungerar ändå.
+  const [aggregateLeaderboardId, setAggregateLeaderboardId] = useState<string | null>(
+    null,
+  );
+  // ⚠ Synkron spegel. `ensureAggregateLeaderboardAttached` sätter id:t och
+  //   goToNewLobby kan köra i SAMMA tick (solo / inga non-hosts att vänta
+  //   in) — React-state hade då fortfarande varit null i closuren.
+  const aggregateLeaderboardIdRef = useRef<string | null>(null);
+  aggregateLeaderboardIdRef.current = aggregateLeaderboardId;
+  const [aggregateName, setAggregateName] = useState<string | null>(null);
+  // Backstop mot ändrad uppsättning. Re-match-lobbyn är låst (0037) så detta
+  // ska aldrig slå — men en serie som fyllts på med fel antal spelare vore
+  // tyst korrupt, och en jämförelse kostar ingenting.
+  const [aggregateParticipantCount, setAggregateParticipantCount] = useState<number | null>(
+    null,
+  );
+  // "Add to existing"-listan när det finns FLERA sparade serier med exakt
+  // denna uppsättning. Promise-resolvern gör att handleReplayYes kan await:a
+  // valet innan inbjudan broadcastas.
+  const [pendingAggregatePick, setPendingAggregatePick] = useState<
+    SavedAggregateSummary[] | null
+  >(null);
+  const aggregatePickResolveRef = useRef<
+    ((choice: AggregatePickChoice) => void) | null
+  >(null);
+  // Tvåstegsval (Peter 2026-08-26): ett tapp på en rad MARKERAR den, och
+  // först då tänds Confirm. Att koppla serien direkt på rad-tappet gjorde
+  // ett feltryck omedelbart bindande.
+  const [selectedAggregateId, setSelectedAggregateId] = useState<string | null>(
+    null,
+  );
+  // Namn-prompt för en NY Marathon (Peter 2026-08-29). Öppnas av
+  // ensureAggregateLeaderboardAttached på varje fresh-create; Save löser med
+  // namnet, Cancel med null (→ tillbaka till föregående stadie).
+  const [aggregateNamePromptVisible, setAggregateNamePromptVisible] =
+    useState(false);
+  const [aggregateNameText, setAggregateNameText] = useState('');
+  const [aggregateNameError, setAggregateNameError] = useState<string | null>(
+    null,
+  );
+  const aggregateNameResolveRef = useRef<
+    ((name: string | null) => void) | null
+  >(null);
+  // Är DET HÄR spelet en fortsättning på en Competition-serie? Serien pekar
+  // ut nästa rumkod när en re-match startas (`markSeriesContinues`), så en
+  // träff här betyder "spelet kommer att räknas in i aggregatet". Används
+  // bara för att avgöra om avhopps-popupen ska nämna Competition-tabellen —
+  // utan serien vore den raden obegriplig.
+  const partOfCompetitionSeriesRef = useRef(false);
+  // Seeda från den lokala serien vid mount — en re-match ärver kopplingen,
+  // så slutskärmen vet direkt att den ska skriva till servern och visa namn.
+  useEffect(() => {
+    let cancelled = false;
+    void loadAggregateSeries().then((series) => {
+      if (cancelled) return;
+      partOfCompetitionSeriesRef.current =
+        !!series?.nextRoomCode && series.nextRoomCode === params.roomCode;
+      const id = series?.leaderboardId ?? null;
+      if (!id) return;
+      setAggregateLeaderboardId(id);
+      void getAggregateLeaderboard(id).then((saved) => {
+        if (cancelled || !saved) return;
+        setAggregateName(saved.name);
+        setAggregateParticipantCount(saved.participants.length);
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  useEffect(() => {
+    if (phase !== 'leaderboard' || !aggregateApplicable) return;
+    // ⚠ Lämnade NÅGON mitt i spelet räknas spelet INTE in i Competition-
+    // serien — varken lokalt eller server-side (Peter 2026-08-26). Deras rad
+    // saknar resultat ("Left the game"), så en aggregerad ställning byggd på
+    // den vore missvisande för alla övriga. Eftersom `setAggregate` bara
+    // anropas här förblir `aggregate` null, och då renderas ingen
+    // "Marathon table"-slide på slutskärmen — samma villkor styr
+    // båda, så de kan inte glida isär.
+    //
+    // Serien i sig lever vidare: `nextRoomCode` konsumeras inte, och nästa
+    // re-match skriver över den via `markSeriesContinues`.
+    if (gamePlayers.some((p) => p.hasLeft)) return;
+    const roomCode = params.roomCode as string;
+    const contribution: AggregateGamePlayer[] = gamePlayers.map((p) => {
+      const scores = allRoundScoresHistory.flatMap((round) =>
+        round.filter((sc) => sc.playerId === p.id),
+      );
+      return {
+        playerId: p.id,
+        name: p.name,
+        emoji: p.emoji,
+        assistance: p.assistance,
+        age: p.age,
+        points: gameTotals[p.id] ?? 0,
+        playedRounds: scores.length,
+        correctAnswers: scores.filter((sc) => sc.correct).length,
+        totalResponseSeconds: scores.reduce((sum, sc) => sum + sc.timeUsed, 0),
+        results: scores.map((sc) => sc.correct),
+        lastResponseSeconds:
+          scores.length > 0 ? scores[scores.length - 1].timeUsed : null,
+      };
+    });
+    let cancelled = false;
+    // Skrivningen är idempotent per rumkod (ERSÄTTER spelets snapshot), så
+    // sena peer-scores i Individual Devices uppdaterar serien i stället för
+    // att dubbelräkna spelet — därför står allRoundScoresHistory i deps.
+    void recordGameInSeries(roomCode, contribution).then((series) => {
+      if (cancelled) return;
+      setAggregate(buildAggregateStandings(series));
+      // Spegla spelet till den sparade serien på kontot.
+      // ⚠ BARA host skriver: en non-host som lämnat mitt i spelet har en
+      //   ofullständig allRoundScoresHistory och skulle skriva trunkerad
+      //   statistik över hostens korrekta rad.
+      const leaderboardId = series.leaderboardId;
+      if (!leaderboardId || !isHost) return;
+      if (
+        aggregateParticipantCount !== null &&
+        contribution.length !== aggregateParticipantCount
+      ) {
+        console.warn(
+          '[quiz] aggregate line-up changed — skipping server write for',
+          roomCode,
+        );
+        return;
+      }
+      // Bokför spelet + snapshotta dess inställningar (0043) så en re-match
+      // via Competitions-fliken kan återanvända EXAKT samma setup som senaste
+      // spelet i stället för host:ens profil-defaults. Kedjat: settings-RPC:n
+      // gör bara en UPDATE, så spelraden måste finnas först. parentControl +
+      // paket tas från quiz-params (AUKTORITATIVT — de speglar host:s val;
+      // parentControl persisteras inte ens i lobby_settings).
+      void recordAggregateGame(leaderboardId, roomCode, contribution).then(() => {
+        void saveAggregateGameSettings(leaderboardId, roomCode, {
+          eraFrom,
+          eraTo,
+          roundsCount: totalRounds,
+          answerResponseSeconds: responseSeconds,
+          youtubeEnabledCategories,
+          imagesEnabledCategories,
+          selectedExtraPackages,
+          parentControlEnabled,
+          spotifyEnabled,
+          // ⚠ ENBART för spelform-grupperingen i Marathon-listan. Läses aldrig
+          // av buildRematchSettings (den härleder gameMode av lobbytypen).
+          // Denna gren är host-only + aldrig remote → single player fångas av
+          // turnOrder.length <= 1.
+          gameMode,
+          singlePlayerDefault: turnOrder.length <= 1,
+        });
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    phase,
+    aggregateApplicable,
+    allRoundScoresHistory,
+    gamePlayers,
+    gameTotals,
+    params.roomCode,
+    isHost,
+    aggregateParticipantCount,
+    // Settings-snapshot (0043) — stabila vid leaderboard-fasen, med i deps
+    // för korrekthet.
+    eraFrom,
+    eraTo,
+    totalRounds,
+    responseSeconds,
+    youtubeEnabledCategories,
+    imagesEnabledCategories,
+    selectedExtraPackages,
+    parentControlEnabled,
+    spotifyEnabled,
+  ]);
+
   // Sista rundans actions: starta nytt rum i Lobby (ev. med samma spelare) eller gå hem.
   // `keepSettings` styr om per-spelare-settings (age/assistance) bärs över från
   // detta spel — settings kan ha redigerats av host i Lobby:n. När false:
@@ -4811,13 +5960,18 @@ export default function QuizScreen() {
     // LobbyScreen och vinner över carry-over-settings — host:s val i
     // "Start New Game"-panelen är alltid det senaste ordet.
     lobbyType: LocalLobbyType = 'multiplayer',
+    // Sätts av "Start New Game" när en INLOGGAD guest host ska tillbaka till
+    // sin egen identitet (Peter 2026-08-26). Nya lobbyn blir då en vanlig
+    // user-lobby: credit dras, profilens namn/avatar används, Game History
+    // skrivs och Remote Play är tillgängligt.
+    leaveGuestMode: boolean = false,
   ) => {
     // `guestOverride` (credit-gate:ns "Restart as Guest"): tvingar NYA
     // lobbyn till guest-host-läge även när DETTA spel hostades av en
-    // registrerad user. Spelarna bärs över som vanligt — bara värd-
-    // identiteten byts till den auto-genererade Guest-identiteten så
-    // spelet blir gratis (inga credits) och ingen Game History skrivs.
-    const asGuestHost = isGuestHostGame || guestOverride != null;
+    // registrerad user. Den skapar numera en FRÄSCH lobby (reusePlayers
+    // false) — en guest-hostad re-match-lobby får inte existera.
+    const asGuestHost =
+      guestOverride != null || (isGuestHostGame && !leaveGuestMode);
     // ── AUKTORITATIV credit-gate ────────────────────────────────────────
     // Sista kollen INNAN rummet registreras. Anropar:na har egna
     // fail-fast-gates (Start New Game-tappet, dormanta handlePlayAgain),
@@ -4831,7 +5985,16 @@ export default function QuizScreen() {
     // som avgör om credits behövs — så credit-gatens egen "Restart as
     // Guest"-utväg (guestOverride) släpps igenom utan att loopa tillbaka
     // in i samma Alert.
-    if (!asGuestHost && !(await ensureHostCreditsForNewGame())) return;
+    if (
+      !asGuestHost &&
+      !(await ensureHostCreditsForNewGame({
+        // En re-match får aldrig kunna växla över till guest — då hade vi
+        // fått exakt den guest-hostade re-match-lobby som inte får finnas.
+        allowGuestRestart: !reusePlayers,
+        newLobbyIsGuestHosted: false,
+      }))
+    )
+      return;
     // Ladda host-profilen FÖRE players-listan byggs så host:s riktiga
     // playerName + avatar bär in i carry-over (annars hade host:s rad i
     // nya lobby:n stått som 'You'/🎮 tills mergeProfileIntoHost hann fyra).
@@ -4840,7 +6003,7 @@ export default function QuizScreen() {
     const profile = asGuestHost ? null : await loadProfile();
     const hostName = guestOverride
       ? guestOverride.guestName
-      : isGuestHostGame
+      : asGuestHost
         ? (params.guestName?.trim() || turnOrder[0]?.name || 'Guest')
         : profile?.playerName?.trim() || 'You';
     const hostEmoji = asGuestHost
@@ -4855,13 +6018,34 @@ export default function QuizScreen() {
     // ev. pre-seeded matchande rad → race ger duplicate-row.
     let carryOverPlayers: LobbyPlayer[];
     if (reusePlayers) {
-      // Behåll alla spelare från detta spel. ALLA carry-over-spelare
-      // (friends eller ej) auto-approvas i nya lobbyn — de var redan
-      // godkända i spelet som just avslutades, så ingen re-approval
-      // behövs (Peter-beslut 2026-08-06). LobbyScreen:s code-only-join
-      // matchar med approved=true på carry-over-branchen så joiner:s
-      // egen upsert inte clobbar.
-      carryOverPlayers = allPlayers.map((p) => {
+      // ── Vilka bärs över? ────────────────────────────────────────────────
+      // Hela uppställningen — filtret nedan är TAUTOLOGISKT under nuvarande
+      // regler och finns som backstop.
+      //
+      // Varför det ändå står kvar: `contribution` på slutskärmen mappar över
+      // HELA `turnOrder`, så en spelare som INTE var med skulle få en rad i
+      // den delade Competition-tabellen (lokalt och server-side via
+      // `recordAggregateGame`) för ett spel de aldrig spelade — och de är
+      // redan deltagare i den sparade leaderboarden, så de SER poängen under
+      // Player history. Filtret gör att en regression i gaten degraderar till
+      // "färre spelare i re-matchen" i stället för "främmande poäng i någons
+      // historik".
+      //
+      // Att det är tautologiskt: host kan bara nå hit när VARJE spelare från
+      // förra spelet både är aktiv (`ptpAllPreviousPlayersActive`) och har
+      // accepterat (`rematchAllApproved`) — annars visas ingen re-match-fråga
+      // alls, respektive förblir Yes grå. Samma sak i IndDev, där hela
+      // rostern är det förväntade setet.
+      //
+      // ALLA carry-over-spelare auto-approvas i nya lobbyn — de var redan
+      // godkända i spelet som just avslutades, så ingen re-approval behövs
+      // (Peter-beslut 2026-08-06). LobbyScreen:s code-only-join matchar med
+      // approved=true på carry-over-branchen så joiner:s egen upsert inte
+      // clobbar.
+      const rematchRoster = allPlayers.filter(
+        (p) => p.isHost || playAgainApprovals.has(p.id),
+      );
+      carryOverPlayers = rematchRoster.map((p) => {
         const turnEntry = turnOrder.find((t) => t.id === p.id);
         // type carry:as från turnOrder (LobbyScreen skickar med den sedan
         // 2026-07-04). Host-raden i guest-hostade spel FORCERAS 'guest' —
@@ -4940,6 +6124,12 @@ export default function QuizScreen() {
       // "bara Home" via guestHost={isRemote}), så goToNewLobby nås aldrig
       // från en remote-match — den nya lobbyn är alltid standard.
       isRemote1v1: false,
+      // Re-match: spelaruppsättningen låses till exakt de som var med i
+      // spelet som just avslutades (Peter 2026-08-25). Skrivs atomiskt med
+      // rums-raden så join-gaten aldrig är fail-open. "Start New Game"
+      // (reusePlayers=false) bär inte över spelare och låser därför inget.
+      rematchLocked: reusePlayers,
+      rematchPlayerIds: reusePlayers ? carryOverPlayers.map((p) => p.id) : [],
     });
     if (!roomRegistered) {
       Alert.alert(
@@ -4967,6 +6157,12 @@ export default function QuizScreen() {
     // ankommer och läser `getLobbyPlayers` för dup-detection — non-host
     // skulle då inte hitta sin pre-seeded rad och skapa ett nytt joiner-id,
     // vilket resulterar i två rader med samma playerName.
+    // Re-match: stämpla nya rumkoden som seriens fortsättning så nästa
+    // slutskärm kan visa Aggregate Leaderboard. Görs bara när spelarna bärs
+    // över — "Start New Game" är per definition en NY serie.
+    if (reusePlayers) {
+      void markSeriesContinues(newCode);
+    }
     if (reusePlayers && params.roomCode && carryOverPlayers.length > 0) {
       // Re-mappa id:t med rumkoden i prefixet så lobby_players-rader inte
       // krockar med det gamla rummet (vi behåller bara namn/age/assistance/
@@ -4982,16 +6178,23 @@ export default function QuizScreen() {
         console.warn('[goToNewLobby] setLobbyPlayers carry-over failed:', err);
       });
     }
-    // Carry-over av game-settings när host valt "Yes, keep them" + "Keep
-    // settings". Läser föregående rums lobby_settings-rad och upsert:ar
-    // den på nya rumkoden — bevarar gameMode (PtP/IndDev),
+    // Carry-over av game-settings. Läser föregående rums lobby_settings-rad
+    // och upsert:ar den på nya rumkoden — bevarar gameMode (PtP/IndDev),
     // singlePlayerDefault (= single-player-läget), roundsCount, eraFrom,
     // eraTo, region, samt media-toggles. answerResponseSeconds override:as
     // med host:s AKTUELLA quiz-state (kan ha justerats mid-game via
-    // GetReadyIntro:s dropdown). Vid keepSettings=false (Start fresh)
-    // lämnar vi nya rummet utan settings-rad så LobbyScreen:s host-seed
-    // -effekt fyller den från profilens host-defaults.
-    if (keepSettings && params.roomCode) {
+    // GetReadyIntro:s dropdown). Vid "Start New Game" (varken keepSettings
+    // eller reusePlayers) lämnas nya rummet utan settings-rad så
+    // LobbyScreen:s host-seed-effekt fyller den från profilens host-defaults.
+    //
+    // ⚠ `keepSettings || reusePlayers`: en RE-MATCH bär ALLTID över settings.
+    // Utan settings-raden seedar LobbyScreen gameMode från host-PROFILEN, så
+    // en PtP-re-match kunde tyst återuppstå som Individual device (eller
+    // tvärtom) i en lobby där Game Mode-väljaren är låst och inte kan
+    // rättas. Levande vägar skickar numera alltid keepSettings=true vid
+    // carry-over (Keep/Reset-prompten är borttagen); termen kodar regeln och
+    // täcker den dormanta Play Again-vägen om den återupplivas.
+    if ((keepSettings || reusePlayers) && params.roomCode) {
       const oldSettings = await getLobbySettings(params.roomCode);
       if (oldSettings) {
         await setLobbySettings(newCode, {
@@ -5011,7 +6214,7 @@ export default function QuizScreen() {
     // Approve Play Again). Fire-and-forget; om send fail:ar (rara race)
     // hänger non-host kvar på lock-overlay tills timeout/manual exit, men
     // host:s egna nav-flow får aldrig blockas.
-    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+    if (syncActive && syncChannelRef.current) {
       // auto_join när spelarna carry:as över: deras pre-seedade rader finns
       // redan i nya lobbyn så non-hosts ska följa med direkt även om de
       // inte hunnit tappa Approve. Kritiskt för credit-gate:ns "Restart as
@@ -5019,10 +6222,24 @@ export default function QuizScreen() {
       // non-hosts fått "Host has already started a new Game"-popupen → Home
       // trots att host ser dem i nya lobbyn. I den normala "Yes, keep
       // them"-vägen är flaggan en no-op (alla har redan Approve-tappat).
+      //
+      // ⚠ Pass-the-Phone är UNDANTAGET: re-match används inte där (Peter
+      // 2026-08-25). Spectatorn ska INTE dras med in i nya lobbyn utan få
+      // "Host has already started a new Game" → Home. Mottagaren visar
+      // exakt den popupen när varken auto_join eller ett eget Approve-tap
+      // finns, så det räcker att hålla flaggan osatt i PtP.
       await syncChannelRef.current
         .broadcastPlayAgainLobbyReady({
           room_code: newCode,
-          auto_join: reusePlayers ? true : undefined,
+          // Kopplingen till den sparade serien följer med så non-host kan
+          // stämpla den på sin lokala serie och seeda sin aggregat-vy.
+          aggregate_leaderboard_id: aggregateLeaderboardIdRef.current ?? undefined,
+          auto_join:
+            gameMode === 'pass-the-phone'
+              ? undefined
+              : reusePlayers
+                ? true
+                : undefined,
         })
         .catch(() => {});
     }
@@ -5054,13 +6271,48 @@ export default function QuizScreen() {
             carryOverPlayers.find((p) => p.isHost)?.assistance ?? 'full',
           guestReplays: guestOverride ? '0' : String(guestReplaysUsed + 1),
           lobbyType,
+          // Låst uppsättning redan på LobbyScreens FÖRSTA frame, utan att
+          // vänta på en DB-läsning av rums-raden.
+          rematchLocked: String(reusePlayers),
+          // Parent Control kan togglas även av en guest host — bär med host:s
+          // val vid carry-over (persisteras aldrig i DB). Guest host har inga
+          // paket (seeden forcerar []), så carryPackages behövs inte här.
+          // seedGameMode: förra spelets läge, seedas SYNKRONT i LobbyScreen så
+          // PtP-confirm-guarden inte fyrar på en IndDev re-match innan den
+          // async seeden landat (guest host kan köra IndDev, samma race).
+          ...((keepSettings || reusePlayers)
+            ? { parentControl: String(parentControlEnabled), seedGameMode: gameMode }
+            : {}),
         },
       });
       return;
     }
     router.replace({
       pathname: '/lobby',
-      params: { code: newCode, isHost: 'true', lobbyType },
+      params: {
+        code: newCode,
+        isHost: 'true',
+        lobbyType,
+        rematchLocked: String(reusePlayers),
+        // Carry-over av Parent Control + valda Host-paket via params (INTE bara
+        // via lobby_settings-blobben). Parent Control persisteras aldrig i DB
+        // (samma mönster som spotify_answer_*), så en re-seed skulle annars
+        // återgå till profil-defaulten. Paket-listan bär vi med här som
+        // AUKTORITATIV källa (host:s exakta in-game-val) så den inte kan tappas
+        // av en stale lobby_settings-rad eller profil-filtret i seeden. Skickas
+        // BARA vid carry-over (samma villkor som settings-blobben ovan); en
+        // fresh "Start New Game" utelämnar dem → seeden faller på profilen.
+        // seedGameMode: förra spelets läge (PtP/IndDev), seedas SYNKRONT i
+        // LobbyScreen så PtP-confirm-guarden i handleStartGame inte fyrar på en
+        // IndDev re-match innan den async seeden (getLobbySettings) landat.
+        ...((keepSettings || reusePlayers)
+          ? {
+              parentControl: String(parentControlEnabled),
+              carryPackages: JSON.stringify(selectedExtraPackages),
+              seedGameMode: gameMode,
+            }
+          : {}),
+      },
     });
   };
 
@@ -5118,29 +6370,41 @@ export default function QuizScreen() {
       profile?.birthYear ?? new Date().getFullYear() - 30;
     track('guest_name_created', { autofilled: true, assistance: 'full' });
     track('room_code_created', { guestHost: true, fromCreditGate: true });
-    // keepSettings=true: guest-seed:en i LobbyScreen klampar ändå till de
-    // guest-låsta värdena (full era/rounds {2,4}) och tar bara de
-    // guest-VARIABLA fälten (gameMode, singlePlayerDefault, roundsCount,
-    // spotifyEnabled, answerResponseSeconds) från carry-over:n. goToNewLobby:s IndDev-broadcast
-    // (play_again_lobby_ready) routar non-hosts som tappat Approve direkt
-    // till nya lobbyn; övriga får "Host has already started a new Game"-
-    // popupen → Home och kan joina igen via nya koden (dup-detection
-    // matchar deras pre-seedade rad).
-    await goToNewLobby(true, true, {
+    // ⚠ FRÄSCH lobby (reusePlayers=false), inte en carry-over. En
+    // guest-hostad RE-MATCH-lobby får inte existera (Peter 2026-08-26):
+    // guest hosts har varken re-match eller replay, så en lobby med
+    // föregående spels låsta uppställning och en guest-värd är en
+    // motsägelse. Knappen är därmed semantiskt identisk med Home:s
+    // "Start Game as Guest". Ev. non-hosts får "Host has already started a
+    // new Game" → Home, vilket är rätt för en fräsch lobby.
+    await goToNewLobby(false, false, {
       guestName: guestHostName,
       guestBirthYear,
     });
   };
 
   // Host Game Credits-gate för alla "starta nytt spel"-vägar från Final
-  // Leaderboard (Play Again + lokala re-match-flödets "Start New Game").
-  // Returnerar true när host får fortsätta. loadProfile() refreshar Free-
-  // saldot vid första load efter midnatt CET så vi jämför mot aktuellt
-  // värde. Guest host: gaten skippas HELT — guest-spel förbrukar aldrig
-  // credits, och en inloggad user som spelar som guest ska varken blockeras
-  // av eller belasta sitt eget saldo.
-  const ensureHostCreditsForNewGame = async (): Promise<boolean> => {
-    if (isGuestHostGame) return true;
+  // Leaderboard (re-match + "Start New Game"). Returnerar true när host får
+  // fortsätta. loadProfile() refreshar Free-saldot vid första load efter
+  // midnatt CET så vi jämför mot aktuellt värde.
+  //
+  // ⚠ Gaten skippas när den NYA lobbyn blir guest-hostad — inte när den
+  // föregående var det. Skillnaden blev viktig 2026-08-26: en inloggad guest
+  // host som trycker Start New Game skapar numera en vanlig user-lobby och
+  // ska belasta sitt eget saldo som vem som helst. Anroparen anger det via
+  // `newLobbyIsGuestHosted`; utan option:en gäller det gamla beteendet.
+  const ensureHostCreditsForNewGame = async (options?: {
+    /** Får popupen erbjuda "Restart as Guest"? Falskt i re-match-flödet —
+     *  se handleReplayYes. Default true. */
+    allowGuestRestart?: boolean;
+    /** Blir den NYA lobbyn guest-hostad? Det, inte om det FÖREGÅENDE spelet
+     *  var det, avgör om saldot ska belastas: en inloggad guest host som
+     *  trycker Start New Game skapar numera en vanlig user-lobby och ska
+     *  betala för den. Default: samma som det föregående spelet. */
+    newLobbyIsGuestHosted?: boolean;
+  }): Promise<boolean> => {
+    const allowGuestRestart = options?.allowGuestRestart ?? true;
+    if (options?.newLobbyIsGuestHosted ?? isGuestHostGame) return true;
     const [freshProfile, hasPremium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
@@ -5149,33 +6413,43 @@ export default function QuizScreen() {
     // skippar också deduktionen så Free-saldot förblir orört.
     if (hasPremium) return true;
     if ((freshProfile?.freeGameCredits ?? 0) > 0) return true;
-    // Tre-vägs-popup (iOS Alert max 3 knappar):
-    // 1. Purchase subscription → Store (unlimited host games + Game
-    //    History fortsätter sparas på profilen).
-    // 2. Restart as Guest → guest-hostad lobby med ALLA spelare
-    //    carry:ade från detta spel; gratis men ingen Game History
-    //    skrivs och max 1 replay därefter.
-    // 3. Exit → stäng popupen, stanna på Final Leaderboard (Home-
-    //    knappen finns kvar där som utväg).
+    // Samma popup som Home:s "Start New Game"-gate (app/index.tsx,
+    // checkHostCredits) — ordagrant samma titel, text och knappar, så
+    // spelaren möter en enda formulering överallt i appen.
+    //
+    // ⚠ ENDA avvikelsen från Home är destinationen: Home pushar
+    // `/store?focus=subscription&from=/`, härifrån går den UTAN `from=`.
+    // Utan paramet faller Store:s Back tillbaka via `router.back()` och
+    // /quiz ligger kvar på stacken med Final Leaderboard-state intakt, så
+    // host kan trycka Yes igen direkt efter köpet. Med `from=/` hade
+    // Store:s Back `replace`:at bort Quiz-komponenten och spelet vore borta.
+    //
+    // "Restart as Guest" erbjuds bara när anroparen tillåter det. Den
+    // utgår i re-match-flödet: en guest-hostad re-match-lobby får inte
+    // existera, och en knapp som tyst kastar bort både uppställningen och
+    // Competition-kedjan mitt i en re-match vore vilseledande.
     Alert.alert(
       'Out of Host Game Credits',
-      'You have used your free host games for today. Add unlimited Host games and keep storing Game History on your profile with QuizVibe Premium — or restart as Guest (no Game History stored).',
-      [
-        // Pushar Store UTAN `from=...`-paramet så Store:s Back-knapp fall:er
-        // till `router.back()` istället för `router.replace(from)`. Det
-        // bevarar /quiz på root Stack:en med Final Leaderboard-state intakt
-        // — annars hade replace:n unmountat Quiz-komponenten och spelaren
-        // skulle landa på en tom /quiz-vy efter köpet.
-        {
-          text: 'Purchase subscription',
-          onPress: () => router.push('/store?focus=subscription'),
-        },
-        {
-          text: 'Restart as Guest',
-          onPress: () => restartAsGuestHost(freshProfile),
-        },
-        { text: 'Exit', style: 'cancel' },
-      ],
+      'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
+      allowGuestRestart
+        ? [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Restart as Guest',
+              onPress: () => restartAsGuestHost(freshProfile),
+            },
+            {
+              text: 'Go to Store',
+              onPress: () => router.push('/store?focus=subscription'),
+            },
+          ]
+        : [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Go to Store',
+              onPress: () => router.push('/store?focus=subscription'),
+            },
+          ],
     );
     return false;
   };
@@ -5267,14 +6541,10 @@ export default function QuizScreen() {
     // stängd — Play Again-flödet är övergivet. Notifiera non-host:s
     // syncChannel + cleanup alla per-rum-stores så de inte fastnar på
     // "Please Wait..."-overlay:n (efter att de tappat Approve) eller
-    // stannar passivt på Final Leaderboard. Gated på IndDev + host
-    // eftersom Pass-the-Phone bara har en device.
-    if (
-      isHost &&
-      gameMode === 'individual-devices' &&
-      params.roomCode &&
-      syncChannelRef.current
-    ) {
+    // stannar passivt på Final Leaderboard. Gäller även Pass-the-Phone
+    // sedan spectator-vyn infördes — non-host:s enhet står kvar på Final
+    // Leaderboard tills detta event kommer.
+    if (isHost && syncActive && params.roomCode && syncChannelRef.current) {
       // Fire FÖRE deactivateRoom/clear så non-host:s syncChannel hinner
       // ta emot innan vi rivs vid component-unmount. Fire-and-forget —
       // ev. send-fail blockar inte host:s nav-flow.
@@ -5301,6 +6571,27 @@ export default function QuizScreen() {
       clearLobbySettings(params.roomCode);
       clearEjected(params.roomCode);
       clearGameStarted(params.roomCode);
+    }
+    // Non-host lämnar: annonsera det INNAN vi navigerar. I PtP är det här
+    // enda vägen ut ur host:s approver-set — utan den skulle en åskådare som
+    // gått hem blockera re-matchen för alltid (watchdogen rör inte setet).
+    //
+    // ⚠ Await:as, till skillnad från övriga player_left-sändningar: router
+    // .replace unmountar komponenten och river syncChannel:en, så en ren
+    // fire-and-forget kan hinna kastas bort innan den gått ut. Kort timeout
+    // så navigationen aldrig hänger på ett dött nät.
+    if (!isHost && syncActive && selfPlayerId && syncChannelRef.current) {
+      const selfName =
+        turnOrder.find((p) => p.id === selfPlayerId)?.name ?? 'Player';
+      await Promise.race([
+        syncChannelRef.current
+          .broadcastPlayerLeft({
+            player_id: selfPlayerId,
+            player_name: selfName,
+          })
+          .catch(() => {}),
+        new Promise((resolve) => setTimeout(resolve, 1200)),
+      ]);
     }
     router.replace('/');
   };
@@ -5394,11 +6685,21 @@ export default function QuizScreen() {
   const [hostInitiatedPlayAgain, setHostInitiatedPlayAgain] = useState(false);
   const [nextLobbyCode, setNextLobbyCode] = useState<string | null>(null);
   const [awaitingNewLobby, setAwaitingNewLobby] = useState(false);
+  // Synkron spegel av awaitingNewLobby så lobby-ready-handler:n kan läsa
+  // det AKTUELLA värdet vid event-ankomst utan att vara beroende av att
+  // useEffect:en hunnit uppdatera handler-closure:n. Skyddar mot ett
+  // millisekund-race där non-host tappar Accept "samtidigt" som host:s
+  // lobby-ready-event ankommer.
+  //
+  // ⚠ Deklarerad HÄR, inte nere bland de övriga handler-ref:arna, eftersom
+  // handleApprovePlayAgain nedan sätter .current direkt vid tappet — en
+  // ref som deklareras senare i filen är inte i scope där.
+  const awaitingNewLobbyRef = useRef(awaitingNewLobby);
+  awaitingNewLobbyRef.current = awaitingNewLobby;
 
   // Host-side state: vilka non-hosts har broadcastat sin Approve-tap.
-  // `playAgainApprovals` är en Set av player_id:n. När size === antal
-  // non-hosts i turnOrder, är "Yes, keep them"-knappen i modal:en
-  // upplyst (innan dess är den utgråad).
+  // `playAgainApprovals` är en Set av player_id:n; grinden nedan kräver att
+  // VARJE förväntad approver finns i den (se rematchExpectedApproverIds).
   const [playAgainApprovals, setPlayAgainApprovals] = useState<Set<string>>(
     () => new Set(),
   );
@@ -5406,17 +6707,56 @@ export default function QuizScreen() {
   // Play Again-tap så vi kan rendera disabled state visuellt.
   const [playAgainModalVisible, setPlayAgainModalVisible] = useState(false);
 
+  // ── Pass-the-Phone: vilka ÅSKÅDAR-ENHETER finns i spelet? ───────────────
+  // Host-side set över non-hosts som faktiskt anslutit till quiz_sync och
+  // hälsat (player_rejoined). I PtP spelar de flesta på host:s telefon —
+  // bara den som svarade "Yes" på lobbyns "följ leaderboarden?"-prompt har
+  // en egen enhet — så rostern (turnOrder) säger ingenting om vem som kan
+  // godkänna en re-match. Det här setet gör det.
+  //
+  // ⚠ HIGH-WATER-MARK, inte live-närvaro (Peter 2026-08-26). En spelare
+  // läggs in när deras enhet hälsar och tas bort ENBART av ett explicit
+  // player_left (= medvetet Home-/Leave-tapp). Watchdogen får ALDRIG röra
+  // setet: den kan inte skilja "gick därifrån" från "låste skärmen", och
+  // iOS fryser JS-tråden vid varje skärmlås — en watchdog-borttagning hade
+  // alltså tyst släppt host vidare medan spelaren satt kvar vid bordet.
+  // Kravet är att var och en som är kvar trycker Accept SJÄLV; tystnad får
+  // aldrig räknas som ja. Priset är att en force-quit:ad enhet blockerar
+  // host tills host trycker Home. Det är avsiktligt.
+  const [ptpSpectatorIds, setPtpSpectatorIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  // Har enheten en inloggad QuizVibe-profil? Avgör guest-hostens slutskärm:
+  // inloggad → "Start New Game" (som skapar en VANLIG user-lobby), ej
+  // inloggad → bara Home. Seedas synkront ur profil-spegeln så vi aldrig
+  // renderar fel knapp en frame; `undefined` betyder ohydrerad (inte
+  // utloggad) och faller därför till false tills loadProfile() svarat.
+  const [hostIsRegisteredUser, setHostIsRegisteredUser] = useState(
+    () => !!getCachedProfile(),
+  );
+  useEffect(() => {
+    let cancelled = false;
+    void loadProfile().then((p) => {
+      if (!cancelled) setHostIsRegisteredUser(!!p);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleApprovePlayAgain = () => {
     if (!hostInitiatedPlayAgain) return; // belt-and-suspenders mot disabled tap
     setAwaitingNewLobby(true);
-    // Broadcasta approval-signal till host:s syncChannel så host:s
-    // counter triggas och "Yes, keep them"-knappen kan låsas upp när
-    // alla non-hosts godkänt.
-    if (
-      gameMode === 'individual-devices' &&
-      syncChannelRef.current &&
-      selfPlayerId
-    ) {
+    // Sätt ref:en synkront också — setState-spegeln uppdateras först vid
+    // nästa render, och host:s play_again_lobby_ready kan (teoretiskt) hinna
+    // fram innan dess. Utan detta hade en accepterare kunnat få "Host has
+    // already started a new Game" i stället för att dras med till lobbyn.
+    awaitingNewLobbyRef.current = true;
+    // Broadcasta approval-signal till host:s syncChannel så host:s counter
+    // triggas och Yes-knappen kan låsas upp när alla godkänt. syncActive
+    // (inte bara IndDev): PtP-åskådaren accepterar över samma kanal.
+    if (syncActive && syncChannelRef.current && selfPlayerId) {
       syncChannelRef.current
         .broadcastPlayerApprovedPlayAgain({ player_id: selfPlayerId })
         .catch(() => {});
@@ -5429,6 +6769,11 @@ export default function QuizScreen() {
   //
   // Peter 2026-08-24 (rev 3): slutskärmen ställer EN fråga i taget.
   //
+  // ⚠ Pass-the-Phone OCH single player hoppar över HELA det här flödet
+  //   sedan 2026-08-25 (Peter): host får direkt "Start New Game" + Home. Se
+  //   `rematchQuestionEnabled` / `localStartNewGameReady` i leaderboard-
+  //   grenen. Beskrivningen nedan gäller ENBART Individual Devices.
+  //
   //   Steg 1 — `replayChoice === 'ask'`: bara rubriken "Re-match with
   //     Aggregate Leaderboard?" + inline Yes/No syns. Start New Game
   //     renderas INTE (vi skickar inte in onStartNewGame). Home-raden
@@ -5436,8 +6781,8 @@ export default function QuizScreen() {
   //       · Yes → carry-over-flödet. IndDev: Yes gråas ut med "Waiting for
   //               N of M players to approve" under sig tills alla non-hosts
   //               tryckt "Approve / Re-match"; host tappar Yes igen när den
-  //               tänds → Keep/Reset-prompten. PtP/single: inget att vänta
-  //               in → direkt till Keep/Reset. Läget är alltid
+  //               tänds → Keep/Reset-prompten. Saknas non-hosts helt går
+  //               den direkt till Keep/Reset. Läget är alltid
   //               `previousLocalMode` — en re-match byter aldrig läge.
   //               Ingen ångra-väg: inbjudan är redan utskickad.
   //       · No  → `replayChoice = 'no'`, re-match-blocket försvinner och
@@ -5448,42 +6793,123 @@ export default function QuizScreen() {
   //     Multiplayer Game / Remote Play) → färsk lobby i valt läge. INGA
   //     carry-over-frågor, inga spelare, settings från profilen.
   //
-  // Guest-hostade spel kör SAMMA flöde med två skillnader: Remote Play visas
-  // aldrig (remote 1vs1 är QuizVibe-users-only) och Keep/Reset-settings-
-  // prompten hoppas över (guest-lobbyns settings är låsta). Deras 1-replay-
-  // cap ligger kvar: vid guestReplaysUsed >= 1 renderas ingen "Start New
-  // Game" alls — bara Home, precis som förr.
+  // Guest-hostade spel hoppar över steg 1 helt (de har varken re-match
+  // eller replay) och landar direkt i steg 2 — men bara om enheten är
+  // inloggad; annars visas bara Home. Är de inloggade lämnar Start New Game
+  // dessutom guest-läget: nya lobbyn blir en VANLIG user-lobby, så Remote
+  // Play är med i lägesvalet och credit-gaten gäller.
   const [startNewGameExpanded, setStartNewGameExpanded] = useState(false);
   // Host valde "Yes, same players again" → carry-over av föregående spelare
   // (och, i IndDev, väntan på deras godkännande innan lobbyn får skapas).
   const [rematchInvite, setRematchInvite] = useState(false);
+  // Synkron spegel: player_left-handlern registreras i en effekt med
+  // deps [phase, isLastQuestion] och skulle annars läsa `rematchInvite` som
+  // det såg ut när fasen blev 'leaderboard' — dvs. alltid false.
+  const rematchInviteRef = useRef(rematchInvite);
+  rematchInviteRef.current = rematchInvite;
+  // Engångs-guard så popupen inte staplas när flera spelare lämnar. Behöver
+  // aldrig nollställas: ett spel per quiz.tsx-mount.
+  const rematchDeniedAlertedRef = useRef(false);
   // Host:s svar på re-match-frågan. 'ask' = frågan står uppe (Start New
   // Game är dold), 'no' = host tackade nej → Start New Game tar över.
   const [replayChoice, setReplayChoice] = useState<'ask' | 'no'>('ask');
 
+  // ── Vem måste godkänna re-matchen? ─────────────────────────────────────
+  // HELA rostern, i BÅDA lägen (Peter 2026-08-26). Varje spelare som var med
+  // i det just avslutade spelet måste bekräfta på sin egen enhet — inte bara
+  // de som råkar vara uppkopplade. Är någon inte längre aktiv går det inte
+  // att göra en re-match alls; se `ptpAllPreviousPlayersActive` nedan, som
+  // stänger frågan i stället för att låta host vänta på någon som omöjligt
+  // kan svara.
+  //
+  // Härleds på KOMPONENT-scope (inte i leaderboard-render-blocket) eftersom
+  // handleReplayYes nedan behöver den.
+  const rematchExpectedApproverIds = useMemo(
+    () => turnOrder.slice(1).map((p) => p.id),
+    [turnOrder],
+  );
+  // Har VARJE spelare från förra spelet en levande enhet? Är svaret nej kan
+  // de aldrig godkänna, och då finns ingen re-match att erbjuda — frågan
+  // stängs i stället för att låta host vänta på någon som omöjligt kan svara.
+  //
+  // Lägena mäter samma sak från olika håll, av nödvändighet:
+  //  • PtP    → POSITIVT bevis. De flesta spelar på host:s telefon utan egen
+  //             app uppe, så bara den som valde "Follow leaderboard" finns i
+  //             `ptpSpectatorIds`. Frånvaro därifrån = kan inte godkänna.
+  //  • IndDev → NEGATIVT bevis. Alla non-hosts spelar per definition på egen
+  //             enhet, så utgångsläget är "aktiv"; bara ett explicit
+  //             `player_left` diskvalificerar.
+  //
+  // ⚠ Watchdogen används INTE i någotdera läget. Den kan inte skilja "gick
+  // därifrån" från "låste skärmen", och iOS fryser JS-tråden vid varje
+  // skärmlås — en watchdog-baserad diskvalificering hade tyst dödat
+  // re-matchen för någon som satt kvar med telefonen i fickan.
+  const allPreviousPlayersActive =
+    gameMode === 'pass-the-phone'
+      ? rematchExpectedApproverIds.every((id) => ptpSpectatorIds.has(id))
+      : rematchExpectedApproverIds.every((id) => !leftPlayerIds.has(id));
+  // `every` (inte size >= n): grinden släpper av sig själv om en åskådare
+  // trycker Home efter att räkningen börjat — deras id försvinner ur det
+  // förväntade setet — utan att vi behöver nollställa playAgainApprovals.
+  const rematchAllApproved = rematchExpectedApproverIds.every((id) =>
+    playAgainApprovals.has(id),
+  );
+  const rematchPendingApproverCount = rematchExpectedApproverIds.filter(
+    (id) => !playAgainApprovals.has(id),
+  ).length;
+
+  // Host skickar om inbjudan medan den väntar. Realtime spelar ALDRIG upp
+  // missade broadcasts, och sedan en åskådare ligger kvar i setet oavsett
+  // vad (high-water-mark) skulle en enda tappad play_again_initiated betyda
+  // evig väntan: knappen dyker aldrig upp på deras enhet, och host kan inte
+  // släppas vidare. Omsändningen gör leveransen självläkande — var telefonen
+  // låst, appen bakgrundad eller socketen död när inbjudan först gick ut så
+  // kommer knappen ändå inom ~5 s efter att enheten är tillbaka.
+  useEffect(() => {
+    if (!isHost || !rematchInvite || rematchAllApproved) return;
+    const id = setInterval(() => {
+      syncChannelRef.current
+        ?.broadcastPlayAgainInitiated({ sender_id: selfPlayerId })
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(id);
+  }, [isHost, rematchInvite, rematchAllApproved, selfPlayerId]);
+
+  // En INLOGGAD guest host startar en VANLIG user-lobby härifrån (Peter
+  // 2026-08-26) — de återgår till sin egen identitet. Vill de spela som
+  // gäst igen gör de det från Home. Följden är att credit-gaten gäller.
+  const startNewGameLeavesGuestMode = isGuestHostGame && hostIsRegisteredUser;
+
   const handleLocalStartNewGamePress = async () => {
-    // Guest host har max 1 nytt spel härifrån — knappen renderas inte alls
-    // vid >= 1; detta är belt-and-suspenders mot oväntade call-paths.
-    if (isGuestHostGame && guestReplaysUsed >= 1) return;
     // Andra tappet stänger panelen igen (samma toggle-känsla som Home).
     if (startNewGameExpanded) {
       setStartNewGameExpanded(false);
       return;
     }
     // Credit-gaten först — meningslöst att öppna ett val host inte kan
-    // fullfölja.
-    if (!(await ensureHostCreditsForNewGame())) return;
+    // fullfölja. Nya lobbyn är guest-hostad bara om vi INTE lämnar
+    // guest-läget; annars ska saldot belastas som för vilken user som helst.
+    if (
+      !(await ensureHostCreditsForNewGame({
+        newLobbyIsGuestHosted: isGuestHostGame && !startNewGameLeavesGuestMode,
+      }))
+    )
+      return;
     setStartNewGameExpanded(true);
   };
 
-  /** Sista steget när spelarna bärs över: Keep/Reset-settings-prompten (och
-   *  för guest hosts: hoppa den — guest-lobbyns settings är ändå låsta). */
+  /** Sista steget när spelarna bärs över.
+   *
+   *  ⚠ Keep/Reset-prompten är BORTTAGEN (Peter 2026-08-26): en re-match och
+   *  en replay behåller ALLTID settings, i alla lägen. "Reset" lämnade nya
+   *  rummet utan settings-rad, varpå LobbyScreen seedade gameMode från
+   *  host-PROFILEN — en PtP-re-match kunde alltså tyst återuppstå som
+   *  Individual device (eller tvärtom) i en lobby där Game Mode-väljaren är
+   *  låst och inte kan rättas. I PtP-riktningen försvann dessutom hela
+   *  åskådar-flödet, eftersom LobbyScreens "följ leaderboarden?"-prompt bara
+   *  fyrar när läget faktiskt är Pass-the-Phone. */
   const proceedWithRematch = (lobbyType: LocalLobbyType) => {
-    if (isGuestHostGame) {
-      void goToNewLobby(true, true, undefined, lobbyType);
-      return;
-    }
-    askKeepSettingsThenGo(turnOrder.length === 1, lobbyType);
+    void goToNewLobby(true, true, undefined, lobbyType);
   };
 
   /** "Start New Game": host valde ett läge. Alltid en FÄRSK lobby — inga
@@ -5495,39 +6921,240 @@ export default function QuizScreen() {
       void handleStartNewGameFromFinal('1v1');
       return;
     }
-    void goToNewLobby(false, false, undefined, lobbyType);
+    void goToNewLobby(
+      false,
+      false,
+      undefined,
+      lobbyType,
+      startNewGameLeavesGuestMode,
+    );
+  };
+
+  /**
+   * Första re-matchen i en serie: knyt den till ett SPARAT aggregat på
+   * kontot (migration 0037), så den syns under Player history hos alla
+   * deltagare och kan återupptas en annan kväll.
+   *
+   * Körs bara när serien saknar `leaderboardId`. Identisk för solo och
+   * flerspelar — bara ordvalet skiljer ("Aggregate Score" vs "Aggregate
+   * Leaderboard"). Är någon deltagare gäst (eller servern otillgänglig) blir
+   * det INGEN server-lagring; den lokala serien och lobby-låsningen fungerar
+   * ändå. Fail-open hela vägen — det här får aldrig blockera en re-match.
+   *
+   * Returnerar **false BARA när host aktivt avbröt** (Cancel i listan). Då
+   * ska hela Yes-flödet stoppas — ingen inbjudan skickas ut. Alla andra
+   * utfall returnerar true = fortsätt.
+   */
+  const ensureAggregateLeaderboardAttached = async (): Promise<boolean> => {
+    if (!isHost || isGuestHostGame) return true;
+    const roomCode = params.roomCode?.trim();
+    if (!roomCode) return true;
+    const stored = await loadAggregateSeries();
+    if (stored?.leaderboardId) return true; // redan kopplad — inget att göra
+
+    // ⚠ user_id finns INTE i turnOrder: rowToPlayer läser kolumnen men
+    //   exponerar den aldrig på LobbyPlayer. Vid re-match är gamla rummet
+    //   ännu inte rivet, så vi läser raderna direkt (RLS tillåter det).
+    //   playerName duger inte som nyckel — lobby-namn är host-redigerbara.
+    const rows = await getLobbyPlayerUserIds(roomCode);
+    const byPlayerId = new Map(rows.map((r) => [r.playerId, r]));
+    const userIds: string[] = [];
+    for (const p of turnOrder) {
+      const uid = byPlayerId.get(p.id)?.userId;
+      // Saknat uid = host-tillagd gäst → ingen serverlagring alls.
+      if (!uid) return true;
+      userIds.push(uid);
+    }
+    if (userIds.length === 0) return true;
+
+    const soloSeries = userIds.length <= 1;
+    const label = aggregateLabel(userIds.length);
+
+    // Default-namn: nästa "Marathon N" över host:s ALLA egna sparade serier
+    // (oavsett spelform/uppsättning — en gemensam sekvens). listMy... returnerar
+    // serier host DELTAR i; vi filtrerar på created_by för host:s EGNA.
+    const hostUserId = userIds[0]; // host är turnOrder[0] (id '1')
+    const mine = await listMyAggregateLeaderboards();
+    const defaultName = nextMarathonName(
+      mine.filter((s) => s.createdBy === hostUserId).map((s) => s.name),
+    );
+
+    // Krav 3: frågan ställs BARA när alla i spelet redan har en sparad serie
+    // ihop. Finns ingen skapas den (numera efter namn-prompt).
+    const existing = await findAggregateLeaderboardsFor(userIds);
+    // ⚠ Spelet som just avslutades bokfördes lokalt INNAN serien fanns på
+    //   servern (slutskärmens effekt körde före den här funktionen), så det
+    //   måste skjutas upp här — annars saknar den sparade serien sin första
+    //   omgång för alltid. Skrivningen är idempotent per rumkod, så att ta
+    //   hela den lokala serien är både enklast och säkrast.
+    const pushLocalGames = async (id: string, series: { games: { roomCode: string; players: AggregateGamePlayer[] }[] }) => {
+      for (const g of series.games) {
+        await recordAggregateGame(id, g.roomCode, g.players);
+      }
+    };
+    const attach = async (id: string) => {
+      const saved = await getAggregateLeaderboard(id);
+      const merged = await attachSeriesToLeaderboard(id, saved?.games ?? []);
+      setAggregateLeaderboardId(id);
+      aggregateLeaderboardIdRef.current = id;
+      setAggregateName(saved?.name ?? null);
+      setAggregateParticipantCount(saved?.participants.length ?? userIds.length);
+      await pushLocalGames(id, merged);
+    };
+    const createWithName = async (name: string) => {
+      const id = await createAggregateLeaderboard(name, userIds);
+      if (!id) return;
+      const merged = await attachSeriesToLeaderboard(id, []);
+      setAggregateLeaderboardId(id);
+      aggregateLeaderboardIdRef.current = id;
+      setAggregateName(name);
+      setAggregateParticipantCount(userIds.length);
+      await pushLocalGames(id, merged);
+    };
+
+    // Namn-prompt: löser med det trimmade namnet på Save, null på Cancel.
+    // Fältet förfylls med defaultName varje gång så en återöppning börjar rent.
+    const promptName = (): Promise<string | null> =>
+      new Promise((resolve) => {
+        setAggregateNameText(defaultName);
+        setAggregateNameError(null);
+        aggregateNameResolveRef.current = resolve;
+        setAggregateNamePromptVisible(true);
+      });
+
+    // Inget sparat med denna uppsättning → skapa fresh, men NAMNGE alltid nu.
+    // Ingen tidigare stage → Cancel tar host tillbaka till slutskärmen (Yes/No
+    // kvar).
+    if (existing.length === 0) {
+      const name = await promptName();
+      if (name === null) return false;
+      await createWithName(name);
+      return true;
+    }
+
+    // Det finns sparade serier → "Add to existing?"-Alert. Loop så att en
+    // namn-Cancel återvänder hit (= stadiet strax före "start fresh" trycktes).
+    while (true) {
+      // Alert är callback-baserad — await:a valet så id:t hinner sättas innan
+      // inbjudan broadcastas.
+      const picked = await new Promise<'new' | 'existing'>((resolve) => {
+        Alert.alert(
+          `Add to existing ${label}?`,
+          soloSeries
+            ? 'You already have a saved Marathon Score. Add these games to it, or start a fresh one?'
+            : `You have played together before. Add these games to a saved ${label}, or start a fresh one?`,
+          [
+            { text: 'No, start fresh', style: 'cancel', onPress: () => resolve('new') },
+            { text: 'Yes', onPress: () => resolve('existing') },
+          ],
+          { cancelable: false },
+        );
+      });
+      if (picked === 'new') {
+        // Alert är redan borta (native) → namn-prompt öppnar utan modal-swap.
+        const name = await promptName();
+        if (name === null) continue; // Cancel → åter till Alert
+        await createWithName(name);
+        return true;
+      }
+
+      // picked === 'existing' → pick-listan. Loop så en namn-Cancel återvänder
+      // till LISTAN (inte till Alert:en ovan).
+      // ⚠ Listan visas ALLTID, även vid exakt en träff (Peter 2026-08-26).
+      //   Tidigare auto-kopplades den enda träffen tyst — host fick då aldrig
+      //   se VILKEN serie spelet hamnade i, och hade ingen väg att ångra sig.
+      setSelectedAggregateId(null);
+      while (true) {
+        setPendingAggregatePick(existing);
+        const choice = await new Promise<AggregatePickChoice>((resolve) => {
+          aggregatePickResolveRef.current = resolve;
+        });
+        aggregatePickResolveRef.current = null;
+        if (choice.kind === 'attach') {
+          setPendingAggregatePick(null);
+          await attach(choice.id);
+          return true;
+        }
+        if (choice.kind === 'cancel') {
+          // Cancel: ingenting skapat/kopplat. Host tillbaka på slutskärmen.
+          setPendingAggregatePick(null);
+          return false;
+        }
+        // choice.kind === 'fresh' → swap pick-list-modal → namn-modal.
+        // ⚠ Två RN <Modal> kan inte vara uppe samtidigt (modal-swap-fällan):
+        //   dölj listan, vänta ut fade:n, öppna sedan namn-prompten.
+        setPendingAggregatePick(null);
+        await wait(MODAL_SWAP_DELAY_MS);
+        const name = await promptName();
+        if (name === null) {
+          // Cancel → åter till pick-listan (loopens topp re-visar den efter
+          // fade:n).
+          await wait(MODAL_SWAP_DELAY_MS);
+          continue;
+        }
+        await createWithName(name);
+        return true;
+      }
+    }
+  };
+
+  /** Byter namn på den sparade serien. Optimistisk lokal uppdatering så
+   *  rubriken svarar direkt; misslyckas RPC:n rullas namnet tillbaka. */
+  const handleRenameAggregate = (name: string) => {
+    const id = aggregateLeaderboardId;
+    if (!id) return;
+    const previous = aggregateName;
+    setAggregateName(name);
+    void renameAggregateLeaderboard(id, name).then((ok) => {
+      if (!ok) setAggregateName(previous);
+    });
   };
 
   /** Host svarade **Yes** på re-match-frågan — eller tappade Yes igen när
    *  den tänts efter att alla non-hosts godkänt. Läget är alltid
    *  `previousLocalMode`; en re-match byter aldrig läge. */
   const handleReplayYes = async () => {
-    // Guest host har max 1 re-match — blocket renderas inte alls vid >= 1;
-    // detta är belt-and-suspenders mot oväntade call-paths.
-    if (isGuestHostGame && guestReplaysUsed >= 1) return;
+    // Guest host har varken re-match eller replay (Peter 2026-08-26) —
+    // blocket renderas inte alls för dem; belt-and-suspenders mot
+    // oväntade call-paths.
+    if (isGuestHostGame) return;
     // Andra tappet: inbjudan är redan utfärdad och godkänd (knappen är grå
-    // och otappbar medan väntan pågår) → fortsätt till Keep/Reset.
+    // och otappbar medan väntan pågår) → NU (efter att alla accepterat) ställs
+    // "Add to existing?"/namn-frågan, sedan skapas lobbyn. Cancel i namn-
+    // prompten returnerar false → host stannar kvar med den upplysta Yes:en
+    // och kan tappa igen.
     if (rematchInvite) {
+      if (!(await ensureAggregateLeaderboardAttached())) return;
       proceedWithRematch(previousLocalMode);
       return;
     }
-    if (!(await ensureHostCreditsForNewGame())) return;
-    const totalNonHosts = Math.max(0, turnOrder.length - 1);
-    // Individual Devices: varje spelare måste godkänna på sin egen enhet.
-    // Yes gråas ut med väntestatusen under sig och host tappar den igen när
-    // alla godkänt. `rematchInvite` sätts BARA här — det är den enda vägen
-    // som faktiskt skickar ut en inbjudan, och flaggan göms No-knappen.
-    if (totalNonHosts > 0 && gameMode === 'individual-devices' && syncChannelRef.current) {
+    // ⚠ Ingen "Restart as Guest" här: en guest-hostad re-match-lobby får
+    //   inte existera, och att mitt i en re-match erbjuda en knapp som tyst
+    //   kastar bort både uppställningen och Competition-kedjan vore
+    //   vilseledande. Host får samma Store-fråga som på Home i stället.
+    if (!(await ensureHostCreditsForNewGame({ allowGuestRestart: false })))
+      return;
+    // Varje förväntad approver måste godkänna på sin egen enhet. Yes gråas
+    // ut med väntestatusen under sig och host tappar den igen när alla
+    // godkänt. `rematchInvite` sätts BARA här — det är den enda vägen som
+    // faktiskt skickar ut en inbjudan, och flaggan gömmer No-knappen.
+    // ⚠ Aggregat-frågan (Add to existing?/namn) ställs INTE här — den skulle
+    //   komma innan spelarna hunnit acceptera. Den körs i stället på andra
+    //   tappet ovan, efter att alla godkänt (Peter 2026-08-29). Aggregat-id:t
+    //   behövs först i play_again_lobby_ready (goToNewLobby), inte i
+    //   broadcastPlayAgainInitiated som bara tänder Accept-knappen.
+    if (rematchExpectedApproverIds.length > 0 && syncChannelRef.current) {
       setRematchInvite(true);
       syncChannelRef.current
         .broadcastPlayAgainInitiated({ sender_id: selfPlayerId })
         .catch(() => {});
       return;
     }
-    // Single player + Pass-the-Phone: ingen att vänta in (alla sitter på
-    // samma enhet) → direkt vidare. Sätter MEDVETET inte rematchInvite:
-    // avbryter host Keep/Reset-prompten ska Yes/No-raden stå kvar oförändrad
-    // så No fortfarande går att välja.
+    // Ingen att vänta in → koppla/namnge serien och gå direkt vidare: single
+    // player, IndDev utan kvarvarande non-hosts, eller PtP där ingen följer
+    // leaderboarden på en egen enhet. Sätter MEDVETET inte rematchInvite, så
+    // No fortfarande går att välja om host backar ur i namn-prompten.
+    if (!(await ensureAggregateLeaderboardAttached())) return;
     proceedWithRematch(previousLocalMode);
   };
 
@@ -5546,14 +7173,19 @@ export default function QuizScreen() {
       // Supabase-replikering ännu inte synkat när non-host:s getLobbyPlayers
       // anropas, vilket annars ger ett ny joiner-DATE-id och två DB-rader.
       const carryOverParam = selfPlayerId ? `&carryOverPlayerId=${encodeURIComponent(selfPlayerId)}` : '';
-      router.replace(`/lobby?code=${nextLobbyCode}&isHost=false${carryOverParam}`);
+      // rematchLocked: non-host når den här vägen ENBART via host:s
+      // play_again_lobby_ready, dvs. alltid en re-match — så låst läge
+      // renderas direkt på första framen i stället för efter en DB-läsning.
+      router.replace(
+        `/lobby?code=${nextLobbyCode}&isHost=false${carryOverParam}&rematchLocked=true`,
+      );
     }
   }, [awaitingNewLobby, nextLobbyCode]);
 
   // Refs för broadcast-handlers — captureras av syncChannel-subscribe:n.
   const playAgainInitiatedHandlerRef = useRef<() => void>(() => {});
   const playAgainLobbyReadyHandlerRef = useRef<
-    (code: string, autoJoin?: boolean) => void
+    (code: string, autoJoin?: boolean, aggregateId?: string) => void
   >(() => {});
   const playerApprovedPlayAgainHandlerRef = useRef<(playerId: string) => void>(
     () => {},
@@ -5581,13 +7213,8 @@ export default function QuizScreen() {
   // Host: broadcastar host_rejoined → non-host drainer scores.
   // Non-host: drainer scores direkt + broadcastar player_rejoined.
   const peerReconnectedHandlerRef = useRef<(senderId: string) => void>(() => {});
-  // Synkron mirror av awaitingNewLobby så lobby-ready-handler:n kan
-  // läsa den AKTUELLA värden vid event-ankomst utan att vara beroende
-  // av att useEffect:en hunnit uppdatera handler-closure:n. Skyddar mot
-  // millisekund-race där non-host tappar Approve "samtidigt" som host:s
-  // lobby-ready-event ankommer.
-  const awaitingNewLobbyRef = useRef(awaitingNewLobby);
-  awaitingNewLobbyRef.current = awaitingNewLobby;
+  // (awaitingNewLobbyRef deklareras tillsammans med sitt state längre upp —
+  // handleApprovePlayAgain sätter den synkront och behöver den i scope.)
   // Guard så popup:en "Host has already started"-inte fyrar flera
   // gånger om host av någon anledning broadcastar lobby_ready upprepade
   // gånger.
@@ -5613,9 +7240,24 @@ export default function QuizScreen() {
   }, []);
   useEffect(() => {
     playAgainInitiatedHandlerRef.current = () => {
-      if (!isHost) setHostInitiatedPlayAgain(true);
+      if (isHost) return;
+      setHostInitiatedPlayAgain(true);
+      // Upprop (PtP): hälsa igen så host garanterat har oss i sitt
+      // approver-set. Stänger hålet "alla tre mount-hälsningarna tappades",
+      // där host annars inte vet att vi finns och skulle gå vidare utan att
+      // vänta in vårt Accept. Idempotent hos host — en hälsning som redan
+      // är registrerad ändrar ingenting.
+      if (isPtPSpectator && selfPlayerId) {
+        syncChannelRef.current
+          ?.broadcastPlayerRejoined({ sender_id: selfPlayerId })
+          .catch(() => {});
+      }
     };
-    playAgainLobbyReadyHandlerRef.current = (code: string, autoJoin?: boolean) => {
+    playAgainLobbyReadyHandlerRef.current = (
+      code: string,
+      autoJoin?: boolean,
+      aggregateId?: string,
+    ) => {
       if (isHost) return;
       if (awaitingNewLobbyRef.current || autoJoin) {
         // Non-host har tappat Approve och väntar med lock-overlay —
@@ -5625,6 +7267,16 @@ export default function QuizScreen() {
         // seedad i nya lobbyn så vi följer med UTAN Approve-tap. Sätt
         // awaitingNewLobby=true så navigations-effekten (som kräver båda
         // state-bits) fyrar; no-op om redan satt.
+        // Samma kedje-stämpel som host gör i goToNewLobby — non-host bygger
+        // sin egen Aggregate-serie lokalt ur sina egna score-broadcasts.
+        // Är serien kopplad till ett sparat aggregat följer id:t med, och vi
+        // seedar den lokala serien från servern (RLS släpper in deltagare).
+        void markSeriesContinues(code, aggregateId ?? null);
+        if (aggregateId) {
+          void getAggregateLeaderboard(aggregateId).then((saved) => {
+            if (saved) void attachSeriesToLeaderboard(aggregateId, saved.games);
+          });
+        }
         setAwaitingNewLobby(true);
         setNextLobbyCode(code);
       } else if (!hostStartedWithoutMeAlertedRef.current) {
@@ -5670,7 +7322,7 @@ export default function QuizScreen() {
       if (lobbyDeletedAlertedRef.current) return;
       lobbyDeletedAlertedRef.current = true;
       // Bläddrar spelaren fortfarande i prisutdelnings-sekvensen? Avbryt den
-      // INTE — köa popupen tills de själva lämnar via "Leave summary".
+      // INTE — köa popupen tills de själva lämnar via "Go to Final leaderboard".
       if (celebrationVisibleRef.current) {
         pendingLobbyDeletedRef.current = true;
         return;
@@ -5687,6 +7339,41 @@ export default function QuizScreen() {
       // non-host-sidan; idle non-host:s tap dock påverkar inte ref:en
       // (vi spårar host:s aktivitet, inte vår egen).
       lastHostActivityRef.current = Date.now();
+      // ── PtP-spectator: egen, minimal gren ────────────────────────────
+      // Pingen är spectatorns skyddsnät mot ett tappat question_advance
+      // (Realtime replayar inte). Den behöver bara tre saker: frågesekvensen,
+      // questionIndex och "har spelet tagit slut". IndDev:s heal-logik nedan
+      // (fas-catch-up till 'countdown', timer-/scoring-ref-nollställningar)
+      // får INTE köras här — spectatorn har varken timer eller svars-UI, och
+      // en transition till 'countdown' skulle kasta den ur spectator-vyn.
+      if (isPtPSpectator) {
+        if (allQuestionIds && allQuestionIds.length > 0) {
+          setBroadcastAllQuestionIds(allQuestionIds);
+        }
+        // Har host redan gått vidare (eller till slutskärmen) men vårt
+        // question_advance tappades? Då är buffrade poäng inte längre
+        // hemliga — töm dem här också, annars fastnar de för alltid.
+        if (
+          questionIndexRef.current !== hostQuestionIndex ||
+          hostPhase === 'leaderboard'
+        ) {
+          flushSpectatorScores();
+        }
+        setQuestionIndex((prev) =>
+          prev === hostQuestionIndex ? prev : hostQuestionIndex,
+        );
+        // Turordningen är deterministisk i PtP (fråga N besvaras av spelare
+        // N % antal), så healen kan räkna fram den i stället för att lita på
+        // att varje question_advance kom fram och roterade indexet.
+        if (turnOrder.length > 0) {
+          setCurrentPlayerIndex(hostQuestionIndex % turnOrder.length);
+        }
+        if (hostPhase === 'leaderboard') {
+          setSpectatorGameOver(true);
+          setPhase((current) => (current === 'leaderboard' ? current : 'leaderboard'));
+        }
+        return;
+      }
       // Heal-on-reconnect för GetReady-ikonerna: om broadcastAllQuestionIds
       // fortfarande är null (t.ex. efter mid-game reload) sätter vi den från
       // ping-payloaden. play_command gör samma sak men fyrar bara vid Play-tap.
@@ -5834,6 +7521,15 @@ export default function QuizScreen() {
               persistEpochLedger();
             }
             const code = params.roomCode;
+            // Non-hosts sitter kvar i /quiz (IndDev-spelare, PtP-spectators)
+            // och har inget annat sätt att upptäcka att host avbrutit —
+            // rums-pollingen finns bara i Lobby. Fire FÖRE deactivateRoom så
+            // eventet hinner ut innan vår channel rivs vid unmount.
+            if (isHost && syncActive && code && syncChannelRef.current) {
+              syncChannelRef.current
+                .broadcastLobbyDeleted({ room_code: code })
+                .catch(() => {});
+            }
             if (code) {
               await deactivateRoom(code);
               clearLeftPlayers(code);
@@ -5879,11 +7575,10 @@ export default function QuizScreen() {
               addSessionRecord(shownIds).catch(() => {});
               persistEpochLedger();
             }
-            if (
-              gameMode === 'individual-devices' &&
-              syncChannelRef.current &&
-              selfPlayerId
-            ) {
+            // syncActive (inte bara IndDev): i PtP är detta den enda
+            // signalen som tar bort åskådaren ur host:s approver-set, så en
+            // re-match inte blockeras av någon som redan gått därifrån.
+            if (syncActive && syncChannelRef.current && selfPlayerId) {
               const selfName =
                 turnOrder.find((p) => p.id === selfPlayerId)?.name ?? 'Player';
               syncChannelRef.current
@@ -6009,7 +7704,7 @@ export default function QuizScreen() {
   // är en overlay och inte en ersättande vy (kort version: slutskärmens
   // server-effekter ska inte fördröjas av en animation).
   // Varje enhet äger sin EGEN sekvens: spelaren lämnar den när de vill via
-  // "Leave summary". Ingen broadcast, ingen host-styrning — en host som går
+  // "Go to Final leaderboard". Ingen broadcast, ingen host-styrning — en host som går
   // till Home avbryter alltså inte en non-host som fortfarande bläddrar.
   const [summaryDone, setSummaryDone] = useState(false);
 
@@ -6081,7 +7776,7 @@ export default function QuizScreen() {
   const handleRemoteForfeit = () => {
     Alert.alert(
       'Quit game?',
-      'You give up this 1vs1 match. Your opponent wins by walkover, and the match cannot be resumed.',
+      'You give up this H2H match. Your opponent wins by walkover, and the match cannot be resumed.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -6119,7 +7814,7 @@ export default function QuizScreen() {
   const handleRemoteSaveExit = () => {
     Alert.alert(
       'Save & Exit?',
-      'Your answers so far are saved. Resume this 1vs1 match within 48 hours via "1vs1 Matches" on the Home screen.',
+      'Your answers so far are saved. Resume this H2H match within 48 hours via "H2H Matches" on the Home screen.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -6205,10 +7900,55 @@ export default function QuizScreen() {
   // quiz.tsx-mount; ny instans → nytt Set).
   const receivedRemoteScoreKeysRef = useRef<Set<string>>(new Set());
   const playerScoreRecordedHandlerRef = useRef<(payload: PlayerScoreRecordedPayload) => void>(() => {});
+  const playerHcpChangedHandlerRef = useRef<(payload: PlayerHcpChangedPayload) => void>(() => {});
   // Pending-kö för score-broadcasts som kan ha tappats under offline-period.
   // Broadcasten körs omedelbart + sparas här; vid reconnect skickas alla om.
   // Mottagarsidan deduplicerar via player_id+question_index — omskick är säkert.
   const pendingScoreBroadcastsRef = useRef<PlayerScoreRecordedPayload[]>([]);
+  // Retry-timers för play_command-omsändningarna (se handleHostStartFromGetReady).
+  // Rensas vid ny Play-tap och vid unmount så en host som quittar mitt i
+  // countdown inte sänder in i en riven kanal.
+  const playCommandRetryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // Dito för question_advance. Egen ref (inte delad med play_command) så en
+  // Play-tap aldrig avbryter en pågående advance-omsändning eller tvärtom —
+  // de två kan legitimt överlappa när host trycker Next och sedan Play snabbt.
+  const questionAdvanceRetryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // A1-fix: dito för spotify_dj_handover. En enda fire-and-forget-sändning gick
+  // förlorad om mottagarens kanal hickade → host fastnade permanent i reveal.
+  // Handovern är idempotent (setDjHandedOver(true) upprepat är harmlöst) så
+  // 3× omsändning är säker. Egen ref för samma skäl som ovan.
+  const djHandoverRetryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // A1-fix: host-side timeout som armar "Continue without DJ"-escapen om DJ:ns
+  // handover aldrig anländer.
+  const djHandoverStuckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Senast processade advance på MOTTAGAR-sidan ('end' = spelet slut).
+  // Nollställs aldrig manuellt: ett spel per quiz.tsx-mount, och Play Again
+  // går via ny lobby → ny mount → ny ref.
+  const lastHandledAdvanceRef = useRef<number | 'end' | null>(null);
+  useEffect(
+    () => () => {
+      playCommandRetryTimersRef.current.forEach(clearTimeout);
+      playCommandRetryTimersRef.current = [];
+      questionAdvanceRetryTimersRef.current.forEach(clearTimeout);
+      questionAdvanceRetryTimersRef.current = [];
+      djHandoverRetryTimersRef.current.forEach(clearTimeout);
+      djHandoverRetryTimersRef.current = [];
+      if (djHandoverStuckTimerRef.current) {
+        clearTimeout(djHandoverStuckTimerRef.current);
+        djHandoverStuckTimerRef.current = null;
+      }
+      if (youtubeErrorTimerRef.current) {
+        clearTimeout(youtubeErrorTimerRef.current);
+        youtubeErrorTimerRef.current = null;
+      }
+    },
+    [],
+  );
+  // Throttle för game_sequence_init-svaret på player_rejoined. Sedan IndDev
+  // non-hosts också hälsar (3 hälsningar × N peers inom ~4 s) skulle en
+  // osträngad handler skicka N×3 identiska sändningar av upp till 500
+  // fråge-id:n och slå i Supabase Realtimes rate-limit.
+  const lastSequenceInitSentRef = useRef(0);
   // D-iii: per-peer connection-status. Drivs av två separata signaler:
   //   - watchdog (15s silence från remote sender) → 'disconnected'
   //   - player_rejoined-event (sender:s explicit Retry-tap) → 'connected'
@@ -6227,8 +7967,133 @@ export default function QuizScreen() {
   useEffect(() => {
     turnOrderIdSetRef.current = new Set(turnOrder.map((p) => p.id));
   }, [turnOrder]);
+
+  // Peers som rapporterat `player_ready` (settled + har frågesekvensen).
+  // Set, inte Record — vi behöver bara medlemskap, och Set-identitet byter
+  // först när någon faktiskt tillkommer (handlern bail:ar på dubbletter).
+  const [playerReadyIds, setPlayerReadyIds] = useState<Set<string>>(new Set());
+
+  // Non-host: allt tungt mount-arbete klart OCH host:s frågesekvens mottagen.
+  // Sekvensen ingår med flit — utan den visar GetReady "Waiting for question
+  // data…" och enheten kan inte ens veta vilken fråga som kommer först.
+  const selfReadyToPlay =
+    seenDataLoaded &&
+    epochLedgerLoaded &&
+    audioOverridesLoaded &&
+    (broadcastAllQuestionIds?.length ?? 0) > 0;
+
+  // Skicka `player_ready` när villkoret först uppfylls. Tre sändningar av
+  // samma skäl som hälsningen (Realtime replayar aldrig); `sentRef` gör att
+  // vi inte startar om kedjan vid varje re-render.
+  const playerReadySentRef = useRef(false);
   useEffect(() => {
-    if (gameMode !== 'individual-devices' || !params.roomCode) return;
+    if (isHost || gameMode !== 'individual-devices' || !selfPlayerId) return;
+    if (!selfReadyToPlay || playerReadySentRef.current) return;
+    playerReadySentRef.current = true;
+    const send = () => {
+      syncChannelRef.current?.broadcastPlayerReady({ player_id: selfPlayerId }).catch(() => {});
+    };
+    send();
+    const timers = [setTimeout(send, 1200), setTimeout(send, 3000)];
+    return () => timers.forEach(clearTimeout);
+  }, [isHost, gameMode, selfPlayerId, selfReadyToPlay]);
+
+  // ── IndDev: peer-readiness-gate på host:s Play-knapp (fråga 0) ───────────
+  // Supabase Realtime broadcast replayas ALDRIG till sena subscribers. Host:s
+  // enda play_command går därför förlorad om en non-host inte hunnit subscriba.
+  // Fönstret är reellt: host navigerar till /quiz direkt vid Start Game (utan
+  // att invänta markRoomGameStarted) medan non-host först måste upptäcka
+  // game-started via rooms-postgres_changes eller 2000 ms-poll och sedan göra
+  // flera awaitade round-trips före router.replace('/quiz') — typiskt 1-3 s
+  // efter host, medan host:s Play-knapp är guld och tappbar direkt vid mount.
+  //
+  // Gaten återanvänder befintlig maskineri: non-host hälsar med player_rejoined
+  // vid mount (se shouldAnnouncePresence nedan), host:s onPlayerRejoined-handler
+  // flippar dem till 'connected'. Ingen ny event-typ.
+  //
+  // BARA fråga 0 (Peter 2026-08-26). Från fråga 1 och framåt är status-mapen
+  // redan fylld, och drop-outs mitt i spelet täcks av host:s befintliga
+  // disconnect-Alert i GetReadyIntro.handlePlayPress. Att gate:a varje fråga
+  // skulle låta en spelare som stängt appen blockera resten av gruppen bakom
+  // en 8s-timeout per fråga.
+  //
+  // Förväntade peers = turnOrder minus host-raden. I IndDev har VARJE rad en
+  // egen enhet: host kan inte lägga till gäster manuellt i läget (Lobby alertar
+  // "Own device required"), och type:'guest' betyder anonymt konto — inte
+  // "delar host:s telefon". Filtrera därför INTE på type. Både selfPlayerId och
+  // hostPlayerId filtreras så en legacy-payload utan selfPlayerId inte ger en
+  // fantom-peer som aldrig hälsar.
+  const expectedPeerIds = useMemo(() => {
+    if (gameMode !== 'individual-devices' || !isHost) return [];
+    return turnOrder
+      .map((p) => p.id)
+      .filter((id) => !!id && id !== selfPlayerId && id !== hostPlayerId);
+  }, [gameMode, isHost, turnOrder, selfPlayerId, hostPlayerId]);
+
+  // ⚠ Grinden räknar på `playerReadyIds`, INTE `playerConnectionStatus`.
+  // `player_rejoined` betyder bara "jag är på kanalen" och skickas 300 ms
+  // efter subscribe — mitt i enhetens tyngsta mount-arbete. Släpps Play-
+  // knappen då hamnar AsyncStorage-resolves + gameQuestions-omräkningar mitt
+  // i nedräkningen, som driver iväg additivt, och enheten går in i question-
+  // fasen sent → YouTube-WebView:n börjar boota sent → hörbar eftersläpning.
+  // `player_ready` skickas först när enheten är settled. (Peter 2026-08-26.)
+  //
+  // ⚠ Räkna ALDRIG Object.keys(...).length på någon av map:arna som
+  // readiness-mått. `player_rejoined` registreras via rå channel.on i
+  // syncChannel och går förbi isKnownSender — ett påhittat id kan injicera en
+  // nyckel. Uppslag per FÖRVÄNTAT id läser aldrig främmande nycklar.
+  // (`player_ready` går via onEvent + known(), men håll samma vana.)
+  const unconfirmedPeerCount = expectedPeerIds.filter(
+    (id) => !playerReadyIds.has(id),
+  ).length;
+
+  // Tom expectedPeerIds täcker automatiskt Single Player (turnOrder.length <= 1),
+  // remote-1v1 (turnOrder = bara self) och Pass-the-Phone (gameMode-guarden)
+  // → ingen grind, ingen beteendeändring i de lägena.
+  const startGateApplies =
+    expectedPeerIds.length > 0 && phase === 'intro' && questionIndex === 0;
+
+  // Min-grey + timeout-escape. Speglar Next-knappens 5-sekunderslås: state +
+  // timers i EN effekt vars cleanup river dem. Dep är en BOOLEAN, inte
+  // expectedPeerIds — den arrayen byter identitet när turnOrder parsas om och
+  // skulle starta om min-perioden mitt i väntan.
+  // Ingen manuell reset behövs vid Play Again: carry-over går via ny lobby med
+  // ny rumkod → quiz.tsx mountas om helt och all state nedan är färsk.
+  const [startGateMinGreyDone, setStartGateMinGreyDone] = useState(false);
+  const [startGateTimedOut, setStartGateTimedOut] = useState(false);
+  useEffect(() => {
+    if (!startGateApplies) return;
+    setStartGateMinGreyDone(false);
+    setStartGateTimedOut(false);
+    const minGreyId = setTimeout(
+      () => setStartGateMinGreyDone(true),
+      START_GATE_MIN_GREY_MS,
+    );
+    const escapeId = setTimeout(
+      () => setStartGateTimedOut(true),
+      START_GATE_TIMEOUT_MS,
+    );
+    return () => {
+      clearTimeout(minGreyId);
+      clearTimeout(escapeId);
+    };
+  }, [startGateApplies]);
+
+  // startGateTimedOut är avsiktligt KLIBBIG: när escapen väl fyrat kan D-iii:s
+  // setPlayerConnectionStatus({})-wipe vid lokal unstable→ok-återhämtning inte
+  // låsa knappen igen.
+  const startLocked =
+    startGateApplies &&
+    !startGateTimedOut &&
+    (!startGateMinGreyDone || unconfirmedPeerCount > 0);
+
+  useEffect(() => {
+    // syncActive = IndDev ELLER Pass-the-Phone med fler än en spelare. I PtP
+    // används bara fem event (score, question_advance, game_sequence_init,
+    // host_active_ping, lobby_deleted/play_again_lobby_ready) — övriga
+    // handlers nedan är inerta där eftersom deras AVSÄNDARE är IndDev-gatade.
+    // Undantaget är onPlayerConnectionChange, se dess egen kommentar.
+    if (!syncActive || !params.roomCode) return;
     const sync = subscribeSyncChannel(params.roomCode, selfPlayerId, {
       // Droppar player-id-bärande events vars id inte är i lobbyn. Fail-open
       // tills rostern populerats (undviker false-drop på tidiga events).
@@ -6254,7 +8119,11 @@ export default function QuizScreen() {
         responseSecondsChangedHandlerRef.current(payload.seconds),
       onPlayAgainInitiated: () => playAgainInitiatedHandlerRef.current(),
       onPlayAgainLobbyReady: (payload) =>
-        playAgainLobbyReadyHandlerRef.current(payload.room_code, payload.auto_join),
+        playAgainLobbyReadyHandlerRef.current(
+          payload.room_code,
+          payload.auto_join,
+          payload.aggregate_leaderboard_id,
+        ),
       onPlayerApprovedPlayAgain: (payload) =>
         playerApprovedPlayAgainHandlerRef.current(payload.player_id),
       onLobbyDeleted: () => lobbyDeletedHandlerRef.current(),
@@ -6263,12 +8132,71 @@ export default function QuizScreen() {
       onHostActivePing: (payload) =>
         hostActivePingHandlerRef.current(payload.question_index, payload.all_question_ids, payload.phase),
       onPlayerConnectionChange: (playerId, status) => {
+        // ⚠ MÅSTE vara IndDev-only. Heartbeat + 15s-watchdog startar inuti
+        // subscribeSyncChannel oavsett läge, så utan denna gate skulle
+        // playerConnectionStatus fyllas även i PtP → GetReadyIntro:s
+        // handlePlayPress blockerar host med "Some players seem to have
+        // unstable network" så fort en spectator bakgrundar sin telefon.
+        // I PtP spelar ingen på sin egen enhet; deras uppkoppling får inte
+        // påverka host:s spel.
+        if (gameMode !== 'individual-devices') return;
         setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: status }));
       },
       onPlayerRejoined: (playerId) => {
-        // Explicit Retry-tap från remote spelare → flippa till 'connected'.
-        // Detta är ENDA vägen tillbaka (heartbeat-receipt räcker inte).
-        setPlayerConnectionStatus((prev) => ({ ...prev, [playerId]: 'connected' }));
+        // Pass-the-Phone: hälsningen är hur host får veta att den här
+        // spelaren har en EGEN enhet och därmed kan (och måste) godkänna en
+        // re-match. Enda vägen IN i setet.
+        //
+        // ⚠ Filtrera mot rostern. player_rejoined registreras via rå
+        // channel.on i syncChannel och går förbi isKnownSender — ett påhittat
+        // id hade annars injicerat en approver som aldrig kan godkänna, och
+        // host:s Yes-knapp låst sig för alltid. Filtret utesluter dessutom
+        // värd-tillagda gäster gratis (de sänder aldrig något).
+        if (
+          isHost &&
+          gameMode === 'pass-the-phone' &&
+          playerId !== selfPlayerId &&
+          turnOrderIdSetRef.current.has(playerId)
+        ) {
+          setPtpSpectatorIds((prev) =>
+            prev.has(playerId) ? prev : new Set(prev).add(playerId),
+          );
+        }
+        // Hälsning från remote spelare → flippa till 'connected'. Detta är
+        // ENDA vägen dit (heartbeat-receipt räcker medvetet inte). Avsändare:
+        // explicit Retry-tap, unstable→ok-återhämtning, ELLER mount-hälsningen
+        // (se shouldAnnouncePresence nedan) som driver readiness-gaten.
+        // Bail:a när värdet är oförändrat — mount-hälsningen skickas 3 ggr per
+        // peer, och ett nytt objekt per hälsning gav upp till 33 host-renders
+        // på 4 s i ett 11-spelarspel (varje render kör om liveLeaderboard).
+        setPlayerConnectionStatus((prev) =>
+          prev[playerId] === 'connected' ? prev : { ...prev, [playerId]: 'connected' },
+        );
+        // Svara direkt med frågesekvensen. game_sequence_init skickas annars
+        // BARA vid +800/2500/5000 ms efter host:s egen subscribe — en enhet
+        // som anslöt efter det fönstret (PtP-åskådaren mountar först när
+        // spelaren tryckt "Yes" i lobbyns prompt) får då inga kategori-
+        // ikoner eller badges förrän nästa question_advance, vilket kan
+        // dröja en hel fråga. Idempotent för alla mottagare.
+        //
+        // Throttlad: game_sequence_init är en BROADCAST till alla, så EN
+        // sändning betjänar varje peer. Sedan IndDev non-hosts också hälsar
+        // (3 ggr per peer inom ~4 s) blev det annars N×3 identiska sändningar
+        // av upp till 500 fråge-id:n → Realtime rate-limit. 400 ms är kort nog
+        // att varje peers 300/1500/3500-hälsning får minst en färsk sekvens.
+        if (isHost && syncChannelRef.current) {
+          const nowMs = Date.now();
+          if (nowMs - lastSequenceInitSentRef.current > 400) {
+            lastSequenceInitSentRef.current = nowMs;
+            syncChannelRef.current
+              .broadcastGameSequenceInit({
+                all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+                spotify_answer_year: spotifyAnswerYear,
+                spotify_answer_name: spotifyAnswerName,
+              })
+              .catch(() => {});
+          }
+        }
         // Del 1-fix: om host redan är i countdown/question re-broadcastar vi
         // play_command med 500 ms fördröjning. Fördröjningen krävs för att
         // ge React tid att rendera setStickyUnstableForQuestion(false) i
@@ -6356,11 +8284,21 @@ export default function QuizScreen() {
         setDjHandedOver(true);
       },
       onPlayerScoreRecorded: (payload) => playerScoreRecordedHandlerRef.current(payload),
+      onPlayerHcpChanged: (payload) => playerHcpChangedHandlerRef.current(payload),
       // Cross-player-historik: non-host skickar sin 20-sessions-historik vid
       // quiz-mount. Merge:as ENDAST innan spelet startat (host står i intro
       // på fråga 0) — senare ankomst (t.ex. reconnect-re-broadcast) ignoreras
       // så gameQuestions-useMemo:n aldrig bygger om poolen mitt i ett spel
       // (rebuild skulle byta den aktiva frågan under fötterna på spelarna).
+      // Peer är settled och redo att spela upp frågematerial → släpper host:s
+      // Play-knapp (startLocked). Idempotent: tre sändningar per peer, och
+      // bail:ar på oförändrat Set så host inte re-renderar i onödan.
+      onPlayerReady: (payload) => {
+        if (!isHost) return;
+        setPlayerReadyIds((prev) =>
+          prev.has(payload.player_id) ? prev : new Set(prev).add(payload.player_id),
+        );
+      },
       onPlayerSeenQuestions: (payload) => {
         if (!isHost) return;
         if (phaseRef.current !== 'intro' || questionIndexRef.current !== 0) return;
@@ -6387,8 +8325,10 @@ export default function QuizScreen() {
     // Host: broadcasta hela fråge-sekvensen vid 800ms, 2500ms och 5000ms
     // efter subscribe. Tre sändningar täcker (a) normalt race-fönster,
     // (b) sen subscription, (c) non-host som reloader och subscribar sent.
-    // non-hosts hinner subscriba i sin tur och ta emot eventet.
     // play_command skickar också all_question_ids så dubbelts är ofarligt.
+    // ⚠ Fönstret är INTE en garanti för att non-host hunnit subscriba — det
+    // var just det antagandet som gjorde att host:s enda play_command kunde
+    // gå förlorad. Mount-hälsningen nedan + startLocked är det som täcker det.
     const initBroadcastTimers: ReturnType<typeof setTimeout>[] = [];
     if (isHost) {
       const sendSequence = () => {
@@ -6404,13 +8344,45 @@ export default function QuizScreen() {
       initBroadcastTimers.push(setTimeout(sendSequence, 2500));
       initBroadcastTimers.push(setTimeout(sendSequence, 5000));
     }
+    // player_rejoined ÄR "jag är här"-signalen i det här protokollet; host:s
+    // handler svarar med game_sequence_init direkt. Tre försök av samma skäl
+    // som player_seen_questions: den egna kanalen kan behöva ett ögonblick
+    // på sig att joina innan send går fram.
+    //
+    // TVÅ avsändare, samma grundproblem — en enhet som subscribar efter att
+    // host redan sänt får aldrig se det som sändes (Realtime replayar inte):
+    //
+    //   PtP-åskådaren mountar EFTER host (spelaren måste först svara "Yes" i
+    //     lobbyns prompt), så host:s tre sendSequence-fönster ovan är i regel
+    //     redan passerade. Utan hälsning fick vi vänta på nästa
+    //     question_advance — upp till en hel fråga innan kategori-ikonerna i
+    //     Rounds-baren och badgarna på "Next to answer"-rutan dök upp.
+    //
+    //   IndDev non-host (2026-08-26) mountar 1-3 s efter host och kan därmed
+    //     missa host:s enda play_command HELT → blev kvar i GetReady medan
+    //     host spelade vidare, främst på fråga 1. Hälsningen ger host (a)
+    //     'connected' i playerConnectionStatus, vilket driver readiness-gaten
+    //     på Play-knappen (startLocked), och (b) en återhämtningsväg: är host
+    //     redan i countdown/question re-broadcastas play_command efter 500 ms
+    //     i handlern ovan, så en sent anländande spelare dras in ändå.
+    const shouldAnnouncePresence =
+      !!selfPlayerId &&
+      (isPtPSpectator || (gameMode === 'individual-devices' && !isHost));
+    if (shouldAnnouncePresence) {
+      const sayHello = () => {
+        sync.broadcastPlayerRejoined({ sender_id: selfPlayerId }).catch(() => {});
+      };
+      initBroadcastTimers.push(setTimeout(sayHello, 300));
+      initBroadcastTimers.push(setTimeout(sayHello, 1500));
+      initBroadcastTimers.push(setTimeout(sayHello, 3500));
+    }
 
     return () => {
       initBroadcastTimers.forEach(clearTimeout);
       sync.unsubscribe();
       syncChannelRef.current = null;
     };
-  }, [gameMode, params.roomCode, selfPlayerId, isHost]);
+  }, [syncActive, gameMode, params.roomCode, selfPlayerId, isHost, isPtPSpectator]);
 
   // D-iv: initial-fetch av audio-overrides-mappen från lobby_settings
   // vid mount. Krävs för non-host som joinar mid-session — broadcasten
@@ -6418,7 +8390,12 @@ export default function QuizScreen() {
   // late-join. Host kör samma fetch (idempotent) så pre-existing
   // overrides från carry-over (Play Again) återställs i lokal state.
   useEffect(() => {
-    if (gameMode !== 'individual-devices' || !params.roomCode) return;
+    if (gameMode !== 'individual-devices' || !params.roomCode) {
+      // Inget att vänta in i övriga lägen — flaggan får inte hänga kvar false
+      // och blockera readiness-handskakningen.
+      setAudioOverridesLoaded(true);
+      return;
+    }
     let cancelled = false;
     getPlayerAudioOverrides(params.roomCode)
       .then((map) => {
@@ -6431,7 +8408,11 @@ export default function QuizScreen() {
             : map,
         );
       })
-      .catch(() => {});
+      .catch(() => {})
+      // Även vid nätverksfel: vi väntar inte längre på den här fetchen.
+      .finally(() => {
+        if (!cancelled) setAudioOverridesLoaded(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -6609,10 +8590,119 @@ export default function QuizScreen() {
       <SafeAreaView style={styles.safe}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.md }}>
           <Text style={{ color: Colors.textPrimary, fontSize: FontSize.lg, fontWeight: '600' }}>
-            Preparing 1vs1 match
+            Preparing H2H match
           </Text>
           <SequentialDots color={Colors.warning} />
         </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ── Pass-the-Phone: non-host:s live-spectator-vy ─────────────────────
+  // Spelaren valde "Follow leaderboard" i Lobby:ns "Do you want to follow the Leaderboard
+  // on this device?". Enheten spelar INTE — den visar host:ens progress-block
+  // plus leaderboarden, som uppdateras när host går vidare till nästa fråga
+  // (se flushSpectatorScores för varför den väntar).
+  //
+  // Ligger FÖRE intro/countdown/question-grenarna men släpper igenom
+  // 'leaderboard' till den befintliga grenen nedan, så Final Leaderboard +
+  // prisutdelnings-sekvensen renderas som för alla andra.
+  if (isPtPSpectator && phase !== 'leaderboard') {
+    const spectatorPlayerCount = Math.max(1, turnOrder.length);
+    const spectatorCurrentPlayer = turnOrder[currentPlayerIndex] ?? {
+      id: 'you',
+      name: 'Player',
+      emoji: '👤',
+    };
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.spectatorTopRow}>
+          <Text style={styles.spectatorTitle}>Following the game</Text>
+          <Pressable
+            onPress={handleLeaveGame}
+            style={({ pressed }) => [
+              styles.spectatorLeaveBtn,
+              pressed && { opacity: 0.7 },
+            ]}
+          >
+            <Text style={styles.spectatorLeaveBtnText}>Leave</Text>
+          </Pressable>
+        </View>
+        {/* Samma Rounds/Question-grafik, spelarruta (med kategori- och
+            svarstyps-badge) och spelarkö som host ser i GetReady — enda
+            skillnaden är rubriken "Next to answer:". Återanvänder
+            komponenten i stället för att kopiera JSX så vyerna aldrig
+            glider isär. */}
+        <GetReadyIntro
+          spectator
+          mode={gameMode}
+          currentPlayer={spectatorCurrentPlayer}
+          queue={introQueueData.players}
+          queueRoundNumbers={introQueueData.roundNumbers}
+          queueQuestionNumbers={introQueueData.questionNumbers}
+          currentRound={Math.min(
+            Math.floor(questionIndex / spectatorPlayerCount) + 1,
+            totalRounds,
+          )}
+          totalRounds={totalRounds}
+          currentQuestion={Math.min(questionIndex + 1, totalQuestions)}
+          totalQuestions={totalQuestions}
+          playerCount={spectatorPlayerCount}
+          mediaSourceByQuestion={effectiveMediaSourceByQuestion}
+          categoryByQuestion={effectiveCategoryByQuestion}
+          answerTypeByQuestion={effectiveAnswerTypeByQuestion}
+          eraFrom={eraFrom}
+          eraTo={eraTo}
+          answerResponseSeconds={responseSeconds}
+          // Krävda props som spectator-grenen aldrig når (ingen play-knapp,
+          // inget settings-block) — no-ops i stället för att göra dem
+          // optional och luckra upp kontraktet för host-vyn.
+          onAnswerResponseSecondsChange={() => {}}
+          onReady={() => {}}
+        />
+        <RoundLeaderboard
+          players={gamePlayers}
+          roundScores={currentRoundScores}
+          totalsByPlayerId={gameTotals}
+          // Progress-blocket ovanför bär både runda och fråga, så
+          // komponentens egen "Round X of Y"-underrubrik vore en dublett —
+          // isLastRound=false krävs dock för interimFooter-grenen.
+          roundNumber={Math.min(
+            Math.floor(questionIndex / spectatorPlayerCount) + 1,
+            totalRounds,
+          )}
+          totalRounds={totalRounds}
+          isLastRound={false}
+          isHost={false}
+          // Tabellen fylls på medan värden spelar vidare på sin telefon —
+          // guld LIVE-badge intill rubriken säger att den uppdateras i
+          // realtid och inte är ett slutresultat.
+          liveBadge
+          allRoundScoresHistory={allRoundScoresHistory}
+          interimFooter={
+            // På sista frågan byter pillen till guld: nästa gång host går
+            // vidare är det till Final Leaderboard, inte till ännu en fråga.
+            // Guld = appens "aktiv/upplåst"-vokabulär, så statusen läser som
+            // "något är på väg att hända" i stället för passiv väntan.
+            isLastQuestion ? (
+              <View style={[styles.spectatorWaitPill, styles.spectatorWaitPillFinal]}>
+                <Text
+                  style={[styles.spectatorWaitPillText, styles.spectatorWaitPillTextFinal]}
+                >
+                  Last question - Final leaderboard
+                </Text>
+                <SequentialDots color={Colors.warning} />
+              </View>
+            ) : (
+              <View style={styles.spectatorWaitPill}>
+                <Text style={styles.spectatorWaitPillText}>
+                  Answers are given on the Host device
+                </Text>
+                <SequentialDots color={Colors.textSecondary} />
+              </View>
+            )
+          }
+        />
       </SafeAreaView>
     );
   }
@@ -6630,31 +8720,18 @@ export default function QuizScreen() {
     const playerCount = Math.max(1, turnOrder.length);
     const currentRound = Math.floor(questionIndex / playerCount) + 1;
     const currentQuestion = questionIndex + 1;
-    // Kö-spelarnas runda och fråge-nummer räknas på den absoluta
-    // question-positionen där just den spelaren faktiskt får sin tur
-    // (questionIndex + 1 + i, 0-baserat). Cap:a på totalQuestions så
-    // wrap-around-spelare i sista rundan som aldrig hinner spela försvinner
-    // från listan helt — annars hade vi visat siffror som overshootar.
-    // Alla tre arrays slicas parallellt så indexen håller ihop.
-    const queueWithCounts = queue
-      .map((p, i) => {
-        const absoluteQuestion0 = questionIndex + 1 + i; // 0-baserat
-        return {
-          player: p,
-          round: Math.floor(absoluteQuestion0 / playerCount) + 1,
-          question: absoluteQuestion0 + 1, // 1-baserat
-          withinBudget: absoluteQuestion0 < totalQuestions,
-        };
-      })
-      .filter((entry) => entry.withinBudget);
-    const introQueue = queueWithCounts.map((entry) => entry.player);
-    const queueRoundNumbers = queueWithCounts.map((entry) => entry.round);
-    const queueQuestionNumbers = queueWithCounts.map((entry) => entry.question);
+    const introQueue = introQueueData.players;
+    const queueRoundNumbers = introQueueData.roundNumbers;
+    const queueQuestionNumbers = introQueueData.questionNumbers;
     // Answer response time får BARA ändras vid round-boundary i Pass-the-
     // Phone-läget — dvs när nästa spelare = första i turordningen
     // (currentPlayerIndex === 0 = alla har svarat lika många gånger).
-    // Individual Devices skippar intro mellan ronder så där är det alltid
-    // adjustable när intro visas (typiskt bara vid game start).
+    // Individual Devices har INGEN spelarrotation (currentPlayerIndex står
+    // still på 0), så villkoret är alltid falskt där → alltid adjustable.
+    // ⚠ IndDev visar intro mellan VARJE fråga precis som PtP —
+    // handleAdvanceToNextRound sätter phase='intro' ovillkorligt; bara
+    // currentPlayerIndex-rotationen är PtP-gatad. Host trycker alltså Play
+    // en gång per fråga i båda lägena.
     const responseSecondsLocked =
       gameMode === 'pass-the-phone' && currentPlayerIndex !== 0;
     // Pre-decode kommande image-fråga genom att mounta osynlig <Image>
@@ -6764,6 +8841,10 @@ export default function QuizScreen() {
             : undefined
         }
         isHost={isHost}
+        // IndDev fråga 0: håll Play-knappen grå tills varje förväntad peer
+        // bekräftat att de är i quizet (se startGateApplies-blocket).
+        startLocked={startLocked}
+        startGateUnconfirmedCount={startGateApplies ? unconfirmedPeerCount : 0}
         // LOKALA lägen: host får Quit Game (river rummet); non-host får
         // Leave Game (lämnar bara egen plats). Båda går ALDRIG via samma
         // codepath för cleanup eftersom non-host inte ska avsluta spelet
@@ -6781,13 +8862,16 @@ export default function QuizScreen() {
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
-      {/* Ambient-slinga fortsätter sömlöst från Lobby-ljud under GetReady — ingen pulsering.
-          Grindas ENBART på isAudioMutedForSelf, precis som appens tre övriga
-          ljudkällor: den memon kodar redan hela policyn per läge (PtP alltid
-          på, remote lokalt, IndDev via override med host=on/non-host=off som
-          default). Ett extra isHost-villkor här skulle göra en non-host som
-          slagit på sitt ljud halvt tyst. */}
-      {!isAudioMutedForSelf && <MorseAmbientSound />}
+      {/* Ambient-slingan tas upp under GetReady — men FÖRST efter ~5 s tystnad
+          när man just kommit in från lobbyn (ambientReady, se quiz-mount-
+          effekten). Grindas i övrigt ENBART på isAudioMutedForSelf, precis som
+          appens tre andra ljudkällor: den memon kodar redan hela policyn per
+          läge (PtP alltid på, remote lokalt, IndDev via override med host=on/
+          non-host=off som default). Ett extra isHost-villkor här skulle göra en
+          non-host som slagit på sitt ljud halvt tyst. Komponenten hålls
+          monterad och styrs via active-proppen så fördröjningen bara är tystnad,
+          inte en teardown (som klickar i högtalaren). */}
+      {!isAudioMutedForSelf && <MorseAmbientSound active={ambientReady} />}
       </View>
     );
   }
@@ -6816,6 +8900,12 @@ export default function QuizScreen() {
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
+      {/* ⚠ Samma barn-POSITION som i intro-grenen ovan (index 2 under samma
+          touchWrap-View), så React återanvänder instansen i stället för att
+          riva den vid fasbytet. `active={false}` tonar då ut slingan mjukt.
+          Renderas den inte här — eller på annan position — är vi tillbaka i
+          den hårda WebView-teardownen som klickade i högtalaren. */}
+      {!isAudioMutedForSelf && <MorseAmbientSound active={false} />}
       </View>
     );
   }
@@ -6825,27 +8915,120 @@ export default function QuizScreen() {
   // läggs den inuti parent-scroll:n följer footer:n med upp när användaren
   // scrollar och blir inte längre alltid synlig.
   if (phase === 'leaderboard') {
-    // Lokalt spel (ej remote): host:s Play Again ersätts av Home:s gula
-    // "Start New Game" med invite-frågan före lägesvalet. Guest hosts ingår,
-    // men bara på sin enda tillåtna omgång — vid guestReplaysUsed >= 1
-    // faller de igenom till RoundLeaderboard:s "bara Home"-gren som förr.
+    // Lokalt spel (ej remote) där host kan erbjuda en re-match.
+    //
+    // ⚠ GUEST HOST HAR VARKEN RE-MATCH ELLER REPLAY (Peter 2026-08-26) — i
+    // något läge, oavsett om enheten är inloggad. Det ersätter det tidigare
+    // 1-replay-taket (guestReplaysUsed), som byggde på motsatt antagande.
+    // Deras slutskärm blir i stället: inloggad → bara "Start New Game",
+    // ej inloggad → bara Home. Se localStartNewGameReady nedan.
     const localRematchFlow =
+      isLastQuestion && isHost && !isRemote && !isGuestHostGame;
+    // Bara den som faktiskt har en egen enhet kan godkänna. I IndDev är det
+    // hela rostern, i PtP de åskådare som anslutit. Härleds på komponent-
+    // scope (rematchExpectedApproverIds) eftersom handleReplayYes behöver den.
+    const rematchNeedsApproval =
+      rematchInvite && syncActive && rematchExpectedApproverIds.length > 0;
+    // ⚠ PtP-MULTIPLAYER kräver att ALLA deltagare är registrerade QuizVibe-
+    // users (Peter 2026-08-26). Finns en enda gäst — värd-tillagd via
+    // "+ Add Player" eller självansluten anon — visas ingen re-match-fråga.
+    // Det är det som upphäver den gamla invändningen "host kan lägga till
+    // gäster utan egen enhet, som aldrig kan godkänna": sådana spel är helt
+    // enkelt inte behöriga. Bonus: alla deltagare har då user_id, så
+    // Competition-serien blir server-sparad i stället för lokal-bara.
+    //
+    // Fail-open på `type === undefined` (`=== 'guest'`, inte
+    // `!== 'registered'`): fältet är optional, och en tyst borttappad type
+    // ska hellre släppa igenom en gäst — där degraderar bara server-
+    // lagringen — än tyst döda re-match för ett legitimt spel.
+    //
+    // ⚠ isLocalSoloGame MÅSTE stå först. Single player är
+    // `singlePlayerDefault: true` OVANPÅ ett vanligt läge, så ett solospel
+    // bär oftast gameMode='pass-the-phone' (profil-defaulten) — en naken
+    // gameMode-check slog ut solo också och frågan syntes aldrig (bugg
+    // 2026-08-26). Undantaget gäller PtP-MULTIPLAYER, inte gameMode i sig.
+    //
+    // ⚠ ANDRA villkoret gäller BÅDA lägen (Peter 2026-08-26): varje spelare
+    // från förra spelet måste ha en levande enhet. Saknas en enda kan hen
+    // aldrig godkänna, och då är en re-match omöjlig — frågan visas inte
+    // alls och host får i stället en grå förklaringsrad ovanför "Start New
+    // Game". Följd, avsedd: lämnar någon medan host väntar retras frågan
+    // mitt i flödet. Det är ärligare än att låta hostens Yes stå grå för
+    // alltid, vilket är exakt vad IndDev gjorde innan den här regeln.
+    //
+    // Gäst-villkoret är däremot PtP-only — IndDev tillåter inte
+    // värd-tillagda gäster i spelet över huvud taget.
+    const rematchBlocked =
+      !isLocalSoloGame &&
+      ((gameMode === 'pass-the-phone' &&
+        turnOrder.some((p) => p.type === 'guest')) ||
+        !allPreviousPlayersActive);
+    const rematchQuestionEnabled = localRematchFlow && !rematchBlocked;
+    // Kan det här spelet ÖVER HUVUD TAGET producera en re-match-inbjudan?
+    //
+    // Beräknas ur data som ALLA enheter har (`turnOrder` + params), så en
+    // åskådare kan veta att ingen inbjudan kommer. Utan den fick de den
+    // dimmade "Accept / Re-match"-platshållaren med badgen "Activated by
+    // Host" — en knapp som aldrig kan tändas, eftersom host:s gäst-gate
+    // aldrig släpper fram frågan. `homeOnlyFooter` gjorde det jobbet förr
+    // men var för trubbig (den gällde ALLA PtP-åskådare); det här är samma
+    // skydd, men bara i de spel där re-match faktiskt är omöjlig.
+    //
+    // ⚠ Inkluderar MEDVETET inte `allPreviousPlayersActive` — den bygger på
+    // `ptpSpectatorIds`, som bara host har. En åskådare kan alltså inte veta
+    // att någon ANNAN saknar enhet, och ska då fortsätta visa den dimmade
+    // knappen: host kan mycket väl skicka inbjudan.
+    const rematchImpossibleForGame =
+      isGuestHostGame ||
+      (!isLocalSoloGame &&
+        gameMode === 'pass-the-phone' &&
+        turnOrder.some((p) => p.type === 'guest'));
+    // Grå förklaringsrad ovanför "Start New Game" när re-match inte går att
+    // erbjuda. Utan den ser det bara ut som att funktionen saknas.
+    //
+    // ⚠ ORDNINGEN är betydelsebärande: gäst-fallet testas FÖRE aktiv-fallet.
+    // Ett PtP-spel med gäster faller nämligen på BÅDA (en gäst kopplar aldrig
+    // upp sig och kan därför aldrig bli "aktiv"), och då är gäst-skälet det
+    // sanna och begripliga — "not all players are active" hade fått det att
+    // låta som att någon gick därifrån.
+    //
+    // Explicit radbrytning i alla texter (Peter 2026-08-26): rubrikraden för
+    // sig, förklaringen under. `guestReplayNote` är centrerad, så båda
+    // raderna centreras.
+    const rematchUnavailableNote = ((): string | undefined => {
+      if (!isLastQuestion || !isHost || isRemote) return undefined;
+      // Guest host: varken re-match eller replay finns för dem, i något läge.
+      if (isGuestHostGame) return 'No re-match possible for Guest Host';
+      if (isLocalSoloGame) return undefined;
+      if (
+        gameMode === 'pass-the-phone' &&
+        turnOrder.some((p) => p.type === 'guest')
+      )
+        return 'No re-match possible —\nGame includes a Guest player';
+      if (!allPreviousPlayersActive)
+        return (
+          'No re-match possible —\n' +
+          'Not all players from the previous game are active any longer'
+        );
+      return undefined;
+    })();
+    // Frågans rubrik: solo aggregerar en SCORE (en spelare), flerspelar en
+    // LEADERBOARD. Kan inte använda aggregateLabel() — serien finns inte än.
+    const replayTitle = isLocalSoloGame
+      ? 'Replay & Marathon score?'
+      : 'Re-match with Marathon table?';
+    // "Start New Game" visas när det inte finns någon re-match-fråga att
+    // besvara (guest host, eller ett obehörigt PtP-spel), och annars först
+    // när host svarat No. Guest host får den BARA om enheten är inloggad —
+    // en ej inloggad guest host faller igenom till RoundLeaderboards
+    // "bara Home"-gren.
+    const localStartNewGameReady =
       isLastQuestion &&
       isHost &&
       !isRemote &&
-      !(isGuestHostGame && guestReplaysUsed >= 1);
-    const rematchTotalNonHosts = Math.max(0, turnOrder.length - 1);
-    const rematchAllApproved =
-      rematchTotalNonHosts === 0 ||
-      playAgainApprovals.size >= rematchTotalNonHosts;
-    // Bara Individual Devices behöver godkännande — i Pass-the-Phone sitter
-    // alla på samma enhet och det finns ingen att vänta in.
-    const rematchNeedsApproval =
-      rematchInvite &&
-      gameMode === 'individual-devices' &&
-      rematchTotalNonHosts > 0;
-    const rematchWaitingCount =
-      rematchTotalNonHosts - playAgainApprovals.size;
+      (isGuestHostGame
+        ? hostIsRegisteredUser
+        : !rematchQuestionEnabled || replayChoice === 'no');
     return (
       <SafeAreaView style={styles.safe} onTouchStart={signalHostActivity}>
         {inactivityCountdownSec !== null && (
@@ -6871,7 +9054,32 @@ export default function QuizScreen() {
           guestHost={isGuestHostGame || isRemote}
           guestReplaysUsed={isRemote ? 1 : guestReplaysUsed}
           hostInitiatedPlayAgain={hostInitiatedPlayAgain}
+          // PtP-åskådaren får samma footer som en IndDev-non-host: den
+          // dimmade "Accept / Re-match" med badgen "Activated by Host", som
+          // tänds guld när host bjuder in (Peter 2026-08-26). Den gamla
+          // homeOnlyFooter-propen är borta — ett guest-hostat spel faller
+          // ändå till Home-only via guestHost-klausulen, eftersom hosten där
+          // aldrig kan bjuda in.
           allRoundScoresHistory={allRoundScoresHistory}
+          // Andra sidan på slutskärmen: hela re-match-serien sammanslagen.
+          // Renderas bara när serien har mer än ett spel — annars är
+          // slutskärmen oförändrad.
+          // ⚠ Propen hör hemma HÄR, på blocket med isLastRound={isLastQuestion}
+          //   — inte på PtP-spectatorns interim-vy ovan, som har
+          //   isLastRound={false} hårdkodat och därför aldrig kan visa
+          //   aggregatet. Ankra framtida edits på isLastRound, inte på
+          //   allRoundScoresHistory (som finns på BÅDA anropen).
+          aggregate={aggregate ?? undefined}
+          aggregateName={aggregateName}
+          // Pennan bara för host: namnet syns för ALLA deltagare på deras
+          // Profile, så det ska vara host:s val. RPC:n guardar bara på
+          // "deltagare" — servern kan inte veta vem som är host just nu.
+          onRenameAggregate={
+            isHost && aggregateLeaderboardId ? handleRenameAggregate : undefined
+          }
+          // Wifi-kolumnen är bara meningsfull i Individual Devices, där alla
+          // svarar på varje fråga. PtP/single/remote → alltid "—".
+          trackConnectionErrors={connectionErrorsApplicable}
           hcpChanges={isLastQuestion ? playerHcpChanges : undefined}
           remote1v1={isRemote}
           // Remote 1v1: gold "Start New Game" + Local/Remote-utfällning
@@ -6885,7 +9093,7 @@ export default function QuizScreen() {
           onStartNewGame={
             isRemote && isLastQuestion && !isGuestHostGame
               ? handleStartNewGameFromFinal
-              : localRematchFlow && replayChoice === 'no'
+              : localStartNewGameReady
                 ? handleLocalStartNewGameSelect
                 : undefined
           }
@@ -6893,40 +9101,42 @@ export default function QuizScreen() {
           // invite-frågan ställs först EFTER valet, så panelens öppet-läge
           // ägs här.
           onStartNewGamePress={
-            localRematchFlow && replayChoice === 'no'
-              ? handleLocalStartNewGamePress
-              : undefined
+            localStartNewGameReady ? handleLocalStartNewGamePress : undefined
           }
           startNewGameExpanded={
-            localRematchFlow && replayChoice === 'no'
-              ? startNewGameExpanded
-              : undefined
+            localStartNewGameReady ? startNewGameExpanded : undefined
           }
           // Re-match-frågan (rubrik + Yes/No) — slutskärmens FÖRSTA steg.
-          // Försvinner så fort host svarat No; localRematchFlow bär redan
-          // guest-hostens 1-re-match-cap, så på omgång 2 visas varken den
-          // eller Start New Game — bara Home.
+          // Försvinner så fort host svarat No. Guest hosts får den aldrig
+          // (localRematchFlow utesluter dem), och inte heller ett PtP-spel
+          // med minst en gäst i uppställningen (ptpRematchBlocked).
           onReplayYes={
-            localRematchFlow && replayChoice === 'ask'
+            rematchQuestionEnabled && replayChoice === 'ask'
               ? handleReplayYes
               : undefined
           }
+          replayTitle={replayTitle}
           onReplayNo={handleReplayNo}
           replayAnswered={rematchInvite}
           replayLocked={
             localRematchFlow && rematchNeedsApproval && !rematchAllApproved
           }
+          // ⚠ Ingen "Start anyway" här (Peter 2026-08-26): var och en som är
+          // kvar måste acceptera själv. Hostens utväg om någon aldrig
+          // svarar är Home, som raderar lobbyn och skickar alla hem.
           onReplayLockedPress={() =>
             Alert.alert(
               'Waiting for players',
-              'The new lobby opens as soon as every player has approved the re-match. Tap Yes again when they have.',
+              'The new lobby opens as soon as every player has accepted the re-match. Tap Yes again when they have.',
             )
           }
-          // Guest host: Remote Play visas ALDRIG — remote 1vs1 spelas enbart
-          // mellan QuizVibe-users. För registrerade hosts står den ALLTID
-          // kvar: "Start New Game" bär sedan 2026-08-24 aldrig över spelare,
-          // så det finns inget carry-over som krockar med en duell.
-          hideRemotePlay={localRematchFlow && isGuestHostGame}
+          // Remote Play visas ALDRIG för en guest host — remote 1vs1 spelas
+          // enbart mellan QuizVibe-users. Men en INLOGGAD guest host lämnar
+          // guest-läget när de trycker Start New Game (nya lobbyn blir en
+          // vanlig user-lobby), så då ska raden vara med.
+          hideRemotePlay={isGuestHostGame && !startNewGameLeavesGuestMode}
+          rematchUnavailableNote={rematchUnavailableNote}
+          rematchImpossible={rematchImpossibleForGame}
           replayNote={
             localRematchFlow && rematchNeedsApproval ? (
               rematchAllApproved ? (
@@ -6936,9 +9146,12 @@ export default function QuizScreen() {
               ) : (
                 <View style={styles.playAgainModalStatusWaitingRow}>
                   <Text style={styles.playAgainModalStatusWaitingText}>
-                    Waiting for {rematchWaitingCount} of {rematchTotalNonHosts}{' '}
-                    {rematchTotalNonHosts === 1 ? 'player' : 'players'} to
-                    approve
+                    Waiting for {rematchPendingApproverCount} of{' '}
+                    {rematchExpectedApproverIds.length}{' '}
+                    {rematchExpectedApproverIds.length === 1
+                      ? 'player'
+                      : 'players'}{' '}
+                    to accept
                   </Text>
                   <SequentialDots color={Colors.textSecondary} />
                 </View>
@@ -6978,7 +9191,13 @@ export default function QuizScreen() {
             även MELLAN ronder via footerns "Next Round →"-gren, och där ska
             ingen prisutdelning fyra. */}
         {isLastQuestion && !summaryDone && (
-          <FinalCelebration highlights={matchHighlights} onDone={handleSummaryDone} />
+          <FinalCelebration
+            highlights={matchHighlights}
+            onDone={handleSummaryDone}
+            // Sprakljudet under Q-ritningen. Grindas ENBART på
+            // isAudioMutedForSelf, precis som appens övriga ljudkällor.
+            muted={isAudioMutedForSelf}
+          />
         )}
         {/* Lock-overlay för non-host som tappat Approve Play Again men där
             host ännu inte hunnit skapa nya lobbyn. cancelable: false →
@@ -7001,6 +9220,198 @@ export default function QuizScreen() {
               </View>
             </View>
           </View>
+        </Modal>
+
+        {/* "Add to existing"-listan när det finns FLERA sparade serier med
+            exakt denna spelaruppsättning. Host väljer vilken som ska fyllas
+            på; Cancel skapar en ny i stället. Promisen i
+            ensureAggregateLeaderboardAttached väntar på valet, så id:t hinner
+            med i inbjudan till non-hosts. */}
+        <Modal
+          visible={pendingAggregatePick !== null}
+          transparent
+          animationType="fade"
+          onRequestClose={() =>
+            aggregatePickResolveRef.current?.({ kind: 'cancel' })
+          }
+        >
+          <View style={styles.playAgainModalOverlay}>
+            <View style={styles.playAgainModalCard}>
+              <Text style={styles.playAgainModalTitle}>
+                Pick {aggregateLabel(turnOrder.length)}
+              </Text>
+              <Text style={styles.playAgainModalBody}>
+                These games will be added to the one you choose.
+              </Text>
+              <ScrollView style={{ maxHeight: 260, alignSelf: 'stretch' }}>
+                {(pendingAggregatePick ?? []).map((item) => {
+                  const selected = selectedAggregateId === item.id;
+                  return (
+                    <Pressable
+                      key={item.id}
+                      onPress={() => setSelectedAggregateId(item.id)}
+                      style={({ pressed }) => [
+                        styles.aggregatePickRow,
+                        selected && styles.aggregatePickRowSelected,
+                        pressed && { opacity: 0.8 },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.aggregatePickName,
+                          selected && styles.aggregatePickNameSelected,
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {item.name}
+                      </Text>
+                      <Text style={styles.aggregatePickMeta}>
+                        {item.gamesCount}{' '}
+                        {item.gamesCount === 1 ? 'game' : 'games'}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+              {/* Steg 2: Confirm tänds först när en rad är markerad. Grått
+                  läge = appens "inte tillgängligt ännu"-vokabulär (samma som
+                  låst Start New Game), inte "fel". */}
+              <Pressable
+                onPress={() => {
+                  if (!selectedAggregateId) return;
+                  aggregatePickResolveRef.current?.({
+                    kind: 'attach',
+                    id: selectedAggregateId,
+                  });
+                }}
+                style={({ pressed }) => [
+                  styles.aggregateConfirmBtn,
+                  !selectedAggregateId && styles.aggregateConfirmBtnLocked,
+                  selectedAggregateId && pressed && { opacity: 0.85 },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.aggregateConfirmBtnText,
+                    !selectedAggregateId && styles.aggregateConfirmBtnTextLocked,
+                  ]}
+                >
+                  Confirm
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() =>
+                  aggregatePickResolveRef.current?.({ kind: 'fresh' })
+                }
+                style={({ pressed }) => [
+                  styles.playAgainModalCancel,
+                  pressed && { opacity: 0.8 },
+                ]}
+              >
+                <Text style={styles.playAgainModalCancelText}>
+                  Start a fresh one
+                </Text>
+              </Pressable>
+              {/* Cancel är INTE samma sak som "fresh": här skapas ingenting
+                  och host är tillbaka på slutskärmen med Yes/No kvar. */}
+              <Pressable
+                onPress={() =>
+                  aggregatePickResolveRef.current?.({ kind: 'cancel' })
+                }
+                style={({ pressed }) => [
+                  styles.playAgainModalCancel,
+                  { borderColor: 'transparent' },
+                  pressed && { opacity: 0.7 },
+                ]}
+              >
+                <Text style={styles.playAgainModalCancelText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Namn-prompt för en NY Marathon (Peter 2026-08-29). Öppnas av
+            ensureAggregateLeaderboardAttached på varje fresh-create; förfylls
+            med nästa "Marathon N". Save löser promisen med namnet, Cancel med
+            null (→ tillbaka till stadiet före "start fresh"). Speglar
+            RoundLeaderboards rename-sheet (KeyboardAvoidingView + TextInput). */}
+        <Modal
+          visible={aggregateNamePromptVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => {
+            setAggregateNamePromptVisible(false);
+            const r = aggregateNameResolveRef.current;
+            aggregateNameResolveRef.current = null;
+            r?.(null);
+          }}
+        >
+          <KeyboardAvoidingView
+            style={styles.playAgainModalOverlay}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          >
+            <View style={styles.playAgainModalCard}>
+              <Text style={styles.playAgainModalTitle}>
+                Please name this new {aggregateLabel(turnOrder.length)}
+              </Text>
+              <TextInput
+                style={styles.aggregateNameInput}
+                value={aggregateNameText}
+                onChangeText={(t) => {
+                  setAggregateNameText(t);
+                  if (aggregateNameError) setAggregateNameError(null);
+                }}
+                placeholder="e.g. Marathon 1"
+                placeholderTextColor={Colors.textDisabled}
+                maxLength={40}
+                returnKeyType="done"
+                autoFocus
+              />
+              {!!aggregateNameError && (
+                <Text style={styles.aggregateNameError}>
+                  {aggregateNameError}
+                </Text>
+              )}
+              <Pressable
+                onPress={() => {
+                  const next = aggregateNameText.trim();
+                  if (!next) {
+                    setAggregateNameError('Give it a name first.');
+                    return;
+                  }
+                  if (containsProfanity(next)) {
+                    setAggregateNameError('Please choose a different name.');
+                    return;
+                  }
+                  setAggregateNamePromptVisible(false);
+                  const r = aggregateNameResolveRef.current;
+                  aggregateNameResolveRef.current = null;
+                  r?.(next);
+                }}
+                style={({ pressed }) => [
+                  styles.aggregateConfirmBtn,
+                  pressed && { opacity: 0.85 },
+                ]}
+              >
+                <Text style={styles.aggregateConfirmBtnText}>Save</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  setAggregateNamePromptVisible(false);
+                  const r = aggregateNameResolveRef.current;
+                  aggregateNameResolveRef.current = null;
+                  r?.(null);
+                }}
+                style={({ pressed }) => [
+                  styles.playAgainModalCancel,
+                  { borderColor: 'transparent' },
+                  pressed && { opacity: 0.7 },
+                ]}
+              >
+                <Text style={styles.playAgainModalCancelText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </KeyboardAvoidingView>
         </Modal>
 
         {/* ⚠ DORMANT sedan 2026-08-08 — öppnas bara av `handlePlayAgain`,
@@ -7282,7 +9693,7 @@ export default function QuizScreen() {
                   })()}
                   isRevealed={phase === 'reveal'}
                   hintsActive={hintsReady}
-                  mosaicActive={timerActive}
+                  mosaicActive={mosaicRunning}
                   hintsSeed={seedForRemoteQuestion(question.id)}
                 />
               </View>
@@ -7294,7 +9705,7 @@ export default function QuizScreen() {
               </View>
             ) : (
               <MediaPlayer
-                source={mediaSource}
+                source={effectiveMediaSource}
                 isPlaying={
                   phase === 'question' ||
                   phase === 'awaiting' ||
@@ -7479,29 +9890,21 @@ export default function QuizScreen() {
             </View>
 
             {/* 2-decimal countdown under timer-bar:en. Döljs för DJ på Spotify-
-                frågor — DJ svarar inte och har ingen svarstid att visa. */}
-            {!(isSpotifyQuestion && isCurrentPlayerDJ) && <View style={styles.decimalTimerWrap}>
-              <Animated.View
-                pointerEvents="none"
-                style={[
-                  styles.decimalTimerHalo,
-                  { backgroundColor: timerColor, opacity: timerRingGlow },
-                ]}
+                frågor — DJ svarar inte och har ingen svarstid att visa.
+                B1: tickandet är isolerat i AnswerStopwatch (self-ticking memo)
+                så det inte re-renderar hela quiz-trädet 20×/sek. */}
+            {!(isSpotifyQuestion && isCurrentPlayerDJ) && (
+              <AnswerStopwatch
+                live={phase === 'question' && timerActive}
+                startMsRef={questionStartMsRef}
+                totalMs={responseSeconds * 1000}
+                frozenMs={decimalElapsedMs}
+                stopwatchColor={stopwatchColor}
+                timerColor={timerColor}
+                timerRingGlow={timerRingGlow}
+                iconSize={qh(32)}
               />
-              <View style={[styles.decimalTimerBox, { borderColor: stopwatchColor }]}>
-                {/* Wrap-View med integer-höjd centrerar SVG:n vertikalt
-                    relativt den stora sekund-siffran (38 px lineHeight). */}
-                <View style={styles.decimalTimerIconWrap}>
-                  <StopwatchIcon size={qh(32)} color={stopwatchColor} />
-                </View>
-                <Text style={[styles.decimalTimerInt, { color: stopwatchColor }]}>
-                  {String(Math.floor(decimalElapsedMs / 1000)).padStart(2, '0')}
-                </Text>
-                <Text style={[styles.decimalTimerDec, { color: Colors.textSecondary }]}>
-                  .{String(Math.floor((decimalElapsedMs % 1000) / 10)).padStart(2, '0')}
-                </Text>
-              </View>
-            </View>}
+            )}
 
             <View style={styles.questionCard}>
               {/* Top-rad: Question-räkneverk vänster + Answering-pillen höger.
@@ -7619,7 +10022,7 @@ export default function QuizScreen() {
                         }}
                         activeOpacity={0.85}
                       >
-                        <Text style={styles.djStopConfirmInlineBtnText}>Spotify song has been stopped</Text>
+                        <Text style={styles.djStopConfirmInlineBtnText}>Track has been stopped in Spotify</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   </>
@@ -7666,29 +10069,20 @@ export default function QuizScreen() {
                   // QuizVibe och gick tillbaka fick låten omstartad medan
                   // klockan tickade (Peters test 2026-08-19).
                   //
-                  // Omstart är i stället en EXPLICIT sekundär åtgärd. Den är
-                  // korrekt i BÅDA lägena — DJ:n väljer den bara när inget
-                  // spelas (misslyckad autoplay, typiskt varm Spotify-session
-                  // efter Play Again där förra låten ligger pausad i mini-
-                  // playern) — och farlig i inget.
+                  // Restart-knappen ("Nothing playing? Restart track…") togs
+                  // bort 2026-08-28 (Peter) — den var enda kvarvarande
+                  // deep-link till track:en här och riskerade en oavsiktlig
+                  // omstart mitt i nedräkningen. "Open Spotify" räcker.
                   <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null} trackId={currentSpotifyTrackId}>
-                    <Pressable
-                      style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
-                      onPress={() => openSpotifyApp()}
-                    >
-                      <SpotifyBrandIcon size={20} variant="white" />
-                      <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
-                    </Pressable>
-                    <Pressable
-                      style={styles.djRestartTrackBtn}
-                      onPress={() => {
-                        if (currentSpotifyTrackId) openSpotifyTrack(currentSpotifyTrackId);
-                      }}
-                    >
-                      <Text style={styles.djRestartTrackBtnText}>
-                        Nothing playing? Restart track from the beginning
-                      </Text>
-                    </Pressable>
+                    <Animated.View style={nextTabPulseStyle}>
+                      <Pressable
+                        style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
+                        onPress={() => openSpotifyApp()}
+                      >
+                        <SpotifyBrandIcon size={20} variant="white" />
+                        <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
+                      </Pressable>
+                    </Animated.View>
                   </DJTrackCard>
                 )}
               </View>
@@ -7894,6 +10288,32 @@ export default function QuizScreen() {
                   </TouchableOpacity>
                   {answersExpanded && (
                   <>
+                  {revealAnswerSummary.dj && (
+                    <View>
+                      <Text style={[rv.answersHeading, rv.answersHeadingDJ]}>
+                        DJ
+                      </Text>
+                      <View style={rv.answerRow}>
+                        {revealAnswerSummary.dj.avatarUri ? (
+                          <Image
+                            source={{ uri: revealAnswerSummary.dj.avatarUri }}
+                            style={rv.answerAvatar}
+                          />
+                        ) : (
+                          <View style={[rv.answerAvatar, rv.answerAvatarFallback]}>
+                            <Text style={rv.answerAvatarEmoji}>
+                              {revealAnswerSummary.dj.emoji ?? '👤'}
+                            </Text>
+                          </View>
+                        )}
+                        <Text style={rv.answerName} numberOfLines={1} ellipsizeMode="tail">
+                          {revealAnswerSummary.dj.name}
+                          {revealAnswerSummary.dj.id === selfPlayerId ? ' (You)' : ''}
+                        </Text>
+                        <SpotifyBrandIcon size={16} variant="white" />
+                      </View>
+                    </View>
+                  )}
                   <View>
                     <Text style={[rv.answersHeading, rv.answersHeadingCorrect]}>
                       Correct
@@ -8022,6 +10442,11 @@ export default function QuizScreen() {
                       bågens rotation-bbox. SVG-dimensionerna bumpade till
                       24 för att kompensera så Q-glyfens visuella storlek
                       är ungefär densamma som tidigare. */}
+                  {/* "Select + " framför brand-Q:t — knappen bär båda
+                      stegen (välj svar, bekräfta) så spelaren inte tror att
+                      Qonfirm ensamt räcker. Samma gold-stil som "onfirm" så
+                      hela etiketten läses som en enhet. */}
+                  <Text style={styles.actionBtnPrefix}>Select +</Text>
                   <Svg width={24} height={24} viewBox="23 18 34 37">
                     <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.warning} strokeWidth="6.5" />
                     <Path d="M49 47 L53 51" stroke={Colors.warning} strokeWidth="6.5" strokeLinecap="round" />
@@ -8073,9 +10498,25 @@ export default function QuizScreen() {
                   </TouchableOpacity>
                 </Animated.View>
               ) : null /* knappar ligger i scroll-zonen ovan */
+            ) : isHost && djHandoverStuck ? (
+              // A1-fix: DJ:ns handover kom aldrig → ge host en manuell väg vidare
+              // så spelet inte fastnar permanent i reveal.
+              <Animated.View style={nextTabPulseStyle}>
+                <TouchableOpacity
+                  style={rv.djHandoverBtn}
+                  onPress={isLastQuestion ? handleHostShowLeaderboard : handleHostAdvanceFromReveal}
+                  activeOpacity={0.85}
+                >
+                  <Text style={rv.djHandoverBtnText}>
+                    {isLastQuestion ? 'Continue without DJ — Final Leaderboard' : 'Continue without DJ  →'}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             ) : (
               <View style={rv.waitingForHostPill}>
-                <Text style={rv.waitingForHostPillText}>Waiting for DJ to handover to Host</Text>
+                <Text style={rv.waitingForHostPillText}>
+                  {isHost ? 'Waiting for DJ to end the track…' : 'Waiting for DJ to handover to Host'}
+                </Text>
                 <SequentialDots color={Colors.textSecondary} />
               </View>
             )
@@ -8088,18 +10529,34 @@ export default function QuizScreen() {
             <Animated.View style={[rv.nextTabWrap, nextCtaPulseStyle]}>
               <Animated.View style={[rv.nextTabHalo, nextCtaGlowStyle]} pointerEvents="none" />
               <TouchableOpacity
-                style={[rv.nextTab, shouldLockForUnstable && { opacity: 0.4 }]}
+                style={[
+                  rv.nextTab,
+                  shouldLockForUnstable && { opacity: 0.4 },
+                  isNextCtaLocked && rv.nextTabCountingDown,
+                ]}
                 onPress={
                   isLastQuestion
                     ? handleHostShowLeaderboard
                     : handleHostAdvanceFromReveal
                 }
                 activeOpacity={0.85}
-                disabled={shouldLockForUnstable}
+                disabled={shouldLockForUnstable || isNextCtaLocked}
               >
-                <Text style={rv.nextTabText}>
-                  {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
-                </Text>
+                {/* Den riktiga etiketten renderas ALLTID (bara osynlig under
+                    nedräkningen) så knappens bredd är identisk före och efter
+                    upplåsningen — annars hoppar den från siffer-bredd till
+                    "Next  →"/"🏆  Final Leaderboard" i samma sekund som
+                    spelaren ska sikta på den. Siffran ligger absolut ovanpå. */}
+                <View style={rv.nextTabLabelWrap}>
+                  <Text style={[rv.nextTabText, isNextCtaLocked && rv.nextTabTextHidden]}>
+                    {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
+                  </Text>
+                  {isNextCtaLocked && (
+                    <Text style={[rv.nextTabText, rv.nextTabCountdownText]}>
+                      {revealNextCountdown}
+                    </Text>
+                  )}
+                </View>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -8124,8 +10581,10 @@ export default function QuizScreen() {
       {/* D-iii: bad-connection-overlay. Modal:n hanterar sin egen fullscreen-
           rendering med high zIndex, så den ligger ovanpå ScrollView:n utan
           extra wrapping. Bara aktiv i IndDev (gated via shouldLockForUnstable
-          — Pass-the-Phone får aldrig unstable-state eftersom syncChannel
-          inte subscribar:as där). Använder sticky-latch så overlay:n står
+          → isConnectionUnstable, som är hårt gatad på gameMode. ⚠ PtP HAR
+          numera en syncChannel (spectator-vyn), så gaten kan inte längre
+          luta sig mot att kanalen saknas — den måste vara explicit).
+          Använder sticky-latch så overlay:n står
           kvar ända till nästa rondens GetReady även om uppkopplingen
           återkommer mid-question.
 
@@ -8160,6 +10619,69 @@ export default function QuizScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
+  // ── PtP-spectator (non-host följer leaderboarden live) ───────────────
+  spectatorTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  spectatorTitle: {
+    flex: 1,
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    letterSpacing: 0.2,
+  },
+  spectatorLeaveBtn: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 6,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+  },
+  spectatorLeaveBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
+  },
+  // Ersätter "Next Round →" på spectatorns interim-leaderboard. Dämpad
+  // styling (samma vokabulär som rv.waitingForHostPill) så det läses som
+  // passiv status, inte som en knapp.
+  spectatorWaitPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    height: 56,
+    marginTop: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
+  spectatorWaitPillText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
+  },
+  // Sista frågan: guld ram + guld text (samma "aktiv/upplåst"-guld som
+  // LIVE-badgen och Home:s gyllene CTA:er). Bara färgen byts — geometrin
+  // ärvs från spectatorWaitPill så pillen inte hoppar när den skiftar.
+  spectatorWaitPillFinal: {
+    borderColor: Colors.warning,
+  },
+  spectatorWaitPillTextFinal: {
+    color: Colors.warning,
+  },
   // D-v: outer wrapper för fragment-baserade return-paths (intro/countdown)
   // så onTouchStart kan registrera host:s activity utan att claim:a
   // responder från SafeAreaView/GetReadyIntro inuti.
@@ -8306,6 +10828,91 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.success,
+  },
+  // "Add to existing"-listans rader. Samma row-vokabulär som MyMatchesScreen
+  // (bordered cardElevated-kort) så listan känns igen.
+  aggregatePickRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    backgroundColor: Colors.cardElevated,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  // Markerad rad — samma blå "vald"-vokabulär som resten av appen.
+  aggregatePickRowSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
+  },
+  aggregatePickName: {
+    flex: 1,
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  aggregatePickNameSelected: {
+    color: Colors.primary,
+    fontWeight: FontWeight.bold,
+  },
+  // Confirm — gold när den är tänd (appens "actionable"-färg på
+  // slutskärmen), grå när ingen rad är markerad.
+  aggregateConfirmBtn: {
+    height: 48,
+    borderRadius: Radius.sm,
+    borderWidth: 1.5,
+    borderColor: Colors.warning,
+    backgroundColor: Colors.warning,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aggregateConfirmBtnLocked: {
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.borderStrong,
+  },
+  aggregateConfirmBtnText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: '#000000',
+  },
+  aggregateConfirmBtnTextLocked: {
+    color: Colors.textDisabled,
+  },
+  aggregatePickMeta: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+  },
+  aggregateNameInput: {
+    height: 48,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    backgroundColor: Colors.background,
+    color: Colors.textPrimary,
+    paddingHorizontal: Spacing.md,
+    fontSize: FontSize.md,
+    alignSelf: 'stretch',
+  },
+  aggregateNameError: {
+    fontSize: FontSize.sm,
+    color: Colors.error,
+    alignSelf: 'stretch',
+  },
+  playAgainModalCancel: {
+    height: 48,
+    borderRadius: Radius.sm,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playAgainModalCancelText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
   },
   playAgainModalActions: {
     flexDirection: 'column',
@@ -8547,25 +11154,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
     color: '#FFFFFF',
-    textAlign: 'center',
-  },
-  // Sekundär, medvetet nedtonad åtgärd under den gröna "Open Spotify":
-  // omstart av spåret. Låg visuell vikt (ingen fyllnad, dämpad kant) så den
-  // aldrig förväxlas med primärknappen — ett felaktigt tap startar om låten
-  // mitt i gissarnas nedräkning.
-  djRestartTrackBtn: {
-    marginTop: Spacing.sm,
-    alignSelf: 'center',
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.md,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
-  },
-  djRestartTrackBtnText: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
-    color: 'rgba(255,255,255,0.65)',
     textAlign: 'center',
   },
   spotifyDJHint: {
@@ -9034,6 +11622,16 @@ const styles = StyleSheet.create({
     color: Colors.warning,
     letterSpacing: 0.5,
   },
+  // "Select +"-prefixet före Q-glyfen. Samma typografi som actionBtnText;
+  // marginRight ger extra luft mot Q:t så "+ Q" inte klibbar ihop (rowens
+  // gap: 3 är avsiktligt tight för att hålla "Qonfirm" som ett ord).
+  actionBtnPrefix: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.warning,
+    letterSpacing: 0.5,
+    marginRight: 3,
+  },
 });
 
 // Inline reveal-feedback — green/red-bordered card med ✓/✗ badge i övre
@@ -9182,6 +11780,9 @@ const rv = StyleSheet.create({
   answersHeadingWrong: {
     color: QUIZ_ERROR_RED,
   },
+  answersHeadingDJ: {
+    color: '#1DB954',
+  },
   answersEmpty: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.medium,
@@ -9298,6 +11899,27 @@ const rv = StyleSheet.create({
     fontWeight: '700',
     color: BOX_COLOR,
     letterSpacing: 0.3,
+  },
+  // Etikett-stack: riktig text i flow (sätter bredden) + countdown-siffran
+  // absolut ovanpå. position: 'relative' så siffran ankras hit.
+  nextTabLabelWrap: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Riktiga etiketten under nedräkningen — osynlig men behåller sin plats.
+  nextTabTextHidden: {
+    opacity: 0,
+  },
+  // Countdown-siffran. tabular-nums så 5 → 1 inte wobblar i sidled.
+  nextTabCountdownText: {
+    position: 'absolute',
+    fontVariant: ['tabular-nums'],
+  },
+  // Dämpad knapp medan låset räknar ned — signalerar "inte tryckbar än"
+  // utan att göra siffran svårläst (därav 0.55, inte unstable-lägets 0.4).
+  nextTabCountingDown: {
+    opacity: 0.55,
   },
   // Non-host:s "Waiting for host…"-pill i IndDev — sitter i samma position
   // som Next-tab skulle. Dämpad styling (textSecondary + borderStrong)

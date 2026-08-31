@@ -1,45 +1,73 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { FontWeight } from '../theme';
+import { Colors, FontWeight } from '../theme';
 
 interface HCPShieldProps {
   hcp: number; // 1–99
   size?: number; // bredd i px; höjd ≈ size * 1.15
+  // Guest-läge (§3): sköldens SIFFRA döljs och ersätts av vattenstämpeln
+  // "Not Defined". Rent kosmetiskt — gästen har fortfarande ett riktigt,
+  // dynamiskt härlett HCP internt (getGuestHcpFromClosestAge), det visas
+  // bara inte som ett tal. `hcp`-propen ignoreras när detta är true.
+  notDefined?: boolean;
 }
 
+// Neutral tier för Guest-sköld ("Not Defined") — grå, ingen elit-glöd.
+const NOT_DEFINED_TIER = {
+  stroke: '#6B7280',
+  fill: 'rgba(107,114,128,0.10)',
+  glowOpacity: 0.25,
+  glowRadius: 10,
+};
+
 /**
- * Tre tiers efter HCP-nivå (lågt = elit).
- * Färg och glöd-intensitet ökar när HCP sjunker.
- * Matchar projektvisionen: brons → silver → guld.
+ * Fyra tiers efter HCP-nivå (lågt = elit), app-paletten (Peter 2026-08-28):
+ *   99–60 → grå (nybörjare)   ·   59–40 → blå
+ *   39–20 → brons             ·   19–1  → guld (elit)
+ * Glöd-intensiteten ökar när HCP sjunker. Blå = Colors.primary, guld =
+ * Colors.warning (theme-tokens); grå (#6B7280, appens muted-grå) och brons
+ * (#B08A5A) saknar tokens och sätts direkt.
  */
 function getTier(hcp: number) {
-  if (hcp <= 33) {
+  // 19–1 → guld (elit)
+  if (hcp <= 19) {
     return {
-      stroke: '#FFD166',       // guld
-      fill:   'rgba(255,209,102,0.12)',
+      stroke: Colors.warning,               // #F5A623
+      fill:   'rgba(245,166,35,0.14)',
       glowOpacity: 0.85,
       glowRadius: 20,
     };
   }
-  if (hcp <= 66) {
+  // 39–20 → brons
+  if (hcp <= 39) {
     return {
-      stroke: '#2DD4BF',       // teal (mellantier)
-      fill:   'rgba(45,212,191,0.10)',
-      glowOpacity: 0.55,
+      stroke: '#B08A5A',
+      fill:   'rgba(176,138,90,0.12)',
+      glowOpacity: 0.6,
       glowRadius: 16,
     };
   }
+  // 59–40 → blå
+  if (hcp <= 59) {
+    return {
+      stroke: Colors.primary,               // #4DA3FF
+      fill:   'rgba(77,163,255,0.12)',
+      glowOpacity: 0.5,
+      glowRadius: 14,
+    };
+  }
+  // 99–60 → grå (nybörjare)
   return {
-    stroke: '#B08A5A',         // brons (nybörjare)
-    fill:   'rgba(176,138,90,0.08)',
+    stroke: '#6B7280',
+    fill:   'rgba(107,114,128,0.10)',
     glowOpacity: 0.3,
     glowRadius: 12,
   };
 }
 
-export function HCPShield({ hcp, size = 100 }: HCPShieldProps) {
-  const tier = getTier(hcp);
+export function HCPShield({ hcp, size = 100, notDefined = false }: HCPShieldProps) {
+  const tier = notDefined ? NOT_DEFINED_TIER : getTier(hcp);
   const w = size;
   const h = size * 1.15;
   const r = 6; // radius för rundade topp-hörn
@@ -74,10 +102,16 @@ export function HCPShield({ hcp, size = 100 }: HCPShieldProps) {
         <Path d={d} stroke={tier.stroke} strokeWidth={2.5} fill={tier.fill} />
       </Svg>
 
-      {/* Textöverlagring – "HCP" över, siffra under */}
+      {/* Textöverlagring – "HCP" över, siffra (eller "Not Defined") under */}
       <View style={[styles.textLayer, { paddingBottom: h * 0.1 }]} pointerEvents="none">
         <Text style={[styles.labelText, { fontSize: size * 0.14 }]}>HCP</Text>
-        <Text style={[styles.valueText, { fontSize: size * 0.34 }]}>{hcp}</Text>
+        {notDefined ? (
+          <Text style={[styles.notDefinedText, { fontSize: size * 0.14 }]}>
+            Not{'\n'}Defined
+          </Text>
+        ) : (
+          <Text style={[styles.valueText, { fontSize: size * 0.34 }]}>{hcp}</Text>
+        )}
       </View>
     </View>
   );
@@ -104,5 +138,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontVariant: ['tabular-nums'],
     marginTop: 2,
+  },
+  notDefinedText: {
+    fontWeight: FontWeight.bold,
+    color: '#fff',
+    marginTop: 2,
+    textAlign: 'center',
+    opacity: 0.85,
   },
 });

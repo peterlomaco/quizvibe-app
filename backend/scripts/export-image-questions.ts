@@ -25,6 +25,7 @@ import {
 } from '../content/schema';
 import { loadDistractorPool } from '../content/distractor-pool';
 import { HINTS_LIBRARY } from '../../src/utils/hintsData';
+import { meetsHintsThreshold, MIN_RAW_HINTS, MIN_RENDER_ENTRIES } from '../../src/utils/hintsText';
 
 const OUTPUT_PATH = path.join(
   __dirname,
@@ -49,6 +50,9 @@ interface ExportedQuestion {
    *  HINTS_REGION_MAP:s region-roll är retirerad. */
   region: string[];
   questionText: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Driver klientens
+   *  HCP-frågefilter: item valbart om itemHcp >= spelarens HCP. */
+  itemHcp: number;
 }
 
 
@@ -98,6 +102,8 @@ function buildExportedQuestion(
     audiences: Array.from(audiencesSet),
     region: Array.from(regionSet),
     questionText: FIXED_QUESTION_TEXT[contentSubject],
+    // Item-HCP (§4.1) = curator-satt probability (0–100).
+    itemHcp: item.probability,
   };
 }
 
@@ -188,6 +194,9 @@ export interface ImageQuizQuestion {
    *  'unknown-region' når ingen spelare. */
   region: string[];
   questionText: string;
+  /** Item-HCP (§4.1) = katalogens probability (0–100). Klientens HCP-filter
+   *  väljer item om itemHcp >= spelarens HCP (relaxas om poolen blir för tunn). */
+  itemHcp: number;
 }
 
 export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = ${JSON.stringify(questions, null, 2)};
@@ -208,12 +217,16 @@ export function getImageQuestionsForGeneration(
 `;
 }
 
-/** Speglar MIN_HINTS_REQUIRED i quiz.tsx — items under tröskeln filtreras
- *  ändå bort på klienten och har inget att göra i exporten. */
-const MIN_HINTS_REQUIRED = 10;
-
 /**
- * Katalog-items som har ett tillräckligt stort hints-bibliotek.
+ * Katalog-items som har ett tillräckligt spelbart hints-bibliotek.
+ *
+ * Gaten (se meetsHintsThreshold i hintsText.ts, delad med quiz.tsx:s runtime-
+ * filter): rått antal ledtrådar ≥ MIN_RAW_HINTS (10), ELLER — om ledtrådarna
+ * grupperar snyggt under rubriker (Birth/Career History/Film History/Titles/
+ * Trophies) — ≥ MIN_RENDER_ENTRIES (5) topp-nivå-bullets. Peter 2026-08-27:
+ * ett item med få råa fakta som ändå grupperar (t.ex. Birth + Career History
+ * + Trophies = 3 grupper av 7 fakta) kan vara lika spelbart som ett med 10
+ * lösa fakta.
  *
  * ⚠ Urvalet gick t.o.m. 2026-08-17 på "har en webp i assets/quiz-images/".
  * Det var en kvarleva: sedan person-bilderna parkerades juridiskt renderar en
@@ -228,7 +241,7 @@ function listHintItemIds(catalog: ReturnType<typeof loadCatalog>): string[] {
   for (const file of catalog.files.values()) {
     if (file.contentForm !== 'image') continue;
     for (const item of file.items) {
-      if ((HINTS_LIBRARY[item.id]?.hints.length ?? 0) >= MIN_HINTS_REQUIRED) ids.add(item.id);
+      if (meetsHintsThreshold(HINTS_LIBRARY[item.id], item.displayName)) ids.add(item.id);
     }
   }
   return [...ids].sort();
@@ -237,7 +250,7 @@ function listHintItemIds(catalog: ReturnType<typeof loadCatalog>): string[] {
 async function main(): Promise<void> {
   const catalog = loadCatalog();
   const ids = listHintItemIds(catalog);
-  console.log(`Found ${ids.length} image items with >= ${MIN_HINTS_REQUIRED} hints`);
+  console.log(`Found ${ids.length} image items with >= ${MIN_RAW_HINTS} hints (or >= ${MIN_RENDER_ENTRIES} grouped entries)`);
 
   const questions: ExportedQuestion[] = [];
   for (const id of ids) {

@@ -1,0 +1,23 @@
+-- 0039_waiting_invites_replica_identity_full — live host-side pending sync.
+--
+-- Peter 2026-08-27: the host's "Share invite" list must drop a player's
+-- "Pending" entry LIVE the moment that player denies the last remaining
+-- invitation from this host — not only on the next modal re-open.
+--
+-- A deny is a DELETE on waiting_invites. By default Postgres emits only the
+-- primary key in a DELETE's OLD record, so:
+--   1. Realtime RLS checks the OLD record against the sender-read policy
+--      (from_user_id = auth.uid()); without from_user_id present it always
+--      fails → the HOST never receives the DELETE event at all.
+--   2. A client-side realtime filter on from_user_id can't match a column
+--      that isn't in the payload.
+-- REPLICA IDENTITY FULL puts every column in the OLD record, so the sender
+-- (host) receives DELETE events for rows they sent and can filter on
+-- from_user_id=eq.<hostUserId>.
+--
+-- Bonus: this also makes the recipient's existing JoinModal DELETE
+-- subscription (filtered on to_user_id) actually fire, which the DEFAULT
+-- replica identity silently prevented.
+--
+-- Applied manually via the Supabase SQL Editor (project convention).
+alter table public.waiting_invites replica identity full;

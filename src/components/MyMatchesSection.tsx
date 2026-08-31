@@ -26,8 +26,9 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect, usePathname } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity } from '@/src/components/haptic';
 
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 import { VersusIcon } from './VersusIcon';
@@ -39,6 +40,10 @@ import {
   type MyRemoteMatch,
 } from '../utils/remoteMatches';
 import { getSavedLobbies } from '../utils/savedLobbies';
+import {
+  getCachedHomeRowVisible,
+  setCachedHomeRowVisible,
+} from '../utils/homeRowVisibility';
 
 // Per-user-namespacad nyckel (samma mönster som friends/gameHistory) så
 // User A:s "sett"-snapshot inte tystar signalen för User B på samma device.
@@ -49,16 +54,34 @@ const SEEN_KEY_PREFIX = '@quizvibe/myMatches/seen/v1/';
  * intressant för spelaren ändrats: ny/borttagen match, status (active →
  * finished/cancelled/void), vem som spelat klart, eller resultatet.
  */
+/** Per-match-tupel `id:status:mitt-klar:motståndar-klar:resultat`. Match-id
+ *  (UUID) innehåller inga kolon, så första fältet kan läsas ut med split(':'). */
+function matchTuple(m: MyRemoteMatch): string {
+  return `${m.match.id}:${m.match.status}:${m.me.finishedAt ? 1 : 0}:${
+    m.opponent?.finishedAt ? 1 : 0
+  }:${m.match.result ?? ''}`;
+}
+
 function buildSignature(list: MyRemoteMatch[]): string {
+  return list.map(matchTuple).sort().join('|');
+}
+
+/**
+ * Match-id:na vars tillstånd ändrats sedan senaste "sett"-snapshot — driver
+ * flash-guiden (skickas som focusMatchIds till /my-matches så exakt de nya
+ * matcherna blinkar). `seen` === null (ej namespace:at) eller '' (inget sett
+ * förut) → allt räknas som nytt.
+ */
+function changedMatchIds(list: MyRemoteMatch[], seen: string | null): string[] {
+  if (!seen) return list.map((m) => m.match.id);
+  const seenById = new Map<string, string>();
+  for (const part of seen.split('|')) {
+    if (!part) continue;
+    seenById.set(part.split(':')[0], part);
+  }
   return list
-    .map(
-      (m) =>
-        `${m.match.id}:${m.match.status}:${m.me.finishedAt ? 1 : 0}:${
-          m.opponent?.finishedAt ? 1 : 0
-        }:${m.match.result ?? ''}`,
-    )
-    .sort()
-    .join('|');
+    .filter((m) => seenById.get(m.match.id) !== matchTuple(m))
+    .map((m) => m.match.id);
 }
 
 /**
@@ -71,7 +94,11 @@ function buildSignature(list: MyRemoteMatch[]): string {
  * (inloggad/guest) och en framtida gren som glömmer proppen ska få den
  * smala rutan, inte råka återinföra den breda.
  */
-export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
+export function MyMatchesSection({
+  full = false,
+  inRow = false,
+  onVisible,
+}: { full?: boolean; inRow?: boolean; onVisible?: (v: boolean) => void } = {}) {
   const compact = !full;
   // Var knappen renderas ('/' på Home, '/profile' i Player history) —
   // skickas med som `from` så /my-matches Back-knapp går tillbaka hit
@@ -82,6 +109,10 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
   const [savedCount, setSavedCount] = useState(0);
   const [seenSignature, setSeenSignature] = useState<string | null>(null);
   const seenKeyRef = useRef<string | null>(null);
+  // false tills mountens första reload klarat — dessförinnan litar vi på
+  // session-cachen så knappen renderas med rätt höjd direkt vid en re-mount
+  // i stället för att pop:a in (se homeRowVisibility.ts).
+  const [hydrated, setHydrated] = useState(false);
 
   const reload = useCallback(async () => {
     const [{ data: sessionData }, anon, mine, saved] = await Promise.all([
@@ -100,6 +131,11 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
     const user = sessionData.session?.user as { id?: string } | undefined;
     setIsGuestSession(anon);
     setMatches(mine);
+    // Synligheten (matcher + sparade lobbies + guest-status) är nu känd —
+    // markera hydrerad så cachen tar över från det optimistiska render-läget.
+    // Läses av `show`-beräkningen nedan; seenSignature-logiken därunder kan
+    // early-return:a utan att påverka detta.
+    setHydrated(true);
 
     // Läs "sett"-snapshotten för aktuell user. Saknas user-id kan vi inte
     // namespace:a — då hoppar vi signalen helt (hellre ingen badge än en
@@ -117,18 +153,6 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
     }
   }, []);
 
-  const handlePress = useCallback(
-    (signature: string) => {
-      // Markera allt som sett innan navigation så etiketten är borta när
-      // spelaren kommer tillbaka till Home.
-      setSeenSignature(signature);
-      const key = seenKeyRef.current;
-      if (key) void AsyncStorage.setItem(key, signature).catch(() => {});
-      router.push({ pathname: '/my-matches', params: { from: pathname || '/' } });
-    },
-    [pathname],
-  );
-
   useFocusEffect(
     useCallback(() => {
       void reload();
@@ -145,7 +169,10 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
   // rena guests kan inte längre skapa matcher, men anon-sessioner från
   // FÖRE spärren kan ha kvar legacy-rader som annars hade renderat knappen
   // på Home. De löper ut på sin 48h-deadline och sveps av cron:en.
-  const visible = isGuestSession ? [] : matches;
+  const visible = useMemo(
+    () => (isGuestSession ? [] : matches),
+    [isGuestSession, matches],
+  );
   // Sparade lobbies är kontobundna (storen nycklas på playerName) — samma
   // guard som matcherna så en anon-session aldrig får ingången.
   const visibleSavedCount = isGuestSession ? 0 : savedCount;
@@ -159,11 +186,55 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
   // Hooks måste köras före den villkorliga return:en nedan.
   const blink = useBlink(hasUpdate);
 
-  if (visible.length === 0 && visibleSavedCount === 0) return null;
+  // Definieras EFTER `visible`/`hasUpdate` (TDZ) — flash-guiden behöver dem.
+  const handlePress = useCallback(
+    (signature: string) => {
+      // Vilka matcher är NYA sedan senast? Beräknas mot den ännu ej
+      // överskrivna snapshotten (setSeenSignature nedan markerar allt sett så
+      // Home-etiketten är borta när spelaren kommer tillbaka).
+      const changed = changedMatchIds(visible, seenSignature);
+      setSeenSignature(signature);
+      const key = seenKeyRef.current;
+      if (key) void AsyncStorage.setItem(key, signature).catch(() => {});
+      router.push({
+        pathname: '/my-matches',
+        params: {
+          from: pathname || '/',
+          // Skicka bara focus-id:n när det faktiskt finns en update — annars
+          // ska /my-matches öppnas utan flash.
+          ...(hasUpdate && changed.length > 0
+            ? { focusMatchIds: changed.join(',') }
+            : {}),
+        },
+      });
+    },
+    [pathname, visible, seenSignature, hasUpdate],
+  );
+
+  // Rapportera synlighet uppåt (HomeExtrasRow kollapsar raden när varken
+  // Competition eller 1vs1 finns). Effekten måste ligga före return:en.
+  const dataVisible = !(visible.length === 0 && visibleSavedCount === 0);
+  // Innan mountens första reload klarat: rendera optimistiskt om cachen säger
+  // att knappen var synlig senast → ingen pop-in vid re-mount. Efter hydrering
+  // gäller riktig data (så en tömd rad kollapsar).
+  const show = dataVisible || (!hydrated && getCachedHomeRowVisible('matches'));
+
+  useEffect(() => {
+    if (hydrated) setCachedHomeRowVisible('matches', dataVisible);
+  }, [hydrated, dataVisible]);
+
+  useEffect(() => {
+    onVisible?.(show);
+  }, [show, onVisible]);
+
+  if (!show) return null;
 
   return (
     <TouchableOpacity
-      style={[styles.mainBtn, compact && styles.mainBtnCompact]}
+      style={[
+        styles.mainBtn,
+        compact && (inRow ? styles.mainBtnInRow : styles.mainBtnCompact),
+      ]}
       activeOpacity={0.8}
       onPress={() => handlePress(signature)}
     >
@@ -173,7 +244,7 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
           pointerEvents none → taps går vidare till knappen. */}
       {!compact && (
         <View style={styles.titleOverlay} pointerEvents="none">
-          <Text style={styles.mainBtnTitle}>1vs1 History</Text>
+          <Text style={styles.mainBtnTitle}>H2H History</Text>
         </View>
       )}
       {/* Samma 1vs1-märke som Home:s "Remote Play"-val (blå silhuetter +
@@ -192,7 +263,7 @@ export function MyMatchesSection({ full = false }: { full?: boolean } = {}) {
         ]}
       >
         <VersusIcon height={compact ? 22 : 30} />
-        {compact && <Text style={styles.compactLabel}>1vs1</Text>}
+        {compact && <Text style={styles.compactLabel}>H2H</Text>}
       </View>
       {/* Spacer i full variant → "New update" + pilen grupperas högerställt
           medan titeln ligger kvar centrerad. Compact använder
@@ -277,6 +348,15 @@ const styles = StyleSheet.create({
   mainBtnCompact: {
     width: '50%',
     alignSelf: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 4,
+    paddingHorizontal: 6,
+  },
+  // Home-rad-variant (HomeExtrasRow): samma compact-visual men UTAN egen
+  // bredd/alignSelf — fyller sin flex:1-slot så knappen anchoras till höger
+  // halvan bredvid Competition-knappen. Slot:ens default stretch ger full
+  // bredd inom halvan.
+  mainBtnInRow: {
     justifyContent: 'space-between',
     gap: 4,
     paddingHorizontal: 6,

@@ -90,7 +90,7 @@ export function RemoteMatchResultPanel({ matchId }: Props) {
               <SequentialDots color={Colors.warning} />
             </View>
             <Text style={styles.subText}>
-              {hoursLeft(match.deadlineAt)}h left — check &quot;1vs1 Matches&quot; on the Home screen later.
+              {hoursLeft(match.deadlineAt)}h left — check &quot;H2H Matches&quot; on the Home screen later.
             </Text>
           </>
         )}

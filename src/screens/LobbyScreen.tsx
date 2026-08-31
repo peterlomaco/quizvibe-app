@@ -13,18 +13,16 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   SafeAreaView,
   StyleProp,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   TextStyle,
-  TouchableOpacity,
   View,
   ViewStyle,
 } from 'react-native';
+import { Pressable, Switch, TouchableOpacity } from '@/src/components/haptic';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { ApproveToggle } from '../components/ApproveToggle';
@@ -59,16 +57,18 @@ import { isAnonymousSession } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
+import { displayHcp, resolveDisplayHcp } from '../utils/hcpEngine';
 import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
+import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
-import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnHcp, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
-import { createRemoteMatch, getMatchByRoomCode, getOwnUserId } from '../utils/remoteMatches';
+import { createRemoteMatch, getMatchByRoomCode, getOwnUserId, hasRemote1v1RelationshipWith } from '../utils/remoteMatches';
 import { saveLobby } from '../utils/savedLobbies';
-import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
+import { defaultEnabledMainCategories, subjectToMainCategory, MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
 import { supabase } from '../utils/supabase';
@@ -77,6 +77,13 @@ import {
   PURCHASED_PACKAGES,
   type MusicPackage,
 } from '../utils/mockPurchasedPackages';
+import {
+  hasActivePackage,
+  computePackageCoverage,
+  computePackageEraRange,
+  resolveActivePackageTags,
+  itemInActivePackages,
+} from '../utils/hostPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import {
   appendPlayerNameDigit,
@@ -84,6 +91,7 @@ import {
   backspacePlayerNameDigits,
   backspacePlayerNameLetters,
   containsBlockedLetterSubstring,
+  containsReservedTakenSubstring,
   extractTakenGuestLetters,
   generatePlayerName,
   getPlayerNameDigits,
@@ -141,6 +149,10 @@ export interface LobbyPlayer extends Player {
   // RLS så ingen annan klient kan slå upp namnet. undefined = spelaren
   // använder sitt kontonamn, eller är en ren guest utan konto.
   accountPlayerName?: string;
+  // Spelarens intjänade display-HCP (1–99). Publiceras av spelaren själv via
+  // publishOwnHcp → lobby_players.hcp (migration 0042) så övriga ser det på
+  // spelarkortet. undefined = ännu ej progressad (skölden visar 99) / gäst.
+  hcp?: number;
 }
 
 type GameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
@@ -213,6 +225,10 @@ function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): Lobb
     isHost: true,
   };
 }
+
+// Competition re-match (från Home): begäran lever i 5 minuter — hinner inte
+// alla inbjudna joina rivs lobbyn och inbjudningarna cascade:as bort.
+const COMPETITION_REMATCH_TTL_MS = 5 * 60 * 1000;
 
 const SEED_PLAYERS: LobbyPlayer[] = [
   { id: '1', name: 'Alex K.',   emoji: '🦊', isReady: true,  type: 'registered', hcpComplete: true,  age: 32, assistance: 'standard', isHost: true, approved: true  },
@@ -391,11 +407,33 @@ const regionSheet = StyleSheet.create({
   cancelText: { fontSize: FontSize.md, color: Colors.textSecondary },
 });
 
-// Att presentera en RN <Modal> direkt i en Alert-callback kan sväljas tyst
-// på iOS — alertens dismiss-animation pågår fortfarande när handlern kör, och
-// en presentation mitt i en transition no-op:ar. Samma defensiva delay som
-// MODAL_SWAP_DELAY_MS i app/index.tsx (där Modal→Modal gav exakt den buggen).
-const ALERT_TO_MODAL_DELAY_MS = 350;
+// Hur länge en ny, ännu icke-godkänd non-host hålls dold innan hen får
+// rendera den röda "Players Waiting"-blinken. Ska täcka tiden det tar för
+// join-radens fält att konvergera (fetchNewJoiners → syncNonHostFields) så
+// friend-auto-approven hinner landa först — en QuizVibe friend ska ALDRIG
+// blinka rött. 3000 ms är valt mot BlinkingLabel-cykeln (1200 ms): Peter såg
+// 1-2 hela blinkningar, alltså upp till ~2,4 s.
+const JOIN_GRACE_MS = 3000;
+
+// Samma fönster på NON-HOST-enheten, där spelaren ser sin EGEN ännu icke-
+// godkända rad. Längre eftersom kedjan är längre: host auto-approvar →
+// bulk-write till lobby_players → non-host:s 2s-poll → render. Worst case
+// landar approven ~3 s in, så 3000 ms har ingen marginal. Non-host kan
+// ändå inte agera på den röda signalen (godkännande är host:s jobb), så
+// ett långt fönster kostar ingenting — Peter: hellre försenad grön blink
+// än 1-2 röda före den (2026-08-26).
+const JOIN_GRACE_NON_HOST_MS = 5000;
+
+// Hur länge "det finns väntande spelare" måste ha varit oavbrutet SANT innan
+// den röda blinken faktiskt renderas. Grace-fönstren ovan flyttar problemet
+// men kan aldrig eliminera det: landar approven strax EFTER fönstret får man
+// en kort röd flash. Den här debouncen tar bort hela klassen av korta flashar
+// oavsett orsak — signalen visas bara när den är stabil. 1200 ms = en hel
+// BlinkingLabel-cykel, så en blink som visas hinner alltid läsas som avsedd.
+const WAITING_LABEL_DEBOUNCE_MS = 1200;
+// Låst-grå för Start Game-knappen medan seed-effekten ännu inte applicerat
+// carry-over-settings. Samma vokabulär som GetReadyIntro:s PLAY_LOCKED_COLOR.
+const START_LOCKED_GREY = '#6B7280';
 
 // Delad copy för single-player-approve-spärren så ALLA approve-vägar
 // (ApproveToggle, "Approve All"-mastern, join-popupens Approve och
@@ -407,8 +445,12 @@ const SINGLE_PLAYER_APPROVE_BLOCK: [string, string] = [
 
 /** Prio för `singlePlayerDefault`-seeden: `lobbyType`-paramet (= host:s
  *  explicita val i "Start New Game"-panelen på Home / Final Leaderboard) >
- *  `fallback` (carry-over lobby_settings > profilens host-default). Utan
- *  param (äldre navigation) gäller fallback:en oförändrat.
+ *  `fallback` (carry-over lobby_settings). Utan param (äldre navigation)
+ *  gäller fallback:en oförändrat.
+ *
+ *  ⚠ Profilen ingår INTE i fallback-kedjan sedan 2026-08-26 — Single player
+ *  är inte längre en host-default, så en stale sparad `true` får inte låsa
+ *  en Multiplayer-lobby. Se ProfileData.singlePlayerDefault.
  *
  *  Module-level och ren — så den aldrig blir en dependency i seed-effekten
  *  (`lobbyType` ligger redan där och är allt funktionen läser).
@@ -419,6 +461,28 @@ function resolveSeedSinglePlayer(lobbyType: string | undefined, fallback: boolea
   if (lobbyType === 'single') return true;
   if (lobbyType === 'multiplayer') return false;
   return fallback;
+}
+
+/** Spelartaket härleds HELT ur läge + premium — det finns inget fritt val
+ *  utanför Players-toggeln (Max 4 / Max 12), och den är bara meningsfull i
+ *  Individual device.
+ *
+ *  ⚠ **Pass-the-Phone är ALLTID 4, även med Premium.** Alla delar EN enhet;
+ *  12 spelare × 20 rundor blir ett orimligt långt spel. Det stod i
+ *  auto-sync-effektens kommentar men fanns aldrig i koden — en premium-host
+ *  fick 12 kapacitetsrutor i en PtP-lobby (Peter 2026-08-26).
+ *
+ *  Module-level och ren så seed-effekten och auto-sync-effekten läser exakt
+ *  samma regel; divergerar de flimrar taket vid mount (seeden sätter ett
+ *  värde, effekten ett annat en frame senare). */
+function resolveMaxPlayers(
+  gameMode: GameMode,
+  singlePlayer: boolean,
+  premium: boolean,
+): 2 | 4 | 12 {
+  if (gameMode === 'remote-1v1') return 2;
+  if (singlePlayer) return 4;
+  return gameMode === 'individual-devices' && premium ? 12 : 4;
 }
 
 // ─── Add Player Modal ─────────────────────────────────────────────────────────
@@ -459,6 +523,9 @@ function validateAddPlayerName(name: string, existingNames?: Set<string>): 'avai
   if (containsProfanity(trimmed)) return 'invalid';
   // Reserverat: brand-namnet "quizvibe" (case-insensitive) får inte ingå.
   if (containsBlockedLetterSubstring(trimmed)) return 'invalid';
+  // Reserverade konkurrent-varumärken ("Hitster"/"Sounder") → samma "taken"-
+  // meddelande som ett redan upptaget namn (Peters beslut 2026-08-29).
+  if (containsReservedTakenSubstring(trimmed)) return 'taken';
   if (TAKEN_PLAYER_NAMES_LOBBY.has(trimmed.toLowerCase())) return 'taken';
   // Kollar mot befintliga spelare i lobbyn (case-insensitive).
   if (existingNames?.has(trimmed.toLowerCase())) return 'taken';
@@ -987,19 +1054,41 @@ function publishOwnAccountAlias(roomCode: string, playerId: string): void {
 }
 
 /**
+ * Publicerar spelarens EGET intjänade display-HCP (1–99, ceil per §1.2.3) till
+ * sin egen lobby_players-rad så övriga enheter kan visa det på spelarkortet.
+ * Samma fire-and-forget-kedjning som publishOwnAccountAlias — MÅSTE anropas
+ * efter att egen rad finns i DB. No-op för gäster + ännu ej progressade
+ * spelare (ingen profile.hcp) → kolumnen förblir null → skölden visar 99.
+ */
+function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
+  loadProfile()
+    .then((profile) => {
+      const hcp = profile?.hcp;
+      if (typeof hcp !== 'number') return;
+      return publishOwnHcp(roomCode, playerId, displayHcp(hcp));
+    })
+    .catch(() => {});
+}
+
+/**
  * Alert.alert som en await-bar Promise<boolean>. Används för guards inuti
  * redan-async flöden (t.ex. handleStartGame) där vi vill avbryta på Cancel
  * utan att lägga till en parameter + rekursion à la ptpConfirmed — och utan
  * att riskera Pressable-event-fällan där ett syntetiskt event landar i ett
  * defaultat argument. Dismiss (Android back) räknas som Cancel.
  */
-function confirmAsync(title: string, message: string, confirmLabel: string): Promise<boolean> {
+function confirmAsync(
+  title: string,
+  message: string,
+  confirmLabel: string,
+  cancelLabel = 'Cancel',
+): Promise<boolean> {
   return new Promise((resolve) => {
     Alert.alert(
       title,
       message,
       [
-        { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+        { text: cancelLabel, style: 'cancel', onPress: () => resolve(false) },
         { text: confirmLabel, onPress: () => resolve(true) },
       ],
       { cancelable: true, onDismiss: () => resolve(false) },
@@ -1107,10 +1196,12 @@ function BlinkingLabel({
   style,
   children,
   duration = 600,
+  numberOfLines = 1,
 }: {
   style: StyleProp<TextStyle>;
   children: React.ReactNode;
   duration?: number;
+  numberOfLines?: number;
 }) {
   const opacity = useRef(new Animated.Value(1)).current;
   useEffect(() => {
@@ -1124,7 +1215,7 @@ function BlinkingLabel({
     return () => loop.stop();
   }, [opacity, duration]);
   return (
-    <Animated.Text style={[style, { opacity }]} numberOfLines={1}>
+    <Animated.Text style={[style, { opacity }]} numberOfLines={numberOfLines}>
       {children}
     </Animated.Text>
   );
@@ -1135,6 +1226,23 @@ function BlinkingLabel({
 // Synlig OFF-färg för source matrix-switchar. Colors.borderStrong är
 // rgba(255,255,255,0.14) = nästan osynlig på mörk bakgrund.
 const MATRIX_SWITCH_OFF = '#3A5068';
+
+/**
+ * Parsar `carryPackages`-URL-paramet (JSON-array av Host-paket-IDs som var
+ * aktiva i spelet som just spelades, satt av quiz.tsx:s goToNewLobby vid Play
+ * Again). Returnerar `undefined` om paramet saknas (= ej carry-over) eller är
+ * korrupt, så seeden faller tillbaka på lobby_settings/profil. En tom array
+ * ('[]') bevaras som ett giltigt "Generic"-val.
+ */
+function parseCarryPackages(raw: string | undefined): string[] | undefined {
+  if (raw === undefined) return undefined;
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'string') : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 export default function LobbyScreen() {
   const {
@@ -1148,6 +1256,11 @@ export default function LobbyScreen() {
     guestReplays,
     carryOverPlayerId,
     lobbyType,
+    rematchLocked,
+    competitionRematch,
+    parentControl,
+    carryPackages,
+    seedGameMode,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
@@ -1168,11 +1281,40 @@ export default function LobbyScreen() {
      *  Sätts av quiz.tsx vid navigation → LobbyScreen hoppar DB-beroende
      *  dup-detection och ärver rätt id direkt. */
     carryOverPlayerId?: string;
-    /** '1v1' när lobbyn skapades via HostTypeModal-valet "1vs1 Matches" på
-     *  Home (registrerad ELLER guest host). Seedar gameMode='remote-1v1'
-     *  hårt — den renodlade 1vs1-lobbyn visar ingen Game Mode-sektion så
-     *  läget kan aldrig bytas inne i lobbyn. */
+    /** Lobbytypen, vald i "Start New Game"-panelen på Home / Final
+     *  Leaderboard: 'single' | 'multiplayer' | '1v1'. LÅSER lobbyn — alla
+     *  tre seedas hårt och kan inte bytas inne i lobbyn (sedan 2026-08-26
+     *  gäller det även single/multiplayer, inte bara 1v1).
+     *  '1v1' kan aldrig komma från en guest host (users-only). */
     lobbyType?: string;
+    /** 'true' när lobbyn skapades via Re-match/Replay från Final Leaderboard.
+     *  Spelaruppsättningen är då LÅST till exakt spelarna från förra spelet.
+     *  Skickas som param (utöver rums-radens rematch_locked) så låst läge
+     *  renderas redan på första framen, utan att vänta på en DB-läsning. */
+    rematchLocked?: string;
+    /** 'true' när re-matchen startats från Home → /competitions (en sparad
+     *  Marathon table). Till skillnad från Final Leaderboards
+     *  re-match är de andra deltagarna INTE anslutna — de får en
+     *  cross-device-inbjudan och joinar på egen enhet. Driver den 5-minuters
+     *  expiry-timern nedan + väntar-bannern. rematchLocked är alltid 'true'
+     *  tillsammans med denna (den låsta uppsättningen bär Start-gaten). */
+    competitionRematch?: string;
+    /** Play Again carry-over: host:s exakta Parent Control-val från spelet som
+     *  just spelades ('true'/'false'). Parent Control persisteras ALDRIG i
+     *  lobby_settings (ingen DB-kolumn), så seeden kan inte läsa det ur stored
+     *  — utan denna param skulle en re-match återgå till profil-defaulten.
+     *  Undefined = fresh lobby (ej carry-over) → seeden faller på profilen. */
+    parentControl?: string;
+    /** Play Again carry-over: JSON-array av host:s aktiva Host-paket från
+     *  spelet som just spelades. AUKTORITATIV källa (kringgår ev. stale
+     *  lobby_settings + profil-filtret i seeden). Undefined = ej carry-over. */
+    carryPackages?: string;
+    /** Play Again carry-over: förra spelets gameMode ('pass-the-phone' |
+     *  'individual-devices'). Seedar `gameMode`-state SYNKRONT så PtP-confirm-
+     *  guarden i handleStartGame inte fyrar på en IndDev re-match innan den
+     *  async seeden (getLobbySettings/loadProfile) landat. Undefined = fresh
+     *  lobby (ej carry-over) → seeden faller på stored/profil. */
+    seedGameMode?: string;
   }>();
   // Om ingen kod skickas (t.ex. om man öppnar lobby-tabben direkt) genereras en.
   // useMemo ser till att koden är stabil över re-renders.
@@ -1196,12 +1338,49 @@ export default function LobbyScreen() {
   // sker däremot på gameMode === 'remote-1v1' (state) så non-host — som får
   // gameMode via settings-syncen — döljer samma sektioner utan egen param.
   const is1v1Lobby = lobbyType === '1v1';
-  // 'single' / 'multiplayer' är de två andra lobbyType-värdena (2026-08-24):
-  // Single vs Multiplayer väljs numera redan på Home / Final Leaderboard i
-  // stället för via Game Mode-rutorna här inne. De läses av
-  // resolveSeedSinglePlayer (module-level ovan) och styr ENBART
-  // singlePlayerDefault-seeden — Game Mode-sektionen renderas som vanligt i
-  // båda fallen, så host kan fritt byta läge inne i lobbyn.
+  // Re-match/Replay-lobby (Peter 2026-08-25): uppsättningen är låst till
+  // spelarna från föregående spel, så aggregatet förblir en rättvis serie.
+  // Konsekvenser: "+ Add Player" döljs, papperskorg + Approve-toggle döljs,
+  // Game Mode + Players blir en statisk indikator (VARJE lägesbyte ejectar
+  // spelare), Start Game blockeras tills alla är tillbaka, och join-gaten
+  // på Home släpper bara in spelare som redan finns i lobbyn.
+  // Host har fortfarande "Delete this Game Lobby" som utväg.
+  //
+  // Param:en `rematchLocked` ger första-frame-rendering för host + Final
+  // Leaderboards Play Again + competition-modalens auto-nav. Men param-LÖSA
+  // join-vägar (Home waiting-invite Accept + join-via-kod) navigerar UTAN den,
+  // så en cross-device-inbjuden competition-deltagare hamnade i multiplayer-
+  // grenen (BÅDE PtP + IndDev) i stället för den låsta re-match-indikatorn
+  // (Peter 2026-08-28). Fallback: läs `rooms.rematch_locked` ur rums-metan
+  // (satt atomiskt vid rums-skapandet, läsbar cross-device via Supabase).
+  const [metaRematchLocked, setMetaRematchLocked] = useState(false);
+  const isRematchLobby = rematchLocked === 'true' || metaRematchLocked;
+  useEffect(() => {
+    // Param redan auktoritativ → ingen DB-läsning behövs.
+    if (rematchLocked === 'true') return;
+    let cancelled = false;
+    void getRoomMeta(roomCode).then((meta) => {
+      if (!cancelled && meta?.rematchLocked) setMetaRematchLocked(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [rematchLocked, roomCode]);
+  // Competition re-match från Home (/competitions): en låst re-match där de
+  // inbjudna deltagarna joinar cross-device via inbjudan. Lägger till en
+  // 5-minuters expiry + en "väntar på spelare"-banner ovanpå den vanliga
+  // låsta-uppsättnings-logiken (isRematchLobby bär resten).
+  const isCompetitionRematch = competitionRematch === 'true';
+  // 'single' / 'multiplayer' är de två andra lobbyType-värdena. Sedan
+  // 2026-08-26 LÅSER de lobbyn på samma sätt som '1v1' gör:
+  //   • 'single'      → statisk "Single player"-indikator, ingen Players-
+  //                     sektion, ingen "+ Add Guest", kapacitet 1 ruta,
+  //                     rundor som 2/4-val (max 4 oavsett premium).
+  //   • 'multiplayer' → bara Pass-the-Phone + Individual device i Game Mode.
+  // Vill host byta: radera lobbyn och välj på nytt via Start New Game.
+  // Se isSingleLobby (deklarerad vid singlePlayerDefault-state:n) — UI-
+  // gatingen sker på STATE, inte på paramet, så non-host får samma vy via
+  // settings-syncen.
 
   // Initial = tom; mount-useEffect på [code, guestMode, ..., hostMode] sätter
   // till [SEED_PLAYERS[0]] för host eller [] för non-host. SEED_PLAYERS som
@@ -1215,6 +1394,12 @@ export default function LobbyScreen() {
   // markera rätt spelare som "left" i leftPlayers-storen så övriga ser
   // status:en när de öppnar lobby:n.
   const ownPlayerIdRef = useRef<string | null>(null);
+  // Eget intjänat Player-HCP (§2 UI) från den synkrona profil-spegeln —
+  // visas på DENNA enhets egen spelarrad (host eller non-host). Lobbyn
+  // mountas färskt efter varje spel, så spegeln bär redan motorns senaste
+  // skrivning. Andra spelares intjänade HCP kräver cross-device-sync
+  // (uppskjutet) och faller därför tillbaka på startvärdet 99.
+  const selfHcp = getCachedProfile()?.hcp;
   // Markeras true när self-rad först ses i stored från DB. Används av
   // syncFromStore för att skilja "vår INSERT har inte propagerat än"
   // (false → injecta från prev) från "host har raderat oss via DB DELETE"
@@ -1227,6 +1412,13 @@ export default function LobbyScreen() {
   // innan Promise.all resolvar och skapa en "stored"-post som sedan vinner
   // mot profil-defaults i if (!stored)-grenen.
   const lobbySeededRef = useRef(false);
+  // Re-render-bärande spegel av lobbySeededRef så Start Game-knappen kan
+  // låsas tills seed-effekten applicerat carry-over-settings. Utan detta
+  // kunde en snabb replay-tap fyra handleStartGame INNAN Promise.all-seeden
+  // hunnit sätta t.ex. youtubeEnabledCategories → quiz fick default-all-3
+  // källor och spelade "helt slumpmässigt" media trots att bara YT Music
+  // var valt. Ref:en är den synkrona sanningen vid tap; state:n driver UI.
+  const [lobbySeeded, setLobbySeeded] = useState(false);
   // Guard mot dubbel-navigation till /quiz när game_started detekteras.
   // Polling-effekten fyrar både via Realtime-tick OCH 2s-interval — utan
   // denna ref skulle vi anropa router.push flera gånger innan unmount.
@@ -1333,6 +1525,7 @@ export default function LobbyScreen() {
     selfEverInStoredRef.current = false;
     navigatedToQuizRef.current = false;
     lobbySeededRef.current = false;
+    setLobbySeeded(false);
     // Host: seed lobby-wide settings. Prio-ordning:
     //   1. lobby_settings (`stored`) — finns redan i DB om host nyss kom
     //      via "Play again + Keep settings"-flowet (quiz.tsx skrev över
@@ -1356,21 +1549,30 @@ export default function LobbyScreen() {
       // answerResponseSeconds är guest-VARIABEL sedan 2026-08-08 (30/45/60).
       getLobbySettings(roomCode).then((stored) => {
         if (cancelled) return;
-        // Renodlad 1vs1-lobby: mode forceras av Home-valet — stored/default
-        // ignoreras. Standard-lobby: stale 'remote-1v1' coercas till PtP
-        // (remote kan inte längre väljas inne i lobbyn).
-        setGameMode(
-          is1v1Lobby
-            ? 'remote-1v1'
-            : (stored?.gameMode ?? 'pass-the-phone') === 'remote-1v1'
-              ? 'pass-the-phone'
-              : stored?.gameMode ?? 'pass-the-phone',
-        );
         // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
         // (start-knapp-swap, handleStartGame, maxPlayers-effekten) är
         // gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
-        // single/multiplayer: Home-valet vinner över carry-over.
-        setSinglePlayerDefault(resolveSeedSinglePlayer(lobbyType, stored?.singlePlayerDefault ?? false));
+        // single/multiplayer: Home-valet vinner över carry-over. Resolveras
+        // FÖRE gameMode nedan — en single-lobby forcerar PtP under huven.
+        const seedSinglePlayer = resolveSeedSinglePlayer(
+          lobbyType,
+          stored?.singlePlayerDefault ?? false,
+        );
+        // Renodlad 1vs1-lobby: mode forceras av Home-valet — stored/default
+        // ignoreras. Single-lobby: PtP under huven (solo behöver inget
+        // IndDev-maskineri — det skulle bara öppna en onödig quiz_sync-kanal).
+        // Standard-lobby: stale 'remote-1v1' coercas till PtP (remote kan
+        // inte längre väljas inne i lobbyn).
+        setGameMode(
+          is1v1Lobby
+            ? 'remote-1v1'
+            : seedSinglePlayer
+              ? 'pass-the-phone'
+              : (stored?.gameMode ?? 'pass-the-phone') === 'remote-1v1'
+                ? 'pass-the-phone'
+                : stored?.gameMode ?? 'pass-the-phone',
+        );
+        setSinglePlayerDefault(seedSinglePlayer);
         setMaxPlayers(is1v1Lobby ? 2 : 4);
         setRegion('Sweden');
         // Clampa mot utbudet {30, 45, 60} — defensivt mot oväntade värden
@@ -1393,13 +1595,19 @@ export default function LobbyScreen() {
         setSketchEnabled(false);
         // Spotify-carry: attesten re-verifieras av "Spotify not confirmed"-
         // guarden i handleStartGame — ingen egen koll behövs här.
-        setSpotifyEnabled(stored?.spotifyEnabled ?? false);
+        // Single: alltid av (Spotify-kortet göms — DJ kräver en motspelare).
+        setSpotifyEnabled(seedSinglePlayer ? false : stored?.spotifyEnabled ?? false);
         setEnabledHostPackages([]);
+        // Parent Control — carry-over-param (guest host kan också toggla den).
+        // Persisteras aldrig i DB, så param är enda carry-över-källan. Utan
+        // param (fresh guest-lobby) → av.
+        setParentControlEnabled(parentControl === 'true');
         setYoutubeEnabledCategories(defaultEnabledMainCategories());
         setImagesEnabledCategories(defaultEnabledMainCategories());
         // Släpp debounce-skrivningen till lobby_settings så non-hosts ser
         // de fasta värdena via sin settings-sync.
         lobbySeededRef.current = true;
+        setLobbySeeded(true);
       });
     } else if (hostMode) {
       Promise.all([loadProfile(), getLobbySettings(roomCode), hasPremiumSubscription()]).then(
@@ -1411,37 +1619,40 @@ export default function LobbyScreen() {
           // forceras till remote-1v1 — stored/profil ignoreras. Standard-
           // lobby: stale 'remote-1v1' (t.ex. gammal profil-default från
           // innan Remote-rutan togs bort) coercas till Pass-the-Phone.
+          // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
+          // är gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
+          // single/multiplayer: Home-valet vinner över carry-over. Profilen
+          // ingår MEDVETET INTE i fallback-kedjan sedan 2026-08-26 — Single
+          // väljs per spel på Home, så en stale sparad `true` får inte låsa
+          // en Multiplayer-lobby.
+          // Resolveras FÖRST — både seedGameMode och rounds-clampen nedan
+          // MÅSTE läsa samma värde, annars cappas lobbyn mot fel läge.
+          const seedSinglePlayer = resolveSeedSinglePlayer(
+            lobbyType,
+            stored?.singlePlayerDefault ?? false,
+          );
           const rawSeedGameMode =
             stored?.gameMode ??
             (profile?.spotifyDefaultEnabled ? 'individual-devices' : undefined) ??
             profile?.gameMode ??
             'pass-the-phone';
+          // Single-lobby: PtP under huven. Solo behöver inget IndDev-
+          // maskineri (onödig quiz_sync-kanal + skev maxPlayers-effekt).
           const seedGameMode: GameMode = is1v1Lobby
             ? 'remote-1v1'
-            : rawSeedGameMode === 'remote-1v1'
+            : seedSinglePlayer
               ? 'pass-the-phone'
-              : rawSeedGameMode;
+              : rawSeedGameMode === 'remote-1v1'
+                ? 'pass-the-phone'
+                : rawSeedGameMode;
           setGameMode(seedGameMode);
-          // Clamp mot premium-status: profilen kan ha ett stale maxPlayers=12
-          // från en tidigare session med aktiv prenumeration — utan denna
-          // clamping sätts 12 EFTER att hasPremium-clamp-effekten kört 4,
-          // och effekten re-fyrar inte eftersom hasPremium inte ändrats.
-          // Remote 1v1: alltid låst till 2 (host + 1 motståndare).
-          if (seedGameMode === 'remote-1v1') {
-            setMaxPlayers(2);
-          } else {
-            const rawMax = profile?.maxPlayers ?? 4;
-            setMaxPlayers(!premium && rawMax > 4 ? 4 : rawMax === 2 ? 4 : (rawMax as 4 | 12));
-          }
-          // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
-          // är gated på `gameMode === 'remote-1v1' && !singlePlayerDefault`.
-          // single/multiplayer: Home-valet vinner över carry-over + profil.
-          // Resolveras EN gång — rounds-clampen nedan MÅSTE läsa samma
-          // värde, annars cappas en "Single Game"-lobby mot fel läge.
-          const seedSinglePlayer = resolveSeedSinglePlayer(
-            lobbyType,
-            stored?.singlePlayerDefault ?? profile?.singlePlayerDefault ?? false,
-          );
+          // Taket härleds ur läge + premium, INTE ur profilens sparade
+          // maxPlayers: Players-toggeln finns bara i IndDev, och där låser
+          // premium ändå till 12 (Max 4 utgråas). Ett stale profil-värde
+          // (t.ex. 12 från en session med aktiv prenumeration) får därför
+          // aldrig läcka in. Samma resolver som auto-sync-effekten nedan, så
+          // seeden och effekten inte sätter olika värden en frame isär.
+          setMaxPlayers(resolveMaxPlayers(seedGameMode, seedSinglePlayer, premium));
           setSinglePlayerDefault(seedSinglePlayer);
           // V1: bara Sweden — eventuella stored/profile-värden som inte är
           // Sweden ignoreras (legacy från Nordics/Europe/Global-tiden).
@@ -1462,8 +1673,12 @@ export default function LobbyScreen() {
           // stepperMax-logiken (premium krävs för >4 i IndDev) speglas här
           // vid load så ett gammalt sparat värde från en premium-session
           // inte sätts > 4 när premium saknas.
-          const savedRounds =
-            stored?.roundsCount ?? profile?.roundsDefault ?? ROUNDS_DEFAULT;
+          // Single player får ALLTID 4 rundor i en fresh lobby (Peter
+          // 2026-08-26) — profilens Number of Rounds gäller enbart
+          // Multiplayer. Carry-over (Replay) vinner fortfarande.
+          const savedRounds = seedSinglePlayer
+            ? stored?.roundsCount ?? ROUNDS_DEFAULT
+            : stored?.roundsCount ?? profile?.roundsDefault ?? ROUNDS_DEFAULT;
           const isIndivPremium =
             premium && seedGameMode === 'individual-devices' && !seedSinglePlayer;
           const initialMax = isIndivPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
@@ -1476,25 +1691,43 @@ export default function LobbyScreen() {
           //   • stored (Play Again + Keep settings) VINNER — inkl. ett
           //     medvetet tomt Generic-val — men klampas mot premium-status
           //     (utgången premium → []) och profilens enabledHostPackages.
-          //   • fresh lobby + premium → auto-aktivera alla enabled paket.
-          //   • ej premium → selection förblir [] (Generic).
+          //   • fresh lobby → selection förblir [] (Generic). Profilens
+          //     enabledHostPackages styr bara UTBUDET (availablePackages), inte
+          //     vad som är AKTIVT — host aktiverar själv via Activate/Select all.
           const catalogIds = PURCHASED_PACKAGES.map((p) => p.id);
           const enabledIds = (profile?.enabledHostPackages ?? catalogIds).filter(
             (id) => catalogIds.includes(id),
           );
+          // Play Again-param: host:s exakta paket-val från spelet som just
+          // spelades (AUKTORITATIVT). Vinner över stored.selectedExtraPackages
+          // — kringgår både en stale lobby_settings-rad och profil-filtret
+          // (enabledIds), så ett paket som var AKTIVT i föregående spel aldrig
+          // tappas vid carry-over. Undefined = ej carry-over.
+          const carriedPackages = parseCarryPackages(carryPackages);
           if (stored) {
-            setSelectedExtraPackages(
-              premium
-                ? stored.selectedExtraPackages.filter((id) => enabledIds.includes(id))
-                : [],
-            );
+            // Klampa mot catalogIds (giltiga paket) + premium — INTE mot
+            // enabledIds. Ett carry-over-paket ska bäras med oavsett profilens
+            // enabledHostPackages (som bara styr fresh-lobby-utbudet).
+            const sourcePackages = carriedPackages ?? stored.selectedExtraPackages;
+            const nextPackages = premium
+              ? sourcePackages.filter((id) => catalogIds.includes(id))
+              : [];
+            setSelectedExtraPackages(nextPackages);
+            // Se till att carry-over-paketen även ERBJUDS i listan (annars
+            // aktivt men dolt). Union av profilens enabled + de aktiva.
+            setEnabledHostPackages([...new Set([...enabledIds, ...nextPackages])]);
             setSketchEnabled(stored.sketchEnabled);
-            // 1v1: Spotify är aldrig tillgängligt (kortet göms) — forcera av.
-            setSpotifyEnabled(is1v1Lobby ? false : stored.spotifyEnabled);
+            // 1v1 + single: Spotify är aldrig tillgängligt (kortet göms i
+            // båda lobbytyperna) — forcera av så inget carry-over läcker in.
+            setSpotifyEnabled(is1v1Lobby || seedSinglePlayer ? false : stored.spotifyEnabled);
           } else if (premium) {
-            setSelectedExtraPackages(enabledIds);
+            // Fresh lobby öppnar på Generic — profilens enabled paket ERBJUDS
+            // i listan men aktiveras INTE automatiskt.
+            setSelectedExtraPackages([]);
+            setEnabledHostPackages(enabledIds);
+          } else {
+            setEnabledHostPackages(enabledIds);
           }
-          setEnabledHostPackages(enabledIds);
           // YouTube categories — prio: stored > profil > all 3.
           // Villkor: !== undefined (ej length > 0) så att [] (explicit av) respekteras.
           const seedYtCats =
@@ -1514,9 +1747,11 @@ export default function LobbyScreen() {
           setImagesEnabledCategories(seedImgCats);
           // Spotify default — prio: stored > profil. Sätts här så toggeln
           // är rätt seedat oavsett om Spotify-callbacken hinner före render.
-          // 1v1: alltid av (Spotify-kortet göms i renodlade 1vs1-lobbyn).
+          // 1v1 + single: alltid av (Spotify-kortet göms i båda).
           if (!stored) {
-            setSpotifyEnabled(is1v1Lobby ? false : profile?.spotifyDefaultEnabled ?? false);
+            setSpotifyEnabled(
+              is1v1Lobby || seedSinglePlayer ? false : profile?.spotifyDefaultEnabled ?? false,
+            );
           }
           // Remote 1v1: gemensam hjälpnivå. Carry-over (Play Again) vinner,
           // annars produktdefaulten Full — MEDVETET inte hostens personliga
@@ -1525,12 +1760,23 @@ export default function LobbyScreen() {
           // i en ny lobby (opt-in) men bärs över vid Play Again.
           setRemoteAssistance(stored?.remoteAssistance ?? 'full');
           setMutualAssistanceEnabled(stored?.mutualAssistanceEnabled ?? false);
+          // Parent Control — carry-over-param VINNER (host:s exakta val från
+          // spelet som just spelades). stored?.parentControlEnabled är alltid
+          // false (fältet persisteras inte till DB, samma mönster som
+          // spotify_answer_*), så vi läser aldrig stored här. Utan param
+          // (fresh lobby) faller vi på host:ens profil-default.
+          const carriedParentControl =
+            parentControl === undefined ? undefined : parentControl === 'true';
+          setParentControlEnabled(
+            carriedParentControl ?? profile?.parentControlEnabled ?? false,
+          );
           // Tillåt debounce-effekten att skriva till setLobbySettings nu när
           // alla initiala värden är satta. Utan denna guard kan debounce:n
           // hinna skriva med default-värden (spotifyEnabled=false) INNAN
           // Promise.all resolvar — och skapa en "stored"-post som vinner
           // mot profil-defaults i if (!stored)-grenen ovan.
           lobbySeededRef.current = true;
+          setLobbySeeded(true);
         },
       );
     }
@@ -1578,7 +1824,10 @@ export default function LobbyScreen() {
           // Guest alias: en INLOGGAD user som joinar via guest-formen
           // publicerar sitt kontonamn så host ser vem det är. Kedjat på
           // upsert:en så raden garanterat finns när UPDATE:n körs.
-          .then(() => publishOwnAccountAlias(roomCode, guestPlayerId))
+          .then(() => {
+            publishOwnAccountAlias(roomCode, guestPlayerId);
+            publishOwnHcpToLobby(roomCode, guestPlayerId);
+          })
           .catch(() => { /* loggas i lobbyPlayers */ });
         // Publicera enhetens fråge-historik för cross-player-exkludering.
         // Guest-join på en enhet med inloggad profil publicerar profilens
@@ -1709,11 +1958,17 @@ export default function LobbyScreen() {
           // claim sätter user_id + has_left=false; separat upsert skriver approved=true.
           claimCarryOverLobbyPlayer(roomCode, joinerId).catch(() => { /* loggas i lobbyPlayers */ });
           upsertOwnLobbyPlayer(roomCode, joiner)
-            .then(() => publishOwnAccountAlias(roomCode, joinerId))
+            .then(() => {
+              publishOwnAccountAlias(roomCode, joinerId);
+              publishOwnHcpToLobby(roomCode, joinerId);
+            })
             .catch(() => { /* loggas i lobbyPlayers */ });
         } else {
           upsertOwnLobbyPlayer(roomCode, joiner)
-            .then(() => publishOwnAccountAlias(roomCode, joinerId))
+            .then(() => {
+              publishOwnAccountAlias(roomCode, joinerId);
+              publishOwnHcpToLobby(roomCode, joinerId);
+            })
             .catch(() => { /* loggas i lobbyPlayers */ });
         }
         // Publicera enhetens fråge-historik för cross-player-exkludering
@@ -1736,7 +1991,7 @@ export default function LobbyScreen() {
       if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
     return () => { cancelled = true; };
-  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType]);
+  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType, parentControl, carryPackages]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
@@ -1785,8 +2040,15 @@ export default function LobbyScreen() {
               // Prefer carry-over value if lobby_settings redan finns (Play Again
               // + Keep Settings skriver spotifyEnabled till nya rumkoden via
               // goToNewLobby). Faller tillbaka till profil-default för fresh lobbies.
-              const shouldEnable =
-                lobbySt?.spotifyEnabled ?? prof?.spotifyDefaultEnabled ?? false;
+              // Single player-lobby: Spotify-kortet är gömt, så profil-
+              // defaulten får inte läcka in här heller. Läser den
+              // auktoritativa stored-raden med lobbyType-paramet som
+              // fallback (settings-skrivningen är debounce:ad, så raden kan
+              // saknas i det första fönstret efter lobby-skapandet).
+              const isSingle = lobbySt?.singlePlayerDefault ?? lobbyType === 'single';
+              const shouldEnable = isSingle
+                ? false
+                : lobbySt?.spotifyEnabled ?? prof?.spotifyDefaultEnabled ?? false;
               setSpotifyEnabled(shouldEnable);
               setSpotifyAnswerYear(lobbySt?.spotifyAnswerYear ?? prof?.spotifyAnswerYear ?? true);
               setSpotifyAnswerName(lobbySt?.spotifyAnswerName ?? prof?.spotifyAnswerName ?? true);
@@ -1813,19 +2075,13 @@ export default function LobbyScreen() {
         // over). Gated på lobbySeededRef så seed-effekten förblir
         // auktoritativ för initialt state.
         //   • premium tappad (lapse/expiry) → töm selection (Generic).
-        //   • premium köpt mid-session (Store-besök → tillbaka) →
-        //     auto-aktivera BARA om selection är tom.
+        //   • premium köpt mid-session → INGEN auto-aktivering. Paketen blir
+        //     tillgängliga (via availablePackages) men host aktiverar själv.
         if (hostMode) {
           const effPremium = isGuestHost ? false : premium;
           if (lobbySeededRef.current && prevPremiumRef.current !== null) {
-            const catIds = PURCHASED_PACKAGES.map((p) => p.id);
-            const enIds = (profile?.enabledHostPackages ?? catIds).filter((id) =>
-              catIds.includes(id),
-            );
             if (!effPremium && prevPremiumRef.current) {
               setSelectedExtraPackages([]);
-            } else if (effPremium && !prevPremiumRef.current) {
-              setSelectedExtraPackages((prev) => (prev.length === 0 ? enIds : prev));
             }
           }
           prevPremiumRef.current = effPremium;
@@ -1939,12 +2195,71 @@ export default function LobbyScreen() {
   // popupen pga en load-race. Guest host (ingen profil) → loadFriends
   // returnerar [] → auto-approve matchar aldrig.
   const hostFriendsRef = useRef<Friend[] | null>(null);
+  // Render-synlig spegel av "har friends-listan laddats?". hostFriendsRef är
+  // en ref och kan därför inte gata render-logiken — men join-kortets
+  // synlighet MÅSTE veta om vi ännu kan avgöra att en joiner är friend (se
+  // isJoinDecisionPending). Sätts true även om load:en failar (tom lista) så
+  // en joiner aldrig kan bli permanent osynlig.
+  const [hostFriendsLoaded, setHostFriendsLoaded] = useState(false);
+  // Ids som är inne i sitt join-grace-fönster (se isJoinDecisionPending).
+  // State (inte ref) — synligheten måste re-rendera när fönstret löper ut.
+  const [joinGraceIds, setJoinGraceIds] = useState<Set<string>>(new Set());
+  // Ids som redan HAR fått sitt fönster, så det aldrig startas om av en
+  // players-uppdatering. Prunas när spelaren lämnar/försvinner → en genuin
+  // rejoin får ett nytt fönster.
+  const joinGraceSeenRef = useRef<Set<string>>(new Set());
+  const joinGraceTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [invitedFriendIds, setInvitedFriendIds] = useState<Set<string>>(new Set());
-  // Input för "Add by Player Name"-raden i Share invite — speglar Profile:s
-  // friends-modal så host kan lägga till en QuizVibe friend direkt från lobby
-  // utan att behöva navigera till Profile först. Nyligen tillagd friend
-  // dyker upp i listan med en Invite-knapp redo att tappas.
+  // Checkbox-urval i Share invite (2026-08-27, ersatte per-rad "Invite"-
+  // knappen) — host bockar för flera friends och skickar dem alla på en gång
+  // via "Send invite"-knappen längst ner. Rensas vid varje modal-open och
+  // efter en lyckad Send. Redan skickade (invitedFriendIds) är INTE med här
+  // — deras kryssruta renderas grön+låst separat.
+  const [selectedFriendIds, setSelectedFriendIds] = useState<Set<string>>(new Set());
+  // Input för "Add by Player Name"-raden i Share invite (2026-08-27,
+  // omarbetad till samma split-field-struktur som PlayerName skapas överallt
+  // annars i appen — se AddPlayerModal ovan) — speglar Profile:s friends-
+  // modal så host kan lägga till en QuizVibe friend direkt från lobby utan
+  // att behöva navigera till Profile först. Nyligen tillagd friend dyker
+  // upp i listan med en kryssruta redo att bockas för.
   const [newFriendPlayerName, setNewFriendPlayerName] = useState('');
+  const [addFriendKbMode, setAddFriendKbMode] = useState<'letter' | 'digit'>('letter');
+  const [addFriendFocused, setAddFriendFocused] = useState(false);
+  const addFriendLettersRef = useRef<TextInput>(null);
+  const addFriendDigitsRef = useRef<TextInput>(null);
+  // Async uniqueness/existence-check på Add-knappen (playerNameExists) —
+  // host får bara lägga till Player Names som faktiskt tillhör en
+  // registrerad QuizVibe-user. `addFriendChecking` disable:ar knappen under
+  // roundtrip:en, `addFriendError` visas inline under fältet vid miss.
+  const [addFriendChecking, setAddFriendChecking] = useState(false);
+  const [addFriendError, setAddFriendError] = useState<string | null>(null);
+  // Pending friends (2026-08-27) — en Player Name som "Add" verifierat
+  // finns (playerNameExists) men som INTE redan är en sparad friend hamnar
+  // här istället för att persisteras direkt. De blir en riktig, sparad
+  // friend (via addFriend) FÖRST när spelaren med matchande playerName
+  // faktiskt dyker upp i players[] (= accepterat inviten och joinat detta
+  // rum) — se watcher-effekten längre ner. Rensas ALDRIG av
+  // handleOpenShareModal så en pending post överlever att host stänger och
+  // öppnar Share invite-modalen igen inom samma lobby-session; den lever
+  // och dör med LobbyScreen-mountet (ingen persistens över app-omstart).
+  const [pendingFriends, setPendingFriends] = useState<Friend[]>([]);
+  // Ids (pending-<lower>) för de pending-poster som FAKTISKT har en utestående
+  // waiting_invites-rad — dvs. host har bockat för dem och tryckt "Send
+  // invite" (eller en invite skickad i en tidigare lobby lever kvar).
+  // Driver "Pending"-badgen: en NYSS tillagd (handleAddFriendFromShare) men
+  // ännu ej skickad kandidat är INTE här → ingen badge (Peter 2026-08-27:
+  // "pending"-perioden startar först när inviten skickas). Full re-sync mot
+  // waiting_invites vid varje modal-open (handleOpenShareModal) → en denied/
+  // accepterad/utgången invite faller ur setet, badgen slocknar och posten
+  // prunas ur listan om den inte hunnit bli en sparad friend.
+  const [sentPendingIds, setSentPendingIds] = useState<Set<string>>(new Set());
+  // Ref-spegel av sentPendingIds så den asynkrona Realtime-DELETE-handlern
+  // (live-borttagning av denied pending nedan) alltid läser det senaste
+  // värdet utan att behöva ligga i sin egen effekt-deps.
+  const sentPendingIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    sentPendingIdsRef.current = sentPendingIds;
+  }, [sentPendingIds]);
 
   // Ref till lobby:s primär-ScrollView. Används för att snäppa scroll-position
   // till toppen vid varje fresh entry (mount eller URL-params-byte) — utan
@@ -2050,11 +2365,6 @@ export default function LobbyScreen() {
   // One-shot-guard: host publicerar sitt Guest alias en gång per lobby
   // (players-sync-effekten körs vid varje ändring).
   const hostAliasPublishedRef = useRef(false);
-  // Approved non-host i Pass-the-Phone-lobby: host startar → bara host
-  // spelar på sin telefon. Non-host får informativ popup ("använd host-
-  // device:n"). Skiljs från startedWithoutMeDetected (oapprovaderad)
-  // eftersom messaging:en är olika.
-  const [passThePhoneStartedDetected, setPassThePhoneStartedDetected] = useState(false);
   // True under den korta processing-fasen mellan host:s Yes-konfirmation
   // och navigation till Home. Visar en loading-overlay med "Please Wait —
   // Deleting this Lobby..." + animerade våg-prickar så host:en känner att
@@ -2100,11 +2410,37 @@ export default function LobbyScreen() {
   const [approveAllValue, setApproveAllValue] = useState<'no' | 'yes'>('no');
 
   // Game mode toggle (Pass-the-Phone vs Multiplayer Individual Devices)
-  const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
+  //
+  // ⚠ SYNKRON seed (inte plain 'pass-the-phone'). Seed-effekten är async
+  // (getLobbySettings/loadProfile), så med default-literal bar state:n
+  // 'pass-the-phone' tills den landade — och PtP-confirm-guarden i
+  // handleStartGame (som läser gameMode-STATE) fyrade på en IndDev re-match
+  // om host hann trycka Start Game innan seeden hunnit rätta läget (Peter).
+  // Samma mönster + skäl som singlePlayerDefault nedan.
+  //
+  // Till skillnad från singlePlayerDefault kan läget INTE härledas ur
+  // lobbyType ensamt (multiplayer säger inget om PtP vs IndDev) — carry-over-
+  // paramet `seedGameMode` bär förra spelets läge (= det som skrevs in i den
+  // carry-over:ade lobby_settings-raden som async seeden läser), så de kan
+  // aldrig divergera en frame isär. Stale 'remote-1v1' coercas till PtP precis
+  // som i seed-effekten. Fresh lobby (ingen param) → 'pass-the-phone', och
+  // async seeden rättar från stored/profil.
+  //
+  // gameMode FÖRBLIR muterbar state (host:s live PtP⇄IndDev-toggle + async
+  // seed skriver den) — den får INTE bli ett rent param-derivat som
+  // isSingleLobby, eftersom läget är en levande toggle i multiplayer-lobbyn.
+  const [gameMode, setGameMode] = useState<GameMode>(() => {
+    if (lobbyType === '1v1') return 'remote-1v1';
+    if (lobbyType === 'single') return 'pass-the-phone';
+    if (seedGameMode === 'individual-devices') return 'individual-devices';
+    if (seedGameMode === 'pass-the-phone') return 'pass-the-phone';
+    return 'pass-the-phone';
+  });
 
   // Host-badgens cross-fade-loop (Animated.Values deklareras längre upp).
-  // Ligger här nere eftersom den tredje frasens TEXT beror på `gameMode`
-  // ("1vs1 challenge" i remote-lobbyn, annars "Single or multiplayer game").
+  // Ligger här nere eftersom den tredje frasens TEXT beror på lobby-typ
+  // ("H2H challenge" i remote-lobbyn, "Single mode" i single-lobbyn,
+  // annars "Multiplayer mode").
   useEffect(() => {
     if (!hostMode) return;
     const opacities = [hostBadgeOp0, hostBadgeOp1, hostBadgeOp2];
@@ -2140,10 +2476,43 @@ export default function LobbyScreen() {
     ownPlayerIdRef.current ?? '',
     gameMode === 'individual-devices',
   );
-  // "Use single player mode as default" — när checkad dämpas Pass-the-Phone-
-  // rutan i toggle:n. Speglar Profile:s motsvarande checkbox; lokal lobby-
-  // state utan profil-pre-load (konsekvent med gameMode som också är lokal).
-  const [singlePlayerDefault, setSinglePlayerDefault] = useState(false);
+  // Single player-läget. Sätts EN gång av seed-effekten utifrån Home:s
+  // "Start New Game"-val (lobbyType-paramet) — det finns ingen setter kvar
+  // i UI:t sedan 2026-08-26, lobbytypen är låst vid skapandet.
+  //
+  // ⚠ SYNKRON seed ur paramet, inte `useState(false)`. Seed-effekten är
+  // async (getLobbySettings/loadProfile), så med `false` som initialvärde
+  // renderades multiplayer-vyn i ~1 s innan låset slog till: Players in
+  // Lobby visade 4 kapacitetsrutor som sedan kollapsade till 1, och Game
+  // Mode-sektionen hann visa PtP/IndDev-rutorna. Syntes tydligast vid
+  // Replay från Final Leaderboard (Peter 2026-08-26). Samma skäl som
+  // `rematchLocked` skickas som param vid sidan av rums-radens kolumn.
+  //
+  // Värdet är identiskt med vad resolveSeedSinglePlayer räknar fram för
+  // 'single' (paramet vinner ALLTID över fallback), så det kan inte
+  // divergera från den auktoritativa seeden. Övriga lobbyType-värden — och
+  // non-host, som aldrig har paramet — startar false och får sitt värde av
+  // seed-effekten respektive settings-syncen.
+  const [singlePlayerDefault, setSinglePlayerDefault] = useState(
+    () => lobbyType === 'single',
+  );
+  /** Lobbytypen är LÅST vid skapandet (Home → Start New Game).
+   *
+   *  Samma resolver som seed-effekten använder, men med LIVE STATE som
+   *  fallback — så värdet är per konstruktion identiskt med det seeden
+   *  räknar fram, och kan aldrig divergera från det.
+   *  • Host har alltid paramet → synkront rätt redan första framen.
+   *  • Non-host har det aldrig → faller på state:n, som settings-syncen
+   *    sätter (samma mönster som remote-1v1:s gating på gameMode-state).
+   *
+   *  ⚠ Att läsa paramet — inte bara state:n — är det som gör vyn immun mot
+   *  att Stack-navigatorn ÅTERANVÄNDER component-instansen över en
+   *  router.replace (då kör useState-initialiseraren inte om, och state
+   *  bär förra lobbyns värde tills den async seeden landar).
+   *
+   *  Deklareras direkt efter state:n så även effekter ovanför render
+   *  (dep-arrayer evalueras under render) kan läsa den utan TDZ. */
+  const isSingleLobby = resolveSeedSinglePlayer(lobbyType, singlePlayerDefault);
 
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   // Lobby-local state; speglar Profile:s host-default-toggle.
@@ -2213,18 +2582,20 @@ export default function LobbyScreen() {
     setRoomMaxPlayers(roomCode, maxPlayers).catch(() => { /* loggas i mockActiveRooms */ });
   }, [maxPlayers, roomCode, hostMode]);
 
-  // Auto-sync maxPlayers ↔ gameMode (host-only): Pass-the-Phone capas alltid
-  // vid 4 spelare (PtP med 12 spelare × 20 rundor = orimligt långt spel),
-  // Individual Devices defaulta:r till 12 så host får full multiplayer-cap
-  // direkt utan extra knapptryck. Non-host syncar maxPlayers via room-meta-
-  // maxPlayers sätts nu explicit via Players-toggeln (Max 4 / Max 12).
-  // Premium → auto-välj Max 12 och lås (Max 4 utgråas).
-  // Ej premium → tvinga tillbaka till Max 4.
-  // Remote 1v1 → ALLTID 2 (host + 1 motståndare) oavsett premium.
+  // Auto-sync maxPlayers ↔ gameMode (host-only) — hela regeln bor i
+  // resolveMaxPlayers (module-level, delas med seed-effekten):
+  //   Pass-the-Phone → ALLTID 4, även med Premium (alla delar en enhet).
+  //   Individual device → 12 med Premium, annars 4.
+  //   Remote 1v1 → ALLTID 2 (host + 1 motståndare).
+  //   Single player → 4 (lägsta giltiga; DB-CHECK tillåter bara 2/4/12).
+  //     Kapacitetsmätaren visar ändå EN ruta.
+  // Players-toggeln (Max 4 / Max 12) är därmed bara meningsfull i IndDev,
+  // och där låser premium till 12 (Max 4 utgråas). Non-host syncar
+  // maxPlayers via room-meta i stället.
   useEffect(() => {
     if (!hostMode) return;
-    setMaxPlayers(gameMode === 'remote-1v1' ? 2 : hasPremium ? 12 : 4);
-  }, [hostMode, hasPremium, gameMode]);
+    setMaxPlayers(resolveMaxPlayers(gameMode, singlePlayerDefault, hasPremium));
+  }, [hostMode, hasPremium, gameMode, singlePlayerDefault]);
 
   // Max rundor beror på spelläge: IndDev → 20, PtP/Single → 4.
   // Premium ger INTE fler rundor i PtP — premium-host i PtP hänvisas till
@@ -2244,9 +2615,7 @@ export default function LobbyScreen() {
   const handleDecrementRounds = useCallback(() => {
     setRoundsCount((prev) => {
       const next = Math.max(ROUNDS_MIN, prev - ROUNDS_STEP);
-      // Haptic-klick bara när värdet faktiskt ändras (vid range-floor
-      // skulle annars en "tom" tap fyra haptik utan visuell respons).
-      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // Haptiken fyras nu av den wrappade tryck-primitiven (se src/components/haptic).
       return next;
     });
   }, []);
@@ -2259,7 +2628,6 @@ export default function LobbyScreen() {
     }
     setRoundsCount((prev) => {
       const next = Math.min(stepperMax, prev + ROUNDS_STEP);
-      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return next;
     });
   }, [stepperMax, roundsCount, singlePlayerDefault, gameMode]);
@@ -2278,6 +2646,10 @@ export default function LobbyScreen() {
   const [spotifyEnabled, setSpotifyEnabled] = useState(false);
   const [spotifyAnswerYear, setSpotifyAnswerYear] = useState(true);
   const [spotifyAnswerName, setSpotifyAnswerName] = useState(true);
+  // Parent Control — host-styrd. När på filtreras YT-items taggade
+  // parentControlled bort ur frågeurvalet (skickas som URL-param till quiz).
+  // Seedas från host:ens profil (parentControlEnabled); non-host speglar host.
+  const [parentControlEnabled, setParentControlEnabled] = useState(false);
   // Remote 1v1: EN gemensam hjälpnivå för båda spelarna (default Full).
   // Assistance är annars personligt, men i en duell där båda kör samma
   // frågesekvens var för sig blir olika nivåer inte jämförbart — därför KAN
@@ -2424,6 +2796,14 @@ export default function LobbyScreen() {
     Alert.alert(
       'Locked for Guest Host',
       'Activation/deactivation only applicable by QuizVibe users Host',
+    );
+
+  // Tap på den låsta Game Mode-indikatorn i en replay/re-match-lobby (single,
+  // PtP, IndDev eller 1vs1) — läget är fast, förklara varför (Peter 2026-08-28).
+  const lockedModeAlert = () =>
+    Alert.alert(
+      'Game mode locked',
+      'This game is a replay / rematch Marathon with Game mode settings fixed.',
     );
 
   const handleToggleAllSources = (value: boolean) => {
@@ -2859,6 +3239,75 @@ export default function LobbyScreen() {
     }
   };
 
+  // "+ Add package"-modal: host väljer paket direkt ur HELA katalogen
+  // (allPackagesCatalog), oberoende av vad som är aktiverat i Profile. Slår host
+  // PÅ ett paket här görs det (a) tillgängligt i lobby-listan (enabledHostPackages)
+  // OCH (b) aktivt i lobbyn (selectedExtraPackages) — "får med till lobbyn". AV =
+  // tas bort ur båda. Lobby-scopat (inte skrivet till profilen) per Peters intent.
+  const [addPackageModalVisible, setAddPackageModalVisible] = useState(false);
+  const handleToggleCatalogPackage = (id: string) => {
+    if (enabledHostPackages.includes(id)) {
+      setEnabledHostPackages((prev) => prev.filter((p) => p !== id));
+      setSelectedExtraPackages((prev) => prev.filter((p) => p !== id));
+    } else {
+      setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    }
+  };
+
+  // ── Host-paket: coverage-graying + Game Era-lås (delad logik i hostPackages.ts) ──
+  // Aktivt paket → musikpoolen blir tema-only (quiz.tsx). Här i lobbyn:
+  //   (a) mixerboard-celler utan material i valt paket gråas ut (pkgGray*),
+  //   (b) Game Era låses till paketens innehålls-span (effectiveEraValues).
+  // Allt härleds ur selectedExtraPackages → auto-uppdaterar vid paket-toggle.
+  const anyPackageActive = useMemo(
+    () => hasActivePackage(selectedExtraPackages),
+    [selectedExtraPackages],
+  );
+  const packageCoverage = useMemo(
+    () => computePackageCoverage(selectedExtraPackages),
+    [selectedExtraPackages],
+  );
+  const packageEraRange = useMemo(
+    () => computePackageEraRange(selectedExtraPackages),
+    [selectedExtraPackages],
+  );
+  const packageEraLocked = anyPackageActive && packageEraRange !== null;
+  // En (kategori × källa)-cell gråas när paket aktivt men saknar material där.
+  const pkgGray = (cat: MainCategory, src: 'youtube' | 'hints'): boolean =>
+    anyPackageActive && !packageCoverage[cat][src];
+  // Kolumn-master gråas när HELA kolumnen (YT + Hints) saknar material.
+  const pkgGrayColumn = (cat: MainCategory): boolean =>
+    anyPackageActive && !packageCoverage[cat].youtube && !packageCoverage[cat].hints;
+  const pkgGraySpotify =
+    anyPackageActive &&
+    !packageCoverage.Music.spotify &&
+    !packageCoverage.Film.spotify &&
+    !packageCoverage.Sport.spotify;
+  // "All"-master gråas bara när HELA matrisen saknar material (alla kolumner grå).
+  const pkgGrayAllSources =
+    pkgGrayColumn('Music') && pkgGrayColumn('Film') && pkgGrayColumn('Sport');
+  // Paket LÅSER hela mixerboarden: en täckt cell visas grön + låst (kan ej stängas
+  // av), en otäckt cell visas grå/av + låst (green-lock tas bort). Host:s egna
+  // toggle-värde göms medan paket är aktivt — paketet dikterar källorna helt.
+  const smCellValue = (cat: MainCategory, src: 'youtube' | 'hints', actual: boolean): boolean =>
+    anyPackageActive ? packageCoverage[cat][src] : actual;
+  const smColValue = (cat: MainCategory, actual: boolean): boolean =>
+    anyPackageActive ? packageCoverage[cat].youtube || packageCoverage[cat].hints : actual;
+  // "All"-master är grön/låst bara när HELA matrisen täcks; annars grå/av (dimmad)
+  // — ett paket som bara täcker Music ska inte visa "All" som på.
+  const pkgAllCovered =
+    anyPackageActive &&
+    !pkgGrayColumn('Music') &&
+    !pkgGrayColumn('Film') &&
+    !pkgGrayColumn('Sport');
+  const smAllValue = anyPackageActive ? pkgAllCovered : allEnabled;
+  // Effektivt Game Era-spann: paketets innehålls-span när låst, annars host:s
+  // slider-val. Används för display, lobby_settings-write, quiz-params + preview
+  // så non-host + spelet alltid får det låsta spannet (aldrig tomt pga era-miss).
+  const effectiveEraValues: [number, number] =
+    packageEraLocked && packageEraRange ? packageEraRange : [eraValues[0], eraValues[1]];
+
   // Switch som kräver att host:s manuellt tillagda guests försvinner (de
   // saknar egen mobil och kan inte spela på individual devices). Visar Alert
   // om sådana finns, raderar dem lokalt + i lobby_players-DB:n vid confirm,
@@ -2946,8 +3395,8 @@ export default function LobbyScreen() {
       );
       if (selfJoinedNonHosts.length > 1) {
         Alert.alert(
-          'Switch to Remote (1vs1)?',
-          'Remote 1vs1 allows only 1 opponent. All players will be removed from the lobby — invite ONE opponent again after switching.',
+          'Switch to Head-to-head?',
+          'Head-to-head allows only 1 opponent. All players will be removed from the lobby — invite ONE opponent again after switching.',
           [
             { text: 'Cancel', style: 'cancel' },
             {
@@ -2976,7 +3425,7 @@ export default function LobbyScreen() {
       }
       // ≤1 självansluten motståndare — behåll den; rensa ev. host-tillagda
       // guests via samma confirm-flöde som IndDev.
-      confirmAndRemoveGuests('Switch to Remote (1vs1)?', applyRemote);
+      confirmAndRemoveGuests('Switch to Head-to-head?', applyRemote);
       return;
     }
     // Vid byte till PtP: maxPlayers alltid 4 (PtP-cap). Om host godkänt fler
@@ -3022,44 +3471,9 @@ export default function LobbyScreen() {
     setSpotifyEnabled(false);
   };
 
-  // Single player-val: ejecta ev. non-host-spelare (de kan inte vara med i
-  // single-player). Samma logik som tidigare singlePlayerDefault-checkbox ON.
-  const handleSelectSingle = () => {
-    if (singlePlayerDefault) return;
-    const ejectables = players.filter((p) => !p.isHost && !p.hasLeft);
-    if (ejectables.length === 0) {
-      setSinglePlayerDefault(true);
-      setSpotifyEnabled(false);
-      return;
-    }
-    Alert.alert(
-      'Switch to single-player mode?',
-      'Play single player mode will delete players in lobby. Still want to play single player?',
-      [
-        { text: 'No', style: 'cancel' },
-        {
-          text: 'Yes',
-          style: 'destructive',
-          onPress: () => {
-            ejectables.forEach((p) => {
-              markEjected(roomCode, p.id);
-              supabase
-                .from('lobby_players')
-                .delete()
-                .eq('room_code', roomCode)
-                .eq('player_id', p.id)
-                .then(({ error }) => {
-                  if (error) console.warn('[lobbyPlayers] single-player eject failed:', error.message);
-                });
-            });
-            setPlayers((prev) => prev.filter((p) => p.isHost));
-            setSinglePlayerDefault(true);
-            setSpotifyEnabled(false);
-          },
-        },
-      ],
-    );
-  };
+  // handleSelectSingle är BORTTAGEN 2026-08-26 — Single player väljs numera
+  // via "Start New Game" på Home (lobbyType-paramet) och är låst för lobbyns
+  // livstid. Det finns ingen väg till single-läget inifrån lobbyn.
 
   // Players-val: Max 4 (gratis) / Max 12 (Premium).
   // Max 12 kräver IndDev-läge (PtP/Single → info-alert) OCH Premium
@@ -3095,24 +3509,20 @@ export default function LobbyScreen() {
   // FREE-badge grön när aktiv, grå när inaktiv. disabled för non-host.
   // redIndiv: om true färgas "Individual device"-rutan röd när inaktiv (används
   // bara i Number of Rounds quick-select, INTE i Game Settings/Game Mode).
-  const renderModeBox = (key: 'single' | 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
+  const renderModeBox = (key: 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
     const isActive =
-      key === 'single'
-        ? singlePlayerDefault
-        : key === 'ptp'
-          ? !singlePlayerDefault && gameMode === 'pass-the-phone'
-          : key === 'remote'
-            ? !singlePlayerDefault && gameMode === 'remote-1v1'
-            : !singlePlayerDefault && gameMode === 'individual-devices';
+      key === 'ptp'
+        ? !singlePlayerDefault && gameMode === 'pass-the-phone'
+        : key === 'remote'
+          ? !singlePlayerDefault && gameMode === 'remote-1v1'
+          : !singlePlayerDefault && gameMode === 'individual-devices';
     return (
       <TouchableOpacity
         style={[styles.modeOption, isActive ? styles.modeOptionPassActive : styles.modeOptionInactive]}
         onPress={() =>
-          key === 'single'
-            ? handleSelectSingle()
-            : handleSelectMode(
-                key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
-              )
+          handleSelectMode(
+            key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
+          )
         }
         disabled={!hostMode}
         activeOpacity={0.7}
@@ -3153,7 +3563,140 @@ export default function LobbyScreen() {
     () => extractTakenGuestLetters(players.filter((p) => !p.hasLeft).map((p) => p.name)),
     [players],
   );
-  const waitingForApproval = players.filter((p) => !isPlayerApproved(p) && !p.hasLeft);
+  // ── Auto-approve-predikat (delas av render + join-watchern) ───────────
+  // Samma guards som handleSetApproved. Bryts de ut hit för att render och
+  // watchern ALDRIG ska kunna glida isär — render måste kunna förutsäga
+  // exakt vad watchern kommer göra en tick senare (se isJoinDecisionPending).
+  const passesSilentApproveGuards = (p: LobbyPlayer) =>
+    !singlePlayerDefault &&
+    lobbyPeerHealth[p.id] !== 'unstable' &&
+    (!spotifyEnabled || !!p.spotifyConnected);
+  const willAutoApproveOnJoin = (p: LobbyPlayer) => {
+    const nameLower = p.name.trim().toLowerCase();
+    return (
+      p.type === 'registered' &&
+      ((hostFriendsRef.current ?? []).some((fr) => fr.playerName.toLowerCase() === nameLower) ||
+        // En pending friend = en spelare host UTTRYCKLIGEN bjudit in OCH som
+        // consent:at till join + ömsesidig vänskap via accept-popupen. De ska
+        // auto-approvas tyst precis som en sparad friend — annars FLASHAR
+        // join-popupen ("<namn> wants to join / Approve + Add to Friend list")
+        // i en tick innan pending→confirmed-watchern hinner promota dem till
+        // sparad friend, varpå auto-approven slår till och stänger popupen
+        // (Peter 2026-08-27). Matcha mot pendingFriends så beslutet är rätt
+        // redan på FÖRSTA watcher-varvet efter join.
+        pendingFriends.some((pf) => pf.playerName.toLowerCase() === nameLower)) &&
+      passesSilentApproveGuards(p) &&
+      // Host:s explicita un-approve vinner alltid — en friend host flyttat
+      // till waiting ska synas där direkt.
+      !hostUnapprovedIdsRef.current.has(p.id)
+    );
+  };
+
+  // ⚠ Håll tillbaka joiners vars godkännande-beslut ännu inte är fattat.
+  // Watchern nedan kör FÖRST efter render-commit, så en QuizVibe friend
+  // hann annars renderas som "väntande" i minst en frame (i praktiken en
+  // knapp sekund när joinern kom in via 2s-pollen eller när en DB-sync
+  // kastade om ordningen) → röd "Players Waiting" blinkade till för att
+  // sekunden senare bli grön "New Player joined" (Peter 2026-08-26).
+  // Röd blink får ALDRIG visas för någon som kommer auto-approvas.
+  // Lösningen är medvetet "avvakta med att visa spelaren" i stället för att
+  // dämpa signalen: kortet dyker upp i rätt sektion direkt i stället för att
+  // hoppa mellan två.
+  //
+  // Tre fall hålls tillbaka:
+  //   (a) friends-listan är inte laddad än — vi VET inte, så vi avvaktar;
+  //   (b) spelaren uppfyller auto-approve-villkoren och kommer vara approved
+  //       nästa tick;
+  //   (c) spelaren är inne i sitt JOIN_GRACE_MS-fönster.
+  //
+  // ⚠ (c) finns för att (b) INTE räckte. Första fixen antog att glappet var
+  // en frame (watchern är en effekt) — men Peter såg 1-2 hela blinkningar
+  // (BlinkingLabel-cykeln är 1200 ms), dvs auto-approven landade 1-2 SEKUNDER
+  // senare. Orsaken ligger i konvergensen: en joiner-rad når host innan alla
+  // fält är satta (type/spotifyConnected/namn skrivs och syncas i flera steg
+  // via fetchNewJoiners → syncNonHostFields), så willAutoApproveOnJoin kan
+  // vara false vid första renders och sann först ett par sekunder senare.
+  // Ett tidsfönster är immunt mot exakt VILKET fält som konvergerar sist —
+  // ett predikat måste förutse dem alla.
+  //
+  // Priset: en joiner som INTE auto-approvas syns som väntande först efter
+  // fönstret. Acceptabelt — host får join-popupen omedelbart (den är den
+  // primära signalen), och den röda blinken är en påminnelse, inte ett larm.
+  // ⚠ Grace-fönstret (c) gäller BÅDA roller — non-host såg samma röda blink
+  // för sin egen rad innan host:s auto-approve hann syncas hit (Peter
+  // 2026-08-26). (a) och (b) är däremot host-only: non-host har varken
+  // friends-lista eller watcher, och `hostFriendsLoaded` är där permanent
+  // false — utan hostMode-gaten hade varje icke-godkänd spelare dolts för
+  // alltid på non-host-enheten.
+  const isJoinDecisionPending = (p: LobbyPlayer) =>
+    !p.isHost &&
+    (joinGraceIds.has(p.id) ||
+      (hostMode && (!hostFriendsLoaded || willAutoApproveOnJoin(p))));
+  const waitingForApproval = players.filter(
+    (p) => !isPlayerApproved(p) && !p.hasLeft && !isJoinDecisionPending(p),
+  );
+
+  // ⚠ Renderings-gate för den röda blinken. `waitingForApproval.length > 0`
+  // räcker INTE som villkor: en approve som landar strax efter grace-fönstret
+  // gav en mycket kort röd flash innan den gröna (Peter 2026-08-26, fjärde
+  // passet). Signalen måste vara STABIL för att visas — den är en påminnelse
+  // om att host behöver agera, och en påminnelse som försvinner inom en
+  // sekund är bara brus. Släpps direkt (utan fördröjning) när ingen väntar,
+  // så den gröna "New Player joined" aldrig hålls tillbaka.
+  const [showWaitingLabel, setShowWaitingLabel] = useState(false);
+  const waitingCount = waitingForApproval.length;
+  useEffect(() => {
+    if (waitingCount === 0) {
+      setShowWaitingLabel(false);
+      return;
+    }
+    const t = setTimeout(() => setShowWaitingLabel(true), WAITING_LABEL_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [waitingCount]);
+
+  // Startar join-grace-fönstret för varje NY unapproved non-host. Timers
+  // ligger i en ref (inte i effektens cleanup) — cleanup körs vid varje
+  // players-ändring och skulle annars avbryta fönstret gång på gång.
+  useEffect(() => {
+    const active = new Set(players.filter((p) => !p.hasLeft).map((p) => p.id));
+    joinGraceSeenRef.current.forEach((id) => {
+      if (!active.has(id)) joinGraceSeenRef.current.delete(id);
+    });
+    const fresh = players
+      .filter(
+        (p) =>
+          !p.isHost &&
+          !p.hasLeft &&
+          !p.approved &&
+          !joinGraceSeenRef.current.has(p.id),
+      )
+      .map((p) => p.id);
+    if (fresh.length === 0) return;
+    fresh.forEach((id) => joinGraceSeenRef.current.add(id));
+    setJoinGraceIds((prev) => {
+      const next = new Set(prev);
+      fresh.forEach((id) => next.add(id));
+      return next;
+    });
+    const timer = setTimeout(() => {
+      setJoinGraceIds((prev) => {
+        if (!fresh.some((id) => prev.has(id))) return prev;
+        const next = new Set(prev);
+        fresh.forEach((id) => next.delete(id));
+        return next;
+      });
+    }, hostMode ? JOIN_GRACE_MS : JOIN_GRACE_NON_HOST_MS);
+    joinGraceTimersRef.current.push(timer);
+  }, [players, hostMode]);
+
+  // Rensa kvarvarande grace-timers vid unmount.
+  useEffect(
+    () => () => {
+      joinGraceTimersRef.current.forEach(clearTimeout);
+      joinGraceTimersRef.current = [];
+    },
+    [],
+  );
 
   // Notify host när Players in Lobby är hopfällt och en ny spelare ansluter.
   const prevNonHostApprovedRef = useRef(-1);
@@ -3184,8 +3727,7 @@ export default function LobbyScreen() {
     if (!hostMode) return;
     // Vänta tills friends-listan laddats — annars kan en friend hinna få
     // popupen pga en load-race.
-    const hostFriends = hostFriendsRef.current;
-    if (hostFriends === null) return;
+    if (hostFriendsRef.current === null) return;
     // Pruna: ids vars spelare försvunnit eller lämnat (hasLeft) tas bort ur
     // prompted-setet så en genuin rejoin promptar igen. Kön rensas från
     // stale ids (borta, lämnade eller approvade via annan väg — t.ex.
@@ -3216,18 +3758,12 @@ export default function LobbyScreen() {
     // Auto-approve friends eller enqueue nya unapproved joiners.
     players.forEach((p) => {
       if (p.isHost || p.hasLeft || p.approved) return;
-      const isFriend =
-        p.type === 'registered' &&
-        hostFriends.some(
-          (f) => f.playerName.toLowerCase() === p.name.trim().toLowerCase(),
-        );
-      // Samma guards som handleSetApproved — blockeras tyst approve faller
-      // spelaren tillbaka till popupen där Approve-tappen visar guard-Alerten.
-      const passesSilentGuards =
-        !singlePlayerDefault &&
-        lobbyPeerHealth[p.id] !== 'unstable' &&
-        (!spotifyEnabled || !!p.spotifyConnected);
-      if (isFriend && passesSilentGuards && !hostUnapprovedIdsRef.current.has(p.id)) {
+      // willAutoApproveOnJoin bär friend-matchen + samma guards som
+      // handleSetApproved (blockeras tyst approve faller spelaren tillbaka
+      // till popupen där Approve-tappen visar guard-Alerten) + host:s
+      // explicita un-approve. Delas med render så isJoinDecisionPending kan
+      // förutsäga exakt detta beslut — ändra ALDRIG villkoret bara här.
+      if (willAutoApproveOnJoin(p)) {
         // Tyst auto-approve. MEDVETET inte gated på promptedIdsRef — om en
         // stale DB→local-sync (syncNonHostFields hann läsa joiner-radens
         // approved=false innan hostens bulk-write committat) downgradear en
@@ -3250,7 +3786,43 @@ export default function LobbyScreen() {
     // mount-load:en sätter ref + setFriends ihop, så deps-membern garanterar
     // att watchern körs om när listan blir laddad även om players[] inte
     // ändrats sedan dess (joiner som hann in före loadFriends-resolven).
-  }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends]);
+    // willAutoApproveOnJoin är MEDVETET inte i deps — den återskapas varje
+    // render och skulle få effekten att köra på varenda render. Allt den
+    // läser (players, guards, friends, pendingFriends) ligger redan i arrayen.
+    // pendingFriends: en pending friend är auto-approve-eligible (se
+    // willAutoApproveOnJoin) — utan den i deps kan en pending post som
+    // hamnat i listan efter senaste players-ändring missas.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends, pendingFriends]);
+
+  // ── Pending friends → bekräftade friends (host) ───────────────────────
+  // Peter 2026-08-27: en Player Name som "Add" verifierat finns men som
+  // INTE redan är sparad friend hamnar som "Pending" (se
+  // handleAddFriendFromShare) — inte skriven till friends-storage. Den
+  // befordras till en riktig, sparad friend (via addFriend) FÖRST när
+  // spelaren med matchande playerName faktiskt dyker upp som en
+  // icke-host, icke-hasLeft rad i players[] — dvs. accepterat inviten och
+  // joinat DENNA lobby. Matchning är case-insensitive playerName, samma
+  // konvention som friend-auto-approve-watchern ovan.
+  useEffect(() => {
+    if (pendingFriends.length === 0) return;
+    const joinedNames = new Set(
+      players.filter((p) => !p.isHost && !p.hasLeft).map((p) => p.name.trim().toLowerCase()),
+    );
+    const toConfirm = pendingFriends.filter((pf) => joinedNames.has(pf.playerName.toLowerCase()));
+    if (toConfirm.length === 0) return;
+    setPendingFriends((prev) => prev.filter((pf) => !toConfirm.some((c) => c.id === pf.id)));
+    (async () => {
+      let updated: Friend[] = [];
+      for (const pf of toConfirm) {
+        updated = await addFriend(pf.playerName, pf.avatarId);
+      }
+      setFriends(updated);
+      // Håll auto-approve-listan i sync så personen auto-approvas direkt
+      // om de lämnar och joinar igen senare i samma lobby.
+      hostFriendsRef.current = updated;
+    })();
+  }, [players, pendingFriends]);
 
   // Driver "Waiting for approval"-mellansteget för non-host. När host inte
   // har godkänt mig än ska jag inte se lobby:n överhuvudtaget — bara en
@@ -3265,7 +3837,7 @@ export default function LobbyScreen() {
   // displayEra speglar realtids-värdet under drag och commitat värde
   // däremellan — så box "1990 – 2020" + youngest-player-warning uppdateras
   // live medan host drar utan att vi behöver toucha lib:ns prop.
-  const displayEra = dragEraValues ?? eraValues;
+  const displayEra = packageEraLocked ? effectiveEraValues : (dragEraValues ?? eraValues);
   const { warning: eraWarning } = checkEraAgainstPlayer(displayEra[1], players);
   // To-året kan inte gå under ERA_TO_MIN (1980) — visa gul varning vid golvet.
   const eraAtToFloor = displayEra[1] <= ERA_TO_MIN;
@@ -3282,37 +3854,23 @@ export default function LobbyScreen() {
   // Tryck på "+ Add Player" — blockera redan här om lobbyn är full så
   // host inte slösar tid på att fylla i formuläret.
   const handleOpenAddPlayer = () => {
-    // Single player: lobbyn har per definition ingen plats för fler spelare.
-    // Att tyst öppna formuläret gav en lobby med två kort men ett spel som
-    // ändå startade som single player (Peter 2026-08-24) — fråga i stället
-    // vilket multiplayer-läge host vill byta till. Cancel lämnar allt orört.
-    if (singlePlayerDefault) {
+    // Re-match: uppsättningen är låst till förra spelets spelare. Knappen
+    // renderas inte i det läget — detta är belt-and-suspenders mot oväntade
+    // call-paths (och gör regeln läsbar där den faktiskt gäller).
+    if (isRematchLobby) {
       Alert.alert(
-        'Change to Multiplayer mode?',
-        'Adding a player requires a multiplayer mode. Which one do you want to play?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            // Individual device tar bort möjligheten att lägga till spelare
-            // manuellt (varje spelare behöver en egen enhet), så vi byter
-            // läge och förklarar vägen in i stället för att öppna formuläret.
-            text: 'Individual device',
-            onPress: () => {
-              handleSelectMode('individual-devices');
-              Alert.alert(
-                'Individual device',
-                "Game mode changed. Players can't be added manually in this mode — every player needs their own device. Share the room code and let them join from it.",
-              );
-            },
-          },
-          {
-            text: 'Pass-the-Phone',
-            onPress: () => {
-              handleSelectMode('pass-the-phone');
-              setTimeout(() => setAddModalVisible(true), ALERT_TO_MODAL_DELAY_MS);
-            },
-          },
-        ],
+        'Line-up locked',
+        'A re-match keeps the exact same players as the previous game. Use Start New Game to play with someone else.',
+      );
+      return;
+    }
+    // Single player: lobbyn är låst till EN spelare sedan 2026-08-26 — läget
+    // väljs via "Start New Game" på Home och kan inte bytas härifrån. Knappen
+    // renderas inte i single-lobbyn, så detta är bara ett skyddsnät.
+    if (isSingleLobby) {
+      Alert.alert(
+        'Single player lobby',
+        'This lobby is locked to one player. Start a Multiplayer Game from Home to play with others.',
       );
       return;
     }
@@ -3665,34 +4223,350 @@ export default function LobbyScreen() {
       return arr;
     });
   };
+  // Re-syncar pending-listan mot host:s utestående waiting_invites-rader.
+  // Delas av handleOpenShateModal (vid modal-open) OCH Realtime-DELETE-
+  // handlern (live medan modalen är öppen). Läser friends ur hostFriendsRef
+  // och prev-sent ur sentPendingIdsRef så den kan köras ur en effekt utan
+  // deps-beroende.
+  const resyncPendingFromInvites = useCallback(async () => {
+    const hostUserId = await getOwnUserId();
+    if (!hostUserId) return;
+    const { data, error } = await supabase
+      .from('waiting_invites')
+      .select('to_player_name')
+      .eq('from_user_id', hostUserId);
+    if (error || !data) return;
+    const friendLower = new Set((hostFriendsRef.current ?? []).map((f) => f.playerName.toLowerCase()));
+    // Namn (lowercase) med minst en LEVANDE invite från denna host. Så länge
+    // NÅGON invite kvarstår är namnet med → posten stannar som "Pending".
+    // Först när mottagaren denied:at ALLA host→spelare-invites (raden borta)
+    // faller namnet ur och posten prunas.
+    const outstandingLower = new Set<string>();
+    for (const row of data) {
+      if (!friendLower.has(row.to_player_name)) outstandingLower.add(row.to_player_name);
+    }
+    const prevSent = sentPendingIdsRef.current;
+    const nextSent = new Set<string>();
+    for (const lower of outstandingLower) nextSent.add(`pending-${lower}`);
+    setSentPendingIds(nextSent);
+    setPendingFriends((prev) => {
+      const kept = prev.filter((pf) => {
+        const lower = pf.playerName.toLowerCase();
+        if (friendLower.has(lower)) return false; // blivit sparad friend
+        if (outstandingLower.has(lower)) return true; // fortfarande utestående
+        return !prevSent.has(pf.id); // aldrig skickad → behåll; skickad-men-borta → släpp
+      });
+      const keptLower = new Set(kept.map((p) => p.playerName.toLowerCase()));
+      const reconstructed: Friend[] = [];
+      for (const lower of outstandingLower) {
+        if (keptLower.has(lower)) continue;
+        reconstructed.push({
+          id: `pending-${lower}`,
+          // SÄKERT ENBART EFTERSOM profiles.player_name enbart sätts via
+          // Register:s prefix-lösa generatePlayerName() eller manuell
+          // inmatning via appendPlayerNameLetter — båda tvingar kanonisk
+          // versal-först/gemener-resten-formatering (playerName.ts).
+          playerName: lower.charAt(0).toUpperCase() + lower.slice(1),
+        });
+      }
+      return [...kept, ...reconstructed];
+    });
+  }, []);
+
   // Öppnar Share invite-modalen och laddar in den senaste friends-listan.
   const handleOpenShareModal = async () => {
     setInvitedFriendIds(new Set());
+    setSelectedFriendIds(new Set());
     setNewFriendPlayerName('');
+    setAddFriendKbMode('letter');
+    setAddFriendFocused(false);
+    setAddFriendError(null);
     setShareModalOpen(true);
     const list = await loadFriends();
     setFriends(list);
     hostFriendsRef.current = list;
+    setHostFriendsLoaded(true);
+
+    // Re-sync mot waiting_invites (Peter 2026-08-27). Två syften:
+    //  1. Cross-session Pending: en invite skickad från en TIDIGARE lobby
+    //     ska fortsatt synas här (med "Pending"-badge) så länge den lever.
+    //  2. Auto-borttagning: en post som VAR skickad men vars rad nu är borta
+    //     (mottagaren denied ALLA host→spelare-invites/accepterade, eller
+    //     rums-cascade) försvinner ur listan om den inte blivit sparad friend.
+    // hostFriendsRef.current är just satt = list ovan, så resyncen läser rätt
+    // friend-lista. Live-uppdatering medan modalen är öppen sker via Realtime-
+    // DELETE-subscriptionen (effekten nedan), som anropar samma resync.
+    await resyncPendingFromInvites();
   };
 
-  // Lägg till en QuizVibe friend direkt från Share invite-modalen. Speglar
-  // Profile:s handleAddFriend exakt — addFriend dedupar case-insensitive på
-  // playerName så dubbel-add är säkert. Efter tillagd friend syns hen i
-  // listan med en Invite-knapp; host kan välja att invite:a direkt eller
-  // bara behålla för senare spel.
+  // Live-borttagning av denied pending (Peter 2026-08-27) — medan Share
+  // invite-modalen är öppen prenumererar host på DELETE-events på sina EGNA
+  // utestående invites (from_user_id=eq.<host>). När mottagaren denied:ar en
+  // invite raderas raden → eventet triggar en resync. Först när mottagaren
+  // denied:at ALLA aktiva host→spelare-invites (sista raden borta) faller
+  // spelaren ur `outstandingLower` i resyncen och "Pending"-posten försvinner.
+  // Kräver REPLICA IDENTITY FULL på waiting_invites (migration 0039) så
+  // DELETE-eventets OLD-record bär from_user_id (för både Realtime-RLS och
+  // klient-filtret). getChannels-rensningen speglar lobby-channel-effekten
+  // ovan: samma topic → befintlig subscribed channel, .on() efteråt kraschar.
+  useEffect(() => {
+    if (!shareModalOpen || !roomCode) return;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    (async () => {
+      const hostUserId = await getOwnUserId();
+      if (!hostUserId || cancelled) return;
+      const topic = `realtime:share-invites:${roomCode}`;
+      supabase.getChannels()
+        .filter((c) => c.topic === topic)
+        .forEach((c) => supabase.removeChannel(c));
+      channel = supabase
+        .channel(`share-invites:${roomCode}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'waiting_invites',
+            filter: `from_user_id=eq.${hostUserId}`,
+          },
+          () => { void resyncPendingFromInvites(); },
+        )
+        .subscribe();
+    })();
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [shareModalOpen, roomCode, resyncPendingFromInvites]);
+
+  // Lägg till en QuizVibe friend direkt från Share invite-modalen.
+  // `playerNameExists` (samma RPC som Register/Add Player-uniqueness-
+  // checken) verifierar FÖRST att namnet tillhör en registrerad QuizVibe-
+  // user — host ska inte kunna spara/bjuda in ett påhittat namn som aldrig
+  // kan svara på inviten.
+  //
+  // Är namnet redan en sparad friend: no-op (den finns redan i listan).
+  // Annars (2026-08-27, Peter): namnet skrivs INTE till friends-storage
+  // direkt — det hamnar som en "Pending"-post i `pendingFriends` och blir
+  // en riktig, sparad friend först när personen faktiskt joinar DENNA lobby
+  // (accepterar inviten) — se watcher-effekten som confirm:ar pendingFriends
+  // mot players[].
   const handleAddFriendFromShare = async () => {
-    if (!newFriendPlayerName.trim()) return;
-    const updated = await addFriend(newFriendPlayerName);
-    setFriends(updated);
-    // Håll auto-approve-listan i sync så en nyligen tillagd friend som
-    // joinar direkt efteråt auto-approvas utan popup.
-    hostFriendsRef.current = updated;
+    const trimmed = normalizePlayerName(newFriendPlayerName.trim());
+    if (!trimmed || addFriendChecking) return;
+    setAddFriendError(null);
+    setAddFriendChecking(true);
+    try {
+      const exists = await playerNameExists(trimmed);
+      if (!exists) {
+        setAddFriendError('No QuizVibe user found with that Player Name');
+        return;
+      }
+      const lower = trimmed.toLowerCase();
+      const alreadyFriend = friends.some((f) => f.playerName.toLowerCase() === lower);
+      const alreadyPending = pendingFriends.some((f) => f.playerName.toLowerCase() === lower);
+      if (!alreadyFriend && !alreadyPending) {
+        // Deterministiskt id (namn-baserat, inte timestamp) — krävs så
+        // cross-session-rekonstruktionen i handleOpenShareModal kan
+        // merge:a/dedupe:a mot samma id istället för att alltid skapa nya.
+        setPendingFriends((prev) => [...prev, { id: `pending-${lower}`, playerName: trimmed }]);
+      }
+      setNewFriendPlayerName('');
+      setAddFriendKbMode('letter');
+    } finally {
+      setAddFriendChecking(false);
+    }
+  };
+
+  // CodeKeyboard-handlers för Add-by-Player-Name-fältet — speglar
+  // AddPlayerModal:s handlePlayerNameKeyPress/Backspace/togglePlayerNameKbMode
+  // exakt (samma append/backspace-helpers => samma versal-först/gemener-
+  // resten-format och samma max-längder).
+  const handleAddFriendKeyPress = (char: string) => {
+    setNewFriendPlayerName((prev) =>
+      addFriendKbMode === 'letter' ? appendPlayerNameLetter(prev, char) : appendPlayerNameDigit(prev, char),
+    );
+    if (addFriendError) setAddFriendError(null);
+  };
+
+  const handleAddFriendBackspace = () => {
+    setNewFriendPlayerName((prev) =>
+      addFriendKbMode === 'letter' ? backspacePlayerNameLetters(prev) : backspacePlayerNameDigits(prev),
+    );
+    if (addFriendError) setAddFriendError(null);
+  };
+
+  const toggleAddFriendKbMode = () => {
+    if (newFriendPlayerName.length === 0 && addFriendKbMode === 'letter') return;
+    if (addFriendKbMode === 'letter') {
+      setAddFriendKbMode('digit');
+      addFriendDigitsRef.current?.focus();
+    } else {
+      setAddFriendKbMode('letter');
+      addFriendLettersRef.current?.focus();
+    }
+  };
+
+  // Merged + sorterad lista för Share invite-renderingen: sparade friends
+  // (redan alfabetiskt sorterade av friendsStorage) + de ännu ej bekräftade
+  // pendingFriends, om varandra alfabetiskt så en pending post inte alltid
+  // hamnar sist. `checkbox`/`Send invite`-flödet nedan opererar på DENNA
+  // lista så en pending friend kan bockas för och bjudas in precis som en
+  // bekräftad — det ÄR ju just genom att bjuda in dem de kan bli bekräftade.
+  const displayFriends = useMemo(
+    () =>
+      [...friends, ...pendingFriends].sort((a, b) =>
+        a.playerName.localeCompare(b.playerName, undefined, { sensitivity: 'base', numeric: true }),
+      ),
+    [friends, pendingFriends],
+  );
+
+  // "Cancel" på CodeKeyboard:et (2026-08-27) — Share invite:s "Done"-knapp
+  // ersattes tidigare med "Send invite" (disabled tills minst en friend är
+  // ibockad), vilket lämnade Add-by-Player-Name-fältet utan något sätt att
+  // avbryta inmatningen och stänga tangentbordet. Tömmer fältet + blur:ar
+  // BÅDA refs (oavsett vilken som var fokuserad) → onBlur döljer
+  // tangentbordet via addFriendFocused.
+  const handleAddFriendCancel = () => {
     setNewFriendPlayerName('');
+    setAddFriendKbMode('letter');
+    setAddFriendError(null);
+    addFriendLettersRef.current?.blur();
+    addFriendDigitsRef.current?.blur();
+    setAddFriendFocused(false);
+  };
+
+  // Skickar invite till alla ibockade friends i ETT svep — sekventiellt
+  // (inte Promise.all) så remote-1v1-räknaren i handleInviteFriend (max 4
+  // obesvarade) räknar rätt mellan varje skickat anrop. Stänger modalen
+  // efteråt (ersätter f.d. "Done"-knappen).
+  const handleSendInvites = async () => {
+    const toSend = displayFriends.filter(
+      (f) => selectedFriendIds.has(f.id) && !invitedFriendIds.has(f.id),
+    );
+    if (toSend.length === 0) {
+      setShareModalOpen(false);
+      return;
+    }
+
+    const hostUserId = await getOwnUserId();
+
+    if (gameMode === 'remote-1v1') {
+      // Bara EN mottagare kan någonsin vara ibockad här (radio-button-
+      // beteende i checkbox-handlern nedan) — inget batch/"vissa spärrade"-
+      // scenario att hantera, bara en enkel ja/nej-check.
+      const friend = toSend[0];
+      if (hostUserId && (await hasRemote1v1RelationshipWith(hostUserId, friend.playerName))) {
+        Alert.alert(
+          'Invitation limit reached',
+          `You already have an ongoing or pending H2H invitation with ${friend.playerName}. Wait for it to finish or be answered before sending a new one.`,
+        );
+        return;
+      }
+      await handleInviteFriend(friend);
+      setSelectedFriendIds(new Set());
+      setShareModalOpen(false);
+      return;
+    }
+
+    // Pre-flight per-recipient 3-cap check (Peter 2026-08-27) — kollas för
+    // HELA batchen i förväg så en flerval-sändning visar EN summering
+    // istället för en alert per spärrad mottagare mitt i loopen. Gäller
+    // alla ANDRA lobbytyper (remote-1v1 har redan returnerat ovan).
+    const cappedIds = new Set<string>();
+    if (hostUserId) {
+      for (const friend of toSend) {
+        const { count, error } = await supabase
+          .from('waiting_invites')
+          .select('id', { count: 'exact', head: true })
+          .eq('from_user_id', hostUserId)
+          .eq('to_player_name', friend.playerName.trim().toLowerCase());
+        if (!error && (count ?? 0) >= 3) cappedIds.add(friend.id);
+      }
+    }
+
+    const sendable = toSend.filter((f) => !cappedIds.has(f.id));
+
+    if (cappedIds.size > 0) {
+      if (sendable.length === 0) {
+        Alert.alert(
+          'Invitation limit reached',
+          'The selected player(s) already have the maximum of 3 pending invitations from you. Either play those first or ask them to deny at least one to make room for a new invitation.',
+        );
+        return;
+      }
+      const proceed = await new Promise<boolean>((resolve) => {
+        Alert.alert(
+          'Invitation limit reached',
+          'Some users already have maximum of 3 invitations pending from you. Send this invitation to the other players anyway?',
+          [
+            { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+            { text: 'Send to others', onPress: () => resolve(true) },
+          ],
+        );
+      });
+      if (!proceed) return;
+    }
+
+    for (const friend of sendable) {
+      await handleInviteFriend(friend);
+    }
+    setSelectedFriendIds(new Set());
+    setShareModalOpen(false);
   };
 
   // Remote 1v1-lobby (inte single player). Gatar "Save 1vs1 – Play later"
   // i BÅDA TopUserBanner-sheetsen — läget är det enda där lobbyn är värd
   // att spara: rummet lever 24h och matchen är asynkron ändå.
+  // Förväntad uppsättning i en låst re-match-lobby: lobby_players.player_id
+  // för spelarna från föregående spel, skrivna atomiskt på rums-raden av
+  // registerActiveRoom (migration 0037). Driver både antalet i den statiska
+  // indikatorn och "alla på plats"-guarden i handleStartGame.
+  const [rematchExpectedIds, setRematchExpectedIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (!isRematchLobby) return;
+    let cancelled = false;
+    void getRoomMeta(roomCode).then((meta) => {
+      const ids = meta?.rematchPlayerIds ?? [];
+      if (!cancelled && ids.length > 0) setRematchExpectedIds(ids);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isRematchLobby, roomCode]);
+
+  // Competition re-match: 5-minuters livslängd. Ref-spegel av "alla på plats"
+  // så expiry-timeouten (satt en gång på mount) läser aktuellt läge vid fire.
+  const allRematchPresentRef = useRef(false);
+  useEffect(() => {
+    allRematchPresentRef.current =
+      !isCompetitionRematch ||
+      findMissingRematchPlayers(rematchExpectedIds, players).length === 0;
+  }, [isCompetitionRematch, rematchExpectedIds, players]);
+
+  useEffect(() => {
+    if (!hostMode || !isCompetitionRematch) return;
+    const timer = setTimeout(() => {
+      // Alla joinade i tid → låt lobbyn leva (host startar när de vill).
+      if (allRematchPresentRef.current) return;
+      // Riv rummet — deactivateRoom raderar rums-raden så waiting_invites
+      // cascade:as bort automatiskt (recipients JoinModal-sub tar bort dem).
+      void deactivateRoom(roomCode);
+      clearLobbyPlayers(roomCode);
+      clearLobbySettings(roomCode);
+      clearEjected(roomCode);
+      clearGameStarted(roomCode);
+      Alert.alert(
+        'Re-match request expired',
+        'Not everyone joined within 5 minutes, so the re-match was cancelled.',
+        [{ text: 'OK', onPress: () => router.replace('/') }],
+        { cancelable: false },
+      );
+    }, COMPETITION_REMATCH_TTL_MS);
+    return () => clearTimeout(timer);
+  }, [hostMode, isCompetitionRematch, roomCode]);
+
   const isRemoteLobby = gameMode === 'remote-1v1' && !singlePlayerDefault;
   // Gemensam hjälpnivå gäller bara när BÅDE lobbyn är remote OCH host slagit
   // på switchen. Är den av beter sig assistance precis som i lokala lägen
@@ -3728,8 +4602,8 @@ export default function LobbyScreen() {
       savedAt: new Date().toISOString(),
     });
     Alert.alert(
-      '1vs1 lobby saved',
-      'Find it under "1vs1" on the Home screen, with status Not started. The lobby stays open for 24 hours.',
+      'H2H lobby saved',
+      'Find it under "H2H" on the Home screen, with status Not started. The lobby stays open for 24 hours.',
       [{ text: 'OK', onPress: () => router.replace('/') }],
     );
   };
@@ -3906,6 +4780,7 @@ export default function LobbyScreen() {
         if (!hostId) return;
         hostAliasPublishedRef.current = true;
         publishOwnAccountAlias(roomCode, hostId);
+        publishOwnHcpToLobby(roomCode, hostId);
       })
       .catch(() => { /* loggas i mockLobbyPlayers */ });
   }, [hostMode, roomCode, players]);
@@ -3932,8 +4807,10 @@ export default function LobbyScreen() {
         maxPlayers,
         region,
         answerResponseSeconds,
-        eraFrom: eraValues[0],
-        eraTo: eraValues[1],
+        // effectiveEraValues = paketets låsta span när paket aktivt, annars
+        // host:s slider-val. Non-host ärver det låsta spannet via denna sync.
+        eraFrom: effectiveEraValues[0],
+        eraTo: effectiveEraValues[1],
         roundsCount,
         selectedExtraPackages,
         youtubeEnabledCategories,
@@ -3942,6 +4819,7 @@ export default function LobbyScreen() {
         spotifyEnabled,
         spotifyAnswerYear,
         spotifyAnswerName,
+        parentControlEnabled,
         remoteAssistance,
         mutualAssistanceEnabled,
       }).catch(() => { /* loggas i mockLobbySettings */ });
@@ -3964,6 +4842,7 @@ export default function LobbyScreen() {
     spotifyEnabled,
     spotifyAnswerYear,
     spotifyAnswerName,
+    parentControlEnabled,
     remoteAssistance,
     mutualAssistanceEnabled,
   ]);
@@ -4031,6 +4910,11 @@ export default function LobbyScreen() {
       setSpotifyEnabled(stored.spotifyEnabled);
       setSpotifyAnswerYear(stored.spotifyAnswerYear);
       setSpotifyAnswerName(stored.spotifyAnswerName);
+      // Parent Control (read-only för non-host). OBS: fältet persisteras inte
+      // till DB → stored.parentControlEnabled är alltid false, så non-host
+      // visar av. Filtret körs ändå bara på host:ens enhet (host bygger och
+      // broadcastar frågesekvensen), så non-host-värdet är rent kosmetiskt.
+      setParentControlEnabled(stored.parentControlEnabled);
       // Remote 1v1: hostens gemensamma hjälpnivå + om den alls är påslagen
       // (read-only för non-host).
       setRemoteAssistance(stored.remoteAssistance);
@@ -4102,11 +4986,20 @@ export default function LobbyScreen() {
   useEffect(() => {
     if (!hostMode) return;
     let cancelled = false;
-    loadFriends().then((list) => {
-      if (cancelled) return;
-      hostFriendsRef.current = list;
-      setFriends(list);
-    });
+    loadFriends()
+      .then((list) => {
+        if (cancelled) return;
+        hostFriendsRef.current = list;
+        setFriends(list);
+        setHostFriendsLoaded(true);
+      })
+      .catch(() => {
+        // Fail-open: utan listan kan vi inte avgöra friend-status, och
+        // isJoinDecisionPending skulle annars dölja joiners för alltid.
+        if (cancelled) return;
+        hostFriendsRef.current = [];
+        setHostFriendsLoaded(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -4197,11 +5090,15 @@ export default function LobbyScreen() {
           // kolumnen är satt (och plockar sedan aldrig upp den igen —
           // spelaren är då redan i localIds). Konvergera den här istället.
           const nextAccountName = updated.accountPlayerName;
+          // HCP publiceras av spelaren själv strax efter deras upsert (samma
+          // konvergens-fönster som guest alias) → syncas här.
+          const nextHcp = updated.hcp;
           if (
             !!p.hasLeft === nextHasLeft &&
             !!p.approved === nextApproved &&
             !!p.spotifyConnected === nextSpotifyConnected &&
-            p.accountPlayerName === nextAccountName
+            p.accountPlayerName === nextAccountName &&
+            p.hcp === nextHcp
           )
             return p;
           changed = true;
@@ -4211,6 +5108,7 @@ export default function LobbyScreen() {
             approved: nextApproved,
             spotifyConnected: nextSpotifyConnected,
             accountPlayerName: nextAccountName,
+            hcp: nextHcp,
           };
         });
         return changed ? next : prev;
@@ -4359,16 +5257,108 @@ export default function LobbyScreen() {
           settingsStored?.youtubeEnabledCategories ?? youtubeEnabledCategories;
         const effectiveImgCats =
           settingsStored?.imagesEnabledCategories ?? imagesEnabledCategories;
+        // Non-host:s väg in i /quiz. Delas av Pass-the-Phone-promptens
+        // "Yes" och Individual Devices-fallthrough:en längst ned — båda
+        // lägena behöver EXAKT samma params (host:s settings + hela
+        // turnOrder), skillnaden är bara att PtP frågar först.
+        const goToQuizAsNonHost = () => {
+          const turnOrder = (playersStored ?? [])
+            .filter((p) => !!p.approved || !!p.isHost)
+            .map((p) => ({
+              id: p.id,
+              name: p.name,
+              emoji: p.emoji,
+              avatarUri: p.avatarUri,
+              assistance: p.assistance ?? 'standard',
+              age: p.age,
+              spotifyConnected: p.spotifyConnected ?? false,
+              type: p.type,
+            }));
+          // Guest-hostat spel detekteras via host-radens type i lobby_players
+          // (guest host seedar sitt kort med type 'guest'; registrerade hosts
+          // får alltid 'registered' via mergeProfileIntoHost). Ingen DB-
+          // migration behövs — gamla lobbies resolvar false. quiz.tsx döljer
+          // Play Again på final leaderboard när flaggan är satt.
+          const storedHostIsGuest = (playersStored ?? []).some(
+            (p) => p.isHost && p.type === 'guest',
+          );
+          router.replace({
+            pathname: '/quiz',
+            params: {
+              assistance: 'standard',
+              age: '32',
+              gameMode: effectiveGameMode,
+              guestHost: String(storedHostIsGuest),
+              // Non-host-vägen från Realtime-driven game-started-detection.
+              // quiz.tsx använder isHost för att rendera Leave Game-knapp
+              // istället för Quit Game-knapp i GetReadyIntro/CountdownIntro.
+              isHost: 'false',
+              // Non-host:s egna player_id — används av Leave-flödet för att
+              // broadcasta `player_left` så host:s skärm får popup + markerar
+              // spelaren som hasLeft i leaderboarden. I Pass-the-Phone är det
+              // dessutom nyckeln som matchar host:s score-broadcasts mot rätt
+              // rad i spectator-tabellen.
+              selfPlayerId: ownId ?? '',
+              players: JSON.stringify(turnOrder),
+              roundsCount: String(effectiveRoundsCount),
+              answerResponseSeconds: String(effectiveAnswerResponseSeconds),
+              eraFrom: String(effectiveEraFrom),
+              eraTo: String(effectiveEraTo),
+              youtubeEnabledCategories: JSON.stringify(effectiveYtCats),
+              imagesEnabledCategories: JSON.stringify(effectiveImgCats),
+              // Theme packages aktiva i lobby:n vid speltillfället (non-host
+              // path — efter Realtime-detection av game-started). Speglar
+              // host-path:en så HistoryEntry får samma data oavsett vilken
+              // enhet som triggade navigation till /quiz.
+              selectedExtraPackages: JSON.stringify(settingsStored?.selectedExtraPackages ?? []),
+              // Spotify DJ-läge måste matchas med host:s värde så non-host
+              // behandlar Spotify-frågor korrekt (timer gating, mediaSource).
+              spotifyEnabled: String(settingsStored?.spotifyEnabled ?? false),
+              roomCode,
+            },
+          });
+        };
         // Approved spelare: nästa steg beror på gameMode.
-        // - Pass-the-Phone: bara host spelar på sin telefon → vänligare
-        //   popup "Host has started... use the Host device".
+        // - Pass-the-Phone: alla svarar på HOST:ens telefon, men non-host:s
+        //   egen enhet kan följa leaderboarden live (score-broadcasts). Fråga
+        //   först — vill spelaren inte titta med går de Home som förut.
         // - Remote 1v1: asynkron duell — motståndaren väljer själv Play now
         //   (solo-quiz direkt) eller Play later (Home → 1vs1 Matches,
         //   48h-fönster).
         // - Individual Devices: alla approved spelare spelar på sin egen
         //   enhet → navigera till /quiz med derived turnOrder.
         if (effectiveGameMode === 'pass-the-phone') {
-          if (!cancelled) setPassThePhoneStartedDetected(true);
+          // navigatedToQuizRef sätts FÖRE Alerten — 2s-pollen (+ realtime-
+          // tick:en) skulle annars stapla en ny popup varannan sekund.
+          if (navigatedToQuizRef.current || cancelled) return;
+          navigatedToQuizRef.current = true;
+          // ⚠ "Follow" är FÖRVALT (Peter 2026-08-26). Skälet är inte bara
+          // trevnad: en PtP-re-match kan sedan samma dag bara ta med host +
+          // de som accepterat på sin EGEN enhet, och bara den som följer
+          // leaderboarden HAR en enhet i spelet. Svarar alla "No" finns det
+          // ingen som kan acceptera, och då erbjuds ingen re-match alls.
+          // Copyn säger därför uttryckligen varför man vill följa med.
+          //
+          // ⚠ `style: 'cancel'` ligger MEDVETET på Follow-knappen, inte på
+          // "Not now". Det är enda sättet att få den fetstilt/förvald på
+          // iOS: RN:s Alert exponerar inget `preferredAction`, och
+          // UIAlertController renderar just .cancel-knappen i halvfet. Flytta
+          // den inte "tillbaka" för att den ser felplacerad ut — då blir
+          // "Not now" den som ser ut som standardvalet igen. På Android
+          // ignoreras style och ordningen avgör; Follow ligger först.
+          Alert.alert(
+            'Host has started the Game',
+            'Play on the Host device. Keep the live leaderboard on this phone so you can join a re-match afterwards.',
+            [
+              {
+                text: 'Follow leaderboard',
+                style: 'cancel',
+                onPress: () => goToQuizAsNonHost(),
+              },
+              { text: 'Not now', onPress: () => router.replace('/') },
+            ],
+            { cancelable: false },
+          );
           return;
         }
         if (effectiveGameMode === 'remote-1v1') {
@@ -4424,66 +5414,14 @@ export default function LobbyScreen() {
           };
           setRemoteStartPrompt({
             message:
-              'Host has started the 1vs1 match. You have 48 hours to play your questions — now or later via "1vs1" on the Home screen.',
+              'Host has started the H2H match. You have 48 hours to play your questions — now or later via "H2H" on the Home screen.',
             playNow: goPlayNow,
           });
           return;
         }
         if (!navigatedToQuizRef.current && !cancelled) {
           navigatedToQuizRef.current = true;
-          const turnOrder = (playersStored ?? [])
-            .filter((p) => !!p.approved || !!p.isHost)
-            .map((p) => ({
-              id: p.id,
-              name: p.name,
-              emoji: p.emoji,
-              avatarUri: p.avatarUri,
-              assistance: p.assistance ?? 'standard',
-              age: p.age,
-              spotifyConnected: p.spotifyConnected ?? false,
-              type: p.type,
-            }));
-          // Guest-hostat spel detekteras via host-radens type i lobby_players
-          // (guest host seedar sitt kort med type 'guest'; registrerade hosts
-          // får alltid 'registered' via mergeProfileIntoHost). Ingen DB-
-          // migration behövs — gamla lobbies resolvar false. quiz.tsx döljer
-          // Play Again på final leaderboard när flaggan är satt.
-          const storedHostIsGuest = (playersStored ?? []).some(
-            (p) => p.isHost && p.type === 'guest',
-          );
-          router.replace({
-            pathname: '/quiz',
-            params: {
-              assistance: 'standard',
-              age: '32',
-              gameMode: effectiveGameMode,
-              guestHost: String(storedHostIsGuest),
-              // Non-host-vägen från Realtime-driven game-started-detection.
-              // quiz.tsx använder isHost för att rendera Leave Game-knapp
-              // istället för Quit Game-knapp i GetReadyIntro/CountdownIntro.
-              isHost: 'false',
-              // Non-host:s egna player_id — används av Leave-flödet för att
-              // broadcasta `player_left` så host:s skärm får popup + markerar
-              // spelaren som hasLeft i leaderboarden.
-              selfPlayerId: ownId ?? '',
-              players: JSON.stringify(turnOrder),
-              roundsCount: String(effectiveRoundsCount),
-              answerResponseSeconds: String(effectiveAnswerResponseSeconds),
-              eraFrom: String(effectiveEraFrom),
-              eraTo: String(effectiveEraTo),
-              youtubeEnabledCategories: JSON.stringify(effectiveYtCats),
-              imagesEnabledCategories: JSON.stringify(effectiveImgCats),
-              // Theme packages aktiva i lobby:n vid speltillfället (non-host
-              // path — efter Realtime-detection av game-started). Speglar
-              // host-path:en så HistoryEntry får samma data oavsett vilken
-              // enhet som triggade navigation till /quiz.
-              selectedExtraPackages: JSON.stringify(settingsStored?.selectedExtraPackages ?? []),
-              // Spotify DJ-läge måste matchas med host:s värde så non-host
-              // behandlar Spotify-frågor korrekt (timer gating, mediaSource).
-              spotifyEnabled: String(settingsStored?.spotifyEnabled ?? false),
-              roomCode,
-            },
-          });
+          goToQuizAsNonHost();
         }
         return;
       }
@@ -4689,8 +5627,8 @@ export default function LobbyScreen() {
   useEffect(() => {
     if (!remoteGuestBlockedDetected) return;
     Alert.alert(
-      'Remote 1vs1 Room',
-      'This Room Code belongs to a Remote 1vs1 match. Remote duels can only be played between QuizVibe users — register a free account or log in to join.',
+      'Head-to-head Room',
+      'This Room Code belongs to a Head-to-head match. Head-to-head duels can only be played between QuizVibe users — register a free account or log in to join.',
       [
         { text: 'OK', onPress: () => router.replace('/') },
         { text: 'Register or Login', onPress: () => router.replace('/?openAuth=join') },
@@ -4710,19 +5648,6 @@ export default function LobbyScreen() {
       { cancelable: false },
     );
   }, [startedWithoutMeDetected]);
-
-  // Pass-the-Phone-popup: approved non-host i en Pass-the-Phone-lobby kan
-  // inte själv navigera till /quiz — host:s telefon är den enda enhet som
-  // spelar. Visa informativ popup med Back to Home-knapp.
-  useEffect(() => {
-    if (!passThePhoneStartedDetected) return;
-    Alert.alert(
-      'Host has started the game',
-      'Please use the Host device (Pass-the-Phone game mode).',
-      [{ text: 'Back to Home', onPress: () => router.replace('/') }],
-      { cancelable: false },
-    );
-  }, [passThePhoneStartedDetected]);
 
   // Skickar invite in-app till en vän — sparas i mottagarens per-user-
   // namespacade Waiting Invites-inbox (friend.playerName som nyckel).
@@ -4744,7 +5669,7 @@ export default function LobbyScreen() {
         if (!error && (count ?? 0) >= 4) {
           Alert.alert(
             'Invitation limit reached',
-            'You already have 4 unanswered 1vs1 invitations. Wait for an answer or for old invitations to expire before sending more.',
+            'You already have 4 unanswered H2H invitations. Wait for an answer or for old invitations to expire before sending more.',
           );
           return;
         }
@@ -4756,15 +5681,31 @@ export default function LobbyScreen() {
       roomCode,
       fromPlayerName,
       fromAvatarId: profile?.selectedAvatarId,
+      alreadyFriend: !friend.id.startsWith('pending-'),
     });
     setInvitedFriendIds((prev) => {
       const next = new Set(prev);
       next.add(friend.id);
       return next;
     });
+    // "Pending"-perioden startar HÄR (inviten är nu en levande waiting_invites-
+    // rad) — inte redan vid Add. Driver badgen på nästa modal-open.
+    if (friend.id.startsWith('pending-')) {
+      setSentPendingIds((prev) => {
+        const next = new Set(prev);
+        next.add(friend.id);
+        return next;
+      });
+    }
   };
 
   const handleStartGame = async (ptpConfirmed = false) => {
+    // Seed-guard: en snabb replay-tap kan hinna fyra Start Game INNAN
+    // seed-effekten (Promise.all → getLobbySettings) applicerat carry-over-
+    // settings. Läser då de OSEEDADE default-kategorierna (all-3 källor) och
+    // spelar "helt slumpmässigt" media. Ref:en är synkron sanning vid tap;
+    // knappen är dessutom visuellt låst tills seeden klar. Bara host seedar.
+    if (hostMode && !lobbySeededRef.current) return;
     // Pool-preflight FÖRST — settings-issue ska upptäckas innan vi bryr
     // oss om spelar-state (approve/single-player-popups). Om host:s filter-
     // kombo (era + main-categories + source-toggles) ger noll matchande
@@ -4816,8 +5757,10 @@ export default function LobbyScreen() {
       return;
     }
 
-    const eraFrom = eraValues[0];
-    const eraTo = eraValues[1];
+    // effectiveEraValues = paketets låsta span när paket aktivt (annars slider-val)
+    // → material-validering + params speglar exakt det spelet spelas med.
+    const eraFrom = effectiveEraValues[0];
+    const eraTo = effectiveEraValues[1];
     const ytCatsAll = youtubeEnabledCategories.length === 3;
     const matchesYtCat = (mc: MainCategory | null) =>
       ytCatsAll ? true : mc !== null && youtubeEnabledCategories.includes(mc);
@@ -4941,6 +5884,22 @@ export default function LobbyScreen() {
       return;
     }
 
+    // Spotify DJ — samma "är ni i samma rum?"-bekräftelse som PtP, men för
+    // IndDev där varje spelare hör Spotify på sin egen enhet. Guarderna ovan
+    // har redan garanterat IndDev + minst en godkänd motspelare, så
+    // spotifyEnabled ensamt räcker som villkor här. confirmAsync (await, ingen
+    // rekursion) körs före credit-blocket så en avbruten start aldrig kostar
+    // en credit.
+    if (spotifyEnabled) {
+      const proceed = await confirmAsync(
+        'Spotify activated',
+        'Are all players in the same room so you can hear each other Spotify songs when played on each device?',
+        'Yes',
+        'No',
+      );
+      if (!proceed) return;
+    }
+
     // D-vii: blockera start om någon approved non-host har röd peer-
     // health. Pass-the-Phone delar device → ingen peer-health-koncept
     // där, gateas bort. Host:s egen status är aldrig 'unstable' i
@@ -4986,14 +5945,14 @@ export default function LobbyScreen() {
       if (isGuestHost) {
         Alert.alert(
           'QuizVibe account required',
-          'Remote 1vs1 matches can only be played between QuizVibe users. Register or sign in to host a 1vs1 match.',
+          'Head-to-head matches can only be played between QuizVibe users. Register or sign in to host an H2H match.',
         );
         return;
       }
       const activeApprovedNonHosts = approvedPlayers.filter((p) => !p.isHost && !p.hasLeft);
       if (activeApprovedNonHosts.length !== 1) {
         Alert.alert(
-          'Remote 1vs1 requires exactly 1 opponent',
+          'Head-to-head requires exactly 1 opponent',
           activeApprovedNonHosts.length === 0
             ? 'Invite and approve one opponent before starting the match.'
             : 'Remove players until exactly one approved opponent remains.',
@@ -5004,7 +5963,7 @@ export default function LobbyScreen() {
       if (remoteOpponent.addedByHost) {
         Alert.alert(
           'Own device required',
-          `${remoteOpponent.name} was added by the Host and has no device of their own. Remote 1vs1 opponents must join with their own device.`,
+          `${remoteOpponent.name} was added by the Host and has no device of their own. Head-to-head opponents must join with their own device.`,
         );
         return;
       }
@@ -5013,7 +5972,7 @@ export default function LobbyScreen() {
       if (remoteOpponent.type === 'guest') {
         Alert.alert(
           'QuizVibe account required',
-          `${remoteOpponent.name} joined as a Guest. Remote 1vs1 matches can only be played between QuizVibe users.`,
+          `${remoteOpponent.name} joined as a Guest. Head-to-head matches can only be played between QuizVibe users.`,
         );
         return;
       }
@@ -5064,6 +6023,24 @@ export default function LobbyScreen() {
           'Start anyway',
         );
         if (!proceed) return;
+      }
+    }
+
+    // Re-match: hela uppsättningen från förra spelet måste vara tillbaka.
+    // Ligger FÖRE credit-blocket — en avbruten start får aldrig kosta en
+    // credit (samma regel som Spotify-attest-guarden ovan).
+    //
+    // Saknas listan (rums-raden skrevs utan 0037-fälten) är detta en no-op;
+    // låsningen i UI:t gäller ändå. Host har alltid "Delete this Game Lobby"
+    // som utväg om någon aldrig kommer tillbaka.
+    if (isRematchLobby) {
+      const missing = findMissingRematchPlayers(rematchExpectedIds, players);
+      if (missing.length > 0) {
+        Alert.alert(
+          'Waiting for players',
+          `${describeMissingPlayers(missing)} from the previous game hasn't re-joined yet. A re-match keeps the exact same line-up, so everyone has to be back before it can start.`,
+        );
+        return;
       }
     }
 
@@ -5142,8 +6119,8 @@ export default function LobbyScreen() {
         {
           roundsCount,
           answerResponseSeconds,
-          eraFrom: eraValues[0],
-          eraTo: eraValues[1],
+          eraFrom: effectiveEraValues[0],
+          eraTo: effectiveEraValues[1],
           youtubeEnabledCategories,
           imagesEnabledCategories,
           selectedExtraPackages,
@@ -5202,7 +6179,7 @@ export default function LobbyScreen() {
             }
           } catch { /* tyst — pillen självkorrigerar vid nästa load */ }
         }
-        Alert.alert('Cannot start match', 'The 1vs1 match could not be created. Check your connection and try again.');
+        Alert.alert('Cannot start match', 'The H2H match could not be created. Check your connection and try again.');
         return;
       }
     }
@@ -5302,16 +6279,14 @@ export default function LobbyScreen() {
         // Tidsgränsen per fråga från host:s profil (default 30 sek). Quiz
         // använder den för timer-bar:en + reveal-trigger.
         answerResponseSeconds: String(answerResponseSeconds),
-        // Game era — passa RAW eraValues (samma värde som lobbySettings-
-        // store håller och som non-host:s navigation läser via
-        // settingsStored). Critical för IndDev: båda enheter MÅSTE bygga
-        // identiskt gameQuestions-pool (samma `inEra`-filter).
-        // checkEraAgainstPlayer ger bara en informativ warning idag
-        // (ingen auto-clamp av display) — så host:s exakta val är det
-        // som går till fråge-poolen. Re-introduce clamping vid behov
-        // genom att skriva clamped till lobbySettings.
-        eraFrom: String(eraValues[0]),
-        eraTo: String(eraValues[1]),
+        // Game era — passa effectiveEraValues (= paketets låsta span när ett
+        // Host-paket är aktivt, annars host:s slider-val). SAMMA värde som
+        // lobbySettings-store håller och som non-host:s navigation läser via
+        // settingsStored, så båda enheter bygger identiskt gameQuestions-pool
+        // (samma `inEra`-filter) i IndDev. Era-låset garanterar att ett
+        // tema-paket aldrig kombineras med en era utan material.
+        eraFrom: String(effectiveEraValues[0]),
+        eraTo: String(effectiveEraValues[1]),
         // Per-source category-filter. quiz.tsx filtrerar YouTube-pool mot
         // youtubeEnabledCategories och image-pool mot imagesEnabledCategories.
         youtubeEnabledCategories: JSON.stringify(youtubeEnabledCategories),
@@ -5328,6 +6303,11 @@ export default function LobbyScreen() {
         spotifyEnabled: String(spotifyEnabled && spotifyConnected),
         spotifyAnswerYear: String(spotifyAnswerYear),
         spotifyAnswerName: String(spotifyAnswerName),
+        // Parent Control — när på filtrerar quiz.tsx bort YT-items taggade
+        // parentControlled ur frågeurvalet. Host bygger poolen (IndDev
+        // broadcastar sekvensen; PtP/Single spelar bara på host:s enhet), så
+        // det räcker att host:s nav bär flaggan.
+        parentControlEnabled: String(parentControlEnabled),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -5339,7 +6319,7 @@ export default function LobbyScreen() {
     if (remoteMatchId) {
       setRemoteStartPrompt({
         message:
-          'The 1vs1 match has been created. You have 48 hours to play your questions — now or later via "1vs1" on the Home screen.',
+          'The H2H match has been created. You have 48 hours to play your questions — now or later via "H2H" on the Home screen.',
         playNow: () => router.push(quizNav),
       });
       return;
@@ -5353,13 +6333,26 @@ export default function LobbyScreen() {
   // härleder medie-källa + kategori per rund baserat på aktuella lobby-inställningar.
   type GsSlot = { source: 'spotify' | 'youtube' | 'image' | 'none'; category: MainCategory | null };
   const gameSequencePreview = useMemo<GsSlot[]>(() => {
+    // Host-paket (tema-only): speglar quiz.tsx:s pool-filter så previewn matchar
+    // det spelet faktiskt spelas med. Aktivt paket → bara tema-taggade music-
+    // items; image-items bär inga paket-taggar → tom Hints-pool.
+    const activePkgTags = resolveActivePackageTags(selectedExtraPackages);
+    const pkgActive = activePkgTags.size > 0;
+    const inPkg = (gp: readonly string[] | undefined) => !pkgActive || itemInActivePackages(gp, activePkgTags);
+    // Paket LÅSER källorna: covered YT-kategorier spelas alltid (grön+låst i
+    // mixerboarden), host:s toggle ignoreras. Speglar quiz.tsx:s effektiva val.
+    const cov = pkgActive ? computePackageCoverage(selectedExtraPackages) : null;
+    const effYtCats: MainCategory[] = cov
+      ? MAIN_CATEGORIES.filter((mc) => cov[mc].youtube)
+      : youtubeEnabledCategories;
     const ytFiltered = MUSIC_QUESTIONS.filter(q => {
-      if (q.contentSubject === 'song') return youtubeEnabledCategories.includes('Music');
-      if (q.contentSubject === 'movie') return youtubeEnabledCategories.includes('Film');
-      if (q.contentSubject === 'sport-event') return youtubeEnabledCategories.includes('Sport');
+      if (!inPkg(q.genrePackages)) return false;
+      if (q.contentSubject === 'song') return effYtCats.includes('Music');
+      if (q.contentSubject === 'movie') return effYtCats.includes('Film');
+      if (q.contentSubject === 'sport-event') return effYtCats.includes('Sport');
       return false;
     });
-    const imgFiltered = IMAGE_QUIZ_QUESTIONS.filter(q => {
+    const imgFiltered = pkgActive ? [] : IMAGE_QUIZ_QUESTIONS.filter(q => {
       const s = q.contentSubject;
       if (s === 'artist' || s === 'band') return imagesEnabledCategories.includes('Music');
       if (s === 'actor' || s === 'character') return imagesEnabledCategories.includes('Film');
@@ -5368,7 +6361,7 @@ export default function LobbyScreen() {
     });
     // Spotify bara i IndDev — PtP och Single Player kör utan Spotify DJ.
     const spotifyActive = spotifyEnabled && gameMode === 'individual-devices' && !singlePlayerDefault;
-    const spotifyPool = spotifyActive ? MUSIC_QUESTIONS.filter(q => q.spotifyTrackId) : [];
+    const spotifyPool = spotifyActive ? MUSIC_QUESTIONS.filter(q => q.spotifyTrackId && inPkg(q.genrePackages)) : [];
     // Ren YT-pool: ytFiltered (respekterar youtubeEnabledCategories) minus Spotify-items.
     const pureYtPool = spotifyActive ? ytFiltered.filter(q => !q.spotifyTrackId) : ytFiltered;
     const imagePool = imgFiltered;
@@ -5411,7 +6404,7 @@ export default function LobbyScreen() {
         Film: ['movie'],
         Sport: ['sport-event'],
       };
-      const ytCatEntries: YtCatEntry[] = (youtubeEnabledCategories as MainCategory[])
+      const ytCatEntries: YtCatEntry[] = effYtCats
         .map((cat) => ({
           cat,
           items: pureYtPool.filter((q) => subjectForCat[cat]?.includes(q.contentSubject ?? '')),
@@ -5461,14 +6454,18 @@ export default function LobbyScreen() {
     }
 
     return slots;
-  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault]);
+  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault, selectedExtraPackages]);
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Morse-ambient-ljud — bara när skärmen är aktiv (avmonteras vid
-          Stack-navigation till t.ex. Quiz, annars fortsätter WebView spela
-          trots att LobbyScreen ligger kvar ouppmonterad i stacken). */}
-      {screenFocused && hostMode && showAmbient && <MorseAmbientSound />}
+      {/* Morse-ambient-ljud — tystas när skärmen tappar fokus (Stack-
+          navigation till t.ex. Quiz), annars fortsätter WebView:n spela trots
+          att LobbyScreen ligger kvar monterad i stacken.
+          ⚠ Elementet AVMONTERAS INTE vid blur — `active={screenFocused}`
+          tonar ut ljudet i stället. Att riva WebView:n mitt i en ringande ton
+          gav ett hörbart klick när host tryckte Start Game (Peter 2026-08-26);
+          se ⚠-noten i MorseAmbientSound.tsx. */}
+      {hostMode && showAmbient && <MorseAmbientSound active={screenFocused} />}
       {/* Top board (login status) — sticky utanför ScrollView så den följer
           med när användaren scrollar i lobbyn. Tap-beteendet är roll-
           beroende:
@@ -5609,10 +6606,16 @@ export default function LobbyScreen() {
                 <Text style={styles.hostBadgeTextGold}>Invite friends</Text>
               </Animated.View>
               {/* Index 2 (guld, overlay) — lägesberoende text: 1vs1-lobbyn
-                  visar "1vs1 challenge", övriga "Single or multiplayer game". */}
+                  visar "H2H challenge", single-lobbyn "Single mode", övriga
+                  "Multiplayer mode". Drivs av lobby-typ-state så texten är
+                  densamma vid första spelet och vid replay/rematch. */}
               <Animated.View style={[styles.hostBadgeInner, styles.hostBadgeOverlay, { opacity: hostBadgeOp2 }]}>
                 <Text style={styles.hostBadgeTextGold}>
-                  {gameMode === 'remote-1v1' ? '1vs1 challenge' : 'Single or multiplayer game'}
+                  {gameMode === 'remote-1v1'
+                    ? 'H2H challenge'
+                    : isSingleLobby
+                    ? 'Single mode'
+                    : 'Multiplayer mode'}
                 </Text>
               </Animated.View>
             </View>
@@ -5645,8 +6648,12 @@ export default function LobbyScreen() {
           </View>
           {/* Share invite är host-only — bara host bjuder in nya spelare.
               Guest host: dold — friends-invites kräver registrerat konto;
-              guests delar rumkoden muntligt istället. */}
-          {hostMode && !isGuestHost && (
+              guests delar rumkoden muntligt istället.
+              Re-match/Replay: dold — uppsättningen är låst till förra spelets
+              spelare, så nya spelare kan inte bjudas in (Peter 2026-08-28).
+              Single-lobby: dold — ett solospel har inga andra spelare att
+              bjuda in (Peter 2026-08-29). */}
+          {hostMode && !isGuestHost && !isRematchLobby && !isSingleLobby && (
             <TouchableOpacity onPress={handleOpenShareModal} style={styles.shareBtn}>
               <Text style={styles.shareBtnText}>↑ Share invite to friends</Text>
             </TouchableOpacity>
@@ -5669,7 +6676,7 @@ export default function LobbyScreen() {
             </View>
             {/* Röd "Players Waiting"-signal till höger om +/− när det finns
                 spelare som väntar på godkännande. Försvinner när alla är godkända. */}
-            {waitingForApproval.length > 0 && (
+            {showWaitingLabel && (
               <BlinkingLabel style={styles.playersWaitingLabel}>
                 Players Waiting
               </BlinkingLabel>
@@ -5694,16 +6701,38 @@ export default function LobbyScreen() {
             <View style={styles.approvedBoxesGrid}>
               {(() => {
                 const approvedCount = approvedPlayers.filter((p) => !p.hasLeft).length;
-                const waitingCount = waitingForApproval.length;
                 // 4 rutor i bredd → 4 spelare = 1 rad, 12 spelare = 3 rader
                 // (ruta 5 hamnar under ruta 1, ruta 6 under ruta 2 osv.).
                 const COLS = 4;
+                // Single player: EN ruta. maxPlayers står kvar på 4 i state
+                // (DB-CHECK tillåter bara 2/4/12) — taket 1 är rent visuellt.
+                // Re-match/Replay: uppsättningen är LÅST till förra spelets
+                // spelare, så taket = exakt det antalet (t.ex. ett 2-spelars
+                // IndDev-spel visar 2 rutor, inte maxPlayers=12). Faller tillbaka
+                // på nuvarande spelarantal medan rematchExpectedIds laddas async,
+                // så ingen 12-rutors-flash (Peter 2026-08-28).
+                const rematchCapacity =
+                  rematchExpectedIds.length > 0
+                    ? rematchExpectedIds.length
+                    : players.filter((p) => !p.hasLeft).length || maxPlayers;
+                const capacity = isSingleLobby
+                  ? 1
+                  : isRematchLobby
+                    ? rematchCapacity
+                    : maxPlayers;
                 const renderBox = (i: number) => {
                   const isFilled = i < approvedCount;
                   const isBlinking = !isFilled && i < approvedCount + waitingCount;
                   // Sista rutan får "max N"-stacken — utom i 1vs1-lobbyn där
-                  // taket alltid är 2 och rutan bara visar siffran "2".
-                  const isLast = i === maxPlayers - 1 && gameMode !== 'remote-1v1';
+                  // taket alltid är 2 och rutan bara visar siffran "2", i
+                  // single-lobbyn där "max 1" bara är brus, och i re-match/replay
+                  // där uppsättningen är LÅST till exakt antalet (då är rutan en
+                  // riktig spelarplats, inte ett tak att sträva mot).
+                  const isLast =
+                    i === capacity - 1 &&
+                    gameMode !== 'remote-1v1' &&
+                    !isSingleLobby &&
+                    !isRematchLobby;
                   const boxStyle = [
                     styles.approvedBox,
                     (isFilled || isBlinking) && styles.approvedBoxFilled,
@@ -5712,7 +6741,7 @@ export default function LobbyScreen() {
                   const content = isLast ? (
                     <View style={styles.approvedBoxMaxStack}>
                       <Text style={styles.approvedBoxMaxLabel} numberOfLines={1}>max</Text>
-                      <Text style={styles.approvedBoxMaxNum} numberOfLines={1}>{maxPlayers}</Text>
+                      <Text style={styles.approvedBoxMaxNum} numberOfLines={1}>{capacity}</Text>
                     </View>
                   ) : (
                     <Text
@@ -5732,14 +6761,14 @@ export default function LobbyScreen() {
                     </ApprovedBox>
                   );
                 };
-                const rowCount = Math.ceil(maxPlayers / COLS);
+                const rowCount = Math.ceil(capacity / COLS);
                 return Array.from({ length: rowCount }).map((_, r) => (
                   <View key={r} style={styles.approvedBoxesGridRow}>
                     {Array.from({ length: COLS }).map((_, c) => {
                       const i = r * COLS + c;
                       // Osynlig spacer på ev. ofull sista rad så kolumnerna
-                      // linjerar (maxPlayers=4/12 = alltid full, men robust).
-                      return i < maxPlayers ? renderBox(i) : (
+                      // linjerar (4/12 = alltid full, single = 1 + 3 spacers).
+                      return i < capacity ? renderBox(i) : (
                         <View key={`sp-${c}`} style={styles.approvedBoxSpacer} />
                       );
                     })}
@@ -5747,14 +6776,17 @@ export default function LobbyScreen() {
                 ));
               })()}
             </View>
-            {hostMode && gameMode === 'pass-the-phone' && (
+            {hostMode && gameMode === 'pass-the-phone' && !isRematchLobby && !isSingleLobby && (
               <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
                 <Text style={styles.addBtnText}>+ Add Guest</Text>
               </TouchableOpacity>
             )}
           </View>
 
-          {gameMode === 'pass-the-phone' && approvedPlayers.length > 0 && (
+          {/* Turordnings-hinten är meningslös i single player-lobbyn — det
+              finns en enda spelare och ingen ordning att ändra. (Lobbyn kör
+              PtP under huven, så gameMode-checken ensam räcker inte.) */}
+          {gameMode === 'pass-the-phone' && !isSingleLobby && approvedPlayers.length > 0 && (
             <Text style={styles.turnOrderHint}>
               {hostMode
                 ? 'Turn order — top plays first. Use ↑↓ to reorder.'
@@ -5779,9 +6811,17 @@ export default function LobbyScreen() {
                 assistance={mutualAssistanceActive ? remoteAssistance : player.assistance}
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
+                hcp={player.type === 'guest' ? undefined : resolveDisplayHcp(player.id === ownPlayerIdRef.current ? (selfHcp ?? player.hcpOverride) : (player.hcp ?? player.hcpOverride))}
+                hcpNotDefined={player.type === 'guest'}
                 accountPlayerName={player.accountPlayerName}
-                turnNumber={gameMode === 'pass-the-phone' ? index + 1 : undefined}
-                showApproveToggle={hostMode && !player.isHost && !player.hasLeft}
+                turnNumber={
+                  // Turnummer bara i PtP-MULTIPLAYER. Single kör PtP under
+                  // huven, så gameMode-checken ensam räcker inte — en "1" på
+                  // enda spelarens kort är brus (samma skäl som att
+                  // turordnings-hinten ovan döljs).
+                  gameMode === 'pass-the-phone' && !isSingleLobby ? index + 1 : undefined
+                }
+                showApproveToggle={hostMode && !isRematchLobby && !player.isHost && !player.hasLeft}
                 approved={true}
                 onApproveChange={(next) => handleSetApproved(player.id, next)}
                 hasLeft={player.hasLeft}
@@ -5794,7 +6834,7 @@ export default function LobbyScreen() {
                     : undefined
                 }
                 spotifyConnected={player.spotifyConnected}
-                showSpotifyBadge={gameMode !== 'remote-1v1'}
+                showSpotifyBadge={gameMode !== 'remote-1v1' && !isSingleLobby}
               />
             ))}
 
@@ -5807,7 +6847,7 @@ export default function LobbyScreen() {
 
                 {/* Master "Approve All"-toggle — bara host ser/använder den.
                     Drar host till Yes godkänns alla aktuellt väntande spelare. */}
-                {hostMode && waitingForApproval.length > 0 && (
+                {hostMode && !isRematchLobby && waitingForApproval.length > 0 && (
                   <View style={styles.approveAllRow}>
                     <ApproveToggle
                       label="Approve All"
@@ -5835,12 +6875,18 @@ export default function LobbyScreen() {
                     assistance={mutualAssistanceActive ? remoteAssistance : player.assistance}
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
+                    hcp={player.type === 'guest' ? undefined : resolveDisplayHcp(player.id === ownPlayerIdRef.current ? (selfHcp ?? player.hcpOverride) : (player.hcp ?? player.hcpOverride))}
+                    hcpNotDefined={player.type === 'guest'}
                     accountPlayerName={player.accountPlayerName}
-                    showApproveToggle={hostMode && !player.hasLeft}
+                    showApproveToggle={hostMode && !isRematchLobby && !player.hasLeft}
                     approved={false}
                     onApproveChange={(next) => handleSetApproved(player.id, next)}
                     hasLeft={player.hasLeft}
-                    onDelete={hostMode ? () => handleDeletePlayer(player.id) : undefined}
+                    onDelete={
+                      hostMode && !isRematchLobby
+                        ? () => handleDeletePlayer(player.id)
+                        : undefined
+                    }
                     onEditPlayer={hostMode && !player.hasLeft ? () => openPlayerEdit(player.id) : undefined}
                     peerHealth={
                       gameMode === 'individual-devices'
@@ -5850,7 +6896,7 @@ export default function LobbyScreen() {
                         : undefined
                     }
                     spotifyConnected={player.spotifyConnected}
-                    showSpotifyBadge={gameMode !== 'remote-1v1'}
+                    showSpotifyBadge={gameMode !== 'remote-1v1' && !isSingleLobby}
                   />
                 ))}
               </View>
@@ -5930,14 +6976,24 @@ export default function LobbyScreen() {
           <View style={[styles.section, { marginTop: Spacing.xs }]}>
             <Text style={styles.sectionLabel}>Game Mode</Text>
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-              <View style={[styles.modeOption, styles.modeOptionPassActive]}>
+              <TouchableOpacity
+                style={[styles.modeOption, styles.modeOptionPassActive]}
+                onPress={lockedModeAlert}
+                activeOpacity={0.7}
+              >
+                {/* Stängt hänglås — lobbytypen är LÅST (1vs1 väljs på Home och
+                    kan inte bytas här). Samma signal som single/re-match-rutan
+                    (Peter 2026-08-28). */}
+                <View style={styles.lockBadge} pointerEvents="none">
+                  <Text style={styles.lockBadgeText}>🔒</Text>
+                </View>
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
-                  Remote play — 1vs1
+                  Head-to-head
                 </Text>
                 <View style={styles.freeBadge} pointerEvents="none">
                   <Text style={styles.freeBadgeText}>FREE</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
               <View style={{ flex: 1 }} />
             </View>
 
@@ -5959,7 +7015,7 @@ export default function LobbyScreen() {
                 onPress={() =>
                   Alert.alert(
                     'Mutual assistance level',
-                    'Off: each player plays with their own personal assistance level.\n\nOn: both players get the SAME level — the one the Host picks below. In a 1vs1 match both answer the same questions on their own devices, so a shared level makes the duel directly comparable.\n\nFull: the full names are listed, just pick the right one.\nStandard: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
+                    'Off: each player plays with their own personal assistance level.\n\nOn: both players get the SAME level — the one the Host picks below. In an H2H match both answer the same questions on their own devices, so a shared level makes the duel directly comparable.\n\nFull: the full names are listed, just pick the right one.\nStandard: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
                   )
                 }
                 hitSlop={8}
@@ -6008,7 +7064,7 @@ export default function LobbyScreen() {
                 </View>
                 <Text style={styles.remoteAssistanceNote}>
                   {hostMode
-                    ? 'Applies to both players in this 1vs1 match.'
+                    ? 'Applies to both players in this H2H match.'
                     : 'Selected by the Host — applies to both players.'}
                 </Text>
               </>
@@ -6018,6 +7074,90 @@ export default function LobbyScreen() {
                 Each player plays with their own assistance level.
               </Text>
             )}
+          </View>
+        ) : isRematchLobby ? (
+          /* Re-match/Replay-lobby (Peter 2026-08-25): spelaruppsättningen är
+             låst till exakt spelarna från förra spelet, så aggregatet förblir
+             en rättvis serie. Därför INGA Game Mode-val och ingen
+             Players-sektion — VARJE lägesbyte ejectar spelare (Single player
+             kastar ut alla non-hosts, Individual device tar bort host-tillagda
+             gäster, Pass-the-Phone nollar maxPlayers till 4). Statisk
+             indikator i samma vokabulär som den renodlade 1vs1-lobbyn ovan.
+             Allt ANNAT (rundor, era, Source Mixerboard, paket, svarstid) är
+             kvar redigerbart — det rör inte uppsättningen. */
+          <View style={[styles.section, { marginTop: Spacing.xs }]}>
+            <Text style={styles.sectionLabel}>Game Mode</Text>
+            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+              <TouchableOpacity
+                style={[styles.modeOption, styles.modeOptionPassActive]}
+                onPress={lockedModeAlert}
+                activeOpacity={0.7}
+              >
+                {/* Stängt hänglås till vänster ersätter det tidigare
+                    "(line-up locked)"-suffixet — kortar raden (Peter 2026-08-27)
+                    som annars svämmade över i PtP-läget. */}
+                <View style={styles.lockBadge} pointerEvents="none">
+                  <Text style={styles.lockBadgeText}>🔒</Text>
+                </View>
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
+                  {singlePlayerDefault
+                    ? 'Replay — Single player'
+                    : /* Namnge LÄGET, inte bara antalet (Peter 2026-08-26):
+                         sedan Pass-the-Phone också kan re-matchas kan en
+                         återvändande spelare annars inte se om de ska vänta
+                         sig "följ leaderboarden?"-prompten eller en egen tur.
+                         Raden är dessutom en synlig kanariefågel för att
+                         läget faktiskt bars över från förra spelet. */
+                      `Re-match — ${
+                        gameMode === 'individual-devices'
+                          ? 'Individual device'
+                          : 'Pass-the-Phone'
+                      }`}
+                </Text>
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.guestHostNote}>
+              These are the players from the previous game. Use Start New Game
+              to play with others.
+            </Text>
+          </View>
+        ) : isSingleLobby ? (
+          /* Single player-lobby (Peter 2026-08-26): läget väljs på Home via
+             "Start New Game" → Single Game och är LÅST för lobbyns livstid.
+             Därför inga Game Mode-val och ingen Players-sektion — statisk
+             indikator i samma vokabulär som 1vs1- och re-match-lobbyn ovan.
+             Vill host spela multiplayer: radera lobbyn och välj Multiplayer
+             Game på Home. Allt annat (rundor, era, Mixerboard) är kvar. */
+          <View style={[styles.section, { marginTop: Spacing.xs }]}>
+            <Text style={styles.sectionLabel}>Game Mode</Text>
+            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+              <TouchableOpacity
+                style={[styles.modeOption, styles.modeOptionPassActive]}
+                onPress={lockedModeAlert}
+                activeOpacity={0.7}
+              >
+                {/* Stängt hänglås — läget är LÅST för lobbyns livstid (single
+                    väljs på Home / vid replay och kan inte bytas här). Samma
+                    signal som re-match-rutan (Peter 2026-08-28). */}
+                <View style={styles.lockBadge} pointerEvents="none">
+                  <Text style={styles.lockBadgeText}>🔒</Text>
+                </View>
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
+                  Single player — 1 player
+                </Text>
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              </TouchableOpacity>
+              <View style={{ flex: 1 }} />
+            </View>
+            <Text style={styles.guestHostNote}>
+              Multiplayer and Head-to-head games are started from Start New Game on
+              Home.
+            </Text>
           </View>
         ) : (
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
@@ -6029,37 +7169,20 @@ export default function LobbyScreen() {
             Game Mode
           </Text>
 
-          {/* Tre rutor i EN rad + bracket-etiketter undertill. Layouten
-              splittades tillfälligt i två rader när Remote (1vs1) låg här;
-              återställd 2026-08-12 när Remote flyttades till Home-valet. */}
+          {/* Två rutor i EN rad + bracket-etikett undertill. Single player
+              och Remote (1vs1) väljs på Home via "Start New Game" och
+              renderas därför inte här — den här grenen är multiplayer-only
+              sedan 2026-08-26. ⚠ Flex-talen på bracket-raden MÅSTE spegla
+              antalet rutor ovanför; det är just den kopplingen som gick
+              sönder när Remote-rutan lades till/togs bort. */}
           <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-            {renderModeBox('single', 'Single player', true)}
             {renderModeBox('ptp', 'Pass-the-Phone', true)}
             {renderModeBox('indiv', 'Individual device', true)}
           </View>
           <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
-            {/* Bracket under "Single player" */}
-            <View style={{ flex: 1, alignItems: 'center' }}>
-              <View style={styles.multiplayerBracket} />
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
-                <Text style={styles.multiplayerBracketLabel}>Single mode</Text>
-                <Pressable
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() =>
-                    Alert.alert(
-                      'Single player mode',
-                      'One player only — challenge yourself.\n\nMax 4 rounds, even with a Premium subscription. Spotify not applicable for Single player mode.',
-                    )
-                  }
-                  hitSlop={8}
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-              </View>
-            </View>
             {/* Bracket under "Pass-the-Phone" + "Individual device" —
-                flex:2 så den spänner över båda rutorna. */}
-            <View style={{ flex: 2, alignItems: 'center' }}>
+                flex:1 så den spänner över hela raden (båda rutorna). */}
+            <View style={{ flex: 1, alignItems: 'center' }}>
               <View style={styles.multiplayerBracket} />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
                 <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
@@ -6068,7 +7191,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Multiplayer mode',
-                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "Remote Play".',
+                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or H2H? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Head-to-head".',
                     )
                   }
                   hitSlop={8}
@@ -6192,12 +7315,17 @@ export default function LobbyScreen() {
           <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
           <View style={styles.connectionsList}>
             {/* ── Spotify DJ-läge ─────────────────────────────────────────
-                Synlig i alla lägen UTOM renodlade 1vs1-lobbyn (Spotify är
-                aldrig tillämpligt i asynkrona dueller — kortet göms helt,
-                inkl. attest-raden). Availability-pillen visar om Spotify DJ
-                stöds i aktuellt game mode (IndDev = grön "Enabled",
-                PtP/Single = grå "Disabled" + toggle utgråad). */}
-            {gameMode !== 'remote-1v1' && (
+                Göms HELT (inkl. attest-raden) i två lobbytyper där Spotify
+                aldrig kan bli tillämpligt:
+                  • renodlade 1vs1-lobbyn (asynkron duell)
+                  • single player-lobbyn (Spotify DJ kräver minst en
+                    motspelare — se handleStartGame:s DJ-guard)
+                Båda är LÅSTA vid skapandet, så läget kan inte bytas till ett
+                där Spotify blir relevant. I en multiplayer-lobby visas kortet
+                alltid; availability-pillen säger om DJ stöds i aktuellt läge
+                (IndDev = grön "Enabled", PtP = grå "Disabled" + toggle
+                utgråad) eftersom host fritt kan byta mellan dem. */}
+            {gameMode !== 'remote-1v1' && !isSingleLobby && (
             <View style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: Radius.sm, marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
             {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
                 ÖVERST i boxen, ovanför ikon/rubrik-raden, synlig i BÅDA
@@ -6301,15 +7429,15 @@ export default function LobbyScreen() {
                     </View>
                   )}
                   <Switch
-                    value={isSpotifyAvailable && spotifyEnabled}
-                    onValueChange={isSpotifyAvailable ? handleToggleSpotifyEnabled : undefined}
-                    disabled={!isSpotifyAvailable}
+                    value={isSpotifyAvailable && spotifyEnabled && !pkgGraySpotify}
+                    onValueChange={isSpotifyAvailable && !anyPackageActive ? handleToggleSpotifyEnabled : undefined}
+                    disabled={!isSpotifyAvailable || anyPackageActive}
                     trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                    thumbColor={isSpotifyAvailable ? '#FFF' : '#888'}
-                    ios_backgroundColor={isSpotifyAvailable && spotifyEnabled ? '#1DB954' : '#3C3C3C'}
+                    thumbColor={isSpotifyAvailable && !pkgGraySpotify ? '#FFF' : '#888'}
+                    ios_backgroundColor={isSpotifyAvailable && spotifyEnabled && !pkgGraySpotify ? '#1DB954' : '#3C3C3C'}
                     style={[
                       styles.sourceMatrixSwitch,
-                      !isSpotifyAvailable && { opacity: 0.4 },
+                      (!isSpotifyAvailable || pkgGraySpotify) && { opacity: 0.4 },
                     ]}
                   />
                 </View>
@@ -6402,13 +7530,13 @@ export default function LobbyScreen() {
                 </View>
                 <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
                   <Switch
-                    value={allEnabled}
+                    value={smAllValue}
                     onValueChange={hostMode ? handleToggleAllSources : undefined}
-                    disabled={!hostMode}
+                    disabled={!hostMode || anyPackageActive}
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
-                    ios_backgroundColor={allEnabled ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
+                    ios_backgroundColor={smAllValue ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={[styles.sourceMatrixSwitch, (isGuestHost || (anyPackageActive && !pkgAllCovered)) && { opacity: 0.45 }]}
                   />
                 </View>
                 <View style={styles.smLabelSourceCell}>
@@ -6449,21 +7577,21 @@ export default function LobbyScreen() {
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
                   <Switch
-                    value={artistsAllOn}
+                    value={smColValue('Music', artistsAllOn)}
                     onValueChange={hostMode ? handleToggleArtistsColumn : undefined}
-                    disabled={!hostMode}
+                    disabled={!hostMode || anyPackageActive}
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
-                    ios_backgroundColor={artistsAllOn ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
+                    ios_backgroundColor={smColValue('Music', artistsAllOn) ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Music')) && { opacity: 0.45 }]}
                   />
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -6473,14 +7601,14 @@ export default function LobbyScreen() {
                   <Text style={styles.sourceMatrixHeaderText}>Film</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={actorsAllOn} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={smColValue('Film', actorsAllOn)} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smColValue('Film', actorsAllOn) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Film')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -6493,17 +7621,17 @@ export default function LobbyScreen() {
                   <Text style={styles.sourceMatrixHeaderText}>Sport</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
-                  <Switch value={athletesAllOn} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={smColValue('Sport', athletesAllOn)} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smColValue('Sport', athletesAllOn) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Sport')) && { opacity: 0.45 }]} />
                 </View>
                 <View
                   onLayout={(e) => setSportCellCenter(e.nativeEvent.layout.x + e.nativeEvent.layout.width / 2)}
                   style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}
                 >
-                  <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Sport', 'youtube', youtubeEnabledCategories.includes('Sport'))} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Sport', 'youtube', youtubeEnabledCategories.includes('Sport')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={[styles.smAutoCell, smCellStyle]} />
                 <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]} />
+                  <Switch value={smCellValue('Sport', 'hints', imagesEnabledCategories.includes('Sport'))} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Sport', 'hints', imagesEnabledCategories.includes('Sport')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -6514,9 +7642,35 @@ export default function LobbyScreen() {
                 packages, så det inte läses som en bugg att raden saknas. */}
             {gameMode === 'remote-1v1' && (
               <Text style={styles.guestHostNote}>
-                Spotify is not available in 1vs1 Games
+                Spotify is not available in H2H Games
               </Text>
             )}
+
+            {/* Parent Control — host-styrd, non-host read-only (disabled).
+                Sitter längst ner i Source Mixerboard, precis ovanför Customized
+                Host packages. När på filtrerar quiz.tsx bort YT-klipp taggade
+                parentControlled ur frågeurvalet. */}
+            <View style={styles.parentControlRow}>
+              <View style={[styles.regionLabelRow, { flex: 1 }]}>
+                <Text style={styles.sectionLabel}>Parent Control</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() => Alert.alert('Parent Control', 'When on, YouTube clips flagged as parent-controlled are removed from the question selection.')}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
+              <Switch
+                value={parentControlEnabled}
+                onValueChange={hostMode ? setParentControlEnabled : undefined}
+                disabled={!hostMode}
+                trackColor={{ false: '#3C3C3C', true: Colors.success }}
+                thumbColor="#FFF"
+                ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
+                style={[styles.connectionSwitch, !hostMode && { opacity: 0.6 }]}
+              />
+            </View>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
                 Basic-utbudet är alltid implicit aktivt (ingen synlig chip);
@@ -6618,10 +7772,9 @@ export default function LobbyScreen() {
                   }
                   if (isPackagesActive) return;
                   if (availablePackages.length === 0) {
-                    Alert.alert(
-                      'No Extra packages available',
-                      'New Extra Host packages are coming soon and will be included in your Premium subscription.',
-                    );
+                    // Inga paket aktiverade i Profile än → öppna "+ Add package"-
+                    // katalogen så host kan lägga till dem direkt i lobbyn.
+                    setAddPackageModalVisible(true);
                     return;
                   }
                   setSelectedExtraPackages(availablePackages.map((p) => p.id));
@@ -6834,6 +7987,18 @@ export default function LobbyScreen() {
                   });
                 })()}
 
+                {/* "+ Add package" — öppnar hela katalogen så host kan lägga
+                    till paket direkt i lobbyn även om inget aktiverats i Profile. */}
+                {hostMode && (
+                  <TouchableOpacity
+                    style={styles.addPackageCatalogBtn}
+                    onPress={() => setAddPackageModalVisible(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.addPackageCatalogBtnText}>+ Add package</Text>
+                  </TouchableOpacity>
+                )}
+
               </View>
               )}
             </View>
@@ -6912,7 +8077,14 @@ export default function LobbyScreen() {
                   change Game era not available for Guest user
                 </Text>
               )}
-              {hostMode && !isGuestHost && (
+              {/* Host-paket aktivt: era låst till paketets innehålls-span (samma
+                  låsta mönster som guest host) — ingen slider, bara info-not. */}
+              {packageEraLocked && !isGuestHost && (
+                <Text style={styles.guestHostNote}>
+                  Game era locked by selected package
+                </Text>
+              )}
+              {hostMode && !isGuestHost && !packageEraLocked && (
                 <View style={{ alignItems: 'center', position: 'relative', width: SLIDER_WIDTH, alignSelf: 'center' }}>
                   <MultiSlider
                     // values-propen hålls STABIL under drag (= committed
@@ -7049,9 +8221,11 @@ export default function LobbyScreen() {
               {/* Siffran ramas in i samma blå-bordred ruta för både host och
                   non-host. Host får -/+ knappar på sidorna och RoundsRuler
                   under för att stega och se intervallet.
-                  Guest host: ENDAST två val-rutor (2/4) — stepper, ruler och
-                  game-mode quick-select renderas inte alls. */}
-              {isGuestHost ? (
+                  Guest host OCH single player-lobby: ENDAST två val-rutor
+                  (2/4) — stepper, ruler och game-mode quick-select renderas
+                  inte alls. Single är cappad på 4 rundor oavsett premium
+                  (roundsMax), så stepper + ruler vore bara brus. */}
+              {isGuestHost || isSingleLobby ? (
                 <>
                   <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
                     {([2, 4] as const).map((n) => {
@@ -7080,7 +8254,9 @@ export default function LobbyScreen() {
                     })}
                   </View>
                   <Text style={styles.guestHostNote}>
-                    Upto 20 rounds option for registered Quizvibe users with Premium
+                    {isSingleLobby
+                      ? 'Max 4 rounds in Single player mode'
+                      : 'Upto 20 rounds option for registered Quizvibe users with Premium'}
                   </Text>
                 </>
               ) : hostMode ? (
@@ -7162,11 +8338,13 @@ export default function LobbyScreen() {
                       EN rad med tre rutor, som huvud-Game Mode-sektionen.
                       Göms HELT i renodlade 1vs1-lobbyn (mode är låst där);
                       Remote-rutan borttagen 2026-08-07 (1vs1 nås via
-                      Home-valet). */}
-                  {gameMode !== 'remote-1v1' && (
+                      Home-valet).
+                      ⚠ Göms ÄVEN i re-match/replay-lobbyn — annars hade den
+                      varit en bakväg förbi låsningen i Game Mode-sektionen
+                      längre upp, och VARJE lägesbyte ejectar spelare. */}
+                  {gameMode !== 'remote-1v1' && !isRematchLobby && (
                     <>
                       <View style={[styles.modeRow, { marginTop: Spacing.lg }]}>
-                        {renderModeBox('single', 'Single player', true)}
                         {renderModeBox('ptp', 'Pass-the-Phone', true)}
                         {renderModeBox('indiv', 'Individual device', true, true)}
                       </View>
@@ -7331,6 +8509,21 @@ export default function LobbyScreen() {
         <View style={styles.bottomPad} />
       </ScrollView>
 
+      {/* Competition re-match: banner som visar vilka inbjudna vi väntar på.
+          Försvinner när alla joinat (då är Start Re-match upplåst). */}
+      {hostMode && isCompetitionRematch && (() => {
+        const missing = findMissingRematchPlayers(rematchExpectedIds, players);
+        if (missing.length === 0) return null;
+        return (
+          <View style={styles.compRematchWaitBanner}>
+            <Text style={styles.compRematchWaitText}>
+              Waiting for {describeMissingPlayers(missing)} to join — the re-match
+              is cancelled if everyone hasn&apos;t joined within 5 minutes.
+            </Text>
+          </View>
+        );
+      })()}
+
       {/* ── Start Game — sticky bottom-bar ──────────────────────────
           Ligger utanför ScrollView:n så den alltid är synlig oavsett
           scroll-position. Kompakt row-layout (label + play-logo på samma
@@ -7345,7 +8538,25 @@ export default function LobbyScreen() {
           style={[styles.startStickyBarGlow, { opacity: startGlow }]}
           pointerEvents="none"
         />
-        {hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
+        {hostMode && !lobbySeeded ? (
+          /* Seed-lås: carry-over-settings (t.ex. Music-only) appliceras av en
+             async seed-effekt (Promise.all → getLobbySettings). Håll Start
+             Game LÅST tills dess så en snabb replay-tap inte startar spelet
+             med de OSEDDA default-källorna (all-3) → "helt slumpmässigt" media.
+             Passiv, grå, ingen puls — läses som ett kort "förbereder", inte
+             en knapp. Fönstret är normalt sub-sekund. */
+          <View style={styles.startGameCompactWrap}>
+            <View style={styles.startGameCompactRow} pointerEvents="none">
+              <View style={styles.startGameWaitTextWrap}>
+                <Text style={styles.startGameWaitText}>Preparing lobby…</Text>
+                <SequentialDots color={Colors.textSecondary} />
+              </View>
+              <View style={styles.startGameCompactLogoWrap}>
+                <QuizVibePlayLogo size={64} color={START_LOCKED_GREY} />
+              </View>
+            </View>
+          </View>
+        ) : hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
          approvedPlayers.filter((p) => !p.isHost).length === 0 ? (
           /* Remote 1vs1 utan approved motståndare: Start Game ersätts av en
              HELT PASSIV väntetext (Peter 2026-08-07) — samma vokabulär som
@@ -7387,7 +8598,16 @@ export default function LobbyScreen() {
               onPress={() => handleStartGame()}
               style={styles.startGameCompactRow}
             >
-              <BlinkingLabel style={styles.startGameCompactLabel}>Start Game</BlinkingLabel>
+              <BlinkingLabel
+                style={styles.startGameCompactLabelTwoLine}
+                numberOfLines={2}
+              >
+                {isRematchLobby
+                  ? singlePlayerDefault
+                    ? 'Start\nReplay'
+                    : 'Start\nRe-match'
+                  : 'Start\nGame'}
+              </BlinkingLabel>
               <View style={styles.startGameCompactLogoWrap}>
                 <Animated.View
                   style={[styles.startGameCompactHalo, { opacity: startGlow }]}
@@ -7646,41 +8866,128 @@ export default function LobbyScreen() {
               Add a QuizVibe friend or invite an existing one to this lobby.
             </Text>
 
-            {/* QuizVibe friends section label */}
+            {/* QuizVibe friends section label + antal-badge (2026-08-27) —
+                samma rund-pill-form (primaryMuted bg + primaryBorder +
+                tabular-nums primary text) som Profile-skärmens
+                friendsCount, så räknaren ser identisk ut på båda ställena. */}
             <View style={shareSheet.sectionLabelRow}>
-              <QuizVibeFriendsLogo size={28} />
-              <Text style={shareSheet.sectionLabel}>QuizVibe friends</Text>
+              <View style={shareSheet.sectionLabelCluster}>
+                <QuizVibeFriendsLogo size={28} />
+                <Text style={shareSheet.sectionLabel}>QuizVibe friends</Text>
+              </View>
+              <View style={shareSheet.friendsCount}>
+                <Text style={shareSheet.friendsCountText}>{friends.length}</Text>
+              </View>
             </View>
 
-            {/* Add by Player Name — speglar Profile:s friends-modal så host
-                kan lägga till en friend direkt från lobby utan att hoppa
-                till Profile. Efter Add hamnar friend:en i listan nedan med
-                en Invite-knapp redo att tappas. */}
-            <View style={shareSheet.addRow}>
+            {/* Add by Player Name — samma split-field-struktur (bokstäver +
+                siffror, QuizVibe:s egna CodeKeyboard) som PlayerName skapas
+                överallt annars i appen (Register/Guest-form/AddPlayerModal),
+                Peter 2026-08-27. `appendPlayerNameLetter` sköter versal-
+                först/gemener-resten-formatet automatiskt per tangenttryck.
+                `playerNameExists` verifierar att namnet tillhör en
+                registrerad QuizVibe-user innan det sparas — se
+                handleAddFriendFromShare. Efter Add hamnar friend:en i
+                listan nedan med en kryssruta redo att bockas för. */}
+            <Text style={shareSheet.addFieldLabel}>Add by Player Name</Text>
+            <View style={shareSheet.addPlayerNameRow}>
               <TextInput
-                style={shareSheet.addInput}
-                placeholder="Add by Player Name"
+                ref={addFriendLettersRef}
+                style={[
+                  shareSheet.addInput,
+                  shareSheet.addPlayerNameLettersInput,
+                  addFriendKbMode === 'letter' && shareSheet.addPlayerNameInputActive,
+                ]}
+                placeholder="Anna"
                 placeholderTextColor={Colors.textDisabled}
-                value={newFriendPlayerName}
-                onChangeText={setNewFriendPlayerName}
-                maxLength={20}
-                returnKeyType="done"
-                onSubmitEditing={handleAddFriendFromShare}
+                value={getPlayerNameLetters(newFriendPlayerName)}
+                maxLength={PLAYER_NAME_MAX_LETTERS}
+                editable={!addFriendChecking}
+                showSoftInputOnFocus={false}
+                selection={{
+                  start: getPlayerNameLetters(newFriendPlayerName).length,
+                  end: getPlayerNameLetters(newFriendPlayerName).length,
+                }}
+                selectTextOnFocus={false}
+                contextMenuHidden={true}
+                onFocus={() => {
+                  setAddFriendKbMode('letter');
+                  setAddFriendFocused(true);
+                }}
+                onBlur={() => setAddFriendFocused(false)}
+              />
+              <Text style={shareSheet.addPlayerNameSeparator}>–</Text>
+              <TextInput
+                ref={addFriendDigitsRef}
+                style={[
+                  shareSheet.addInput,
+                  shareSheet.addPlayerNameDigitsInput,
+                  addFriendKbMode === 'digit' && shareSheet.addPlayerNameInputActive,
+                  getPlayerNameLetters(newFriendPlayerName).length === 0 && shareSheet.addPlayerNameInputDisabled,
+                ]}
+                placeholder="1234"
+                placeholderTextColor={Colors.textDisabled}
+                value={getPlayerNameDigits(newFriendPlayerName)}
+                maxLength={PLAYER_NAME_MAX_DIGITS}
+                editable={!addFriendChecking && getPlayerNameLetters(newFriendPlayerName).length > 0}
+                showSoftInputOnFocus={false}
+                selection={{
+                  start: getPlayerNameDigits(newFriendPlayerName).length,
+                  end: getPlayerNameDigits(newFriendPlayerName).length,
+                }}
+                selectTextOnFocus={false}
+                contextMenuHidden={true}
+                onFocus={() => {
+                  if (getPlayerNameLetters(newFriendPlayerName).length === 0) {
+                    addFriendLettersRef.current?.focus();
+                    return;
+                  }
+                  setAddFriendKbMode('digit');
+                  setAddFriendFocused(true);
+                }}
+                onBlur={() => setAddFriendFocused(false)}
               />
               <Pressable
                 onPress={handleAddFriendFromShare}
-                disabled={!newFriendPlayerName.trim()}
+                disabled={!newFriendPlayerName.trim() || addFriendChecking}
                 style={({ pressed }) => [
                   shareSheet.addBtn,
-                  !newFriendPlayerName.trim() && shareSheet.addBtnDisabled,
+                  (!newFriendPlayerName.trim() || addFriendChecking) && shareSheet.addBtnDisabled,
                   pressed && { opacity: 0.85 },
                 ]}
               >
-                <Text style={shareSheet.addBtnText}>Add</Text>
+                <Text style={shareSheet.addBtnText}>
+                  {addFriendChecking ? '…' : 'Add'}
+                </Text>
               </Pressable>
             </View>
+            {addFriendError && (
+              <Text style={shareSheet.addErrorText}>{addFriendError}</Text>
+            )}
+            {addFriendFocused && (
+              <CodeKeyboard
+                mode={addFriendKbMode}
+                letterCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                onPress={handleAddFriendKeyPress}
+                onBackspace={handleAddFriendBackspace}
+                onModeToggle={toggleAddFriendKbMode}
+                // Digit-mode kräver minst 1 letter — toggle dimmas i letter-
+                // mode tills letter-sektionen har innehåll.
+                modeToggleDisabled={addFriendKbMode === 'letter' && newFriendPlayerName.length === 0}
+                // Share invite:s botten-knapp är "Send invite" (disabled
+                // tills en friend är ibockad) — ingen "Done" att avbryta
+                // via. Cancel ersätter mode-toggle i botten-raden; togglen
+                // flyttar in i grid:en (direkt efter Z).
+                onCancel={handleAddFriendCancel}
+              />
+            )}
 
-            {friends.length === 0 ? (
+            {/* Tjock avdelare mellan Add by Player Name-rutorna och listan
+                nedanför (Peter 2026-08-27) — tydligare sektions-brytning än
+                den tunna 1px-dividern mellan enskilda friend-rader. */}
+            <View style={shareSheet.addSectionDivider} />
+
+            {displayFriends.length === 0 ? (
               <View style={shareSheet.emptyState}>
                 <Text style={shareSheet.emptyText}>No friends saved yet</Text>
                 <Text style={shareSheet.emptySubtext}>
@@ -7688,46 +8995,112 @@ export default function LobbyScreen() {
                 </Text>
               </View>
             ) : (
-              <ScrollView style={{ maxHeight: 260 }} keyboardShouldPersistTaps="handled">
-                {friends.map((friend, i) => {
+              // maxHeight krymps medan CodeKeyboard:et är uppe (Add by
+              // Player Name fokuserad) så hela sheet:en ryms inom
+              // container:s 90%-tak på kortare skärmar.
+              <ScrollView
+                style={{ maxHeight: addFriendFocused ? 140 : 260 }}
+                keyboardShouldPersistTaps="handled"
+              >
+                {displayFriends.map((friend, i) => {
                   const invited = invitedFriendIds.has(friend.id);
+                  const checked = invited || selectedFriendIds.has(friend.id);
+                  // Pending (2026-08-27): visas ENBART när inviten faktiskt
+                  // skickats (en levande waiting_invites-rad finns, spårad i
+                  // sentPendingIds) — INTE redan när host tryckt Add. En
+                  // pending-post utan badge är en tillagd kandidat som host
+                  // ännu inte bockat för och skickat. Blir en sparad friend
+                  // först när personen joinar (se pendingFriends-watchern).
+                  const isPending =
+                    friend.id.startsWith('pending-') && sentPendingIds.has(friend.id);
                   return (
                     <View key={friend.id}>
                       <View style={shareSheet.friendRow}>
-                        <Text style={shareSheet.friendEmoji}>
-                          {getAvatarEmojiById(friend.avatarId)}
-                        </Text>
-                        <Text style={shareSheet.friendName}>{friend.playerName}</Text>
-                        <TouchableOpacity
-                          onPress={() => handleInviteFriend(friend)}
+                        <View style={shareSheet.friendNameCluster}>
+                          {/* Namn-pillen speglar TopUserBanner:s inloggade
+                              login-pill (avatar + Player Name, primaryMuted
+                              bg + primaryBorder + primary text) — Peter
+                              2026-08-27: "skrivs så som de syns när de är
+                              inloggade". */}
+                          <View style={shareSheet.friendNamePill}>
+                            <Text style={shareSheet.friendPillIcon}>
+                              {getAvatarEmojiById(friend.avatarId)}
+                            </Text>
+                            <Text style={shareSheet.friendPillText} numberOfLines={1}>
+                              {friend.playerName}
+                            </Text>
+                          </View>
+                          {isPending && (
+                            <View style={shareSheet.pendingBadge}>
+                              <Text style={shareSheet.pendingBadgeText}>Pending</Text>
+                            </View>
+                          )}
+                        </View>
+                        {/* Kryssruta ersätter den tidigare per-rad "Invite"-
+                            knappen (2026-08-27) — host bockar för flera
+                            friends och skickar dem alla via "Send invite"
+                            längst ner. Redan skickade (invited) renderas
+                            grön+låst så host inte råkar dubbel-skicka. */}
+                        <Pressable
+                          onPress={() => {
+                            if (invited) return;
+                            setSelectedFriendIds((prev) => {
+                              // Remote 1v1 har bara EN motståndarplats —
+                              // radio-button-beteende: att bocka för en ny
+                              // spelare ersätter alltid ett tidigare val
+                              // istället för att lägga till det (Peter
+                              // 2026-08-27). Alla andra lobbytyper behåller
+                              // multi-select-togglet oförändrat.
+                              if (gameMode === 'remote-1v1') {
+                                return prev.has(friend.id) ? new Set() : new Set([friend.id]);
+                              }
+                              const next = new Set(prev);
+                              if (next.has(friend.id)) next.delete(friend.id);
+                              else next.add(friend.id);
+                              return next;
+                            });
+                          }}
                           disabled={invited}
+                          hitSlop={8}
                           style={[
-                            shareSheet.inviteBtn,
-                            invited && shareSheet.inviteBtnDone,
+                            shareSheet.checkbox,
+                            checked && shareSheet.checkboxChecked,
                           ]}
+                          accessibilityRole="checkbox"
+                          accessibilityState={{ checked }}
+                          accessibilityLabel={`Invite ${friend.playerName}`}
                         >
-                          <Text
-                            style={[
-                              shareSheet.inviteBtnText,
-                              invited && shareSheet.inviteBtnTextDone,
-                            ]}
-                          >
-                            {invited ? '✓ Invited' : 'Invite'}
-                          </Text>
-                        </TouchableOpacity>
+                          {checked && <Text style={shareSheet.checkmark}>✓</Text>}
+                        </Pressable>
                       </View>
-                      {i < friends.length - 1 && <View style={shareSheet.divider} />}
+                      {i < displayFriends.length - 1 && <View style={shareSheet.divider} />}
                     </View>
                   );
                 })}
               </ScrollView>
             )}
 
+            {/* "Send invite" ersätter f.d. "Done"-knappen (2026-08-27) —
+                skickar in-app-invites till alla ibockade friends i ett svep
+                och stänger modalen. Disabled tills minst en är ibockad;
+                backdrop-tap/hardware-back stänger fortfarande utan att
+                skicka något. */}
             <TouchableOpacity
-              onPress={() => setShareModalOpen(false)}
-              style={shareSheet.closeBtn}
+              onPress={handleSendInvites}
+              disabled={selectedFriendIds.size === 0}
+              style={[
+                shareSheet.closeBtn,
+                selectedFriendIds.size === 0 && shareSheet.closeBtnDisabled,
+              ]}
             >
-              <Text style={shareSheet.closeBtnText}>Done</Text>
+              <Text
+                style={[
+                  shareSheet.closeBtnText,
+                  selectedFriendIds.size === 0 && shareSheet.closeBtnTextDisabled,
+                ]}
+              >
+                Send invite
+              </Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -7783,7 +9156,7 @@ export default function LobbyScreen() {
                 ]}
                 onPress={() => { void handleSaveRemoteLobby(false); }}
               >
-                <Text style={styles.saveLobbyBtnText}>Save 1vs1 — Play later</Text>
+                <Text style={styles.saveLobbyBtnText}>Save H2H — Play later</Text>
               </Pressable>
             )}
 
@@ -7852,7 +9225,7 @@ export default function LobbyScreen() {
                 ]}
                 onPress={() => { void handleSaveRemoteLobby(true); }}
               >
-                <Text style={styles.saveLobbyBtnText}>Save 1vs1 — Play later</Text>
+                <Text style={styles.saveLobbyBtnText}>Save H2H — Play later</Text>
               </Pressable>
             )}
 
@@ -7871,6 +9244,76 @@ export default function LobbyScreen() {
               onPress={() => setHostDeleteSheetVisible(false)}
             >
               <Text style={styles.guestLeaveCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ── "+ Add package"-modal ─────────────────────────────────────
+          Host väljer paket direkt ur HELA katalogen (allPackagesCatalog),
+          oberoende av Profile-valet. PÅ = paketet blir tillgängligt i lobby-
+          listan OCH aktivt i lobbyn (handleToggleCatalogPackage). */}
+      <Modal
+        visible={addPackageModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setAddPackageModalVisible(false)}
+      >
+        <View style={styles.guestLeaveOverlay}>
+          <Pressable
+            style={styles.guestLeaveBackdrop}
+            onPress={() => setAddPackageModalVisible(false)}
+          />
+          <View style={styles.addPkgSheet}>
+            <Text style={styles.addPkgTitle}>Add packages</Text>
+            <Text style={styles.addPkgSubtitle}>
+              Turn on the packages you want in this lobby
+            </Text>
+            <ScrollView style={{ maxHeight: 320, alignSelf: 'stretch' }}>
+              {allPackagesCatalog.length === 0 ? (
+                <Text style={styles.noExtraPackagesText}>No packages available yet</Text>
+              ) : (
+                [...allPackagesCatalog]
+                  .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                  .map((pkg) => {
+                    const isOn = enabledHostPackages.includes(pkg.id);
+                    return (
+                      <View key={pkg.id} style={styles.purchasedPackageRow}>
+                        <View
+                          style={[
+                            styles.purchasedPackageBox,
+                            isOn && styles.purchasedPackageBoxActive,
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.purchasedPackageName,
+                              isOn && styles.purchasedPackageNameActive,
+                            ]}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {pkg.name}
+                          </Text>
+                        </View>
+                        <Switch
+                          value={isOn}
+                          onValueChange={() => handleToggleCatalogPackage(pkg.id)}
+                          trackColor={{ false: Colors.error, true: Colors.success }}
+                          thumbColor="#FFF"
+                          ios_backgroundColor={isOn ? Colors.success : Colors.error}
+                          style={styles.connectionSwitch}
+                        />
+                      </View>
+                    );
+                  })
+              )}
+            </ScrollView>
+            <Pressable
+              style={styles.addPkgDoneBtn}
+              onPress={() => setAddPackageModalVisible(false)}
+            >
+              <Text style={styles.addPkgDoneText}>Done</Text>
             </Pressable>
           </View>
         </View>
@@ -8065,7 +9508,7 @@ export default function LobbyScreen() {
           <View style={styles.guestLeaveBackdrop} pointerEvents="none" />
           {remoteStartPrompt && (
             <View style={styles.noApprovedCard}>
-              <Text style={styles.noApprovedTitle}>Remote Play started — 1vs1</Text>
+              <Text style={styles.noApprovedTitle}>Head-to-head started</Text>
               <Text style={styles.noApprovedMessage}>{remoteStartPrompt.message}</Text>
               <Text style={styles.remoteStartPlayLabel}>Play</Text>
               <View style={styles.remoteStartBtnRow}>
@@ -8964,6 +10407,28 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: 0.6,
   },
+  // Kant-skärande hänglås-badge i vänsterkanten av re-match-rutan — visuell
+  // "line-up locked"-signal som ersätter det gamla text-suffixet.
+  lockBadge: {
+    position: 'absolute',
+    top: -10,
+    left: Spacing.sm,
+    // Opak, DISTINKT bakgrund (cardElevated är ljusare än rutans interiör som
+    // renderas ~Colors.card) så badgen läses som en fylld pill i stället för att
+    // smälta in och se genomskinlig ut mot border-linjen den skär (Peter
+    // 2026-08-28).
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    zIndex: 10,
+    elevation: 4,
+  },
+  lockBadgeText: {
+    fontSize: 11,
+  },
   // Dämpad FREE-badge — appliceras tillsammans med modeOptionDimmed
   // när singlePlayerDefault är på, så badgen signalerar "låst" istället
   // för "tillgängligt gratis".
@@ -9597,6 +11062,13 @@ const styles = StyleSheet.create({
     // hamnar för nära Images-radens switch ovanför.
     marginTop: Spacing.md,
   },
+  // Parent Control-rad längst ner i Source Mixerboard (ovanför Customized
+  // Host packages). Extra luft ovanför så den lossnar från matrisen.
+  parentControlRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: Spacing.md,
+  },
   usePackagesLabel: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
@@ -9641,6 +11113,59 @@ const styles = StyleSheet.create({
   activatePackageBtnActive: {
     borderColor: '#F5A623',
     backgroundColor: Colors.primaryMuted,
+  },
+  // "+ Add package"-knapp under paketlistan — öppnar hela-katalogen-modalen.
+  addPackageCatalogBtn: {
+    marginTop: Spacing.sm,
+    alignSelf: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    backgroundColor: Colors.cardElevated,
+  },
+  addPackageCatalogBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.primary,
+  },
+  // "+ Add package"-modalens bottom-sheet — speglar guestLeaveSheet.
+  addPkgSheet: {
+    backgroundColor: Colors.card,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: Spacing.xl,
+    paddingBottom: Spacing.xxl,
+    gap: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+  },
+  addPkgTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+  },
+  addPkgSubtitle: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: Spacing.xs,
+  },
+  addPkgDoneBtn: {
+    marginTop: Spacing.md,
+    alignSelf: 'stretch',
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addPkgDoneText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: '#FFF',
   },
   // Yttre wrapper kring sub-rubriken, paketlistan och Buy CTA. Geometrin
   // (padding 3, gap 4, Radius.md, 1px Colors.border, Colors.background-bg)
@@ -9800,7 +11325,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.warning,
+    color: Colors.textSecondary,
     lineHeight: 15,
   },
   connectionLabel: {
@@ -10211,6 +11736,18 @@ const styles = StyleSheet.create({
   // Baren pinnas under ScrollView:n (sibling i SafeAreaView) så Start
   // Game alltid är synlig. Row-layout med logo 64 håller höjden nere
   // (~96 px totalt vs ~230 px för gamla stacked-layouten).
+  compRematchWaitBanner: {
+    backgroundColor: Colors.primaryMuted,
+    borderTopWidth: 1,
+    borderTopColor: Colors.primaryBorder,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+  },
+  compRematchWaitText: {
+    fontSize: FontSize.sm,
+    color: Colors.textPrimary,
+    textAlign: 'center',
+  },
   startStickyBar: {
     position: 'relative',
     borderTopWidth: 1,
@@ -10257,6 +11794,19 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.warning,
     letterSpacing: 0.5,
+  },
+  // Re-match/Replay-varianten av startGameCompactLabel — samma text bara
+  // brutet över två rader ("Start" / "Re-match" resp. "Start" / "Replay"),
+  // så CTA:n fortfarande läser "Start Game" i andemening men signalerar
+  // att uppställningen är återanvänd. Mindre fontStorlek än enrads-varianten
+  // så två rader ryms inom samma sticky-bar-höjd.
+  startGameCompactLabelTwoLine: {
+    fontSize: 19,
+    fontWeight: FontWeight.bold,
+    color: Colors.warning,
+    letterSpacing: 0.3,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   // Halo bara bakom logon (inte texten) så labeln förblir läsbar när
   // glow-opaciteten pulsar upp mot 0.85.
@@ -10697,6 +12247,10 @@ const shareSheet = StyleSheet.create({
     gap: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border,
+    // Bounder sheet:en till viewport så toppen aldrig spiller över skärmen
+    // när CodeKeyboard:et (Add by Player Name) tar plats — samma mönster
+    // som modal.container ovan (AddPlayerModal).
+    maxHeight: '90%',
   },
   handle: {
     width: 36, height: 4, borderRadius: 2,
@@ -10708,21 +12262,65 @@ const shareSheet = StyleSheet.create({
   subtitle: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center', marginBottom: Spacing.sm },
 
   // Rad med QuizVibeFriendsLogo bredvid "QuizVibe friends"-labeln —
-  // samma ikon som på Profile-skärmens friends-kort.
+  // samma ikon som på Profile-skärmens friends-kort. justifyContent:
+  // space-between skjuter antal-badgen (friendsCount) till radens
+  // högerkant, samma layout som Profile:s friendsHeader-rad.
   sectionLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
+    justifyContent: 'space-between',
     paddingHorizontal: Spacing.xs,
+  },
+  // Vänster-klustret (logo + rubrik) hålls ihop som EN enhet så
+  // space-between på sectionLabelRow bara öppnar upp mellan klustret och
+  // antal-badgen — inte mellan logo och text.
+  sectionLabelCluster: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  // Antal-badge — pixel-identisk med Profile-skärmens friendsCount/
+  // friendsCountText (ProfileScreen.tsx) så räknaren ser likadan ut
+  // oavsett var i appen host öppnar sin QuizVibe friends-lista.
+  friendsCount: {
+    minWidth: 32,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.primaryMuted,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  friendsCountText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.primary,
+    fontVariant: ['tabular-nums'],
   },
   sectionLabel: {
     ...Typography.overline,
     color: Colors.textSecondary,
   },
 
-  // Add-by-Player-Name-rad — speglar Profile:s friendsModal.addRow exakt så
-  // visual-vokabulär förblir konsistent mellan Profile och Lobby.
-  addRow: {
+  // Add-by-Player-Name-label + split-field-rad (2026-08-27) — samma
+  // struktur som PlayerName skapas överallt annars i appen: en bokstavs-
+  // ruta (versal först, gemener resten via appendPlayerNameLetter) + en
+  // siffer-ruta, båda matade av QuizVibe:s egna CodeKeyboard (ingen system-
+  // tangentbord). Speglar modal.playerNameLettersInput/-DigitsInput
+  // (AddPlayerModal) med samma 7:6-flex-ratio.
+  addFieldLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    paddingHorizontal: Spacing.xs,
+  },
+  addPlayerNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
   },
   addInput: {
@@ -10735,12 +12333,33 @@ const shareSheet = StyleSheet.create({
     fontSize: 15,
     color: Colors.textPrimary,
   },
+  addPlayerNameLettersInput: {
+    flex: 7,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  addPlayerNameDigitsInput: {
+    flex: 6,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  addPlayerNameSeparator: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    paddingHorizontal: 2,
+  },
+  addPlayerNameInputActive: { borderColor: Colors.primary },
+  addPlayerNameInputDisabled: { opacity: 0.45 },
   addBtn: {
     height: 44,
     borderRadius: Radius.md,
     backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
   },
   addBtnDisabled: {
     backgroundColor: 'rgba(255,255,255,0.06)',
@@ -10750,6 +12369,13 @@ const shareSheet = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: '#fff',
     letterSpacing: 0.3,
+  },
+  // Inline felmeddelande under Add-raden — visas när playerNameExists()
+  // inte hittar någon registrerad user med det inskrivna Player Name.
+  addErrorText: {
+    fontSize: FontSize.xs,
+    color: Colors.error,
+    paddingHorizontal: Spacing.xs,
   },
 
   emptyState: {
@@ -10768,26 +12394,95 @@ const shareSheet = StyleSheet.create({
   friendRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: Spacing.md,
     paddingVertical: Spacing.sm + 2,
   },
-  friendEmoji: { fontSize: 22, width: 36, textAlign: 'center' },
-  friendName: { flex: 1, fontSize: FontSize.md, fontWeight: FontWeight.medium, color: Colors.textPrimary },
-  inviteBtn: {
+  // Klustrar namn-pillen + ev. Pending-badge ihop som EN enhet så
+  // justifyContent: space-between på friendRow bara öppnar upp mellan
+  // klustret och kryssrutan — inte mellan pillen och badgen.
+  friendNameCluster: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    flexShrink: 1,
+  },
+  // Pending-badge (2026-08-27) — en Add:ad friend som ännu inte accepterat
+  // inviten och joinat lobbyn. Amber/gold i samma "väntar"-ton som PREMIUM-
+  // lås-badges, tydligt skild från den gröna checkbox-vokabulären.
+  pendingBadge: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    backgroundColor: 'rgba(245,166,35,0.12)',
+    borderColor: Colors.warning,
+  },
+  pendingBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.warning,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  // Namn-pill — speglar TopUserBanner:s inloggade login-pill (avatar +
+  // Player Name) 1:1 (samma bg/border/text-färg, rounded-full), Peter
+  // 2026-08-27: "skrivs så som de syns när de är inloggade". Hugger sitt
+  // innehåll (ingen flex:1) så den ser likadan ut som pillen i header:n
+  // istället för att sträckas ut över hela raden.
+  friendNamePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 6,
     paddingHorizontal: Spacing.md,
     paddingVertical: 6,
     borderRadius: Radius.full,
-    backgroundColor: Colors.primary,
-  },
-  inviteBtnDone: {
-    backgroundColor: 'transparent',
     borderWidth: 1,
+    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.primaryBorder,
+    maxWidth: 200,
+    flexShrink: 1,
+  },
+  friendPillIcon: { fontSize: 14 },
+  friendPillText: { fontSize: 12, fontWeight: '600', color: Colors.primary, flexShrink: 1 },
+  // Kryssruta (2026-08-27, ersatte per-rad "Invite"-knappen) — tom ruta
+  // omarkerad, grön ruta + vit ✓ markerad. Samma geometri som Lobby:s
+  // singlePlayerCheckbox men grön istället för grå (Peter bad om "green
+  // check-icon"). Redan skickade invites renderar samma gröna state men
+  // med `disabled` — checked-stilen är alltså delad mellan urval och
+  // "redan skickat".
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.success,
     borderColor: Colors.success,
   },
-  inviteBtnText: { fontSize: FontSize.xs, fontWeight: FontWeight.bold, color: '#fff', letterSpacing: 0.3 },
-  inviteBtnTextDone: { color: Colors.success },
+  checkmark: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+    lineHeight: 15,
+  },
 
   divider: { height: 1, backgroundColor: Colors.separator },
+  // Tjock sektions-avdelare mellan Add-raden/CodeKeyboard och friend-listan
+  // (2026-08-27) — bredare + starkare färg än den tunna friend-till-friend-
+  // dividern ovan, så övergången "lägga till" → "lista" läses tydligt.
+  addSectionDivider: {
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: Colors.borderStrong,
+    marginVertical: Spacing.xs,
+  },
 
   closeBtn: {
     height: 48,
@@ -10798,4 +12493,10 @@ const shareSheet = StyleSheet.create({
     marginTop: Spacing.xs,
   },
   closeBtnText: { fontSize: 15, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
+  // "Send invite" disabled tills minst en friend är ibockad.
+  closeBtnDisabled: {
+    backgroundColor: 'transparent',
+    borderColor: Colors.border,
+  },
+  closeBtnTextDisabled: { color: Colors.textDisabled },
 });

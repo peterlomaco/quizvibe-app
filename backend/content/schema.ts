@@ -288,6 +288,13 @@ export const ContentItemSchema = z.object({
   // Se memory/project_music_question_tagging.md för fullständig spec.
   inBaseCatalog: z.boolean().default(true),
   genrePackages: z.array(z.string().min(1)).default([]),
+  // Parent control-tagg. true = klippet sorteras bort ur frågeurvalet när
+  // host:ens profil har Parent Control påslaget (Profile/Lobby-switchen).
+  // Default false = klippet är INTE parent-controlled och visas alltid. Sätt
+  // 'parentControlled: true' i YAML på de specifika YT-items som ska filtreras
+  // bort i barnvänliga spel. Gäller i dag bara youtube-form items (musik/film/
+  // sport) — det är dem urvalet filtrerar. Se export-music-questions.ts.
+  parentControlled: z.boolean().default(false),
   // Item-level audience-override. När satt overrider den fil-headerns
   // audience-tag för detta specifika item. Edge-case-fix när item-recognition
   // inte sammanfaller med fil-buckets (t.ex. ny dansband-låt 2026 i

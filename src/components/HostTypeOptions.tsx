@@ -1,6 +1,7 @@
 import { Colors, Radius, Spacing } from '@/src/theme';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity } from '@/src/components/haptic';
 import Svg, { Circle, Rect as SvgRect, Text as SvgText } from 'react-native-svg';
 import { VersusIcon } from '@/src/components/VersusIcon';
 
@@ -152,10 +153,10 @@ export function HostTypeOptions({
         <HostTypeOptionRow
           accentColor={accentColor}
           icon={<VersusIcon height={50} />}
-          label="Remote Play"
+          label="Head-to-head"
           // Samma subtitel oavsett låst/olåst — "QuizVibe user"-badgen bär
           // kontokravet, subtiteln får beskriva vad läget ÄR.
-          subtitle="1vs1 — challenge friends remotely"
+          subtitle="H2H — challenge friends remotely"
           locked={remoteMode === 'locked'}
           badgeText={remoteMode === 'locked' ? 'QuizVibe user' : undefined}
           onPress={() => {

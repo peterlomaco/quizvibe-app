@@ -65,6 +65,50 @@ interface Props {
 // Ha ALDRIG en lokal kopia av formeln här.
 const PLAYER_W = QUIZ_MEDIA_W;
 const PLAYER_H = QUIZ_MEDIA_H;
+
+/**
+ * Stänger av YouTubes textning i spelaren.
+ *
+ * Varför injicerad JS och inte en player-parameter: `cc_load_policy` kan bara
+ * tvinga textning PÅ (`1`). Värdet `0` är inte "av" utan "följ användarens
+ * inställning", så vår nolla i `initialPlayerParams` gjorde ingenting. Många
+ * officiella uppladdningar har textningsspår (Ylvis, Black Eyed Peas, Lewis
+ * Capaldi, Shakira m.fl.), och utan inloggad användare i WebView:n valde
+ * YouTube språk på egen hand — Peter fick italiensk text på Ylvis 2026-08-27.
+ * Texten renderas dessutom i letterbox-remsan under bilden, så den syns även
+ * när videon inte fyller kortet.
+ *
+ * `unloadModule('captions')` är API:ets dokumenterade sätt att stänga av dem.
+ * Modulnamnet skiljer sig mellan spelarversioner ('captions' i den moderna,
+ * 'cc' i den äldre AS3-baserade) — vi anropar båda, och anrop för en modul
+ * som inte finns är harmlöst.
+ *
+ * Pollar för att `YT.Player`-instansen skapas asynkront efter att
+ * iframe_api laddat; `injectedJavaScript` körs vid sid-load, alltså före den
+ * finns. Ger upp efter ~10 s så vi inte lämnar ett intervall som tickar
+ * under hela frågan.
+ */
+const DISABLE_CAPTIONS_SCRIPT = `
+(function () {
+  var tries = 0;
+  var timer = setInterval(function () {
+    tries++;
+    try {
+      // Lib:ns wrapper-HTML deklarerar 'var player' i ett klassiskt
+      // <script>, alltså window.player. Bar 'player' som fallback ifall
+      // lib:n byter till module-scope i en framtida version.
+      var p = window.player || (typeof player !== 'undefined' ? player : null);
+      if (p && typeof p.unloadModule === 'function') {
+        p.unloadModule('captions');
+        p.unloadModule('cc');
+        clearInterval(timer);
+      }
+    } catch (e) { /* spelaren inte redo än */ }
+    if (tries > 100) clearInterval(timer);
+  }, 100);
+})();
+true;
+`;
 // Hur länge vi väntar på att autoplay ska starta innan vi visar tap-prompt.
 // För kort = prompt blinkar onödigt på iOS-versioner som tillåter autoplay
 // (YouTube-state-events kommer typiskt unstarted → buffering → playing och
@@ -229,6 +273,7 @@ export function YouTubeMediaPlayer({
         webViewProps={{
           allowsInlineMediaPlayback: true,
           mediaPlaybackRequiresUserAction: false,
+          injectedJavaScript: DISABLE_CAPTIONS_SCRIPT,
         }}
       />
       {/* End-of-clip overlay — täcker iframe:n helt så ingen YouTube-

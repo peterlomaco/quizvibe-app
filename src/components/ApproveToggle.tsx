@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Switch, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Switch } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Spacing } from '../theme';
 
 interface ApproveToggleProps {

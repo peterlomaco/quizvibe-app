@@ -57,6 +57,11 @@ interface LobbyPlayerRow {
   // av publishOwnAccountName (targeted UPDATE på egen rad) — ingår inte i
   // playerToRow, se noten om has_left/seen_question_ids nedan.
   account_player_name?: string | null;
+  // Spelarens intjänade display-HCP (1–99, migration 0042). Optional eftersom
+  // äldre rader / icke-applicerad migration saknar kolumnen. Skrivs BARA av
+  // publishOwnHcp (targeted UPDATE på egen rad) — ingår inte i playerToRow,
+  // exakt samma mönster som account_player_name.
+  hcp?: number | null;
   // OBS: kolumnen `seen_question_ids` (migration 0026) ingår MEDVETET INTE
   // i denna row-shape eller i playerToRow — den skrivs enbart via
   // updateOwnSeenQuestionIds (targeted UPDATE) så host:s bulk-UPSERT aldrig
@@ -81,6 +86,7 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     hasLeft: row.has_left,
     spotifyConnected: row.spotify_verified ?? false,
     accountPlayerName: row.account_player_name ?? undefined,
+    hcp: row.hcp ?? undefined,
     // Host-added guests har user_id=null i DB eftersom host saknar deras
     // auth-session vid upsert (setLobbyPlayers strippar dessutom user_id ur
     // non-host-payload:en). Self-joined guests sätter user_id=auth.uid() via
@@ -95,6 +101,8 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
 // has_left utelämnas medvetet från UPSERT-payload — den kolumnen ägs av
 // markOwnPlayerLeft och får inte clobbas av host:s bulk-UPSERT. INSERT:n
 // får DB-default (false); UPDATE rör inte oprefererade kolumner.
+// Samma sak gäller account_player_name (publishOwnAccountName), seen_question_ids
+// (updateOwnSeenQuestionIds) och hcp (publishOwnHcp) — alla targeted-UPDATE-ägda.
 function playerToRow(
   code: string,
   player: LobbyPlayer,
@@ -264,6 +272,68 @@ export async function claimCarryOverLobbyPlayer(
   }
 }
 
+export interface RematchInvitee {
+  playerId: string;
+  playerName: string;
+}
+
+/**
+ * Pre-seeda lobby_players-rader för de inbjudna deltagarna i en Competition-
+ * re-match som startats från Home (/competitions). Till skillnad från Final
+ * Leaderboards carry-over är dessa spelare INTE anslutna än — de får en
+ * cross-device-inbjudan (waiting_invites) och joinar på egen enhet.
+ *
+ * Raderna skrivs därför med `has_left: true` så den låsta uppsättningens
+ * Start-gate (findMissingRematchPlayers) räknar dem som "inte på plats" tills
+ * de faktiskt joinar. Två saker gör att det konvergerar rätt:
+ *   • Join-gaten (checkRematchLockedLobby) matchar på NAMN oavsett has_left,
+ *     så en inbjuden släpps in och ärver sitt player_id via code-only-joinens
+ *     dup-detection.
+ *   • upsertOwnLobbyPlayer forcerar `has_left: false` vid join → present, och
+ *     host:s syncNonHostFields (UPDATE-handler) flippar raden till present.
+ *
+ * approved: true — en re-match ärver förra spelets godkännanden (rematch-
+ * lobbyn har ingen approval-toggle).
+ *
+ * ⚠ Skriver `has_left` EXPLICIT (till skillnad från setLobbyPlayers som
+ *   medvetet utelämnar kolumnen). Det är korrekt här: host äger seedningen
+ *   och ska sätta rader som "inte på plats". När spelaren själv joinar tar
+ *   deras egen upsert över has_left.
+ */
+export async function seedRematchInviteePlayers(
+  code: string,
+  invitees: RematchInvitee[],
+): Promise<void> {
+  if (!code || invitees.length === 0) return;
+  const normalized = normalizeCode(code);
+  const rows = invitees.map((inv, i) => ({
+    room_code: normalized,
+    player_id: inv.playerId,
+    user_id: null as string | null,
+    name: inv.playerName,
+    emoji: '👤',
+    avatar_uri: null as string | null,
+    type: 'registered' as const,
+    age: null as number | null,
+    assistance: null as 'minimal' | 'standard' | 'full' | null,
+    hcp_override: null as number | null,
+    hcp_complete: true,
+    is_host: false,
+    is_ready: true,
+    approved: true,
+    turn_order: i + 1,
+    lobby_edited: false,
+    spotify_verified: false,
+    has_left: true,
+  }));
+  const { error } = await supabase
+    .from('lobby_players')
+    .upsert(rows, { onConflict: 'room_code,player_id' });
+  if (error) {
+    console.warn('[lobbyPlayers] seedRematchInviteePlayers failed:', error.message);
+  }
+}
+
 /**
  * Markerar att egen spelare lämnat lobbyn (Slice 3C-ii cross-device).
  * UPDATE:ar bara has_left=true på raden där user_id = auth.uid() — RLS
@@ -333,6 +403,38 @@ export async function getLobbyPlayers(code: string): Promise<LobbyPlayer[] | und
     return null;
   }
   return data && data.length > 0 ? (data as LobbyPlayerRow[]).map(rowToPlayer) : undefined;
+}
+
+/**
+ * Rå `user_id` per spelare i rummet.
+ *
+ * ⚠ `rowToPlayer` läser `user_id` men exponerar det ALDRIG på `LobbyPlayer`,
+ *   så det når varken turnOrder eller quiz-vyn. Sparade Aggregate
+ *   Leaderboards nycklas på Supabase-uid (playerName duger inte — lobby-namn
+ *   är host-redigerbara och gäst-alias genereras lokalt), och host behöver
+ *   därför läsa raderna direkt. RLS tillåter det: `"anyone can read lobby
+ *   players" … using (true)` (migration 0003). Samma mönster som remote-1v1
+ *   redan använder för att slå upp motståndarens uid i LobbyScreen.
+ *
+ * ⚠ `user_id != null` betyder INTE registrerad — gäster får anonyma auth-uid
+ *   och host-tillagda rader har `user_id IS NULL`. Registrerad-testet görs
+ *   server-side (profiles-rad finns), aldrig här.
+ */
+export async function getLobbyPlayerUserIds(
+  code: string,
+): Promise<{ playerId: string; userId: string | null; type: string }[]> {
+  if (!code) return [];
+  const { data, error } = await supabase
+    .from('lobby_players')
+    .select('player_id, user_id, type')
+    .eq('room_code', normalizeCode(code));
+  if (error) {
+    console.warn('[lobbyPlayers] getLobbyPlayerUserIds failed:', error.message);
+    return [];
+  }
+  return ((data as { player_id: string; user_id: string | null; type: string }[]) ?? []).map(
+    (r) => ({ playerId: r.player_id, userId: r.user_id, type: r.type }),
+  );
 }
 
 /**
@@ -409,6 +511,37 @@ export async function publishOwnAccountName(
     .eq('user_id', userId);
   if (error) {
     console.warn('[lobbyPlayers] publishOwnAccountName failed:', error.message);
+  }
+}
+
+/**
+ * Publicerar spelarens EGET intjänade display-HCP (1–99) till sin egen
+ * lobby_players-rad (migration 0042) så övriga enheter kan visa det på
+ * spelarkortet. Targeted UPDATE scoped på room_code + player_id + user_id
+ * (samma mönster som publishOwnAccountName) — ingår ALDRIG i host:s bulk-
+ * UPSERT, så en icke-applicerad migration ger bara ett console.warn.
+ * No-op om hcp inte är ett tal (gäst / ännu ej progressad spelare → skölden
+ * faller tillbaka på 99).
+ */
+export async function publishOwnHcp(
+  code: string,
+  playerId: string,
+  hcp: number,
+): Promise<void> {
+  if (!code || !playerId || typeof hcp !== 'number') return;
+  const normalized = normalizeCode(code);
+  await ensureAuthSession();
+  const { data: userResp } = await supabase.auth.getUser();
+  const userId = userResp.user?.id;
+  if (!userId) return;
+  const { error } = await supabase
+    .from('lobby_players')
+    .update({ hcp })
+    .eq('room_code', normalized)
+    .eq('player_id', playerId)
+    .eq('user_id', userId);
+  if (error) {
+    console.warn('[lobbyPlayers] publishOwnHcp failed:', error.message);
   }
 }
 

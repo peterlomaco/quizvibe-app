@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
  
 interface ListRowProps {

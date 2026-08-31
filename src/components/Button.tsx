@@ -1,11 +1,11 @@
 import React from 'react';
 import {
     ActivityIndicator,
-    Pressable,
     StyleSheet,
     Text,
     ViewStyle,
 } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
  
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';

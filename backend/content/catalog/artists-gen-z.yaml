@@ -287,3 +287,59 @@ items:
     peakTo: 2023
     wikimediaSearchHints: ["Netta Barzilai Israeli singer Eurovision 2018"]
     answerMethods: ["name-letters"]
+  - id: alex-warren
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Alex Warren"
+    correctYear: 2000
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Alex Warren"]
+    answerMethods: ["name-letters"]
+  - id: dara
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "DARA"
+    correctYear: 1998
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["DARA"]
+    answerMethods: ["name-letters"]
+  - id: jj
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "JJ"
+    correctYear: 2001
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["JJ"]
+    answerMethods: ["name-letters"]
+  - id: joost-klein
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Joost Klein"
+    correctYear: 1997
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Joost Klein"]
+    answerMethods: ["name-letters"]
+  - id: nemo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Nemo"
+    correctYear: 1999
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Nemo Mettler"]
+    answerMethods: ["name-letters"]
+  - id: sombr
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "sombr"
+    correctYear: 2005
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["sombr"]
+    answerMethods: ["name-letters"]

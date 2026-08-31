@@ -318,3 +318,54 @@ items:
     probability: 82
     wikimediaSearchHints: ["Krister Henriksson Swedish actor Wallander"]
     answerMethods: ["timeline", "name-letters"]
+  # === Batch 2026-08-27 — kompletterar film-gapet (correctNames i movies-katalogen saknade Hints-entry) ===
+  - id: clint-eastwood
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Clint Eastwood"
+    correctYear: 1930
+    peakFrom: 1964
+    peakTo: 2004
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Clint Eastwood actor director"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: gene-kelly
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gene Kelly"
+    correctYear: 1912
+    peakFrom: 1943
+    peakTo: 1957
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Gene Kelly actor dancer Singin in the Rain"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: judy-garland
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Judy Garland"
+    correctYear: 1922
+    peakFrom: 1939
+    peakTo: 1954
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Judy Garland actress singer Wizard of Oz"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: orson-welles
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Orson Welles"
+    correctYear: 1915
+    peakFrom: 1941
+    peakTo: 1958
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Orson Welles actor director Citizen Kane"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: debbie-reynolds
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Debbie Reynolds"
+    correctYear: 1932
+    peakFrom: 1950
+    peakTo: 1964
+    probability: 76
+    region: ["global"]
+    wikimediaSearchHints: ["Debbie Reynolds actress Singin in the Rain"]
+    answerMethods: ["timeline", "name-letters"]

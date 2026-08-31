@@ -38,20 +38,21 @@
 // eller Profile → Player history).
 
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  type LayoutChangeEvent,
   Modal,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 
 import { TopUserBanner } from '../components/TopUserBanner';
 import { BOTTOM_BANNER_HEIGHT } from '../components/BottomBanner';
+import { NewUpdateBadge } from '../components/NewUpdateBadge';
 import { RemoteMatchResultPanel } from '../components/RemoteMatchResultPanel';
 import { VersusIcon } from '../components/VersusIcon';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
@@ -101,7 +102,12 @@ export default function MyMatchesScreen() {
   // Back tar spelaren tillbaka dit hen kom ifrån. Saknas/ogiltig → Home.
   // Whitelist:ad mappning (inte rå param) så expo-routers typade
   // router.replace accepterar värdet och okända värden inte kan smitas in.
-  const { from } = useLocalSearchParams<{ from?: string }>();
+  const { from, focusMatchIds } = useLocalSearchParams<{
+    from?: string;
+    // Flash-guide: kommaseparerade match-id:n som MyMatchesSection pekar ut
+    // som "nya" när Home-knappens "New update" tappas.
+    focusMatchIds?: string;
+  }>();
   const backTo = from === '/profile' ? '/profile' : '/';
   const [matches, setMatches] = useState<MyRemoteMatch[]>([]);
   // Lobbies spelaren parkerat via "Save 1vs1 – Play later" i lobbyns
@@ -123,6 +129,32 @@ export default function MyMatchesScreen() {
   // Historikens motståndar-grupper (nyckel = PlayerName) — alla startar
   // ihopfällda; state lever bara medan skärmen är monterad.
   const [expandedOpponents, setExpandedOpponents] = useState<Record<string, boolean>>({});
+
+  // Flash-guide: match-id:n som ska blinka "New update" (sektionsrubrik + rad),
+  // seedade EN gång från focusMatchIds-paramet. Lever i lokalt state så
+  // blinket kvarstår som ledtråd även efter att paramet konsumerats.
+  const [flashIds, setFlashIds] = useState<Set<string>>(new Set());
+  // Auto-scroll till rätt sektion via onLayout-kedja (measureLayout är trasig
+  // på Fabric). sectionsY = "sections"-containerns y i scroll-innehållet;
+  // sectionY = varje sektions y relativt containern. maybeScroll fyrar när
+  // båda är kända för den väntande sektionen.
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionsYRef = useRef<number | null>(null);
+  const sectionYRef = useRef<Partial<Record<SectionKey, number>>>({});
+  const pendingScrollRef = useRef<SectionKey | null>(null);
+  // Applicera varje focusMatchIds-värde EXAKT en gång (realtime-reloads får
+  // annars re-scrolla medan paramet ännu inte hunnit rensas).
+  const consumedFocusRef = useRef<string | null>(null);
+
+  const maybeScroll = useCallback(() => {
+    const key = pendingScrollRef.current;
+    if (!key) return;
+    const sy = sectionsYRef.current;
+    const ry = sectionYRef.current[key];
+    if (sy == null || ry == null) return;
+    pendingScrollRef.current = null;
+    scrollRef.current?.scrollTo({ y: Math.max(0, sy + ry - 12), animated: true });
+  }, []);
 
   const toggleSection = useCallback((key: SectionKey) => {
     setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -192,6 +224,54 @@ export default function MyMatchesScreen() {
     const unsubscribe = subscribeToMyMatches(() => { void reload(); });
     return unsubscribe;
   }, [reload]);
+
+  // Konsumera flash-guiden EN gång per paramvärde när datan laddats: markera
+  // matcherna, fäll ut sektionen (+ ev. motståndar-grupp) de ligger i, och köa
+  // scroll till första träffade sektionen. Rensa paramet så det bara fyrar en
+  // gång (blinket lever kvar i flashIds-state).
+  useEffect(() => {
+    if (!focusMatchIds || !loaded) return;
+    if (consumedFocusRef.current === focusMatchIds) return;
+    consumedFocusRef.current = focusMatchIds;
+    const ids = new Set(focusMatchIds.split(',').filter(Boolean));
+    router.setParams({ focusMatchIds: undefined });
+    if (ids.size === 0) return;
+
+    const classify = (m: MyRemoteMatch): SectionKey =>
+      m.match.status !== 'active'
+        ? 'history'
+        : m.me.finishedAt == null && !answeredIds.has(m.match.id)
+          ? 'notStarted'
+          : 'ongoing';
+
+    const order: SectionKey[] = ['notStarted', 'ongoing', 'history'];
+    const hitSections = new Set<SectionKey>();
+    const hitOpponents = new Set<string>();
+    for (const m of matches) {
+      if (!ids.has(m.match.id)) continue;
+      const key = classify(m);
+      hitSections.add(key);
+      if (key === 'history') hitOpponents.add(m.opponent?.userId ?? 'unknown-opponent');
+    }
+
+    setFlashIds(ids);
+    if (hitSections.size > 0) {
+      setExpanded((prev) => {
+        const next = { ...prev };
+        for (const k of hitSections) next[k] = true;
+        return next;
+      });
+    }
+    if (hitOpponents.size > 0) {
+      setExpandedOpponents((prev) => {
+        const next = { ...prev };
+        for (const k of hitOpponents) next[k] = true;
+        return next;
+      });
+    }
+    pendingScrollRef.current = order.find((k) => hitSections.has(k)) ?? null;
+    maybeScroll();
+  }, [focusMatchIds, loaded, matches, answeredIds, maybeScroll]);
 
   // Gäster: aktiva + host-avbrutna ("Lobby deleted by Host"-kvittot ska
   // synas även för guest-motståndare); avgjorda resultat döljs.
@@ -270,17 +350,26 @@ export default function MyMatchesScreen() {
       statusColor = iWon ? Colors.success : Colors.error;
     }
 
+    const isFlash = flashIds.has(match.id);
     return (
       <TouchableOpacity
         key={match.id}
-        style={[styles.row, myTurn && styles.rowYourTurn]}
+        style={[styles.row, myTurn && styles.rowYourTurn, isFlash && styles.rowFlash]}
         activeOpacity={0.7}
-        onPress={() =>
-          myTurn
-            ? router.push({ pathname: '/quiz', params: buildRemoteQuizParams(m) })
-            : setResultMatchId(match.id)
-        }
+        onPress={() => {
+          // Sluta blinka raden när spelaren agerat på den (guiden är klar).
+          if (isFlash) {
+            setFlashIds((prev) => {
+              const next = new Set(prev);
+              next.delete(match.id);
+              return next;
+            });
+          }
+          if (myTurn) router.push({ pathname: '/quiz', params: buildRemoteQuizParams(m) });
+          else setResultMatchId(match.id);
+        }}
       >
+        {isFlash && <NewUpdateBadge pill active style={styles.rowFlashBadge} />}
         <View style={styles.rowText}>
           <Text style={styles.opponentName} numberOfLines={1}>
             {/* I historiken står motståndaren redan i underrubriken —
@@ -365,6 +454,7 @@ export default function MyMatchesScreen() {
   // sektionsrubrikerna men en snäpp mindre och indragen.
   const renderOpponentGroup = (oppKey: string, oppName: string, rows: MyRemoteMatch[]) => {
     const isOpen = expandedOpponents[oppKey] ?? false;
+    const groupFlash = rows.some((m) => flashIds.has(m.match.id));
     return (
       <View key={oppKey} style={styles.opponentGroup}>
         <Pressable
@@ -375,6 +465,7 @@ export default function MyMatchesScreen() {
           <Text style={styles.subHeader} numberOfLines={1}>
             Game against: {oppName}
           </Text>
+          {groupFlash && <NewUpdateBadge active style={styles.headerFlashBadge} />}
           <View style={styles.subToggleBox}>
             <Text style={styles.subChevron}>{isOpen ? '−' : '+'}</Text>
           </View>
@@ -395,14 +486,23 @@ export default function MyMatchesScreen() {
     // och räknas in i sektionens antal.
     const saved = key === 'notStarted' ? visibleSaved : [];
     const total = rows.length + saved.length;
+    const sectionFlash = rows.some((m) => flashIds.has(m.match.id));
     return (
-      <View key={key} style={styles.section}>
+      <View
+        key={key}
+        style={styles.section}
+        onLayout={(e: LayoutChangeEvent) => {
+          sectionYRef.current[key] = e.nativeEvent.layout.y;
+          maybeScroll();
+        }}
+      >
         <Pressable
           onPress={() => toggleSection(key)}
           style={({ pressed }) => [styles.sectionHeaderRow, pressed && { opacity: 0.7 }]}
           hitSlop={8}
         >
           <Text style={styles.sectionHeader}>{SECTION_TITLES[key]}</Text>
+          {sectionFlash && <NewUpdateBadge active style={styles.headerFlashBadge} />}
           {/* +/−-boxen sitter direkt efter rubriken (som i Profile);
               antalet högerställs via marginLeft: 'auto'. */}
           <View style={styles.sectionToggleBox}>
@@ -436,28 +536,34 @@ export default function MyMatchesScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <TopUserBanner onBackPress={() => router.replace(backTo)} backLabel="Back" />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView ref={scrollRef} contentContainerStyle={styles.content}>
         {/* Rubrik + 1vs1-märket (två blå silhuetter förbundna av prickar)
             direkt efter — samma ikon som Home:s "1vs1"-knapp. */}
         <View style={styles.screenTitleRow}>
-          <Text style={styles.screenTitle}>1vs1 History</Text>
+          <Text style={styles.screenTitle}>H2H History</Text>
           <VersusIcon height={30} />
         </View>
         <Text style={styles.screenSubtitle}>
-          Remote duels — each player answers on their own device within 48 hours.
+          Head-to-head duels — each player answers on their own device within 48 hours.
         </Text>
 
         {loaded && visible.length === 0 && visibleSaved.length === 0 && (
           <Text style={styles.emptyText}>
-            No 1vs1 matches yet. Tap &quot;Start New Game&quot; on Home, choose
-            Remote Play (1vs1) and invite a friend to start your first duel.
+            No H2H matches yet. Tap &quot;Start New Game&quot; on Home, choose
+            Head-to-head and invite a friend to start your first duel.
           </Text>
         )}
 
         {/* Sektionerna renderas alltid när användaren har minst en match —
             en tom sektion visar "No matches here." när den fälls ut. */}
         {(visible.length > 0 || visibleSaved.length > 0) && (
-          <View style={styles.sections}>
+          <View
+            style={styles.sections}
+            onLayout={(e: LayoutChangeEvent) => {
+              sectionsYRef.current = e.nativeEvent.layout.y;
+              maybeScroll();
+            }}
+          >
             {(['notStarted', 'ongoing', 'history'] as SectionKey[]).map(renderSection)}
           </View>
         )}
@@ -620,6 +726,21 @@ const styles = StyleSheet.create({
   },
   rowYourTurn: {
     borderColor: Colors.warning,
+  },
+  // Flash-guide: den utpekade "New update"-raden får guld-kant (samma som
+  // "din tur") + en kant-skärande pill uppe till höger.
+  rowFlash: {
+    borderColor: Colors.warning,
+  },
+  rowFlashBadge: {
+    position: 'absolute',
+    top: -8,
+    right: Spacing.md,
+    zIndex: 2,
+  },
+  // "New update"-signal intill en sektions-/motståndar-rubrik (inline guldtext).
+  headerFlashBadge: {
+    marginLeft: Spacing.sm,
   },
   // Sparad lobby (ingen match ännu) — blå kant skiljer den från de gyllene
   // "din tur"-raderna: här ska spelaren tillbaka in i LOBBYN, inte in i ett

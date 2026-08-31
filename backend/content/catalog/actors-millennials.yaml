@@ -500,3 +500,144 @@ items:
     probability: 74
     wikimediaSearchHints: ["Adam Pålsson Swedish actor Snabba Cash The Bridge"]
     answerMethods: ["timeline", "name-letters"]
+  # === Batch 2026-08-27 — kompletterar film-gapet (correctNames i movies-katalogen saknade Hints-entry) ===
+  - id: keanu-reeves
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Keanu Reeves"
+    correctYear: 1964
+    peakFrom: 1989
+    peakTo: 2019
+    probability: 90
+    region: ["global"]
+    wikimediaSearchHints: ["Keanu Reeves actor The Matrix John Wick"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: laurence-fishburne
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Laurence Fishburne"
+    correctYear: 1961
+    peakFrom: 1993
+    peakTo: 2003
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Laurence Fishburne actor The Matrix"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: heath-ledger
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Heath Ledger"
+    correctYear: 1979
+    peakFrom: 1999
+    peakTo: 2008
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Heath Ledger actor The Dark Knight Joker"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: andrew-garfield
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Andrew Garfield"
+    correctYear: 1983
+    peakFrom: 2006
+    peakTo: 2026
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Andrew Garfield actor The Social Network Spider-Man"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: jesse-eisenberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jesse Eisenberg"
+    correctYear: 1983
+    peakFrom: 2002
+    peakTo: 2026
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Jesse Eisenberg actor The Social Network"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: elijah-wood
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Elijah Wood"
+    correctYear: 1981
+    peakFrom: 2001
+    peakTo: 2005
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Elijah Wood actor The Lord of the Rings Frodo"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: ian-mckellen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ian McKellen"
+    correctYear: 1939
+    peakFrom: 2000
+    peakTo: 2014
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Ian McKellen actor The Lord of the Rings Gandalf"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: hilary-swank
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hilary Swank"
+    correctYear: 1974
+    peakFrom: 1999
+    peakTo: 2010
+    probability: 76
+    region: ["global"]
+    wikimediaSearchHints: ["Hilary Swank actress Million Dollar Baby"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: macaulay-culkin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Macaulay Culkin"
+    correctYear: 1980
+    peakFrom: 1990
+    peakTo: 1994
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Macaulay Culkin actor Home Alone"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: drew-barrymore
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Drew Barrymore"
+    correctYear: 1975
+    peakFrom: 1996
+    peakTo: 2006
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Drew Barrymore actress E.T. Charlie's Angels"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: russell-crowe
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Russell Crowe"
+    correctYear: 1964
+    peakFrom: 1997
+    peakTo: 2007
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Russell Crowe actor Gladiator"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: sam-worthington
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sam Worthington"
+    correctYear: 1976
+    peakFrom: 2009
+    peakTo: 2019
+    probability: 76
+    region: ["global"]
+    wikimediaSearchHints: ["Sam Worthington actor Avatar"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: zoe-saldana
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Zoe Saldana"
+    correctYear: 1978
+    peakFrom: 2009
+    peakTo: 2026
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Zoe Saldana actress Avatar Guardians of the Galaxy"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: shia-labeouf
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Shia LaBeouf"
+    correctYear: 1986
+    peakFrom: 2007
+    peakTo: 2014
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Shia LaBeouf actor Transformers Borg vs McEnroe"]
+    answerMethods: ["timeline", "name-letters"]

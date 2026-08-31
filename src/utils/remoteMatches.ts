@@ -212,6 +212,50 @@ export async function getOwnUserId(): Promise<string | null> {
   return data.session?.user?.id ?? null;
 }
 
+/**
+ * Remote 1v1 directional cap (Peter 2026-08-27): true om `hostUserId` redan
+ * har en pågående (aktiv remote_matches-rad) ELLER väntande (fortsatt
+ * outstanding waiting_invites-rad för ett remote-1v1-rum) relation med
+ * `recipientPlayerName`, i rollen HOST. Att bara kolla "som host" gör detta
+ * riktningsberoende — mottagarens egen, separat hostade remote-lobby mot
+ * samma host är en annan riktning och ska INTE blockeras av denna check.
+ */
+export async function hasRemote1v1RelationshipWith(
+  hostUserId: string,
+  recipientPlayerName: string,
+): Promise<boolean> {
+  const recipientLower = recipientPlayerName.trim().toLowerCase();
+
+  // Väntande: en outstanding invite denna host skickat för ett remote-1v1-
+  // rum. waiting_invites.room_code har en riktig FK mot rooms(code), så
+  // rooms!inner(is_remote_1v1)-embed/filter är giltig PostgREST-syntax.
+  const { count: pendingCount, error: pendingError } = await supabase
+    .from('waiting_invites')
+    .select('id, rooms!inner(is_remote_1v1)', { count: 'exact', head: true })
+    .eq('from_user_id', hostUserId)
+    .eq('to_player_name', recipientLower)
+    .eq('rooms.is_remote_1v1', true);
+  if (!pendingError && (pendingCount ?? 0) > 0) return true;
+
+  // Pågående: en aktiv match denna host skapat med samma mottagare. RLS
+  // begränsar redan remote_matches-SELECT till matcher caller deltar i
+  // (is_remote_match_participant), så detta returnerar bara host:s egna.
+  const { data, error } = await supabase
+    .from('remote_matches')
+    .select('id, remote_match_players(user_id, is_host, player_name)')
+    .eq('status', 'active');
+  if (error || !data) return false;
+  return data.some((m: any) => {
+    const players = (m.remote_match_players ?? []) as
+      { user_id: string; is_host: boolean; player_name: string }[];
+    const iAmHost = players.some((p) => p.user_id === hostUserId && p.is_host);
+    const opponentMatch = players.some(
+      (p) => p.user_id !== hostUserId && p.player_name.toLowerCase() === recipientLower,
+    );
+    return iAmHost && opponentMatch;
+  });
+}
+
 /** me/opponent-split för UI. null om jag inte är deltagare. */
 export function splitMatchForUser(match: RemoteMatch, userId: string): MyRemoteMatch | null {
   const me = match.players.find((p) => p.userId === userId);

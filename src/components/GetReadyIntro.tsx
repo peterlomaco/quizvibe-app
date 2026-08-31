@@ -5,16 +5,16 @@ import {
   Dimensions,
   Image,
   Modal,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { MainCategory } from '../utils/mainCategory';
+import type { PlayedMediaSource } from '../utils/mediaSource';
 import Svg, { Path } from 'react-native-svg';
 import { MediaSourceIcon } from './MediaSourceIcon';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
@@ -75,7 +75,7 @@ const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
 
 /** Media-källa per fråga, för IndDev:s media-source-kö. 'none' renderas som
  *  ❓ när YouTube inte är aktiv för frågan. */
-export type QuestionMediaType = 'youtube' | 'spotify' | 'image' | 'none';
+export type QuestionMediaType = PlayedMediaSource | 'none';
 
 interface Props {
   /** Game mode — styr vilken vy av kö-tabellen som renderas + ev. UI-text.
@@ -170,6 +170,19 @@ interface Props {
    *  live-leaderboard. Map:en kan vara tom (alla connected) eller saknas
    *  helt (Pass-the-Phone-läget bryr sig inte om detta). */
   playerConnectionStatus?: Record<string, 'connected' | 'disconnected'>;
+  /** Host:s Play-knapp är LÅST (grå, non-tappable) trots att `canStartGame`
+   *  är sant. Parent (quiz.tsx) sätter den i Individual Devices på fråga 0
+   *  tills varje förväntad peer bekräftat sig via `player_rejoined` — en
+   *  Supabase-broadcast replayas ALDRIG till sena subscribers, så ett
+   *  play_command som skickas innan alla enheter subscribat är förlorat för
+   *  gott. Komponenten gör INGEN egen bedömning: den renderar bara grått vs
+   *  guld. Default false → alla befintliga call-sites oförändrade. */
+  startLocked?: boolean;
+  /** Antal förväntade peers som ännu inte bekräftat sig. > 0 när parent:s
+   *  timeout-escape släppt knappen fri trots att någon saknas → tap ger en
+   *  varning innan start. Skilt från `playerConnectionStatus`-varningen: en
+   *  peer som aldrig hälsat är FRÅNVARANDE ur map:en, inte 'disconnected'. */
+  startGateUnconfirmedCount?: number;
   /** D-iii: parent (quiz.tsx) styr unstable-overlay i intro-fasen så
    *  sticky-låsningen kan följa över phase-byten. När `unstableLocked`
    *  är true mountas overlay:n med Retry-knapp; `unstableCanRetry`
@@ -197,6 +210,14 @@ interface Props {
    *  callbacken — gör inga mode-checkar här. */
   selfAudioOn?: boolean;
   onSelfAudioChange?: (audioOn: boolean) => void;
+  /** Pass-the-Phone-åskådarläge (non-host som följer leaderboarden på sin
+   *  egen enhet). Komponenten renderar då ENBART progress-blocket — dot-bars
+   *  för Rounds + Question, rubriken "Next to answer:", spelarrutan med
+   *  kategori-/svarstyps-badges och den hopfällbara spelarkön. Allt annat
+   *  (top-bar, Q-logga, Game settings, play-knapp, hopfällbar leaderboard)
+   *  utelämnas; parent renderar den alltid synliga leaderboard-tabellen
+   *  under blocket. */
+  spectator?: boolean;
 }
 
 /** Liten avatar-cell som visas före spelarnamnet — uri-bild om finns, annars
@@ -256,6 +277,12 @@ const LOGO_SIZE = Math.min(COMPACT ? 76 : 96, SCREEN_WIDTH - 200);
 // halo-insetten räknas mot den synliga square-kanten (~16px-margin runt logon).
 const PLAY_BUTTON_SIZE = VERY_COMPACT ? 108 : COMPACT ? 122 : 140;
 const PLAY_HALO_INSET = Math.round(PLAY_BUTTON_SIZE * 0.1);
+// Grå "låst" ton för Play-knappen medan startLocked är satt. Samma literal som
+// resten av appen använder för låsta/otillgängliga element (RoundsRuler,
+// HostTypeOptions, LobbyScreen). Medvetet INTE Colors.textDisabled — den är
+// rgba(168,179,199,0.4) och blir för svag som SVG-stroke mot Colors.background;
+// loggan skulle nästan försvinna i stället för att läsa som "inte ännu".
+const PLAY_LOCKED_COLOR = '#6B7280';
 // Avatar-storlek i tabellradens Player-kolumn — samma för current och kö
 // så alla rader linjerar lodrätt.
 const QUEUE_AVATAR_SIZE = 32;
@@ -300,6 +327,8 @@ export function GetReadyIntro({
   quitLabel,
   isHost = true,
   playerConnectionStatus,
+  startLocked = false,
+  startGateUnconfirmedCount = 0,
   unstableLocked,
   unstableCanRetry,
   onUnstableRetry,
@@ -308,6 +337,7 @@ export function GetReadyIntro({
   onPlayerAudioChange,
   selfAudioOn = true,
   onSelfAudioChange,
+  spectator = false,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
   // Remote 1v1 (= onSaveExit satt): top-baren följer lobbyns mönster —
@@ -354,6 +384,23 @@ export function GetReadyIntro({
   // Interceptar play-knappens onPress i IndDev för att varna host om
   // disconnected peers INNAN nästa fråga startar.
   const handlePlayPress = () => {
+    // Belt-and-suspenders: TouchableOpacity:s disabled är primär-grinden,
+    // men ett programmatiskt anrop ska inte kunna slinka förbi.
+    if (startLocked) return;
+    // Peers som aldrig hälsat är FRÅNVARANDE ur playerConnectionStatus, inte
+    // 'disconnected' — checken nedan skulle alltså räkna dem till noll. Detta
+    // fyrar bara efter parent:s timeout-escape (dessförinnan är knappen låst).
+    if (startGateUnconfirmedCount > 0) {
+      Alert.alert(
+        'Players not connected',
+        `${startGateUnconfirmedCount} player(s) have not joined the quiz yet. They will miss this question. Start anyway?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Start anyway', onPress: onReady },
+        ],
+      );
+      return;
+    }
     if (isIndDev && isHost && playerConnectionStatus) {
       const disconnectedCount = Object.values(playerConnectionStatus).filter(
         (s) => s === 'disconnected',
@@ -495,6 +542,10 @@ export function GetReadyIntro({
   // — det är önskat: leaderboarden börjar collapsed varje gång intro:n visas.
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [settingsExpanded, setSettingsExpanded] = useState(false);
+  // Default hopfälld i BÅDA lägena (Peter 2026-08-25). En kort stund var
+  // spectator-läget default utfällt, men då öppnades åskådarvyn med kön
+  // uppslagen och tryckte ned leaderboard-tabellen som är hela poängen med
+  // skärmen. Spelaren fäller ut kön själv vid behov.
   const [queueExpanded, setQueueExpanded] = useState(false);
   // Trigger:n hanterar locked vs unlocked separat — locked → info-Alert,
   // unlocked → öppna dropdown.
@@ -550,6 +601,158 @@ export function GetReadyIntro({
       blinkLoop.stop();
     };
   }, [playPulse, playGlow, nextBlink]);
+
+  // ── Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö ──────────
+  // R- och Q-kolumnerna är borttagna; progress visas i stället som två
+  // dot-bars ovanför kö-tabellen. Kö-tabellen är single-column och visar
+  // bara avatar + namn. Round-separator-raden i kön behålls eftersom det
+  // är enda visuella signalen för round-byten i listan nu.
+  //
+  // Utbrutet som konstant 2026-08-25 så spectator-läget kan rendera EXAKT
+  // samma block utan att duplicera JSX eller styles — host och åskådare
+  // får aldrig glida isär. Rubriken är det enda som skiljer:
+  // "Pass-the-Phone to:" hos host, "Next to answer:" hos åskådaren.
+  const ptpProgressBlock = (
+    <View style={styles.tableBlock}>
+      {!isSinglePlayer && renderDotBar(
+        totalRounds,
+        currentRound,
+        'Rounds',
+        mediaSourceByQuestion
+          ? (() => {
+              const turnIdx = (currentQuestion - 1) % Math.max(1, playerCount);
+              return Array.from({ length: totalRounds }, (_, r) =>
+                mediaSourceByQuestion[r * playerCount + turnIdx] ?? null,
+              );
+            })()
+          : undefined,
+      )}
+      {renderDotBar(totalQuestions, currentQuestion, 'Question')}
+
+      <View style={[styles.tableRow, styles.tableHeaderRow]}>
+        <View style={[styles.colPlayer, styles.cellHeader]}>
+          <Text style={styles.headerCellText}>
+            {spectator ? 'Next to answer:' : 'Pass-the-Phone to:'}
+          </Text>
+        </View>
+      </View>
+
+      {/* Current player-rad — Player-cellen får en primary-bordered
+          box runt avatar+namn så det är tydligt vem som är näst på tur.
+          Kant-skärande kategori-badge ovanpå boxen visar V1-kategori
+          (Music/Film/Sport) för nästa fråga så spelaren vet vad som
+          kommer. */}
+      <View style={styles.tableRow}>
+        <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
+          <View style={styles.currentPlayerBox}>
+            <Text style={styles.currentMediaNumber}>{currentQuestion}</Text>
+            <PlayerAvatar player={currentPlayer} size={QUEUE_AVATAR_SIZE} />
+            <Text style={styles.currentPlayerName} numberOfLines={1}>
+              {playerName}
+            </Text>
+            {currentAnswerType && (
+              <View style={styles.answerTypeBadge} pointerEvents="none">
+                <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
+              </View>
+            )}
+            {currentCategory && (
+              <View style={styles.categoryBadge} pointerEvents="none">
+                <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
+
+      {/* Kö-rader (scrollar internt om kön är lång). "Round X"-separator
+          infogas mellan kö-rader när rondnumret förändras — visuell
+          signal för round-byten i listan när R-kolumnen är borta. */}
+      {/* Kö-chips (upp till 9 kommande spelare) — vänster-packade med
+          flexWrap, samma layout som IndDev:s media-kö. Cap är 9 så att
+          Next-rutan + chip-kön tillsammans visar max 10 frågor. Inga
+          Round-dividers i chip-raden — ev. rond-byten framgår av
+          frågenumren. End of Game inline efter sista chip när kön
+          slutar exakt vid totalQuestions; annars + more questions
+          centrerat på egen rad. */}
+      {queue.length > 0 && (() => {
+        const visibleQueue = queue.slice(0, 9);
+        const lastChipQ =
+          queueQuestionNumbers[visibleQueue.length - 1] ?? currentQuestion;
+        const isEndOfGame = totalQuestions - lastChipQ <= 0;
+        return (
+          <>
+            <TouchableOpacity
+              style={styles.queueToggleRow}
+              onPress={() => setQueueExpanded((v) => !v)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.queueToggleLabel}>Playing queue</Text>
+              <View style={styles.settingsToggleBox}>
+                <Text style={styles.settingsToggleGlyph}>
+                  {queueExpanded ? '−' : '+'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            {queueExpanded && (
+              <>
+                <View style={styles.mediaQueueChipsRow}>
+                  {visibleQueue.map((p, i) => (
+                    <View key={`chip-${i}`} style={styles.queueChip}>
+                      <Text style={styles.queueChipNumber}>
+                        {queueQuestionNumbers[i]}
+                      </Text>
+                      <Text
+                        style={styles.queueChipName}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {p.name}
+                      </Text>
+                    </View>
+                  ))}
+                  {isEndOfGame && (
+                    <Text
+                      style={styles.endOfGameInline}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.8}
+                    >
+                      🏁  End of Game
+                    </Text>
+                  )}
+                </View>
+                {!isEndOfGame && (
+                  <View style={styles.endOfGameRow}>
+                    <Text style={styles.endOfGameText}>+ more questions</Text>
+                  </View>
+                )}
+              </>
+            )}
+          </>
+        );
+      })()}
+
+      {/* Empty-queue-fallback — sista spelarens vy där kön är tom. */}
+      {queue.length === 0 && (
+        <View style={styles.endOfGameRow}>
+          <Text style={styles.endOfGameText}>🏁  End of Game</Text>
+        </View>
+      )}
+
+    </View>
+  );
+
+  // ── Spectator-läge: rendera BARA progress-blocket ────────────────────
+  // Pass-the-Phone-åskådaren (non-host som valt att följa leaderboarden)
+  // återanvänder host:ens Rounds/Question-grafik + spelarrutan + kön, men
+  // inget annat: ingen top-bar, ingen Q-logga, inget settings-block, ingen
+  // play-knapp och ingen hopfällbar leaderboard — parent (quiz.tsx) sätter
+  // den ALLTID synliga leaderboard-tabellen under blocket i stället.
+  // Ingen flex:1 här: blocket ska ta sin naturliga höjd så tabellen får
+  // resten av skärmen.
+  if (spectator) {
+    return <View style={styles.spectatorBlockWrap}>{ptpProgressBlock}</View>;
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -649,7 +852,7 @@ export function GetReadyIntro({
               )}
               <View style={{ flex: 1 }}>
                 <Text style={styles.exitSheetHeaderName}>{currentPlayer.name}</Text>
-                <Text style={styles.exitSheetHeaderStatus}>1vs1 Match</Text>
+                <Text style={styles.exitSheetHeaderStatus}>H2H Match</Text>
               </View>
             </View>
 
@@ -1133,31 +1336,79 @@ export function GetReadyIntro({
           {canStartGame ? (
             <>
               {/* Yttre wrapper omfamnar text + logo — ringar sitter här
-                  så de aldrig skär in i "Press Play"-texten ovanför. */}
+                  så de aldrig skär in i "Press Play"-texten ovanför.
+                  Pulsen PAUSAS medan startLocked är satt: en pulserande knapp
+                  läses som "tryck här", och det är precis vad den inte går att
+                  göra då. Samma regel som Next-tabbens 5-sekunderslås. */}
               <Animated.View
-                style={[styles.playOuterWrap, { transform: [{ scale: playPulse }] }]}
+                style={[
+                  styles.playOuterWrap,
+                  !startLocked && { transform: [{ scale: playPulse }] },
+                ]}
               >
-                <View style={styles.playRingOuter} pointerEvents="none" />
-                <View style={styles.playRingInner} pointerEvents="none" />
+                <View
+                  style={[styles.playRingOuter, startLocked && styles.playRingLocked]}
+                  pointerEvents="none"
+                />
+                <View
+                  style={[styles.playRingInner, startLocked && styles.playRingLocked]}
+                  pointerEvents="none"
+                />
                 <View style={styles.tapHereRow}>
-                  <Text style={styles.tapHereText}>Press Play</Text>
+                  <Text
+                    style={[styles.tapHereText, startLocked && styles.tapHereTextLocked]}
+                  >
+                    {startLocked ? 'Get ready' : 'Press Play'}
+                  </Text>
                   <Svg width={18} height={18} viewBox="0 0 18 18">
-                    <Path d="M4 2 L16 9 L4 16 Z" fill={Colors.warning} />
+                    <Path
+                      d="M4 2 L16 9 L4 16 Z"
+                      fill={startLocked ? PLAY_LOCKED_COLOR : Colors.warning}
+                    />
                   </Svg>
                 </View>
-                <View style={styles.playLogoWrap}>
-                  <Animated.View
-                    style={[styles.playLogoHalo, { opacity: playGlow }]}
-                    pointerEvents="none"
-                  />
+                <View style={[styles.playLogoWrap, startLocked && styles.playLogoWrapLocked]}>
+                  {/* Halo:n unmountas helt i låst läge — en grå logga med gold
+                      glow bakom ser ut som en renderingsbugg. */}
+                  {!startLocked && (
+                    <Animated.View
+                      style={[styles.playLogoHalo, { opacity: playGlow }]}
+                      pointerEvents="none"
+                    />
+                  )}
                   <TouchableOpacity
                     activeOpacity={0.85}
                     onPress={handlePlayPress}
-                    accessibilityLabel={`${playerName} press to start your turn`}
+                    disabled={startLocked}
+                    accessibilityState={{ disabled: startLocked }}
+                    accessibilityLabel={
+                      startLocked
+                        ? 'Waiting for all players to connect'
+                        : `${playerName} press to start your turn`
+                    }
                     style={styles.playLogoTouchable}
                   >
-                    <QuizVibePlayLogo size={PLAY_BUTTON_SIZE} color={Colors.warning} />
+                    <QuizVibePlayLogo
+                      size={PLAY_BUTTON_SIZE}
+                      color={startLocked ? PLAY_LOCKED_COLOR : Colors.warning}
+                    />
                   </TouchableOpacity>
+                </View>
+                {/* Etiketten renderas ALLTID och döljs med opacity 0 i stället
+                    för att unmountas — annars krymper playOuterWrap i samma
+                    sekund som knappen blir guld och hela GetReady-layouten
+                    hoppar. Ingen sifferräknare (till skillnad från Next-tabben):
+                    väntan är peer-beroende, och en räknare som ibland hoppar
+                    till guld på 3 och ibland på 1 är värre än prickar. */}
+                <View
+                  style={[
+                    styles.startLockedLabel,
+                    !startLocked && styles.startLockedLabelHidden,
+                  ]}
+                  pointerEvents="none"
+                >
+                  <Text style={styles.startLockedText}>Connecting players</Text>
+                  {startLocked && <SequentialDots color={Colors.textSecondary} />}
                 </View>
               </Animated.View>
             </>
@@ -1358,137 +1609,9 @@ export function GetReadyIntro({
             )}
           </View>
         ) : (
-          // ── Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö ──
-          // R- och Q-kolumnerna är borttagna; progress visas istället som
-          // två dot-bars ovanför kö-tabellen. Kö-tabellen är single-column
-          // (Pass-the-Phone to:) och visar bara avatar + namn. Round-
-          // separator-raden i kön behålls eftersom det är enda visuella
-          // signal för round-byten i listan nu.
-          <View style={styles.tableBlock}>
-            {!isSinglePlayer && renderDotBar(
-              totalRounds,
-              currentRound,
-              'Rounds',
-              mediaSourceByQuestion
-                ? (() => {
-                    const turnIdx = (currentQuestion - 1) % Math.max(1, playerCount);
-                    return Array.from({ length: totalRounds }, (_, r) =>
-                      mediaSourceByQuestion[r * playerCount + turnIdx] ?? null,
-                    );
-                  })()
-                : undefined,
-            )}
-            {renderDotBar(totalQuestions, currentQuestion, 'Question')}
-
-            <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <View style={[styles.colPlayer, styles.cellHeader]}>
-                <Text style={styles.headerCellText}>Pass-the-Phone to:</Text>
-              </View>
-            </View>
-
-            {/* Current player-rad — Player-cellen får en primary-bordered
-                box runt avatar+namn så det är tydligt vem som är näst på tur.
-                Kant-skärande kategori-badge ovanpå boxen visar V1-kategori
-                (Music/Film/Sport) för nästa fråga så spelaren vet vad som
-                kommer. */}
-            <View style={styles.tableRow}>
-              <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
-                <View style={styles.currentPlayerBox}>
-                  <Text style={styles.currentMediaNumber}>{currentQuestion}</Text>
-                  <PlayerAvatar player={currentPlayer} size={QUEUE_AVATAR_SIZE} />
-                  <Text style={styles.currentPlayerName} numberOfLines={1}>
-                    {playerName}
-                  </Text>
-                  {currentAnswerType && (
-                    <View style={styles.answerTypeBadge} pointerEvents="none">
-                      <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
-                    </View>
-                  )}
-                  {currentCategory && (
-                    <View style={styles.categoryBadge} pointerEvents="none">
-                      <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
-                    </View>
-                  )}
-                </View>
-              </View>
-            </View>
-
-            {/* Kö-rader (scrollar internt om kön är lång). "Round X"-separator
-                infogas mellan kö-rader när rondnumret förändras — visuell
-                signal för round-byten i listan när R-kolumnen är borta. */}
-            {/* Kö-chips (upp till 9 kommande spelare) — vänster-packade med
-                flexWrap, samma layout som IndDev:s media-kö. Cap är 9 så att
-                Next-rutan + chip-kön tillsammans visar max 10 frågor. Inga
-                Round-dividers i chip-raden — ev. rond-byten framgår av
-                frågenumren. End of Game inline efter sista chip när kön
-                slutar exakt vid totalQuestions; annars + more questions
-                centrerat på egen rad. */}
-            {queue.length > 0 && (() => {
-              const visibleQueue = queue.slice(0, 9);
-              const lastChipQ =
-                queueQuestionNumbers[visibleQueue.length - 1] ?? currentQuestion;
-              const isEndOfGame = totalQuestions - lastChipQ <= 0;
-              return (
-                <>
-                  <TouchableOpacity
-                    style={styles.queueToggleRow}
-                    onPress={() => setQueueExpanded((v) => !v)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.queueToggleLabel}>Playing queue</Text>
-                    <View style={styles.settingsToggleBox}>
-                      <Text style={styles.settingsToggleGlyph}>
-                        {queueExpanded ? '−' : '+'}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                  {queueExpanded && (
-                    <>
-                      <View style={styles.mediaQueueChipsRow}>
-                        {visibleQueue.map((p, i) => (
-                          <View key={`chip-${i}`} style={styles.queueChip}>
-                            <Text style={styles.queueChipNumber}>
-                              {queueQuestionNumbers[i]}
-                            </Text>
-                            <Text
-                              style={styles.queueChipName}
-                              numberOfLines={1}
-                              ellipsizeMode="tail"
-                            >
-                              {p.name}
-                            </Text>
-                          </View>
-                        ))}
-                        {isEndOfGame && (
-                          <Text
-                            style={styles.endOfGameInline}
-                            numberOfLines={1}
-                            adjustsFontSizeToFit
-                            minimumFontScale={0.8}
-                          >
-                            🏁  End of Game
-                          </Text>
-                        )}
-                      </View>
-                      {!isEndOfGame && (
-                        <View style={styles.endOfGameRow}>
-                          <Text style={styles.endOfGameText}>+ more questions</Text>
-                        </View>
-                      )}
-                    </>
-                  )}
-                </>
-              );
-            })()}
-
-            {/* Empty-queue-fallback — sista spelarens vy där kön är tom. */}
-            {queue.length === 0 && (
-              <View style={styles.endOfGameRow}>
-                <Text style={styles.endOfGameText}>🏁  End of Game</Text>
-              </View>
-            )}
-
-          </View>
+          // Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö.
+          // Deklarerad ovanför så spectator-läget kan rendera samma block.
+          ptpProgressBlock
         )}
       </View>
       </ScrollView>
@@ -1517,6 +1640,12 @@ function mediaSourceLabel(source: QuestionMediaType | undefined): string {
 }
 
 const styles = StyleSheet.create({
+  // Spectator-läge: blocket står för sig självt utan SafeAreaView/flex:1
+  // så leaderboard-tabellen under det får resten av skärmen.
+  spectatorBlockWrap: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+  },
   safe: {
     flex: 1,
     backgroundColor: Colors.background,
@@ -2678,6 +2807,39 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     borderWidth: 2.5,
     borderColor: Colors.warning,
+  },
+  // ── Låst Play-knapp (startLocked) ────────────────────────────────────────
+  // Grå spegling av gold-statet ovan. Bara färg + glow ändras; all geometri är
+  // identisk så knappen inte hoppar när den låses upp.
+  playRingLocked: {
+    borderColor: PLAY_LOCKED_COLOR,
+  },
+  tapHereTextLocked: {
+    color: PLAY_LOCKED_COLOR,
+  },
+  // ⚠ playLogoWrap bär en HÅRDKODAD gold shadow (shadowColor: Colors.warning,
+  // shadowOpacity 0.85, elevation 12) som ligger UTANFÖR halo-View:n och därför
+  // överlever att halo:n unmountas. Utan denna override glöder den grå loggan
+  // fortfarande guldgult på både iOS och Android.
+  playLogoWrapLocked: {
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  startLockedLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: Spacing.sm,
+  },
+  startLockedLabelHidden: {
+    opacity: 0,
+  },
+  startLockedText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    letterSpacing: 0.3,
   },
   // Non-host:s waiting-vy i Individual Devices: samma gold-halo'd Q-play-logo
   // som host, plus en text-rad under loggan med "Waiting - Host will start

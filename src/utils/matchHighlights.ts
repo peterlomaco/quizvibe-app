@@ -5,19 +5,28 @@
  * Ren funktion utan React så regeln kan enhetstestas
  * (backend/content/test/matchHighlights.test.ts).
  *
- * ── Kort-ordning (prioritet) ────────────────────────────────────────────
- *   1. Flest rätt totalt                        — alltid
- *   2. Snabbast att låsa svar (snittid)          — alltid
- *   3. Snabbaste enskilda rätta svar             — om något rätt svar finns
- *   4-6. Bäst på YouTube / Spotify / Hints       — källan har ≥2 frågor
- *   7-9. Bäst på Musik / Film / Sport            — kategorin har ≥2 frågor
+ * ── Däcket (Peter 2026-08-25) ───────────────────────────────────────────
+ *   1. Correct answers  — PLACERINGSLISTA över ALLA spelare
+ *   2. Best on Spotify  — enbart förstaplatsen
+ *   3. Best on YouTube  — enbart förstaplatsen
+ *   4. Best on Hints    — enbart förstaplatsen
+ *   5. Fastest fingers  — PLACERINGSLISTA över ALLA spelare
  *
- * ── Varför ≥2-regeln ────────────────────────────────────────────────────
- * Standardspelet är 4 rundor. Utan tröskeln dyker kort som "Bäst på Sport —
- * Anna, 1 av 1 rätt" upp och läses som ihåligt. Med den får ett 4-rundorsspel
- * några få meningsfulla kort och ett 20-rundorsspel hela uppsättningen.
+ * Ordningen är explicit begärd; ändra den inte utan nytt beslut. Spotify
+ * ligger FÖRE YouTube trots att YouTube är den vanligaste källan.
  *
- * ── Snittiden (kort 2) ──────────────────────────────────────────────────
+ * ── Delad placering ─────────────────────────────────────────────────────
+ * Listkorten använder standard competition ranking (1, 1, 3): spelare med
+ * samma antal rätt delar plats. Det skiljer sig MEDVETET från Final
+ * Leaderboard, som bryter poänglika på snittsvarstid och därför alltid ger
+ * en unik ordning. Korten firar prestationen, tabellen kör tävlingen.
+ *
+ * Källkorten (2-4) visar BARA förstaplatsen — men flera spelare kan dela
+ * den, och då namnges alla. De använder SAMMA radlayout som listkorten
+ * ("1. 🦊 Anna … 2/2", antal rätt / antal frågor i källan), så alla kort i
+ * sekvensen läses likadant.
+ *
+ * ── Snittiden (kort 5, "Fastest fingers") ───────────────────────────────
  * Mäter tiden att LÅSA ett svar, oavsett om det blev rätt eller fel. Det är
  * samma tal som redan står i leaderboardens AVG-kolumn och som redan avgör
  * vid poänglika i sorteringen — sekvensen förstärker alltså den poängmodell
@@ -26,36 +35,86 @@
  *     ett svar och ska inte belönas för det).
  *   • connectionError-poster räknas BORT (nätverkets fel, inte spelarens;
  *     leaderboarden särredovisar dem redan i egen kolumn).
+ * Delad placering avgörs på det VISADE talet (2 decimaler) — annars kan två
+ * rader som båda står på "8.42s" hamna på plats 1 och 2, vilket läses som
+ * en bugg.
+ *
+ * ── Dormant: kategorikort (Musik/Film/Sport) + snabbaste enskilda svar ──
+ * Fanns t.o.m. 2026-08-25 och föll bort när däcket ovan spikades. Typfältet
+ * `category`, kind:arna 'category'/'fastest-single' och badge-renderingen i
+ * FinalCelebration lämnas kvar så de kan återinföras med en loop över
+ * CATEGORY_CARDS — men inget emitterar dem i dag, och `categoryByQuestion`
+ * är därför oanvänd (den skickas fortfarande från quiz.tsx).
  */
 
 import type { MainCategory } from './mainCategory';
 import type { QuestionMediaType } from '../components/GetReadyIntro';
 import type { LeaderboardPlayer, RoundScore } from '../components/RoundLeaderboard';
 
-/** Max antal kort i sekvensen — håller den under ~15 s. */
+/**
+ * Max antal kort i sekvensen. Däcket ovan ger som mest 5, så taket binder
+ * inte i dag — det står kvar som skyddsnät om fler korttyper återinförs.
+ */
 export const MAX_HIGHLIGHT_CARDS = 6;
 
-/** Minsta antal frågor i en hink för att den ska förtjäna ett eget kort. */
-export const MIN_QUESTIONS_PER_BUCKET = 2;
+/**
+ * Minsta antal frågor i en källhink för att den ska förtjäna ett eget kort.
+ *
+ * ⚠ 1, inte 2 (sänkt 2026-08-25). Regeln är "visa inte kort för källor som
+ * inte spelats" — en källa som spelats EN gång HAR spelats. Tröskeln 2 var
+ * dessutom oförenlig med däcket: standardspelet är 4 rundor och Hints-kvoten
+ * är floor(N/4) = 1 fråga, så Hints-kortet hade aldrig kunnat visas.
+ */
+export const MIN_QUESTIONS_PER_BUCKET = 1;
 
 export type HighlightKind =
   | 'most-correct'
   | 'fastest-average'
+  /** Dormant — se filhuvudet. */
   | 'fastest-single'
   | 'source'
+  /** Dormant — se filhuvudet. */
   | 'category';
+
+/** En namngiven spelare på ett kort (källkortens förstaplats). */
+export interface HighlightPlayerRef {
+  playerId: string;
+  name: string;
+  emoji: string | null;
+}
+
+/** En rad i ett placeringskort. `place` är delad vid lika (1, 1, 3). */
+export interface HighlightRankRow extends HighlightPlayerRef {
+  /**
+   * `null` = spelaren rankas inte. Gäller den som lämnade mitt i matchen:
+   * de listas fortfarande (placeringslistorna namnger ALLA spelare) men utan
+   * siffra, och `value` är "Left" i stället för ett resultat.
+   */
+  place: number | null;
+  /** Radens tal, t.ex. "3/4" eller "8.42s" — eller "Left". */
+  value: string;
+  /** true när minst en annan rad delar samma placering. */
+  shared: boolean;
+}
 
 export interface HighlightCard {
   /** Stabil nyckel för React + tester. */
   id: string;
   kind: HighlightKind;
-  /** Kort rubrik, t.ex. "Most correct answers" eller "Best on YouTube". */
+  /** Kort rubrik, t.ex. "Correct answers" eller "Best on YouTube". */
   title: string;
-  /** Vinnarens namn, eller null i personal-läge (då bär value:t allt). */
-  playerName: string | null;
-  playerEmoji: string | null;
-  /** Huvudtalet, t.ex. "7 of 10" eller "4.12s". */
-  value: string;
+  /**
+   * Placeringslista. ENDA sättet ett kort namnger spelare — alla korttyper
+   * använder samma radlayout ("1. 🦊 Anna … 2/2"). Listkorten (1 och 5) tar
+   * med ALLA spelare; källkorten (2-4) bara förstaplatsen, som kan delas av
+   * flera. Sätts inte i solospel/personal-läge — där bär `value` kortet.
+   */
+  rows?: HighlightRankRow[];
+  /**
+   * Huvudtalet, t.ex. "3 of 4" eller "4.12s". Används i stället för `rows`
+   * när det inte finns någon att placera sig mot (solospel/personal).
+   */
+  value?: string;
   /** Valfri underrad, t.ex. "3 questions". */
   detail?: string;
   /**
@@ -65,16 +124,13 @@ export interface HighlightCard {
    */
   source?: QuestionMediaType;
   /**
-   * Kategorikort renderas med appens gold kant-skärande kategoribadge
-   * (samma vokabulär som GetReadyIntro:s `categoryBadge`). Alla tre
-   * kategorier delar MEDVETET en enda guldfärg — per-kategori-färgning har
-   * testats tidigare och gav splittrad känsla.
+   * DORMANT (se filhuvudet). Kategorikort renderades med appens gold
+   * kant-skärande kategoribadge; inget emitterar dem i dag.
    */
   category?: MainCategory;
   /**
-   * Dekorativ emoji — BARA för de generella korten (flest rätt, snittid,
-   * snabbaste svar). De har ingen app-standard-ikon; källor och kategorier
-   * har det och ska därför aldrig sätta detta fält.
+   * Dekorativ emoji — BARA för de generella korten (placeringslistorna).
+   * Källor har en app-standard-ikon och ska därför aldrig sätta detta fält.
    */
   icon?: string;
 }
@@ -85,23 +141,27 @@ export interface BuildMatchHighlightsInput {
   /** allRoundScoresHistory, platt eller nästlad — vi flattar själva. */
   scores: RoundScore[][];
   players: LeaderboardPlayer[];
-  /** Indexerad mot host:s auktoritativa frågesekvens. */
-  categoryByQuestion: (MainCategory | null)[];
+  /** DORMANT — kategorikorten är borttagna, se filhuvudet. */
+  categoryByQuestion?: (MainCategory | null)[];
   /** Indexerad mot host:s auktoritativa frågesekvens. */
   mediaSourceByQuestion: QuestionMediaType[];
   mode: HighlightMode;
 }
 
-/** Källor som får ett eget kort, i visningsordning. */
+/**
+ * Källor som får ett eget kort, i VISNINGSORDNING: Spotify → YouTube →
+ * Hints (kort 2, 3 och 4). Ordningen är explicit begärd.
+ */
 const SOURCE_CARDS: { source: QuestionMediaType; label: string }[] = [
-  { source: 'youtube', label: 'YouTube' },
   { source: 'spotify', label: 'Spotify' },
+  { source: 'youtube', label: 'YouTube' },
   // 'image' heter Hints i appen — personbilderna är juridiskt parkerade och
   // det som faktiskt spelas är flagga + ledtrådar (samma frågepool).
   { source: 'image', label: 'Hints' },
 ];
 
-const CATEGORY_CARDS: MainCategory[] = ['Music', 'Film', 'Sport'];
+/** DORMANT — se filhuvudet. Behålls så kategorikorten kan återinföras. */
+export const CATEGORY_CARDS: MainCategory[] = ['Music', 'Film', 'Sport'];
 
 /** Sekunder med två decimaler, som leaderboardens AVG/LAST-kolumner. */
 function formatSeconds(value: number): string {
@@ -114,8 +174,6 @@ interface PlayerAgg {
   answered: number;
   /** Snittid att låsa svar; null när inget underlag finns. */
   avgSeconds: number | null;
-  /** Snabbaste enskilda RÄTTA svar; null om inga rätta svar. */
-  fastestCorrect: number | null;
 }
 
 /**
@@ -131,14 +189,11 @@ function aggregatePlayers(flat: RoundScore[], players: LeaderboardPlayer[]): Pla
         correct: player.summaryStats.correctAnswers,
         answered: player.summaryStats.playedRounds,
         avgSeconds: player.summaryStats.avgResponseSeconds,
-        // Per-fråga-underlag saknas → inget "snabbaste enskilda svar".
-        fastestCorrect: null,
       };
     }
     const own = flat.filter((s) => s.playerId === player.id);
     // Snittiden exkluderar uppkopplingsmissar — se filhuvudet.
     const timed = own.filter((s) => !s.connectionError);
-    const correctTimes = own.filter((s) => s.correct).map((s) => s.timeUsed);
     return {
       player,
       correct: own.filter((s) => s.correct).length,
@@ -147,42 +202,105 @@ function aggregatePlayers(flat: RoundScore[], players: LeaderboardPlayer[]): Pla
         timed.length > 0
           ? timed.reduce((sum, s) => sum + s.timeUsed, 0) / timed.length
           : null,
-      fastestCorrect: correctTimes.length > 0 ? Math.min(...correctTimes) : null,
     };
   });
 }
 
-/** Vinnaren enligt `better`, eller null om ingen kandidat har underlag. */
-function pickWinner<T>(
-  candidates: T[],
-  valueOf: (c: T) => number | null,
-  better: (a: number, b: number) => boolean,
-): T | null {
-  let best: T | null = null;
-  let bestValue: number | null = null;
-  for (const c of candidates) {
-    const v = valueOf(c);
-    if (v === null) continue;
-    if (bestValue === null || better(v, bestValue)) {
-      best = c;
-      bestValue = v;
-    }
-  }
-  return best;
+function toRef(player: LeaderboardPlayer): HighlightPlayerRef {
+  return { playerId: player.id, name: player.name, emoji: player.emoji ?? null };
 }
 
-const higher = (a: number, b: number) => a > b;
-const lower = (a: number, b: number) => a < b;
+interface RankEntry {
+  player: LeaderboardPlayer;
+  /** Sorteringstal. */
+  sortValue: number;
+  /** Radens visade tal. */
+  value: string;
+  /**
+   * Nyckel för DELAD placering. Två rader med samma nyckel får samma plats.
+   * Skiljd från sortValue så snittiden kan dela plats på det VISADE talet.
+   */
+  tieKey: string;
+}
+
+/**
+ * Standard competition ranking: 1, 1, 3 (inte 1, 1, 2). Sorteringen är
+ * stabil, så rader med samma tieKey behåller inbördes ordning från
+ * `players` — vilket är turordningen, inte något godtyckligt.
+ */
+function buildRankRows(entries: RankEntry[], higherIsBetter: boolean): HighlightRankRow[] {
+  const sorted = [...entries].sort((a, b) =>
+    higherIsBetter ? b.sortValue - a.sortValue : a.sortValue - b.sortValue,
+  );
+  const counts = new Map<string, number>();
+  for (const e of sorted) counts.set(e.tieKey, (counts.get(e.tieKey) ?? 0) + 1);
+
+  let place = 0;
+  let prevKey: string | null = null;
+  return sorted.map((e, i) => {
+    if (e.tieKey !== prevKey) {
+      place = i + 1;
+      prevKey = e.tieKey;
+    }
+    return {
+      ...toRef(e.player),
+      place,
+      value: e.value,
+      shared: (counts.get(e.tieKey) ?? 1) > 1,
+    };
+  });
+}
+
+/**
+ * Placeringslistorna namnger ALLA spelare, så den som lämnade mitt i matchen
+ * ska synas — men utan resultat (Peter 2026-08-26). De läggs sist, utan
+ * placeringssiffra, med "Left" i stället för sitt tal. Deras delsumma är
+ * ingen giltig placering: de slutade svara.
+ *
+ * ⚠ Gäller BARA listkorten. Källkorten ("Best on Spotify" osv.) visar bara
+ * förstaplatsen — där ska en avhoppare inte kunna vinna, så de filtreras
+ * bort ur `aggs` innan korten byggs.
+ */
+function appendDepartedRows(
+  rows: HighlightRankRow[],
+  departed: LeaderboardPlayer[],
+): HighlightRankRow[] {
+  if (departed.length === 0) return rows;
+  return [
+    ...rows,
+    ...departed.map((player) => ({
+      ...toRef(player),
+      place: null,
+      value: 'Left',
+      shared: false,
+    })),
+  ];
+}
 
 /**
  * Bygger korten för en avslutad match. Returnerar max MAX_HIGHLIGHT_CARDS
- * kort; hinkar utan underlag hoppas över helt (spelades ingen Spotify finns
+ * kort; källor utan underlag hoppas över helt (spelades ingen Spotify finns
  * inget Spotify-kort — ingen extra flagga behövs).
  */
 export function buildMatchHighlights(
   input: BuildMatchHighlightsInput,
 ): HighlightCard[] {
-  const { scores, players, categoryByQuestion, mediaSourceByQuestion, mode } = input;
+  const { scores, mediaSourceByQuestion, mode } = input;
+  // ⚠ Den som lämnade MITT i matchen RANKAS inte (Peter 2026-08-26) — de
+  // slutade svara, så deras delsumma är ingen giltig placering. Utan det
+  // kunde någon som gick efter två rätta svar toppa "Correct answers"
+  // sekunder innan slutskärmen visar dem längst ner utan placeringssiffra.
+  // Samma regel som `finalizeRows` i LeaderboardTable.
+  //
+  // De VISAS ändå i listkorten, sist och utan siffra, med "Left" i stället
+  // för ett resultat — listorna namnger alla spelare. Se `appendDepartedRows`.
+  // Ur allt annat (aggregering, källkort, ranked-gaten) är de borta.
+  //
+  // `hasLeft` sätts bara för avhopp under pågående spel (`leftDuringGameIds`
+  // i quiz.tsx); den som lämnar EFTER slutsignalen spelade hela matchen och
+  // är kvar här som vanligt.
+  const players = input.players.filter((p) => !p.hasLeft);
+  const departed = input.players.filter((p) => p.hasLeft);
   if (players.length === 0) return [];
 
   const flat = scores.flat();
@@ -192,99 +310,113 @@ export function buildMatchHighlights(
   const aggs = aggregatePlayers(flat, players);
   const cards: HighlightCard[] = [];
 
-  // Namnfält utelämnas i personal-läge — då bär title + value hela kortet
-  // ("Music — you got 3 of 4 right") i stället för att utse en "vinnare"
-  // bland en enda spelare.
-  const nameOf = (p: LeaderboardPlayer) => (personal ? null : p.name);
-  const emojiOf = (p: LeaderboardPlayer) => (personal ? null : p.emoji);
+  /**
+   * Placeringslistor kräver någon att placera sig MOT. Med en enda spelare
+   * degenererar listan till en rad, så solospelet behåller value-layouten.
+   *
+   * ⚠ Gaten är antalet spelare, INTE `mode`. Remote 1v1 kör personal-läge
+   * (kategori-/källjämförelser saknar underlag) men har två spelare med
+   * fullgott underlag för BÅDA listkorten — de ska placeras mot varandra.
+   */
+  const ranked = players.length >= 2;
 
-  // ── 1. Flest rätt totalt ───────────────────────────────────────────────
-  const mostCorrect = pickWinner(aggs, (a) => (a.answered > 0 ? a.correct : null), higher);
-  if (mostCorrect) {
+  // ── 1. Correct answers ─────────────────────────────────────────────────
+  // Delad placering på ANTAL RÄTT — "3/4" och "3/3" delar plats, eftersom
+  // regeln är formulerad på antalet rätt, inte på träffprocent.
+  if (ranked) {
     cards.push({
       id: 'most-correct',
       kind: 'most-correct',
-      title: personal ? 'Correct answers' : 'Most correct answers',
-      playerName: nameOf(mostCorrect.player),
-      playerEmoji: emojiOf(mostCorrect.player),
-      value: `${mostCorrect.correct} of ${mostCorrect.answered}`,
+      title: 'Correct answers',
+      rows: appendDepartedRows(
+        buildRankRows(
+          aggs.map((a) => ({
+            player: a.player,
+            sortValue: a.correct,
+            value: `${a.correct}/${a.answered}`,
+            tieKey: String(a.correct),
+          })),
+          true,
+        ),
+        departed,
+      ),
+      detail: 'Same number of correct answers shares a place',
       icon: '🎯',
     });
-  }
-
-  // ── 2. Snabbast att låsa svar (snittid) ────────────────────────────────
-  const fastestAvg = pickWinner(aggs, (a) => a.avgSeconds, lower);
-  if (fastestAvg && fastestAvg.avgSeconds !== null) {
-    cards.push({
-      id: 'fastest-average',
-      kind: 'fastest-average',
-      title: personal ? 'Average lock-in time' : 'Fastest to lock an answer',
-      playerName: nameOf(fastestAvg.player),
-      playerEmoji: emojiOf(fastestAvg.player),
-      value: formatSeconds(fastestAvg.avgSeconds),
-      detail: 'Average across all answers',
-      icon: '⚡',
-    });
-  }
-
-  // ── 3. Snabbaste enskilda rätta svar ───────────────────────────────────
-  const fastestSingle = pickWinner(aggs, (a) => a.fastestCorrect, lower);
-  if (fastestSingle && fastestSingle.fastestCorrect !== null) {
-    cards.push({
-      id: 'fastest-single',
-      kind: 'fastest-single',
-      title: 'Fastest correct answer',
-      playerName: nameOf(fastestSingle.player),
-      playerEmoji: emojiOf(fastestSingle.player),
-      value: formatSeconds(fastestSingle.fastestCorrect),
-      icon: '🚀',
-    });
+  } else {
+    const solo = aggs[0];
+    if (solo && solo.answered > 0) {
+      cards.push({
+        id: 'most-correct',
+        kind: 'most-correct',
+        title: 'Correct answers',
+        value: `${solo.correct} of ${solo.answered}`,
+        icon: '🎯',
+      });
+    }
   }
 
   /**
-   * Gemensam byggare för källa-/kategorikorten. `questionIndices` är de
-   * frågeindex som tillhör hinken; kortet skapas bara om hinken har minst
-   * MIN_QUESTIONS_PER_BUCKET frågor OCH någon svarat rätt på minst en.
+   * Källkorten (2-4). Kortet skapas bara om källan spelats
+   * (MIN_QUESTIONS_PER_BUCKET frågor) OCH någon svarat rätt på minst en —
+   * sekvensen ska vara firande, och "Best on Spotify — 0 of 3" är inte det.
+   *
+   * Flera spelare kan DELA förstaplatsen; då namnges alla. Placeringar
+   * under första visas aldrig här.
    */
-  const bucketCard = (
+  const sourceCard = (
     id: string,
-    kind: HighlightKind,
     title: string,
-    visual: Pick<HighlightCard, 'source' | 'category'>,
+    source: QuestionMediaType,
     questionIndices: Set<number>,
   ): HighlightCard | null => {
     if (questionIndices.size < MIN_QUESTIONS_PER_BUCKET) return null;
-    // Poster utan questionIndex (äldre data) kan inte hänföras till en hink.
+    // Poster utan questionIndex (äldre data) kan inte hänföras till en källa.
     const inBucket = flat.filter(
       (s) => s.questionIndex !== undefined && questionIndices.has(s.questionIndex),
     );
     if (inBucket.length === 0) return null;
 
-    const perPlayer = players.map((player) => {
-      const own = inBucket.filter((s) => s.playerId === player.id);
-      return {
-        player,
-        correct: own.filter((s) => s.correct).length,
-        answered: own.length,
-      };
-    });
-    const winner = pickWinner(
-      perPlayer,
-      (p) => (p.answered > 0 ? p.correct : null),
-      higher,
-    );
-    // Ingen fick något rätt → hoppa över. Sekvensen ska vara firande.
-    if (!winner || winner.correct === 0) return null;
+    const perPlayer = players
+      .map((player) => {
+        const own = inBucket.filter((s) => s.playerId === player.id);
+        return {
+          player,
+          correct: own.filter((s) => s.correct).length,
+          answered: own.length,
+        };
+      })
+      .filter((p) => p.answered > 0);
+    if (perPlayer.length === 0) return null;
+
+    const top = Math.max(...perPlayer.map((p) => p.correct));
+    // Ingen fick något rätt → hoppa över.
+    if (top === 0) return null;
+    const winners = perPlayer.filter((p) => p.correct === top);
 
     return {
       id,
-      kind,
+      kind: 'source',
       title,
-      playerName: nameOf(winner.player),
-      playerEmoji: emojiOf(winner.player),
-      value: `${winner.correct} of ${winner.answered}`,
-      detail: `${questionIndices.size} ${questionIndices.size === 1 ? 'question' : 'questions'}`,
-      ...visual,
+      // Samma radlayout som listkorten ("1. 🦊 Anna … 2/2"), men BARA
+      // förstaplatsen. Alla vinnare har per definition samma `correct`;
+      // `answered` kan skilja om någon tappade uppkopplingen, så nämnaren
+      // är hinkens storlek — antal rätt / antal frågor i källan.
+      rows: personal
+        ? undefined
+        : winners.map((w) => ({
+            ...toRef(w.player),
+            place: 1,
+            value: `${w.correct}/${questionIndices.size}`,
+            shared: winners.length > 1,
+          })),
+      // Personal-läget har ingen att placera sig mot — talet bär kortet.
+      value: personal ? `${top} of ${questionIndices.size}` : undefined,
+      detail:
+        winners.length > 1 && !personal
+          ? `${winners.length} players share first place`
+          : undefined,
+      source,
     };
   };
 
@@ -296,33 +428,59 @@ export function buildMatchHighlights(
     return out;
   };
 
-  // ── 4-6. Källor ────────────────────────────────────────────────────────
+  // ── 2-4. Källor: Spotify → YouTube → Hints ─────────────────────────────
   // Rubriken behåller källans NAMN eftersom Hints-ikonen (Q + "?") inte är
   // självförklarande på egen hand — brand-ikonen och namnet förstärker
   // varandra, precis som i Lobby:s Game Connections-rader.
   for (const { source, label } of SOURCE_CARDS) {
-    const card = bucketCard(
+    const card = sourceCard(
       `source-${source}`,
-      'source',
       personal ? label : `Best on ${label}`,
-      { source },
+      source,
       indicesWhere(mediaSourceByQuestion, (s) => s === source),
     );
     if (card) cards.push(card);
   }
 
-  // ── 7-9. Kategorier ────────────────────────────────────────────────────
-  // Kategorinamnet bärs av den kant-skärande guld-badgen (appens standard),
-  // så rubriken upprepar det INTE — den säger vad talet betyder i stället.
-  for (const category of CATEGORY_CARDS) {
-    const card = bucketCard(
-      `category-${category}`,
-      'category',
-      personal ? 'Correct answers' : 'Best player',
-      { category },
-      indicesWhere(categoryByQuestion, (c) => c === category),
-    );
-    if (card) cards.push(card);
+  // ── 5. Fastest fingers ─────────────────────────────────────────────────
+  // Spelare utan tidsunderlag (svarade aldrig, eller bara connectionError)
+  // kan inte placeras och utelämnas ur listan.
+  const timedAggs = aggs.filter(
+    (a): a is PlayerAgg & { avgSeconds: number } => a.avgSeconds !== null,
+  );
+  if (timedAggs.length > 0) {
+    if (ranked) {
+      cards.push({
+        id: 'fastest-average',
+        kind: 'fastest-average',
+        title: 'Fastest fingers',
+        rows: appendDepartedRows(
+          buildRankRows(
+            timedAggs.map((a) => ({
+              player: a.player,
+              sortValue: a.avgSeconds,
+              value: formatSeconds(a.avgSeconds),
+              // Delad placering på det VISADE talet — se filhuvudet.
+              tieKey: formatSeconds(a.avgSeconds),
+            })),
+            false,
+          ),
+          departed,
+        ),
+        detail: 'Average time to lock in an answer',
+        icon: '⚡',
+      });
+    } else {
+      const solo = timedAggs[0];
+      cards.push({
+        id: 'fastest-average',
+        kind: 'fastest-average',
+        title: 'Average lock-in time',
+        value: formatSeconds(solo.avgSeconds),
+        detail: 'Average across all answers',
+        icon: '⚡',
+      });
+    }
   }
 
   return cards.slice(0, MAX_HIGHLIGHT_CARDS);

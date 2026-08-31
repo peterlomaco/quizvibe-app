@@ -591,3 +591,226 @@ items:
     probability: 82
     wikimediaSearchHints: ["Joey Tempest Europe rock band Swedish singer"]
     answerMethods: ["timeline", "name-letters"]
+  - id: 50-cent
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "50 Cent"
+    correctYear: 1975
+    probability: 65
+    region: ["global"]
+    genrePackages: ["hiphop"]
+    wikimediaSearchHints: ["50 Cent"]
+    answerMethods: ["name-letters"]
+  - id: alexia
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Alexia"
+    correctYear: 1967
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Summer"]
+    wikimediaSearchHints: ["Alexia"]
+    answerMethods: ["name-letters"]
+  - id: anastacia
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Anastacia"
+    correctYear: 1968
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Anastacia"]
+    answerMethods: ["name-letters"]
+  - id: benny-benassi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Benny Benassi"
+    correctYear: 1967
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Club & Dance Hits"]
+    wikimediaSearchHints: ["Benny Benassi"]
+    answerMethods: ["name-letters"]
+  - id: dana-international
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dana International"
+    correctYear: 1969
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Dana International"]
+    answerMethods: ["name-letters"]
+  - id: dj-otzi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "DJ Ötzi"
+    correctYear: 1971
+    probability: 65
+    region: ["global"]
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["DJ Ötzi"]
+    answerMethods: ["name-letters"]
+  - id: eimear-quinn
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Eimear Quinn"
+    correctYear: 1972
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Eimear Quinn"]
+    answerMethods: ["name-letters"]
+  - id: gotye
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gotye"
+    correctYear: 1980
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Gotye"]
+    answerMethods: ["name-letters"]
+  - id: haddaway
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Haddaway"
+    correctYear: 1965
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Eurodance & pop"]
+    wikimediaSearchHints: ["Haddaway"]
+    answerMethods: ["name-letters"]
+  - id: janet-jackson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Janet Jackson"
+    correctYear: 1966
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Love & Peace"]
+    wikimediaSearchHints: ["Janet Jackson"]
+    answerMethods: ["name-letters"]
+  - id: knaan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "K'naan"
+    correctYear: 1978
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["sport", "football"]
+    wikimediaSearchHints: ["K'naan"]
+    answerMethods: ["name-letters"]
+  - id: kate-ryan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kate Ryan"
+    correctYear: 1980
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Club & Dance Hits"]
+    wikimediaSearchHints: ["Kate Ryan"]
+    answerMethods: ["name-letters"]
+  - id: lou-bega
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Lou Bega"
+    correctYear: 1975
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Lou Bega"]
+    answerMethods: ["name-letters"]
+  - id: marie-n
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Marie N"
+    correctYear: 1973
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Marie N"]
+    answerMethods: ["name-letters"]
+  - id: mark-morrison
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mark Morrison"
+    correctYear: 1972
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Mark Morrison"]
+    answerMethods: ["name-letters"]
+  - id: natalie-imbruglia
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Natalie Imbruglia"
+    correctYear: 1975
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Natalie Imbruglia"]
+    answerMethods: ["name-letters"]
+  - id: niamh-kavanagh
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Niamh Kavanagh"
+    correctYear: 1968
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Niamh Kavanagh"]
+    answerMethods: ["name-letters"]
+  - id: psy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "PSY"
+    correctYear: 1977
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Park Jae-sang"]
+    answerMethods: ["name-letters"]
+  - id: robert-miles
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Robert Miles"
+    correctYear: 1969
+    probability: 65
+    region: ["global"]
+    genrePackages: ["Mega Hits"]
+    wikimediaSearchHints: ["Robert Miles"]
+    answerMethods: ["name-letters"]
+  - id: ruslana
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ruslana"
+    correctYear: 1973
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Ruslana Lyzhychko"]
+    answerMethods: ["name-letters"]
+  - id: sandra-kim
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sandra Kim"
+    correctYear: 1972
+    probability: 65
+    region: ["global"]
+    inBaseCatalog: false
+    genrePackages: ["Eurovision"]
+    wikimediaSearchHints: ["Sandra Kim"]
+    answerMethods: ["name-letters"]
+  - id: shania-twain
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Shania Twain"
+    correctYear: 1965
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Shania Twain"]
+    answerMethods: ["name-letters"]
+  - id: sinead-oconnor
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sinéad O'Connor"
+    correctYear: 1966
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Sinéad O'Connor"]
+    answerMethods: ["name-letters"]
+  - id: snoop-doggy-dogg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Snoop Doggy Dogg"
+    correctYear: 1971
+    probability: 65
+    region: ["global"]
+    genrePackages: ["hiphop"]
+    wikimediaSearchHints: ["Snoop Doggy Dogg"]
+    answerMethods: ["name-letters"]
+  - id: snow
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Snow"
+    correctYear: 1969
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Snow"]
+    answerMethods: ["name-letters"]

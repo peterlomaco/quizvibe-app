@@ -296,3 +296,22 @@ items:
     probability: 70
     wikimediaSearchHints: ["Ing-Marie Carlsson Swedish actress"]
     answerMethods: ["timeline", "name-letters"]
+  # === Batch 2026-08-27 — kompletterar film-gapet (correctNames i movies-sweden.yaml saknade Hints-entry) ===
+  - id: janne-carlsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Janne Carlsson"
+    correctYear: 1937
+    peakFrom: 1965
+    peakTo: 1990
+    probability: 66
+    wikimediaSearchHints: ["Janne Carlsson Swedish drummer actor Göta kanal"]
+    answerMethods: ["timeline", "name-letters"]
+  - id: peter-haber
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Peter Haber"
+    correctYear: 1952
+    peakFrom: 1993
+    peakTo: 2013
+    probability: 76
+    wikimediaSearchHints: ["Peter Haber Swedish actor Martin Beck Sunes sommar"]
+    answerMethods: ["timeline", "name-letters"]

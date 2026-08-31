@@ -173,12 +173,13 @@ items:
     probability: 88
     wikimediaSearchHints: ["USA for Africa We Are the World"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3Z2tPWiNiIpg8UMMoowHIk"
     youtubeClips:
-      - videoId: "s3wNuru4U0I"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Oxygene 80"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      - videoId: "_cDNhqNv2HY"
+        startSec: 20
+        endSec: 50
+        channelTitle: "CaptainCarlossi"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   # 1986
   - id: europe-the-final-countdown
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -222,6 +223,21 @@ items:
         endSec: 45
         channelTitle: "Rick Astley"
         notes: "Peter-kurerad 2026-08-12 — ersatte Topic-audion (3BFTio5296w) med officiella musikvideon (4K Remaster) på artistens egen kanal."
+  - id: inner-circle-bad-boys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bad Boys — Inner Circle"
+    correctYear: 1987
+    probability: 82
+    region: ["global"]
+    spotifyTrackId: "1NojrDCqDLh4dWRZ7F589Q"
+    wikimediaSearchHints: ["Inner Circle Bad Boys"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "yVBB2upbVys"
+        startSec: 0
+        endSec: 15
+        channelTitle: "Inner Circle"
+        notes: "Peter-tillagd 2026-08-29. correctYear 1987 = Inner Circles originalrelease på albumet One Way (INTE 1993 års COPS-tema-hit). startSec ej finjusterad — verifiera i spelaren."
   # 1988
   - id: bobby-mcferrin-dont-worry-be-happy
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -300,6 +316,7 @@ items:
     wikimediaSearchHints: ["MC Hammer U Can't Touch This 1990"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     youtubeClips:
       - videoId: "q8WSdypJ4WA"
         startSec: 15
@@ -439,11 +456,11 @@ items:
     wikimediaSearchHints: ["Oasis Wonderwall"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "FVdjZYfDuLE"
-        startSec: 0
-        endSec: 15
-        channelTitle: "Oasis - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "bx1Bh8ZvH84"
+        startSec: 15
+        endSec: 45
+        channelTitle: "OasisVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). startSec 15 angiven av Peter. Officiella musikvideon; ersatte Topic-audion FVdjZYfDuLE. SD ar bara en note i youtube-validate."
   - id: coolio-gangstas-paradise
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gangsta's Paradise — Coolio"
@@ -463,11 +480,19 @@ items:
     displayName: "Wannabe — Spice Girls"
     correctYear: 1996
     probability: 90
+    region: ["global"]
     wikimediaSearchHints: ["Spice Girls Wannabe"]
     answerMethods: ["timeline"]
-    # youtubeClips borttagna 2026-08-10: tscL_I2v7pU (Spice Girls - Topic) blev
+    genrePackages: ["Eurodance & pop"]
+    # Tidigare klipp tscL_I2v7pU (Spice Girls - Topic) togs bort 2026-08-10: blev
     # region-blockerad i 249 länder inkl. SE → "Video unavailable" i spelaren.
-    # Ersättningsklipp krävs.
+    # Ersatt 2026-08-25 ur Peters lista (validerat oblockerat i SE, HD).
+    youtubeClips:
+      - videoId: "Orz_bA80Ut0"
+        startSec: 48
+        endSec: 78
+        channelTitle: "Spice Girls Mania"
+        notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   - id: los-del-rio-macarena
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Macarena — Los del Río"
@@ -482,6 +507,20 @@ items:
         endSec: 45
         channelTitle: "Los Del Río - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag gwWRjvwlLKg är en privat re-upload; Topic är rättsinnehavarens kanal."
+  - id: dromhus-vill-ha-dig
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Vill ha dig — Drömhus"
+    correctYear: 1996
+    probability: 70
+    wikimediaSearchHints: ["Drömhus Vill ha dig 1996 Swedish pop"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% svenska"]
+    youtubeClips:
+      - videoId: "S1GitKiAHNs"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Drömhus"
+        notes: "Officiell musikvideo. Peter-kurerad 2026-08-29. Titeln avslöjar inte årtalet."
   # === Content-expansion 2026-05-29: fler ikoniska 80-90-tals-låtar ===
   - id: journey-dont-stop-believin
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -610,6 +649,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["David Bowie Let's Dance 1983"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4cVHMHgmWgudD399ZdhQ3L"
     youtubeClips:
       - videoId: "VbD_kBJc_gI"
         startSec: 0
@@ -636,12 +676,19 @@ items:
     probability: 90
     wikimediaSearchHints: ["Wham Last Christmas 1984"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
+    genrePackages: ["Christmas"]
     youtubeClips:
-      - videoId: "T0T9GyM28tg"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Wham! - Topic"
-        notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "E8gmARGvPlI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Wham!"
+        notes: "Peter-kurerad 2026-08-30 (ersatte T0T9GyM28tg)."
+      - videoId: "KhqNTjbQ71A"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Wham!"
+        notes: "Peter-kurerad 2026-08-30 (ersatte T0T9GyM28tg)."
   - id: springsteen-dancing-in-the-dark
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dancing in the Dark — Bruce Springsteen"
@@ -747,6 +794,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban It's My Life 1992"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     spotifyTrackId: "6bjl81yfCztuBXLC9Mqs2N"
     youtubeClips:
       - videoId: "oW0VovnyjPY"
@@ -816,6 +864,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Tina Turner What's Love Got to Do with It 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3ErsOxqe2RmXkR65wkygDz"
     youtubeClips:
       - videoId: "oGpFcHTxjZs"
         startSec: 30
@@ -895,6 +944,7 @@ items:
     wikimediaSearchHints: ["Nas If I Ruled the World 1996 It Was Written"]
     answerMethods: ["timeline"]
     genrePackages: ["hiphop"]
+    parentControlled: true
     spotifyTrackId: "5PQmSHzWnlgG4EBuIqjac2"
     youtubeClips:
       - videoId: "o2gwGy1ZIMg"
@@ -914,7 +964,7 @@ items:
         endSec: 45
         channelTitle: "SchlagerArchive"
         notes: "Melodifestivalen 1981 vinnare."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: chips-dag-efter-dag
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dag efter dag — Chips"
@@ -923,11 +973,11 @@ items:
     wikimediaSearchHints: ["Chips Dag efter dag Eurovision 1982"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "2GAaOyfMLfA"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "Melodifestivalen 1982 vinnare. ESC 1982 performance."
+      - videoId: "tUE0zbkmv0Q"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Zoinks Scoob"
+        notes: "Peter-kurerad 2026-08-29. Ersatte d-ghe23_uwI. Titeln avslöjar inte årtalet."
   - id: herreys-diggiloo-diggiley
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diggi-Loo Diggi-Ley — Herreys"
@@ -937,11 +987,11 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "ySOCalwr6Yo"
-        startSec: 5
-        endSec: 20
+        startSec: 20
+        endSec: 40
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: kikki-danielsson-bra-vibrationer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bra vibrationer — Kikki Danielsson"
@@ -956,7 +1006,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1985 vinnare. ESC 1985 performance."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: lotta-engberg-fyra-bugg
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fyra bugg och en Coca Cola — Lotta Engberg"
@@ -970,7 +1020,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1987 vinnare."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   - id: tommy-korberg-stad-i-ljus
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stad i ljus — Tommy Körberg"
@@ -978,13 +1028,20 @@ items:
     probability: 70
     wikimediaSearchHints: ["Tommy Körberg Stad i ljus Eurovision 1988"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7bVwUOySQGO2afJ0LArAMi"
     youtubeClips:
-      - videoId: "u4-gEpNI6CI"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "Melodifestivalen 1988 vinnare. ESC 1988 performance."
-    genrePackages: ["Eurovision"]
+      - videoId: "GO9VUhn1TXk"
+        startSec: 1
+        endSec: 31
+        channelTitle: "Tommy Körberg - Topic"
+        notes: "Peter-kurerad 2026-08-27. startSec 1 angiven av Peter. Peters egna G9iUTMXF0tw SPOILAR (1988 vid tecken 46 av 51); officiell Topic-audio anvand istallet."
+      - videoId: "DxLlgLY2xEo"
+        startSec: 2
+        endSec: 32
+        channelTitle: "Py Bäckman"
+        notes: "Peter-kurerad 2026-08-27. Lyric video. startSec 2 angiven av Peter."
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen", "100% svenska"]
   - id: carola-fangad-av-en-stormvind
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fångad av en stormvind — Carola"
@@ -998,6 +1055,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1991 vinnare, ESC-vinnare 1991."
+    genrePackages: ["Melodifestivalen"]
   - id: arvingarna-eloise
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eloise — Arvingarna"
@@ -1011,7 +1069,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1993 vinnare. ESC 1993 performance."
-    genrePackages: ["Eurovision"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
   # ===== Eurovision Song Contest vinnare =====
   - id: bucks-fizz-making-your-mind-up
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1039,20 +1097,6 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1982 vinnare — Tyskland."
-  - id: corinne-hermes-si-la-vie-est-cadeau
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Si la vie est cadeau — Corinne Hermès"
-    correctYear: 1983
-    probability: 64
-    wikimediaSearchHints: ["Corinne Hermès Si la vie est cadeau Eurovision 1983"]
-    answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "F8y5xc8UodE"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "ESC 1983 vinnare — Luxemburg."
-    genrePackages: ["Eurovision"]
   - id: bobbysocks-la-det-swinge
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "La det swinge — Bobbysocks!"
@@ -1080,6 +1124,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1986 vinnare — Belgien."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: johnny-logan-hold-me-now
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hold Me Now — Johnny Logan"
@@ -1094,6 +1139,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1987 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: celine-dion-ne-partez-pas
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ne partez pas sans moi — Céline Dion"
@@ -1108,6 +1154,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1988 vinnare — Schweiz."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: riva-rock-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rock Me — Riva"
@@ -1138,6 +1185,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1990 vinnare — Italien."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: linda-martin-why-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Why Me? — Linda Martin"
@@ -1152,6 +1200,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1992 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: niamh-kavanagh-in-your-eyes
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In Your Eyes — Niamh Kavanagh"
@@ -1182,11 +1231,13 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1994 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: secret-garden-nocturne
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nocturne — Secret Garden"
     correctYear: 1995
     probability: 74
+    region: ["nordic"]
     wikimediaSearchHints: ["Secret Garden Nocturne Eurovision 1995 Norway"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -1196,6 +1247,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1995 vinnare — Norge."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: eimear-quinn-the-voice
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Voice — Eimear Quinn"
@@ -1210,6 +1262,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 1996 vinnare — Irland."
     genrePackages: ["Eurovision"]
+    inBaseCatalog: false
   - id: lotta-engberg-successchottis
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Succéschottis — Lotta Engberg"
@@ -1245,6 +1298,9 @@ items:
     probability: 80
     wikimediaSearchHints: ["Sven-Ingvars Sommar i Sverige 1994 Swedish dansband Byns enda blondin"]
     answerMethods: ["timeline"]
+    region: ["sweden"]
+    genrePackages: ["Summer", "100% svenska"]
+    inBaseCatalog: false
     spotifyTrackId: "7s8EmGKCWKHsKXhhEZBdaM"
     youtubeClips:
       - videoId: "PQuDXSXGkAg"
@@ -1307,10 +1363,10 @@ items:
     genrePackages: ["100% svenska"]
     youtubeClips:
       - videoId: "KH_kDfdwf8A"
-        startSec: 0
+        startSec: 6
         endSec: 30
         channelTitle: "Thomas Di Leva"
-        notes: "Official video."
+        notes: "Official video. startSec 0->6 (Peter 2026-08-29)."
   - id: ronny-ragge-de-e-sommar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "De e sommar — Ronny & Ragge"
@@ -1648,6 +1704,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["David Bowie Mick Jagger Dancing in the Street 1985 Live Aid"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6FnuMo55jNECTDdS1nD5H0"
     youtubeClips:
       - videoId: "opRRax4ph3E"
         startSec: 0
@@ -1714,8 +1771,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "p3j2NYZ8FKs"
-        startSec: 0
-        endSec: 30
+        startSec: 30
+        endSec: 60
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = 1985 ars ominspelning (singel okt 1985), den som blev hit och den vi spelar. Bandets egen Bobby-O-version fran april 1984 floppade — samma undantagsresonemang som a-ha Take on Me. Albumet Please kom 1986."
   # --- 1986 ---
@@ -1740,11 +1797,15 @@ items:
     wikimediaSearchHints: ["Peter Cetera Glory of Love 1986 Karate Kid Part II"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "yQHhqDRn4_c"
+      - videoId: "wktJg27TXx4"
         startSec: 0
         endSec: 30
-        notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+        channelTitle: "Truett Turk"
+        notes: "Peter-kurerad 2026-08-27. Ersatte yQHhqDRn4_c. VERIFIERA I SPELAREN: titeln ar 78 tecken med 1986 vid tecken 57 - bor kapas bort, men aret ar svaret."
     notes: "correctYear = singeln (maj 1986), fore albumet Solitude/Solitaire (juli 1986)."
+    region: ["global"]
+    genrePackages: ["Film", "Soft & Ballads"]
+    inBaseCatalog: false
   - id: peter-gabriel-sledgehammer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sledgehammer — Peter Gabriel"
@@ -1754,8 +1815,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "OJWJE0x7T4Q"
-        startSec: 0
-        endSec: 30
+        startSec: 30
+        endSec: 60
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (21 april 1986), knappt en manad fore albumet So (19 maj 1986) — bada vagarna ger 1986."
   - id: prince-kiss
@@ -1797,8 +1858,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "YF1R0hc5Q2I"
-        startSec: 0
-        endSec: 30
+        startSec: 17
+        endSec: 47
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet Tango in the Night (april 1987), forsta gangen laten gick att hora. Singeln kom i nov 1987."
   - id: fleetwood-mac-seven-wonders
@@ -1897,6 +1958,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Tina Turner The Best Simply the Best 1989 Foreign Affair"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6pPWRBubXOBAHnjl5ZIujB"
     youtubeClips:
       - videoId: "GC5E8ie2pdM"
         startSec: 0
@@ -1915,6 +1977,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban No Coke Hello Afrika"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     youtubeClips:
       - videoId: "4uPDfuC3Jck"
         startSec: 0
@@ -1930,6 +1993,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban Sing Hallelujah One Love"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     youtubeClips:
       - videoId: "pKxJca7LLNM"
         startSec: 0
@@ -1945,6 +2009,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban Let the Beat Go On Look Whos Talking"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     youtubeClips:
       - videoId: "oKs25yuV3_A"
         startSec: 20
@@ -1960,6 +2025,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban Look Whos Talking 1994"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
     youtubeClips:
       - videoId: "n1dk78L0XzI"
         startSec: 5
@@ -1997,3 +2063,917 @@ items:
         channelTitle: "ModernTalkingVEVO"
         notes: "Ersatte Peters lank 8ikFTY8fbwo 2026-08-14: den var '98-nyinspelningen (Ft. Eric Singleton) med \"'98\" i titeln — fel inspelning for ett 1984-svar. Detta ar originalvideon fran artistens VEVO-kanal, ingen arsangivelse i titeln."
     notes: "correctYear = singeln (okt 1984), fore The 1st Album (1985). OBS: spela ALDRIG '98-versionen har — den gor svaret 1984 obegripligt."
+  # === Tillagg 2026-08-25 (Peters "YT och Spotify lista") ===
+  - id: eros-ramazzotti-la-cosa-mas-bella
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "La Cosa Más Bella (Più bella cosa) — Eros Ramazzotti"
+    correctYear: 1996
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Eros Ramazzotti Piu bella cosa"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    spotifyTrackId: "1EZypwk0xcj64ZLAglhLs2"
+    youtubeClips:
+      - videoId: "UojBaKX5Vz4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ErosRamazzottiVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: zucchero-paul-young-senza-una-donna
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Senza una donna — Zucchero & Paul Young"
+    correctYear: 1991
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Zucchero Paul Young Senza una donna"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    spotifyTrackId: "1wzggqX4y7amR0xdJIekwE"
+    youtubeClips:
+      - videoId: "V69vs8JmXYM"
+        startSec: 5
+        endSec: 35
+        channelTitle: "Zucchero"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+    notes: "Spotify-ID:t ar STUDIOduetten 1991 — verifierat 2026-08-25. Albumnamnet (\"All The Best - Zu & Co (Night Of The Proms 2014)\") ar bara en samlings-utgava, INTE en liveinspelning: sparet heter \"- Remastered 2007\" (aldrig \"- Live\") och ar 268 s, vilket matchar MusicBrainz 267-269 s for 1991 ars studiosingel. Byt inte bort det som \"live\"."
+  - id: mr-big-to-be-with-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "To Be with You — Mr. Big"
+    correctYear: 1991
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Mr Big To Be With You Lean into It"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace", "Power Ballads"]
+    spotifyTrackId: "3bP47tw8MOgtrwdO1iahVl"
+    youtubeClips:
+      - videoId: "3ksOBNd0SWo"
+        startSec: 8
+        endSec: 38
+        channelTitle: "2MinusTVHD"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: londonbeat-ive-been-thinking-about-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I've Been Thinking About You — Londonbeat"
+    correctYear: 1990
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Londonbeat Ive Been Thinking About You"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "50PeqUz1BjMw9ayNTk5O4d"
+    youtubeClips:
+      - videoId: "06k-lO4vuic"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Enhanced Music Videos"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: jan-hammer-crocketts-theme
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Crockett's Theme — Jan Hammer"
+    correctYear: 1986
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Jan Hammer Crocketts Theme Miami Vice"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Film"]
+    spotifyTrackId: "3TnJ7M6in8Pb5EyGBUK02Y"
+    youtubeClips:
+      - videoId: "Lfgf9HatIHI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Miami Vice"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: roxette-queen-of-rain
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Queen of Rain — Roxette"
+    correctYear: 1992
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Roxette Queen of Rain Tourism"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5lnz9DbNfzJWiiUudfG6IW"
+    youtubeClips: []
+  - id: roxette-run-to-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Run to You — Roxette"
+    correctYear: 1994
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Roxette Run to You Crash Boom Bang"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    spotifyTrackId: "1zeqAF6Hf1lPJoNkkmNA9j"
+    youtubeClips: []
+  - id: tina-turner-we-dont-need-another-hero
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "We Don't Need Another Hero (Thunderdome) — Tina Turner"
+    correctYear: 1985
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Tina Turner We Dont Need Another Hero Thunderdome"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "50XXRUFNjs85P0MjCZ1c9X"
+    youtubeClips:
+      - videoId: "HLBXAs2LO8k"
+        startSec: 0
+        endSec: 30
+        channelTitle: "#NVU Music"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: peter-lundblad-ta-mig-till-havet
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ta mig till havet — Peter Lundblad"
+    correctYear: 1986
+    probability: 80
+    region: ["sweden"]
+    wikimediaSearchHints: ["Peter Lundblad Ta mig till havet"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer", "100% svenska"]
+    spotifyTrackId: "01LWBjJwFdRSCeovqipb3D"
+    youtubeClips: []
+  - id: tommy-nilsson-en-dag
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "En dag — Tommy Nilsson"
+    correctYear: 1989
+    probability: 80
+    region: ["sweden"]
+    wikimediaSearchHints: ["Tommy Nilsson En dag Melodifestivalen"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
+    spotifyTrackId: "4y81ov9ojdBPu5eLhDKxS9"
+    youtubeClips: []
+    notes: "YT-klippet ur Peters lista (BqplQcbdWtI) utelamnat: videotiteln innehaller aret 1989 = spoiler."
+  - id: tommy-nilsson-dina-farger-var-bla
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dina färger var blå — Tommy Nilsson"
+    correctYear: 1996
+    probability: 80
+    region: ["sweden"]
+    wikimediaSearchHints: ["Tommy Nilsson Dina farger var bla Sa nara"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% svenska"]
+    spotifyTrackId: "2eIe720mhOM77Gfa6I4Url"
+    youtubeClips: []
+  - id: andrea-bocelli-con-te-partiro
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Con te partirò — Andrea Bocelli"
+    correctYear: 1995
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Andrea Bocelli Con te partiro Bocelli"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7zrpoAJte9o12TzawqgdD0"
+    youtubeClips: []
+  - id: jennifer-rush-the-power-of-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Power of Love — Jennifer Rush"
+    correctYear: 1984
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Jennifer Rush The Power of Love"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Power Ballads"]
+    spotifyTrackId: "18DfMhEx4ddoreHrvZDF6Q"
+    youtubeClips: []
+  - id: bon-jovi-bed-of-roses
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bed of Roses — Bon Jovi"
+    correctYear: 1992
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Bon Jovi Bed of Roses Keep the Faith"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace", "Power Ballads"]
+    youtubeClips:
+      - videoId: "NvR60Wg9R7Q"
+        startSec: 0
+        endSec: 30
+        channelTitle: "BonJoviVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: lenny-kravitz-are-you-gonna-go-my-way
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Are You Gonna Go My Way — Lenny Kravitz"
+    correctYear: 1993
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Lenny Kravitz Are You Gonna Go My Way"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "i5PZQMwL7iE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Lenny Kravitz"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: mark-morrison-return-of-the-mack
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Return of the Mack — Mark Morrison"
+    correctYear: 1996
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Mark Morrison Return of the Mack"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "uB1D9wWxd2w"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Mark Morrison"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: queen-the-show-must-go-on
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Show Must Go On — Queen"
+    correctYear: 1991
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Queen The Show Must Go On Innuendo"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport"]
+    youtubeClips:
+      - videoId: "t99KH0TR-J4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Queen Official"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: roxette-it-must-have-been-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "It Must Have Been Love — Roxette"
+    correctYear: 1990
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Roxette It Must Have Been Love Pretty Woman"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    youtubeClips:
+      - videoId: "k2C5TjS2sh4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Roxette"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+    notes: "correctYear = 1990 (Pretty Woman-versionen). Roxettes egen forsta inspelning ar julversionen 1987 — samma undantagslogik som a-ha Take On Me."
+  - id: michael-jackson-remember-the-time
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Remember the Time — Michael Jackson"
+    correctYear: 1991
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Michael Jackson Remember the Time Dangerous"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    youtubeClips:
+      - videoId: "LeiFF0gvqcc"
+        startSec: 210
+        endSec: 240
+        channelTitle: "michaeljacksonVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+    notes: "correctYear = albumet Dangerous (nov 1991), fore singeln (jan 1992)."
+  - id: spin-doctors-two-princes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Two Princes — Spin Doctors"
+    correctYear: 1991
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Spin Doctors Two Princes Pocket Full of Kryptonite"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "wsdy_rct6uo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "SpinDoctorsVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+    notes: "correctYear = albumet Pocket Full of Kryptonite (aug 1991), fore singeln (jan 1993)."
+  - id: snow-informer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Informer — Snow"
+    correctYear: 1992
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Snow Informer 12 Inches of Snow"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TSffz_bl6zo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "RHINO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: cypress-hill-insane-in-the-brain
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Insane in the Brain — Cypress Hill"
+    correctYear: 1993
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Cypress Hill Insane in the Brain Black Sunday"]
+    answerMethods: ["timeline"]
+    genrePackages: ["hiphop"]
+    parentControlled: true
+    youtubeClips:
+      - videoId: "RijB8wnJCN0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "CypressHillVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: robyn-show-me-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Show Me Love — Robyn"
+    correctYear: 1995
+    probability: 80
+    region: ["sweden"]
+    wikimediaSearchHints: ["Robyn Show Me Love Robyn Is Here"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    youtubeClips:
+      - videoId: "bhWEI6-_w9E"
+        startSec: 0
+        endSec: 30
+        channelTitle: "RobynVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+    notes: "correctYear = albumet Robyn Is Here (okt 1995), fore singeln (feb 1997)."
+  - id: snoop-dogg-whats-my-name
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Who Am I (What's My Name)? — Snoop Doggy Dogg"
+    correctYear: 1993
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Snoop Doggy Dogg Whats My Name Doggystyle"]
+    answerMethods: ["timeline"]
+    genrePackages: ["hiphop"]
+    parentControlled: true
+    youtubeClips:
+      - videoId: "2soGJXQAQec"
+        startSec: 50
+        endSec: 80
+        channelTitle: "SnoopDoggVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: no-mercy-missing
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Missing — No Mercy"
+    correctYear: 1995
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["No Mercy Missing cover"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    youtubeClips:
+      - videoId: "73NY_bSbgqE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "NoMercyVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: everything-but-the-girl-missing
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Missing — Everything but the Girl"
+    correctYear: 1994
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Everything but the Girl Missing Amplified Heart"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    youtubeClips:
+      - videoId: "U56Ns66Qrb8"
+        startSec: 0
+        endSec: 30
+        channelTitle: "EBTGVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: no-mercy-where-do-you-go
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Where Do You Go — No Mercy"
+    correctYear: 1996
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["No Mercy Where Do You Go"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    youtubeClips:
+      - videoId: "ElAFJopotgw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Greatest Hits"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: jon-secada-just-another-day
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Just Another Day — Jon Secada"
+    correctYear: 1992
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Jon Secada Just Another Day"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Love & Peace"]
+    youtubeClips:
+      - videoId: "G0pDyyooUJE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "moonfloated"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: paula-abdul-straight-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Straight Up — Paula Abdul"
+    correctYear: 1988
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Paula Abdul Straight Up Forever Your Girl"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8yFwvifjuf4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "MVIDEO4K"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: mr-president-coco-jamboo
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Coco Jamboo — Mr. President"
+    correctYear: 1996
+    probability: 80
+    region: ["europe"]
+    wikimediaSearchHints: ["Mr President Coco Jamboo"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    youtubeClips:
+      - videoId: "EScLmWJs82I"
+        startSec: 0
+        endSec: 30
+        channelTitle: "MELOMAN DANCE"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: milli-vanilli-girl-you-know-its-true
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Girl You Know It's True — Milli Vanilli"
+    correctYear: 1988
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Milli Vanilli Girl You Know Its True"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "0ZV9FyngchQ"
+        startSec: 0
+        endSec: 30
+        channelTitle: "musicvideorestorations"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  - id: rem-shiny-happy-people
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Shiny Happy People — R.E.M."
+    correctYear: 1991
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["REM Shiny Happy People Out of Time"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YYOKMUTTDdA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "remhq"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+  # === Tillagg 2026-08-25 (Eurodance & pop ur Peters "YT och Spotify lista") ===
+  - id: haddaway-what-is-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "What Is Love — Haddaway"
+    correctYear: 1993
+    probability: 86
+    region: ["europe"]
+    wikimediaSearchHints: ["Haddaway What Is Love The Album"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
+    youtubeClips:
+      - videoId: "HEXWRTEbj1I"
+        startSec: 3
+        endSec: 33
+        channelTitle: "DECADR"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\" med explicit startSec 3. Videotitel verifierad: 'Haddaway - What Is Love (Official 4K Video)' — inget ar i titeln."
+    notes: "correctYear = debutsingeln (januari 1993, Coconut Records) och debutalbumet The Album (1993) — samma ar oavsett vilken som kom forst."
+  - id: e-type-set-the-world-on-fire
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Set the World on Fire — E-Type"
+    correctYear: 1994
+    probability: 84
+    region: ["nordic"]
+    wikimediaSearchHints: ["E-Type Set the World on Fire Made in Sweden"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
+    youtubeClips:
+      - videoId: "K9Tw8baMPpM"
+        startSec: 10
+        endSec: 40
+        channelTitle: "ETypeVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\" med explicit startSec 10. Videotitel verifierad: 'E-Type - Set The World On Fire' — inget ar i titeln."
+    notes: "correctYear = forsta singeln fran debutalbumet Made in Sweden, bada 1994. OBS: MusicBrainz listar 1995-utgavor — det ar internationella releaser, inte E-Types forsta."
+  - id: e-type-this-is-the-way
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "This Is the Way — E-Type"
+    correctYear: 1994
+    probability: 82
+    region: ["nordic"]
+    wikimediaSearchHints: ["E-Type This Is the Way Made in Sweden"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Eurodance & pop"]
+    youtubeClips:
+      - videoId: "7w1HeDqYCU4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ETypeVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Videotitel verifierad: 'E-Type - This Is The Way' — inget ar i titeln."
+    notes: "correctYear = andra singeln fran debutalbumet Made in Sweden, bada 1994. Samma album som e-type-set-the-world-on-fire."
+  - id: no-doubt-dont-speak
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Don't Speak — No Doubt"
+    correctYear: 1995
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["No Doubt Don't Speak Tragic Kingdom"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TR3Vdo5etCQ"
+        startSec: 30
+        endSec: 60
+        channelTitle: "NoDoubtVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 30 angiven av Peter. correctYear 1995 = albumet Tragic Kingdom (okt 1995). GRANSFALL: singeln kom april 1996 och laten minns oftast som 1996."
+  - id: fugees-killing-me-softly
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Killing Me Softly — Fugees"
+    correctYear: 1996
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Fugees Killing Me Softly The Score"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oKOtzIo-uYw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "TheFugeesVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Egen inspelning - separat item fran roberta-flack-killing-me-softly (1973) per ar-policyn: itemet ar artistens inspelning, inte kompositionen."
+  - id: men-at-work-down-under
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Down Under — Men at Work"
+    correctYear: 1981
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Men at Work Down Under Business as Usual"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XfR9iY5y94s"
+        startSec: 0
+        endSec: 30
+        channelTitle: "MenAtWorkVEVO"
+        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear 1981 = Columbia-inspelningen (albumet Business as Usual). RATTA INTE till 1980: bandet sjalvslappte en ANNAN inspelning 1980 som B-sida (langsammare tempo, annat arr) - klippet ar 1981-versionen, och itemet ar inspelningen."
+  - id: toni-braxton-un-break-my-heart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Un-Break My Heart — Toni Braxton"
+    correctYear: 1996
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Toni Braxton Un-Break My Heart"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "p2Rch6WvPJE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ToniBraxtonVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: ted-gardestad-lat-karleken-sla-rot
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Låt kärleken slå rot — Ted Gärdestad"
+    correctYear: 1981
+    probability: 78
+    region: ["sweden"]
+    wikimediaSearchHints: ["Ted Gärdestad Låt kärleken slå rot"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "u4ucz96rbMA"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Ted Gärdestad - Topic"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). xlsx saknade YT-lank; officiell Topic-audio uppsokt. correctYear 1981 enligt MusicBrainz."
+    genrePackages: ["Love & Peace"]
+  - id: 2-unlimited-no-limit
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "No Limit — 2 Unlimited"
+    correctYear: 1993
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["2 Unlimited No Limit"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7kmEEkECFQw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "2 Unlimited Official"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits"]
+  - id: janet-jackson-thats-the-way-love-goes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "That’s the Way Love Goes — Janet Jackson"
+    correctYear: 1993
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Janet Jackson That's the Way Love Goes"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2b_KfAGiglc"
+        startSec: 120
+        endSec: 150
+        channelTitle: "JanetJacksonVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace"]
+  - id: la-bouche-be-my-lover
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Be My Lover — La Bouche"
+    correctYear: 1994
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["La Bouche Be My Lover"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ViP87WipSm0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "LaBoucheVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Eurodance & pop"]
+  - id: celine-dion-the-power-of-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Power of Love — Céline Dion"
+    correctYear: 1993
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Céline Dion The Power of Love"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Y8HOfcYWZoo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "CelineDionVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Soft & Ballads"]
+  - id: seal-kiss-from-a-rose
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kiss from a Rose — Seal"
+    correctYear: 1994
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Seal Kiss from a Rose"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "hDd2G_V1rzc"
+        startSec: 6
+        endSec: 36
+        channelTitle: "Seal"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace", "Film"]
+  - id: green-day-basket-case
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Basket Case — Green Day"
+    correctYear: 1994
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Green Day Basket Case"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "NUTGr5t3MoY"
+        startSec: 16
+        endSec: 46
+        channelTitle: "Green Day"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Punk & Rock"]
+  - id: michael-jackson-you-are-not-alone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "You Are Not Alone — Michael Jackson"
+    correctYear: 1995
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Michael Jackson You Are Not Alone"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "pAyKJAtDNCw"
+        startSec: 10
+        endSec: 40
+        channelTitle: "michaeljacksonVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace", "Soft & Ballads"]
+  - id: bryan-adams-please-forgive-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Please Forgive Me — Bryan Adams"
+    correctYear: 1993
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Bryan Adams Please Forgive Me"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Qy4zFJmE-1E"
+        startSec: 30
+        endSec: 60
+        channelTitle: "Bryan Adams - Topic"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). Peters lank (Bryan Adams egen kanal) gick inte att badda in; officiell Topic-audio anvand."
+    genrePackages: ["Love & Peace", "Soft & Ballads"]
+  - id: radiohead-creep
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Creep — Radiohead"
+    correctYear: 1992
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Radiohead Creep"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XFkzRNyygfk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Radiohead"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1992 = singeln (21 sep 1992); albumet Pablo Honey kom 1993."
+    genrePackages: ["Punk & Rock"]
+    inBaseCatalog: false
+  - id: all-4-one-i-swear
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I Swear — All-4-One"
+    correctYear: 1994
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["All-4-One I Swear"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "cVpvlaKfLQc"
+        startSec: 0
+        endSec: 30
+        channelTitle: "RHINO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace", "Soft & Ballads"]
+    inBaseCatalog: false
+  - id: alanis-morissette-ironic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ironic — Alanis Morissette"
+    correctYear: 1995
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Alanis Morissette Ironic"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Jne9t8sHpUc"
+        startSec: 15
+        endSec: 45
+        channelTitle: "Alanis Morissette"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1995 = albumet Jagged Little Pill; singeln kom feb 1996."
+    genrePackages: ["Hits"]
+  - id: red-hot-chili-peppers-under-the-bridge
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Under the Bridge — Red Hot Chili Peppers"
+    correctYear: 1991
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Red Hot Chili Peppers Under the Bridge"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "GLvohMXgcBo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Red Hot Chili Peppers"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Punk & Rock", "Mega Hits"]
+  - id: sir-mix-a-lot-baby-got-back
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Baby Got Back — Sir Mix-a-Lot"
+    correctYear: 1992
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Sir Mix-a-Lot Baby Got Back"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-TsEFYY95mE"
+        startSec: 30
+        endSec: 60
+        channelTitle: "Sir Mix-A-Lot - Topic"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). Peters rad hade RHCP-klippet inklistrat av misstag; officiell Topic-audio uppsokt."
+    genrePackages: ["hiphop"]
+    parentControlled: true
+    inBaseCatalog: false
+  - id: bon-jovi-always
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Always — Bon Jovi"
+    correctYear: 1994
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Bon Jovi Always"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9BMwcO6_hyA"
+        startSec: 20
+        endSec: 50
+        channelTitle: "BonJoviVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Love & Peace", "Soft & Ballads"]
+    inBaseCatalog: false
+  - id: fugees-ready-or-not
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ready or Not — Fugees"
+    correctYear: 1996
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Fugees Ready or Not"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "aIXyKmElvv8"
+        startSec: 36
+        endSec: 66
+        channelTitle: "TheFugeesVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Hits", "Soft & Ballads"]
+  - id: corona-the-rhythm-of-the-night
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Rhythm of the Night — Corona"
+    correctYear: 1994
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Corona The Rhythm of the Night"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "OnT58cIJSpw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "RHINO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Eurodance & pop"]
+  - id: mariah-carey-hero
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hero — Mariah Carey"
+    correctYear: 1993
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Mariah Carey Hero"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "0IA3ZvCkRkQ"
+        startSec: 10
+        endSec: 40
+        channelTitle: "MariahCareyVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). OBS: detta ar Vevo-kanalens LIVE-version, inte studioinspelningen."
+    genrePackages: ["Soft & Ballads"]
+    inBaseCatalog: false
+  - id: blackstreet-no-diggity
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "No Diggity — Blackstreet feat. Dr. Dre"
+    correctYear: 1996
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Blackstreet No Diggity"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "3KL9mRus19o"
+        startSec: 0
+        endSec: 30
+        channelTitle: "BlackstreetVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1996 = albumet Another Level (MusicBrainz gav 1997)."
+    genrePackages: ["hiphop"]
+    parentControlled: true
+  - id: whitney-houston-i-have-nothing
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I Have Nothing — Whitney Houston"
+    correctYear: 1992
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Whitney Houston I Have Nothing"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FxYw0XPEoKE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "whitneyhoustonVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Soft & Ballads", "Film"]
+  - id: tlc-waterfalls
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Waterfalls — TLC"
+    correctYear: 1994
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["TLC Waterfalls"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8WEtxJ4-sh4"
+        startSec: 5
+        endSec: 35
+        channelTitle: "TLCVEVO"
+        notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+    genrePackages: ["Soft & Ballads"]
+  - id: robert-miles-children
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Children — Robert Miles"
+    correctYear: 1995
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Robert Miles Children"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "DvyCbevQbtI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "RobertMilesVEVO"
+        notes: "Peter-kurerad 2026-08-27. Officiella Vevo-videon (SD, bara en note). Ersatte RIGOq8MEyH0 ur xlsx som var en 14 min lang 90-tals-topplista. correctYear 1995 = EP:n Soundtracks (jan 1995, Italien); slog igenom internationellt 1996."
+    genrePackages: ["Mega Hits"]
+  - id: tomas-ledin-sommaren-ar-kort
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sommaren är kort — Tomas Ledin"
+    correctYear: 1982
+    probability: 82
+    region: ["sweden"]
+    wikimediaSearchHints: ["Tomas Ledin Sommaren är kort"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "wlhY1WEAH8U"
+        startSec: 3
+        endSec: 33
+        channelTitle: "apelsiiinen12"
+        notes: "Peter-kurerad 2026-08-27. startSec 3 angiven av Peter. correctYear 1982 enligt MusicBrainz."
+    genrePackages: ["100% svenska", "Summer"]

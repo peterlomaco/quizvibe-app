@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/src/components/haptic';
 import Svg, { Path } from 'react-native-svg';
 import type { PeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
 import { Avatar } from './Avatar';
+import { HCPShield } from './HCPShield';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { WifiFanIcon } from './WifiFanIcon';
 
@@ -66,9 +68,15 @@ interface PlayerRowProps {
   peerHealth?: PeerHealth | 'self';
   // Spotify-koppling för spelaren — true = kopplat konto (grön), false/undefined = ej kopplat (grå).
   spotifyConnected?: boolean;
-  // Visa Spotify-attest-badgen? Default true. 1vs1-lobbyn skickar false —
-  // remote-läget har inga Spotify-frågor.
+  // Visa Spotify-attest-badgen? Default true. 1vs1- OCH single player-lobbyn
+  // skickar false — inget av lägena kan servera Spotify-frågor.
   showSpotifyBadge?: boolean;
+  // Player-HCP-sköld (§2 UI) bredvid avataren. `hcp` = talet som visas
+  // (1–99, lågt = bättre). `hcpNotDefined` → gäst-sköld med "Not Defined"-
+  // vattenstämpel (gästen har ett riktigt internt HCP men det visas inte).
+  // Utelämnas båda → ingen sköld renderas (t.ex. spelare utan age/assistance).
+  hcp?: number;
+  hcpNotDefined?: boolean;
 }
 
 export function PlayerRow({
@@ -94,6 +102,8 @@ export function PlayerRow({
   peerHealth,
   spotifyConnected,
   showSpotifyBadge = true,
+  hcp,
+  hcpNotDefined,
 }: PlayerRowProps) {
   // "Details +/-"-toggle per spelarkort — gömmer Assistance + Age-pillarna
   // tills man fäller ut. Default hopfällt (Details +).
@@ -179,6 +189,14 @@ export function PlayerRow({
             useBrandFallback={!isGuest}
           />
         </View>
+
+        {/* Player-HCP-sköld bredvid avataren (§2 UI). Döljs för left-spelare
+            (kortet är då nedtonat/"borta"). Gäst → "Not Defined"-vattenstämpel. */}
+        {!hasLeft && (hcpNotDefined || hcp !== undefined) && (
+          <View style={styles.hcpShieldWrap}>
+            <HCPShield hcp={hcp ?? 99} size={40} notDefined={hcpNotDefined} />
+          </View>
+        )}
 
         <View style={styles.info}>
           <View style={styles.nameRow}>
@@ -398,9 +416,10 @@ export function PlayerRow({
 
       {/* ── Spotify-attest-badge — uppe till höger på kortets kantlinje.
           Plan B (2026-07-22): visar spelarens self-attest ("jag har Spotify-
-          appen"), inte en OAuth-koppling. Döljs helt i 1vs1-lobbyn
-          (showSpotifyBadge=false) — Spotify-frågor finns inte i remote-
-          läget, så badgen vore brus. ── */}
+          appen"), inte en OAuth-koppling. Döljs helt (showSpotifyBadge=false)
+          i 1vs1-lobbyn (remote har inga Spotify-frågor) och i single player-
+          lobbyn (Spotify DJ kräver minst en motspelare) — badgen vore brus
+          där, och båda lobbytyperna är låsta så läget kan inte bytas. ── */}
       {showSpotifyBadge && (
         <View style={[styles.spotifyBorderTag, { borderColor: spotifyConnected ? '#1DB954' : Colors.borderStrong }]} pointerEvents="none">
           <SpotifyBrandIcon size={10} variant="white" />
@@ -469,6 +488,13 @@ const styles = StyleSheet.create({
   // avatar-layout.
   avatarWrap: {
     position: 'relative',
+  },
+  // HCP-sköld bredvid avataren — vertikalt centrerad i övre raden.
+  hcpShieldWrap: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: Spacing.sm,
+    marginRight: Spacing.xs,
   },
   // Avatar-wrapper när spelaren har left: dimmas via opacity så själva
   // emoji/foto kvarstår men signalerar nedprioritet.

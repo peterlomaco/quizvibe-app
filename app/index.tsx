@@ -15,12 +15,14 @@ import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
 import { buildRemoteQuizParams, getMatchByRoomCode, getOwnUserId, splitMatchForUser } from '@/src/utils/remoteMatches';
 import { MyMatchesSection } from '@/src/components/MyMatchesSection';
+import { HomeExtrasRow } from '@/src/components/HomeExtrasRow';
 import {
   appendPlayerNameDigit,
   appendPlayerNameLetter,
   backspacePlayerNameDigits,
   backspacePlayerNameLetters,
   containsBlockedLetterSubstring,
+  containsReservedTakenSubstring,
   extractTakenGuestLetters,
   generatePlayerName,
   getPlayerNameDigits,
@@ -33,11 +35,12 @@ import {
 } from '@/src/utils/playerName';
 import { ensureAuthSession, signInWithPlayerName } from '@/src/utils/auth';
 import { containsProfanity } from '@/src/utils/profanity';
-import { clearProfile, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
+import { clearProfile, emailExists, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { clearPremiumSubscription, hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
+import { addFriend } from '@/src/utils/friendsStorage';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -50,15 +53,14 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 // ─── Join Modal ───────────────────────────────────────────────────────────────
@@ -126,8 +128,8 @@ type RemoteBlockContext = 'join' | 'host';
 const MODAL_SWAP_DELAY_MS = 350;
 
 const REMOTE_BLOCK_NOTICE: Record<RemoteBlockContext, string> = {
-  join: 'This Room Code belongs to a Remote 1vs1 match. Remote duels can only be played between QuizVibe users — register a free account or log in to join.',
-  host: 'Remote 1vs1 matches can only be played between QuizVibe users. Register a free account or log in to host a 1vs1 match.',
+  join: 'This Room Code belongs to a Head-to-head match. Head-to-head duels can only be played between QuizVibe users — register a free account or log in to join.',
+  host: 'Head-to-head matches can only be played between QuizVibe users. Register a free account or log in to host an H2H match.',
 };
 
 function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
@@ -154,13 +156,15 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
  * spel.
  */
 const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolean | string }[] = [
-  { label: 'Local play — Single, Pass-the-Phone, Individual devices', user: true, guest: true },
-  { label: 'Remote play — 1vs1 matches', user: true, guest: false },
+  { label: 'Single & Multiplayer Game', user: true, guest: true },
+  { label: 'Head-to-head matches', user: true, guest: false },
   { label: 'Saved results & player history', user: true, guest: false },
   { label: 'Friends list & in-app invites', user: true, guest: false },
   { label: 'Choose Game era', user: true, guest: false },
+  { label: 'Select categories and source (Source mixerboard)', user: true, guest: false },
+  { label: 'Spotify, YouTube and Hints', user: true, guest: true },
   { label: 'Host games per day', user: '4 free', guest: 'Trial' },
-  { label: 'Replay & Aggregate Leaderboard', user: true, guest: '1 time' },
+  { label: 'Replay & Marathon table', user: true, guest: false },
   { label: 'Premium option', user: true, guest: false },
 ];
 
@@ -224,6 +228,9 @@ function validatePlayerName(name: string): 'available' | 'taken' | 'invalid' {
   // som substring i letters-sektionen — skyddar mot "QuizVibe", "Myquizvibe",
   // etc. Synkad med playerName.ts:s auto-gen-blocklist.
   if (containsBlockedLetterSubstring(trimmed)) return 'invalid';
+  // Reserverade konkurrent-varumärken ("Hitster"/"Sounder") → samma "taken"-
+  // meddelande som ett redan upptaget namn (Peters beslut 2026-08-29).
+  if (containsReservedTakenSubstring(trimmed)) return 'taken';
   if (TAKEN_PLAYER_NAMES.has(trimmed.toLowerCase())) return 'taken';
   return 'available';
 }
@@ -300,6 +307,39 @@ async function checkSinglePlayerLobby(code: string): Promise<boolean> {
   return true;
 }
 
+// Re-match-lobby: uppsättningen är låst till spelarna från föregående spel,
+// så bara de får komma in (Peter 2026-08-25). Samma kontrakt som
+// checkLobbyCapacity: true = popup visades = caller ska abortera.
+//
+// Källan är `rooms.rematch_locked` (0037) — INTE lobby_settings — av samma
+// skäl som `is_remote_1v1`: rums-raden skrivs atomiskt vid skapandet, medan
+// lobby_settings går genom hostens 300 ms-debounce och hade gjort gaten
+// fail-open i ~1s efter att lobbyn skapats.
+//
+// En spelare som VAR med i förra spelet har redan en pre-seedad rad i
+// lobby_players (carry-over) och släpps igenom — de ärver sitt gamla
+// player_id via code-only-joinens befintliga dup-detection. Matchningen är
+// case-insensitiv på playerName, samma nyckel som den grenen använder.
+//
+// Fail-open när metan saknas, samma konvention som isLobbyFull/isOwnLobby.
+async function checkRematchLockedLobby(
+  code: string,
+  playerName: string | null | undefined,
+): Promise<boolean> {
+  const meta = await getRoomMeta(code);
+  if (!meta?.rematchLocked) return false;
+  const name = playerName?.trim().toLowerCase();
+  if (name) {
+    const seeded = await getLobbyPlayers(code);
+    if (seeded?.some((p) => p.name.trim().toLowerCase() === name)) return false;
+  }
+  Alert.alert(
+    'Re-match lobby',
+    'This Room Code belongs to a re-match. Only the players from the previous game can join.',
+  );
+  return true;
+}
+
 function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'multiplayer', onRemoteAccountRequired, initialGuestDraft }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   const [code, setCode] = useState('');
@@ -309,6 +349,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [playerNameStatus, setPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [invites, setInvites] = useState<WaitingInvite[]>([]);
+  // True medan ett accept-flöde pågår (removeInvite → navigera → stäng modal).
+  // removeInvite triggar en realtime DELETE → reload, som annars skulle
+  // setInvites([]) och blanka den fortfarande öppna modalen till "No invites
+  // yet" innan den hinner stänga. Guarden fryser listan tills modalen är borta.
+  const acceptInFlightRef = useRef(false);
   // Index på den code-cell som har fokus — driver vilken `mode` (letter/digit)
   // CodeKeyboard renderar samt vilken cell tap-knapparna skriver in i. null =
   // ingen code-cell fokuserad → custom keyboard döljs (system keyboard kan
@@ -457,6 +502,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // för att kunna visa rätt enabled/disabled-läge på "Join Waiting Invites".
   useEffect(() => {
     if (visible) {
+      acceptInFlightRef.current = false;
       loadInvites().then(setInvites);
     }
   }, [visible]);
@@ -492,6 +538,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         .filter((c) => c.topic === topic)
         .forEach((c) => supabase.removeChannel(c));
       const reload = () => {
+        // Under ett pågående accept-flöde: hoppa över reload så den öppna
+        // modalen inte blankas till "No invites yet" innan den hinner stänga.
+        if (acceptInFlightRef.current) return;
         loadInvites().then((updated) => {
           if (!cancelled) setInvites(updated);
         });
@@ -516,7 +565,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     };
   }, [visible]);
 
-  const handleAcceptInvite = async (invite: WaitingInvite) => {
+  // Faktiskt utför accept-flödet — guards + navigation oförändrade. Bruten
+  // ut ur handleAcceptInvite (2026-08-27) så både "redan friend"-fallet och
+  // consent-popupens OK-knapp kan dela EXAKT samma logik.
+  const proceedAcceptInvite = async (invite: WaitingInvite) => {
     // Active-room-check: host kan ha raderat lobby:n mellan att invite
     // skickades och usern hann confirma. Visa tydlig "Lobby no longer
     // available"-popup och rensa bort den stale inviten ur listan så user
@@ -536,16 +588,60 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // single. Inviten ligger KVAR i listan (som capacity-fallet) — host kan
     // byta tillbaka, och då ska den fortfarande gå att tacka ja till.
     if (await checkSinglePlayerLobby(invite.roomCode)) return;
+    // Host kan ha startat en re-match efter att inbjudan skickades — då är
+    // uppsättningen låst och bara förra spelets spelare kommer in.
+    if (await checkRematchLockedLobby(invite.roomCode, currentPlayerName)) return;
     // Capacity-check FÖRE removeInvite: om lobby:n är full ska usern få
     // popup och inviten ligga kvar i listan, så de kan försöka igen om
     // någon lämnar. Speglar samma check som handleJoinWithCode kör.
     if (await checkLobbyCapacity(invite.roomCode)) return;
+    // Ömsesidig friend-add (Peter 2026-08-27): att acceptera lägger till
+    // HOST:en på RECIPIENT:ens egna friends-lista också — host-sidans add
+    // sker separat via LobbyScreen:s pending→confirmed-watcher när den här
+    // spelaren dyker upp i lobbyns players[]. addFriend dedupar case-
+    // insensitivt så det är säkert att anropa ovillkorligt.
+    // Frys invite-listan innan removeInvite: dess realtime DELETE → reload
+    // skulle annars setInvites([]) och blanka den öppna modalen till
+    // "No invites yet". Guarden i reload:en hoppar över det medan detta är true.
+    acceptInFlightRef.current = true;
+    await addFriend(invite.fromPlayerName, invite.fromAvatarId);
     await removeInvite(invite.id);
-    onClose();
+    // Navigera FÖRST — den transparenta modalen ligger ovanför nav-stacken (iOS)
+    // så /lobby-pushen körs bakom den. Stäng modalen EFTER att pushen hunnit
+    // landa (MODAL_SWAP_DELAY_MS) så den fadar direkt mot lobbyn istället för
+    // att blotta Home-skärmen under slide-in-transitionen.
     router.push({
       pathname: '/lobby',
       params: { code: invite.roomCode, isHost: 'false' },
     });
+    setTimeout(() => onClose(), MODAL_SWAP_DELAY_MS);
+  };
+
+  // "Deny" (Peter 2026-08-27) — tyst avböjning, ingen host-notifiering.
+  // Raden tas bara bort ur mottagarens inbox.
+  const handleDenyInvite = async (invite: WaitingInvite) => {
+    const updated = await removeInvite(invite.id);
+    setInvites(updated);
+  };
+
+  // Accept-knappen (Peter 2026-08-27, ersatte hela-radens implicita accept).
+  // Om host:s invite redan har mottagaren som friend (invite.alreadyFriend)
+  // går det direkt igenom; annars visas ett consent-steg FÖRST eftersom
+  // accepterandet lägger till en NY, ömsesidig friend-relation.
+  const handleAcceptInvite = async (invite: WaitingInvite) => {
+    if (invite.alreadyFriend) {
+      await proceedAcceptInvite(invite);
+      return;
+    }
+    Alert.alert(
+      'Accept invitation?',
+      'By accepting this invitation you will both 1. join the lobby and 2. accept that both of you will be added to each others QuizVibe friend list.',
+      [
+        { text: 'OK', onPress: () => proceedAcceptInvite(invite) },
+        { text: 'Deny', style: 'destructive', onPress: () => handleDenyInvite(invite) },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+    );
   };
 
   const handleJoinWithCode = async () => {
@@ -567,7 +663,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           if (my.me.finishedAt != null) {
             Alert.alert(
               'Already played',
-              'You have already played your questions in this 1vs1 match. Check "1vs1" on the Home screen for the result.',
+              'You have already played your questions in this H2H match. Check "H2H" on the Home screen for the result.',
             );
             return;
           }
@@ -591,6 +687,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
     // Single-player-lobby: ingen plats att joina förrän host byter läge.
     if (await checkSinglePlayerLobby(code)) return;
+    // Re-match-lobby: låst uppsättning — bara förra spelets spelare släpps in.
+    if (await checkRematchLockedLobby(code, currentPlayerName)) return;
     // Capacity-check: om host:s lobby redan är full visar vi popup med text
     // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
     if (await checkLobbyCapacity(code)) return;
@@ -832,6 +930,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
     // Single-player-lobby: speglar handleJoinWithCode.
     if (await checkSinglePlayerLobby(code)) return;
+    // Re-match-lobby: speglar handleJoinWithCode. En gäst som VAR med i
+    // förra spelet har en pre-seedad rad och matchar på sitt guest-namn.
+    if (await checkRematchLockedLobby(code, guestIdentity || currentPlayerName)) return;
     // Capacity-check: speglar handleJoinWithCode — full lobby visar popup
     // istället för att skicka in gästen som ändå skulle få "lobby is full"
     // när de hamnade i Lobby-vyn.
@@ -1092,12 +1193,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                 </View>
               ) : (
                 invites.map((inv) => (
-                  <TouchableOpacity
-                    key={inv.id}
-                    style={modal.inviteRow}
-                    activeOpacity={0.7}
-                    onPress={() => handleAcceptInvite(inv)}
-                  >
+                  <View key={inv.id} style={modal.inviteRow}>
                     <Text style={modal.inviteEmoji}>
                       {getAvatarEmojiById(inv.fromAvatarId)}
                     </Text>
@@ -1105,8 +1201,23 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       <Text style={modal.inviteFrom}>{inv.fromPlayerName}</Text>
                       <Text style={modal.inviteCode}>Room {formatRoomCode(inv.roomCode)}</Text>
                     </View>
-                    <Text style={modal.inviteJoinText}>Join ›</Text>
-                  </TouchableOpacity>
+                    <View style={modal.inviteActions}>
+                      <TouchableOpacity
+                        style={modal.inviteDenyBtn}
+                        activeOpacity={0.7}
+                        onPress={() => handleDenyInvite(inv)}
+                      >
+                        <Text style={modal.inviteDenyText}>Deny</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={modal.inviteAcceptBtn}
+                        activeOpacity={0.7}
+                        onPress={() => handleAcceptInvite(inv)}
+                      >
+                        <Text style={modal.inviteAcceptText}>Accept</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 ))
               )}
             </>
@@ -1601,7 +1712,19 @@ export default function HomeScreen() {
   // handleCreateGame (registrerad) resp. guest-host-formen med
   // guestLobbyType satt (konsumeras av handleStartGameAsGuestHost via prop).
   const [hostTypeExpanded, setHostTypeExpanded] = useState<'none' | 'registered' | 'guest'>('none');
+  // In-flight-guard för registered "Start New Game"-flödet. Panelen kollapsas
+  // INTE längre synkront vid valet (det gav ett synligt layout-hopp innan
+  // /lobby pushats — se onSelect nedan), så den står kvar interaktiv under
+  // handleCreateGame:s async-gap. Ref:en stoppar en andra rad-tap från att
+  // fyra en andra handleCreateGame (dubbel registerActiveRoom + dubbel push).
+  const creatingGameRef = useRef(false);
   const [guestLobbyType, setGuestLobbyType] = useState<HostLobbyType>('multiplayer');
+  // Guest-sektionens fold-state — bara relevant för inloggade users (Peter
+  // 2026-08-27). Default false (ihopfälld) så "Start New Game"-guest-
+  // knappen inte konkurrerar visuellt med de gyllene user-knapparna;
+  // en tap på "+" fäller ut den. Utloggade users påverkas inte — deras
+  // guest-sektion visas alltid oförändrad.
+  const [guestSectionExpanded, setGuestSectionExpanded] = useState(false);
   // Info-modalen bakom "i"-ikonerna intill BÅDA sektionsrubrikerna
   // ("QuizVibe user" + "Guest login / Non-registered") — jämförelse
   // user vs guest (USER_VS_GUEST_ROWS + PREMIUM_FEATURES).
@@ -1656,6 +1779,9 @@ export default function HomeScreen() {
 
   // ── Register-form state (sekventiell upplåsning som guest-flödet) ──
   const [regEmail, setRegEmail] = useState('');
+  // Email valideras vid email-steget: format + "finns redan?" (Check-knapp).
+  // Delar status-type med PlayerName (idle/checking/available/taken/invalid).
+  const [regEmailStatus, setRegEmailStatus] = useState<PlayerNameStatus>('idle');
   const [regPlayerName, setRegPlayerName] = useState('');
   const [regPlayerNameStatus, setRegPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [regPassword, setRegPassword] = useState('');
@@ -1759,6 +1885,7 @@ export default function HomeScreen() {
         setForgotNewPassword('');
         setForgotSending(false);
         setRegEmail('');
+        setRegEmailStatus('idle');
         setRegPlayerName('');
         setRegPlayerNameStatus('idle');
         setRegPassword('');
@@ -1835,6 +1962,7 @@ export default function HomeScreen() {
       setForgotNewPassword('');
       setForgotSending(false);
       setRegEmail('');
+      setRegEmailStatus('idle');
       setRegPlayerName('');
       setRegPlayerNameStatus('idle');
       setRegPassword('');
@@ -1859,6 +1987,7 @@ export default function HomeScreen() {
   useEffect(() => {
     if (profileMenuStep === 'register') {
       setRegEmail('');
+      setRegEmailStatus('idle');
       setRegPlayerName('');
       setRegPlayerNameStatus('idle');
       setRegPassword('');
@@ -1894,6 +2023,13 @@ export default function HomeScreen() {
   );
 
   const isLoggedIn = !!profile;
+
+  // Fäll ihop guest-sektionen automatiskt när spelaren loggar in — annars
+  // kunde den stå kvar utfälld från en session där man tittade på den som
+  // utloggad guest och sedan loggade in utan att skärmen remountat.
+  useEffect(() => {
+    if (isLoggedIn) setGuestSectionExpanded(false);
+  }, [isLoggedIn]);
 
   const openJoin = (step: JoinStep = 'choose', options?: { hideGuest?: boolean }) => {
     setJoinInitialStep(step);
@@ -2008,6 +2144,23 @@ export default function HomeScreen() {
         router.setParams({ openAuth: undefined });
       }
     }, [localParams.openAuth]),
+  );
+
+  // hostTypeExpanded kollapsas MEDVETET inte i registered-onSelect (se
+  // kommentaren där) för att undvika ett synligt layout-hopp innan /lobby
+  // pushats. Nollställ i stället här när Home tappar fokus — cleanup:en körs
+  // när lobbyn har täckt skärmen, så kollapsen sker off-screen. Krävs bara
+  // för native swipe-back till samma Home-instans; de vanliga retur-vägarna
+  // (BottomBanner "Home", lobby-delete) går via router.replace('/') = full
+  // re-mount → 'none' ändå. Cleanup:en är ofarlig vid unmount. Guest-pathen
+  // påverkas inte: den öppnar en modal (ingen route-blur) och behåller sin
+  // egen kollaps.
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setHostTypeExpanded('none');
+      };
+    }, []),
   );
 
   const [fontsLoaded] = useFonts({
@@ -2287,18 +2440,47 @@ export default function HomeScreen() {
   const REG_PASSWORD_MIN_LENGTH = 6;
   const REG_PASSWORD_MAX_LENGTH = 32;
   const regPasswordValid = regPassword.length >= REG_PASSWORD_MIN_LENGTH;
-  // Sekventiella gates: email → playerName → password → year → assistance → region
-  const regPlayerNameUnlocked = regEmailValid;
+  // Sekventiella gates: email → playerName → password → year → assistance → region.
+  // Email måste nu Check:as (format + uniqueness) — inte bara ha giltigt format —
+  // innan PlayerName låses upp.
+  const regPlayerNameUnlocked = regEmailStatus === 'available';
   const regPasswordUnlocked = regPlayerNameUnlocked && regPlayerNameStatus === 'available';
   const regYearUnlocked = regPasswordUnlocked && regPasswordConfirmed;
   const regAssistanceUnlocked = regYearUnlocked && regParsedBirthYear !== null;
   // Assistance och Region är default-ifyllda, så region-låset följer assistance-låset.
   const regRegionUnlocked = regAssistanceUnlocked;
   const isRegisterFormValid =
-    regEmailValid &&
+    regEmailStatus === 'available' &&
     regPlayerNameStatus === 'available' &&
     regPasswordConfirmed &&
     regParsedBirthYear !== null;
+
+  // Email: ändra text → status faller till 'idle' så användaren måste Check:a
+  // igen efter varje redigering (samma mönster som PlayerName).
+  const handleRegEmailChange = (t: string) => {
+    setRegEmail(t);
+    if (regEmailStatus !== 'idle') setRegEmailStatus('idle');
+  };
+
+  // Check-knapp på email: (1) format via REG_EMAIL_REGEX, (2) uniqueness via
+  // email_exists-RPC. Fail-open till 'available' vid nätverksfel — Register-
+  // submitens signUp är sista auktoriteten (samma som playerName-checken).
+  const handleRegCheckEmail = async () => {
+    const trimmed = regEmail.trim();
+    if (!trimmed) return;
+    Keyboard.dismiss();
+    if (!REG_EMAIL_REGEX.test(trimmed)) {
+      setRegEmailStatus('invalid');
+      return;
+    }
+    setRegEmailStatus('checking');
+    try {
+      const exists = await emailExists(trimmed);
+      setRegEmailStatus(exists ? 'taken' : 'available');
+    } catch {
+      setRegEmailStatus('available');
+    }
+  };
 
   const handleRegCheckPlayerName = async () => {
     const trimmed = regPlayerName.trim();
@@ -2674,8 +2856,23 @@ export default function HomeScreen() {
                 <HostTypeOptions
                   accentColor={Colors.warning}
                   onSelect={(lobbyType) => {
-                    setHostTypeExpanded('none');
-                    void handleCreateGame(lobbyType);
+                    // Kollapsa INTE panelen här. setHostTypeExpanded('none')
+                    // skulle synkront återinföra Join-knappen + HomeExtrasRow
+                    // + guest-sektionen i layouten, och eftersom container:n
+                    // är flexGrow:1 + justifyContent:'space-between'
+                    // redistribueras hela kolumnen → synligt hopp INNAN
+                    // /lobby ens pushats (handleCreateGame await:ar credits +
+                    // registerActiveRoom först). Låt panelen stå kvar frusen
+                    // under async-gapet + push-slide-outen; den nollställs
+                    // off-screen i blur-cleanup:en (useFocusEffect nedan).
+                    if (creatingGameRef.current) return;
+                    creatingGameRef.current = true;
+                    void handleCreateGame(lobbyType).finally(() => {
+                      // Släpp guarden när flödet settlar — täcker både
+                      // success-pushen och credit-/registrerings-abort:en
+                      // (Alert + return utan navigation).
+                      creatingGameRef.current = false;
+                    });
                   }}
                 />
               )}
@@ -2712,7 +2909,7 @@ export default function HomeScreen() {
               Utloggade guests får den kvar sist på skärmen (se blocket
               efter actionsSection). Renderar sig själv bara när användaren
               har minst en 1vs1-match — annars null. */}
-          {isLoggedIn && hostTypeExpanded === 'none' && <MyMatchesSection />}
+          {isLoggedIn && hostTypeExpanded === 'none' && <HomeExtrasRow />}
 
           {/* Guest-sektionen (rubrik + två knappar) — döljs HELT när
               inloggad (registered users använder Join with Room Code —
@@ -2802,12 +2999,31 @@ export default function HomeScreen() {
                 marginBottom matchar actionsSection:s gap så rytmen blir
                 identisk med utloggat läge. */}
             {isLoggedIn && hostTypeExpanded === 'none' && (
-              <View style={[styles.sectionHeaderRow, { marginBottom: Spacing.md }]}>
-                <Text
-                  style={[styles.guestSectionHeader, { fontFamily: appNameFont, marginTop: 0 }]}
+              // Fold-header — bara inloggade users har något att fälla ihop
+              // (utloggade guests ser rubriken ovan, utan toggle, som förut).
+              // Toggle-boxen ("+"/"−") ligger FÖRST i raden så den hamnar
+              // längst till vänster på skärmen (Peter 2026-08-27), speglar
+              // Profile-skärmens kollapsbara sektioner men med rubriken
+              // vänsterjusterad istället för centrerad.
+              <View style={[styles.guestFoldHeaderRow, { marginBottom: Spacing.md }]}>
+                <Pressable
+                  onPress={() => setGuestSectionExpanded((prev) => !prev)}
+                  style={({ pressed }) => [styles.guestFoldToggleRow, pressed && { opacity: 0.7 }]}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={guestSectionExpanded ? 'Collapse guest options' : 'Expand guest options'}
                 >
-                  Guest login / Non-registered
-                </Text>
+                  <View style={styles.guestFoldToggleBox}>
+                    <Text style={styles.guestFoldToggleText}>
+                      {guestSectionExpanded ? '−' : '+'}
+                    </Text>
+                  </View>
+                  <Text
+                    style={[styles.guestSectionHeader, { fontFamily: appNameFont, marginTop: 0 }]}
+                  >
+                    Guest login / Non-registered
+                  </Text>
+                </Pressable>
                 <Pressable
                   onPress={() => setCompareInfoVisible(true)}
                   hitSlop={10}
@@ -2819,63 +3035,67 @@ export default function HomeScreen() {
                 </Pressable>
               </View>
             )}
-            {/* Pulsen ligger BARA på knappen — utfälld panel står still. */}
-            <Animated.View
-              style={{ transform: [{ scale: hostTypeExpanded === 'guest' ? 1 : pulse }] }}
-            >
-              <TouchableOpacity
-                style={[styles.gameBtn, styles.gameBtnGuest]}
-                activeOpacity={0.85}
-                onPress={() =>
-                  setHostTypeExpanded((prev) => (prev === 'guest' ? 'none' : 'guest'))
-                }
-              >
-                <Text
-                  style={[
-                    styles.gameBtnText,
-                    { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
-                  ]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
+            {(!isLoggedIn || guestSectionExpanded) && (
+              <>
+                {/* Pulsen ligger BARA på knappen — utfälld panel står still. */}
+                <Animated.View
+                  style={{ transform: [{ scale: hostTypeExpanded === 'guest' ? 1 : pulse }] }}
                 >
-                  Start New Game
-                </Text>
-                {/* Badge per login-läge: inloggad → "No Data Saved"
-                    i grått (samma homeUserBadge-stil som user-knapparna);
-                    utloggad → FREE i grönt (matchar övriga guest-/register-
-                    knappar).
+                  <TouchableOpacity
+                    style={[styles.gameBtn, styles.gameBtnGuest]}
+                    activeOpacity={0.85}
+                    onPress={() =>
+                      setHostTypeExpanded((prev) => (prev === 'guest' ? 'none' : 'guest'))
+                    }
+                  >
+                    <Text
+                      style={[
+                        styles.gameBtnText,
+                        { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                      ]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      Start New Game
+                    </Text>
+                    {/* Badge per login-läge: inloggad → "No Data Saved"
+                        i grått (samma homeUserBadge-stil som user-knapparna);
+                        utloggad → FREE i grönt (matchar övriga guest-/register-
+                        knappar).
 
-                    Göms när utfällningen är öppen: då bär Local Play/Remote
-                    Play sina egna badges och en badge på föräldern blir
-                    dubbelinformation. */}
-                {hostTypeExpanded !== 'guest' && (
-                <View
-                  style={[styles.homeFreeBadge, isLoggedIn && styles.homeUserBadge]}
-                  pointerEvents="none"
-                >
-                  <Text style={styles.homeFreeBadgeText}>
-                    {isLoggedIn ? 'No Data Saved' : 'FREE'}
-                  </Text>
-                </View>
+                        Göms när utfällningen är öppen: då bär Local Play/Remote
+                        Play sina egna badges och en badge på föräldern blir
+                        dubbelinformation. */}
+                    {hostTypeExpanded !== 'guest' && (
+                    <View
+                      style={[styles.homeFreeBadge, isLoggedIn && styles.homeUserBadge]}
+                      pointerEvents="none"
+                    >
+                      <Text style={styles.homeFreeBadgeText}>
+                        {isLoggedIn ? 'No Data Saved' : 'FREE'}
+                      </Text>
+                    </View>
+                    )}
+                  </TouchableOpacity>
+                </Animated.View>
+                {hostTypeExpanded === 'guest' && (
+                  <HostTypeOptions
+                    accentColor="#6B7280"
+                    remoteMode={isLoggedIn ? 'hidden' : 'locked'}
+                    onRemoteLockedPress={() => handleRemoteAccountRequired('host')}
+                    localBadge={
+                      isLoggedIn
+                        ? { text: 'No Data Saved', muted: true }
+                        : { text: 'FREE' }
+                    }
+                    onSelect={(lobbyType) => {
+                      setHostTypeExpanded('none');
+                      setGuestLobbyType(lobbyType);
+                      openJoin('guest-host');
+                    }}
+                  />
                 )}
-              </TouchableOpacity>
-            </Animated.View>
-            {hostTypeExpanded === 'guest' && (
-              <HostTypeOptions
-                accentColor="#6B7280"
-                remoteMode={isLoggedIn ? 'hidden' : 'locked'}
-                onRemoteLockedPress={() => handleRemoteAccountRequired('host')}
-                localBadge={
-                  isLoggedIn
-                    ? { text: 'No Data Saved', muted: true }
-                    : { text: 'FREE' }
-                }
-                onSelect={(lobbyType) => {
-                  setHostTypeExpanded('none');
-                  setGuestLobbyType(lobbyType);
-                  openJoin('guest-host');
-                }}
-              />
+              </>
             )}
           </View>
           )}
@@ -3437,28 +3657,75 @@ export default function HomeScreen() {
                   style={{ flexShrink: 1, maxHeight: SCREEN_HEIGHT < 600 ? 200 : 320 }}
                   contentContainerStyle={{ gap: Spacing.md }}
                 >
-                  {/* Email — först ut. Aktiveringslänk skickas hit efter Register. */}
+                  {/* Email — först ut. Måste Check:as (format + "finns redan?")
+                      innan PlayerName låses upp. Aktiveringslänk skickas hit
+                      efter Register. */}
                   <View style={modal.fieldGroup}>
                     <Text style={modal.fieldLabel}>Email</Text>
-                    <TextInput
-                      style={[
-                        modal.inputText,
-                        // Highlight medan email är aktivt steg (ej giltigt än)
-                        !regEmailValid && modal.playerNameInputActive,
-                      ]}
-                      placeholder="you@example.com"
-                      placeholderTextColor={Colors.textDisabled}
-                      value={regEmail}
-                      onChangeText={setRegEmail}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      maxLength={60}
-                      returnKeyType="next"
-                    />
-                    <Text style={modal.statusHint}>
-                      We&apos;ll send an activation link here to verify your address.
-                    </Text>
+                    <View style={modal.playerNameRow}>
+                      <TextInput
+                        style={[
+                          modal.inputText,
+                          modal.playerNameInput,
+                          // Highlight medan email är aktivt steg (ej Check:ad än)
+                          regEmailStatus !== 'available' && modal.playerNameInputActive,
+                        ]}
+                        placeholder="you@example.com"
+                        placeholderTextColor={Colors.textDisabled}
+                        value={regEmail}
+                        onChangeText={handleRegEmailChange}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        maxLength={60}
+                        editable={regEmailStatus !== 'checking'}
+                        returnKeyType="next"
+                        onSubmitEditing={handleRegCheckEmail}
+                      />
+                      <TouchableOpacity
+                        onPress={handleRegCheckEmail}
+                        disabled={!regEmailValid || regEmailStatus === 'checking' || regEmailStatus === 'available'}
+                        style={[
+                          modal.checkBtn,
+                          (!regEmailValid || regEmailStatus === 'checking') && modal.checkBtnDisabled,
+                          regEmailStatus === 'available' && modal.checkBtnDone,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            modal.checkBtnText,
+                            regEmailStatus === 'available' && modal.checkBtnTextDone,
+                          ]}
+                        >
+                          {regEmailStatus === 'checking' ? '…'
+                            : regEmailStatus === 'available' ? '✓'
+                            : 'Check'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    {regEmailStatus === 'idle' && (
+                      <Text style={modal.statusHint}>
+                        We&apos;ll send an activation link here to verify your address.
+                      </Text>
+                    )}
+                    {regEmailStatus === 'checking' && (
+                      <Text style={modal.statusHint}>Checking email…</Text>
+                    )}
+                    {regEmailStatus === 'available' && (
+                      <Text style={[modal.statusHint, modal.statusHintOk]}>
+                        ✓ Email is available
+                      </Text>
+                    )}
+                    {regEmailStatus === 'taken' && (
+                      <Text style={[modal.statusHint, modal.statusHintError]}>
+                        ✗ Email already registered — log in instead or use another
+                      </Text>
+                    )}
+                    {regEmailStatus === 'invalid' && (
+                      <Text style={[modal.statusHint, modal.statusHintError]}>
+                        ✗ Invalid email format
+                      </Text>
+                    )}
                   </View>
 
                   {/* PlayerName (låst tills email är giltig). onLayout
@@ -3920,13 +4187,30 @@ export default function HomeScreen() {
         transparent
         onRequestClose={() => setCompareInfoVisible(false)}
       >
-        <Pressable style={modal.overlay} onPress={() => setCompareInfoVisible(false)}>
-          {/* Tap inuti sheet:en ska INTE stänga — egen Pressable som
-              sväljer trycket. */}
-          <Pressable style={modal.sheet} onPress={() => {}}>
+        {/* Backdrop som ABSOLUT SYSKON (inte en Pressable som wrappar
+            sheet:en) — en Pressable runt sheet:en fångar ScrollView:ns
+            pan-gest så listan inte går att scrolla. Med backdrop bakom +
+            plain View-sheet scrollar ScrollView:n fritt, och tap utanför
+            sheet:en (dimmade ytan) stänger fortfarande. Samma mönster som
+            JoinModal (overlay → View sheet). */}
+        <View style={modal.overlay}>
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setCompareInfoVisible(false)}
+          />
+          {/* DEFINITE höjd (height, inte maxHeight) så ScrollView:n får en
+              bunden förälder att fylla. Med bara maxHeight på sheet:en +
+              flexShrink på ScrollView:n kollapsar listan mot 0 (sheet-höjd
+              beror på barnen, barnens höjd beror på sheet:en = cirkulärt).
+              85 % av skärmen ger en tydlig lista + plats åt titel/Close. */}
+          <View style={[modal.sheet, { height: '85%' }]}>
             <Text style={modal.title}>QuizVibe user vs Guest</Text>
             <Text style={modal.subtitle}>Registration is free.</Text>
-            <ScrollView style={{ flexShrink: 1 }} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ paddingBottom: Spacing.md }}
+              showsVerticalScrollIndicator
+            >
               <View style={styles.compareHeaderRow}>
                 <View style={styles.compareLabelCell} />
                 <Text style={[styles.compareColHead, styles.compareColHeadUser]}>USER</Text>
@@ -3963,8 +4247,8 @@ export default function HomeScreen() {
             <TouchableOpacity onPress={() => setCompareInfoVisible(false)} style={modal.cancelBtn}>
               <Text style={modal.cancelText}>Close</Text>
             </TouchableOpacity>
-          </Pressable>
-        </Pressable>
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -4157,7 +4441,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.warning,
+    color: Colors.textSecondary,
     lineHeight: 15,
   },
   // ── user vs guest-jämförelsen (info-modalen) ─────────────────────
@@ -4274,6 +4558,35 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     textAlign: 'center',
     marginTop: Spacing.xl,
+  },
+  // Fold-header för inloggade users' guest-sektion — speglar Profile-
+  // skärmens kollapsbara sektioner (+/− toggle-box) men vänsterjusterad
+  // istället för centrerad, så toggle-boxen hamnar längst till vänster
+  // på skärmen (Peter 2026-08-27).
+  guestFoldHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  guestFoldToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  guestFoldToggleBox: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: '#6B7280',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guestFoldToggleText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#6B7280',
+    lineHeight: 20,
   },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm, paddingTop: Spacing.sm },
   footerText: { fontSize: 12, color: Colors.textSecondary },
@@ -4649,10 +4962,35 @@ const modal = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 2,
   },
-  inviteJoinText: {
-    fontSize: 14,
+  // Deny/Accept-knapparna (Peter 2026-08-27, ersatte hela-radens implicita
+  // accept + "Join ›"-texten).
+  inviteActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  inviteDenyBtn: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+  },
+  inviteDenyText: {
+    fontSize: 13,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.textSecondary,
+  },
+  inviteAcceptBtn: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.primary,
+  },
+  inviteAcceptText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
   },
 });
 

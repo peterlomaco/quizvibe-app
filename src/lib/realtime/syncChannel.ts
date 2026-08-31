@@ -4,9 +4,17 @@
 //
 // MVP-omfattning: play_command, question_advance, player_left,
 // player_answer_confirmed, response_seconds_changed (D-ii) + network_heartbeat
-// (D-iii). Full D-ii-spec (player_media_ready, start_at-timestamp,
-// readiness-handshake) layer:as in senare; denna fil utökas då med fler
-// event-typer.
+// (D-iii). Av D-ii:s readiness-spec finns nu `start_at`-stämpeln
+// (play_command.timer_start_at) och readiness-handskakningen
+// (player_rejoined-hälsning + `player_ready`) på plats.
+//
+// ⚠ `player_media_ready` finns fortfarande INTE, och kan inte byggas som den
+// skisserades: YouTube-WebView:n skapas först när phase blir 'question', dvs
+// EFTER att host tryckt Play — ett media-ready-event kan därför aldrig hinna
+// grinda själva Play-tappet. En äkta media-gate kräver att spelaren
+// för-mountas dold under intro/countdown (finns inte i dag, och har en
+// YouTube-ToS-dimension eftersom vi då renderar en dold spelare). `player_ready`
+// är det pragmatiska substitutet: enheten är settled, inte spelaren laddad.
 //
 // Skiljs medvetet från postgres_changes-baserade Realtime-subscriptions
 // (rooms/lobby_players/lobby_settings) som driver persistent state. Broadcast
@@ -102,6 +110,12 @@ export interface PlayAgainLobbyReadyPayload {
    *  rad finns redan i nya lobbyn. Utan flaggan (Start fresh) visas
    *  "Host has already started a new Game"-popupen → Home som tidigare. */
   auto_join?: boolean;
+  /** Id på den SERVER-sparade Aggregate Leaderboard/Score (migration 0037)
+   *  som serien är kopplad till. Non-host stämplar det på sin LOKALA serie
+   *  tillsammans med rumkoden och seedar sedan sin aggregat-vy från servern
+   *  — de är deltagare, så RLS tillåter läsningen. Utelämnas när spelet inte
+   *  sparas (gäst i uppsättningen) eller vid äldre klienter. */
+  aggregate_leaderboard_id?: string;
 }
 
 /**
@@ -321,6 +335,21 @@ export interface PlayerScoreRecordedPayload {
 }
 
 /**
+ * En spelare har räknat om sitt Player-HCP vid game-end. Broadcastas av VARJE
+ * IndDev-klient EN gång (med några retries) när sista rundans leaderboard
+ * visas — mottagarna merge:ar deltat i sin `playerHcpChanges` så §5-raden
+ * ("HCP 42 (-1)") syns för alla spelare på alla enheter. `before`/`after` är
+ * DISPLAY-HCP (avrundat uppåt). Idempotent: mottagaren nycklar på player_id.
+ */
+export interface PlayerHcpChangedPayload {
+  /** Lobby_players.player_id för spelaren vars HCP räknades om. */
+  player_id: string;
+  /** Display-HCP före/efter denna omgång (1–99). */
+  before: number;
+  after: number;
+}
+
+/**
  * Non-host skickar sin lokala fråge-historik (rullande 20-sessions-fönstret
  * från hostQuestionHistory) till host direkt vid quiz-mount. Host unionerar
  * ALLA spelares historik och exkluderar frågor som NÅGON deltagare sett i
@@ -328,6 +357,26 @@ export interface PlayerScoreRecordedPayload {
  * spelare hostar nästa spel. Broadcastas med retries (host är redan
  * subscribed eftersom host mountar quiz före non-hosts navigerar in).
  */
+/**
+ * `player_ready` — non-host signalerar att enheten är SETTLED och redo att
+ * spela upp frågematerial. Skilt från `player_rejoined`, som bara betyder
+ * "jag är på kanalen": hälsningen skickas 300 ms efter subscribe, alltså mitt
+ * i enhetens tyngsta mount-arbete (AsyncStorage-läsningar, gameQuestions-
+ * memon över ~970 items, audio-override-fetch). Släpper host:s Play-knapp på
+ * hälsningen hamnar allt det arbetet MITT I nedräkningen i stället för före —
+ * och CountdownIntro:s kedjade setTimeout:ar drar då iväg additivt, vilket
+ * försenar när enheten går in i question-fasen och därmed när dess
+ * YouTube-WebView ens börjar boota.
+ *
+ * Skickas när ALLA fyra är klara: seen-ids + epoch-ledger + audio-overrides
+ * inlästa, och host:s frågesekvens mottagen. Retries av samma skäl som
+ * hälsningen (Realtime replayar inte). Idempotent hos host.
+ */
+export interface PlayerReadyPayload {
+  /** Avsändarens lobby_players.player_id. */
+  player_id: string;
+}
+
 export interface PlayerSeenQuestionsPayload {
   /** Avsändarens lobby_players.player_id. */
   player_id: string;
@@ -419,11 +468,17 @@ export interface SyncChannelHandlers {
    */
   onPlayerScoreRecorded?: (payload: PlayerScoreRecordedPayload) => void;
   /**
+   * En annan IndDev-spelare har räknat om sitt Player-HCP vid game-end.
+   * Merge:as in i `playerHcpChanges` för §5-raden på alla enheter.
+   */
+  onPlayerHcpChanged?: (payload: PlayerHcpChangedPayload) => void;
+  /**
    * En non-host har skickat sin lokala fråge-historik (20-sessions-fönstret).
    * Host unionerar in i peer-seen-set:en som exkluderar frågor någon
    * deltagare redan sett — ignoreras efter att spelet startat (pool-rebuild
    * mitt i spelet skulle byta aktuell fråga).
    */
+  onPlayerReady?: (payload: PlayerReadyPayload) => void;
   onPlayerSeenQuestions?: (payload: PlayerSeenQuestionsPayload) => void;
   /**
    * Valfritt membership-predikat. Om satt droppar vi player-id-bärande
@@ -492,11 +547,14 @@ export interface SyncChannel {
    * så leaderboarden är komplett på alla enheter.
    */
   broadcastPlayerScoreRecorded: (payload: PlayerScoreRecordedPayload) => Promise<void>;
+  /** Broadcasta vårt omräknade Player-HCP vid game-end (IndDev). */
+  broadcastPlayerHcpChanged: (payload: PlayerHcpChangedPayload) => Promise<void>;
   /**
    * Non-host broadcastar sin lokala fråge-historik till host vid quiz-mount
    * så host:s pool-bygge kan exkludera frågor NÅGON deltagare sett i sina
    * senaste 20 spel.
    */
+  broadcastPlayerReady: (payload: PlayerReadyPayload) => Promise<void>;
   broadcastPlayerSeenQuestions: (payload: PlayerSeenQuestionsPayload) => Promise<void>;
   /**
    * Rensar per-sender lastSeen + lastReported så watchdog:n börjar om från
@@ -625,6 +683,9 @@ function vPlayAgainLobbyReady(raw: unknown): PlayAgainLobbyReadyPayload | null {
     // Optional bool — allt annat än exakt true tolkas som frånvarande så
     // äldre payloads utan fältet beter sig som tidigare.
     auto_join: raw.auto_join === true ? true : undefined,
+    aggregate_leaderboard_id: str(raw.aggregate_leaderboard_id)
+      ? raw.aggregate_leaderboard_id
+      : undefined,
   };
 }
 function vPlayerApprovedPlayAgain(raw: unknown): PlayerApprovedPlayAgainPayload | null {
@@ -707,6 +768,10 @@ function vHostRejoined(raw: unknown): HostRejoinedPayload | null {
   if (!isObj(raw) || !str(raw.sender_id)) return null;
   return { sender_id: raw.sender_id };
 }
+function vPlayerReady(raw: unknown): PlayerReadyPayload | null {
+  if (!isObj(raw) || !str(raw.player_id)) return null;
+  return { player_id: raw.player_id };
+}
 function vPlayerSeenQuestions(raw: unknown): PlayerSeenQuestionsPayload | null {
   if (!isObj(raw) || !str(raw.player_id)) return null;
   // optIds returnerar undefined för tom/ogiltig array — behandla som tom
@@ -737,6 +802,14 @@ function vPlayerScoreRecorded(raw: unknown): PlayerScoreRecordedPayload | null {
     correct: raw.correct,
     time_used: raw.time_used,
   };
+}
+
+function vPlayerHcpChanged(raw: unknown): PlayerHcpChangedPayload | null {
+  if (!isObj(raw) || !str(raw.player_id) || !num(raw.before) || !num(raw.after))
+    return null;
+  if (raw.before < 1 || raw.before > 99 || raw.after < 1 || raw.after > 99)
+    return null;
+  return { player_id: raw.player_id, before: raw.before, after: raw.after };
 }
 
 /**
@@ -898,8 +971,18 @@ export function subscribeSyncChannel(
     onEvent('player_score_recorded', vPlayerScoreRecorded, (p) => {
       if (known(p.player_id, 'player_score_recorded')) handlers.onPlayerScoreRecorded!(p);
     });
+  // player_hcp_changed: en annan IndDev-enhet har räknat om sitt Player-HCP
+  // vid game-end. Player-id-bärande → samma membership-guard som scores.
+  if (handlers.onPlayerHcpChanged)
+    onEvent('player_hcp_changed', vPlayerHcpChanged, (p) => {
+      if (known(p.player_id, 'player_hcp_changed')) handlers.onPlayerHcpChanged!(p);
+    });
   // player_seen_questions: non-host:s fråge-historik → host:s peer-union.
   // Player-id-bärande → membership-guard som övriga sådana events.
+  if (handlers.onPlayerReady)
+    onEvent('player_ready', vPlayerReady, (p) => {
+      if (known(p.player_id, 'player_ready')) handlers.onPlayerReady!(p);
+    });
   if (handlers.onPlayerSeenQuestions)
     onEvent('player_seen_questions', vPlayerSeenQuestions, (p) => {
       if (known(p.player_id, 'player_seen_questions')) handlers.onPlayerSeenQuestions!(p);
@@ -1058,6 +1141,12 @@ export function subscribeSyncChannel(
     },
     broadcastPlayerScoreRecorded: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'player_score_recorded', payload });
+    },
+    broadcastPlayerHcpChanged: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'player_hcp_changed', payload });
+    },
+    broadcastPlayerReady: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'player_ready', payload });
     },
     broadcastPlayerSeenQuestions: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'player_seen_questions', payload });

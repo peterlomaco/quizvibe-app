@@ -38,3 +38,82 @@ items:
     peakTo: 2003
     wikimediaSearchHints: ["Eric Gadd"]
     answerMethods: ["name-letters"]
+  - id: cajsa-stina-akerstrom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Cajsa Stina Åkerström"
+    correctYear: 1967
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["100% svenska"]
+    wikimediaSearchHints: ["Cajsa Stina Åkerström"]
+    answerMethods: ["name-letters"]
+  - id: charlotte-nilsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Charlotte Nilsson"
+    correctYear: 1974
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
+    wikimediaSearchHints: ["Charlotte Nilsson"]
+    answerMethods: ["name-letters"]
+  - id: gunther
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Günther"
+    correctYear: 1967
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Günther"]
+    answerMethods: ["name-letters"]
+  - id: hasse-andersson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hasse Andersson"
+    correctYear: 1948
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    wikimediaSearchHints: ["Hasse Andersson"]
+    answerMethods: ["name-letters"]
+  - id: martin-stenmarck
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Martin Stenmarck"
+    correctYear: 1972
+    probability: 65
+    region: ["sweden"]
+    wikimediaSearchHints: ["Martin Stenmarck"]
+    answerMethods: ["name-letters"]
+  - id: peter-lundblad
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Peter Lundblad"
+    correctYear: 1950
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Summer", "100% svenska"]
+    wikimediaSearchHints: ["Peter Lundblad"]
+    answerMethods: ["name-letters"]
+  - id: roger-pontare
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Roger Pontare"
+    correctYear: 1951
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
+    wikimediaSearchHints: ["Roger Pontare"]
+    answerMethods: ["name-letters"]
+  - id: thomas-di-leva
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Thomas Di Leva"
+    correctYear: 1963
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["100% svenska"]
+    wikimediaSearchHints: ["Thomas Di Leva"]
+    answerMethods: ["name-letters"]
+  - id: tommy-nilsson
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Tommy Nilsson"
+    correctYear: 1960
+    probability: 65
+    region: ["sweden"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
+    wikimediaSearchHints: ["Tommy Nilsson"]
+    answerMethods: ["name-letters"]

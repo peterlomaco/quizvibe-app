@@ -9,16 +9,14 @@ import {
     KeyboardAvoidingView,
     Modal,
     Platform,
-    Pressable,
     SafeAreaView,
     ScrollView,
     StyleSheet,
-    Switch,
     Text,
     TextInput,
-    TouchableOpacity,
     View,
 } from 'react-native';
+import { Pressable, Switch, TouchableOpacity } from '@/src/components/haptic';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Avatar } from '../components/Avatar';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
@@ -26,10 +24,13 @@ import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
+import { HCPShield } from '../components/HCPShield';
+import { HostTypeOptions, type HostLobbyType } from '../components/HostTypeOptions';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeQAvatar } from '../components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '../components/ShoppingCartIcon';
+import { CodeKeyboard } from '../components/CodeKeyboard';
 import {
     ROUNDS_DEFAULT,
     ROUNDS_MAX_INDIV,
@@ -55,6 +56,7 @@ import {
     clearProfile,
     getCachedProfile,
     loadProfile,
+    playerNameExists,
     saveProfile,
     type AssistanceLevel,
     type AvatarSource,
@@ -62,6 +64,17 @@ import {
     type ProfileData,
     type Region,
 } from '../utils/profileStorage';
+import {
+    appendPlayerNameDigit,
+    appendPlayerNameLetter,
+    backspacePlayerNameDigits,
+    backspacePlayerNameLetters,
+    getPlayerNameDigits,
+    getPlayerNameLetters,
+    normalizePlayerName,
+    PLAYER_NAME_MAX_DIGITS,
+    PLAYER_NAME_MAX_LETTERS,
+} from '../utils/playerName';
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — self-attest via
 // ProfileData.spotifyAppConfirmed ersätter connectSpotify/getSpotifyConnectionStatus.
 import { getCachedPremium, hasPremiumSubscription } from '../utils/subscriptionStorage';
@@ -79,6 +92,8 @@ import { clearLobbySettings } from '../utils/mockLobbySettings';
 import { clearGameStarted } from '../utils/mockStartedGames';
 import { generateRoomCode } from '../utils/roomCode';
 import { checkSpotifyInstalled } from '../utils/spotifyDJ';
+import { resolveDisplayHcp } from '../utils/hcpEngine';
+import { refreshOwnHcpDecay } from '../utils/hcpProgress';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -273,7 +288,24 @@ export default function ProfileScreen() {
   const [lastFreeCreditsRefreshDate, setLastFreeCreditsRefreshDate] = useState<string | undefined>(undefined);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [friendsModalOpen, setFriendsModalOpen] = useState(false);
+  // Checkbox-urval för bulk-delete i "+ Add QuizVibe Friends"-modalen
+  // (Peter 2026-08-27, ersatte den tidigare per-rad "×"-knappen).
+  const [selectedFriendIds, setSelectedFriendIds] = useState<Set<string>>(new Set());
+  // Add-by-Player-Name-fältet (2026-08-27, omarbetat till samma split-field-
+  // struktur — bokstäver + siffror via QuizVibe:s egna CodeKeyboard — som
+  // PlayerName skapas överallt annars i appen. Speglar Lobby:s Share invite-
+  // modal 1:1 (se LobbyScreen.tsx) så de två "Add QuizVibe friend"-formulären
+  // beter sig identiskt.
   const [newFriendPlayerName, setNewFriendPlayerName] = useState('');
+  const [addFriendKbMode, setAddFriendKbMode] = useState<'letter' | 'digit'>('letter');
+  const [addFriendFocused, setAddFriendFocused] = useState(false);
+  const addFriendLettersRef = useRef<TextInput>(null);
+  const addFriendDigitsRef = useRef<TextInput>(null);
+  // Async existence-check (playerNameExists) — bara riktiga registrerade
+  // QuizVibe-users kan sparas som friend. `addFriendChecking` disable:ar
+  // Add-knappen under roundtrip:en, `addFriendError` visas inline vid miss.
+  const [addFriendChecking, setAddFriendChecking] = useState(false);
+  const [addFriendError, setAddFriendError] = useState<string | null>(null);
   const [answerResponseSeconds, setAnswerResponseSeconds] = useState<AnswerResponse>(30);
   // Initial-värde matchar generic-fallback-spec (1981 → innevarande år
   // via ERA_MAX) — Profile:s loadProfile-effect overridar med profilens
@@ -289,9 +321,11 @@ export default function ProfileScreen() {
   // Default game mode (host-default) — 'pass-the-phone' (gratis) eller
   // 'individual-devices' (Premium).
   const [gameMode, setGameMode] = useState<GameMode>('pass-the-phone');
-  // "Use single player mode as default" — när checkad låses host-default till
-  // Individual Devices och Pass-the-Phone-rutan visas dämpad/grå i toggle:n.
-  const [singlePlayerDefault, setSinglePlayerDefault] = useState(false);
+  // Single player är BORTTAGET som host-default 2026-08-26 — läget väljs per
+  // spel via "Start New Game" på Home, inte i profilen. ProfileData-fältet
+  // `singlePlayerDefault` finns kvar (DB-kolumn + Lobby:s carry-over läser
+  // den) men skrivs härifrån alltid som false; se stale-coercen i load-
+  // effekten och den explicita false-skrivningen i handleSave.
   // Premium-status — styr om PREMIUM-badge på Max 12-toggle visas i guld
   // (köpt) eller grått (inte köpt än), om Individual Devices är unlocked,
   // om Rounds-rulern visar gold-bracket + blå-tickade siffror, och om
@@ -311,11 +345,10 @@ export default function ProfileScreen() {
   // ner om det skulle hamna utanför nya max:t.
   const [roundsCount, setRoundsCount] = useState<number>(ROUNDS_DEFAULT);
   // 20 rundor kräver Premium OCH Individual Devices — speglar Lobby-logiken
-  // exakt. PtP och Single Player är alltid max 4 oavsett subscription.
+  // exakt. PtP är alltid max 4 oavsett subscription. (Single player hanteras
+  // inte här alls — det är ett per-spel-val på Home och alltid max 4.)
   const roundsMax =
-    hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault
-      ? ROUNDS_MAX_INDIV
-      : ROUNDS_MAX_PASS;
+    hasPremium && gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
   // Ej premium → klampas alltid till Max 4. Effekten körs både när hasPremium
   // ändras (t.ex. sub löper ut) OCH när maxPlayers sätts till 12 från sparad
   // profil (race-safe: efffekten fyrar vid maxPlayers-ändringen → sätter 4 →
@@ -323,8 +356,14 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (!hasPremium && maxPlayers > 4) setMaxPlayers(4);
   }, [hasPremium, maxPlayers]);
+  // §2.4 — kör inaktivitets-decay vid Profile-open så HCP-skölden reflekterar
+  // ev. inaktivitet redan innan nästa spel (motorn applicerar annars decayen
+  // först vid nästa spelomgång). Fire-and-forget; speglar till profile.hcp.
+  useEffect(() => {
+    void refreshOwnHcpDecay();
+  }, []);
   const handleSelectMaxPlayers = (n: 4 | 12) => {
-    if (n === 12 && (singlePlayerDefault || gameMode !== 'individual-devices')) {
+    if (n === 12 && gameMode !== 'individual-devices') {
       Alert.alert(
         'Individual device required',
         'Please activate Individual device mode to be able to select Max 12 players.',
@@ -347,22 +386,19 @@ export default function ProfileScreen() {
   const handleDecrementRounds = () => {
     setRoundsCount((prev) => {
       const next = Math.max(ROUNDS_MIN, prev - ROUNDS_STEP);
-      // Haptic-klick bara när värdet faktiskt ändras (vid range-floor
-      // skulle annars en "tom" tap fyra haptik utan visuell respons).
-      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // Haptiken fyras nu av den wrappade tryck-primitiven (se src/components/haptic).
       return next;
     });
   };
   const handleIncrementRounds = () => {
     if (roundsCount >= roundsMax) {
-      if (singlePlayerDefault || gameMode === 'pass-the-phone' || gameMode === 'remote-1v1') {
+      if (gameMode === 'pass-the-phone' || gameMode === 'remote-1v1') {
         Alert.alert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
       }
       return;
     }
     setRoundsCount((prev) => {
       const next = Math.min(roundsMax, prev + ROUNDS_STEP);
-      if (next !== prev) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return next;
     });
   };
@@ -377,15 +413,10 @@ export default function ProfileScreen() {
     }
   }, [roundsCount, roundsMax]);
 
-  // Tre fria game mode-val (host-default). Inget premium-gate på lägesvalet —
-  // subscription gatar caps (rundor/spelare) separat. Single player sätter
-  // bara flaggan (inga lobby-spelare att eject:a i Profile-vyn).
-  const handleSelectSingle = () => {
-    setSinglePlayerDefault(true);
-    setMaxPlayers(4);
-  };
+  // Två fria multiplayer-val (host-default). Inget premium-gate på lägesvalet
+  // — subscription gatar caps (rundor/spelare) separat. Single player och
+  // Remote 1vs1 väljs per spel på Home, inte här.
   const handleSelectGameMode = (mode: GameMode) => {
-    setSinglePlayerDefault(false);
     setGameMode(mode);
     if (mode !== 'individual-devices') {
       setMaxPlayers(4);
@@ -397,15 +428,13 @@ export default function ProfileScreen() {
   // FREE-badge grön när aktiv, grå när inaktiv. Speglar Lobby.
   // redIndiv: om true färgas "Individual device"-rutan röd när inaktiv (används
   // bara i Number of Rounds quick-select, INTE i Game Settings/Game Mode).
-  const renderModeBox = (key: 'single' | 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
+  const renderModeBox = (key: 'ptp' | 'remote' | 'indiv', label: string, smallText?: boolean, redIndiv?: boolean) => {
     const isActive =
-      key === 'single'
-        ? singlePlayerDefault
-        : key === 'ptp'
-          ? !singlePlayerDefault && gameMode === 'pass-the-phone'
-          : key === 'remote'
-            ? !singlePlayerDefault && gameMode === 'remote-1v1'
-            : !singlePlayerDefault && gameMode === 'individual-devices';
+      key === 'ptp'
+        ? gameMode === 'pass-the-phone'
+        : key === 'remote'
+          ? gameMode === 'remote-1v1'
+          : gameMode === 'individual-devices';
     return (
       <Pressable
         style={({ pressed }) => [
@@ -414,11 +443,9 @@ export default function ProfileScreen() {
           pressed && { opacity: 0.7 },
         ]}
         onPress={() =>
-          key === 'single'
-            ? handleSelectSingle()
-            : handleSelectGameMode(
-                key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
-              )
+          handleSelectGameMode(
+            key === 'ptp' ? 'pass-the-phone' : key === 'remote' ? 'remote-1v1' : 'individual-devices',
+          )
         }
       >
         <Text
@@ -439,6 +466,10 @@ export default function ProfileScreen() {
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
   const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  // Lobbytyp-utfällning under "Start New Game" i logout-sheet:n — samma
+  // inline-väljare (Single Game / Multiplayer Game / Head-to-head) som Home:s
+  // "Start New Game" (Peter 2026-08-29). Kollapsas när sheet:en stängs.
+  const [hostTypeExpanded, setHostTypeExpanded] = useState(false);
   // Loading-state under server-anropet i handleConfirmDeleteAccount. Blockar
   // dubbel-tap på Delete Account-knappen + dimmer UI:t i sheet:en så user
   // ser att något händer.
@@ -511,6 +542,11 @@ export default function ProfileScreen() {
   const [spotifyGuideVisible, setSpotifyGuideVisible] = useState(false);
   // I Profile: Spotify DJ-defaulten är valbar om usern attestat "Spotify user".
   const isSpotifyAvailable = spotifyConnected;
+
+  // ── Parent Control ───────────────────────────────────────────────────
+  // Host-default: när på filtreras YT-items taggade parentControlled bort ur
+  // frågeurvalet i alla spel där denna profil är host. Default av.
+  const [parentControlEnabled, setParentControlEnabled] = useState(false);
 
   const [smColWidth, setSmColWidth] = useState(0);
   const smCellStyle = smColWidth > 0 ? { width: smColWidth } : undefined;
@@ -799,7 +835,10 @@ export default function ProfileScreen() {
           gameEraTo: data.gameEraTo ?? _defaultEraTo,
           maxPlayers: data.maxPlayers ?? 4,
           gameMode: data.gameMode ?? 'pass-the-phone',
-          singlePlayerDefault: data.singlePlayerDefault ?? false,
+          // Stale-coerce: Single player togs bort som host-default
+          // 2026-08-26. Ett gammalt sparat `true` skulle annars smyga in i
+          // Lobby:s seed-fallback och låsa en Multiplayer-lobby.
+          singlePlayerDefault: false,
           roundsDefault: data.roundsDefault ?? ROUNDS_DEFAULT,
           answerResponseSeconds: data.answerResponseSeconds ?? 30,
           // Default — alla köpta paket aktiverade så nyköpta dyker upp i
@@ -807,15 +846,18 @@ export default function ProfileScreen() {
           // tom så detta resulterar i tom array idag. Legacy gen-paket-ids
           // strippas nedanför.
           enabledHostPackages: data.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id),
-          // Per-source categories — default all 3 (safe fallback).
-          youtubeEnabledCategories:
-            data.youtubeEnabledCategories && data.youtubeEnabledCategories.length > 0
-              ? data.youtubeEnabledCategories
-              : defaultEnabledMainCategories(),
-          imagesEnabledCategories:
-            data.imagesEnabledCategories && data.imagesEnabledCategories.length > 0
-              ? data.imagesEnabledCategories
-              : defaultEnabledMainCategories(),
+          // Per-source categories — default all 3 ENDAST när fältet saknas
+          // (aldrig konfigurerat). En tom array `[]` är ett MEDVETET val =
+          // hela källan AV (t.ex. Hints av, YouTube på) och måste bevaras —
+          // annars skriver denna augment tyst tillbaka alla 3 och ett nytt
+          // spel serverar Hints trots att profilen har dem av. Array.isArray
+          // hedrar även en legacy-`null` som "saknas".
+          youtubeEnabledCategories: Array.isArray(data.youtubeEnabledCategories)
+            ? data.youtubeEnabledCategories
+            : defaultEnabledMainCategories(),
+          imagesEnabledCategories: Array.isArray(data.imagesEnabledCategories)
+            ? data.imagesEnabledCategories
+            : defaultEnabledMainCategories(),
         };
         // Strippa eventuellt kvarvarande gen-paket-id:n (pkg-gen-elder,
         // pkg-gen-x, etc.) ur enabledHostPackages — gen-paket-konceptet
@@ -838,12 +880,15 @@ export default function ProfileScreen() {
           data.gameEraTo == null ||
           data.maxPlayers == null ||
           data.gameMode == null ||
-          data.singlePlayerDefault == null ||
+          data.singlePlayerDefault !== false ||
           data.roundsDefault == null ||
           data.answerResponseSeconds == null ||
           packagesChanged ||
-          !data.youtubeEnabledCategories || data.youtubeEnabledCategories.length === 0 ||
-          !data.imagesEnabledCategories || data.imagesEnabledCategories.length === 0
+          // Endast SAKNAT fält (aldrig konfigurerat) är ofullständigt — en tom
+          // array är ett giltigt "källan av"-val och får INTE trigga en
+          // coerce-write tillbaka till alla 3.
+          !Array.isArray(data.youtubeEnabledCategories) ||
+          !Array.isArray(data.imagesEnabledCategories)
         );
         if (wasIncomplete) {
           saveProfile(augmented).catch(() => { /* silent — vyn fungerar ändå */ });
@@ -878,7 +923,6 @@ export default function ProfileScreen() {
             ? 'pass-the-phone'
             : augmented.gameMode ?? 'pass-the-phone';
         setGameMode(loadedGameMode);
-        setSinglePlayerDefault(augmented.singlePlayerDefault ?? false);
         // Clamp så ett gammalt värde > nuvarande max (t.ex. om host har 12
         // rundor sparat från Individual Devices + Premium men nu saknar Premium)
         // inte hamnar utanför range:n. initialMax tar hänsyn till BÅDE läge OCH
@@ -887,8 +931,7 @@ export default function ProfileScreen() {
         const savedRounds = augmented.roundsDefault ?? ROUNDS_DEFAULT;
         const isIndivPremium =
           hasPremium &&
-          (augmented.gameMode ?? 'pass-the-phone') === 'individual-devices' &&
-          !(augmented.singlePlayerDefault ?? false);
+          (augmented.gameMode ?? 'pass-the-phone') === 'individual-devices';
         const initialMax = isIndivPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
         setRoundsCount(Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)));
         setEnabledHostPackages(augmented.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id));
@@ -897,6 +940,7 @@ export default function ProfileScreen() {
         setSpotifyEnabled(augmented.spotifyDefaultEnabled ?? false);
         setSpotifyAnswerYear(augmented.spotifyAnswerYear ?? true);
         setSpotifyAnswerName(augmented.spotifyAnswerName ?? true);
+        setParentControlEnabled(augmented.parentControlEnabled ?? false);
         // Snapshot av laddad state — jämförs vid navigation bort.
         // gameMode speglar den COERCADE staten (inte rå augmented) så en
         // stale 'remote-1v1'-profil inte fastnar i evig "unsaved changes".
@@ -906,7 +950,6 @@ export default function ProfileScreen() {
           gameEraFrom: augmented.gameEraFrom ?? 1981,
           gameEraTo: augmented.gameEraTo ?? ERA_MAX,
           gameMode: loadedGameMode,
-          singlePlayerDefault: augmented.singlePlayerDefault ?? false,
           maxPlayers: augmented.maxPlayers ?? 4,
           roundsCount: Math.max(ROUNDS_MIN, Math.min(
             // Bara IndDev får 20-cappen — PtP OCH Remote 1v1 är max 4.
@@ -917,6 +960,7 @@ export default function ProfileScreen() {
           youtubeEnabledCategories: augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories(),
           imagesEnabledCategories: augmented.imagesEnabledCategories ?? defaultEnabledMainCategories(),
           enabledHostPackages: augmented.enabledHostPackages ?? [],
+          parentControlEnabled: augmented.parentControlEnabled ?? false,
         });
       });
       loadFriends().then((list) => {
@@ -962,11 +1006,66 @@ export default function ProfileScreen() {
     }, [localParams.scrollToTop]),
   );
 
+  // Speglar Lobby:s handleAddFriendFromShare — `playerNameExists` verifierar
+  // FÖRST att namnet tillhör en registrerad QuizVibe-user innan det sparas.
   const handleAddFriend = async () => {
-    if (!newFriendPlayerName.trim()) return;
-    const updated = await addFriend(newFriendPlayerName);
-    setFriends(updated);
+    const trimmed = normalizePlayerName(newFriendPlayerName.trim());
+    if (!trimmed || addFriendChecking) return;
+    setAddFriendError(null);
+    setAddFriendChecking(true);
+    try {
+      const exists = await playerNameExists(trimmed);
+      if (!exists) {
+        setAddFriendError('No QuizVibe user found with that Player Name');
+        return;
+      }
+      const updated = await addFriend(trimmed);
+      setFriends(updated);
+      setNewFriendPlayerName('');
+      setAddFriendKbMode('letter');
+    } finally {
+      setAddFriendChecking(false);
+    }
+  };
+
+  // CodeKeyboard-handlers för Add-by-Player-Name-fältet — identiska med
+  // Lobby:s handleAddFriendKeyPress/Backspace/toggleAddFriendKbMode.
+  const handleAddFriendKeyPress = (char: string) => {
+    setNewFriendPlayerName((prev) =>
+      addFriendKbMode === 'letter' ? appendPlayerNameLetter(prev, char) : appendPlayerNameDigit(prev, char),
+    );
+    if (addFriendError) setAddFriendError(null);
+  };
+
+  const handleAddFriendBackspace = () => {
+    setNewFriendPlayerName((prev) =>
+      addFriendKbMode === 'letter' ? backspacePlayerNameLetters(prev) : backspacePlayerNameDigits(prev),
+    );
+    if (addFriendError) setAddFriendError(null);
+  };
+
+  const toggleAddFriendKbMode = () => {
+    if (newFriendPlayerName.length === 0 && addFriendKbMode === 'letter') return;
+    if (addFriendKbMode === 'letter') {
+      setAddFriendKbMode('digit');
+      addFriendDigitsRef.current?.focus();
+    } else {
+      setAddFriendKbMode('letter');
+      addFriendLettersRef.current?.focus();
+    }
+  };
+
+  // "Cancel" på CodeKeyboard:et (2026-08-27) — speglar Lobby:s
+  // handleAddFriendCancel. "Done" längst ner i modalen stänger HELA Friends-
+  // vyn (mer än vad man vill vid en avbruten inmatning); Cancel tömmer bara
+  // det pågående namnet och stänger tangentbordet, modalen är kvar öppen.
+  const handleAddFriendCancel = () => {
     setNewFriendPlayerName('');
+    setAddFriendKbMode('letter');
+    setAddFriendError(null);
+    addFriendLettersRef.current?.blur();
+    addFriendDigitsRef.current?.blur();
+    setAddFriendFocused(false);
   };
 
   const handleRemoveFriend = async (id: string) => {
@@ -974,9 +1073,42 @@ export default function ProfileScreen() {
     setFriends(updated);
   };
 
+  // Bulk-delete (2026-08-27) — ersätter den tidigare instant-"×" i "+ Add
+  // QuizVibe Friends"-modalen. Confirm-Alert speglar Lobby:s
+  // handleDeletePlayer-mönster (Cancel + destructive Delete). Sekventiella
+  // removeFriend-anrop är säkra — varje call slutför sitt egna
+  // loadFriends→filter→saveFriends-varv innan nästa startar.
+  const handleDeleteSelectedFriends = () => {
+    const count = selectedFriendIds.size;
+    if (count === 0) return;
+    Alert.alert(
+      count === 1 ? 'Remove friend' : 'Remove friends',
+      `Are you sure you want to delete ${count} friend${count > 1 ? 's' : ''} from your QuizVibe friends list?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            let updated = friends;
+            for (const id of selectedFriendIds) {
+              updated = await removeFriend(id);
+            }
+            setFriends(updated);
+            setSelectedFriendIds(new Set());
+          },
+        },
+      ],
+    );
+  };
+
   const selectedAvatar = AVATARS.find((a) => a.id === selectedAvatarId);
   const age = birthYear !== null ? CURRENT_YEAR - birthYear : null;
   const assistanceLabel  = ASSISTANCE_OPTIONS.find((s) => s.id === assistance)?.label;
+  // Player-HCP-sköld (§2 UI). Läser det intjänade värdet ur profil-spegeln
+  // (motorn skriver profile.hcp efter varje spel); saknas det faller
+  // resolveDisplayHcp tillbaka på startvärdet 99 (§1.1 — alla startar på 99).
+  const hcpDisplay = resolveDisplayHcp(getCachedProfile()?.hcp);
   const regionLabel = REGION_OPTIONS.find((r) => r.id === region)?.label;
   const answerResponseLabel = ANSWER_RESPONSE_OPTIONS.find(
     (o) => o.id === answerResponseSeconds,
@@ -984,8 +1116,8 @@ export default function ProfileScreen() {
 
   const handleSave = async (section: 'defaults' | 'host' | 'packages') => {
     // Spotify DJ kräver Individual Devices-läge — blockera om Spotify är på
-    // men mode-valet inte är IndDev (PtP, Single Player eller IndDev off).
-    if (spotifyEnabled && (gameMode !== 'individual-devices' || singlePlayerDefault)) {
+    // men mode-valet inte är IndDev.
+    if (spotifyEnabled && gameMode !== 'individual-devices') {
       Alert.alert(
         'Spotify requires Individual Devices',
         'Spotify DJ mode is only available in Individual Devices mode. Please change the Game Mode or turn off Spotify.',
@@ -1010,7 +1142,10 @@ export default function ProfileScreen() {
         gameEraTo: eraValues[1],
         maxPlayers,
         gameMode,
-        singlePlayerDefault,
+        // Explicit false — Single player är inte längre en host-default, och
+        // utan skrivningen ligger ett stale `true` kvar i loadProfile:s
+        // cache-merge (profileStorage.ts).
+        singlePlayerDefault: false,
         roundsDefault: roundsCount,
         enabledHostPackages,
         youtubeEnabledCategories,
@@ -1019,13 +1154,15 @@ export default function ProfileScreen() {
         spotifyAnswerYear,
         spotifyAnswerName,
         spotifyAppConfirmed: spotifyConnected,
+        parentControlEnabled,
       });
       savedSnapshotRef.current = JSON.stringify({
         birthYear, assistance,
         gameEraFrom: eraValues[0], gameEraTo: eraValues[1],
-        gameMode, singlePlayerDefault, maxPlayers, roundsCount,
+        gameMode, maxPlayers, roundsCount,
         answerResponseSeconds, youtubeEnabledCategories,
         imagesEnabledCategories, enabledHostPackages,
+        parentControlEnabled,
       });
       setSavedSection(section);
       setTimeout(() => setSavedSection(null), 2000);
@@ -1039,9 +1176,10 @@ export default function ProfileScreen() {
     const current = JSON.stringify({
       birthYear, assistance,
       gameEraFrom: eraValues[0], gameEraTo: eraValues[1],
-      gameMode, singlePlayerDefault, maxPlayers, roundsCount,
+      gameMode, maxPlayers, roundsCount,
       answerResponseSeconds, youtubeEnabledCategories,
       imagesEnabledCategories, enabledHostPackages,
+      parentControlEnabled,
     });
     return current !== savedSnapshotRef.current;
   };
@@ -1182,7 +1320,7 @@ export default function ProfileScreen() {
   // rensa stale mock-stores, tracka event och navigera till /lobby.
   // Inlinad här istället för delad utility tills en tredje call-site
   // dyker upp (då lyfter vi till en delad helper i src/utils/).
-  const handleCreateGame = async () => {
+  const handleCreateGame = async (lobbyType: HostLobbyType = 'multiplayer') => {
     const [freshProfile, freshHasPremium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
@@ -1202,17 +1340,20 @@ export default function ProfileScreen() {
       }
     }
     const code = generateRoomCode();
+    // Remote 1vs1 är alltid exakt 2 spelare. Sätts redan här (i stället för
+    // att vänta på LobbyScreen:s setRoomMaxPlayers-effekt) så kapacitets-
+    // kollen vid join är korrekt från första sekunden. Speglar Home:s
+    // handleCreateGame — se app/index.tsx.
+    const isRemote1v1 = lobbyType === '1v1';
     // Returvärdet MÅSTE kontrolleras — en tyst no-op ger en fantom-lobby
     // som joiners inte hittar ("Room not found"-buggen 2026-08-07).
     const roomRegistered = await registerActiveRoom(code, {
-      maxPlayers: freshProfile?.maxPlayers ?? 4,
+      maxPlayers: isRemote1v1 ? 2 : freshProfile?.maxPlayers ?? 4,
       hostIsPremium: freshHasPremium,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? '',
       gameStarted: false,
-      // Profile:s Create Game-genväg skapar alltid en standard-lobby;
-      // Remote 1vs1 väljs bara via Home:s HostTypeOptions-utfällning.
-      isRemote1v1: false,
+      isRemote1v1,
     });
     if (!roomRegistered) {
       Alert.alert(
@@ -1227,8 +1368,11 @@ export default function ProfileScreen() {
     clearEjected(code);
     clearGameStarted(code);
     track('room_code_created');
+    setHostTypeExpanded(false);
     setLogoutModalVisible(false);
-    router.push({ pathname: '/lobby', params: { code, isHost: 'true' } });
+    // lobbyType styr lobbyns förvalda läge ('single'/'multiplayer') resp.
+    // remote-läget ('1v1') — samma param som Home skickar.
+    router.push({ pathname: '/lobby', params: { code, isHost: 'true', lobbyType } });
   };
 
   return (
@@ -1239,7 +1383,7 @@ export default function ProfileScreen() {
           useFocusEffect så den uppdateras när vi navigerar tillbaka efter
           login/edit på andra skärmar. */}
       <TopUserBanner
-        onPress={() => setLogoutModalVisible(true)}
+        onPress={() => { setHostTypeExpanded(false); setLogoutModalVisible(true); }}
         onBackPress={() => guardedNavigate(() => router.replace('/'))}
       />
       <ScrollView
@@ -1346,6 +1490,12 @@ export default function ProfileScreen() {
             <Text style={styles.playerNameDisplay} numberOfLines={1}>
               {playerName}
             </Text>
+
+            {/* Player-HCP-sköld under avatar + namn (§2 UI). En registrerad
+                användare har alltid ett HCP (startar på 99). */}
+            <View style={styles.hcpShieldWrap}>
+              <HCPShield hcp={hcpDisplay} size={64} />
+            </View>
           </View>
 
           {/* Högerkolumn: competition setup */}
@@ -1479,38 +1629,19 @@ export default function ProfileScreen() {
               (premium-läge). Försök att välja Individual Devices utan
               Premium triggar Store-omdirigering. */}
           <View style={styles.field}>
-            <Text style={styles.sectionLabel}>Game Mode</Text>
-            {/* Tre rutor i EN rad + bracket-etiketter undertill — speglar
-                Lobby. Layouten splittades tillfälligt i två rader när Remote
-                (1vs1) låg här; återställd 2026-08-12. */}
+            <Text style={styles.sectionLabel}>Multiplayer Game Mode</Text>
+            {/* Två rutor i EN rad + bracket-etikett undertill — speglar Lobby.
+                Single player och Remote (1vs1) är INTE host-defaults: de väljs
+                per spel via "Start New Game" på Home (2026-08-26). ⚠ Flex-talet
+                på bracket-raden MÅSTE spegla antalet rutor ovanför. */}
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-              {renderModeBox('single', 'Single player', true)}
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true)}
             </View>
             <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
-              {/* Bracket under "Single player" */}
-              <View style={{ flex: 1, alignItems: 'center' }}>
-                <View style={styles.multiplayerBracket} />
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
-                  <Text style={styles.multiplayerBracketLabel}>Single mode</Text>
-                  <Pressable
-                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    onPress={() =>
-                      Alert.alert(
-                        'Single player mode',
-                        'One player only — challenge yourself.\n\nMax 4 rounds, even with a Premium subscription. Spotify not applicable for Single player mode.',
-                      )
-                    }
-                    hitSlop={8}
-                  >
-                    <Text style={styles.infoIconText}>i</Text>
-                  </Pressable>
-                </View>
-              </View>
               {/* Bracket under "Pass-the-Phone" + "Individual device" —
-                  flex:2 så den spänner över båda rutorna. */}
-              <View style={{ flex: 2, alignItems: 'center' }}>
+                  flex:1 så den spänner över hela raden (båda rutorna). */}
+              <View style={{ flex: 1, alignItems: 'center' }}>
                 <View style={styles.multiplayerBracket} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
                   <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
@@ -1519,7 +1650,7 @@ export default function ProfileScreen() {
                     onPress={() =>
                       Alert.alert(
                         'Multiplayer mode',
-                        'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for 1vs1? Remote duels are started from the Home screen — tap Start New Game and pick "Remote Play".',
+                        'This is your default for Multiplayer games.\n\nPass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nSingle player and Head-to-head are picked per game on the Home screen — tap Start New Game and choose "Single Game" or "Head-to-head".',
                       )
                     }
                     hitSlop={8}
@@ -1552,10 +1683,10 @@ export default function ProfileScreen() {
                   styles.modeOption,
                   maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
                   pressed && { opacity: 0.7 },
-                  hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault && { opacity: 0.45 },
+                  hasPremium && gameMode === 'individual-devices' && { opacity: 0.45 },
                 ]}
                 onPress={() => handleSelectMaxPlayers(4)}
-                disabled={hasPremium && gameMode === 'individual-devices' && !singlePlayerDefault}
+                disabled={hasPremium && gameMode === 'individual-devices'}
               >
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
                   Max 4 players
@@ -1813,6 +1944,32 @@ export default function ProfileScreen() {
 
           </View>
 
+          {/* Parent Control — host-default. När på filtreras YT-klipp taggade
+              parentControlled bort ur frågeurvalet i spel där denna profil är
+              host. Placerad under Source Mixerboard, precis ovanför Game era. */}
+          <View style={styles.field}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={[styles.regionLabelRow, { flex: 1, marginBottom: 0 }]}>
+                <Text style={styles.sectionLabel}>Parent Control</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() => Alert.alert('Parent Control', 'When on, YouTube clips flagged as parent-controlled are removed from the question selection in games you host.')}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
+              <Switch
+                value={parentControlEnabled}
+                onValueChange={setParentControlEnabled}
+                trackColor={{ false: '#3C3C3C', true: Colors.success }}
+                thumbColor="#FFF"
+                ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
+                style={styles.sourceMatrixSwitch}
+              />
+            </View>
+          </View>
+
           {/* Game era — adjustable år-spann för frågor. */}
           <View style={styles.field}>
             <View style={styles.regionLabelRow}>
@@ -2000,16 +2157,18 @@ export default function ProfileScreen() {
                   ],
                 )}
                 hasSubscription={hasPremium}
-                indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
+                indivActive={gameMode === 'individual-devices'}
               />
             </View>
+            <Text style={styles.roundsScopeNote}>
+              Applies to Multiplayer games. Single player is always 4 rounds.
+            </Text>
           </View>
 
           {/* Game mode quick-select — under RoundsRuler för snabb mode-byte.
-              EN rad med tre rutor, som huvud-Game Mode-sektionen. */}
+              EN rad med två rutor, som huvud-Game Mode-sektionen. */}
           <View style={styles.field}>
             <View style={styles.modeRow}>
-              {renderModeBox('single', 'Single player', true)}
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true, true)}
             </View>
@@ -2309,7 +2468,16 @@ export default function ProfileScreen() {
           </View>
 
           <Pressable
-            onPress={() => setFriendsModalOpen(true)}
+            onPress={() => {
+              // Fräscha fält varje gång modalen öppnas — speglar Lobby:s
+              // handleOpenShareModal.
+              setNewFriendPlayerName('');
+              setAddFriendKbMode('letter');
+              setAddFriendFocused(false);
+              setAddFriendError(null);
+              setSelectedFriendIds(new Set());
+              setFriendsModalOpen(true);
+            }}
             style={({ pressed }) => [
               styles.friendsBtn,
               pressed && { opacity: 0.85 },
@@ -2473,33 +2641,110 @@ export default function ProfileScreen() {
               Save Player Names to invite friends with one tap from Lobby.
             </Text>
 
-            {/* Add friend row */}
+            {/* Add friend row — samma split-field-struktur (bokstäver +
+                siffror, QuizVibe:s egna CodeKeyboard) som PlayerName skapas
+                överallt annars i appen, speglar Lobby:s Share invite-modal
+                1:1 (Peter 2026-08-27). `appendPlayerNameLetter` sköter
+                versal-först/gemener-resten-formatet per tangenttryck.
+                `playerNameExists` verifierar att namnet tillhör en
+                registrerad QuizVibe-user innan det sparas. */}
+            <Text style={friendsModal.addFieldLabel}>Add by Player Name</Text>
             <View style={friendsModal.addRow}>
               <TextInput
-                style={friendsModal.addInput}
-                placeholder="Add by Player Name"
+                ref={addFriendLettersRef}
+                style={[
+                  friendsModal.addInput,
+                  friendsModal.addPlayerNameLettersInput,
+                  addFriendKbMode === 'letter' && friendsModal.addPlayerNameInputActive,
+                ]}
+                placeholder="Anna"
                 placeholderTextColor={Colors.textDisabled}
-                value={newFriendPlayerName}
-                onChangeText={setNewFriendPlayerName}
-                maxLength={20}
-                returnKeyType="done"
-                onSubmitEditing={handleAddFriend}
+                value={getPlayerNameLetters(newFriendPlayerName)}
+                maxLength={PLAYER_NAME_MAX_LETTERS}
+                editable={!addFriendChecking}
+                showSoftInputOnFocus={false}
+                selection={{
+                  start: getPlayerNameLetters(newFriendPlayerName).length,
+                  end: getPlayerNameLetters(newFriendPlayerName).length,
+                }}
+                selectTextOnFocus={false}
+                contextMenuHidden={true}
+                onFocus={() => {
+                  setAddFriendKbMode('letter');
+                  setAddFriendFocused(true);
+                }}
+                onBlur={() => setAddFriendFocused(false)}
+              />
+              <Text style={friendsModal.addPlayerNameSeparator}>–</Text>
+              <TextInput
+                ref={addFriendDigitsRef}
+                style={[
+                  friendsModal.addInput,
+                  friendsModal.addPlayerNameDigitsInput,
+                  addFriendKbMode === 'digit' && friendsModal.addPlayerNameInputActive,
+                  getPlayerNameLetters(newFriendPlayerName).length === 0 && friendsModal.addPlayerNameInputDisabled,
+                ]}
+                placeholder="1234"
+                placeholderTextColor={Colors.textDisabled}
+                value={getPlayerNameDigits(newFriendPlayerName)}
+                maxLength={PLAYER_NAME_MAX_DIGITS}
+                editable={!addFriendChecking && getPlayerNameLetters(newFriendPlayerName).length > 0}
+                showSoftInputOnFocus={false}
+                selection={{
+                  start: getPlayerNameDigits(newFriendPlayerName).length,
+                  end: getPlayerNameDigits(newFriendPlayerName).length,
+                }}
+                selectTextOnFocus={false}
+                contextMenuHidden={true}
+                onFocus={() => {
+                  if (getPlayerNameLetters(newFriendPlayerName).length === 0) {
+                    addFriendLettersRef.current?.focus();
+                    return;
+                  }
+                  setAddFriendKbMode('digit');
+                  setAddFriendFocused(true);
+                }}
+                onBlur={() => setAddFriendFocused(false)}
               />
               <Pressable
                 onPress={handleAddFriend}
-                disabled={!newFriendPlayerName.trim()}
+                disabled={!newFriendPlayerName.trim() || addFriendChecking}
                 style={({ pressed }) => [
                   friendsModal.addBtn,
-                  !newFriendPlayerName.trim() && friendsModal.addBtnDisabled,
+                  (!newFriendPlayerName.trim() || addFriendChecking) && friendsModal.addBtnDisabled,
                   pressed && { opacity: 0.85 },
                 ]}
               >
-                <Text style={friendsModal.addBtnText}>Add</Text>
+                <Text style={friendsModal.addBtnText}>
+                  {addFriendChecking ? '…' : 'Add'}
+                </Text>
               </Pressable>
             </View>
+            {addFriendError && (
+              <Text style={friendsModal.addErrorText}>{addFriendError}</Text>
+            )}
+            {addFriendFocused && (
+              <CodeKeyboard
+                mode={addFriendKbMode}
+                letterCharset="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                onPress={handleAddFriendKeyPress}
+                onBackspace={handleAddFriendBackspace}
+                onModeToggle={toggleAddFriendKbMode}
+                // Digit-mode kräver minst 1 letter — toggle dimmas i letter-
+                // mode tills letter-sektionen har innehåll.
+                modeToggleDisabled={addFriendKbMode === 'letter' && newFriendPlayerName.length === 0}
+                // Cancel avbryter bara den pågående namn-inmatningen och
+                // stänger tangentbordet — "Done" längst ner stänger hela
+                // Friends-modalen, ett större steg än man vill ta mitt i en
+                // felskrivning. Mode-toggle flyttar in i grid:en (efter Z).
+                onCancel={handleAddFriendCancel}
+              />
+            )}
 
-            {/* List */}
-            <ScrollView style={{ maxHeight: 320 }}>
+            {/* List — maxHeight krymps medan CodeKeyboard:et är uppe (Add
+                by Player Name fokuserad) så hela sheet:en ryms inom
+                sheet:s 90%-tak på kortare skärmar. */}
+            <ScrollView style={{ maxHeight: addFriendFocused ? 160 : 320 }}>
               {friends.length === 0 ? (
                 <View style={friendsModal.emptyState}>
                   <Text style={friendsModal.emptyIcon}>🫥</Text>
@@ -2509,33 +2754,66 @@ export default function ProfileScreen() {
                   </Text>
                 </View>
               ) : (
-                friends.map((friend, i) => (
-                  <View key={friend.id}>
-                    <View style={friendsModal.friendRow}>
-                      <Text style={friendsModal.friendEmoji}>
-                        {getAvatarEmojiById(friend.avatarId)}
-                      </Text>
-                      <Text style={friendsModal.friendName}>{friend.playerName}</Text>
-                      <Pressable
-                        onPress={() => handleRemoveFriend(friend.id)}
-                        hitSlop={10}
-                        style={friendsModal.removeBtn}
-                      >
-                        <Text style={friendsModal.removeBtnText}>×</Text>
-                      </Pressable>
+                friends.map((friend, i) => {
+                  const checked = selectedFriendIds.has(friend.id);
+                  return (
+                    <View key={friend.id}>
+                      <View style={friendsModal.friendRow}>
+                        <Text style={friendsModal.friendEmoji}>
+                          {getAvatarEmojiById(friend.avatarId)}
+                        </Text>
+                        <Text style={friendsModal.friendName}>{friend.playerName}</Text>
+                        {/* Kryssruta (2026-08-27, ersatte per-rad "×") —
+                            speglar Lobby:s shareSheet.checkbox-mönster så
+                            host bockar för flera friends och tar bort dem
+                            allihop via Delete-knappen längst ner. */}
+                        <Pressable
+                          onPress={() => {
+                            setSelectedFriendIds((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(friend.id)) next.delete(friend.id);
+                              else next.add(friend.id);
+                              return next;
+                            });
+                          }}
+                          hitSlop={8}
+                          style={[friendsModal.checkbox, checked && friendsModal.checkboxChecked]}
+                          accessibilityRole="checkbox"
+                          accessibilityState={{ checked }}
+                          accessibilityLabel={`Select ${friend.playerName}`}
+                        >
+                          {checked && <Text style={friendsModal.checkmark}>✓</Text>}
+                        </Pressable>
+                      </View>
+                      {i < friends.length - 1 && <View style={friendsModal.divider} />}
                     </View>
-                    {i < friends.length - 1 && <View style={friendsModal.divider} />}
-                  </View>
-                ))
+                  );
+                })
               )}
             </ScrollView>
 
-            <Pressable
-              onPress={() => setFriendsModalOpen(false)}
-              style={friendsModal.closeBtn}
-            >
-              <Text style={friendsModal.closeBtnText}>Done</Text>
-            </Pressable>
+            <View style={friendsModal.footerRow}>
+              <Pressable
+                onPress={handleDeleteSelectedFriends}
+                disabled={selectedFriendIds.size === 0}
+                style={[friendsModal.deleteBtn, selectedFriendIds.size === 0 && friendsModal.deleteBtnDisabled]}
+              >
+                <Text
+                  style={[
+                    friendsModal.deleteBtnText,
+                    selectedFriendIds.size === 0 && friendsModal.deleteBtnTextDisabled,
+                  ]}
+                >
+                  {selectedFriendIds.size > 0 ? `Delete (${selectedFriendIds.size})` : 'Delete'}
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setFriendsModalOpen(false)}
+                style={friendsModal.closeBtn}
+              >
+                <Text style={friendsModal.closeBtnText}>Done</Text>
+              </Pressable>
+            </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -2788,12 +3066,12 @@ export default function ProfileScreen() {
         visible={logoutModalVisible}
         transparent
         animationType="fade"
-        onRequestClose={() => setLogoutModalVisible(false)}
+        onRequestClose={() => { setHostTypeExpanded(false); setLogoutModalVisible(false); }}
       >
         <View style={styles.logoutOverlay}>
           <Pressable
             style={styles.logoutBackdrop}
-            onPress={() => setLogoutModalVisible(false)}
+            onPress={() => { setHostTypeExpanded(false); setLogoutModalVisible(false); }}
           />
           <View style={styles.logoutSheet}>
             <View style={styles.logoutHeader}>
@@ -2816,21 +3094,40 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            {/* Create Game-genväg — gateas av credits-popupen i
-                handleCreateGame. Speglar Home:s primary "Create Game"-
-                knapp så användaren kan starta ett spel utan att gå
-                tillbaka till Home först. Primary-styling (blå bg + vit
-                text) så den läser som den tydliga CTA:n i menyn. */}
+            {/* Start New Game — fäller ut samma lobbytyp-väljare (Single
+                Game / Multiplayer Game / Head-to-head) som Home:s "Start New
+                Game" i stället för att skapa en standard-lobby direkt (Peter
+                2026-08-29). Credit-gaten körs i handleCreateGame när en
+                lobbytyp väljs; guardedNavigate ligger utanpå så osparade
+                profil-ändringar fångas på vägen ut. */}
             <Pressable
               style={({ pressed }) => [
                 styles.logoutCreateGameBtn,
                 pressed && { opacity: 0.85 },
               ]}
-              onPress={() => guardedNavigate(handleCreateGame)}
+              onPress={() => setHostTypeExpanded((prev) => !prev)}
             >
               <Text style={styles.logoutCreateGameBtnText}>Start New Game</Text>
             </Pressable>
+            {hostTypeExpanded && (
+              <HostTypeOptions
+                accentColor={Colors.warning}
+                onSelect={(lobbyType) => {
+                  // Kollapsa INTE panelen här — då blinkar meny-vyn förbi
+                  // medan handleCreateGame:s async-arbete (profil/premium/
+                  // rums-registrering) körs. handleCreateGame stänger själv
+                  // sheet:en + panelen precis före router.push, och lämnar
+                  // panelen utfälld om credit-gaten avbryter.
+                  guardedNavigate(() => handleCreateGame(lobbyType));
+                }}
+              />
+            )}
 
+            {/* Övriga sheet-knappar döljs medan lobbytyp-väljaren är utfälld
+                så valet står ensamt (speglar Home) och sheet:en inte svämmar
+                över på korta skärmar. */}
+            {!hostTypeExpanded && (
+              <>
             {/* Join Game — as registered user. Navigerar till Home med
                 ?openJoinRegistered=1 så Home auto-öppnar JoinModal i
                 'choose'-step med hideGuest:true (samma flöde som
@@ -2898,13 +3195,20 @@ export default function ProfileScreen() {
                 {deletingAccount ? 'Deleting…' : 'Delete Account'}
               </Text>
             </Pressable>
+              </>
+            )}
 
             <Pressable
               style={styles.logoutCancelBtn}
-              onPress={() => setLogoutModalVisible(false)}
+              onPress={() => {
+                // Utfälld väljare → kollapsa tillbaka till menyn; annars
+                // stäng hela sheet:en.
+                if (hostTypeExpanded) { setHostTypeExpanded(false); return; }
+                setLogoutModalVisible(false);
+              }}
               disabled={deletingAccount}
             >
-              <Text style={styles.logoutCancelText}>Cancel</Text>
+              <Text style={styles.logoutCancelText}>{hostTypeExpanded ? 'Back' : 'Cancel'}</Text>
             </Pressable>
           </View>
         </View>
@@ -3693,6 +3997,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
   },
+  hcpShieldWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
   // Right column: competition setup
   rightColumn: {
@@ -4227,7 +4535,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     fontStyle: 'italic',
-    color: Colors.warning,
+    color: Colors.textSecondary,
     lineHeight: 15,
   },
   // Speglar Lobby:s purchasedPackageBox + purchasedPackageBoxActive 1:1
@@ -4324,6 +4632,15 @@ const styles = StyleSheet.create({
   },
   // Number of Rounds — speglar Lobby:s roundsGuestBox + roundsStepper*-
   // styles 1:1 så Profile- och Lobby-vyn ser identisk ut.
+  // Klargör att Number of Rounds är en MULTIPLAYER-default — Single player
+  // väljs per spel på Home och är alltid 4 rundor. Speglar Lobby:s
+  // guestHostNote (samma vokabulär för "det här går inte att ändra här").
+  roundsScopeNote: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    marginTop: Spacing.xs,
+    textAlign: 'center',
+  },
   roundsGuestBox: {
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.md,
@@ -4760,6 +5077,10 @@ const friendsModal = StyleSheet.create({
     gap: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border,
+    // Bounder sheet:en till viewport så toppen aldrig spiller över skärmen
+    // när CodeKeyboard:et (Add by Player Name) tar plats — samma mönster
+    // som Lobby:s Share invite-modal.
+    maxHeight: '90%',
   },
   handle: {
     width: 36,
@@ -4781,7 +5102,21 @@ const friendsModal = StyleSheet.create({
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
+  // Add-by-Player-Name-label + split-field-rad (2026-08-27) — samma
+  // struktur (bokstäver + siffror via CodeKeyboard) som PlayerName skapas
+  // överallt annars i appen. Speglar Lobby:s shareSheet-motsvarigheter
+  // (LobbyScreen.tsx) exakt.
+  addFieldLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    paddingHorizontal: Spacing.xs,
+  },
   addRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
   },
   addInput: {
@@ -4794,12 +5129,33 @@ const friendsModal = StyleSheet.create({
     fontSize: 15,
     color: Colors.textPrimary,
   },
+  addPlayerNameLettersInput: {
+    flex: 7,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  addPlayerNameDigitsInput: {
+    flex: 6,
+    minWidth: 0,
+    paddingHorizontal: Spacing.sm,
+    textAlign: 'center',
+  },
+  addPlayerNameSeparator: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    paddingHorizontal: 2,
+  },
+  addPlayerNameInputActive: { borderColor: Colors.primary },
+  addPlayerNameInputDisabled: { opacity: 0.45 },
   addBtn: {
     height: 44,
     borderRadius: Radius.md,
     backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
   },
   addBtnDisabled: {
     backgroundColor: 'rgba(255,255,255,0.06)',
@@ -4809,6 +5165,13 @@ const friendsModal = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: '#fff',
     letterSpacing: 0.3,
+  },
+  // Inline felmeddelande under Add-raden — visas när playerNameExists()
+  // inte hittar någon registrerad user med det inskrivna Player Name.
+  addErrorText: {
+    fontSize: FontSize.xs,
+    color: Colors.error,
+    paddingHorizontal: Spacing.xs,
   },
   emptyState: {
     alignItems: 'center',
@@ -4843,24 +5206,60 @@ const friendsModal = StyleSheet.create({
     fontWeight: FontWeight.medium,
     color: Colors.textPrimary,
   },
-  removeBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.cardElevated,
+  // Kryssruta (2026-08-27, ersatte removeBtn/"×") — speglar Lobby:s
+  // shareSheet.checkbox/checkboxChecked/checkmark-mönster exakt.
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  removeBtnText: {
-    fontSize: 18,
-    color: Colors.textSecondary,
-    lineHeight: 20,
+  checkboxChecked: {
+    backgroundColor: Colors.success,
+    borderColor: Colors.success,
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+    lineHeight: 15,
   },
   divider: {
     height: 1,
     backgroundColor: Colors.separator,
   },
+  // Footer-raden (2026-08-27) — Delete + Done sida vid sida, ersatte den
+  // ensamma "Done"-knappen.
+  footerRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  deleteBtn: {
+    flex: 1,
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.error,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtnDisabled: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  deleteBtnText: {
+    fontSize: 15,
+    fontWeight: FontWeight.semibold,
+    color: '#fff',
+  },
+  deleteBtnTextDisabled: {
+    color: Colors.textSecondary,
+  },
   closeBtn: {
+    flex: 1,
     height: 48,
     borderRadius: Radius.md,
     backgroundColor: Colors.cardElevated,
@@ -4868,7 +5267,6 @@ const friendsModal = StyleSheet.create({
     borderColor: Colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Spacing.sm,
   },
   closeBtnText: {
     fontSize: 15,

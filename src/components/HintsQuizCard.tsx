@@ -8,7 +8,10 @@
 //
 // Höjd matchar PLAYER_HEIGHT (~220 px) via flex:1 i parent-containern.
 // Inga nummerbadges — enbart •-punkter och ↳ för sub-rader.
-// Konsekutiva 'club'-hints grupperas under "Career History" rubrik; varje klubb = 1 hint.
+// Ledtrådar grupperas under rubriker (Birth/Career History/Film History/
+// Titles/Trophies) via buildRenderEntries i hintsGenerator.ts — se den för
+// grupperingsreglerna. Ogrupperade fakta (t.ex. en ensam merit) visas som
+// vanliga bullets.
 // Alla hints synliga vid T/2 (HINTS_ALL_OUT_FRACTION = 0.5).
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -20,10 +23,10 @@ import {
   View,
 } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
-import type { HintLibrary } from '../utils/hintsData';
+import type { HintCategoryLabel, HintLibrary } from '../utils/hintsData';
 import { countryToFlagEmoji } from '../utils/hintsData';
-import { selectHints } from '../utils/hintsGenerator';
-import { resolveHints, type ResolvedHint } from '../utils/hintsText';
+import { buildRenderEntries, selectHints, type GroupEntry, type SingleEntry } from '../utils/hintsGenerator';
+import { resolveHints } from '../utils/hintsText';
 import { createSeededRng } from '../utils/seededRandom';
 import { ProgressiveCover } from './ProgressiveCover';
 
@@ -58,29 +61,10 @@ interface Props {
 }
 
 // ── Hint-gruppering ─────────────────────────────────────────────────────────
-
-type SingleEntry = { kind: 'single'; hint: ResolvedHint; index: number };
-type GroupEntry  = { kind: 'group'; label: string; items: { hint: ResolvedHint; index: number }[] };
-type RenderEntry = SingleEntry | GroupEntry;
-
-function buildRenderEntries(hints: ResolvedHint[]): RenderEntry[] {
-  const entries: RenderEntry[] = [];
-  let i = 0;
-  while (i < hints.length) {
-    if (hints[i].hint.type === 'club') {
-      const items: GroupEntry['items'] = [];
-      while (i < hints.length && hints[i].hint.type === 'club') {
-        items.push({ hint: hints[i], index: i });
-        i++;
-      }
-      entries.push({ kind: 'group', label: 'Career History', items });
-    } else {
-      entries.push({ kind: 'single', hint: hints[i], index: i });
-      i++;
-    }
-  }
-  return entries;
-}
+//
+// Grupperingslogiken (Birth/Career History/Film History/Titles/Trophies) bor
+// i src/utils/hintsGenerator.ts (buildRenderEntries) — ren funktion utan
+// React, delad med backend-exportens spelbarhets-gate. Se dess kommentar.
 
 function categoryToGenre(label: string): string {
   if (label === 'Musikartist' || label === 'Band') return 'Music';
@@ -101,7 +85,7 @@ function categoryToProfession(label: string): string {
 
 // Mappar contentSubject (från YAML-katalogen) till HintCategoryLabel-ekvivalent
 // så att quiz-frågans kontext styr kategorirubrikens primära label.
-function contentSubjectToHintLabel(subject: string): string | null {
+function contentSubjectToHintLabel(subject: string): HintCategoryLabel | null {
   switch (subject) {
     case 'artist':  return 'Musikartist';
     case 'band':    return 'Band';
@@ -122,7 +106,10 @@ function splitDisplayName(name: string): string[] {
 
 // ── Huvud-komponent ─────────────────────────────────────────────────────────
 
-export function HintsQuizCard({
+// B1-perf: memoiserad så quiz-skärmens 1 Hz timeLeft-re-renders inte ritar om
+// hela hint-kortet. Alla props är primitiver eller stabila referenser (library
+// = question.hints per fråga), så shallow-compare bailar korrekt.
+function HintsQuizCardBase({
   library,
   displayName,
   resetKey,
@@ -148,16 +135,25 @@ export function HintsQuizCard({
     if (mosaicActive === true) setMosaicEverStarted(true);
   }, [mosaicActive]);
 
+  // Rubrikens FAKTISKA Genre·Profession-etikett — beräknas här (inte längre
+  // nere vid JSX:en) eftersom profession-redundans-strippningen i
+  // resolveHints() behöver veta den för att kunna dölja/omformulera
+  // profession-bullet:en (se "Profession-redundans" i hintsText.ts).
+  const libraryLabel: HintCategoryLabel = library?.categoryLabel ?? 'Musikartist';
+  const subjectLabel = contentSubject ? contentSubjectToHintLabel(contentSubject) : null;
+  const primaryLabel: HintCategoryLabel = subjectLabel ?? libraryLabel;
+
   const hints = useMemo(
     () =>
       library
         ? resolveHints(
             selectHints(library, MAX_HINTS, hintsSeed ? createSeededRng(hintsSeed) : undefined),
             displayName,
+            primaryLabel,
           )
         : [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resetKey, library, hintsSeed, displayName],
+    [resetKey, library, hintsSeed, displayName, primaryLabel],
   );
   const renderEntries = useMemo(() => buildRenderEntries(hints), [hints]);
 
@@ -207,11 +203,8 @@ export function HintsQuizCard({
   }, [isRevealed, nameAnim]);
 
   const flag          = library ? countryToFlagEmoji(library.nationality) : '🏳️';
-  const libraryLabel  = library?.categoryLabel ?? 'Musikartist';
-  // Frågans kontext (contentSubject) avgör primär label — override:ar library:ns categoryLabel
-  // när de skiljer sig (crossover-fall: artist som även är känd skådespelare etc.).
-  const subjectLabel  = contentSubject ? contentSubjectToHintLabel(contentSubject) : null;
-  const primaryLabel  = subjectLabel ?? libraryLabel;
+  // libraryLabel/subjectLabel/primaryLabel beräknas längre upp (krävs redan
+  // av hints-useMemo:n för profession-redundans-strippningen).
   const genre         = categoryToGenre(primaryLabel);
   const profession    = categoryToProfession(primaryLabel);
   // Crossover: visa "also known as X" när quiz-kontexten skiljer sig från library-etiketten.
@@ -238,7 +231,7 @@ export function HintsQuizCard({
             <Text style={styles.hintsPlaceholder}>· · ·</Text>
           ) : renderEntries.map((entry, ei) =>
             entry.kind === 'group' ? (
-              <ClubGroup
+              <HintGroup
                 key={`g${ei}`}
                 entry={entry}
                 revealedCount={displayRevealedCount}
@@ -325,9 +318,15 @@ function BulletHint({
   );
 }
 
-// ── ClubGroup ───────────────────────────────────────────────────────────────
+// ── HintGroup ───────────────────────────────────────────────────────────────
+//
+// Generisk rubrik+underrader-block — driver Birth, Career History,
+// Film History, Titles och Trophies (se buildRenderEntries i
+// hintsGenerator.ts). Namnet "HintGroup" ersätter det tidigare "ClubGroup"
+// (2026-08-27) eftersom komponenten alltid var läges-agnostisk — den läser
+// `entry.label` istället för att hårdkoda "Career History".
 
-function ClubGroup({
+function HintGroup({
   entry,
   revealedCount,
   isRevealed,
@@ -355,16 +354,16 @@ function ClubGroup({
         <Text style={[styles.hintText, styles.groupHeaderText]}>{entry.label}</Text>
       </Animated.View>
 
-      {/* Klubbrader */}
+      {/* Underrader */}
       {entry.items.map(({ hint, index }) => {
         const visible = revealedCount > index || isRevealed;
-        return visible ? <ClubSubRow key={hint.hint.id} text={hint.text} /> : null;
+        return visible ? <HintSubRow key={hint.hint.id} text={hint.text} /> : null;
       })}
     </View>
   );
 }
 
-function ClubSubRow({ text }: { text: string }) {
+function HintSubRow({ text }: { text: string }) {
   const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -530,3 +529,5 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
 });
+
+export const HintsQuizCard = React.memo(HintsQuizCardBase);
