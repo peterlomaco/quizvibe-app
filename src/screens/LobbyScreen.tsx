@@ -38,7 +38,7 @@ import { QuizVibePlayLogo } from '../components/QuizVibePlayLogo';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — handleConnectSpotify/
-// handleDisconnectSpotify är numera lokala self-attest-handlers utan API.
+// applySpotifyDisconnect är numera lokala self-attest-handlers utan API.
 // Spotify OAuth-status-import borttagen (Plan B 2026-07-22) — self-attest via
 // profile.spotifyAppConfirmed ersätter getSpotifyConnectionStatus.
 import { SequentialDots } from '../components/SequentialDots';
@@ -2800,6 +2800,13 @@ export default function LobbyScreen() {
     ? Math.max(0, Math.round(smGridW - sportSwitchCenter - 2 - 1 - SPOTIFY_SWITCH_W / 2) - 4)
     : 28;
 
+  // Namnet på spelaren vars enhet detta är — visas i den kant-skärande badgen
+  // på "I have Spotify App on this device"-boxen (grön bg = bekräftat, röd =
+  // ej bekräftat). ownPlayerIdRef läses under render; spotifyConnected/players
+  // triggar ändå re-render så badgen håller sig aktuell.
+  const ownSpotifyBadgeName =
+    players.find((p) => p.id === ownPlayerIdRef.current)?.name ?? '';
+
   // YouTube och Hints (imagesEnabledCategories) är oberoende — ingen auto-sync.
 
   // Guest host: Mixerboarden är LÅST (alla kategorier ON, källor slumpas
@@ -3038,9 +3045,19 @@ export default function LobbyScreen() {
    */
   const applySpotifyAttest = () => {
     setSpotifyConnected(true);
-    // Auto-aktivera DJ-toggeln direkt efter attest (host) — annars måste
-    // användaren trycka på toggeln en extra gång manuellt efteråt.
-    if (hostMode) setSpotifyEnabled(true);
+    // Auto-aktivera DJ-toggeln efter attest (host) BARA om läget är tillämpligt
+    // (IndDev, ej PtP/single/1v1) OCH ingen approved non-host saknar Spotify-
+    // bekräftelse. Annars lämnas toggeln av. Utan gaten slog "I have Spotify"-
+    // switchen på Spotify DJ i PtP (där läget inte ens är valbart), Year+Name-
+    // raden dök upp, och toggeln följde med som "på" in i IndDev innan någon
+    // medspelare bekräftat Spotify. Host slår själv på DJ-toggeln när alla
+    // approved spelare har bekräftat (handleToggleSpotifyEnabled kör guarden).
+    if (hostMode && isSpotifyAvailable) {
+      const someNonHostMissingSpotify = players.some(
+        (p) => !p.isHost && !p.hasLeft && p.approved && !p.spotifyConnected,
+      );
+      if (!someNonHostMissingSpotify) setSpotifyEnabled(true);
+    }
     // Uppdatera spelarkortet direkt.
     const ownId = ownPlayerIdRef.current;
     if (ownId) {
@@ -3092,39 +3109,66 @@ export default function LobbyScreen() {
   };
 
   /**
-   * Tar bort self-attesten ("jag har inte Spotify ändå").
-   * Stänger av Spotify DJ-läget om det var aktivt.
+   * Side-effects för att ta bort self-attesten (lobby OFF + profil OFF).
+   * Utbruten (speglar applySpotifyAttest) så profil-bekräftelse-popupen och
+   * guest-vägen kan dela exakt samma side-effects. Persisterar
+   * spotifyAppConfirmed=false till profilen (registrerade users) så
+   * Profile-toggeln följer med; guests → no-op via null.
    */
-  const handleDisconnectSpotify = () => {
+  const applySpotifyDisconnect = () => {
+    setSpotifyConnected(false);
+    setSpotifyEnabled(false);
+    const ownId = ownPlayerIdRef.current;
+    if (ownId) {
+      setPlayers((prev) =>
+        prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: false } : p)),
+      );
+    }
+    // Non-host: synka spotify_verified=false till lobby_players.
+    if (!hostMode && ownId) {
+      const ownPlayer = players.find((p) => p.id === ownId);
+      if (ownPlayer) {
+        upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: false }).catch(() => {});
+      }
+    }
+    loadProfile().then((profile) => {
+      if (profile) {
+        saveProfile({ ...profile, spotifyAppConfirmed: false }).catch(() => {});
+      }
+    }).catch(() => {});
+  };
+
+  /**
+   * Manuell toggle av "I have Spotify App on this device"-switchen i lobbyn.
+   *
+   * Profilen är källan: switchen seedas från profile.spotifyAppConfirmed vid
+   * lobby-entry (host focus-effect + non-host code-only-join), och en manuell
+   * ändring i lobbyn propagerar TILLBAKA till profilen — men bara efter en
+   * bekräftelse ("Your Profile will be changed to Spotify ON/OFF", OK/Cancel).
+   * Cancel lämnar BÅDE lobby-switchen OCH profilen orörda: switchen är
+   * controlled på spotifyConnected, så den flippar inte förrän vi sätter
+   * staten (applySpotifyAttest / applySpotifyDisconnect). Guests har ingen
+   * profil att ändra → togglar lobby-lokalt utan popup.
+   */
+  const handleSpotifyAttestToggle = async (v: boolean) => {
+    const profile = await loadProfile();
+    // Guest (ingen profil) eller redan i synk med profilen → applicera direkt,
+    // ingen "profilen ändras"-popup (det finns inget profil-värde som ändras).
+    if (!profile || !!profile.spotifyAppConfirmed === v) {
+      if (v) void handleConnectSpotify();
+      else applySpotifyDisconnect();
+      return;
+    }
     Alert.alert(
-      'Remove Spotify confirmation',
-      'Do you want to remove your "I have Spotify" confirmation?',
+      'Update your profile?',
+      `Your Profile will be changed to Spotify ${v ? 'ON' : 'OFF'}.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            setSpotifyConnected(false);
-            setSpotifyEnabled(false);
-            const ownId = ownPlayerIdRef.current;
-            if (ownId) {
-              setPlayers((prev) =>
-                prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: false } : p)),
-              );
-            }
-            // Non-host: synka spotify_verified=false till lobby_players.
-            if (!hostMode && ownId) {
-              const ownPlayer = players.find((p) => p.id === ownId);
-              if (ownPlayer) {
-                upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: false }).catch(() => {});
-              }
-            }
-            loadProfile().then((profile) => {
-              if (profile) {
-                saveProfile({ ...profile, spotifyAppConfirmed: false }).catch(() => {});
-              }
-            }).catch(() => {});
+          text: 'OK',
+          onPress: () => {
+            if (v) void handleConnectSpotify();
+            else applySpotifyDisconnect();
           },
         },
       ],
@@ -3142,44 +3186,22 @@ export default function LobbyScreen() {
         'Confirm that you have the Spotify app on this device before enabling Spotify DJ mode. No Spotify account connection is needed — the song opens in your own Spotify app.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'I have Spotify', onPress: handleConnectSpotify },
+          { text: 'I have Spotify', onPress: () => { void handleSpotifyAttestToggle(true); } },
         ],
       );
       return;
     }
     if (val) {
-      // Kontrollera Spotify-attest för approved non-hosts i lobbyn.
+      // HÅRD spärr: host kan INTE aktivera Spotify DJ så länge någon approved
+      // non-host inte bekräftat Spotify-appen (Peter). Tidigare erbjöds en
+      // "Proceed anyway"-väg som flyttade obekräftade spelare till waiting —
+      // den är borttagen; nu blockeras aktiveringen helt tills alla bekräftat.
       const approvedNonHosts = players.filter((p) => !p.isHost && !p.hasLeft && p.approved);
-      const withSpotify = approvedNonHosts.filter((p) => p.spotifyConnected);
       const withoutSpotify = approvedNonHosts.filter((p) => !p.spotifyConnected);
-
-      if (approvedNonHosts.length > 0 && withSpotify.length === 0) {
-        // Check 1: Ingen annan spelare har bekräftat Spotify.
-        Alert.alert(
-          'Spotify not applicable',
-          'No other players have confirmed Spotify. Please ask other players to confirm they have the Spotify app (in their Spotify settings row).',
-        );
-        return;
-      }
       if (withoutSpotify.length > 0) {
-        // Check 2: Några approved spelare saknar Spotify-attest — erbjud att flytta dem till waiting.
         Alert.alert(
-          'Not all players have Spotify',
-          `${withoutSpotify.length} approved player${withoutSpotify.length > 1 ? 's have' : ' has'} not confirmed the Spotify app. They will be moved back to "To be approved" status. Proceed anyway?`,
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Proceed',
-              onPress: () => {
-                setPlayers((prev) =>
-                  prev.map((p) =>
-                    withoutSpotify.some((w) => w.id === p.id) ? { ...p, approved: false } : p,
-                  ),
-                );
-                setSpotifyEnabled(true);
-              },
-            },
-          ],
+          'Players need Spotify',
+          `${withoutSpotify.length} approved player${withoutSpotify.length > 1 ? 's have' : ' has'} not confirmed the Spotify app. Everyone must confirm Spotify (in their settings row) before you can enable Spotify DJ mode.`,
         );
         return;
       }
@@ -3208,6 +3230,31 @@ export default function LobbyScreen() {
     }
     setSpotifyEnabled(val);
   };
+
+  // R2 (Peter): om en approved non-host stänger av sin Spotify-bekräftelse
+  // medan host har Spotify DJ aktivt → stäng av Spotify DJ automatiskt,
+  // aktivera Source Mixerboard (så spelet har innehåll utan Spotify) och
+  // informera host. Changes 1+2 garanterar att spotifyEnabled bara kan vara
+  // true när alla approved non-hosts bekräftat, så det enda som gör en approved
+  // non-host obekräftad här är att de deaktiverat efter godkännandet.
+  // Effekten fyrar exakt en gång: setSpotifyEnabled(false) → deps ändras →
+  // effekten early-returnar på nästa körning.
+  useEffect(() => {
+    if (!hostMode || !spotifyEnabled) return;
+    const someNonHostDisabled = players.some(
+      (p) => !p.isHost && !p.hasLeft && p.approved && !p.spotifyConnected,
+    );
+    if (!someNonHostDisabled) return;
+    setSpotifyEnabled(false);
+    // Aktivera Source Mixerboard om den var tom (Spotify enda källan) så spelet
+    // fortfarande har innehåll. Redan valda källor lämnas orörda.
+    setYoutubeEnabledCategories((prev) => (prev.length > 0 ? prev : defaultEnabledMainCategories()));
+    setImagesEnabledCategories((prev) => (prev.length > 0 ? prev : defaultEnabledMainCategories()));
+    Alert.alert(
+      'Spotify disabled by a player',
+      'Players have disabled Spotify and Source Mixerboard will automatically be activated.',
+    );
+  }, [players, spotifyEnabled, hostMode]);
 
   // Use Packages — Basic-utbudet är alltid implicit aktivt (ingen UI). Hosten
   // kan välja till extra-paket ovanpå. Knytningen mellan packages och
@@ -5967,6 +6014,22 @@ export default function LobbyScreen() {
       return;
     }
 
+    // R3 (Peter): separat spärr — host kan INTE starta ett Spotify-spel om
+    // någon annan approved spelare har Spotify avstängt. Belt-and-suspenders
+    // mot R2-auto-disablen ifall en non-host stänger av sin bekräftelse i
+    // sync-fönstret precis innan start. approvedNonHosts kommer från turnOrder,
+    // vars rader bär spotifyConnected (satt i turnOrder-mappningen ovan).
+    if (spotifyEnabled) {
+      const missingSpotify = approvedNonHosts.filter((p) => !p.spotifyConnected);
+      if (missingSpotify.length > 0) {
+        Alert.alert(
+          'Players missing Spotify',
+          `${missingSpotify.length} player${missingSpotify.length > 1 ? 's have' : ' has'} Spotify disabled. Turn off Spotify DJ, or wait for everyone to confirm the Spotify app, before starting.`,
+        );
+        return;
+      }
+    }
+
     if (!singlePlayerDefault && approvedNonHosts.length === 0) {
       setNoApprovedModalVisible(true);
       return;
@@ -6113,7 +6176,7 @@ export default function LobbyScreen() {
         'Confirm that you have the Spotify app on this device before starting a Spotify DJ game.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'I have Spotify', onPress: handleConnectSpotify },
+          { text: 'I have Spotify', onPress: () => { void handleSpotifyAttestToggle(true); } },
         ],
       );
       return;
@@ -6488,21 +6551,43 @@ export default function LobbyScreen() {
     const hasPureYt = pureYtPool.length > 0;
     const hasImage = imagePool.length > 0;
 
-    // Sekventiell fasordning: Spotify → YouTube → Hints/Image
-    // Ratio med Spotify (IndDev):  25% Spotify / 25% YouTube / 50% Hints.
-    // Ratio utan Spotify (PtP/SP): 50% YouTube / 50% Hints — Spotify-blocken
-    // absorberas av YouTube om YT är aktiverat, annars av Hints.
-    // Fallback: saknas Hints omdirigeras dess block till Spotify → YouTube.
-    let spotifyCount = hasSpotify ? Math.floor(roundsCount / 4) : 0;
-    // YouTube: 25% om Spotify aktiv, 50% om Spotify saknas.
-    const ytDivisor = hasSpotify ? 4 : 2;
-    let ytCount = hasPureYt ? Math.floor(roundsCount / ytDivisor) : 0;
-    let imageCount = roundsCount - spotifyCount - ytCount;
+    // Sekventiell fasordning: Spotify → YouTube → Hints/Image.
+    //
+    // ⚠ MÅSTE spegla quiz.tsx:s block-count-logik EXAKT (app/quiz.tsx, "Fas-
+    // storlekar") — annars lovar previewn en fas-fördelning spelet inte
+    // levererar (t.ex. 2-rundors Sport-YT+Sport-Hints visade [YT, Hints] medan
+    // quiz spelar [YT, YT]). Ratio: Hints golvas FÖRST till 25% (utfyllnad, inte
+    // dragare — Peter 2026-08-14), resten går till YouTube; Spotify tar hela
+    // DJ-varv. Ändras kvoten i quiz.tsx måste den ändras här också.
+    //
+    // Golvningens följd (avsiktlig): vid 2-3 rundor får Hints NOLL.
+    let imageCount = hasImage ? Math.floor(roundsCount / 4) : 0;
+    let restBlocks = roundsCount - imageCount;
 
-    if (!hasImage && imageCount > 0) {
-      if (hasSpotify) spotifyCount += imageCount;
-      else if (hasPureYt) ytCount += imageCount;
-      imageCount = 0;
+    // Spotify: helt antal DJ-varv (gated till IndDev där block = frågor).
+    const playerCount = Math.max(1, approvedPlayers.length);
+    const canRotateDJ = hasSpotify && playerCount > 0 && roundsCount >= playerCount;
+    let spotifyCount = 0;
+    if (canRotateDJ) {
+      const rawSpotify = Math.min(Math.floor(restBlocks / 2), spotifyPool.length);
+      const rotations = Math.max(1, Math.floor(rawSpotify / playerCount));
+      const capped = Math.min(rotations * playerCount, spotifyPool.length, roundsCount);
+      spotifyCount = Math.floor(capped / playerCount) * playerCount;
+      if (spotifyCount > restBlocks) {
+        imageCount = roundsCount - spotifyCount;
+        restBlocks = spotifyCount;
+      }
+    }
+
+    let ytCount = hasPureYt ? restBlocks - spotifyCount : 0;
+
+    // Degenererade lägen: otillgänglig källas block → YouTube först, sedan Hints,
+    // sist Spotify (samma turordning som quiz.tsx).
+    const unallocated = roundsCount - spotifyCount - ytCount - imageCount;
+    if (unallocated > 0) {
+      if (hasPureYt) ytCount += unallocated;
+      else if (hasImage) imageCount += unallocated;
+      else if (hasSpotify) spotifyCount = Math.min(spotifyCount + unallocated, spotifyPool.length);
     }
 
     const slots: GsSlot[] = [];
@@ -6573,7 +6658,7 @@ export default function LobbyScreen() {
     }
 
     return slots;
-  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault, selectedExtraPackages]);
+  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault, selectedExtraPackages, approvedPlayers.length]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -7399,38 +7484,13 @@ export default function LobbyScreen() {
         </View>
         )}
 
-        {/* ── Region Scope ──────────────────────────────────────
-            Host-satt spelregel (vilken kulturell kontext frågorna
-            ska dras från). Visas för alla i lobbyn men kan bara
-            *ändras* av host — samma mönster som Game Mode ovanför. */}
-        <View style={[styles.section, { marginTop: Spacing.sm, gap: Spacing.xs }]}>
-          <View style={styles.regionLabelRow}>
-            <Text style={styles.sectionLabel}>Region Scope</Text>
-            <Pressable
-              style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-              onPress={() =>
-                Alert.alert(
-                  'Region Scope',
-                  "Recognition context — the region the questions are drawn from and whose audience the recognition level is based on. Players get content that's familiar in the chosen region.",
-                )
-              }
-              hitSlop={8}
-              accessibilityLabel="Region Scope info"
-            >
-              <Text style={styles.infoIconText}>i</Text>
-            </Pressable>
-          </View>
-          <TouchableOpacity
-            style={styles.regionTrigger}
-            activeOpacity={0.7}
-            disabled={!hostMode}
-            onPress={() => { if (hostMode) setRegionModalOpen(true); }}
-          >
-            <Text style={{ fontSize: 18 }}>{REGION_FLAGS[region]}</Text>
-            <Text style={styles.regionTriggerText}>{region}</Text>
-            {hostMode && <Text style={{ fontSize: 14, color: Colors.textSecondary }}>⌄</Text>}
-          </TouchableOpacity>
-        </View>
+        {/* ── Region Scope — BORTTAGEN UR LOBBYN (Peter) ────────────
+            Region scope styrs numera enbart via varje spelares Profile,
+            och den avgör deras content-pool redan när lobbyn skapas. I V1
+            är Sweden enda regionen, så en lobby-väljare tillför inget.
+            `region`-staten + RegionModal-plumbingen behålls (seedas till
+            'Sweden', driver HCP-nyckel + quiz-params) så vyn kan återinföras
+            om QuizVibe expanderar till fler länder än Sverige. */}
 
         {/* ── Game Connections ─────────────────────────────────── */}
         {/* Visar vilka källor spelet drar frågor från. Vänsterjusterad lista
@@ -7454,10 +7514,12 @@ export default function LobbyScreen() {
             <View style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: Radius.sm, marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
             {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
                 ÖVERST i boxen, ovanför ikon/rubrik-raden, synlig i BÅDA
-                attest-lägen. Switchen är controlled på spotifyConnected:
-                ON → handleConnectSpotify, OFF → handleDisconnectSpotify
-                (Cancel i disconnect-alerten lämnar den kvar i ON). Grå ram
-                runt text + switch så de läses som EN kontroll. */}
+                attest-lägen. Switchen är controlled på spotifyConnected och
+                går via handleSpotifyAttestToggle: en ändring bekräftas med
+                "Your Profile will be changed to Spotify ON/OFF" och propagerar
+                till profilen (registrerade users). Cancel lämnar switchen kvar
+                (controlled → flippar inte). Grå ram runt text + switch så de
+                läses som EN kontroll. */}
             {/* marginRight: 28 + paddingRight: 4 → attest-switchens högerkant
                 hamnar 32px från boxkanten = samma kolumn som DJ-switchen i
                 rubrikraden (spotifyDJRow paddingRight 18 + controls margin 14).
@@ -7478,9 +7540,26 @@ export default function LobbyScreen() {
                 // Smal höger-padding (2) — vid 4 slog attest-marginalens
                 // 0-golv i på 390pt-skärmar och switchen fastnade ~2pt vänster.
                 paddingRight: 2,
-                paddingVertical: 2,
+                paddingVertical: 6,
               }}
             >
+              {/* Kant-skärande badge, övre vänstra hörnet: spelarens namn.
+                  Grön bg = Spotify bekräftat (toggle on), röd bg = ej
+                  bekräftat. Vit text. bg speglar boxens ramfärg så badgen
+                  läses som en del av ramen (samma mönster som HOST/GUEST). */}
+              {ownSpotifyBadgeName !== '' && (
+                <View
+                  style={[
+                    styles.spotifyAttestBadge,
+                    { backgroundColor: spotifyConnected ? Colors.success : Colors.error },
+                  ]}
+                  pointerEvents="none"
+                >
+                  <Text style={styles.spotifyAttestBadgeText} numberOfLines={1}>
+                    {ownSpotifyBadgeName}
+                  </Text>
+                </View>
+              )}
               <Text
                 style={[styles.spotifyLinkText, { color: Colors.textPrimary, fontSize: FontSize.sm, flex: 1, textDecorationLine: 'none' }]}
               >
@@ -7488,7 +7567,7 @@ export default function LobbyScreen() {
               </Text>
               <Switch
                 value={spotifyConnected}
-                onValueChange={(v) => (v ? handleConnectSpotify() : handleDisconnectSpotify())}
+                onValueChange={(v) => { void handleSpotifyAttestToggle(v); }}
                 trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
                 thumbColor="#FFF"
                 ios_backgroundColor={spotifyConnected ? '#1DB954' : '#3C3C3C'}
@@ -10770,6 +10849,27 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     color: '#1DB954',            // Spotify Green — bekräftar kopplat konto.
     marginTop: 2,
+  },
+  // Kant-skärande namn-badge på attest-boxen (övre vänstra hörnet). bg sätts
+  // inline (grön = bekräftat, röd = ej). Speglar HOST/GUEST-badge-mönstret:
+  // position absolute + top: -8 skär boxramen, parent får ej overflow: hidden.
+  spotifyAttestBadge: {
+    position: 'absolute',
+    top: -8,
+    left: Spacing.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    // Rymmer det längsta playername-formatet (10 bokstäver + "-" + 7 siffror
+    // = 18 tecken, t.ex. "GuestAbcde-1234567") utan trunkering.
+    maxWidth: 240,
+    zIndex: 2,
+  },
+  spotifyAttestBadgeText: {
+    fontSize: FontSize.xs,
+    fontWeight: '700',
+    color: '#FFF',
+    letterSpacing: 0.3,
   },
   spotifyNotActivatedRow: {
     flexDirection: 'row',
