@@ -198,13 +198,13 @@ export function PlayerRow({
           />
         </View>
 
-        {/* Total-HCP-sköld bredvid avataren (§2 UI). Döljs för left-spelare
-            (kortet är då nedtonat/"borta"). Gäst → "Not Defined"-vattenstämpel.
-            Music/Film/Sport ligger i en EGEN full-bredds-rad under meta-raden
-            (fälls ut via "Details") så de inte klämmer PlayerName-kolumnen. */}
+        {/* HCP-sköld bredvid avataren. MUSIC-ONLY LAUNCH: en enda sköld
+            (Total = musik-HCP), ingen kategori-badge (`label` utelämnad), inga
+            Music/Film/Sport-subsköldar. Döljs för left-spelare; gäst →
+            "Not Defined"-vattenstämpel. */}
         {!hasLeft && (hcpNotDefined || hcp !== undefined) && (
           <View style={styles.hcpShieldWrap}>
-            <HCPShieldCard hcp={hcp ?? 99} size={40} label="Total" notDefined={hcpNotDefined} />
+            <HCPShieldCard hcp={hcp ?? 99} size={40} notDefined={hcpNotDefined} />
           </View>
         )}
 
@@ -422,16 +422,9 @@ export function PlayerRow({
         </View>
       )}
 
-      {/* ── Per-kategori-HCP: full-bredds-rad under meta-raden ─────────
-          Fälls ut med "Details" (samma som Assistance/Age). Egen rad så de
-          breda kategori-sköldarna inte klämmer PlayerName-kolumnen. */}
-      {!hasLeft && !hcpNotDefined && hcp !== undefined && detailsExpanded && (
-        <View style={styles.hcpCatRow}>
-          <HCPShieldCard hcp={hcpMusic ?? 99} size={40} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" />
-          <HCPShieldCard hcp={hcpFilm ?? 99} size={40} label="Film" badgeColor={Colors.warning} badgeTextColor="#000" />
-          <HCPShieldCard hcp={hcpSport ?? 99} size={40} label="Sport" badgeColor={Colors.warning} badgeTextColor="#000" />
-        </View>
-      )}
+      {/* MUSIC-ONLY LAUNCH: per-kategori-HCP-raden (Music/Film/Sport-subsköldar)
+          borttagen — bara Total-skölden bredvid avataren visas. "Details"-
+          toggeln styr fortsatt Assistance/Age-pillerna. */}
 
       </View>
 

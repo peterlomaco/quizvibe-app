@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Pressable } from '@/src/components/haptic';
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from './RoundLeaderboard';
 import { Avatar } from './Avatar';
-import { HCPShieldCard } from './HCPShield';
 import { WifiOffIcon } from './WifiOffIcon';
 
 // Höjd på den utfällda per-kategori-sköld-raden (Total/Music/Film/Sport med
@@ -131,10 +129,7 @@ export function LeaderboardTable({
   // delta denna enhet räknat (self + PtP-deltagare); IndDev-peers saknar den.
   hcpCategoryChanges?: Record<string, HcpCategoryChange>;
 }) {
-  // Vilken rad som har sina kategori-sköldar utfällda (en i taget).
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const expandedEntry = expandedId ? entries.find((e) => e.playerId === expandedId) : undefined;
-  const expandedCat = expandedId ? hcpCategoryChanges?.[expandedId] : undefined;
+  // MUSIC-ONLY LAUNCH: kategori-sköld-popupen borttagen (bara inline Total-HCP).
   return (
     <View>
         <View style={styles.lbTable}>
@@ -151,8 +146,6 @@ export function LeaderboardTable({
             // §5 — HCP + förändring (after − before). Negativ = bättre.
             const hcp = hcpChanges?.[entry.playerId];
             const hcpDelta = hcp ? hcp.after - hcp.before : 0;
-            const catChange = hcpCategoryChanges?.[entry.playerId];
-            const isExpanded = expandedId === entry.playerId;
             return (
               <View key={entry.playerId} style={[styles.lbCell, styles.lbLeftCell]}>
                 {/* Avhoppare får ingen placeringssiffra — de deltog inte
@@ -173,24 +166,14 @@ export function LeaderboardTable({
                       {meta}
                     </Text>
                   )}
+                  {/* MUSIC-ONLY LAUNCH: inline "HCP N (delta)" kvar; "+"-knappen
+                      + 4-sköld-popupen (Total/Music/Film/Sport) borttagna. */}
                   {hcp && (
                     <View style={styles.lbHcpLine}>
                       <Text style={styles.lbNameHcp} numberOfLines={1}>
                         HCP {hcp.after}
                         {hcpDelta !== 0 ? ` (${hcpDelta > 0 ? '+' : ''}${hcpDelta})` : ''}
                       </Text>
-                      {/* "+"-knappen sitter direkt efter HCP-texten (inte som
-                          en bred syskon-cell som skulle bredda Player-kolumnen
-                          och trycka resultatet åt höger). */}
-                      {catChange && !entry.hasLeft && (
-                        <Pressable
-                          onPress={() => setExpandedId((cur) => (cur === entry.playerId ? null : entry.playerId))}
-                          hitSlop={8}
-                          style={styles.lbHcpExpandBtn}
-                        >
-                          <Text style={styles.lbHcpExpandText}>{isExpanded ? '−' : '+'}</Text>
-                        </Pressable>
-                      )}
                     </View>
                   )}
                 </View>
@@ -309,44 +292,8 @@ export function LeaderboardTable({
           ))}
         </View>
       </View>
-
-      {/* Utfälld spelares per-kategori-sköldar — separat popup (rör aldrig
-          tabellens kolumner; alla fyra sköldar får gott om plats). */}
-      <Modal
-        visible={!!expandedEntry && !!expandedCat}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setExpandedId(null)}
-      >
-        <Pressable style={styles.lbHcpModalBackdrop} onPress={() => setExpandedId(null)}>
-          {/* Inre Pressable med no-op onPress fångar tappet så backdrop-
-              stängningen inte fyrar när man tappar på själva kortet. */}
-          <Pressable style={styles.lbHcpModalCard} onPress={() => {}}>
-            {expandedEntry && expandedCat && (
-              <>
-                <View style={styles.lbHcpModalTitleRow}>
-                  <Avatar uri={expandedEntry.avatarUri} emoji={expandedEntry.emoji} name={expandedEntry.name} size={30} useBrandFallback />
-                  <View style={styles.lbHcpModalTitleStack}>
-                    <Text style={styles.lbHcpModalName} numberOfLines={1}>
-                      {expandedEntry.name}
-                    </Text>
-                    <Text style={styles.lbHcpModalSub}>HCP Progression</Text>
-                  </View>
-                </View>
-                <View style={styles.lbHcpModalRow}>
-                  <HCPShieldCard hcp={expandedCat.total.after} size={48} label="Total" deltaBadge={expandedCat.total.delta} />
-                  <HCPShieldCard hcp={expandedCat.music.after} size={48} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.music.delta} />
-                  <HCPShieldCard hcp={expandedCat.film.after} size={48} label="Film" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.film.delta} />
-                  <HCPShieldCard hcp={expandedCat.sport.after} size={48} label="Sport" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.sport.delta} />
-                </View>
-                <Pressable style={styles.lbHcpModalClose} onPress={() => setExpandedId(null)}>
-                  <Text style={styles.lbHcpModalCloseText}>Close</Text>
-                </Pressable>
-              </>
-            )}
-          </Pressable>
-        </Pressable>
-      </Modal>
+      {/* MUSIC-ONLY LAUNCH: per-kategori-HCP-popupen (Total/Music/Film/Sport)
+          borttagen — inline "HCP N (delta)" i Player-kolumnen räcker. */}
     </View>
   );
 }

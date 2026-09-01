@@ -187,10 +187,21 @@ export function applyInactivityDecay(progress: HcpProgress, now: Date): HcpProgr
   };
 }
 
-/** Total-HCP (flyttal): snittet av de tre kategoriernas float-HCP (§1.3). */
+/**
+ * Total-HCP (flyttal).
+ *
+ * ⚠ MUSIC-ONLY LAUNCH (2026-09): Total = Music-kategorins HCP, INTE snittet av de
+ * tre. Film/Sport spelas aldrig (katalogen är parkerad) och ligger kvar på
+ * HCP_START = 99 — ett snitt `(Music + 99 + 99) / 3` skulle späda ut en musik-
+ * spelares Total mot 99, vilket motsäger "HCP baserat enbart på musikfrågornas
+ * rätt-svarsfrekvens". Denna enda funktion föder profile.hcp, lobby_players.hcp,
+ * player_hcp_changed-Total och varje Total-sköld (via bundleOf +
+ * resolveDisplayTotalHcp). Återställ snittet när Film/Sport återaktiveras:
+ *   const { Music, Film, Sport } = progress.categories;
+ *   return (Music.hcp + Film.hcp + Sport.hcp) / 3;
+ */
 export function totalHcp(progress: HcpProgress): number {
-  const { Music, Film, Sport } = progress.categories;
-  return (Music.hcp + Film.hcp + Sport.hcp) / 3;
+  return progress.categories.Music.hcp;
 }
 
 /**

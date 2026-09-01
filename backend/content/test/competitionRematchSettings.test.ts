@@ -68,8 +68,8 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     expect(s.answerResponseSeconds).toBe(30);
     expect(s.selectedExtraPackages).toEqual([]);
     expect(s.spotifyEnabled).toBe(false);
-    // Utan snapshot: alla tre käll-kategorier.
-    expect([...s.youtubeEnabledCategories].sort()).toEqual(['Film', 'Music', 'Sport']);
+    // MUSIC-ONLY LAUNCH: default är bara Music (Film/Sport parkerade).
+    expect(s.youtubeEnabledCategories).toEqual(['Music']);
   });
 
   it('ignores an invalid answer-response value from the snapshot', () => {
@@ -78,7 +78,7 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     expect(s.answerResponseSeconds).toBe(30); // faller på profil-defaulten
   });
 
-  it('drops non-catalog categories and falls back to all-3 when empty', () => {
+  it('drops non-catalog categories and falls back to Music-only when empty', () => {
     const weird = {
       ...SNAPSHOT,
       youtubeEnabledCategories: ['Music', 'Bogus'],
@@ -86,8 +86,8 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     };
     const s = buildRematchSettings({ ...PROFILE_DEFAULTS, settings: weird }, 4);
     expect(s.youtubeEnabledCategories).toEqual(['Music']);
-    // Alla ogiltiga → fallback till alla tre.
-    expect([...s.imagesEnabledCategories].sort()).toEqual(['Film', 'Music', 'Sport']);
+    // MUSIC-ONLY LAUNCH: alla ogiltiga → fallback till Music (ej alla tre).
+    expect(s.imagesEnabledCategories).toEqual(['Music']);
   });
 
   it('honors an explicitly-empty images array (Hints turned off last game)', () => {

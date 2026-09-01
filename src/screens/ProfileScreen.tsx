@@ -483,8 +483,7 @@ export default function ProfileScreen() {
   // Profile default settings-blocket (avatar + playerName + setup + Save)
   // — samma kollapsbara mönster som Game connections och Player history.
   const [profileDefaultsExpanded, setProfileDefaultsExpanded] = useState(false);
-  // "+"-utfällning av per-kategori-HCP-sköldarna (Music/Film/Sport). Default av.
-  const [hcpCategoriesExpanded, setHcpCategoriesExpanded] = useState(false);
+  // MUSIC-ONLY LAUNCH: per-kategori-HCP-utfällningen borttagen (bara Total-sköld).
   // Host default settings-blocket (Game Mode → Number of Rounds) —
   // egen huvudrubrik mellan Profile defaults och Game connections, samma
   // kollapsbara mönster som de övriga top-level sektionerna.
@@ -1502,10 +1501,11 @@ export default function ProfileScreen() {
               {playerName}
             </Text>
 
-            {/* Total-HCP-sköld under avatar + namn (§1.3). Music/Film/Sport
-                fälls ut via "HCP per category"-raden under kolumnerna. */}
+            {/* HCP-sköld under avatar + namn. MUSIC-ONLY LAUNCH: en enda sköld
+                (Total = musik-HCP), ingen kategori-badge (`label` utelämnad) och
+                inga Music/Film/Sport-subsköldar. */}
             <View style={styles.hcpShieldWrap}>
-              <HCPShieldCard hcp={hcpShieldBundle.total} size={64} label="Total" />
+              <HCPShieldCard hcp={hcpShieldBundle.total} size={64} />
             </View>
           </View>
 
@@ -1586,34 +1586,11 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
 
-            {/* "HCP per category"-rad — under Assistance-dropdownen i höger-
-                kolumnen. "+"/"−"-toggle fäller ut Music/Film/Sport-sköldarna.
-                Rubriken i samma font som fält-labels ("Assistance level"). */}
-            <Pressable
-              onPress={() => setHcpCategoriesExpanded((v) => !v)}
-              hitSlop={8}
-              style={({ pressed }) => [styles.hcpCatHeaderRow, pressed && { opacity: 0.7 }]}
-            >
-              <View style={styles.hcpCatToggleBox}>
-                <Text style={styles.gameConnectionsChevron}>
-                  {hcpCategoriesExpanded ? '−' : '+'}
-                </Text>
-              </View>
-              <Text style={styles.fieldLabel}>HCP per category</Text>
-            </Pressable>
+            {/* MUSIC-ONLY LAUNCH: "HCP per category"-utfällningen (Music/Film/
+                Sport-subsköldar) borttagen — bara Total-skölden ovan visas. */}
 
           </View>
           </View>
-
-          {/* Per-kategori-HCP (§1.3) — full-bredds-rad, utfälld via raden ovan.
-              Badge-färgen matchar GetReady/countdown-vyns kategori-badge (guld + svart). */}
-          {hcpCategoriesExpanded && (
-            <View style={styles.hcpSubRow}>
-              <HCPShieldCard hcp={hcpShieldBundle.music} size={56} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" />
-              <HCPShieldCard hcp={hcpShieldBundle.film} size={56} label="Film" badgeColor={Colors.warning} badgeTextColor="#000" />
-              <HCPShieldCard hcp={hcpShieldBundle.sport} size={56} label="Sport" badgeColor={Colors.warning} badgeTextColor="#000" />
-            </View>
-          )}
 
           {/* ── Save (inuti kortet) ─────────────────────────────── */}
           <Button
@@ -1774,11 +1751,55 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Source Dashboard */}
+          {/* Music Mixerboard */}
           <View style={styles.field}>
-            <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
+            <Text style={styles.sectionLabel}>MUSIC MIXERBOARD</Text>
+            {/* Grå ram runt hela mixerboarden (Spotify + YouTube + Hints) —
+                samma setup som lobby-vyn. Spotify-blockets egen bg borttagen så
+                ramen blir en enda enhetlig box. */}
+            <View style={styles.mixerboardBox}>
             {/* Spotify DJ-rad — alltid synlig, tillgänglig om konto kopplat */}
-            <View style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: Radius.sm, marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
+            <View style={{ marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
+            {/* Attest-box "I have Spotify App on this device" — samma som lobby-vyn.
+                Kant-skärande namn-badge (grön=bekräftat, röd=ej), toggle höger. */}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+                marginLeft: Spacing.sm,
+                marginRight: 0,
+                marginTop: 6,
+                borderWidth: 1,
+                borderColor: spotifyConnected ? Colors.success : Colors.error,
+                borderRadius: Radius.sm,
+                paddingLeft: Spacing.sm,
+                paddingRight: 18,
+                paddingVertical: 6,
+              }}
+            >
+              {!!playerName && (
+                <View
+                  style={[styles.spotifyAttestBadge, { backgroundColor: spotifyConnected ? Colors.success : Colors.error }]}
+                  pointerEvents="none"
+                >
+                  <Text style={styles.spotifyAttestBadgeText} numberOfLines={1}>{playerName}</Text>
+                </View>
+              )}
+              <Text style={[styles.spotifyLinkText, { color: Colors.textPrimary, fontSize: FontSize.sm, flex: 1, textDecorationLine: 'none' }]}>
+                I have Spotify App on this device
+              </Text>
+              <View style={{ marginRight: -16 }}>
+                <Switch
+                  value={spotifyConnected}
+                  onValueChange={handleToggleSpotifyUser}
+                  trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
+                  thumbColor="#FFF"
+                  ios_backgroundColor={spotifyConnected ? '#1DB954' : '#3C3C3C'}
+                  style={styles.sourceMatrixSwitch}
+                />
+              </View>
+            </View>
             <View style={[styles.spotifyDJRow, { backgroundColor: undefined, borderRadius: undefined, marginBottom: 0 }]}>
               <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 1, marginLeft: -2 }]}>
                 <SpotifyBrandIcon size={22} variant="white" />
@@ -1797,26 +1818,19 @@ export default function ProfileScreen() {
                     <Text style={styles.infoIconText}>i</Text>
                   </Pressable>
                 </View>
-                {/* Self-attest "Spotify user"-toggle (Plan B 2026-07-22) — ersätter
-                    OAuth-connect. Default AV; gated DJ-defaulten till höger. */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 }}>
-                  <Text style={spotifyConnected ? styles.spotifyConnectedLabel : styles.spotifyNoConnectionLabel}>
-                    Spotify user
-                  </Text>
-                  <Switch
-                    value={spotifyConnected}
-                    onValueChange={handleToggleSpotifyUser}
-                    trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={spotifyConnected ? '#1DB954' : '#3C3C3C'}
-                    style={styles.sourceMatrixSwitch}
-                  />
-                </View>
-                {/* Guide-länken nås via info-ikonens popup ("Guide How it
-                    works"-knappen) — inline-länken borttagen 2026-08-06. */}
+                {/* Attest ("I have Spotify App...") ligger i egen box ovanför —
+                    samma som lobby-vyn. Guide via info-ikonens popup. */}
               </View>
-              {/* Toggle — disabled när ej kopplat */}
-              <View style={[styles.spotifyHostControls, { marginRight: -16, alignSelf: 'flex-start', marginTop: 1 }]}>
+              {/* Enabled/Disabled-pill + toggle (samma som lobby). Pillen visas
+                  bara när Spotify är attestat; speglar spotifyEnabled-läget. */}
+              <View style={[styles.spotifyHostControls, { marginRight: -16, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
+                {spotifyConnected && (
+                  <View style={[styles.spotifyAvailPill, spotifyEnabled ? styles.spotifyAvailPillOn : styles.spotifyAvailPillOff]}>
+                    <Text style={[styles.spotifyAvailPillText, !spotifyEnabled && styles.spotifyAvailPillTextOff]}>
+                      {spotifyEnabled ? 'Enabled' : 'Disabled'}
+                    </Text>
+                  </View>
+                )}
                 <Switch
                   value={spotifyConnected && spotifyEnabled}
                   onValueChange={spotifyConnected ? handleToggleSpotifyEnabled : undefined}
@@ -1829,13 +1843,15 @@ export default function ProfileScreen() {
               </View>
             </View>
             {spotifyEnabled && (
-              // paddingLeft: 34 = samma x som "Spotify"-rubriken ovanför
-              // (speglar Lobbys Type:-rad).
-              <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 34, paddingRight: 18, paddingTop: 2, paddingBottom: 2 }}>
+              // Hela Type-blocket höger-ställt (alignItems:'flex-end'): "Type:"-
+              // header + Year/Name-rader nära högerkanten, label direkt till
+              // vänster om sin toggle. Togglarna (marginRight -16) linjerar under
+              // Spotify/YouTube/Hints-togglarna. Speglar lobby-vyn.
+              <View style={{ paddingRight: 18, paddingTop: 2, paddingBottom: 4, alignItems: 'flex-end' }}>
                 <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Type:</Text>
-                <View style={{ marginLeft: 'auto', marginRight: -16, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                  <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
+                  <View style={{ marginRight: -16 }}>
                     <Switch
                       value={spotifyAnswerYear}
                       onValueChange={(v) => {
@@ -1851,8 +1867,10 @@ export default function ProfileScreen() {
                       style={styles.sourceMatrixSwitch}
                     />
                   </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Name</Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                  <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Name</Text>
+                  <View style={{ marginRight: -16 }}>
                     <Switch
                       value={spotifyAnswerName}
                       onValueChange={(v) => {
@@ -1872,42 +1890,31 @@ export default function ProfileScreen() {
               </View>
             )}
             </View>
-            <View
-              style={styles.smGrid}
-              onLayout={(e) => {
-                const w = Math.round((e.nativeEvent.layout.width - 112) / 3);
-                if (w > 0 && w !== smColWidth) setSmColWidth(w);
-              }}
-            >
-
-              {/* Etikett-stack */}
-              <View style={styles.smLabelStack}>
-                <View style={[styles.smHeaderCell, styles.smDataShift]}>
-                  <Text style={styles.sourceMatrixAllText}>All</Text>
-                </View>
-                <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
-                  <Switch
-                    value={sourcesAllEnabled}
-                    onValueChange={handleToggleAllSources}
-                    trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={sourcesAllEnabled ? Colors.success : PROFILE_MATRIX_OFF}
-                    style={styles.profileSwitch}
-                  />
-                </View>
-                <View style={styles.smLabelSourceCell}>
+            {/* Grått streck mellan Spotify-delen och YouTube-delen (speglar lobby). */}
+            <View style={styles.mixerboardDivider} />
+            {/* MUSIC-ONLY LAUNCH: bara två källtoggles (YouTube + Hints), styr
+                Music-kategorin. Ikon + rubrik linjerar med Spotify-raden ovan. */}
+            <View style={{ marginTop: Spacing.xs }}>
+              {/* YouTube-rad — samma vänster-geometri som Spotify-raden. */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingVertical: 8, paddingRight: 18, paddingLeft: Spacing.sm }}>
+                <View style={[styles.connectionIconWrap, { marginLeft: -2 }]}>
                   <YouTubeBrandIcon size={20} />
-                  <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
-                  <Pressable
-                    onPress={() => Alert.alert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers\n• Athletes – sport events')}
-                    hitSlop={8}
-                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  >
-                    <Text style={styles.infoIconText}>i</Text>
-                  </Pressable>
                 </View>
-                <View style={styles.smAutoCell} />
-                <View style={styles.smLabelSourceCell}>
+                <Text style={[styles.sourceMatrixSourceText, { marginLeft: -8 }]}>YouTube</Text>
+                <Pressable
+                  onPress={() => Alert.alert('YouTube', 'Music videos and audio clips — guess the release year.')}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+                <View style={{ marginLeft: 'auto', marginRight: -16 }}>
+                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                </View>
+              </View>
+              {/* Hints-rad — samma vänster-geometri som Spotify/YouTube. */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingVertical: 8, paddingRight: 18, paddingLeft: Spacing.sm }}>
+                <View style={[styles.connectionIconWrap, { marginLeft: -2 }]}>
                   <View style={styles.imagesIconWrap}>
                     <Svg width={20} height={20} viewBox="24 22 32 32">
                       <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
@@ -1915,69 +1922,21 @@ export default function ProfileScreen() {
                     </Svg>
                     <Text style={styles.imagesQMark}>?</Text>
                   </View>
-                  <Text style={styles.sourceMatrixSourceText}>Hints</Text>
-                  <Pressable
-                    onPress={() => Alert.alert('Hints', 'Person name guessing — currently being prepared. Switches are available for when the feature activates.')}
-                    hitSlop={8}
-                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  >
-                    <Text style={styles.infoIconText}>i</Text>
-                  </Pressable>
                 </View>
-              </View>
-
-              {/* Artists kolumn */}
-              <View style={styles.smDataStack}>
-                <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Music</Text>
-                </View>
-                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={artistsAllOn} onValueChange={handleToggleArtistsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={artistsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
-                </View>
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
-                </View>
-                <View style={[styles.smAutoCell, smCellStyle]} />
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
+                <Text style={[styles.sourceMatrixSourceText, { marginLeft: -8 }]}>Hints</Text>
+                <Pressable
+                  onPress={() => Alert.alert('Hints', 'Guess the artist or band from a flag + progressive clues.')}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+                <View style={{ marginLeft: 'auto', marginRight: -16 }}>
                   <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
               </View>
-
-              {/* Actors kolumn */}
-              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
-                <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Film</Text>
-                </View>
-                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={actorsAllOn} onValueChange={handleToggleActorsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
-                </View>
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
-                </View>
-                <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]} />
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
-                </View>
-              </View>
-
-              {/* Athletes kolumn */}
-              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
-                <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Sport</Text>
-                </View>
-                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
-                  <Switch value={athletesAllOn} onValueChange={handleToggleAthletesColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={athletesAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
-                </View>
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={youtubeEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Sport') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
-                </View>
-                <View style={[styles.smAutoCell, smCellStyle, { paddingRight: 0 }]} />
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={imagesEnabledCategories.includes('Sport')} onValueChange={handleToggleAthletesGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Sport') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
-                </View>
-              </View>
-
             </View>
+            </View>{/* ── slut grå mixerboard-ram ── */}
 
           </View>
 
@@ -5039,6 +4998,40 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Kant-skärande namn-badge på attest-boxen (övre vänstra hörnet) — speglar
+  // lobby-vyn. bg sätts inline (grön = attestat, röd = ej).
+  spotifyAttestBadge: {
+    position: 'absolute',
+    top: -8,
+    left: Spacing.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    maxWidth: 240,
+    zIndex: 2,
+  },
+  spotifyAttestBadgeText: {
+    fontSize: FontSize.xs,
+    fontWeight: '700',
+    color: '#FFF',
+    letterSpacing: 0.3,
+  },
+  // Grå ram runt hela mixerboarden (Spotify + YouTube + Hints) — speglar
+  // lobby-vyns mixerboardBox.
+  mixerboardBox: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  // Grått streck inuti mixerboarden mellan Spotify-delen och YouTube-delen.
+  mixerboardDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+    marginVertical: Spacing.xs,
   },
   connectionLabel: {
     fontSize: FontSize.sm,

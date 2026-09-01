@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
-import { MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
+import { type MainCategory } from '../utils/mainCategory';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
 
@@ -154,7 +154,9 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
   const mediaSourceBlock = mediaSource != null ? (
     <View style={styles.mediaSourceWrap}>
       <View style={styles.sideCol}>
-        {MAIN_CATEGORIES.map((c) => (
+        {/* MUSIC-ONLY LAUNCH: bara Music-taggen visas (Film/Sport parkerade).
+            Återinför MAIN_CATEGORIES.map när Film/Sport återaktiveras. */}
+        {(['Music'] as const).map((c) => (
           <SideTag key={c} label={c} active={category === c} accent={CATEGORY_ACCENT} />
         ))}
       </View>

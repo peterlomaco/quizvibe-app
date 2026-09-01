@@ -67,14 +67,16 @@ describe('emptyHcpProgress (§1.1/§1.3 — alla kategorier startar på 99)', ()
   });
 });
 
-describe('totalHcp / resolveDisplayTotalHcp (§1.3 — snitt av 3 kategorier)', () => {
-  it('total = snittet av de tre kategoriernas float-HCP', () => {
-    const p = progress(cat(40), cat(41), cat(42));
-    expect(totalHcp(p)).toBeCloseTo(41, 5);
-    expect(resolveDisplayTotalHcp(p)).toBe(41); // 41 ceil = 41
+describe('totalHcp / resolveDisplayTotalHcp (MUSIC-ONLY: Total = Music)', () => {
+  it('total = Music-kategorins float-HCP (Film/Sport ignoreras)', () => {
+    // MUSIC-ONLY LAUNCH: Total speglar Music, INTE snittet — annars skulle
+    // parkerade Film/Sport (99) späda ut en musik-spelares Total.
+    const p = progress(cat(40), cat(99), cat(99));
+    expect(totalHcp(p)).toBeCloseTo(40, 5);
+    expect(resolveDisplayTotalHcp(p)).toBe(40);
   });
   it('avrundar total uppåt', () => {
-    const p = progress(cat(40), cat(41), cat(41)); // snitt 40.6667
+    const p = progress(cat(40.2), cat(99), cat(99)); // Music 40.2 → ceil 41
     expect(resolveDisplayTotalHcp(p)).toBe(41);
   });
   it('null progress → 99', () => {

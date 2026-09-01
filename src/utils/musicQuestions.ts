@@ -49,34 +49,6 @@ export interface MusicQuestion {
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = [
   {
-    "id": "steamboat-willie-1928",
-    "displayName": "Steamboat Willie",
-    "correctYear": 1928,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "I5pG1wbRKOg",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Did You Catch This?",
-        "license": "standard",
-        "notes": "4K-remaster av Steamboat Willie (public domain sedan jan 2024). Ikononisk öppning med Mickey som visslar på ångbåten."
-      }
-    ]
-  },
-  {
     "id": "cab-calloway-minnie-the-moocher",
     "displayName": "Minnie the Moocher — Cab Calloway",
     "correctYear": 1931,
@@ -229,110 +201,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
-    "id": "the-wizard-of-oz-1939",
-    "displayName": "The Wizard of Oz",
-    "correctYear": 1939,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Judy Garland"
-    ],
-    "distractorNames": [
-      "Shirley Temple",
-      "Vivien Leigh",
-      "Katharine Hepburn",
-      "Ingrid Bergman"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "FfpF8UUVTeM",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Warner On Demand",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Officiell WB-trailer, titeln avslöjar varken skådespelare eller år."
-      }
-    ]
-  },
-  {
-    "id": "citizen-kane-1941",
-    "displayName": "Citizen Kane",
-    "correctYear": 1941,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 74,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Orson Welles"
-    ],
-    "distractorNames": [
-      "Humphrey Bogart",
-      "James Stewart",
-      "Cary Grant",
-      "Gary Cooper"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "fXf2LGhW66M",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Mackenzie Parker",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. OBS: fan-gjord 'modern trailer' på privat kanal — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
-      }
-    ]
-  },
-  {
-    "id": "bambi-1942",
-    "displayName": "Bambi",
-    "correctYear": 1942,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 86,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "YgNx5J0SROE",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Disney UK",
-        "license": "standard",
-        "notes": "Disney UK officiell Diamond Edition-trailer — Bambi i skogen, klassisk Disney-estetik."
-      }
-    ]
-  },
-  {
     "id": "bing-crosby-white-christmas",
     "displayName": "White Christmas — Bing Crosby",
     "correctYear": 1942,
@@ -361,45 +229,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bing Crosby - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
-      }
-    ]
-  },
-  {
-    "id": "casablanca-1942",
-    "displayName": "Casablanca",
-    "correctYear": 1942,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Humphrey Bogart",
-      "Ingrid Bergman"
-    ],
-    "distractorNames": [
-      "Cary Grant",
-      "James Stewart",
-      "Katharine Hepburn",
-      "Greta Garbo"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "0V1eoBH0Zcw",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "thecoolidge",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Original-trailer i HD, titeln avslöjar varken skådespelare eller år."
       }
     ]
   },
@@ -620,45 +449,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
-    "id": "singin-in-the-rain-1952",
-    "displayName": "Singin' in the Rain",
-    "correctYear": 1952,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Gene Kelly",
-      "Debbie Reynolds"
-    ],
-    "distractorNames": [
-      "Fred Astaire",
-      "Frank Sinatra",
-      "Audrey Hepburn",
-      "Grace Kelly"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "D-NJHUasYVA",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Park Circus",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Officiell Park Circus-trailer (rättighetsdistributör), ren titel."
-      }
-    ]
-  },
-  {
     "id": "bill-haley-rock-around-the-clock",
     "displayName": "Rock Around the Clock — Bill Haley & His Comets",
     "correctYear": 1954,
@@ -683,34 +473,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "OLD TAPES",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "lady-and-the-tramp",
-    "displayName": "Lady and the Tramp",
-    "correctYear": 1955,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "SAoLpLXvGN0",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Disney UK",
-        "license": "standard",
-        "notes": "Disney UK officiell Blu-ray-trailer — spagetti-scen + hundar etablerade."
       }
     ]
   },
@@ -899,34 +661,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ritchie Valens - Topic",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell single-version via YouTube Topic (1958 original, ej Los Lobos/film)."
-      }
-    ]
-  },
-  {
-    "id": "johansson-patterson-title-1959",
-    "displayName": "Ingemar Johansson besegrar Floyd Patterson — VM-titeln i tungvikt",
-    "correctYear": 1959,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "qfU54_O6cXI",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "FRIZALZ",
-        "license": "standard",
-        "notes": "Peter-curerat + validerat i in-app-spelaren 2026-08-05. YouTube Short (vertikalt format, svarta kanter i 16:9-spelaren OK). Ingen årtals-spoiler i titeln."
       }
     ]
   },
@@ -1580,44 +1314,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Rolling Stones - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "the-good-the-bad-and-the-ugly-1966",
-    "displayName": "The Good, the Bad and the Ugly",
-    "correctYear": 1966,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Clint Eastwood"
-    ],
-    "distractorNames": [
-      "Charles Bronson",
-      "Steve McQueen",
-      "Lee Marvin",
-      "Yul Brynner"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "WCN5JJY_wiA",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Videotiteln lyder '... Official Trailer #1 - Clint Eastwood Movie (1966) HD'. Peter bedömde 2026-08-13 att slutet av titelraden inte hinner läsas i spelaren och BEHÖLL klippet medvetet — flagga inte om som spoiler. OBS att det som står där är rätt SKÅDESPELARE (frågan är actor-select, svaret = Clint Eastwood), inte bara årtalet. Vill man ta bort risken utan att byta klipp: sätt correctNames till Eli Wallach / Lee Van Cleef (också huvudroller, står inte i titeln)."
       }
     ]
   },
@@ -2463,34 +2159,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "spitz-1972-munich-olympics",
-    "displayName": "Mark Spitz tar 7 OS-guld i München",
-    "correctYear": 1972,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "1Q-tBLGGSkc",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Olympic Games",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1972' vid tecken 34. Officiella IOC-kanalen, ren titel."
-      }
-    ]
-  },
-  {
     "id": "stevie-wonder-superstition",
     "displayName": "Superstition — Stevie Wonder",
     "correctYear": 1972,
@@ -2515,45 +2183,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Weedy Weed Smoker",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
-      }
-    ]
-  },
-  {
-    "id": "the-godfather",
-    "displayName": "The Godfather",
-    "correctYear": 1972,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Marlon Brando",
-      "Al Pacino"
-    ],
-    "distractorNames": [
-      "Jack Nicholson",
-      "Robert Redford",
-      "Dustin Hoffman",
-      "Steve McQueen"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "UaVTIH8mujA",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Paramount Pictures",
-        "license": "standard",
-        "notes": "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener."
       }
     ]
   },
@@ -2767,34 +2396,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "robin-hood-1973",
-    "displayName": "Robin Hood",
-    "correctYear": 1973,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "rekU76GG9Sk",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "Jim Margle",
-        "license": "standard",
-        "notes": "Original 1973 teatral trailer (1:00) — Robin Hood + Maid Marian etableras."
-      }
-    ]
-  },
-  {
     "id": "rolling-stones-angie",
     "displayName": "Angie — The Rolling Stones",
     "correctYear": 1973,
@@ -2920,34 +2521,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "ali-rumble-jungle-1974",
-    "displayName": "Muhammad Ali 'Rumble in the Jungle' mot Foreman",
-    "correctYear": 1974,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "M22nWSzyccE",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "ElTerribleProduction",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — Ali vs Foreman highlights HD (1974)."
-      }
-    ]
-  },
-  {
     "id": "bob-marley-no-woman-no-cry",
     "displayName": "No Woman, No Cry — Bob Marley & The Wailers",
     "correctYear": 1974,
@@ -2972,34 +2545,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "channelTitle": "Bob Marley",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "edstrom-vm-74-vasttyskland",
-    "displayName": "Ralf Edströms volley mot Västtyskland i VM",
-    "correctYear": 1974,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "53PhRbbH1QY",
-        "startSec": 2,
-        "endSec": 22,
-        "channelTitle": "NickDangah",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25. startSec 2 angiven av Peter. SD men REN TITEL - Peters egna LgEmL37z6H0 har '1974' vid tecken 31 av 35 = fullt synligt i spelaren. SD ar bara en note i youtube-validate, en spoilad titel gor fragan trasig; 1974-material ar SD i kallan anda."
       }
     ]
   },
@@ -3114,45 +2659,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bruce Springsteen - Topic",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1975 studio-version)."
-      }
-    ]
-  },
-  {
-    "id": "jaws",
-    "displayName": "Jaws",
-    "correctYear": 1975,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Roy Scheider",
-      "Richard Dreyfuss"
-    ],
-    "distractorNames": [
-      "Robert Redford",
-      "Dustin Hoffman",
-      "Jack Nicholson",
-      "Gene Hackman"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "qCzncv0ISaE",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Universal Pictures",
-        "license": "standard",
-        "notes": "Official Universal Pictures-klipp — 'Bigger Boat'-scenen i 4K HDR."
       }
     ]
   },
@@ -3386,103 +2892,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "nadia-comaneci-montreal-1976",
-    "displayName": "Nadia Comăneci perfekta 10:or i Montreal",
-    "correctYear": 1976,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "5OCVWRFQbss",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Olympics Gymnastics",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1976' vid tecken 45. Officiella IOC-kanalen, ren titel."
-      }
-    ]
-  },
-  {
-    "id": "rocky",
-    "displayName": "Rocky",
-    "correctYear": 1976,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Sylvester Stallone"
-    ],
-    "distractorNames": [
-      "Burt Reynolds",
-      "Steve McQueen",
-      "James Caan",
-      "Gene Hackman"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "-Hk-LYcavrw",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Amazon MGM Studios",
-        "license": "standard",
-        "notes": "MGM Official trailer — Bill Conti's Gonna Fly Now-tema + training-montage."
-      }
-    ]
-  },
-  {
-    "id": "salming-canada-cup-ovation-1976",
-    "displayName": "Stående ovationer till Börje Salming — Canada Cup",
-    "correctYear": 1976,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "lKIVRfCN9jA",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Jeff The Leafs Fan",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1976' vid tecken 49. VERIFIERA I SPELAREN: har star '1976' vid tecken 63 av 95 - bor kapas bort."
-      }
-    ]
-  },
-  {
     "id": "abba-take-a-chance-on-me",
     "displayName": "Take a Chance on Me — ABBA",
     "correctYear": 1977,
@@ -3710,45 +3119,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "star-wars-new-hope",
-    "displayName": "Star Wars: A New Hope",
-    "correctYear": 1977,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Mark Hamill",
-      "Harrison Ford"
-    ],
-    "distractorNames": [
-      "Donald Sutherland",
-      "Jack Nicholson",
-      "Robert Redford",
-      "Warren Beatty"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "vZ734NWnAHA",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Star Wars",
-        "license": "standard",
-        "notes": "Official Star Wars channel — A New Hope trailer. John Williams theme."
-      }
-    ]
-  },
-  {
     "id": "blondie-heart-of-glass",
     "displayName": "Heart of Glass — Blondie",
     "correctYear": 1978,
@@ -3864,45 +3234,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Gloria Gaynor - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "grease-1978",
-    "displayName": "Grease",
-    "correctYear": 1978,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "John Travolta",
-      "Olivia Newton-John"
-    ],
-    "distractorNames": [
-      "Elvis Presley",
-      "Burt Reynolds",
-      "Farrah Fawcett",
-      "Brooke Shields"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ZW0DfsCzfq4",
-        "startSec": 0,
-        "endSec": 20,
-        "channelTitle": "Kurt Harmsworth",
-        "license": "standard",
-        "notes": "Summer Nights-scen med Travolta + Newton-John — ikonisk strandbild."
       }
     ]
   },
@@ -4170,34 +3501,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "borg-mcenroe-wimbledon-1980",
-    "displayName": "Borg-McEnroe Wimbledon-final",
-    "correctYear": 1980,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "nFeLpTjH2pk",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Wimbledon",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1980' vid tecken 33. Officiella Wimbledon-kanalen, ren titel."
-      }
-    ]
-  },
-  {
     "id": "bruce-springsteen-the-river",
     "displayName": "The River — Bruce Springsteen",
     "correctYear": 1980,
@@ -4277,34 +3580,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "miracle-on-ice-1980",
-    "displayName": "Miracle on Ice — USA besegrar Sovjet",
-    "correctYear": 1980,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "aJ6itnbs7Yg",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "ESPN Throwback",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln inleddes med '1980'. ESPN, sista minuten av matchen, ren titel. SD = bara note."
-      }
-    ]
-  },
-  {
     "id": "queen-another-one-bites-the-dust",
     "displayName": "Another One Bites the Dust — Queen",
     "correctYear": 1980,
@@ -4330,125 +3605,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Queen Official",
         "license": "standard",
         "notes": "Bytt 2026-08-10: gamla klippet (Y09uL2qbYCg, Queen - Topic) hade allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster från rättsinnehavarens kanal, HD, blockerad enbart i RU."
-      }
-    ]
-  },
-  {
-    "id": "raging-bull-1980",
-    "displayName": "Raging Bull",
-    "correctYear": 1980,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Robert De Niro"
-    ],
-    "distractorNames": [
-      "Sylvester Stallone",
-      "Jack Nicholson",
-      "Burt Reynolds",
-      "Jon Voight"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "F2UKuKxCJqc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Amazon MGM Studios",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
-      }
-    ]
-  },
-  {
-    "id": "sallskapsresan",
-    "displayName": "Sällskapsresan",
-    "correctYear": 1980,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Lasse Åberg"
-    ],
-    "distractorNames": [
-      "Stig Grybe",
-      "Magnus Härenstam",
-      "Gösta Ekman",
-      "Björn Skifs",
-      "Per Oscarsson"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "3WD7f7pvoSY",
-        "startSec": 10,
-        "endSec": 45,
-        "channelTitle": "HD Retro Trailers",
-        "license": "standard",
-        "notes": "HD originaltrailer. Uno Svenningsson + Lasse Åberg ikonisk öppning."
-      }
-    ]
-  },
-  {
-    "id": "star-wars-empire-strikes-back-1980",
-    "displayName": "Star Wars: The Empire Strikes Back",
-    "correctYear": 1980,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Mark Hamill",
-      "Harrison Ford"
-    ],
-    "distractorNames": [
-      "Kurt Russell",
-      "Christopher Reeve",
-      "Michael Douglas",
-      "Richard Dreyfuss"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "JNwNXF9Y6kY",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Star Wars",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Officiella Star Wars-kanalen, ren titel utan skådespelar- eller års-spoiler."
       }
     ]
   },
@@ -4522,34 +3678,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "wassberg-os-guld-1980",
-    "displayName": "Thomas Wassberg OS-guld 15 km (0.01 sekund!) Lake Placid",
-    "correctYear": 1980,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ZtaY0UckhVI",
-        "startSec": 30,
-        "endSec": 55,
-        "channelTitle": "Jari Isometsä",
-        "license": "standard",
-        "notes": "HD documentary om Wassberg — inkl. OS-guld 1980 med 0.01s marginal. Ersatte SD-klipp (qj-CaxQ6bMM)."
-      }
-    ]
-  },
-  {
     "id": "bjorn-skifs-fangad-i-en-drom",
     "displayName": "Fångad i en dröm — Björn Skifs",
     "correctYear": 1981,
@@ -4606,44 +3734,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1981 vinnare — Storbritannien."
-      }
-    ]
-  },
-  {
-    "id": "gota-kanal",
-    "displayName": "Göta kanal — eller vem drog ur proppen?",
-    "correctYear": 1981,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Janne Carlsson"
-    ],
-    "distractorNames": [
-      "Lasse Åberg",
-      "Stig Grybe",
-      "Gösta Ekman",
-      "Allan Edwall"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "qx7zpGYSm0s",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "NjutafilmsStudioS",
-        "license": "standard",
-        "notes": "Officiell NjutaFilms-trailer. Karaktärerna + kanalscenerna väl representerade."
       }
     ]
   },
@@ -4726,44 +3816,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
-      }
-    ]
-  },
-  {
-    "id": "indiana-jones-raiders",
-    "displayName": "Indiana Jones: Raiders of the Lost Ark",
-    "correctYear": 1981,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Harrison Ford"
-    ],
-    "distractorNames": [
-      "Tom Selleck",
-      "Mel Gibson",
-      "Bruce Willis",
-      "Kurt Russell"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "0xQSIdSRlAk",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Paramount Movies",
-        "license": "standard",
-        "notes": "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
       }
     ]
   },
@@ -4934,45 +3986,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Zoinks Scoob",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-29. Ersatte d-ghe23_uwI. Titeln avslöjar inte årtalet."
-      }
-    ]
-  },
-  {
-    "id": "e-t-the-extra-terrestrial",
-    "displayName": "E.T. the Extra-Terrestrial",
-    "correctYear": 1982,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Henry Thomas",
-      "Drew Barrymore"
-    ],
-    "distractorNames": [
-      "Macaulay Culkin",
-      "River Phoenix",
-      "Elijah Wood",
-      "Jake Gyllenhaal"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "2tK7AMgLvv0",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "IMAX",
-        "license": "standard",
-        "notes": "IMAX official trailer — John Williams theme + iconic bicycle/moon-scen."
       }
     ]
   },
@@ -5575,8 +4588,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "z-tEuBTbobc",
@@ -5758,34 +4773,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "gunde-svan-os-guld-1984",
-    "displayName": "Gunde Svan OS-guld 15 km Sarajevo",
-    "correctYear": 1984,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "U4FVIDWttIs",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "GundeWassberg",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "herreys-diggiloo-diggiley",
     "displayName": "Diggi-Loo Diggi-Ley — Herreys",
     "correctYear": 1984,
@@ -5839,44 +4826,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "18DfMhEx4ddoreHrvZDF6Q",
     "youtubeClips": []
-  },
-  {
-    "id": "jonssonligan-far-guldfeber",
-    "displayName": "Jönssonligan får guldfeber",
-    "correctYear": 1984,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 83,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Gösta Ekman"
-    ],
-    "distractorNames": [
-      "Lasse Åberg",
-      "Stig Grybe",
-      "Magnus Härenstam",
-      "Per Oscarsson"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "FD3jK0gWbPc",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "ZorbaMovies",
-        "license": "standard",
-        "notes": "Trailer. Jönssonligan-gänget tydliga."
-      }
-    ]
   },
   {
     "id": "laura-branigan-self-control",
@@ -6155,72 +5104,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "the-karate-kid-1984",
-    "displayName": "The Karate Kid",
-    "correctYear": 1984,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "bgBy0_y-Ktw",
-        "startSec": 0,
-        "endSec": 30,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Karate Kid: Crane Kick Final Fight Scene (Ralph Macchio, William Zabka)'."
-      }
-    ]
-  },
-  {
-    "id": "the-terminator-1984",
-    "displayName": "The Terminator",
-    "correctYear": 1984,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Arnold Schwarzenegger",
-      "Linda Hamilton"
-    ],
-    "distractorNames": [
-      "Mel Gibson",
-      "Tom Cruise",
-      "Bruce Willis",
-      "Kurt Russell"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "nGrW-OR2uDk",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Amazon MGM Studios",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell 1984-trailer (MGM)."
-      }
-    ]
-  },
-  {
     "id": "tina-turner-whats-love",
     "displayName": "What's Love Got to Do with It — Tina Turner",
     "correctYear": 1984,
@@ -6374,44 +5257,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "a-ha",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Officiella rotoscope-musikvideon på bandets egen kanal — ersatte Topic-audion (statisk albumkonst)."
-      }
-    ]
-  },
-  {
-    "id": "back-to-the-future",
-    "displayName": "Back to the Future",
-    "correctYear": 1985,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Michael J. Fox"
-    ],
-    "distractorNames": [
-      "Rob Lowe",
-      "Tom Hanks",
-      "Emilio Estevez",
-      "Patrick Swayze"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "T_WSXXPQYeY",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Universal Pictures",
-        "license": "standard",
-        "notes": "Official Universal Pictures-klipp — Johnny B. Goode-scenen. BEHÅLLET 2026-08-12: Peters förslag 2LnShmQ_hLc är en privat re-upload av teaser-trailern; rättsinnehavarens klipp är stabilare."
       }
     ]
   },
@@ -7015,45 +5860,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "top-gun",
-    "displayName": "Top Gun",
-    "correctYear": 1986,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Tom Cruise",
-      "Val Kilmer"
-    ],
-    "distractorNames": [
-      "Kevin Bacon",
-      "Mel Gibson",
-      "Patrick Swayze",
-      "Matthew Modine"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "xa_z57UatDY",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Official 1986-trailer — Danger Zone-tema + jet-action."
-      }
-    ]
-  },
-  {
     "id": "cornelis-vreeswijk-sommarkort",
     "displayName": "Sommarkort (En stund på jorden) — Cornelis Vreeswijk",
     "correctYear": 1987,
@@ -7447,34 +6253,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "tre-kronor-vm-1987-vien",
-    "displayName": "Tre Kronor VM-guld Wien",
-    "correctYear": 1987,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 75,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "dUQg2eu6lf4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "HockeySverige",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "u2-with-or-without-you",
     "displayName": "With or Without You — U2",
     "correctYear": 1987,
@@ -7832,34 +6610,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "vinnie-jones-gascoigne-grab",
-    "displayName": "Vinnie Jones griper Gascoigne — det berömda greppet",
-    "correctYear": 1988,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 76,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "FyCw5RLDyYw",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Deadball Diaries",
-        "license": "standard",
-        "notes": "Ikonisk fotbollsmoment — Vinnie Jones (Wimbledon) griper Gascoigne (Newcastle) 1988. Sport-kategori via contentSubject: sport-event."
-      }
-    ]
-  },
-  {
     "id": "whitney-one-moment-in-time",
     "displayName": "One Moment in Time — Whitney Houston",
     "correctYear": 1988,
@@ -7877,8 +6627,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "4Yp2eZ-TMuI",
@@ -7918,44 +6670,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "field-of-dreams-1989",
-    "displayName": "Field of Dreams",
-    "correctYear": 1989,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Kevin Costner"
-    ],
-    "distractorNames": [
-      "Tom Hanks",
-      "Patrick Swayze",
-      "Tom Cruise",
-      "Mel Gibson"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Ut06d4dptWo",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Movieclips",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
-      }
-    ]
-  },
-  {
     "id": "hakan-sodergren-nu-tar-vi-dom",
     "displayName": "Nu tar vi dom — Håkan Södergren & Ishockeylandslaget",
     "correctYear": 1989,
@@ -7973,8 +6687,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "eToFpwpVJ1k",
@@ -8293,44 +7009,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "home-alone",
-    "displayName": "Home Alone",
-    "correctYear": 1990,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Macaulay Culkin"
-    ],
-    "distractorNames": [
-      "Jake Lloyd",
-      "Haley Joel Osment",
-      "Elijah Wood",
-      "Freddie Highmore"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "NOIgZYlYvyk",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "NOW PLAYING",
-        "license": "standard",
-        "notes": "Home Alone (1990) officiell trailer — Kevin McCallister + booby traps etableras."
-      }
-    ]
-  },
-  {
     "id": "londonbeat-ive-been-thinking-about-you",
     "displayName": "I've Been Thinking About You — Londonbeat",
     "correctYear": 1990,
@@ -8438,8 +7116,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "T8T1a45HX4o",
@@ -9124,34 +7804,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "aladdin-1992",
-    "displayName": "Aladdin",
-    "correctYear": 1992,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "GacgWYqL-Bc",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "Marcus R",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-27. Ersatte XBrfbWtmvWs vars titel hade 1992 vid tecken 9 av 53 = spoiler. Svenskt tal."
-      }
-    ]
-  },
-  {
     "id": "bon-jovi-bed-of-roses",
     "displayName": "Bed of Roses — Bon Jovi",
     "correctYear": 1992,
@@ -9633,6 +8285,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "6gAPl8snSQiUoAOpLUDIqA",
     "youtubeClips": [
       {
@@ -9641,72 +8294,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "channelTitle": "Svenne Rubins - Topic",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "sverige-em-1992-semifinal",
-    "displayName": "Sverige semifinal hemma-EM mot Tyskland",
-    "correctYear": 1992,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "8LkwRue9aK4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "hejatysklanduuups",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "the-bodyguard-1992",
-    "displayName": "The Bodyguard",
-    "correctYear": 1992,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Kevin Costner",
-      "Whitney Houston"
-    ],
-    "distractorNames": [
-      "Tom Cruise",
-      "Mel Gibson",
-      "Julia Roberts",
-      "Demi Moore"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "v4qauDAr_hA",
-        "startSec": 0,
-        "endSec": 30,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Bodyguard - Theatrical Trailer' — avslojar varken skadespelare eller ar."
       }
     ]
   },
@@ -9926,47 +8513,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "cool-runnings-1993",
-    "displayName": "Cool Runnings",
-    "correctYear": 1993,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "John Candy"
-    ],
-    "distractorNames": [
-      "Robin Williams",
-      "Bill Murray",
-      "Eddie Murphy",
-      "Chris Farley"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "3mS-l1F5Xvs",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "DVDizzydotcom",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — original 1993-trailer (1080p HD-upscale)."
-      }
-    ]
-  },
-  {
     "id": "cypress-hill-insane-in-the-brain",
     "displayName": "Insane in the Brain — Cypress Hill",
     "correctYear": 1993,
@@ -10057,45 +8603,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "JanetJacksonVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "jurassic-park",
-    "displayName": "Jurassic Park",
-    "correctYear": 1993,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Sam Neill",
-      "Jeff Goldblum"
-    ],
-    "distractorNames": [
-      "Kevin Costner",
-      "Mel Gibson",
-      "Kurt Russell",
-      "Bruce Willis"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "VzZN9AVBS1I",
-        "startSec": 60,
-        "endSec": 75,
-        "channelTitle": "Universal Pictures At Home",
-        "license": "standard",
-        "notes": "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
       }
     ]
   },
@@ -10224,44 +8731,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "sunes-sommar",
-    "displayName": "Sunes sommar",
-    "correctYear": 1993,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Peter Haber"
-    ],
-    "distractorNames": [
-      "Mikael Persbrandt",
-      "Lasse Åberg",
-      "Gösta Ekman",
-      "Johan Ulveson"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "88B9JxorPcI",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "ZorbaMovies",
-        "license": "standard",
-        "notes": "Trailer. Familjefilm, stark igenkänning hos millennials som barn."
-      }
-    ]
-  },
-  {
     "id": "all-4-one-i-swear",
     "displayName": "I Swear — All-4-One",
     "correctYear": 1994,
@@ -10324,34 +8793,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "BonJoviVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "brolin-vm-94-rumanien",
-    "displayName": "Tomas Brolins frisparksmål mot Rumänien i VM",
-    "correctYear": 1994,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "M5QLO0z0K0A",
-        "startSec": 8,
-        "endSec": 27,
-        "channelTitle": "Retro Calcio",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25. HD. VERIFIERA I SPELAREN: titeln ar 77 tecken och '94' star vid tecken 65 - bor kapas bort, men kolla. Peters egna 48x5dX-x7r4 har '1994' vid tecken 25 av 29 = garanterat synligt."
       }
     ]
   },
@@ -10593,72 +9034,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "forrest-gump",
-    "displayName": "Forrest Gump",
-    "correctYear": 1994,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Tom Hanks"
-    ],
-    "distractorNames": [
-      "Kevin Costner",
-      "Robin Williams",
-      "Mel Gibson",
-      "Jim Carrey"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "bSMxl1V8FSg",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Movieclips",
-        "license": "standard",
-        "notes": "Movieclips 'Run, Forrest, Run!'-scenen — iconic moment + theme."
-      }
-    ]
-  },
-  {
-    "id": "forsberg-foppa-flick-lillehammer-1994",
-    "displayName": "Peter Forsbergs straff-flick Lillehammer",
-    "correctYear": 1994,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 96,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Fsc7CqCG8Jc",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Spittin' Chiclets",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1994' vid tecken 17. Ren titel, visar sjalva straffen."
-      }
-    ]
-  },
-  {
     "id": "ges-graver-guld-usa",
     "displayName": "När vi gräver guld i USA — GES",
     "correctYear": 1994,
@@ -10677,8 +9052,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "sport",
-      "football"
+      "football",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "3iAJRvvn8pywXZtvBNNP71",
     "youtubeClips": [
       {
@@ -10782,45 +9159,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1994 vinnare — Irland."
-      }
-    ]
-  },
-  {
-    "id": "pulp-fiction",
-    "displayName": "Pulp Fiction",
-    "correctYear": 1994,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "John Travolta",
-      "Samuel L. Jackson"
-    ],
-    "distractorNames": [
-      "Kevin Costner",
-      "Tom Hanks",
-      "Nicolas Cage",
-      "Denzel Washington"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "s7EdQ4FqbhY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Movieclips",
-        "license": "standard",
-        "notes": "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots. BEHÅLLET 2026-08-12: Peters förslag tGpTpVyI_OQ (Miramax) har titeln 'John Travolta, Uma Thurman, Samuel L. Jackson' = direkt spoiler för actor-select."
       }
     ]
   },
@@ -10971,44 +9309,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "the-lion-king-1994",
-    "displayName": "The Lion King",
-    "correctYear": 1994,
-    "contentSubject": "movie",
-    "questionText": "What is the name of the main character in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": true,
-    "correctNames": [
-      "Simba"
-    ],
-    "distractorNames": [
-      "Mufasa",
-      "Scar",
-      "Nala",
-      "Timon"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "lfiprM5l_cE",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "Aarush Boi",
-        "license": "standard",
-        "notes": "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
-      }
-    ]
-  },
-  {
     "id": "tlc-waterfalls",
     "displayName": "Waterfalls — TLC",
     "correctYear": 1994,
@@ -11091,34 +9391,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
-    "id": "cantona-kungfu-kick-1995",
-    "displayName": "Cantonas kung-fu-spark mot Crystal Palace-fan",
-    "correctYear": 1995,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "C7PSY7KYThk",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Cinematheque Universelle",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1995' vid tecken 42. Ren titel. Detta ar samma klipp som byttes BORT 2026-05 for att vara SD - SD ar bara en note i youtube-validate, en spoilad titel gor fragan trasig. HD-alternativet -qV6bp5cZMU ar aldersbegransat (blockerat)."
-      }
-    ]
-  },
-  {
     "id": "coolio-gangstas-paradise",
     "displayName": "Gangsta's Paradise — Coolio",
     "correctYear": 1995,
@@ -11196,8 +9468,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "QgppLdY0QjU",
@@ -11387,34 +9661,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1995 vinnare — Norge."
-      }
-    ]
-  },
-  {
-    "id": "ali-olympic-torch-atlanta-1996",
-    "displayName": "Muhammad Ali tänder OS-elden i Atlanta",
-    "correctYear": 1996,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 86,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "JOYJA3B4_TA",
-        "startSec": 0,
-        "endSec": 19,
-        "channelTitle": "Fight Greats",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1996' vid tecken 45. Ren titel."
       }
     ]
   },
@@ -11652,8 +9898,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "xm7et8ecVjM",
@@ -12094,8 +10342,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "sport",
-      "football"
+      "football",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "SSbBvKaM6sk",
@@ -12499,45 +10749,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "titanic",
-    "displayName": "Titanic",
-    "correctYear": 1997,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Leonardo DiCaprio",
-      "Kate Winslet"
-    ],
-    "distractorNames": [
-      "Brad Pitt",
-      "Matt Damon",
-      "Julia Roberts",
-      "Sandra Bullock"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "I7c1etV7D7g",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "20th Century Studios",
-        "license": "standard",
-        "notes": "Official 25th Anniversary trailer — Celine Dion theme + iconic scenes."
-      }
-    ]
-  },
-  {
     "id": "ace-of-base-cruel-summer",
     "displayName": "Cruel Summer — Ace of Base",
     "correctYear": 1998,
@@ -12719,8 +10930,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "sport",
-      "football"
+      "football",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "59mdyQniSaNFeXaKMGu9RB",
     "youtubeClips": [
       {
@@ -12793,34 +11006,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1998 vinnare."
-      }
-    ]
-  },
-  {
-    "id": "jordan-last-shot-1998",
-    "displayName": "Michael Jordans 'Last Shot' i NBA-finalen",
-    "correctYear": 1998,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "MlzL6bT1C2U",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Coach Brock",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1998' vid tecken 41. Ren titel."
       }
     ]
   },
@@ -12907,34 +11092,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-30 (ersatte 98ID_halfhs)."
-      }
-    ]
-  },
-  {
-    "id": "mulan-1998",
-    "displayName": "Mulan",
-    "correctYear": 1998,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "sRtZaSkBp58",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Allen Theatres Inc",
-        "license": "standard",
-        "notes": "Original 1998 teatral trailer — Mulan som krigare + Make a Man Out of You-känsla."
       }
     ]
   },
@@ -13524,45 +11681,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "the-matrix",
-    "displayName": "The Matrix",
-    "correctYear": 1999,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Keanu Reeves",
-      "Laurence Fishburne"
-    ],
-    "distractorNames": [
-      "Brad Pitt",
-      "Nicolas Cage",
-      "Hugh Jackman",
-      "Will Smith"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "vKQi3bBA1y8",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Official 1999-trailer — bullet-time + Neo/Trinity-scener."
-      }
-    ]
-  },
-  {
     "id": "zombie-nation-kernkraft-400",
     "displayName": "Kernkraft 400 — Zombie Nation",
     "correctYear": 1999,
@@ -13580,9 +11698,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport",
-      "football"
+      "Club",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "SxhwbXYe1XE",
@@ -13702,44 +11821,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 273,
         "channelTitle": "Coldplay",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "gladiator-2000",
-    "displayName": "Gladiator",
-    "correctYear": 2000,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Russell Crowe"
-    ],
-    "distractorNames": [
-      "Mel Gibson",
-      "Tom Cruise",
-      "Kevin Costner",
-      "Brad Pitt"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "gDbltV8z7dQ",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Paramount Movies",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
       }
     ]
   },
@@ -13931,48 +12012,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "snatch-2000",
-    "displayName": "Snatch",
-    "correctYear": 2000,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Brad Pitt",
-      "Jason Statham"
-    ],
-    "distractorNames": [
-      "Vin Diesel",
-      "Dwayne Johnson",
-      "Gerard Butler",
-      "Mark Wahlberg"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "9Jar2XkBboo",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "Movieclips Classic Trailers",
-        "license": "standard",
-        "notes": "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."
-      }
-    ]
-  },
-  {
     "id": "the-hives-hate-to-say",
     "displayName": "Hate to Say I Told You So — The Hives",
     "correctYear": 2000,
@@ -14111,45 +12150,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "harry-potter-philosophers-stone-2001",
-    "displayName": "Harry Potter and the Philosopher's Stone",
-    "correctYear": 2001,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 91,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Daniel Radcliffe",
-      "Emma Watson"
-    ],
-    "distractorNames": [
-      "Tobey Maguire",
-      "Elijah Wood",
-      "Macaulay Culkin",
-      "Jake Lloyd"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "iSItf2y7hgs",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "ClipZone: Heroes & Villains",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — scen ur 2001-filmen (ej 2026 HBO-reboot-teaser)."
-      }
-    ]
-  },
-  {
     "id": "kylie-minogue-cant-get-you-out-of-my-head",
     "displayName": "Can't Get You Out of My Head — Kylie Minogue",
     "correctYear": 2001,
@@ -14201,45 +12201,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MUSIC EVOLUTION",
         "license": "standard",
         "notes": "Official Video 4K 60fps remaster — HD-fix av tidigare SD-klipp 2026-05-22. Refrängområde."
-      }
-    ]
-  },
-  {
-    "id": "lotr-fellowship-2001",
-    "displayName": "The Lord of the Rings: The Fellowship of the Ring",
-    "correctYear": 2001,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 89,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Elijah Wood",
-      "Ian McKellen"
-    ],
-    "distractorNames": [
-      "Tobey Maguire",
-      "Daniel Radcliffe",
-      "Brendan Fraser",
-      "Ewan McGregor"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "_nZdmwHrcnw",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Warner Bros. Entertainment",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12 — ersatte Movieclips-trailern (V75dMMIW2B4) med rättsinnehavarens 4K Ultra HD-klipp."
       }
     ]
   },
@@ -14318,8 +12279,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "sport",
-      "football"
+      "football",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "2ZlJLzKzRGA",
@@ -14328,34 +12291,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Planet Funk",
         "license": "standard",
         "notes": "Official video 2001."
-      }
-    ]
-  },
-  {
-    "id": "shrek-2001",
-    "displayName": "Shrek",
-    "correctYear": 2001,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "s9nVUOP3Oik",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Dreamworks",
-        "license": "standard",
-        "notes": "DreamWorks officiell trailer (1:48) — Shrek + Åsnon i träsket. Allsvars DreamWorks-kanal."
       }
     ]
   },
@@ -14658,34 +12593,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "finding-nemo",
-    "displayName": "Finding Nemo",
-    "correctYear": 2003,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "6fHR58bSwpg",
-        "startSec": 20,
-        "endSec": 35,
-        "channelTitle": "Saskia Rice",
-        "license": "standard",
-        "notes": "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
-      }
-    ]
-  },
-  {
     "id": "outkast-hey-ya",
     "displayName": "Hey Ya! — OutKast",
     "correctYear": 2003,
@@ -14924,45 +12831,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "eternal-sunshine-of-the-spotless-mind-2004",
-    "displayName": "Eternal Sunshine of the Spotless Mind",
-    "correctYear": 2004,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 76,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Jim Carrey",
-      "Kate Winslet"
-    ],
-    "distractorNames": [
-      "Adam Sandler",
-      "Ben Stiller",
-      "Cameron Diaz",
-      "Julia Roberts"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "86NjzbHhZOE",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Max Caulfield",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. OBS: privat kanal-uppladdning av trailern — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
-      }
-    ]
-  },
-  {
     "id": "gunther-ding-dong-song",
     "displayName": "Ding Dong Song — Günther",
     "correctYear": 2004,
@@ -15031,8 +12899,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "miPLp_U0sMU",
@@ -15041,48 +12911,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Markoolio - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "million-dollar-baby-2004",
-    "displayName": "Million Dollar Baby",
-    "correctYear": 2004,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Hilary Swank",
-      "Clint Eastwood"
-    ],
-    "distractorNames": [
-      "Sandra Bullock",
-      "Charlize Theron",
-      "Tom Hanks",
-      "Denzel Washington"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "5_RsHRmIRBY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell 2004-trailer (Swank/Eastwood). Ej Ava Max-låten."
       }
     ]
   },
@@ -15146,72 +12974,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "sa-som-i-himmelen",
-    "displayName": "Så som i himmelen",
-    "correctYear": 2004,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Mikael Nyqvist"
-    ],
-    "distractorNames": [
-      "Rolf Lassgård",
-      "Björn Skifs",
-      "Mikael Persbrandt",
-      "Peter Haber"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "FT5A0rYUSVE",
-        "startSec": 10,
-        "endSec": 45,
-        "channelTitle": "NuovoCinemaGiornico",
-        "license": "standard",
-        "notes": "Originaltrailer. Oscar-nominerad svensk film. Mikael Nyqvist."
-      }
-    ]
-  },
-  {
-    "id": "stefan-holm-os-guld-2004",
-    "displayName": "Stefan Holm OS-guld höjdhopp Aten",
-    "correctYear": 2004,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "2ubAsMWGoBI",
-        "startSec": 0,
-        "endSec": 14,
-        "channelTitle": "Olympic Games",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2004' vid tecken 33. Officiella IOC-kanalen; '#Athens2004' star vid tecken 96 av 100 = kapas bort."
-      }
-    ]
-  },
-  {
     "id": "usher-yeah",
     "displayName": "Yeah! — Usher",
     "correctYear": 2004,
@@ -15235,39 +12997,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 251,
         "channelTitle": "7clouds",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "zlatan-heel-italy-em-2004",
-    "displayName": "Zlatans häl-mål mot Italien EM-04",
-    "correctYear": 2004,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport",
-      "football"
-    ],
-    "inBaseCatalog": false,
-    "youtubeClips": [
-      {
-        "videoId": "Z8iQiYSMXi4",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "TV4 Sport",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25. Rattsinnehavarens egen kanal. SD (bara en note i youtube-validate). Titeln ar 69 tecken med '2004' vid tecken 53 - bor kapas bort i spelaren; Peters egen matning 2026-08-13 visade att tecken 54 inte syns."
       }
     ]
   },
@@ -15776,34 +13505,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "tre-kronor-os-turin-2006",
-    "displayName": "Tre Kronor OS-guld Turin",
-    "correctYear": 2006,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "StClSX9cNVY",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "simmerpuck",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2006' vid tecken 41. Ren titel."
-      }
-    ]
-  },
-  {
     "id": "chris-brown-with-you",
     "displayName": "With You — Chris Brown",
     "correctYear": 2007,
@@ -16257,34 +13958,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "federer-nadal-wimbledon-2008",
-    "displayName": "Federer-Nadal Wimbledon-final ('greatest match')",
-    "correctYear": 2008,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "k6k3TDXbmGM",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Secret Base",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2008' vid tecken 42. VERIFIERA I SPELAREN: har star '2008' vid tecken 72 av 76 - bor kapas bort. Enda ratt-event-klippet utan tidigt artal."
-      }
-    ]
-  },
-  {
     "id": "kate-ryan-ella-elle-la",
     "displayName": "Ella, elle l'a — Kate Ryan",
     "correctYear": 2008,
@@ -16388,34 +14061,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "phelps-beijing-8-guld-2008",
-    "displayName": "Michael Phelps 8 OS-guld Peking",
-    "correctYear": 2008,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "sftrI-e8nHg",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Bao Highlights",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "rio-shine-on",
     "displayName": "Shine On — R.I.O.",
     "correctYear": 2008,
@@ -16449,45 +14094,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "the-dark-knight-2008",
-    "displayName": "The Dark Knight",
-    "correctYear": 2008,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Christian Bale",
-      "Heath Ledger"
-    ],
-    "distractorNames": [
-      "Ben Affleck",
-      "Robert Downey Jr.",
-      "Hugh Jackman",
-      "Ryan Reynolds"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "EXeTwQWrcwY",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell 2008-trailer #1 (Nolan)."
-      }
-    ]
-  },
-  {
     "id": "alexander-rybak-fairytale",
     "displayName": "Fairytale — Alexander Rybak",
     "correctYear": 2009,
@@ -16512,45 +14118,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2009 vinnare — Norge."
-      }
-    ]
-  },
-  {
-    "id": "avatar",
-    "displayName": "Avatar",
-    "correctYear": 2009,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Sam Worthington",
-      "Zoe Saldana"
-    ],
-    "distractorNames": [
-      "Matt Damon",
-      "Chris Pratt",
-      "Mila Kunis",
-      "Scarlett Johansson"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "5PSNL1qE6VY",
-        "startSec": 60,
-        "endSec": 75,
-        "channelTitle": "20th Century Studios",
-        "license": "standard",
-        "notes": "20th Century Studios official 2009-trailer — Pandora-värld, Na'vi-action."
       }
     ]
   },
@@ -16587,34 +14154,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Popular Music",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-27. Ersatte Topic-klippet OIPmhkzN2ug. Lyrics-version. startSec 15 angiven av Peter."
-      }
-    ]
-  },
-  {
-    "id": "bolt-100m-world-record-2009",
-    "displayName": "Usain Bolt slår 100m-VR (9.58s)",
-    "correctYear": 2009,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "DiJKCQSkjOw",
-        "startSec": 60,
-        "endSec": 75,
-        "channelTitle": "World Athletics",
-        "license": "standard",
-        "notes": "World Athletics official channel — Berlin 2009 100m WR 9.58s."
       }
     ]
   },
@@ -17276,45 +14815,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "the-social-network-2010",
-    "displayName": "The Social Network",
-    "correctYear": 2010,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Jesse Eisenberg",
-      "Andrew Garfield"
-    ],
-    "distractorNames": [
-      "Michael Cera",
-      "Joseph Gordon-Levitt",
-      "Shia LaBeouf",
-      "Anton Yelchin"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "rBCNU0XT9GY",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Sony Pictures Releasing UK",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Officiell Sony-trailer. Titeln innehåller '15 October 2010' men frågan är actor-select, så året är inte svaret — får INTE bytas till timeline utan nytt klipp."
-      }
-    ]
-  },
-  {
     "id": "timoteij-kom",
     "displayName": "Kom — Timoteij",
     "correctYear": 2010,
@@ -17661,47 +15161,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Maroon5VEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 60 angiven av Peter - videon ar 4:39 mot latens 3:21 och oppnar med intervjuklipp."
-      }
-    ]
-  },
-  {
-    "id": "moneyball-2011",
-    "displayName": "Moneyball",
-    "correctYear": 2011,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Brad Pitt"
-    ],
-    "distractorNames": [
-      "Matt Damon",
-      "George Clooney",
-      "Ryan Gosling",
-      "Christian Bale"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "-4QPVo0UIzc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Rotten Tomatoes Trailers",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -18076,34 +15535,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "zlatan-bicycle-kick-england-2012",
-    "displayName": "Zlatans bicycle kick mot England",
-    "correctYear": 2012,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "RM_5tJncHww",
-        "startSec": 0,
-        "endSec": 25,
-        "channelTitle": "GOAL",
-        "license": "standard",
-        "notes": "GOAL-kanal. Zlatans bicycle kick mot England 14/11-2012. Ersatte blockerat klipp."
-      }
-    ]
-  },
-  {
     "id": "avicii-hey-brother",
     "displayName": "Hey Brother — Avicii",
     "correctYear": 2013,
@@ -18245,44 +15676,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Håkan Hellström - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "hundraringen-klev-ut",
-    "displayName": "Hundraåringen som klev ut genom fönstret och försvann",
-    "correctYear": 2013,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Robert Gustafsson"
-    ],
-    "distractorNames": [
-      "Rolf Lassgård",
-      "Mikael Nyqvist",
-      "Peter Haber",
-      "Mikael Persbrandt"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "pjiJ1cL3Uss",
-        "startSec": 10,
-        "endSec": 45,
-        "channelTitle": "Buena Vista Sverige",
-        "license": "standard",
-        "notes": "Officiell svensk trailer. Buena Vista Sverige. Robert Gustafsson."
       }
     ]
   },
@@ -18668,34 +16061,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "kalla-os-guld-stafett-2014",
-    "displayName": "Charlotte Kalla OS-guld stafett Sochi",
-    "correctYear": 2014,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "mlLqT65ADys",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Olympic Games",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2014' vid tecken 32. Officiella IOC-kanalen, ren titel - Kallas comeback pa sista strackan."
-      }
-    ]
-  },
-  {
     "id": "mark-ronson-uptown-funk",
     "displayName": "Uptown Funk — Mark Ronson ft. Bruno Mars",
     "correctYear": 2014,
@@ -18949,44 +16314,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "en-man-som-heter-ove",
-    "displayName": "En man som heter Ove",
-    "correctYear": 2015,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Rolf Lassgård"
-    ],
-    "distractorNames": [
-      "Robert Gustafsson",
-      "Mikael Nyqvist",
-      "Mikael Persbrandt",
-      "Peter Haber"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "q84plEEyGZY",
-        "startSec": 12,
-        "endSec": 47,
-        "channelTitle": "MovieZine",
-        "license": "standard",
-        "notes": "Officiell svensk trailer. Rolf Lassgård. SF Studios-produktion."
-      }
-    ]
-  },
-  {
     "id": "major-lazer-lean-on",
     "displayName": "Lean On — Major Lazer & DJ Snake feat. MØ",
     "correctYear": 2015,
@@ -19191,34 +16518,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ZaraLarssonMusicVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Ersatte Topic-klippet 8BmMB3i--FM med officiella musikvideon (samma langd 3:22, sa startSec 30 traffar samma parti)."
-      }
-    ]
-  },
-  {
-    "id": "angry-birds",
-    "displayName": "The Angry Birds Movie",
-    "correctYear": 2016,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "e4sdQBmqnuA",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Sony Pictures Releasing UK",
-        "license": "standard",
-        "notes": "Sony Pictures UK — officiell 2016-trailer. Red + Bomb + Chuck i fokus. Ej embed-blockerad."
       }
     ]
   },
@@ -19437,8 +16736,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "46NBoIAHrmR7qcUGCIFEjR",
     "youtubeClips": [
       {
@@ -19540,34 +16841,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Laleh",
         "license": "standard",
         "notes": "Official music video. 85M+ streams."
-      }
-    ]
-  },
-  {
-    "id": "leicester-premier-league-2016",
-    "displayName": "Leicester City vinner Premier League",
-    "correctYear": 2016,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "7MHy3eS43FE",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Sky Sports Retro",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — ögonblicket Leicester blev mästare 2016 (Sky Sports)."
       }
     ]
   },
@@ -19687,34 +16960,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "simone-biles-rio-2016",
-    "displayName": "Simone Biles 4 OS-guld i Rio",
-    "correctYear": 2016,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "aBrmCgCuwno",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "TNT Sports",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "weeknd-starboy",
     "displayName": "Starboy — The Weeknd",
     "correctYear": 2016,
@@ -19802,86 +17047,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ZaynVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "zootopia-2016",
-    "displayName": "Zootopia",
-    "correctYear": 2016,
-    "contentSubject": "movie",
-    "questionText": "What is the name of the main character in this film?",
-    "itemHcp": 86,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": true,
-    "correctNames": [
-      "Judy Hopps"
-    ],
-    "distractorNames": [
-      "Simba",
-      "Nemo",
-      "Shrek",
-      "Mulan"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "CzvH6_e2a-U",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Zero Media",
-        "license": "standard",
-        "notes": "Scen: Judy Hopps anländer till Zootopia — Try Everything (Shakira) i bakgrunden. HD trailer."
-      }
-    ]
-  },
-  {
-    "id": "borg-vs-mcenroe-2017",
-    "displayName": "Borg vs McEnroe",
-    "correctYear": 2017,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Sverrir Gudnason",
-      "Shia LaBeouf"
-    ],
-    "distractorNames": [
-      "Tom Hanks",
-      "Benedict Cumberbatch",
-      "Michael Fassbender",
-      "Joel Edgerton"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "yQgWMs0TBKU",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "SF Studios",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
       }
     ]
   },
@@ -19999,34 +17164,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ed Sheeran",
         "license": "standard",
         "notes": "Officiell musikvideo (Ed Sheeran-kanalen)."
-      }
-    ]
-  },
-  {
-    "id": "federer-australian-open-2017",
-    "displayName": "Federers comeback-vinst Australian Open",
-    "correctYear": 2017,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "TzA0pe2DQ_s",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Australian Open",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -20222,34 +17359,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "tre-kronor-vm-2017-koln",
-    "displayName": "Tre Kronor VM-guld Köln",
-    "correctYear": 2017,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 75,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "EjxAdkmx3vs",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "IIHF",
-        "license": "standard",
-        "notes": "IIHF official channel — Canada-Sweden 2017 World Championship final highlights. Curerad 2026-05-27 via refined query."
-      }
-    ]
-  },
-  {
     "id": "zayn-dusk-till-dawn",
     "displayName": "Dusk Till Dawn — ZAYN feat. Sia",
     "correctYear": 2017,
@@ -20401,34 +17510,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "emil-forsberg-vs-schweiz-vm-2018",
-    "displayName": "Emil Forsbergs mål mot Schweiz åttondelsfinal",
-    "correctYear": 2018,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "6jvU9naWHV0",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Sports Heroes",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "fuego-eleni-foureira",
     "displayName": "Fuego — Eleni Foureira",
     "correctYear": 2018,
@@ -20575,8 +17656,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "sport",
-      "football"
+      "football",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "1p0RjMued7Tmm0o7CjzoHY",
     "youtubeClips": []
   },
@@ -20687,8 +17770,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "sport",
-      "football"
+      "football",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "3HTgmcqR7nYtD7EmJ4hOLi",
     "youtubeClips": [
       {
@@ -21200,34 +18285,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "duplantis-stavhopp-vr-2020",
-    "displayName": "Armand Duplantis sätter stavhopps-VR (6.17m)",
-    "correctYear": 2020,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "aeKnFJS8orA",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "World Athletics",
-        "license": "standard",
-        "notes": "World Athletics official channel — Duplantis 6.17m world record Toruń 2020. Curerad 2026-05-27 via refined query."
-      }
-    ]
-  },
-  {
     "id": "glass-animals-heat-waves",
     "displayName": "Heat Waves — Glass Animals",
     "correctYear": 2020,
@@ -21360,8 +18417,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "sport",
-      "football"
+      "football",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "2iL0W5qi0ivZ9WRXbZ74cS",
     "youtubeClips": []
   },
@@ -22124,34 +19183,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2024 vinnare. ESC 2024 official music video."
-      }
-    ]
-  },
-  {
-    "id": "moregard-os-brons-paris-2024",
-    "displayName": "Truls Möregård OS-brons bordtennis Paris",
-    "correctYear": 2024,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 72,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "npkVrfT11zQ",
-        "startSec": 80,
-        "endSec": 110,
-        "channelTitle": "Kanal 5 Sverige",
-        "license": "standard",
-        "notes": "Kanal 5 Sverige — Truls Möregårds OS-brons i bordtennis Paris 2024."
       }
     ]
   },

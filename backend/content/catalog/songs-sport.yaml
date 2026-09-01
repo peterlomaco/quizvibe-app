@@ -1,11 +1,16 @@
 # Sport-musik — låtar med sportinriktning (fotbolls-VM/EM-låtar, hockey-VM-
 # låtar, idrottare som gjort musik). Crossover-kategori: contentForm=youtube
-# ("YouTube"), contentSubject=song ("musik", svaret är årtal), och varje item
-# bär genrePackages: ["sport"] ("sport"-taggen). Klientens mainCategory-filter
-# låter dessa matcha BÅDE Music- och Sport-togglarna (sport-tema-låt).
+# ("YouTube"), contentSubject=song ("musik", svaret är årtal).
+#
+# ⚠ MUSIC-ONLY LAUNCH (2026-09): items som Peter märkt "Music" i Musik sport.xlsx
+# ingår i "Sport Anthems"-temapaketet (pkg-sport-anthems) — de bär
+# genrePackages: [..., "sport-anthems"] + inBaseCatalog: false (paket-exklusiva,
+# surfar bara när paketet är aktivt). Items märkta "Sport" (Brandsta, Anis Don
+# Demina, Wavin' Flag, Mera mål, Långa Bollar, Gul och blå, Det ligger nåt i
+# luften) lämnas OTAGGADE + inBaseCatalog: false → parkerade (surfar aldrig utan
+# ett football/sport-paket som inte shippar). Se Workstream G i pivot-planen.
 #
 # audience: ["all"] eftersom sport-hymner känns igen tvärs generationer.
-# Item-level audience-override för väldigt nya låtar (t.ex. Duplantis "Bop").
 # correctYear = release-år. region sweden = svensk igenkänning (V1).
 audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
 region: ["sweden"]
@@ -19,6 +24,7 @@ items:
     displayName: "När vi gräver guld i USA — GES"
     correctYear: 1994
     probability: 88
+    inBaseCatalog: false
     wikimediaSearchHints: ["Glenmark Eriksson Strömstedt När vi gräver guld i USA 1994"]
     answerMethods: ["timeline"]
     spotifyTrackId: "3iAJRvvn8pywXZtvBNNP71"
@@ -28,12 +34,13 @@ items:
         endSec: 45
         channelTitle: "Glenmark Eriksson Strömstedt - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport", "football"]
+    genrePackages: ["sport", "football", "sport-anthems"]
   - id: nick-borgen-den-glider-in
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Den glider in — Nick Borgen"
     correctYear: 1995
     probability: 88
+    inBaseCatalog: false
     wikimediaSearchHints: ["Nick Borgen Den glider in 1995"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -42,7 +49,7 @@ items:
         endSec: 45
         channelTitle: "Tre Kronor - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   - id: markoolio-mera-mal
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mera mål — Markoolio"
@@ -64,6 +71,7 @@ items:
     displayName: "In med bollen — Markoolio"
     correctYear: 2004
     probability: 80
+    inBaseCatalog: false
     wikimediaSearchHints: ["Markoolio In med bollen EM 2004"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -72,12 +80,13 @@ items:
         endSec: 45
         channelTitle: "Markoolio - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   - id: tomas-ledin-vi-ar-pa-gang
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vi är på gång — Tomas Ledin"
     correctYear: 1983
     probability: 78
+    inBaseCatalog: false
     wikimediaSearchHints: ["Tomas Ledin Vi är på gång 1983 Melodifestivalen"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -85,20 +94,23 @@ items:
         startSec: 5
         endSec: 50
         channelTitle: "uutiiset"
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   - id: friends-in-need-alla-vi
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alla vi — Friends In Need"
     correctYear: 1999
     probability: 80
+    inBaseCatalog: false
     wikimediaSearchHints: ["Dr Alban Björn Borg Tomas Brolin Alla vi 1999"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   - id: svenne-rubins-langa-bollar-pa-bengt
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Långa Bollar På Bengt — Svenne Rubins"
     correctYear: 1992
     probability: 82
+    region: ["sweden"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Svenne Rubins Långa bollar på Bengt 1992 fotboll"]
     answerMethods: ["timeline"]
     spotifyTrackId: "6gAPl8snSQiUoAOpLUDIqA"
@@ -113,9 +125,10 @@ items:
     displayName: "Sweet Caroline — DJ Ötzi"
     correctYear: 2019
     probability: 84
+    inBaseCatalog: false
     wikimediaSearchHints: ["DJ Ötzi Sweet Caroline cover"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football"]
+    genrePackages: ["sport", "football", "sport-anthems"]
     spotifyTrackId: "3HTgmcqR7nYtD7EmJ4hOLi"
     youtubeClips:
       - videoId: "LVrlbGIIgbw"
@@ -159,9 +172,10 @@ items:
     displayName: "Våran sång — Miss Li"
     correctYear: 2018
     probability: 76
+    inBaseCatalog: false
     wikimediaSearchHints: ["Miss Li Våran sång Sverige fotboll VM 2018"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football"]
+    genrePackages: ["sport", "football", "sport-anthems"]
     spotifyTrackId: "1p0RjMued7Tmm0o7CjzoHY"
     youtubeClips: []
   - id: bolaget-det-ligger-nat-i-luften
@@ -201,6 +215,7 @@ items:
     correctYear: 1989
     probability: 84
     region: ["sweden"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Håkan Södergren Nu tar vi dom hockey-VM 1989"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -209,15 +224,16 @@ items:
         endSec: 45
         channelTitle: "Håkan Södergren - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   - id: poodles-en-for-alla-for-en
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "En för alla, för en — Tre Kronor & The Poodles"
     correctYear: 2013
     probability: 78
+    inBaseCatalog: false
     wikimediaSearchHints: ["The Poodles En för alla för en hockey-VM 2013"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   # ── Övrig svensk sport-musik ──
   # ── Internationella fotbolls-VM/EM-låtar ──
   - id: lightning-seeds-three-lions
@@ -226,6 +242,7 @@ items:
     correctYear: 1996
     probability: 80
     region: ["europe"]
+    inBaseCatalog: false
     wikimediaSearchHints: ["Lightning Seeds Three Lions Football's Coming Home 1996"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -234,12 +251,13 @@ items:
         endSec: 45
         channelTitle: "Baddiel - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   - id: new-order-world-in-motion
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "World in Motion — New Order"
     correctYear: 1990
     probability: 76
+    inBaseCatalog: false
     wikimediaSearchHints: ["New Order World in Motion 1990 England World Cup"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -248,7 +266,7 @@ items:
         endSec: 45
         channelTitle: "New Order - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   - id: knaan-wavin-flag
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wavin' Flag — K'naan"
@@ -270,6 +288,7 @@ items:
     displayName: "One Moment in Time — Whitney Houston"
     correctYear: 1988
     probability: 80
+    inBaseCatalog: false
     wikimediaSearchHints: ["Whitney Houston One Moment in Time 1988 Olympics"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -278,12 +297,13 @@ items:
         endSec: 45
         channelTitle: "Whitney Houston - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   - id: guetta-this-ones-for-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "This One's for You — David Guetta ft. Zara Larsson"
     correctYear: 2016
     probability: 82
+    inBaseCatalog: false
     wikimediaSearchHints: ["David Guetta Zara Larsson This One's for You UEFA Euro 2016"]
     answerMethods: ["timeline"]
     spotifyTrackId: "46NBoIAHrmR7qcUGCIFEjR"
@@ -293,15 +313,16 @@ items:
         endSec: 30
         channelTitle: "David Guetta"
         notes: "Officiell MV från David Guettas kanal. UEFA EURO 2016 Official Song. Ersätter Topic-versionen."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "sport-anthems"]
   - id: bono-we-are-the-people
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Are the People — Martin Garrix ft. Bono & The Edge"
     correctYear: 2021
     probability: 80
+    inBaseCatalog: false
     wikimediaSearchHints: ["Martin Garrix Bono Edge We Are the People UEFA Euro 2020"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football"]
+    genrePackages: ["sport", "football", "sport-anthems"]
     spotifyTrackId: "2iL0W5qi0ivZ9WRXbZ74cS"
     youtubeClips: []
   # ── Idrottare som gjort musik ──
@@ -310,18 +331,20 @@ items:
     displayName: "Bop — Armand Duplantis"
     correctYear: 2025
     probability: 74
+    inBaseCatalog: false
     wikimediaSearchHints: ["Mondo Armand Duplantis Bop 2025"]
     answerMethods: ["timeline"]
-    genrePackages: ["pkg-sport"]
+    genrePackages: ["pkg-sport", "sport-anthems"]
   # ── Fotbollsatmosfär ──
   - id: blur-song-2
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Song 2 — Blur"
     correctYear: 1997
     probability: 88
+    inBaseCatalog: false
     wikimediaSearchHints: ["Blur Song 2 1997 British rock"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football"]
+    genrePackages: ["sport", "football", "sport-anthems"]
     youtubeClips:
       - videoId: "SSbBvKaM6sk"
         startSec: 0
@@ -333,9 +356,10 @@ items:
     displayName: "Kernkraft 400 — Zombie Nation"
     correctYear: 1999
     probability: 86
+    inBaseCatalog: false
     wikimediaSearchHints: ["Zombie Nation Kernkraft 400 1999 techno dance"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football"]
+    genrePackages: ["Club", "sport-anthems"]
     youtubeClips:
       - videoId: "SxhwbXYe1XE"
         startSec: 0
@@ -347,9 +371,10 @@ items:
     displayName: "Carnaval de Paris — Dario G"
     correctYear: 1998
     probability: 84
+    inBaseCatalog: false
     wikimediaSearchHints: ["Dario G Carnaval de Paris 1998 France World Cup anthem"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football"]
+    genrePackages: ["sport", "football", "sport-anthems"]
     spotifyTrackId: "59mdyQniSaNFeXaKMGu9RB"
     youtubeClips:
       - videoId: "dLB56lFYlBI"
@@ -362,9 +387,10 @@ items:
     displayName: "Chase the Sun — Planet Funk"
     correctYear: 2001
     probability: 82
+    inBaseCatalog: false
     wikimediaSearchHints: ["Planet Funk Chase the Sun 2001 dance electronic"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football"]
+    genrePackages: ["sport", "football", "sport-anthems"]
     youtubeClips:
       - videoId: "2ZlJLzKzRGA"
         startSec: 0

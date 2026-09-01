@@ -129,8 +129,8 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         a: 'Theme Packages are purchasable extra packages you can select to make a game round specifically focused on a certain theme. Theme packages will be available continously — they are parked for the V1 launch and arrive in v1.1+. Right now everyone gets the free generation package that matches the year they chose at registration.',
       },
       {
-        q: 'Why do some questions have video and others have an image?',
-        a: 'We have two question types covering our three main categories (Music, Film, Sport): YouTube clips (answer = year) and images of artists, actors, and athletes (answer = name). The Host can disable YouTube or images in the Lobby\'s Game Connections block, but at least one source must be active.',
+        q: 'Why do some questions play a clip and others show hints?',
+        a: 'QuizVibe is a music quiz with two question types: YouTube / Spotify song clips (answer = the release year) and artist/band Hints — a flag plus progressive clues (answer = the name). The Host tunes which sources are used in the Lobby\'s Music Mixerboard, but at least one source must be active.',
       },
     ],
   },
@@ -344,8 +344,8 @@ export default function FAQScreen() {
         })}
 
         <Text style={styles.footnote}>
-          Missing an answer? Email info@quizvibe.se and we'll add
-          the question here if it's of general value.
+          Missing an answer? Email info@quizvibe.se and we&apos;ll add
+          the question here if it&apos;s of general value.
         </Text>
 
         <View style={styles.bottomPad} />

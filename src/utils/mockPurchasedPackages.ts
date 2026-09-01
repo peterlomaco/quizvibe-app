@@ -49,6 +49,15 @@ export interface MusicPackage {
 export const PURCHASED_PACKAGES: MusicPackage[] = [
   { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'], allowSpotifyOnly: true },
   { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['hiphop'], allowSpotifyOnly: true },
+  // Sport Anthems (music-only launch 2026-09): sport-relaterad MUSIK (fotbolls-/
+  // hockey-VM-låtar, idrottare som gjort musik) som Peter märkt "Music" i
+  // Musik sport.xlsx. Items bär genrePackages: [..., "sport-anthems"] +
+  // inBaseCatalog: false i songs-sport.yaml. allowSpotifyOnly UTELÄMNAT (=false):
+  // flera anthems är YouTube-only (saknar spotifyTrackId), så Spotify-only skulle
+  // tappa dem — host måste hålla YT (eller Hints) på. OBS: artist/band-Hints i
+  // paketet kräver separat infra (image-export emitterar inga genrePackages +
+  // quiz.tsx tömmer Hints-poolen i paket-läge) → låt-only tills vidare.
+  { id: 'pkg-sport-anthems', name: 'Sport Anthems', tags: ['sport-anthems'] },
 ];
 
 // ─── Generation-key (för audience-filter) ────────────────────────────

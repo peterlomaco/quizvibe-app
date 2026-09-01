@@ -10,7 +10,7 @@
 // + initial-load via getLobbySettings.
 
 import { supabase } from './supabase';
-import { MainCategory, defaultEnabledMainCategories, isMainCategory, IMAGES_MANDATORY_CATEGORIES } from './mainCategory';
+import { MainCategory, defaultEnabledMainCategories, isMainCategory } from './mainCategory';
 
 export type LobbyGameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
 // UI använder capitalized strings; DB lagrar lowercase enligt CHECK-
@@ -169,11 +169,12 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     youtubeEnabledCategories: ytCats !== null
       ? ytCats
       : (row.youtube_enabled !== false ? defaultEnabledMainCategories() : []),
+    // ⚠ MUSIC-ONLY LAUNCH: legacy-fallbacken byggde tidigare
+    // [...IMAGES_MANDATORY_CATEGORIES(=Film,Sport), Music] = Film/Sport aktiva för
+    // pre-0014-rader. Music-only ⇒ spegla youtube-fallbacken (Music-only).
     imagesEnabledCategories: imgCats !== null
       ? imgCats
-      : [...new Set([...IMAGES_MANDATORY_CATEGORIES,
-          ...(row.images_enabled !== false ? (['Music'] as MainCategory[]) : []),
-        ]) as unknown as MainCategory[]],
+      : (row.images_enabled !== false ? defaultEnabledMainCategories() : []),
     // Tolerant: kolumnen kanske inte finns ännu (pre-migration) → default false.
     sketchEnabled: row.sketch_enabled ?? false,
     spotifyEnabled: row.spotify_enabled ?? false,
