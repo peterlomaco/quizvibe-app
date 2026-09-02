@@ -131,6 +131,7 @@ import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { HeartbeatSound } from '@/src/components/HeartbeatSound';
 import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
+import { WebViewWarmer } from '@/src/components/WebViewWarmer';
 // Person-bilderna är juridiskt parkerade sedan 2026-06-04 — en "image"-fråga
 // renderar bara flagga + ledtrådar via HintsQuizCard. assets/quiz-images/,
 // quizImages.ts och hela sketch-pipelinen raderades 2026-08-17.
@@ -9145,6 +9146,14 @@ export default function QuizScreen() {
           monterad och styrs via active-proppen så fördröjningen bara är tystnad,
           inte en teardown (som klickar i högtalaren). */}
       {!isAudioMutedForSelf && <MorseAmbientSound active={ambientReady} />}
+      {/* Processvärmare för den mutade non-host:en i IndDev: host har en levande
+          WebView (MorseAmbientSound ovan) som värmer iOS WebView-process-poolen,
+          non-host är mutad → ingen → kall pool → långsam YouTube-boot. Denna
+          tysta WebView (inget YouTube, ingen uppspelning, ingen ToS-yta) håller
+          poolen varm. Slotten är ALLTID närvarande (motsatt gate mot
+          MorseAmbientSound) och sitter direkt efter den i BÅDA grenarna, så
+          index är stabilt och instansen återanvänds över intro→countdown. */}
+      {isAudioMutedForSelf && gameMode === 'individual-devices' && !isHost && <WebViewWarmer />}
       </View>
     );
   }
@@ -9168,6 +9177,21 @@ export default function QuizScreen() {
         // Talad nedräkning följer samma grind som övriga ljudkällor — se
         // MorseAmbientSound ovan för varför isHost inte hör hemma här.
         silent={isAudioMutedForSelf}
+        // Non-host i IndDev ankrar nedräkningen mot host:s delade wall-clock
+        // (timer_start_at − 10500 = host:s egen CountdownIntro-t0 = dess Play-
+        // tap-ögonblick), så countdown/question/timer/media landar på samma
+        // moment som host oavsett broadcast-latens. 10500 är SAMMA konstant
+        // som host använder i handleHostStartFromGetReady (håll i synk).
+        // hostTimerStartAtRef sätts synkront i play_command-handlern precis
+        // före setPhase('countdown'), så den är redan populerad här. Host +
+        // PtP + remote skickar undefined → oförändrad lokal timing.
+        anchorT0={
+          !isHost &&
+          gameMode === 'individual-devices' &&
+          hostTimerStartAtRef.current > 0
+            ? hostTimerStartAtRef.current - 10500
+            : undefined
+        }
       />
       {/* Pre-decode-trick borttaget 2026-05-27 (text-rendering = no decode). */}
       {inactivityCountdownSec !== null && (
@@ -9179,6 +9203,10 @@ export default function QuizScreen() {
           Renderas den inte här — eller på annan position — är vi tillbaka i
           den hårda WebView-teardownen som klickade i högtalaren. */}
       {!isAudioMutedForSelf && <MorseAmbientSound active={false} />}
+      {/* Samma processvärmare + samma barn-POSITION som i intro-grenen (direkt
+          efter MorseAmbientSound-sloten) så WebView-instansen återanvänds över
+          intro→countdown i stället för att rivas + återskapas. */}
+      {isAudioMutedForSelf && gameMode === 'individual-devices' && !isHost && <WebViewWarmer />}
       </View>
     );
   }

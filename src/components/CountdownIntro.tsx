@@ -54,6 +54,13 @@ interface Props {
    *  rutorna i vänsterkolumnen bredvid mediaSource-boxen som highlightas.
    *  null → alla tre rutorna grå. */
   category?: MainCategory | null;
+  /** Delad wall-clock-ms som countdown-schemat ska ankras mot (= host:s
+   *  CountdownIntro-t0). Sätts BARA för non-host i IndDev så nedräkningen,
+   *  question-fasen, timern och media landar på samma moment som host oavsett
+   *  broadcast-latens. Utelämnas → lokal timing (t0 = mount). Ett orimligt
+   *  värde (stor klock-skew / extrem latens) faller tillbaka på lokal timing,
+   *  så ändringen kan aldrig bli sämre än utan ankaret. */
+  anchorT0?: number;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -141,7 +148,7 @@ function SideTag({
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, category = null, finalWord, silent = false }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, category = null, finalWord, silent = false, anchorT0 }: Props) {
   // Remote 1v1 delar IndDev:s headline ("Get Ready to QuizVibe") — varje
   // spelare sitter på egen enhet, ingen specifik spelare att namnge.
   const isIndDev = mode === 'individual-devices' || mode === 'remote-1v1';
@@ -235,7 +242,23 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
     // 8200 för startFrom=5) — bara driften försvinner. Blockeras tråden
     // längre än en tick hinner flera steg fyra i samma frame och siffror
     // hoppar; det är korrekt för en deadline-ankrad nedräkning.
-    const t0 = Date.now();
+    // t0 = countdown-schemats nollpunkt. Normalt lokal mount-tid, men non-host
+    // i IndDev får host:s delade wall-clock (anchorT0) så hela kedjan landar
+    // på host:s moment oavsett broadcast-latens. Ankaret används BARA om det
+    // implicerade förflutna (Date.now() - anchorT0) ligger i ett rimligt
+    // fönster ([-1000, 3000] ms — täcker verklig latens; retries gör >3s till
+    // ett undantag). Utanför fönstret (stor klock-skew / extrem latens) faller
+    // vi tillbaka på lokal timing = exakt dagens beteende, så det kan aldrig
+    // bli sämre. Ett t0 i det förflutna hanteras redan av max(0, …)-clampen i
+    // addTimerAt: passerade steg fyras direkt (samma "siffer-hopp" som vid
+    // blockerad tråd, dokumenterat ovan).
+    let t0 = Date.now();
+    if (anchorT0 != null) {
+      const elapsed = t0 - anchorT0;
+      if (elapsed >= -1000 && elapsed <= 3000) {
+        t0 = anchorT0;
+      }
+    }
     const addTimerAt = (fn: () => void, offsetMs: number) => {
       const id = setTimeout(fn, Math.max(0, offsetMs - (Date.now() - t0)));
       tickTimers.current.push(id);
@@ -288,7 +311,7 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
       tickTimers.current.forEach(clearTimeout);
       tickTimers.current = [];
     };
-  }, [startFrom, finalWord, voiceFrom, silent]);
+  }, [startFrom, finalWord, voiceFrom, silent, anchorT0]);
 
   // Pop-in per siffer-byte (3, 2, 1) + kontinuerlig zoom-puls (1 ↔ 1.18).
   useEffect(() => {
