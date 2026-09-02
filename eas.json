@@ -30,6 +30,11 @@
       "env": {
         "EXPO_PUBLIC_SPOTIFY_CLIENT_ID": "d9ce6568d6d64bfdbba3b92b604c6ee0"
       }
+    },
+    "staging-testflight": {
+      "extends": "production",
+      "environment": "preview",
+      "channel": "preview"
     }
   },
   "submit": {
