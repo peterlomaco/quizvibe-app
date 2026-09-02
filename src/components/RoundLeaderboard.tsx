@@ -1238,7 +1238,10 @@ export function RoundLeaderboard({
                   stacked
                   filled
                   badge="Activated by Host"
-                  buttonHeight={playAgainHeight}
+                  // Kompakt höjd = matchar Home-knappen nedanför (Peter
+                  // 2026-09-02). Filled-läget har ingen chevron, så bottomY:s
+                  // geometri är oanvänd — bara touch-höjden krymper.
+                  buttonHeight={PLAY_AGAIN_BUTTON_HEIGHT_COMPACT}
                   bottomY={bottomY}
                 />
                 {homeButton(PLAY_AGAIN_BUTTON_HEIGHT_COMPACT, true)}
