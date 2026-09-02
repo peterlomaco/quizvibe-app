@@ -1944,26 +1944,24 @@ export default function ProfileScreen() {
               parentControlled bort ur frågeurvalet i spel där denna profil är
               host. Placerad under Source Mixerboard, precis ovanför Game era. */}
           <View style={styles.field}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={[styles.regionLabelRow, { flex: 1, marginBottom: 0 }]}>
-                <Text style={styles.sectionLabel}>Parent Control</Text>
-                <Pressable
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => Alert.alert('Parent Control', 'When on, YouTube clips flagged as parent-controlled are removed from the question selection in games you host.')}
-                  hitSlop={8}
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-              </View>
-              <Switch
-                value={parentControlEnabled}
-                onValueChange={setParentControlEnabled}
-                trackColor={{ false: '#3C3C3C', true: Colors.success }}
-                thumbColor="#FFF"
-                ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
-                style={styles.sourceMatrixSwitch}
-              />
+            <View style={styles.regionLabelRow}>
+              <Text style={styles.sectionLabel}>Parent Control</Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() => Alert.alert('Parent Control', 'When on, YouTube clips flagged as parent-controlled are removed from the question selection in games you host.')}
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
             </View>
+            <Switch
+              value={parentControlEnabled}
+              onValueChange={setParentControlEnabled}
+              trackColor={{ false: '#3C3C3C', true: Colors.success }}
+              thumbColor="#FFF"
+              ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
+              style={styles.sourceMatrixSwitch}
+            />
           </View>
 
           {/* Game era — adjustable år-spann för frågor. */}

@@ -7935,7 +7935,7 @@ export default function LobbyScreen() {
                 Host packages. När på filtrerar quiz.tsx bort YT-klipp taggade
                 parentControlled ur frågeurvalet. */}
             <View style={styles.parentControlRow}>
-              <View style={[styles.regionLabelRow, { flex: 1 }]}>
+              <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Parent Control</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
@@ -7952,7 +7952,7 @@ export default function LobbyScreen() {
                 trackColor={{ false: '#3C3C3C', true: Colors.success }}
                 thumbColor="#FFF"
                 ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
-                style={[styles.connectionSwitch, !hostMode && { opacity: 0.6 }]}
+                style={[styles.connectionSwitch, { marginLeft: 0 }, !hostMode && { opacity: 0.6 }]}
               />
             </View>
 
@@ -11395,8 +11395,9 @@ const styles = StyleSheet.create({
   // Parent Control-rad längst ner i Source Mixerboard (ovanför Customized
   // Host packages). Extra luft ovanför så den lossnar från matrisen.
   parentControlRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
     marginTop: Spacing.md,
   },
   usePackagesLabel: {
