@@ -2091,19 +2091,21 @@ export default function QuizScreen() {
         picked.add(q.id);
         drawn.push(q);
       }
-      // Partiellt Spotify-spel: spräng in Spotify-frågorna på slumpade
-      // positioner i den viktade sekvensen. DJ-round-robin scannar
-      // gameQuestions i ordning och tilldelar DJ per Spotify-fråga —
-      // positionerna spelar ingen roll för att båda spelarna ska få
-      // varsin DJ-tur.
-      if (guestSpotifyCount > 0) {
-        const spotifyPicks = spotifyByFreshness.slice(0, guestSpotifyCount);
-        for (const sq of spotifyPicks) {
-          const pos = Math.floor(Math.random() * (drawn.length + 1));
-          drawn.splice(pos, 0, sq);
-        }
-      }
-      if (drawn.length > 0) return drawn;
+      // Källordning: Spotify → YouTube → Hints, EXAKT samma sekvens som det
+      // ordinarie flödet (mixed = [...spotifySeq, ...ytSeq, ...imgSeq]). Den
+      // viktade dragningen ovan bestämmer bara HUR MÅNGA av varje källa som
+      // spelas — den blandar YouTube och Hints om vartannat, så utan denna
+      // omordning öppnade guest-spel nästan alltid på Hints (75 % vikt).
+      // Spotify-frågorna läggs först: DJ-round-robin scannar gameQuestions i
+      // ordning och tilldelar DJ per Spotify-fråga, så konsekutiva positioner
+      // ger fortfarande varje spelare en DJ-tur.
+      const pureYoutubeIds = new Set(pureYoutubePool.map((q) => q.id));
+      const guestYtDrawn = drawn.filter((q) => pureYoutubeIds.has(q.id));
+      const guestImgDrawn = drawn.filter((q) => !pureYoutubeIds.has(q.id));
+      const spotifyPicks =
+        guestSpotifyCount > 0 ? spotifyByFreshness.slice(0, guestSpotifyCount) : [];
+      const guestOrdered = [...spotifyPicks, ...guestYtDrawn, ...guestImgDrawn];
+      if (guestOrdered.length > 0) return guestOrdered;
       // Defensivt: inget kunde dras (borde inte hända — all-tomt-fallbacken
       // ovan har redan hanterat helt tomma pooler) → fall igenom till
       // ordinarie allokering.
