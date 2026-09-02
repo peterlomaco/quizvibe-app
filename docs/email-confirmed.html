@@ -1,0 +1,160 @@
+<!doctype html>
+<!--
+  QuizVibe – e-postbekräftelse-landningssida.
+
+  Hit landar användaren efter att ha klickat på aktiveringslänken i
+  "Confirm your email"-mailet. Supabase verifierar token:en och redirectar
+  hit (via emailRedirectTo i signUp() + tillåten Redirect URL i dashboard).
+
+  MEDVETET en STATISK .html UTAN Jekyll-front-matter → Jekyll kopierar den
+  verbatim (ingen theme-layout runt), så vi äger hela sidan. Nås på
+  https://quizvibe.se/email-confirmed.html (publiceras från docs/ på master).
+
+  Logotypen är inline-SVG (samma geometri som src/components/QuizVibeLogo.tsx)
+  med brand-färgerna inbakade. Fristående — inga externa anrop.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Email confirmed — QuizVibe</title>
+  <style>
+    :root {
+      --bg: #0B1220;
+      --card: #132238;
+      --card-elevated: #1A3050;
+      --primary: #4DA3FF;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #FFFFFF;
+      --text-secondary: #A8B3C7;
+      --success: #52C87A;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 28px 32px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    }
+    .logo { width: 88px; height: 88px; margin: 0 auto 12px; display: block; }
+    .wordmark {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin: 0 0 4px;
+    }
+    .tagline {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin: 0 0 28px;
+    }
+    .check {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: rgba(82, 200, 122, 0.14);
+      border: 1.5px solid rgba(82, 200, 122, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 10px;
+      color: var(--text);
+    }
+    p {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin: 0 0 6px;
+    }
+    .hint {
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      opacity: 0.75;
+    }
+    .footer {
+      margin-top: 28px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card">
+      <!-- QuizVibe-logga (inline SVG, samma som appens QuizVibeLogo) -->
+      <svg class="logo" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="QuizVibe">
+        <rect x="18" y="18" width="44" height="44" rx="12"
+              fill="rgba(77,163,255,0.12)" stroke="rgba(77,163,255,0.20)"
+              stroke-width="1.5" transform="rotate(12 40 40)" />
+        <rect x="16" y="16" width="44" height="44" rx="12"
+              fill="#132238" stroke="#4DA3FF" stroke-width="1.5"
+              transform="rotate(-6 40 40)" />
+        <circle cx="37" cy="37" r="13" fill="none" stroke="#4DA3FF"
+                stroke-width="3" />
+        <path d="M46 46 L52 52" stroke="#4DA3FF" stroke-width="3"
+              stroke-linecap="round" />
+        <g transform="rotate(25 37 37)">
+          <path d="M 29 23 A 12 12 0 0 1 45 23" fill="none" stroke="#4DA3FF"
+                stroke-width="1.8" stroke-linecap="round" />
+          <path d="M 31 30 A 9 9 0 0 1 43 30" fill="none" stroke="#4DA3FF"
+                stroke-width="1.8" stroke-linecap="round" />
+          <path d="M 33 34 A 6 6 0 0 1 41 34" fill="none" stroke="#4DA3FF"
+                stroke-width="1.8" stroke-linecap="round" />
+        </g>
+      </svg>
+
+      <p class="wordmark">QuizVibe</p>
+      <p class="tagline">Music</p>
+
+      <div class="check" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M20 6 L9 17 L4 12" stroke="#52C87A" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+
+      <h1>Email address confirmed</h1>
+      <p>Your QuizVibe account is now active.</p>
+      <p>Please log in to the QuizVibe app to start playing.</p>
+
+      <p class="hint">You can close this window and return to the app.</p>
+
+      <p class="footer">QuizVibe is operated by LoMaCo AB, Sweden.</p>
+    </main>
+  </div>
+</body>
+</html>

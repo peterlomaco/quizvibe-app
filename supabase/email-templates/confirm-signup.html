@@ -1,0 +1,90 @@
+<!--
+  QuizVibe – "Confirm signup" email template (source of truth, version-controlled).
+
+  WHERE TO USE: Supabase Dashboard → Authentication → Emails → Templates →
+  "Confirm signup" → paste this whole file into the message body.
+
+  VARIABLE: {{ .ConfirmationURL }} is Supabase's confirmation link. Keep it
+  exactly as-is (do NOT hardcode a URL). After the user clicks it, Supabase
+  verifies the token and redirects to the emailRedirectTo passed by the client
+  (https://quizvibe.se/email-confirmed.html) — see docs/email-confirmed.html.
+
+  BRANDING: header shows the QuizVibe logo (docs/quizvibe-logo.png, hosted at
+  https://quizvibe.se/quizvibe-logo.png). alt="QuizVibe" is the fallback shown
+  when a client blocks images; the SMTP sender name "QuizVibe" also identifies it.
+
+  Email-safe: table layout + inline styles, light background, brand-blue accent.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+       style="background:#F4F7FB;margin:0;padding:0;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+             style="max-width:480px;background:#FFFFFF;border:1px solid #E6ECF3;
+                    border-radius:16px;overflow:hidden;
+                    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',
+                    Roboto,Helvetica,Arial,sans-serif;">
+        <tr>
+          <td align="center" style="padding:36px 32px 8px;">
+            <img src="https://quizvibe.se/quizvibe-logo.png" width="72" height="72"
+                 alt="QuizVibe" style="display:block;margin:0 auto;border:0;" />
+            <div style="font-size:12px;font-weight:700;letter-spacing:2px;
+                        text-transform:uppercase;color:#8A97AB;
+                        margin-top:12px;">Music</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 32px 0;">
+            <div style="height:1px;background:#EDF1F6;margin:20px 0 4px;"></div>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:20px 32px 0;">
+            <h1 style="font-size:22px;font-weight:700;color:#1A2233;
+                       margin:0 0 12px;">Confirm your email address</h1>
+            <p style="font-size:15px;line-height:1.55;color:#4A5568;
+                      margin:0 0 8px;">
+              Thanks for signing up to QuizVibe. Please confirm your email
+              address to activate your account.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:24px 32px 8px;">
+            <a href="{{ .ConfirmationURL }}"
+               style="display:inline-block;background:#1E6FD9;color:#FFFFFF;
+                      font-size:16px;font-weight:700;text-decoration:none;
+                      padding:14px 28px;border-radius:10px;">
+              Confirm your email address
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:12px 32px 0;">
+            <p style="font-size:13px;line-height:1.5;color:#8A97AB;margin:0;">
+              Or paste this link into your browser:
+            </p>
+            <p style="font-size:13px;line-height:1.5;margin:6px 0 0;
+                      word-break:break-all;">
+              <a href="{{ .ConfirmationURL }}"
+                 style="color:#1E6FD9;text-decoration:underline;">
+                {{ .ConfirmationURL }}</a>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 32px 32px;">
+            <div style="height:1px;background:#EDF1F6;margin:0 0 16px;"></div>
+            <p style="font-size:12px;line-height:1.5;color:#9AA6B8;margin:0 0 6px;">
+              If you didn't create a QuizVibe account, you can safely ignore
+              this email.
+            </p>
+            <p style="font-size:12px;line-height:1.5;color:#9AA6B8;margin:0;">
+              QuizVibe is operated by LoMaCo AB, Sweden.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
