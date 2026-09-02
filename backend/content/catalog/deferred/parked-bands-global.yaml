@@ -1,0 +1,24 @@
+# Parkerade band — konflikt-/dölj-items ur Music.xlsx-passet (2026-09).
+# Ligger utanför live-poolen. Återaktivera: flytta till rätt bands-fil + kör export.
+audience: ["all"]
+region: ["global"]
+category: artists
+contentForm: image
+contentSubject: band
+items:
+  - id: usa-for-africa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "USA for Africa"
+    correctYear: 1985
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["USA for Africa"]
+    answerMethods: ["name-letters"]
+  - id: yes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Yes"
+    correctYear: 1968
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Yes"]
+    answerMethods: ["name-letters"]

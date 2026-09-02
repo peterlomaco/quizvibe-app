@@ -1,0 +1,24 @@
+# Parkerade låtar — konflikt-/dölj-items ur Music.xlsx-passet (2026-09).
+# Ligger utanför live-poolen. Återaktivera: flytta till rätt songs-fil + kör export.
+audience: ["all"]
+region: ["global"]
+category: songs
+contentForm: youtube
+contentSubject: song
+items:
+  - id: friends-in-need-alla-vi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Alla vi — Friends In Need"
+    correctYear: 1999
+    probability: 80
+    wikimediaSearchHints: ["Dr Alban Björn Borg Tomas Brolin Alla vi 1999"]
+    answerMethods: ["timeline"]
+    region: ["sweden"]
+  - id: duplantis-bop
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bop — Armand Duplantis"
+    correctYear: 2025
+    probability: 74
+    wikimediaSearchHints: ["Mondo Armand Duplantis Bop 2025"]
+    answerMethods: ["timeline"]
+    region: ["sweden"]

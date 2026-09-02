@@ -48,7 +48,7 @@ export interface MusicPackage {
 // matchar `pkg-gen-*`). `tags` speglar genrePackages-strängarna i katalogen.
 export const PURCHASED_PACKAGES: MusicPackage[] = [
   { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'], allowSpotifyOnly: true },
-  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['hiphop'], allowSpotifyOnly: true },
+  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['Hip Hop'], allowSpotifyOnly: true },
   // Sport Anthems (music-only launch 2026-09): sport-relaterad MUSIK (fotbolls-/
   // hockey-VM-låtar, idrottare som gjort musik) som Peter märkt "Music" i
   // Musik sport.xlsx. Items bär genrePackages: [..., "sport-anthems"] +

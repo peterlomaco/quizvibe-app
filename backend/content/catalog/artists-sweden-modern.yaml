@@ -21,6 +21,7 @@ items:
     peakTo: 2015
     wikimediaSearchHints: ["Linda Bengtzing"]
     answerMethods: ["name-letters"]
+    genrePackages: ["Dansband"]
   - id: anna-bergendahl
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anna Bergendahl"
@@ -85,6 +86,7 @@ items:
     peakTo: 2018
     wikimediaSearchHints: ["Robin Stjernberg Melodifestivalen 2013"]
     answerMethods: ["name-letters"]
+    region: ["nordic"]
   - id: tusse
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tusse"
@@ -117,7 +119,7 @@ items:
     displayName: "Frans"
     correctYear: 1998
     probability: 65
-    region: ["sweden"]
+    region: ["nordic"]
     wikimediaSearchHints: ["Frans Jeppsson Wall"]
     answerMethods: ["name-letters"]
   - id: helena-paparizou
@@ -125,7 +127,7 @@ items:
     displayName: "Helena Paparizou"
     correctYear: 1982
     probability: 65
-    region: ["sweden"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision", "Melodifestivalen"]
     wikimediaSearchHints: ["Helena Paparizou"]

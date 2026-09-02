@@ -44,7 +44,7 @@ items:
     correctYear: 1967
     probability: 65
     region: ["sweden"]
-    genrePackages: ["100% svenska"]
+    genrePackages: ["100% in swedish"]
     wikimediaSearchHints: ["Cajsa Stina Åkerström"]
     answerMethods: ["name-letters"]
   - id: charlotte-nilsson
@@ -87,7 +87,7 @@ items:
     correctYear: 1950
     probability: 65
     region: ["sweden"]
-    genrePackages: ["Summer", "100% svenska"]
+    genrePackages: ["Summer", "100% in swedish"]
     wikimediaSearchHints: ["Peter Lundblad"]
     answerMethods: ["name-letters"]
   - id: roger-pontare
@@ -96,7 +96,7 @@ items:
     correctYear: 1951
     probability: 65
     region: ["sweden"]
-    genrePackages: ["Eurovision", "Melodifestivalen"]
+    genrePackages: ["Melodifestivalen"]
     wikimediaSearchHints: ["Roger Pontare"]
     answerMethods: ["name-letters"]
   - id: thomas-di-leva
@@ -105,7 +105,7 @@ items:
     correctYear: 1963
     probability: 65
     region: ["sweden"]
-    genrePackages: ["100% svenska"]
+    genrePackages: ["100% in swedish"]
     wikimediaSearchHints: ["Thomas Di Leva"]
     answerMethods: ["name-letters"]
   - id: tommy-nilsson
@@ -113,7 +113,7 @@ items:
     displayName: "Tommy Nilsson"
     correctYear: 1960
     probability: 65
-    region: ["sweden"]
+    region: ["nordic"]
     genrePackages: ["Eurovision", "Melodifestivalen"]
     wikimediaSearchHints: ["Tommy Nilsson"]
     answerMethods: ["name-letters"]

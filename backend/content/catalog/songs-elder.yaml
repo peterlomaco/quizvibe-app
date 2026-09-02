@@ -18,6 +18,7 @@ items:
     probability: 75
     wikimediaSearchHints: ["Louis Armstrong Body and Soul"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   - id: cab-calloway-minnie-the-moocher
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Minnie the Moocher — Cab Calloway"
@@ -26,6 +27,14 @@ items:
     wikimediaSearchHints: ["Cab Calloway Minnie the Moocher"]
     answerMethods: ["timeline"]
     spotifyTrackId: "7GASUbWzEnJKfgg4lz65qY"
+    region: ["global"]
+    youtubeClips:
+      - videoId: "WtSLYrTKrEw"
+        startSec: 48
+        endSec: 63
+      - videoId: "8suquDgg0dw"
+        startSec: 28
+        endSec: 43
   - id: fred-astaire-night-and-day
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Night and Day — Fred Astaire"
@@ -67,6 +76,7 @@ items:
         endSec: 45
         channelTitle: "Cole Porter - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
+    region: ["global"]
   - id: fred-astaire-cheek-to-cheek
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cheek to Cheek — Fred Astaire"
@@ -74,6 +84,8 @@ items:
     probability: 82
     wikimediaSearchHints: ["Fred Astaire Cheek to Cheek Top Hat"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    region: ["unknown-region"]
   - id: bing-crosby-pennies-from-heaven
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pennies from Heaven — Bing Crosby"
@@ -81,6 +93,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Bing Crosby Pennies from Heaven 1936"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   - id: duke-ellington-caravan
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Caravan — Duke Ellington"
@@ -88,6 +101,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Duke Ellington Caravan 1937"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   - id: ella-fitzgerald-a-tisket-a-tasket
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A-Tisket, A-Tasket — Ella Fitzgerald"
@@ -95,6 +109,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ella Fitzgerald A-Tisket A-Tasket"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   # Over the Rainbow flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: glenn-miller-in-the-mood
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -109,6 +124,7 @@ items:
         endSec: 20
         channelTitle: "Glenn Miller Orchestra - Topic"
         notes: "Officiell album-audio via YouTube Topic. Iconic swing-intro."
+    region: ["global"]
   - id: glenn-miller-chattanooga-choo-choo
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Chattanooga Choo Choo — Glenn Miller"
@@ -116,6 +132,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Glenn Miller Chattanooga Choo Choo"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   - id: bing-crosby-white-christmas
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "White Christmas — Bing Crosby"
@@ -124,13 +141,14 @@ items:
     wikimediaSearchHints: ["Bing Crosby White Christmas"]
     answerMethods: ["timeline"]
     inBaseCatalog: false
-    genrePackages: ["christmas"]
+    genrePackages: ["Christmas edition"]
     youtubeClips:
       - videoId: "w7mz91nTF40"
         startSec: 30
         endSec: 45
         channelTitle: "Bing Crosby - Topic"
         notes: "Officiell album-audio via YouTube Topic. Refrängområde."
+    region: ["global"]
   - id: dooley-wilson-as-time-goes-by
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "As Time Goes By — Dooley Wilson"
@@ -138,6 +156,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["As Time Goes By Casablanca Dooley Wilson"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   - id: bing-crosby-swinging-on-a-star
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Swinging on a Star — Bing Crosby"
@@ -179,6 +198,7 @@ items:
         endSec: 35
         channelTitle: "Nat King Cole - Topic"
         notes: "Officiell album-audio via YouTube Topic. 'Chestnuts roasting'-vers."
+    region: ["global"]
   - id: frank-sinatra-almost-like-being-in-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Almost Like Being in Love — Frank Sinatra"
@@ -206,6 +226,7 @@ items:
         endSec: 45
         channelTitle: "시공초월노래 번역자 기뮤"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["global"]
   - id: perry-como-some-enchanted-evening
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Some Enchanted Evening — Perry Como"
@@ -228,6 +249,7 @@ items:
     wikimediaSearchHints: ["Nat King Cole Mona Lisa 1950"]
     spotifyTrackId: "5dae01pKNjRQtgOeAkFzPY"
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   - id: johnnie-ray-cry
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cry — Johnnie Ray"
@@ -235,6 +257,7 @@ items:
     probability: 75
     wikimediaSearchHints: ["Johnnie Ray Cry 1951"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   - id: jo-stafford-you-belong-to-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "You Belong to Me — Jo Stafford"
@@ -242,6 +265,8 @@ items:
     probability: 78
     wikimediaSearchHints: ["Jo Stafford You Belong to Me 1952"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    region: ["unknown-region"]
   - id: patti-page-doggie-in-the-window
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "(How Much Is) That Doggie in the Window — Patti Page"
@@ -249,6 +274,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Patti Page Doggie in the Window 1953"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   - id: bill-haley-rock-around-the-clock
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rock Around the Clock — Bill Haley & His Comets"
@@ -262,6 +288,7 @@ items:
         endSec: 45
         channelTitle: "OLD TAPES"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["global"]
   - id: chuck-berry-maybellene
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Maybellene — Chuck Berry"
@@ -269,6 +296,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Chuck Berry Maybellene 1955"]
     answerMethods: ["timeline"]
+    region: ["unknown-region"]
   # Heartbreak Hotel flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: elvis-presley-jailhouse-rock
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -283,6 +311,7 @@ items:
         endSec: 30
         channelTitle: "Elvis Presley - Topic"
         notes: "Officiell album-audio via YouTube Topic. Refrängområde."
+    region: ["global"]
   - id: chuck-berry-johnny-b-goode
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Johnny B. Goode — Chuck Berry"
@@ -296,6 +325,7 @@ items:
         endSec: 45
         channelTitle: "VisageClub80s"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["global"]
   - id: ray-charles-whatd-i-say
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What'd I Say — Ray Charles"
@@ -309,6 +339,7 @@ items:
         endSec: 45
         channelTitle: "Classic Mood Experience"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["global"]
   - id: everly-brothers-cathys-clown
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cathy's Clown — The Everly Brothers"
@@ -322,6 +353,7 @@ items:
         endSec: 45
         channelTitle: "The Everly Brothers - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: ben-e-king-stand-by-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stand by Me — Ben E. King"
@@ -336,6 +368,7 @@ items:
         endSec: 45
         channelTitle: "PRIMITIV RECORD"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["global"]
   - id: beach-boys-surfin-safari
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Surfin' Safari — The Beach Boys"
@@ -349,6 +382,7 @@ items:
         endSec: 45
         channelTitle: "The Beach Boys - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
+    region: ["global"]
   - id: beatles-she-loves-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "She Loves You — The Beatles"
@@ -362,6 +396,7 @@ items:
         endSec: 25
         channelTitle: "The Beatles - Topic"
         notes: "Officiell album-audio via YouTube Topic (Remastered 2009). 'Yeah yeah yeah'-hook."
+    region: ["global"]
   - id: beatles-a-hard-days-night
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A Hard Day's Night — The Beatles"
@@ -376,6 +411,7 @@ items:
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
   # === Content-expansion 2026-05-29: fler ikoniska 50-60-tals-låtar ===
+    region: ["global"]
   - id: little-richard-tutti-frutti
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tutti Frutti — Little Richard"
@@ -389,6 +425,7 @@ items:
         endSec: 43
         channelTitle: "OLD TAPES"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["nordic"]
   - id: buddy-holly-thatll-be-the-day
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "That'll Be the Day — Buddy Holly"
@@ -402,6 +439,7 @@ items:
         endSec: 45
         channelTitle: "Buddy Holly - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: ritchie-valens-la-bamba
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "La Bamba — Ritchie Valens"
@@ -415,6 +453,7 @@ items:
         endSec: 45
         channelTitle: "Ritchie Valens - Topic"
         notes: "Curerad 2026-05-29 — officiell single-version via YouTube Topic (1958 original, ej Los Lobos/film)."
+    region: ["global"]
   - id: sam-cooke-a-change-is-gonna-come
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A Change Is Gonna Come — Sam Cooke"
@@ -428,6 +467,7 @@ items:
         endSec: 45
         channelTitle: "Sam Cooke - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (Sam Cooke-originalet, ej Brian Owens-cover)."
+    region: ["global"]
   - id: etta-james-at-last
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "At Last — Etta James"
@@ -441,6 +481,7 @@ items:
         endSec: 45
         channelTitle: "Etta James - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: ray-charles-georgia-on-my-mind
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Georgia on My Mind — Ray Charles"
@@ -454,6 +495,7 @@ items:
         endSec: 45
         channelTitle: "Ray Charles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: roy-orbison-oh-pretty-woman
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Oh, Pretty Woman — Roy Orbison"
@@ -467,6 +509,7 @@ items:
         endSec: 45
         channelTitle: "Roy Orbison - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: frank-sinatra-fly-me-to-the-moon
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fly Me to the Moon — Frank Sinatra"
@@ -480,6 +523,7 @@ items:
         endSec: 45
         channelTitle: "Frank Sinatra - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: lill-babs-leva-livet
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Leva livet — Lill-Babs"
@@ -518,7 +562,13 @@ items:
     wikimediaSearchHints: ["Muddy Waters Mannish Boy"]
     answerMethods: ["timeline"]
     spotifyTrackId: "58PSYdY0GFg0LFb2PxYk4T"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "2QoBR-F3tp4"
+        startSec: 30
+        endSec: 45
+      - videoId: "r2gu3ONNx-8"
+        startSec: 6
+        endSec: 21
   - id: dusty-springfield-i-only-want-to-be-with-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Only Want to Be with You — Dusty Springfield"

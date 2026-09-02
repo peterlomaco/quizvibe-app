@@ -40,6 +40,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Pink Floyd band"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: led-zeppelin
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Led Zeppelin"
@@ -47,6 +48,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Led Zeppelin band"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: acdc
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "AC/DC"
@@ -55,6 +57,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["AC/DC band rock"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["Rock & Punk"]
   - id: u2
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "U2"
@@ -62,6 +65,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["U2 band Bono"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: metallica
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Metallica"
@@ -69,6 +73,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Metallica band metal"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: eagles
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eagles"
@@ -76,6 +81,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Eagles band Hotel California"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: fleetwood-mac
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fleetwood Mac"
@@ -83,6 +89,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Fleetwood Mac band"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: black-sabbath
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Black Sabbath"
@@ -90,6 +97,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Black Sabbath band Ozzy"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: guns-n-roses
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Guns N' Roses"
@@ -97,6 +105,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Guns N Roses band Axl Rose"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: coldplay
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Coldplay"
@@ -104,6 +113,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Coldplay band Chris Martin"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: the-doors
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Doors"
@@ -111,6 +121,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["The Doors band Jim Morrison"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: arctic-monkeys
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Arctic Monkeys"
@@ -118,6 +129,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Arctic Monkeys band Alex Turner"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: green-day
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Green Day"
@@ -125,6 +137,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Green Day band punk"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: the-police
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Police"
@@ -132,6 +145,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["The Police band Sting"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: kiss
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kiss"
@@ -139,6 +153,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Kiss band rock"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: genesis
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Genesis"
@@ -146,6 +161,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Genesis Phil Collins band"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: the-smiths
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Smiths"
@@ -153,6 +169,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["The Smiths"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: daft-punk
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daft Punk"
@@ -160,6 +177,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Daft Punk electronic duo"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: maroon-5
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Maroon 5"
@@ -167,6 +185,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Maroon 5"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: backstreet-boys
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Backstreet Boys"
@@ -174,6 +193,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Backstreet Boys band"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: spice-girls
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Spice Girls"
@@ -181,6 +201,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Spice Girls band"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: bee-gees
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bee Gees"
@@ -188,6 +209,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bee Gees band brothers"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: aha
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "a-ha"
@@ -195,6 +217,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["a-ha"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["europe"]
   - id: eurythmics
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eurythmics"
@@ -202,6 +225,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Eurythmics band Annie Lennox"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: roxette
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Roxette"
@@ -231,6 +255,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["The Hives Swedish garage rock band Pelle Almqvist"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["europe"]
   - id: bo-kaspers-orkester
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bo Kaspers Orkester"
@@ -245,6 +270,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["The Ark Swedish glam rock Ola Salo"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: a-teens
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A*Teens"
@@ -259,6 +285,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Vikingarna Swedish dansband Christer Sjögren"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["Dansband"]
   - id: hep-stars
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hep Stars"
@@ -266,6 +293,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Hep Stars Swedish band Benny Andersson Sunny Girl"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: tages
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tages"
@@ -273,7 +301,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Tages Swedish band Gothenburg 1960s"]
     answerMethods: ["timeline", "name-letters"]
-  # === Genre/dansband/cross-nordic expansion 2026-05-27 ===
+    genrePackages: ["Dansband"]
   - id: swedish-house-mafia
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Swedish House Mafia"
@@ -281,6 +309,8 @@ items:
     probability: 86
     wikimediaSearchHints: ["Swedish House Mafia Axwell Ingrosso Angello Don't You Worry Child"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["Club & Dance"]
+    region: ["global"]
   - id: lasse-stefanz
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lasse Stefanz"
@@ -288,6 +318,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Lasse Stefanz Swedish dansband Cabaret"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["Dansband"]
   - id: first-aid-kit
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "First Aid Kit"
@@ -337,7 +368,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["The Soundtrack of Our Lives Swedish rock band TSOOL Ebbot Lundberg"]
     answerMethods: ["timeline", "name-letters"]
-  # === Bred batch 2026-05-27 — dansband/house/hiphop/epa-dunk/svensk-finsk-norsk-dansk ===
+    region: ["global"]
   - id: sten-and-stanley
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sten & Stanley"
@@ -345,6 +376,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Sten Stanley Swedish dansband"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["Dansband"]
   - id: larz-kristerz
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Larz-Kristerz"
@@ -352,6 +384,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Larz-Kristerz Swedish dansband Hultsfred"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["Dansband"]
   - id: galantis
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Galantis"
@@ -373,6 +406,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Lordi Finnish hard rock monsters Eurovision 2006 Hard Rock Hallelujah"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["europe"]
   - id: nightwish
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Nightwish"
@@ -380,6 +414,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Nightwish Finnish symphonic metal Tarja Turunen"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: ylvis
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ylvis"
@@ -387,6 +422,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Ylvis Norwegian duo What Does the Fox Say"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: wham
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wham!"
@@ -394,6 +430,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Wham band George Michael Andrew Ridgeley Last Christmas"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: gyllene-tider
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gyllene Tider"
@@ -408,6 +445,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Journey American rock band Steve Perry Don't Stop Believin"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: maneskin
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Måneskin"
@@ -417,6 +455,7 @@ items:
     peakTo: 2026
     wikimediaSearchHints: ["Måneskin Italian rock band Eurovision 2021"]
     answerMethods: ["name-letters"]
+    region: ["europe"]
   - id: 2-unlimited
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "2 Unlimited"
@@ -441,7 +480,7 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["Love & Peace", "Soft & Ballads"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["All-4-One"]
     answerMethods: ["name-letters"]
   - id: antique
@@ -460,7 +499,7 @@ items:
     correctYear: 1989
     probability: 65
     region: ["global"]
-    genrePackages: ["Eurodance & pop"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["Aqua"]
     answerMethods: ["name-letters"]
   - id: bananarama
@@ -509,7 +548,7 @@ items:
     answerMethods: ["name-letters"]
   - id: bobbysocks
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Bobbysocks!"
+    displayName: "Bobbysocks"
     correctYear: 1983
     probability: 65
     region: ["global"]
@@ -562,7 +601,7 @@ items:
     displayName: "Bucks Fizz"
     correctYear: 1981
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Bucks Fizz"]
     answerMethods: ["name-letters"]
   - id: chic
@@ -579,7 +618,7 @@ items:
     correctYear: 1986
     probability: 65
     region: ["global"]
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     wikimediaSearchHints: ["Cypress Hill"]
     answerMethods: ["name-letters"]
   - id: dario-g
@@ -605,7 +644,7 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["rock"]
+    genrePackages: ["Rock & Punk"]
     wikimediaSearchHints: ["Def Leppard"]
     answerMethods: ["name-letters"]
   - id: destinys-child
@@ -630,7 +669,7 @@ items:
     displayName: "DNCE"
     correctYear: 2015
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["DNCE"]
     answerMethods: ["name-letters"]
   - id: eiffel-65
@@ -647,7 +686,7 @@ items:
     correctYear: 1982
     probability: 65
     region: ["global"]
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["Everything but the Girl"]
     answerMethods: ["name-letters"]
   - id: foreigner
@@ -705,7 +744,6 @@ items:
     correctYear: 1992
     probability: 65
     region: ["global"]
-    genrePackages: ["Hits"]
     wikimediaSearchHints: ["Hanson"]
     answerMethods: ["name-letters"]
   - id: imagine-dragons
@@ -731,7 +769,7 @@ items:
     displayName: "KAJ"
     correctYear: 2009
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["KAJ"]
     answerMethods: ["name-letters"]
@@ -740,7 +778,7 @@ items:
     displayName: "Kalush Orchestra"
     correctYear: 2021
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Kalush Orchestra"]
@@ -750,7 +788,7 @@ items:
     displayName: "Kaoma"
     correctYear: 1989
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     genrePackages: ["Summer"]
     wikimediaSearchHints: ["Kaoma"]
     answerMethods: ["name-letters"]
@@ -759,7 +797,7 @@ items:
     displayName: "KEiiNO"
     correctYear: 2018
     probability: 65
-    region: ["global"]
+    region: ["nordic"]
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["KEiiNO"]
     answerMethods: ["name-letters"]
@@ -769,7 +807,7 @@ items:
     correctYear: 1994
     probability: 65
     region: ["global"]
-    genrePackages: ["Eurodance & pop"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["La Bouche"]
     answerMethods: ["name-letters"]
   - id: lmfao
@@ -834,7 +872,7 @@ items:
     correctYear: 1988
     probability: 65
     region: ["global"]
-    genrePackages: ["Love & Peace", "Power Ballads"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["Mr. Big"]
     answerMethods: ["name-letters"]
   - id: mr-president
@@ -861,7 +899,7 @@ items:
     displayName: "New Order"
     correctYear: 1980
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     genrePackages: ["sport"]
     wikimediaSearchHints: ["New Order"]
     answerMethods: ["name-letters"]
@@ -895,7 +933,7 @@ items:
     correctYear: 1996
     probability: 65
     region: ["global"]
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["No Mercy"]
     answerMethods: ["name-letters"]
   - id: o-zone
@@ -903,7 +941,7 @@ items:
     displayName: "O-Zone"
     correctYear: 1999
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     wikimediaSearchHints: ["O-Zone"]
     answerMethods: ["name-letters"]
   - id: oasis
@@ -919,7 +957,7 @@ items:
     displayName: "Olsen Brothers"
     correctYear: 1972
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Olsen Brothers"]
     answerMethods: ["name-letters"]
@@ -937,7 +975,6 @@ items:
     correctYear: 2009
     probability: 65
     region: ["global"]
-    genrePackages: ["Film"]
     wikimediaSearchHints: ["OneRepublic"]
     answerMethods: ["name-letters"]
   - id: outkast
@@ -989,7 +1026,7 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["Punk & Rock"]
+    genrePackages: ["Rock & Punk"]
     wikimediaSearchHints: ["Radiohead"]
     answerMethods: ["name-letters"]
   - id: red-hot-chili-peppers
@@ -998,7 +1035,7 @@ items:
     correctYear: 1982
     probability: 65
     region: ["global"]
-    genrePackages: ["Punk & Rock", "Mega Hits"]
+    genrePackages: ["Rock & Punk", "Mega Hits"]
     wikimediaSearchHints: ["Red Hot Chili Peppers"]
     answerMethods: ["name-letters"]
   - id: riva
@@ -1006,7 +1043,7 @@ items:
     displayName: "Riva"
     correctYear: 1988
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Riva"]
@@ -1018,7 +1055,7 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["Soft & Ballads"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["Savage Garden"]
     answerMethods: ["name-letters"]
   - id: scooter
@@ -1061,7 +1098,7 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["Punk & Rock"]
+    genrePackages: ["Rock & Punk"]
     wikimediaSearchHints: ["Smash Mouth"]
     answerMethods: ["name-letters"]
   - id: snap
@@ -1093,7 +1130,7 @@ items:
     displayName: "Steppenwolf"
     correctYear: 1967
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Steppenwolf"]
     answerMethods: ["name-letters"]
   - id: sugarhill-gang
@@ -1102,7 +1139,7 @@ items:
     correctYear: 1973
     probability: 65
     region: ["global"]
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     wikimediaSearchHints: ["The Sugarhill Gang"]
     answerMethods: ["name-letters"]
   - id: survivor
@@ -1118,7 +1155,7 @@ items:
     displayName: "Talk Talk"
     correctYear: 1981
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Talk Talk"]
     answerMethods: ["name-letters"]
   - id: teach-in
@@ -1126,7 +1163,7 @@ items:
     displayName: "Teach-In"
     correctYear: 1970
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Teach-In"]
@@ -1136,7 +1173,7 @@ items:
     displayName: "The Archies"
     correctYear: 1968
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["The Archies"]
     answerMethods: ["name-letters"]
   - id: the-b-52s
@@ -1144,7 +1181,7 @@ items:
     displayName: "The B-52's"
     correctYear: 1976
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     wikimediaSearchHints: ["The B-52's"]
     answerMethods: ["name-letters"]
   - id: the-beach-boys
@@ -1209,7 +1246,7 @@ items:
     correctYear: 1984
     probability: 65
     region: ["global"]
-    genrePackages: ["Punk & Rock"]
+    genrePackages: ["Rock & Punk"]
     wikimediaSearchHints: ["The Offspring"]
     answerMethods: ["name-letters"]
   - id: the-rasmus
@@ -1258,7 +1295,7 @@ items:
     correctYear: 1991
     probability: 65
     region: ["global"]
-    genrePackages: ["Soft & Ballads"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["TLC"]
     answerMethods: ["name-letters"]
   - id: toto
@@ -1269,14 +1306,6 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Toto"]
     answerMethods: ["name-letters"]
-  - id: usa-for-africa
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "USA for Africa"
-    correctYear: 1985
-    probability: 65
-    region: ["global"]
-    wikimediaSearchHints: ["USA for Africa"]
-    answerMethods: ["name-letters"]
   - id: van-halen
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Van Halen"
@@ -1284,7 +1313,7 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["rock"]
+    genrePackages: ["Rock & Punk"]
     wikimediaSearchHints: ["Van Halen"]
     answerMethods: ["name-letters"]
   - id: vengaboys
@@ -1293,7 +1322,7 @@ items:
     correctYear: 1997
     probability: 65
     region: ["global"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["Vengaboys"]
     answerMethods: ["name-letters"]
   - id: village-people
@@ -1312,14 +1341,6 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Whitesnake"]
     answerMethods: ["name-letters"]
-  - id: yes
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Yes"
-    correctYear: 1968
-    probability: 65
-    region: ["global"]
-    wikimediaSearchHints: ["Yes"]
-    answerMethods: ["name-letters"]
   - id: zombie-nation
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Zombie Nation"
@@ -1336,6 +1357,6 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["rock"]
+    genrePackages: ["Rock & Punk"]
     wikimediaSearchHints: ["ZZ Top"]
     answerMethods: ["name-letters"]

@@ -63,10 +63,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "7GASUbWzEnJKfgg4lz65qY",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "WtSLYrTKrEw",
+        "startSec": 48,
+        "endSec": 63,
+        "license": "standard"
+      },
+      {
+        "videoId": "8suquDgg0dw",
+        "startSec": 28,
+        "endSec": 43,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "fred-astaire-night-and-day",
@@ -139,7 +152,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -167,7 +180,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -195,10 +208,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Film edition"
     ],
     "spotifyTrackId": "1zzJOF5gOMXzqoUCbOg4JE",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "oW2QZ7KuaxA",
+        "startSec": 52,
+        "endSec": 67,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "bing-crosby-white-christmas",
@@ -215,10 +238,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "christmas"
+      "Christmas edition"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -303,7 +326,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -387,7 +410,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -443,7 +466,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "spotifyTrackId": "5dae01pKNjRQtgOeAkFzPY",
     "youtubeClips": []
@@ -463,7 +486,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -491,7 +514,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "youtubeClips": [
       {
@@ -522,7 +545,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "58PSYdY0GFg0LFb2PxYk4T",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "2QoBR-F3tp4",
+        "startSec": 30,
+        "endSec": 45,
+        "license": "standard"
+      },
+      {
+        "videoId": "r2gu3ONNx-8",
+        "startSec": 6,
+        "endSec": 21,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "elvis-presley-heartbreak-hotel",
@@ -539,7 +575,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -567,7 +603,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -595,7 +631,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -623,7 +659,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -651,7 +687,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -679,7 +715,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -707,7 +743,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -735,7 +771,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -763,7 +799,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -791,7 +827,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3SdTKo2uVsxFblQjpScoHy",
     "youtubeClips": [
@@ -820,7 +856,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -848,7 +884,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -934,7 +970,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -962,7 +998,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1019,7 +1055,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1047,7 +1083,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1075,7 +1111,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1103,7 +1139,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1131,7 +1167,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1187,7 +1223,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1243,7 +1279,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1302,7 +1338,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "63T7DJ1AFDD6Bn8VzG6JE8",
@@ -1332,7 +1368,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1342,6 +1378,41 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Aretha Franklin - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "beatles-all-you-need-is-love",
+    "displayName": "All You Need Is Love — The Beatles",
+    "correctYear": 1967,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Mki34tyoCp0",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
+      },
+      {
+        "videoId": "sHBOM8m4ygM",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
       }
     ]
   },
@@ -1360,7 +1431,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1417,7 +1488,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "7tqhbajSfrz2F7E1Z75ASX",
     "youtubeClips": [
@@ -1446,7 +1517,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "1BmVQ5RGqqtF5cnsv6cQYu",
     "youtubeClips": [
@@ -1477,6 +1548,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Dansband"
+    ],
     "spotifyTrackId": "19vrvFgXDghcRpCf5zrbFA",
     "youtubeClips": [
       {
@@ -1504,7 +1578,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1532,7 +1606,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1589,7 +1663,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1617,7 +1691,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1645,7 +1719,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1673,7 +1747,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1701,7 +1775,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1729,7 +1803,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1757,7 +1831,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1817,7 +1891,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1852,7 +1926,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "2uzlv8PjqsVvF1DhEahyhy",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "wvUQcnfwUUM",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      },
+      {
+        "videoId": "s_VPt7228DU",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "simon-garfunkel-bridge-over-troubled-water",
@@ -1869,7 +1956,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1900,7 +1987,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "1k1Bqnv2R0uJXQN4u6LKYt",
     "youtubeClips": []
@@ -1920,7 +2007,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1948,7 +2035,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "1QbOvACeYanja5pbnJbAmk",
     "youtubeClips": [
@@ -1977,7 +2064,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2005,7 +2092,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2033,7 +2120,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2061,7 +2148,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -2096,11 +2183,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "0cKk8BKEi7zXbdrYdyqBP5",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "uA2zODu1nJw",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "bill-withers-lean-on-me",
@@ -2117,7 +2211,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2145,7 +2239,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2173,7 +2267,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2201,7 +2295,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -2233,7 +2327,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "1GUpCVoNqQoriLkftXc3S3",
     "youtubeClips": [
@@ -2262,7 +2356,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -2294,7 +2388,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2322,7 +2416,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2382,7 +2476,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2410,7 +2504,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2441,7 +2535,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "dansband"
+      "Dansband"
     ],
     "spotifyTrackId": "7915ILGV5otD6Oq3rOcKBR",
     "youtubeClips": [
@@ -2502,7 +2596,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision",
@@ -2535,7 +2629,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3PQLYVskjUeRmRIfECsL0X",
     "youtubeClips": [
@@ -2563,7 +2657,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2591,7 +2685,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2TxCwUlqaOH3TIyJqGgR91",
     "youtubeClips": [
@@ -2649,7 +2743,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2737,7 +2831,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2797,7 +2891,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -2829,7 +2923,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0GjEhVFGZW8afUYGChu3Rr",
     "youtubeClips": [
@@ -2858,10 +2952,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "spotifyTrackId": "4GkOfUKUqDDgoeiov8Uqyi",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "09839DpTctU",
+        "startSec": 28,
+        "endSec": 43,
+        "license": "standard"
+      },
+      {
+        "videoId": "8y7WGPWYsa0",
+        "startSec": 51,
+        "endSec": 66,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "fleetwood-mac-go-your-own-way",
@@ -2878,7 +2988,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2934,7 +3044,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "4UDmDIqJIbrW0hMBQMFOsM",
     "youtubeClips": [
@@ -2991,10 +3101,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "spotifyTrackId": "1Y7VG310Lf5IYP7sVOob4X",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "bEOl38y8Nj8",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      },
+      {
+        "videoId": "87PPOZUxEu8",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "fleetwood-mac-dreams",
@@ -3011,7 +3137,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3039,7 +3165,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -3071,7 +3197,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport"
@@ -3133,7 +3259,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3160,7 +3286,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3224,7 +3350,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3284,7 +3410,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3340,7 +3466,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "54OR1VDpfkBuOY5zZjhZAY",
     "youtubeClips": [
@@ -3400,7 +3526,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "2zYzyRzz6pRmhPzyfMEC8s",
@@ -3412,6 +3538,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "AC/DC - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "bette-midler-the-rose",
+    "displayName": "The Rose — Bette Midler",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "jxvPjuREDpE",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -3430,7 +3585,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -3462,14 +3617,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "2XbwFs07dfm2MGQuYmRMZT",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "H8yUxDOHlh8",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
+      },
+      {
+        "videoId": "WjE4Vxe5-Ak",
+        "startSec": 35,
+        "endSec": 50,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "vikingarna-djingis-kan",
@@ -3518,7 +3686,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "7HrzErXq3TsKOY1gmdIShB",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "_Jw8P7gHxzI",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "george-benson-give-me-the-night",
@@ -3535,7 +3710,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3562,7 +3737,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -3594,7 +3769,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5HkFTCxSeJ3kGNyQJbT4rJ",
     "youtubeClips": [
@@ -3724,7 +3899,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "youtubeClips": [
       {
@@ -3787,10 +3962,24 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Melodifestivalen"
+      "Melodifestivalen",
+      "100% in swedish"
     ],
     "spotifyTrackId": "6EnNjWkk1YX3fsTXtwO773",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "fDQRShw-Vdc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      },
+      {
+        "videoId": "1SudSj4156A",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "human-league-dont-you-want-me",
@@ -3807,7 +3996,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3834,7 +4023,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3862,7 +4051,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3918,7 +4107,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3948,7 +4137,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -4004,7 +4193,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4032,7 +4221,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4088,7 +4277,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "youtubeClips": [
       {
@@ -4116,7 +4305,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4143,7 +4332,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4170,7 +4359,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4198,7 +4387,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4229,7 +4418,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska",
+      "100% in swedish",
       "Summer"
     ],
     "youtubeClips": [
@@ -4258,7 +4447,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4320,7 +4509,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -4349,10 +4538,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "spotifyTrackId": "63nyotHMEI8PrEZB2FL4DZ",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "lcOxhH8N3Bo",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "bowie-lets-dance",
@@ -4426,7 +4625,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4454,7 +4653,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4482,7 +4681,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4510,10 +4709,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "spotifyTrackId": "4czNORk5MjW5WOn98bki32",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "nqAvFx3NxUM",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "police-every-breath-you-take",
@@ -4530,7 +4739,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4558,7 +4767,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4617,7 +4826,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4647,7 +4856,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -4675,7 +4884,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "4dhPbGPssNpV6pSEtgTmO7",
     "youtubeClips": [
@@ -4704,7 +4913,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0GONea6G2XdnHWjNZd6zt3",
     "youtubeClips": [
@@ -4732,7 +4941,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4759,7 +4968,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4787,7 +4996,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision",
@@ -4822,10 +5031,17 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Power Ballads"
+      "Soft & Love"
     ],
     "spotifyTrackId": "18DfMhEx4ddoreHrvZDF6Q",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "b_zHQ6kFuQ0",
+        "startSec": 39,
+        "endSec": 54,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "laura-branigan-self-control",
@@ -4842,7 +5058,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "youtubeClips": [
       {
@@ -4869,7 +5085,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4925,7 +5141,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4953,7 +5169,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4980,7 +5196,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5007,7 +5223,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5035,7 +5251,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5063,7 +5279,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2W8J9Gfw5q8tSvsuWSnMBl",
     "youtubeClips": [
@@ -5091,7 +5307,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5118,7 +5334,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3ErsOxqe2RmXkR65wkygDz",
     "youtubeClips": [
@@ -5150,7 +5366,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -5179,10 +5395,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "Christmas"
+      "Christmas edition"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -5247,7 +5463,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5275,7 +5491,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "youtubeClips": [
       {
@@ -5303,7 +5519,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "6FnuMo55jNECTDdS1nD5H0",
     "youtubeClips": [
@@ -5331,7 +5547,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5358,7 +5574,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5385,7 +5601,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5412,7 +5628,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5472,7 +5688,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5499,7 +5715,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5555,7 +5771,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3Z2tPWiNiIpg8UMMoowHIk",
     "youtubeClips": [
@@ -5626,6 +5842,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "cyndi-lauper-true-colors",
+    "displayName": "True Colors — Cyndi Lauper",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "LPn0KFlbqX8",
+        "startSec": 10,
+        "endSec": 25,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "europe-the-final-countdown",
     "displayName": "The Final Countdown — Europe",
     "correctYear": 1986,
@@ -5640,7 +5882,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5671,7 +5913,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Film"
+      "Film edition"
     ],
     "spotifyTrackId": "3TnJ7M6in8Pb5EyGBUK02Y",
     "youtubeClips": [
@@ -5700,7 +5942,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5730,8 +5972,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Film",
-      "Soft & Ballads"
+      "Film edition",
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -5760,7 +6002,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5791,10 +6033,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Summer",
-      "100% svenska"
+      "100% in swedish"
     ],
     "spotifyTrackId": "01LWBjJwFdRSCeovqipb3D",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "gM3N67a-x1U",
+        "startSec": 12,
+        "endSec": 27,
+        "license": "standard"
+      },
+      {
+        "videoId": "-R4rbXlrOdI",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "prince-kiss",
@@ -5814,7 +6069,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -5842,7 +6097,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -5877,11 +6132,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Summer"
+      "Summer",
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "5lRvBRQJFVWZGRqDm7YkL4",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "BqgcUydlJvg",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "def-leppard-pour-some-sugar-on-me",
@@ -5901,7 +6164,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -5930,7 +6193,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5957,7 +6220,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5984,7 +6247,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6011,7 +6274,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6041,7 +6304,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -6099,7 +6362,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -6134,7 +6397,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "4orJQkF2exPD4xSFmMY00U",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "fFwqvkav4ys",
+        "startSec": 5,
+        "endSec": 20,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "lotta-engberg-fyra-bugg",
@@ -6240,7 +6510,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6267,7 +6537,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6277,6 +6547,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "U2 - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "whitesnake-here-i-go-again",
+    "displayName": "Here I Go Again — Whitesnake",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Rock & Punk",
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "WyF8RHM1OCg",
+        "startSec": 10,
+        "endSec": 25,
+        "license": "standard"
       }
     ]
   },
@@ -6323,7 +6623,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6351,7 +6651,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -6383,7 +6683,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6466,7 +6766,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2sDaqQj5VptFuLztuKxMSU",
     "youtubeClips": [
@@ -6495,7 +6795,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "79LdvxXi5JYUjhnO7v9Fi3",
     "youtubeClips": [
@@ -6527,7 +6827,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "youtubeClips": [
       {
@@ -6559,7 +6859,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Melodifestivalen",
-      "100% svenska"
+      "100% in swedish"
     ],
     "spotifyTrackId": "7bVwUOySQGO2afJ0LArAMi",
     "youtubeClips": [
@@ -6596,7 +6896,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6624,7 +6924,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
@@ -6657,7 +6957,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6717,7 +7017,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Summer"
@@ -6749,7 +7049,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6776,7 +7076,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6807,7 +7107,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "0fN96hLpE08LmXFfS5VmdE",
@@ -6828,7 +7128,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6920,7 +7220,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "6pPWRBubXOBAHnjl5ZIujB",
     "youtubeClips": [
@@ -6951,11 +7251,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision",
+      "100% in swedish",
       "Melodifestivalen"
     ],
     "spotifyTrackId": "4y81ov9ojdBPu5eLhDKxS9",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "BqplQcbdWtI",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "acdc-thunderstruck",
@@ -6972,10 +7279,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Rock & Punk"
     ],
     "spotifyTrackId": "57bgtoPSgt236HzfBOd8kj",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "v2AC41dglnM",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "dr-alban-no-coke",
@@ -6995,7 +7312,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -7052,7 +7369,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7083,7 +7400,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -7113,7 +7430,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "sport",
@@ -7149,7 +7466,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -7177,7 +7494,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7205,7 +7522,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7261,7 +7578,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -7356,12 +7673,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Summer",
-      "hiphop"
+      "Hip Hop"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
     "spotifyTrackId": "20XdEFyaUR9C7aDIdq2OAd",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "Kr0tTbTbmVA",
+        "startSec": 5,
+        "endSec": 20,
+        "license": "standard"
+      },
+      {
+        "videoId": "bBs60R9qahI",
+        "startSec": 4,
+        "endSec": 19,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "metallica-enter-sandman",
@@ -7378,7 +7708,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7406,7 +7736,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7437,7 +7767,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -7468,8 +7798,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Power Ballads"
+      "Soft & Love"
     ],
     "spotifyTrackId": "3bP47tw8MOgtrwdO1iahVl",
     "youtubeClips": [
@@ -7498,7 +7827,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7560,7 +7889,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock",
+      "Rock & Punk",
       "Mega Hits"
     ],
     "youtubeClips": [
@@ -7589,7 +7918,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7645,7 +7974,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7673,7 +8002,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7732,7 +8061,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "1wzggqX4y7amR0xdJIekwE",
     "youtubeClips": [
@@ -7761,7 +8090,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7821,8 +8150,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Power Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -7850,7 +8178,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7881,7 +8209,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "spotifyTrackId": "6bjl81yfCztuBXLC9Mqs2N",
     "youtubeClips": [
@@ -7913,7 +8241,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -7941,7 +8269,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7996,7 +8324,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -8024,7 +8352,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -8089,7 +8417,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Summer",
-      "100% svenska"
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "39ADGrzCrbWwTFlhDcsf9P",
@@ -8113,7 +8441,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -8144,8 +8472,24 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "5lnz9DbNfzJWiiUudfG6IW",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "27eClHQxXls",
+        "startSec": 5,
+        "endSec": 20,
+        "license": "standard"
+      },
+      {
+        "videoId": "cBwX6I0ShhM",
+        "startSec": 6,
+        "endSec": 21,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "shakespears-sister-stay",
@@ -8162,7 +8506,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8193,7 +8537,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -8223,7 +8567,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8315,8 +8659,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads",
-      "Film"
+      "Soft & Love",
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -8344,7 +8688,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8403,7 +8747,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0hrBpAOgrt8RXigk83LLNE",
     "youtubeClips": [
@@ -8432,10 +8776,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
-      "Eurovision",
+      "Dansband",
       "Melodifestivalen"
     ],
     "youtubeClips": [
@@ -8467,8 +8811,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -8499,7 +8842,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -8530,7 +8873,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "youtubeClips": [
@@ -8562,7 +8905,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -8593,7 +8936,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -8652,7 +8995,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -8716,7 +9059,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "youtubeClips": [
@@ -8748,8 +9091,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -8781,8 +9123,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -8814,10 +9155,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish",
+      "Soft & Love"
     ],
     "spotifyTrackId": "1QJcdzMUidsBaMTHoZZRGn",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "MDNeDz-I9mE",
+        "startSec": 7,
+        "endSec": 22,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "corona-the-rhythm-of-the-night",
@@ -8837,7 +9186,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -8865,7 +9214,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8896,7 +9245,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -8927,7 +9276,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -8958,7 +9307,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -8989,7 +9338,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -9020,7 +9369,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9052,8 +9401,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "sport",
-      "football",
-      "sport-anthems"
+      "football"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "3iAJRvvn8pywXZtvBNNP71",
@@ -9086,7 +9434,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock"
+      "Rock & Punk"
     ],
     "youtubeClips": [
       {
@@ -9117,7 +9465,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -9145,7 +9493,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -9177,7 +9525,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "0Jg602cHeMCnPez9baacIe",
     "youtubeClips": [
@@ -9209,7 +9557,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "1zeqAF6Hf1lPJoNkkmNA9j",
     "youtubeClips": []
@@ -9229,7 +9577,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9260,8 +9608,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Film"
+      "Soft & Love",
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -9293,7 +9641,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Summer",
-      "100% svenska"
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "7s8EmGKCWKHsKXhhEZBdaM",
@@ -9326,7 +9674,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9387,8 +9735,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "7zrpoAJte9o12TzawqgdD0",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "nVUHHW1tJYA",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "coolio-gangstas-paradise",
@@ -9405,7 +9763,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9436,8 +9794,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9529,7 +9886,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9557,7 +9914,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9587,9 +9944,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
-    "genrePackages": [
-      "Mega Hits"
-    ],
     "youtubeClips": [
       {
         "videoId": "DvyCbevQbtI",
@@ -9616,10 +9970,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9682,7 +10036,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "youtubeClips": [
@@ -9711,7 +10065,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "spotifyTrackId": "7aQjPecQdIuNd1sz3KCDhD",
     "youtubeClips": [
@@ -9743,7 +10097,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "youtubeClips": [
       {
@@ -9771,7 +10125,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -9806,7 +10160,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "1EZypwk0xcj64ZLAglhLs2",
     "youtubeClips": [
@@ -9867,7 +10221,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Hits",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -10015,10 +10369,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "5PQmSHzWnlgG4EBuIqjac2",
@@ -10078,7 +10432,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -10109,11 +10463,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "6WhseDHUvM0lOk5oavjztk",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "DTraekuMxd4",
+        "startSec": 28,
+        "endSec": 43,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "spice-girls-wannabe",
@@ -10133,7 +10494,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -10164,10 +10525,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish",
+      "Summer"
     ],
     "spotifyTrackId": "2eIe720mhOM77Gfa6I4Url",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "2DWUpLh9AbQ",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "toni-braxton-un-break-my-heart",
@@ -10187,7 +10556,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -10250,7 +10619,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -10306,7 +10675,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Summer"
@@ -10338,12 +10707,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
-      "football",
-      "sport-anthems"
+      "football"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -10431,7 +10799,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -10494,7 +10862,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -10522,7 +10890,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -10582,10 +10950,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "5eJ314ozT4CTPlyjdsGq78",
     "youtubeClips": [
@@ -10645,7 +11013,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -10705,8 +11073,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads",
-      "Love & Peace"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -10735,7 +11102,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -10818,7 +11185,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft Hits"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -10846,10 +11213,17 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "7p9dd71JR2ucoAuO1Sy0VZ",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "_W2jONIjrM0",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "cher-believe",
@@ -10866,7 +11240,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -10893,7 +11267,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -10926,12 +11300,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
-      "football",
-      "sport-anthems"
+      "football"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "59mdyQniSaNFeXaKMGu9RB",
@@ -11052,7 +11425,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11113,7 +11486,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock"
+      "Rock & Punk"
     ],
     "youtubeClips": [
       {
@@ -11143,8 +11516,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
     "spotifyTrackId": "2XkMVyMLZhrUivl7XuhidO",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "gITjhYfdjvs",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "scooter-how-much-is-the-fish",
@@ -11192,7 +11575,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5kW0BW8B5hjrbpe0OuFUr9",
     "youtubeClips": [
@@ -11224,7 +11607,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -11255,7 +11638,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -11265,6 +11648,62 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "whitneyhoustonVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "antique-dinata-dinata",
+    "displayName": "Dinata Dinata — Antique",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Club & Dance"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "474UjAuu0mc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "antique-opa-opa",
+    "displayName": "Opa Opa — Antique",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HiWQC4Ynu2k",
+        "startSec": 23,
+        "endSec": 38,
+        "license": "standard"
       }
     ]
   },
@@ -11342,7 +11781,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11369,7 +11808,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision",
@@ -11432,10 +11871,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "4LwU4Vp6od3Sb08CsP99GC",
@@ -11464,7 +11903,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11491,14 +11930,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "75IN3CtuZwTHTnZvYM4qnJ",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "sNPnbI1arSE",
+        "startSec": 10,
+        "endSec": 25,
+        "license": "standard"
+      },
+      {
+        "videoId": "EAKfXCRmhq8",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "enrique-iglesias-bailamos",
@@ -11518,7 +11970,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Film"
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -11549,8 +12001,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -11666,7 +12117,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -11695,11 +12146,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "Club",
-      "sport-anthems"
+      "Club & Dance",
+      "Sport"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -11757,7 +12208,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11785,7 +12236,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11812,7 +12263,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11842,8 +12293,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -11871,7 +12321,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11931,7 +12381,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -11962,10 +12412,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "youtubeClips": [
@@ -12026,7 +12476,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "6xxXrNJnnsQNLdgNk8S4y8",
     "youtubeClips": []
@@ -12046,7 +12496,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12087,6 +12537,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Antique",
         "license": "standard",
         "notes": "Official music video. ESC 2001 Greece entry (3rd place)."
+      },
+      {
+        "videoId": "VVLfuW3KiLY",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -12164,7 +12620,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12191,7 +12647,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12275,12 +12731,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
-      "football",
-      "sport-anthems"
+      "football"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -12309,7 +12764,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -12323,6 +12778,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2001 vinnare — Estland."
+      }
+    ]
+  },
+  {
+    "id": "antique-follow-me",
+    "displayName": "Follow Me — Antique",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Club & Dance"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "ywH2os9XB88",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -12341,7 +12826,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12371,7 +12856,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -12399,7 +12884,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12427,7 +12912,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12457,7 +12942,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -12488,7 +12973,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -12516,10 +13001,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "7iL6o9tox1zgHpKUfh9vuC",
@@ -12607,7 +13092,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12667,7 +13152,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -12699,7 +13184,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12755,7 +13240,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "youtubeClips": [
       {
@@ -12814,7 +13299,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club Hits"
+      "Club & Dance"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -12848,7 +13333,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "2LELFaNglE9B5xlcmd4qtQ",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "SZNVTkT1DNs",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "lena-philipsson-det-gor-ont",
@@ -12929,7 +13421,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "youtubeClips": [
       {
@@ -12956,7 +13448,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -12988,7 +13480,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13015,7 +13507,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13042,7 +13534,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -13074,7 +13566,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13222,7 +13714,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "youtubeClips": [
       {
@@ -13253,7 +13745,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -13343,7 +13835,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13370,7 +13862,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision"
@@ -13404,7 +13896,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -13435,7 +13927,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -13491,7 +13983,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13522,7 +14014,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -13553,7 +14045,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -13616,7 +14108,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -13647,7 +14139,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -13678,7 +14170,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -13706,7 +14198,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13733,7 +14225,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "0NEw29HKkDkt1yDyBJOgXe",
     "youtubeClips": []
@@ -13753,7 +14245,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Melodifestivalen"
@@ -13784,7 +14276,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13814,7 +14306,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -13845,7 +14337,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -13873,11 +14365,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Hits",
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -13945,7 +14437,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14000,7 +14492,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14027,10 +14519,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5vQXxfGn1bjv5WESrYVVpw",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "2Abk1jAONjw",
+        "startSec": 4,
+        "endSec": 19,
+        "license": "standard"
+      },
+      {
+        "videoId": "zVH638r_X_I",
+        "startSec": 6,
+        "endSec": 21,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "lady-gaga-poker-face",
@@ -14047,7 +14552,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14108,7 +14613,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "youtubeClips": [
       {
@@ -14136,7 +14641,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14234,7 +14739,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2igwFfvr1OAGX9SKDCPBwO",
     "youtubeClips": [
@@ -14266,7 +14771,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -14294,7 +14799,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14321,7 +14826,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -14382,7 +14887,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14410,7 +14915,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision",
@@ -14442,7 +14947,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14501,7 +15006,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -14529,7 +15034,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14559,7 +15064,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -14648,7 +15153,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -14683,7 +15188,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -14711,7 +15216,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "6aqNCrRA7vs7v6QvRpI50t",
     "youtubeClips": [
@@ -14743,10 +15248,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "dansband"
+      "Dansband",
+      "100% in swedish"
     ],
     "spotifyTrackId": "6kKJbnWfmVUKnhqa8n17xT",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "rU-ngQ5hSF8",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "shakira-waka-waka",
@@ -14763,7 +15276,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14798,10 +15311,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -14860,7 +15373,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14888,7 +15401,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5UqCQaDshqbIk3pkhy4Pjg",
     "youtubeClips": [
@@ -14919,7 +15432,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -14947,7 +15460,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -14979,7 +15492,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -15011,7 +15524,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15123,7 +15636,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15182,7 +15695,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -15213,7 +15726,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -15270,7 +15783,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15298,7 +15811,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "2bU3gg0M8GGBs7ItBKsJX9",
     "youtubeClips": [
@@ -15465,7 +15978,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15492,7 +16005,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "1z9kQ14XBSN0r2v6fx4IdG",
     "youtubeClips": [
@@ -15520,7 +16033,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3zu2CuVTJwaZn2m4rBzaUO",
     "youtubeClips": [
@@ -15549,7 +16062,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "4lhqb6JvbHId48OUJGwymk",
     "youtubeClips": [
@@ -15578,7 +16091,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0nrRP2bk19rLc0orkWPQk2",
     "youtubeClips": [
@@ -15607,7 +16120,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2Foc5Q5nqNiosCNqttzHof",
     "youtubeClips": [
@@ -15635,7 +16148,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision"
@@ -15697,7 +16210,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "spotifyTrackId": "5TbzAWWc5eJaANpA9kfGCd",
     "youtubeClips": []
@@ -15776,7 +16289,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15807,7 +16320,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -15817,6 +16330,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "PitbullVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "poodles-en-for-alla-for-en",
+    "displayName": "En för alla, för en — Tre Kronor & The Poodles",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "sport-anthems"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "MxUhHQKZRGs",
+        "startSec": 14,
+        "endSec": 29,
+        "license": "standard"
       }
     ]
   },
@@ -15835,7 +16379,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Melodifestivalen"
@@ -15866,7 +16410,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "youtubeClips": [
       {
@@ -15894,7 +16438,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5HOpkTTVcmZHnthgyxrIL8",
     "youtubeClips": [
@@ -15955,7 +16499,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "7HE1FnMtSsRotzIAQPXpr5",
     "youtubeClips": [
@@ -16015,7 +16559,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -16047,7 +16591,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16075,7 +16619,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16131,7 +16675,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Melodifestivalen"
@@ -16190,7 +16734,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16217,7 +16761,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16444,7 +16988,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3S4px9f4lceWdKf0gWciFu",
     "youtubeClips": [
@@ -16481,7 +17025,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16508,7 +17052,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16592,7 +17136,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16678,7 +17222,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16705,7 +17249,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "youtubeClips": [
       {
@@ -16733,7 +17277,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
@@ -16767,7 +17311,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -16830,7 +17374,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "spotifyTrackId": "2FnUyLhe7sjXgnZlK9sc0z",
     "youtubeClips": [
@@ -16974,7 +17518,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17036,7 +17580,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -17149,10 +17693,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "Christmas Edition"
+      "Christmas edition"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "0tgVpDi06FyKpA1z0VMD4v",
@@ -17182,10 +17726,17 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0pqnGHJpmpxLKifKRmU6WP",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "7wtfhZwyrcc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "kygo-for-life",
@@ -17231,7 +17782,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17258,7 +17809,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17317,7 +17868,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17376,7 +17927,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -17407,7 +17958,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft Hits"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -17437,8 +17988,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Eurovision",
+      "Melodifestivalen"
+    ],
     "spotifyTrackId": "0s3P5PImfDZYWIseR3b39D",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "U2UmYBkszOA",
+        "startSec": 5,
+        "endSec": 20,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "clean-bandit-solo",
@@ -17483,10 +18045,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -17548,7 +18110,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17584,11 +18146,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -17625,7 +18186,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17656,12 +18217,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "sport",
-      "football",
-      "sport-anthems"
+      "football"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "1p0RjMued7Tmm0o7CjzoHY",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "vBoOpjGx-Qc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "netta-toy",
@@ -17678,7 +18245,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -17739,7 +18306,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17766,12 +18333,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "sport",
-      "football",
-      "sport-anthems"
+      "football"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "3HTgmcqR7nYtD7EmJ4hOLi",
@@ -17800,7 +18366,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17828,7 +18394,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -17860,7 +18426,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17887,7 +18453,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision",
@@ -18071,7 +18637,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18099,7 +18665,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0VjIjW4GlUZAMYd2vXMi3b",
     "youtubeClips": [
@@ -18131,7 +18697,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -18159,7 +18725,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18192,7 +18758,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen"
     ],
     "spotifyTrackId": "4RcEx6TvICENelSh3O7gvu",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "faIF5Ej_VHI",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "dua-lipa-break-my-heart",
@@ -18240,7 +18813,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18271,7 +18844,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -18299,10 +18872,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3USxtqRwSYz57Ewm6wWRMp",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "mRD0-GxqHVo",
+        "startSec": 29,
+        "endSec": 44,
+        "license": "standard"
+      },
+      {
+        "videoId": "rfTgO9rpqck",
+        "startSec": 41,
+        "endSec": 56,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "jason-derulo-take-you-dancing",
@@ -18413,16 +18999,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
-      "football",
-      "sport-anthems"
+      "football"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "2iL0W5qi0ivZ9WRXbZ74cS",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "kGT73GcwhCU",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "el-diablo-elena-tsagkrinou",
@@ -18472,7 +19064,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18499,7 +19091,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -18531,7 +19123,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18558,7 +19150,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18614,7 +19206,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -18646,7 +19238,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "youtubeClips": [
       {
@@ -18709,7 +19301,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "spotifyTrackId": "4uUG5RXrOk84mYEfFvj3cK",
     "youtubeClips": [
@@ -18738,7 +19330,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18765,7 +19357,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -18829,7 +19421,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Film"
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -18857,7 +19449,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18885,7 +19477,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18943,7 +19535,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -18976,7 +19568,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19059,7 +19651,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19142,7 +19734,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "7nEHTOQJqKCx7Dvgng3l8t",
     "youtubeClips": [
@@ -19170,7 +19762,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Melodifestivalen"
@@ -19201,7 +19793,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -19233,7 +19825,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19261,7 +19853,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19344,7 +19936,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -19467,7 +20059,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19536,7 +20128,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "3AGFGLUAhu0Cwv1Mkea3d4",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "c37GL5IZG-o",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "dara-bangaranga",
@@ -19553,7 +20152,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -19619,7 +20218,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -19651,7 +20250,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {

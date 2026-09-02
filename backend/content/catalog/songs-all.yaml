@@ -34,6 +34,12 @@ items:
     wikimediaSearchHints: ["Judy Garland Over the Rainbow Wizard of Oz"]
     spotifyTrackId: "1zzJOF5gOMXzqoUCbOg4JE"
     answerMethods: ["timeline"]
+    genrePackages: ["Film edition"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "oW2QZ7KuaxA"
+        startSec: 52
+        endSec: 67
   - id: elvis-presley-heartbreak-hotel
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Heartbreak Hotel — Elvis Presley"
@@ -47,6 +53,7 @@ items:
         endSec: 25
         channelTitle: "Elvis Presley - Topic"
         notes: "Officiell album-audio via YouTube Topic. Refrängområde."
+    region: ["global"]
   - id: eagles-hotel-california
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hotel California — Eagles"
@@ -55,6 +62,15 @@ items:
     wikimediaSearchHints: ["Eagles Hotel California"]
     spotifyTrackId: "4GkOfUKUqDDgoeiov8Uqyi"
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "09839DpTctU"
+        startSec: 28
+        endSec: 43
+      - videoId: "8y7WGPWYsa0"
+        startSec: 51
+        endSec: 66
   - id: dancing-queen
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dancing Queen — ABBA"
@@ -75,6 +91,7 @@ items:
         endSec: 30
         channelTitle: "AbbaVEVO"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Officiell Vevo-upload, HD, spelbar i SE - ersatter den region-blockerade re-uploaden."
+    region: ["global"]
   - id: michael-jackson-billie-jean
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Billie Jean — Michael Jackson"
@@ -102,6 +119,7 @@ items:
         endSec: 75
         channelTitle: "prod. ovr"
         notes: "Official Shortened 4K Video — rörlig MV (zombiedans). Mid-song."
+    region: ["global"]
   - id: smells-like-teen-spirit
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Smells Like Teen Spirit — Nirvana"
@@ -115,6 +133,7 @@ items:
         endSec: 15
         channelTitle: "SLAYERO MUSIC"
         notes: "4K Remastered 60FPS — rörlig MV (cheerleaders/gymnastiksal). Ikonisk riff-intro."
+    region: ["global"]
   - id: whitney-houston-i-will-always-love-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Will Always Love You — Whitney Houston"
@@ -128,6 +147,7 @@ items:
         endSec: 15
         channelTitle: "Whitney Houston - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: celine-dion-my-heart-will-go-on
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My Heart Will Go On — Celine Dion"
@@ -167,6 +187,7 @@ items:
         endSec: 75
         channelTitle: "Adele"
         notes: "Official Music Video — signature ballad. Chorus area."
+    region: ["global"]
   - id: avicii-wake-me-up
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wake Me Up — Avicii"
@@ -181,6 +202,7 @@ items:
         endSec: 15
         channelTitle: "Avicii - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: shape-of-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Shape of You — Ed Sheeran"
@@ -194,6 +216,7 @@ items:
         endSec: 40
         channelTitle: "Ed Sheeran"
         notes: "Dropp vid refräng"
+    region: ["global"]
   - id: weeknd-blinding-lights
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Blinding Lights — The Weeknd"
@@ -209,3 +232,4 @@ items:
         endSec: 63
         channelTitle: "TheWeekndVEVO"
         notes: "Officiell VEVO-musikvideo. Neon retro 80s-känsla."
+    region: ["global"]

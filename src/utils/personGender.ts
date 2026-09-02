@@ -50,6 +50,19 @@ export const PERSON_GENDER_MANUAL: Record<string, PersonGender> = {
   'snow': 'male',       // Darrin O'Brien ("Informer")
   'zayn': 'male',       // Zayn Malik
 
+  // Artister som Peter flyttade från unknown-region → global/europe i
+  // Music.xlsx-passet (2026-09) → numera i region scope. Wikidata-fetchen
+  // hade inte kört för dem (de låg utanför scope); könet är otvetydigt.
+  'chuck-berry': 'male',
+  'frank-ocean': 'male',
+  'harry-belafonte': 'male',
+  'megan-thee-stallion': 'female',
+  'ne-yo': 'male',
+  'otis-redding': 'male',
+  'patti-smith': 'female',
+  'sza': 'female',
+  'toni-braxton': 'female',
+
   // ⚠ Lägg INTE in items vars P21 är icke-binär (Miley Cyrus, Demi Lovato,
   // Sam Smith, Nemo). De ska sakna kön här → ingen låsning, subject-poolen gäller.
 };

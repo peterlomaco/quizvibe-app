@@ -34,7 +34,7 @@ items:
         endSec: 45
         channelTitle: "Glenmark Eriksson Strömstedt - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport", "football", "sport-anthems"]
+    genrePackages: ["sport", "football"]
   - id: nick-borgen-den-glider-in
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Den glider in — Nick Borgen"
@@ -95,15 +95,6 @@ items:
         endSec: 50
         channelTitle: "uutiiset"
     genrePackages: ["sport", "sport-anthems"]
-  - id: friends-in-need-alla-vi
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Alla vi — Friends In Need"
-    correctYear: 1999
-    probability: 80
-    inBaseCatalog: false
-    wikimediaSearchHints: ["Dr Alban Björn Borg Tomas Brolin Alla vi 1999"]
-    answerMethods: ["timeline"]
-    genrePackages: ["sport", "sport-anthems"]
   - id: svenne-rubins-langa-bollar-pa-bengt
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Långa Bollar På Bengt — Svenne Rubins"
@@ -128,13 +119,14 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["DJ Ötzi Sweet Caroline cover"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football", "sport-anthems"]
+    genrePackages: ["sport", "football"]
     spotifyTrackId: "3HTgmcqR7nYtD7EmJ4hOLi"
     youtubeClips:
       - videoId: "LVrlbGIIgbw"
         startSec: 0
         endSec: 30
         channelTitle: "DJ Ötzi"
+    region: ["europe"]
   - id: edivibz-gul-och-bla
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gul och blå — Edivibz"
@@ -175,9 +167,12 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Miss Li Våran sång Sverige fotboll VM 2018"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football", "sport-anthems"]
+    genrePackages: ["sport", "football"]
     spotifyTrackId: "1p0RjMued7Tmm0o7CjzoHY"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "vBoOpjGx-Qc"
+        startSec: 0
+        endSec: 15
   - id: bolaget-det-ligger-nat-i-luften
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Det ligger nåt i luften — Bolaget"
@@ -207,7 +202,10 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["sport", "football"]
     spotifyTrackId: "3AGFGLUAhu0Cwv1Mkea3d4"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "c37GL5IZG-o"
+        startSec: 0
+        endSec: 15
   # ── Svenska hockey-låtar ──
   - id: hakan-sodergren-nu-tar-vi-dom
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -234,6 +232,10 @@ items:
     wikimediaSearchHints: ["The Poodles En för alla för en hockey-VM 2013"]
     answerMethods: ["timeline"]
     genrePackages: ["sport", "sport-anthems"]
+    youtubeClips:
+      - videoId: "MxUhHQKZRGs"
+        startSec: 14
+        endSec: 29
   # ── Övrig svensk sport-musik ──
   # ── Internationella fotbolls-VM/EM-låtar ──
   - id: lightning-seeds-three-lions
@@ -267,6 +269,7 @@ items:
         channelTitle: "New Order - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport", "sport-anthems"]
+    region: ["europe"]
   - id: knaan-wavin-flag
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wavin' Flag — K'naan"
@@ -298,6 +301,7 @@ items:
         channelTitle: "Whitney Houston - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     genrePackages: ["sport", "sport-anthems"]
+    region: ["global"]
   - id: guetta-this-ones-for-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "This One's for You — David Guetta ft. Zara Larsson"
@@ -314,6 +318,7 @@ items:
         channelTitle: "David Guetta"
         notes: "Officiell MV från David Guettas kanal. UEFA EURO 2016 Official Song. Ersätter Topic-versionen."
     genrePackages: ["sport", "sport-anthems"]
+    region: ["global"]
   - id: bono-we-are-the-people
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Are the People — Martin Garrix ft. Bono & The Edge"
@@ -322,20 +327,13 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Martin Garrix Bono Edge We Are the People UEFA Euro 2020"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football", "sport-anthems"]
+    genrePackages: ["sport", "football"]
     spotifyTrackId: "2iL0W5qi0ivZ9WRXbZ74cS"
-    youtubeClips: []
-  # ── Idrottare som gjort musik ──
-  - id: duplantis-bop
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Bop — Armand Duplantis"
-    correctYear: 2025
-    probability: 74
-    inBaseCatalog: false
-    wikimediaSearchHints: ["Mondo Armand Duplantis Bop 2025"]
-    answerMethods: ["timeline"]
-    genrePackages: ["pkg-sport", "sport-anthems"]
-  # ── Fotbollsatmosfär ──
+    youtubeClips:
+      - videoId: "kGT73GcwhCU"
+        startSec: 15
+        endSec: 30
+    region: ["global"]
   - id: blur-song-2
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Song 2 — Blur"
@@ -344,13 +342,14 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Blur Song 2 1997 British rock"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football", "sport-anthems"]
+    genrePackages: ["sport", "football"]
     youtubeClips:
       - videoId: "SSbBvKaM6sk"
         startSec: 0
         endSec: 30
         channelTitle: "Blur"
         notes: "Official music video."
+    region: ["global"]
   - id: zombie-nation-kernkraft-400
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kernkraft 400 — Zombie Nation"
@@ -359,13 +358,14 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Zombie Nation Kernkraft 400 1999 techno dance"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club", "sport-anthems"]
+    genrePackages: ["Club & Dance", "Sport"]
     youtubeClips:
       - videoId: "SxhwbXYe1XE"
         startSec: 0
         endSec: 30
         channelTitle: "Zombie Nation"
         notes: "Official video 1999."
+    region: ["global"]
   - id: dario-g-carnaval-de-paris
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Carnaval de Paris — Dario G"
@@ -374,7 +374,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Dario G Carnaval de Paris 1998 France World Cup anthem"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football", "sport-anthems"]
+    genrePackages: ["sport", "football"]
     spotifyTrackId: "59mdyQniSaNFeXaKMGu9RB"
     youtubeClips:
       - videoId: "dLB56lFYlBI"
@@ -382,6 +382,7 @@ items:
         endSec: 35
         channelTitle: "Dario G"
         notes: "Official music video. FIFA World Cup France 1998 anthem."
+    region: ["global"]
   - id: planet-funk-chase-the-sun
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Chase the Sun — Planet Funk"
@@ -390,10 +391,11 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Planet Funk Chase the Sun 2001 dance electronic"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "football", "sport-anthems"]
+    genrePackages: ["sport", "football"]
     youtubeClips:
       - videoId: "2ZlJLzKzRGA"
         startSec: 0
         endSec: 30
         channelTitle: "Planet Funk"
         notes: "Official video 2001."
+    region: ["global"]

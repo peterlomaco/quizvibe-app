@@ -24,9 +24,12 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Cornelis Vreeswijk Sommarkort En stund på jorden"]
     answerMethods: ["timeline"]
-    genrePackages: ["Summer"]
+    genrePackages: ["Summer", "100% in swedish"]
     spotifyTrackId: "5lRvBRQJFVWZGRqDm7YkL4"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "BqgcUydlJvg"
+        startSec: 0
+        endSec: 15
   - id: ace-of-base-cruel-summer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cruel Summer — Ace of Base"
@@ -50,7 +53,13 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["Summer"]
     spotifyTrackId: "2uzlv8PjqsVvF1DhEahyhy"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "wvUQcnfwUUM"
+        startSec: 0
+        endSec: 15
+      - videoId: "s_VPt7228DU"
+        startSec: 0
+        endSec: 15
   - id: fresh-prince-summertime
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Summertime — DJ Jazzy Jeff & The Fresh Prince"
@@ -60,10 +69,16 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["DJ Jazzy Jeff Fresh Prince Summertime 1991"]
     answerMethods: ["timeline"]
-    genrePackages: ["Summer", "hiphop"]
+    genrePackages: ["Summer", "Hip Hop"]
     parentControlled: true
     spotifyTrackId: "20XdEFyaUR9C7aDIdq2OAd"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "Kr0tTbTbmVA"
+        startSec: 5
+        endSec: 20
+      - videoId: "bBs60R9qahI"
+        startSec: 4
+        endSec: 19
   - id: inner-circle-sweat
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sweat (A La La La Long) — Inner Circle"
