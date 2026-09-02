@@ -58,8 +58,8 @@ import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { displayHcp, resolveDisplayHcp, HCP_START } from '../utils/hcpEngine';
-import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
-import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
+import { addLeftPlayer, clearLeftPlayers, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
+import { deactivateRoom, getRoomMeta, markRoomGameStarted, registerActiveRoom, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnHcp, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
@@ -4801,6 +4801,72 @@ export default function LobbyScreen() {
       setDeletingLobby(false);
       onDone();
     }, 1600);
+  };
+
+  // "Switch to single player" i "No approved players"-dialogen (2026-09-02).
+  // En multiplayer-lobby är LÅST till sitt läge (lobbyType-paramet forcerar
+  // isSingleLobby = false), så att bara sätta singlePlayerDefault(true) hade
+  // inte gjort någon skillnad — lobbyn skulle fortsätta se ut som en
+  // multiplayer-lobby. I stället skapar vi en FÄRSK single-player-lobby med
+  // NY rumkod och replace:ar dit, precis som Home:s "Start New Game →
+  // Single player". Den gamla multiplayer-lobbyn rivs (deactivateRoom +
+  // clear-bunten) så koden inte ligger kvar joinbar och ev. skickade invites
+  // städas. Registrera FÖRST — misslyckas det river vi inte den nuvarande
+  // lobbyn. Ingen credit dras här (deduktionen sker vid Start Game i den nya
+  // single-lobbyn, precis som vanligt).
+  const handleSwitchToSingleLobby = async () => {
+    const cachedProfile = getCachedProfile();
+    const newCode = generateRoomCode();
+    const hostPlayerName = isGuestHost
+      ? guestName?.trim() ?? ''
+      : cachedProfile?.playerName ?? '';
+    const roomRegistered = await registerActiveRoom(newCode, {
+      // Single-lobbyn har inget spelartak att välja — 4 är lägsta giltiga
+      // (DB-CHECK tillåter bara 2/4/12); mätaren visar ändå EN ruta.
+      maxPlayers: 4,
+      hostIsPremium: isGuestHost ? false : hasPremium,
+      currentPlayerCount: 1,
+      hostPlayerName,
+      gameStarted: false,
+      isRemote1v1: false,
+    });
+    if (!roomRegistered) {
+      Alert.alert(
+        'Could not create game lobby',
+        'The room could not be registered. Check your connection and that you are signed in, then try again.',
+      );
+      return;
+    }
+    // Fresh slate för den nya koden (defensivt — matchar Home:s
+    // handleCreateGame).
+    clearLeftPlayers(newCode);
+    clearLobbyPlayers(newCode);
+    clearLobbySettings(newCode);
+    clearEjected(newCode);
+    clearGameStarted(newCode);
+    // Riv den nuvarande multiplayer-lobbyn + navigera in i den nya single-
+    // lobbyn. performLobbyDelete deaktiverar roomCode, städar mock-stores
+    // + waiting_invites och visar loading-overlay ~1.6s innan onDone.
+    await performLobbyDelete(() => {
+      router.replace({
+        pathname: '/lobby',
+        params: {
+          code: newCode,
+          isHost: 'true',
+          lobbyType: 'single',
+          // Bevara guest-host-identiteten om lobbyn skapades via "Start Game
+          // as Guest" — annars faller den nya lobbyn tillbaka till profilen.
+          ...(isGuestHost
+            ? {
+                guestHost: 'true',
+                ...(guestName ? { guestName } : {}),
+                ...(guestBirthYear ? { guestBirthYear } : {}),
+                ...(guestAssistance ? { guestAssistance } : {}),
+              }
+            : {}),
+        },
+      });
+    });
   };
 
   // Två-stegs delete-flow för host:en (motsvarighet till non-host:s
@@ -9552,7 +9618,7 @@ export default function LobbyScreen() {
               ]}
               onPress={() => {
                 setNoApprovedModalVisible(false);
-                setSinglePlayerDefault(true);
+                void handleSwitchToSingleLobby();
               }}
             >
               <Text style={styles.noApprovedBtnText}>

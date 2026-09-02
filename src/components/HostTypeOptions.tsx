@@ -134,7 +134,7 @@ export function HostTypeOptions({
       <HostTypeOptionRow
         accentColor={accentColor}
         icon={<SoloIcon height={50} />}
-        label="Single Game"
+        label="Single player"
         subtitle="Play solo on this device"
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
