@@ -16011,7 +16011,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "LyKYV_7vs6k",
-        "startSec": 37,
+        "startSec": 47,
         "endSec": 67,
         "channelTitle": "PremiunMusicHD",
         "license": "standard"

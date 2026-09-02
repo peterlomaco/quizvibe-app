@@ -792,7 +792,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "LyKYV_7vs6k"
-        startSec: 37
+        startSec: 47
         endSec: 67
         channelTitle: "PremiunMusicHD"
     spotifyTrackId: "1z9kQ14XBSN0r2v6fx4IdG"
