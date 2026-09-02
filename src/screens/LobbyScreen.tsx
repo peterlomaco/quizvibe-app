@@ -38,7 +38,7 @@ import { QuizVibePlayLogo } from '../components/QuizVibePlayLogo';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — handleConnectSpotify/
-// handleDisconnectSpotify är numera lokala self-attest-handlers utan API.
+// applySpotifyDisconnect är numera lokala self-attest-handlers utan API.
 // Spotify OAuth-status-import borttagen (Plan B 2026-07-22) — self-attest via
 // profile.spotifyAppConfirmed ersätter getSpotifyConnectionStatus.
 import { SequentialDots } from '../components/SequentialDots';
@@ -57,9 +57,9 @@ import { isAnonymousSession } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
-import { displayHcp, resolveDisplayHcp } from '../utils/hcpEngine';
-import { addLeftPlayer, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
-import { deactivateRoom, getRoomMeta, markRoomGameStarted, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
+import { displayHcp, resolveDisplayHcp, HCP_START } from '../utils/hcpEngine';
+import { addLeftPlayer, clearLeftPlayers, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
+import { deactivateRoom, getRoomMeta, markRoomGameStarted, registerActiveRoom, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnHcp, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
@@ -68,7 +68,7 @@ import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
 import { createRemoteMatch, getMatchByRoomCode, getOwnUserId, hasRemote1v1RelationshipWith } from '../utils/remoteMatches';
 import { saveLobby } from '../utils/savedLobbies';
-import { defaultEnabledMainCategories, subjectToMainCategory, MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
+import { defaultEnabledMainCategories, subjectToMainCategory, subjectInEnabledCategories, MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
 import { supabase } from '../utils/supabase';
@@ -83,6 +83,7 @@ import {
   computePackageEraRange,
   resolveActivePackageTags,
   itemInActivePackages,
+  packagesAllowSpotifyOnly,
 } from '../utils/hostPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import {
@@ -153,6 +154,11 @@ export interface LobbyPlayer extends Player {
   // publishOwnHcp → lobby_players.hcp (migration 0042) så övriga ser det på
   // spelarkortet. undefined = ännu ej progressad (skölden visar 99) / gäst.
   hcp?: number;
+  // Per-kategori-HCP (migration 0050), Total = `hcp` ovan. Driver "+"-utfäll-
+  // ningen på spelarkortet. undefined → kategori-sköld faller till 99.
+  hcpMusic?: number;
+  hcpFilm?: number;
+  hcpSport?: number;
 }
 
 type GameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
@@ -1063,9 +1069,17 @@ function publishOwnAccountAlias(roomCode: string, playerId: string): void {
 function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
   loadProfile()
     .then((profile) => {
-      const hcp = profile?.hcp;
-      if (typeof hcp !== 'number') return;
-      return publishOwnHcp(roomCode, playerId, displayHcp(hcp));
+      const total = profile?.hcp;
+      if (typeof total !== 'number') return;
+      // Per-kategori-bundle från profilspegeln (senast spelade region). Saknas
+      // den (aldrig spelat en v2-omgång) → 99 för kategorierna, Total från `hcp`.
+      const cat = profile?.hcpByCategory;
+      return publishOwnHcp(roomCode, playerId, {
+        total: displayHcp(total),
+        music: cat?.music ?? HCP_START,
+        film: cat?.film ?? HCP_START,
+        sport: cat?.sport ?? HCP_START,
+      });
     })
     .catch(() => {});
 }
@@ -1400,6 +1414,8 @@ export default function LobbyScreen() {
   // skrivning. Andra spelares intjänade HCP kräver cross-device-sync
   // (uppskjutet) och faller därför tillbaka på startvärdet 99.
   const selfHcp = getCachedProfile()?.hcp;
+  // Egna per-kategori-HCP (§1.3) för "+"-utfällningen på det egna kortet.
+  const selfHcpCat = getCachedProfile()?.hcpByCategory;
   // Markeras true när self-rad först ses i stored från DB. Används av
   // syncFromStore för att skilja "vår INSERT har inte propagerat än"
   // (false → injecta från prev) från "host har raderat oss via DB DELETE"
@@ -1544,9 +1560,13 @@ export default function LobbyScreen() {
       // "Play Again + keep players" bevarar guest-hostens val — quiz.tsx:s
       // goToNewLobby skriver carry-over-settings till nya rumkoden innan
       // navigation. Fresh lobby saknar stored-rad → defaults nedan.
-      // Låsta fält förblir ALLTID hårdkodade (maxPlayers 4, full era, inga
-      // paket, alla source-kategorier ON — Mixerboard är guest-låst).
+      // Låsta fält förblir ALLTID hårdkodade (maxPlayers 4, inga paket,
+      // alla source-kategorier ON — Mixerboard är guest-låst).
       // answerResponseSeconds är guest-VARIABEL sedan 2026-08-08 (30/45/60).
+      // Game era är guest-VARIABEL sedan 2026-09-02 (Peter): fresh guest-
+      // lobby defaultar till [birthYear, idag] och slidern är editerbar
+      // precis som för en registrerad host — carry-over av stored.eraFrom/To
+      // respekteras vid Play Again.
       getLobbySettings(roomCode).then((stored) => {
         if (cancelled) return;
         // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
@@ -1586,7 +1606,18 @@ export default function LobbyScreen() {
               ? 60
               : 30,
         );
-        setEraValues([ERA_MIN, ERA_MAX]);
+        // Fresh guest-lobby: [födelseår, idag]. Carry-over (Play Again) läser
+        // stored.eraFrom/To. Clampa som i registrerade grenen: to golvas till
+        // ERA_TO_MIN (1980), from till [ERA_MIN, to − intervall].
+        const guestEraFrom =
+          stored?.eraFrom ?? (guestBirthYear ? parseInt(guestBirthYear, 10) : 1981);
+        const guestEraTo = stored?.eraTo ?? ERA_MAX;
+        const guestClampTo = Math.max(ERA_TO_MIN, Math.min(ERA_MAX, guestEraTo));
+        const guestClampFrom = Math.max(
+          ERA_MIN,
+          Math.min(guestEraFrom, guestClampTo - ERA_MIN_INTERVAL),
+        );
+        setEraValues([guestClampFrom, guestClampTo]);
         // Clampa mot guest-utbudet {2, 4} — defensivt mot oväntade värden.
         setRoundsCount(
           stored?.roundsCount === 2 ? 2 : stored?.roundsCount === 4 ? 4 : ROUNDS_DEFAULT,
@@ -2751,38 +2782,19 @@ export default function LobbyScreen() {
   const enabledColumnsCount = [artistsEnabled, actorsEnabled, athletesEnabled].filter(Boolean).length;
   // Uppmätt kolumnbredd via onLayout på smGrid — garanterar pixel-perfekt
   // centrering oavsett flex-beräkningsfel i Yoga/React Native.
-  const [smColWidth, setSmColWidth] = useState(0);
-  const smCellStyle = smColWidth > 0 ? { width: smColWidth } : undefined;
-  // Höger-marginaler som centrerar Spotify-radens switchar på Sport-kolumnens
-  // switch-mittlinje i matrisen nedanför. Härledd formel (smColWidth/2 från
-  // högerkanten) gav per-enhets-residualer (kolumn-separatorer, cell-padding,
-  // flex-avrundning) — därför MÄTS Sport-cellens faktiska position via
-  // measureLayout mot grid:en istället (exakt på alla enheter).
-  const SPOTIFY_SWITCH_W = 51; // RN Switch-layoutbredd (transform-scale påverkar inte layoutboxen)
-  const [smGridW, setSmGridW] = useState(0);
-  // Sport-switchens center härleds via ONLAYOUT-kedja (stack-x i grid +
-  // cell-center i stack). OBS: measureLayout användes först men är opålitlig
-  // på Fabric/new arch — silent no-op via error-callbacken, vilket lämnade
-  // fallback-marginaler som bara råkade aligna på vissa skärmbredder
-  // (414pt ok, 390pt ~4.5pt fel). onLayout fyrar alltid.
-  const [sportStackX, setSportStackX] = useState(0);
-  const [sportCellCenter, setSportCellCenter] = useState(0);
-  // Cellens alignItems:'center' + paddingLeft 3 → switch-center = cellcenter + 1.5.
-  const sportSwitchCenter = sportStackX + sportCellCenter + 1.5;
-  const haveSportMeasure = smGridW > 0 && sportStackX > 0 && sportCellCenter > 0;
-  // DJ-/Year-Name-raderna har paddingRight 18; negativ margin får äta av den
-  // på smala skärmar. Attest-ramen: paddingRight 4 + border 1 innanför
-  // marginalen. Fallback tills onLayout-mätningarna landat.
-  // −4 = konstant bias (debug-linje-verifierad 2026-08-06: mätningen träffar
-  // Sport-kolumnens center exakt på båda enheterna, men Spotify-switcharna
-  // låg ~3–4pt vänster om linjen på BÅDA — switch-layoutbreddens antagande
-  // är några pt för smalt).
-  const spotifySwitchMR = haveSportMeasure
-    ? Math.round(smGridW - sportSwitchCenter - 18 - SPOTIFY_SWITCH_W / 2) - 4
-    : 0;
-  const spotifyAttestMR = haveSportMeasure
-    ? Math.max(0, Math.round(smGridW - sportSwitchCenter - 2 - 1 - SPOTIFY_SWITCH_W / 2) - 4)
-    : 28;
+  // MUSIC-ONLY LAUNCH: 3×3-matrisen borttagen → Spotify-radens switch-
+  // alignment mäts inte längre mot Sport-kolumnen (onLayout-kedjan är borta).
+  // Fasta höger-marginaler i stället; de nya YouTube/Hints-raderna delar
+  // spotifySwitchMR så alla tre switch-högerkanter linjerar. Justera dessa
+  // två tal om switcharna behöver nudgas på en specifik skärm.
+  const spotifySwitchMR = -16;
+
+  // Namnet på spelaren vars enhet detta är — visas i den kant-skärande badgen
+  // på "I have Spotify App on this device"-boxen (grön bg = bekräftat, röd =
+  // ej bekräftat). ownPlayerIdRef läses under render; spotifyConnected/players
+  // triggar ändå re-render så badgen håller sig aktuell.
+  const ownSpotifyBadgeName =
+    players.find((p) => p.id === ownPlayerIdRef.current)?.name ?? '';
 
   // YouTube och Hints (imagesEnabledCategories) är oberoende — ingen auto-sync.
 
@@ -3022,9 +3034,19 @@ export default function LobbyScreen() {
    */
   const applySpotifyAttest = () => {
     setSpotifyConnected(true);
-    // Auto-aktivera DJ-toggeln direkt efter attest (host) — annars måste
-    // användaren trycka på toggeln en extra gång manuellt efteråt.
-    if (hostMode) setSpotifyEnabled(true);
+    // Auto-aktivera DJ-toggeln efter attest (host) BARA om läget är tillämpligt
+    // (IndDev, ej PtP/single/1v1) OCH ingen approved non-host saknar Spotify-
+    // bekräftelse. Annars lämnas toggeln av. Utan gaten slog "I have Spotify"-
+    // switchen på Spotify DJ i PtP (där läget inte ens är valbart), Year+Name-
+    // raden dök upp, och toggeln följde med som "på" in i IndDev innan någon
+    // medspelare bekräftat Spotify. Host slår själv på DJ-toggeln när alla
+    // approved spelare har bekräftat (handleToggleSpotifyEnabled kör guarden).
+    if (hostMode && isSpotifyAvailable) {
+      const someNonHostMissingSpotify = players.some(
+        (p) => !p.isHost && !p.hasLeft && p.approved && !p.spotifyConnected,
+      );
+      if (!someNonHostMissingSpotify) setSpotifyEnabled(true);
+    }
     // Uppdatera spelarkortet direkt.
     const ownId = ownPlayerIdRef.current;
     if (ownId) {
@@ -3076,39 +3098,66 @@ export default function LobbyScreen() {
   };
 
   /**
-   * Tar bort self-attesten ("jag har inte Spotify ändå").
-   * Stänger av Spotify DJ-läget om det var aktivt.
+   * Side-effects för att ta bort self-attesten (lobby OFF + profil OFF).
+   * Utbruten (speglar applySpotifyAttest) så profil-bekräftelse-popupen och
+   * guest-vägen kan dela exakt samma side-effects. Persisterar
+   * spotifyAppConfirmed=false till profilen (registrerade users) så
+   * Profile-toggeln följer med; guests → no-op via null.
    */
-  const handleDisconnectSpotify = () => {
+  const applySpotifyDisconnect = () => {
+    setSpotifyConnected(false);
+    setSpotifyEnabled(false);
+    const ownId = ownPlayerIdRef.current;
+    if (ownId) {
+      setPlayers((prev) =>
+        prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: false } : p)),
+      );
+    }
+    // Non-host: synka spotify_verified=false till lobby_players.
+    if (!hostMode && ownId) {
+      const ownPlayer = players.find((p) => p.id === ownId);
+      if (ownPlayer) {
+        upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: false }).catch(() => {});
+      }
+    }
+    loadProfile().then((profile) => {
+      if (profile) {
+        saveProfile({ ...profile, spotifyAppConfirmed: false }).catch(() => {});
+      }
+    }).catch(() => {});
+  };
+
+  /**
+   * Manuell toggle av "I have Spotify App on this device"-switchen i lobbyn.
+   *
+   * Profilen är källan: switchen seedas från profile.spotifyAppConfirmed vid
+   * lobby-entry (host focus-effect + non-host code-only-join), och en manuell
+   * ändring i lobbyn propagerar TILLBAKA till profilen — men bara efter en
+   * bekräftelse ("Your Profile will be changed to Spotify ON/OFF", OK/Cancel).
+   * Cancel lämnar BÅDE lobby-switchen OCH profilen orörda: switchen är
+   * controlled på spotifyConnected, så den flippar inte förrän vi sätter
+   * staten (applySpotifyAttest / applySpotifyDisconnect). Guests har ingen
+   * profil att ändra → togglar lobby-lokalt utan popup.
+   */
+  const handleSpotifyAttestToggle = async (v: boolean) => {
+    const profile = await loadProfile();
+    // Guest (ingen profil) eller redan i synk med profilen → applicera direkt,
+    // ingen "profilen ändras"-popup (det finns inget profil-värde som ändras).
+    if (!profile || !!profile.spotifyAppConfirmed === v) {
+      if (v) void handleConnectSpotify();
+      else applySpotifyDisconnect();
+      return;
+    }
     Alert.alert(
-      'Remove Spotify confirmation',
-      'Do you want to remove your "I have Spotify" confirmation?',
+      'Update your profile?',
+      `Your Profile will be changed to Spotify ${v ? 'ON' : 'OFF'}.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            setSpotifyConnected(false);
-            setSpotifyEnabled(false);
-            const ownId = ownPlayerIdRef.current;
-            if (ownId) {
-              setPlayers((prev) =>
-                prev.map((p) => (p.id === ownId ? { ...p, spotifyConnected: false } : p)),
-              );
-            }
-            // Non-host: synka spotify_verified=false till lobby_players.
-            if (!hostMode && ownId) {
-              const ownPlayer = players.find((p) => p.id === ownId);
-              if (ownPlayer) {
-                upsertOwnLobbyPlayer(roomCode, { ...ownPlayer, spotifyConnected: false }).catch(() => {});
-              }
-            }
-            loadProfile().then((profile) => {
-              if (profile) {
-                saveProfile({ ...profile, spotifyAppConfirmed: false }).catch(() => {});
-              }
-            }).catch(() => {});
+          text: 'OK',
+          onPress: () => {
+            if (v) void handleConnectSpotify();
+            else applySpotifyDisconnect();
           },
         },
       ],
@@ -3126,44 +3175,22 @@ export default function LobbyScreen() {
         'Confirm that you have the Spotify app on this device before enabling Spotify DJ mode. No Spotify account connection is needed — the song opens in your own Spotify app.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'I have Spotify', onPress: handleConnectSpotify },
+          { text: 'I have Spotify', onPress: () => { void handleSpotifyAttestToggle(true); } },
         ],
       );
       return;
     }
     if (val) {
-      // Kontrollera Spotify-attest för approved non-hosts i lobbyn.
+      // HÅRD spärr: host kan INTE aktivera Spotify DJ så länge någon approved
+      // non-host inte bekräftat Spotify-appen (Peter). Tidigare erbjöds en
+      // "Proceed anyway"-väg som flyttade obekräftade spelare till waiting —
+      // den är borttagen; nu blockeras aktiveringen helt tills alla bekräftat.
       const approvedNonHosts = players.filter((p) => !p.isHost && !p.hasLeft && p.approved);
-      const withSpotify = approvedNonHosts.filter((p) => p.spotifyConnected);
       const withoutSpotify = approvedNonHosts.filter((p) => !p.spotifyConnected);
-
-      if (approvedNonHosts.length > 0 && withSpotify.length === 0) {
-        // Check 1: Ingen annan spelare har bekräftat Spotify.
-        Alert.alert(
-          'Spotify not applicable',
-          'No other players have confirmed Spotify. Please ask other players to confirm they have the Spotify app (in their Spotify settings row).',
-        );
-        return;
-      }
       if (withoutSpotify.length > 0) {
-        // Check 2: Några approved spelare saknar Spotify-attest — erbjud att flytta dem till waiting.
         Alert.alert(
-          'Not all players have Spotify',
-          `${withoutSpotify.length} approved player${withoutSpotify.length > 1 ? 's have' : ' has'} not confirmed the Spotify app. They will be moved back to "To be approved" status. Proceed anyway?`,
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Proceed',
-              onPress: () => {
-                setPlayers((prev) =>
-                  prev.map((p) =>
-                    withoutSpotify.some((w) => w.id === p.id) ? { ...p, approved: false } : p,
-                  ),
-                );
-                setSpotifyEnabled(true);
-              },
-            },
-          ],
+          'Players need Spotify',
+          `${withoutSpotify.length} approved player${withoutSpotify.length > 1 ? 's have' : ' has'} not confirmed the Spotify app. Everyone must confirm Spotify (in their settings row) before you can enable Spotify DJ mode.`,
         );
         return;
       }
@@ -3193,10 +3220,40 @@ export default function LobbyScreen() {
     setSpotifyEnabled(val);
   };
 
+  // R2 (Peter): om en approved non-host stänger av sin Spotify-bekräftelse
+  // medan host har Spotify DJ aktivt → stäng av Spotify DJ automatiskt,
+  // aktivera Source Mixerboard (så spelet har innehåll utan Spotify) och
+  // informera host. Changes 1+2 garanterar att spotifyEnabled bara kan vara
+  // true när alla approved non-hosts bekräftat, så det enda som gör en approved
+  // non-host obekräftad här är att de deaktiverat efter godkännandet.
+  // Effekten fyrar exakt en gång: setSpotifyEnabled(false) → deps ändras →
+  // effekten early-returnar på nästa körning.
+  useEffect(() => {
+    if (!hostMode || !spotifyEnabled) return;
+    const someNonHostDisabled = players.some(
+      (p) => !p.isHost && !p.hasLeft && p.approved && !p.spotifyConnected,
+    );
+    if (!someNonHostDisabled) return;
+    setSpotifyEnabled(false);
+    // Aktivera Source Mixerboard om den var tom (Spotify enda källan) så spelet
+    // fortfarande har innehåll. Redan valda källor lämnas orörda.
+    setYoutubeEnabledCategories((prev) => (prev.length > 0 ? prev : defaultEnabledMainCategories()));
+    setImagesEnabledCategories((prev) => (prev.length > 0 ? prev : defaultEnabledMainCategories()));
+    Alert.alert(
+      'Spotify disabled by a player',
+      'Players have disabled Spotify and Source Mixerboard will automatically be activated.',
+    );
+  }, [players, spotifyEnabled, hostMode]);
+
   // Use Packages — Basic-utbudet är alltid implicit aktivt (ingen UI). Hosten
   // kan välja till extra-paket ovanpå. Knytningen mellan packages och
   // room-code är implicit (lobby-state).
   const [selectedExtraPackages, setSelectedExtraPackages] = useState<string[]>([]);
+  // Paket-läge: host:s aggregat-toggles för YT/Hints när ett paket är valt.
+  // Source Mixerboard kollapsar då till dessa två (+ Spotify). Default true;
+  // sätts auto-false om paketet saknar material för källan (se coverage-guards).
+  const [packageYoutubeEnabled, setPackageYoutubeEnabled] = useState(true);
+  const [packageHintsEnabled, setPackageHintsEnabled] = useState(true);
   // Profil-styrd filterlista: bara paket som hosten aktiverat i sin
   // Profile (Customized Host packages-toggle) visas i Lobby. Default =
   // alla paket aktiverade så nyköpta dyker upp utan extra steg via Profile.
@@ -3287,6 +3344,27 @@ export default function LobbyScreen() {
   // "All"-master gråas bara när HELA matrisen saknar material (alla kolumner grå).
   const pkgGrayAllSources =
     pkgGrayColumn('Music') && pkgGrayColumn('Film') && pkgGrayColumn('Sport');
+  // ── Paket-läge: aggregat-täckning per källa (driver de två toggle-raderna) ──
+  // Paket-läget kollapsar 3×3-matrisen till EN YT- + EN Hints-toggle (+ Spotify).
+  // En toggle är AKTIVERBAR bara om paketet har material för källan; annars
+  // disabled/grå. "Aktiv" = host:s toggle på OCH täckning finns.
+  const pkgHasYoutube =
+    anyPackageActive &&
+    (packageCoverage.Music.youtube || packageCoverage.Film.youtube || packageCoverage.Sport.youtube);
+  const pkgHasHints =
+    anyPackageActive &&
+    (packageCoverage.Music.hints || packageCoverage.Film.hints || packageCoverage.Sport.hints);
+  const pkgHasSpotify = anyPackageActive && !pkgGraySpotify;
+  const pkgYtActive = pkgHasYoutube && packageYoutubeEnabled;
+  const pkgHintsActive = pkgHasHints && packageHintsEnabled;
+  // Spotify som ENDA källa: bara tillåtet för paket som markerats
+  // allowSpotifyOnly (musik-genrer) OCH när Spotify faktiskt är aktiv i lobbyn.
+  const pkgSpotifyActive =
+    pkgHasSpotify && spotifyEnabled && isSpotifyAvailable;
+  const pkgSpotifyOnlyOk =
+    anyPackageActive &&
+    pkgSpotifyActive &&
+    packagesAllowSpotifyOnly(selectedExtraPackages);
   // Paket LÅSER hela mixerboarden: en täckt cell visas grön + låst (kan ej stängas
   // av), en otäckt cell visas grå/av + låst (green-lock tas bort). Host:s egna
   // toggle-värde göms medan paket är aktivt — paketet dikterar källorna helt.
@@ -3307,6 +3385,43 @@ export default function LobbyScreen() {
   // så non-host + spelet alltid får det låsta spannet (aldrig tomt pga era-miss).
   const effectiveEraValues: [number, number] =
     packageEraLocked && packageEraRange ? packageEraRange : [eraValues[0], eraValues[1]];
+
+  // Paket-läge: aggregat-toggle-handlers. Minst en av YT/Hints måste förbli
+  // AKTIV (på + täckning) — Spotify får aldrig vara enda källan när ett paket
+  // är valt. guestLockAlert som skyddsnät (paket kräver Premium → ej guest host).
+  // Spotify FÅR vara enda källan för allowSpotifyOnly-paket (musik-genrer) →
+  // då är det OK att stänga av både YT och Hints. För övriga paket
+  // (t.ex. Sport/Football) krävs minst en av YT/Hints.
+  const handleTogglePackageYoutube = (v: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
+    if (!v && !pkgHintsActive && !pkgSpotifyOnlyOk) {
+      Alert.alert(
+        'At least one source required',
+        'Turn on YouTube or Hints for this package. Spotify can only be the sole source for music packages.',
+      );
+      return;
+    }
+    setPackageYoutubeEnabled(v);
+  };
+  const handleTogglePackageHints = (v: boolean) => {
+    if (isGuestHost) { guestLockAlert(); return; }
+    if (!v && !pkgYtActive && !pkgSpotifyOnlyOk) {
+      Alert.alert(
+        'At least one source required',
+        'Turn on YouTube or Hints for this package. Spotify can only be the sole source for music packages.',
+      );
+      return;
+    }
+    setPackageHintsEnabled(v);
+  };
+  // När host går tillbaka till Generic (inga paket) → återställ aggregat-
+  // togglarna till på, så nästa valda paket öppnar med båda källorna aktiva.
+  useEffect(() => {
+    if (selectedExtraPackages.length === 0) {
+      setPackageYoutubeEnabled(true);
+      setPackageHintsEnabled(true);
+    }
+  }, [selectedExtraPackages.length]);
 
   // Switch som kräver att host:s manuellt tillagda guests försvinner (de
   // saknar egen mobil och kan inte spela på individual devices). Visar Alert
@@ -4675,6 +4790,16 @@ export default function LobbyScreen() {
     // upptäcker det inom ~2s (även medan host:s loading-overlay
     // visas — det är realistiskt async-beteende).
     await deactivateRoom(roomCode);
+    // Rensa stale waiting_invites EXPLICIT — förlita oss inte enbart på
+    // ON DELETE CASCADE (rooms → waiting_invites). Om FK-cascaden inte
+    // fyrar (t.ex. i ett projekt där migrationen inte är applicerad) skulle
+    // en redan skickad invite ligga kvar i mottagarens Waiting Invites-lista
+    // och fortsatt gå att tacka ja till fast lobbyn är borta. DELETE:n
+    // triggar Realtime-events som BÅDE JoinModal:s öppna lista och Home:s
+    // "Waiting Invites"-signal lyssnar på → inviten försvinner live, och en
+    // stängd modal visar den inte vid nästa load. Samma mekanism som
+    // game-start-pathen redan använder (2026-09-02). Best-effort, kastar ej.
+    void clearWaitingInvitesForRoom(roomCode).catch(() => { /* loggas i waitingInvites */ });
     clearLobbyPlayers(roomCode);
     clearLobbySettings(roomCode);
     clearEjected(roomCode);
@@ -4691,6 +4816,72 @@ export default function LobbyScreen() {
       setDeletingLobby(false);
       onDone();
     }, 1600);
+  };
+
+  // "Switch to single player" i "No approved players"-dialogen (2026-09-02).
+  // En multiplayer-lobby är LÅST till sitt läge (lobbyType-paramet forcerar
+  // isSingleLobby = false), så att bara sätta singlePlayerDefault(true) hade
+  // inte gjort någon skillnad — lobbyn skulle fortsätta se ut som en
+  // multiplayer-lobby. I stället skapar vi en FÄRSK single-player-lobby med
+  // NY rumkod och replace:ar dit, precis som Home:s "Start New Game →
+  // Single player". Den gamla multiplayer-lobbyn rivs (deactivateRoom +
+  // clear-bunten) så koden inte ligger kvar joinbar och ev. skickade invites
+  // städas. Registrera FÖRST — misslyckas det river vi inte den nuvarande
+  // lobbyn. Ingen credit dras här (deduktionen sker vid Start Game i den nya
+  // single-lobbyn, precis som vanligt).
+  const handleSwitchToSingleLobby = async () => {
+    const cachedProfile = getCachedProfile();
+    const newCode = generateRoomCode();
+    const hostPlayerName = isGuestHost
+      ? guestName?.trim() ?? ''
+      : cachedProfile?.playerName ?? '';
+    const roomRegistered = await registerActiveRoom(newCode, {
+      // Single-lobbyn har inget spelartak att välja — 4 är lägsta giltiga
+      // (DB-CHECK tillåter bara 2/4/12); mätaren visar ändå EN ruta.
+      maxPlayers: 4,
+      hostIsPremium: isGuestHost ? false : hasPremium,
+      currentPlayerCount: 1,
+      hostPlayerName,
+      gameStarted: false,
+      isRemote1v1: false,
+    });
+    if (!roomRegistered) {
+      Alert.alert(
+        'Could not create game lobby',
+        'The room could not be registered. Check your connection and that you are signed in, then try again.',
+      );
+      return;
+    }
+    // Fresh slate för den nya koden (defensivt — matchar Home:s
+    // handleCreateGame).
+    clearLeftPlayers(newCode);
+    clearLobbyPlayers(newCode);
+    clearLobbySettings(newCode);
+    clearEjected(newCode);
+    clearGameStarted(newCode);
+    // Riv den nuvarande multiplayer-lobbyn + navigera in i den nya single-
+    // lobbyn. performLobbyDelete deaktiverar roomCode, städar mock-stores
+    // + waiting_invites och visar loading-overlay ~1.6s innan onDone.
+    await performLobbyDelete(() => {
+      router.replace({
+        pathname: '/lobby',
+        params: {
+          code: newCode,
+          isHost: 'true',
+          lobbyType: 'single',
+          // Bevara guest-host-identiteten om lobbyn skapades via "Start Game
+          // as Guest" — annars faller den nya lobbyn tillbaka till profilen.
+          ...(isGuestHost
+            ? {
+                guestHost: 'true',
+                ...(guestName ? { guestName } : {}),
+                ...(guestBirthYear ? { guestBirthYear } : {}),
+                ...(guestAssistance ? { guestAssistance } : {}),
+              }
+            : {}),
+        },
+      });
+    });
   };
 
   // Två-stegs delete-flow för host:en (motsvarighet till non-host:s
@@ -4813,6 +5004,8 @@ export default function LobbyScreen() {
         eraTo: effectiveEraValues[1],
         roundsCount,
         selectedExtraPackages,
+        packageYoutubeEnabled,
+        packageHintsEnabled,
         youtubeEnabledCategories,
         imagesEnabledCategories,
         sketchEnabled,
@@ -4836,6 +5029,8 @@ export default function LobbyScreen() {
     eraValues,
     roundsCount,
     selectedExtraPackages,
+    packageYoutubeEnabled,
+    packageHintsEnabled,
     youtubeEnabledCategories,
     imagesEnabledCategories,
     sketchEnabled,
@@ -4906,6 +5101,8 @@ export default function LobbyScreen() {
         }
         return stored.selectedExtraPackages;
       });
+      setPackageYoutubeEnabled(stored.packageYoutubeEnabled);
+      setPackageHintsEnabled(stored.packageHintsEnabled);
       setSketchEnabled(stored.sketchEnabled);
       setSpotifyEnabled(stored.spotifyEnabled);
       setSpotifyAnswerYear(stored.spotifyAnswerYear);
@@ -5091,14 +5288,20 @@ export default function LobbyScreen() {
           // spelaren är då redan i localIds). Konvergera den här istället.
           const nextAccountName = updated.accountPlayerName;
           // HCP publiceras av spelaren själv strax efter deras upsert (samma
-          // konvergens-fönster som guest alias) → syncas här.
+          // konvergens-fönster som guest alias) → syncas här (Total + kategorier).
           const nextHcp = updated.hcp;
+          const nextHcpMusic = updated.hcpMusic;
+          const nextHcpFilm = updated.hcpFilm;
+          const nextHcpSport = updated.hcpSport;
           if (
             !!p.hasLeft === nextHasLeft &&
             !!p.approved === nextApproved &&
             !!p.spotifyConnected === nextSpotifyConnected &&
             p.accountPlayerName === nextAccountName &&
-            p.hcp === nextHcp
+            p.hcp === nextHcp &&
+            p.hcpMusic === nextHcpMusic &&
+            p.hcpFilm === nextHcpFilm &&
+            p.hcpSport === nextHcpSport
           )
             return p;
           changed = true;
@@ -5109,6 +5312,9 @@ export default function LobbyScreen() {
             spotifyConnected: nextSpotifyConnected,
             accountPlayerName: nextAccountName,
             hcp: nextHcp,
+            hcpMusic: nextHcpMusic,
+            hcpFilm: nextHcpFilm,
+            hcpSport: nextHcpSport,
           };
         });
         return changed ? next : prev;
@@ -5311,6 +5517,12 @@ export default function LobbyScreen() {
               // host-path:en så HistoryEntry får samma data oavsett vilken
               // enhet som triggade navigation till /quiz.
               selectedExtraPackages: JSON.stringify(settingsStored?.selectedExtraPackages ?? []),
+              // Paket-aggregat-toggles — matchas mot host:s värde så non-host
+              // bygger samma pool (default true).
+              packageYoutubeEnabled: String(settingsStored?.packageYoutubeEnabled ?? true),
+              packageHintsEnabled: String(settingsStored?.packageHintsEnabled ?? true),
+              // Region scope HCP-progressen nycklas på (§1.3). DbRegion lowercase.
+              region: (settingsStored?.region ?? 'Sweden').toLowerCase(),
               // Spotify DJ-läge måste matchas med host:s värde så non-host
               // behandlar Spotify-frågor korrekt (timer gating, mediaSource).
               spotifyEnabled: String(settingsStored?.spotifyEnabled ?? false),
@@ -5722,6 +5934,18 @@ export default function LobbyScreen() {
     // ensam (single player eller inga approved non-hosts) är det ej möjligt.
     const approvedNonHostCount = approvedPlayers.filter((p) => !p.isHost && !p.hasLeft).length;
 
+    // Paket-läge: source-valideringen nedan gäller BASE-mode-arrayerna, som
+    // ignoreras när ett paket är valt. Kräv istället att minst en av paketets
+    // aggregat-toggles (YT/Hints) är aktiv — ELLER att Spotify är enda källan
+    // för ett paket som tillåter det (allowSpotifyOnly, musik-genrer).
+    if (anyPackageActive && !pkgYtActive && !pkgHintsActive && !pkgSpotifyOnlyOk) {
+      Alert.alert(
+        'At least one source required',
+        'Turn on YouTube or Hints for this package. Spotify can only be the sole source for music packages.',
+      );
+      return;
+    }
+
     // Min-2-regel: minst 2 aktiva val i Source Dashboard (YouTube × profession
     // eller Hints × profession). Spotify kan spelas ensamt och räknas separat.
     const activeNonSpotifyCount = [
@@ -5736,7 +5960,7 @@ export default function LobbyScreen() {
     // Min-2 gäller bara om varken Spotify eller Artists är aktiv.
     const artistsActive =
       youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
-    if (!spotifyEnabled && !artistsActive && activeNonSpotifyCount < 2) {
+    if (!anyPackageActive && !spotifyEnabled && !artistsActive && activeNonSpotifyCount < 2) {
       Alert.alert(
         'Too few sources selected',
         'Enable at least 2 source combinations for Actors/Athletes, or also enable Artists or Spotify — those can be played on their own.',
@@ -5745,6 +5969,7 @@ export default function LobbyScreen() {
     }
 
     if (
+      !anyPackageActive &&
       spotifyEnabled &&
       youtubeEnabledCategories.length === 0 &&
       imagesEnabledCategories.length === 0 &&
@@ -5852,6 +6077,22 @@ export default function LobbyScreen() {
         'Spotify DJ mode requires at least one other player. Please approve other players or disable Spotify DJ in Source Dashboard before starting.',
       );
       return;
+    }
+
+    // R3 (Peter): separat spärr — host kan INTE starta ett Spotify-spel om
+    // någon annan approved spelare har Spotify avstängt. Belt-and-suspenders
+    // mot R2-auto-disablen ifall en non-host stänger av sin bekräftelse i
+    // sync-fönstret precis innan start. approvedNonHosts kommer från turnOrder,
+    // vars rader bär spotifyConnected (satt i turnOrder-mappningen ovan).
+    if (spotifyEnabled) {
+      const missingSpotify = approvedNonHosts.filter((p) => !p.spotifyConnected);
+      if (missingSpotify.length > 0) {
+        Alert.alert(
+          'Players missing Spotify',
+          `${missingSpotify.length} player${missingSpotify.length > 1 ? 's have' : ' has'} Spotify disabled. Turn off Spotify DJ, or wait for everyone to confirm the Spotify app, before starting.`,
+        );
+        return;
+      }
     }
 
     if (!singlePlayerDefault && approvedNonHosts.length === 0) {
@@ -6000,7 +6241,7 @@ export default function LobbyScreen() {
         'Confirm that you have the Spotify app on this device before starting a Spotify DJ game.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'I have Spotify', onPress: handleConnectSpotify },
+          { text: 'I have Spotify', onPress: () => { void handleSpotifyAttestToggle(true); } },
         ],
       );
       return;
@@ -6296,6 +6537,12 @@ export default function LobbyScreen() {
         // att frysa in i HistoryEntry så Player history visar vilket paket
         // spelet kördes med.
         selectedExtraPackages: JSON.stringify(selectedExtraPackages),
+        // Paket-läge: host:s aggregat-toggles för YT/Hints (default true).
+        // Styr om paketets YT-/Hints-material spelas när ett paket är aktivt.
+        packageYoutubeEnabled: String(packageYoutubeEnabled),
+        packageHintsEnabled: String(packageHintsEnabled),
+        // Region scope HCP-progressen nycklas på (§1.3). DbRegion lowercase.
+        region: region.toLowerCase(),
         // Spotify DJ-läge — activeras om host slagit på toggeln i Game Connections
         // OCH host har self-attestat Spotify-appen (Plan B — ingen kontokoppling).
         // quiz.tsx beräknar DJ-rotationsplanen från turnOrder + totalRounds +
@@ -6345,20 +6592,16 @@ export default function LobbyScreen() {
     const effYtCats: MainCategory[] = cov
       ? MAIN_CATEGORIES.filter((mc) => cov[mc].youtube)
       : youtubeEnabledCategories;
-    const ytFiltered = MUSIC_QUESTIONS.filter(q => {
-      if (!inPkg(q.genrePackages)) return false;
-      if (q.contentSubject === 'song') return effYtCats.includes('Music');
-      if (q.contentSubject === 'movie') return effYtCats.includes('Film');
-      if (q.contentSubject === 'sport-event') return effYtCats.includes('Sport');
-      return false;
-    });
-    const imgFiltered = pkgActive ? [] : IMAGE_QUIZ_QUESTIONS.filter(q => {
-      const s = q.contentSubject;
-      if (s === 'artist' || s === 'band') return imagesEnabledCategories.includes('Music');
-      if (s === 'actor' || s === 'character') return imagesEnabledCategories.includes('Film');
-      if (s === 'athlete') return imagesEnabledCategories.includes('Sport');
-      return false;
-    });
+    // Källmedlemskap via DELAD helper (native mainCategory, ingen crossover) —
+    // samma logik som quiz-poolen (app/quiz.tsx) så preview och spel aldrig driftar.
+    const ytFiltered = MUSIC_QUESTIONS.filter(
+      (q) => inPkg(q.genrePackages) && subjectInEnabledCategories(q.contentSubject, effYtCats),
+    );
+    const imgFiltered = pkgActive
+      ? []
+      : IMAGE_QUIZ_QUESTIONS.filter((q) =>
+          subjectInEnabledCategories(q.contentSubject, imagesEnabledCategories),
+        );
     // Spotify bara i IndDev — PtP och Single Player kör utan Spotify DJ.
     const spotifyActive = spotifyEnabled && gameMode === 'individual-devices' && !singlePlayerDefault;
     const spotifyPool = spotifyActive ? MUSIC_QUESTIONS.filter(q => q.spotifyTrackId && inPkg(q.genrePackages)) : [];
@@ -6369,21 +6612,43 @@ export default function LobbyScreen() {
     const hasPureYt = pureYtPool.length > 0;
     const hasImage = imagePool.length > 0;
 
-    // Sekventiell fasordning: Spotify → YouTube → Hints/Image
-    // Ratio med Spotify (IndDev):  25% Spotify / 25% YouTube / 50% Hints.
-    // Ratio utan Spotify (PtP/SP): 50% YouTube / 50% Hints — Spotify-blocken
-    // absorberas av YouTube om YT är aktiverat, annars av Hints.
-    // Fallback: saknas Hints omdirigeras dess block till Spotify → YouTube.
-    let spotifyCount = hasSpotify ? Math.floor(roundsCount / 4) : 0;
-    // YouTube: 25% om Spotify aktiv, 50% om Spotify saknas.
-    const ytDivisor = hasSpotify ? 4 : 2;
-    let ytCount = hasPureYt ? Math.floor(roundsCount / ytDivisor) : 0;
-    let imageCount = roundsCount - spotifyCount - ytCount;
+    // Sekventiell fasordning: Spotify → YouTube → Hints/Image.
+    //
+    // ⚠ MÅSTE spegla quiz.tsx:s block-count-logik EXAKT (app/quiz.tsx, "Fas-
+    // storlekar") — annars lovar previewn en fas-fördelning spelet inte
+    // levererar (t.ex. 2-rundors Sport-YT+Sport-Hints visade [YT, Hints] medan
+    // quiz spelar [YT, YT]). Ratio: Hints golvas FÖRST till 25% (utfyllnad, inte
+    // dragare — Peter 2026-08-14), resten går till YouTube; Spotify tar hela
+    // DJ-varv. Ändras kvoten i quiz.tsx måste den ändras här också.
+    //
+    // Golvningens följd (avsiktlig): vid 2-3 rundor får Hints NOLL.
+    let imageCount = hasImage ? Math.floor(roundsCount / 4) : 0;
+    let restBlocks = roundsCount - imageCount;
 
-    if (!hasImage && imageCount > 0) {
-      if (hasSpotify) spotifyCount += imageCount;
-      else if (hasPureYt) ytCount += imageCount;
-      imageCount = 0;
+    // Spotify: helt antal DJ-varv (gated till IndDev där block = frågor).
+    const playerCount = Math.max(1, approvedPlayers.length);
+    const canRotateDJ = hasSpotify && playerCount > 0 && roundsCount >= playerCount;
+    let spotifyCount = 0;
+    if (canRotateDJ) {
+      const rawSpotify = Math.min(Math.floor(restBlocks / 2), spotifyPool.length);
+      const rotations = Math.max(1, Math.floor(rawSpotify / playerCount));
+      const capped = Math.min(rotations * playerCount, spotifyPool.length, roundsCount);
+      spotifyCount = Math.floor(capped / playerCount) * playerCount;
+      if (spotifyCount > restBlocks) {
+        imageCount = roundsCount - spotifyCount;
+        restBlocks = spotifyCount;
+      }
+    }
+
+    let ytCount = hasPureYt ? restBlocks - spotifyCount : 0;
+
+    // Degenererade lägen: otillgänglig källas block → YouTube först, sedan Hints,
+    // sist Spotify (samma turordning som quiz.tsx).
+    const unallocated = roundsCount - spotifyCount - ytCount - imageCount;
+    if (unallocated > 0) {
+      if (hasPureYt) ytCount += unallocated;
+      else if (hasImage) imageCount += unallocated;
+      else if (hasSpotify) spotifyCount = Math.min(spotifyCount + unallocated, spotifyPool.length);
     }
 
     const slots: GsSlot[] = [];
@@ -6454,7 +6719,7 @@ export default function LobbyScreen() {
     }
 
     return slots;
-  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault, selectedExtraPackages]);
+  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault, selectedExtraPackages, approvedPlayers.length]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -6550,7 +6815,7 @@ export default function LobbyScreen() {
               utrymmet är fritt). Host visar den ovanför room code-kortet. */}
           {!hostMode && (
             <Text style={styles.headerTagline} numberOfLines={1}>
-              Music. Film. Sport.
+              Music. Party & Hits.
             </Text>
           )}
         </View>
@@ -6559,7 +6824,7 @@ export default function LobbyScreen() {
             room code-kortet; non-host visar den i headern (se ovan). */}
         {hostMode && (
           <Text style={styles.roomTagline}>
-            Music. Film. Sport.
+            Music. Party & Hits. And Guess.
           </Text>
         )}
 
@@ -6812,6 +7077,9 @@ export default function LobbyScreen() {
                 isHostPlayer={player.isHost}
                 isGuest={player.type === 'guest'}
                 hcp={player.type === 'guest' ? undefined : resolveDisplayHcp(player.id === ownPlayerIdRef.current ? (selfHcp ?? player.hcpOverride) : (player.hcp ?? player.hcpOverride))}
+                hcpMusic={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.music : player.hcpMusic)}
+                hcpFilm={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.film : player.hcpFilm)}
+                hcpSport={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.sport : player.hcpSport)}
                 hcpNotDefined={player.type === 'guest'}
                 accountPlayerName={player.accountPlayerName}
                 turnNumber={
@@ -6876,6 +7144,9 @@ export default function LobbyScreen() {
                     isHostPlayer={false}
                     isGuest={player.type === 'guest'}
                     hcp={player.type === 'guest' ? undefined : resolveDisplayHcp(player.id === ownPlayerIdRef.current ? (selfHcp ?? player.hcpOverride) : (player.hcp ?? player.hcpOverride))}
+                    hcpMusic={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.music : player.hcpMusic)}
+                    hcpFilm={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.film : player.hcpFilm)}
+                    hcpSport={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.sport : player.hcpSport)}
                     hcpNotDefined={player.type === 'guest'}
                     accountPlayerName={player.accountPlayerName}
                     showApproveToggle={hostMode && !isRematchLobby && !player.hasLeft}
@@ -7274,45 +7545,20 @@ export default function LobbyScreen() {
         </View>
         )}
 
-        {/* ── Region Scope ──────────────────────────────────────
-            Host-satt spelregel (vilken kulturell kontext frågorna
-            ska dras från). Visas för alla i lobbyn men kan bara
-            *ändras* av host — samma mönster som Game Mode ovanför. */}
-        <View style={[styles.section, { marginTop: Spacing.sm, gap: Spacing.xs }]}>
-          <View style={styles.regionLabelRow}>
-            <Text style={styles.sectionLabel}>Region Scope</Text>
-            <Pressable
-              style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-              onPress={() =>
-                Alert.alert(
-                  'Region Scope',
-                  "Recognition context — the region the questions are drawn from and whose audience the recognition level is based on. Players get content that's familiar in the chosen region.",
-                )
-              }
-              hitSlop={8}
-              accessibilityLabel="Region Scope info"
-            >
-              <Text style={styles.infoIconText}>i</Text>
-            </Pressable>
-          </View>
-          <TouchableOpacity
-            style={styles.regionTrigger}
-            activeOpacity={0.7}
-            disabled={!hostMode}
-            onPress={() => { if (hostMode) setRegionModalOpen(true); }}
-          >
-            <Text style={{ fontSize: 18 }}>{REGION_FLAGS[region]}</Text>
-            <Text style={styles.regionTriggerText}>{region}</Text>
-            {hostMode && <Text style={{ fontSize: 14, color: Colors.textSecondary }}>⌄</Text>}
-          </TouchableOpacity>
-        </View>
+        {/* ── Region Scope — BORTTAGEN UR LOBBYN (Peter) ────────────
+            Region scope styrs numera enbart via varje spelares Profile,
+            och den avgör deras content-pool redan när lobbyn skapas. I V1
+            är Sweden enda regionen, så en lobby-väljare tillför inget.
+            `region`-staten + RegionModal-plumbingen behålls (seedas till
+            'Sweden', driver HCP-nyckel + quiz-params) så vyn kan återinföras
+            om QuizVibe expanderar till fler länder än Sverige. */}
 
         {/* ── Game Connections ─────────────────────────────────── */}
         {/* Visar vilka källor spelet drar frågor från. Vänsterjusterad lista
             med färgade brand-badges (kompakt list-format). marginTop ger lite
             extra luft mellan Game Mode-beskrivningen och denna rubrik. */}
         <View style={[styles.section, { marginTop: Spacing.sm }]}>
-          <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
+          <Text style={styles.sectionLabel}>MUSIC MIXERBOARD</Text>
           <View style={styles.connectionsList}>
             {/* ── Spotify DJ-läge ─────────────────────────────────────────
                 Göms HELT (inkl. attest-raden) i två lobbytyper där Spotify
@@ -7325,50 +7571,74 @@ export default function LobbyScreen() {
                 alltid; availability-pillen säger om DJ stöds i aktuellt läge
                 (IndDev = grön "Enabled", PtP = grå "Disabled" + toggle
                 utgråad) eftersom host fritt kan byta mellan dem. */}
+            {/* MUSIC-ONLY LAUNCH: EN grå ram runt hela mixerboarden (Spotify →
+                YouTube → Hints), se mockup. Öppnas här, stängs efter paket-
+                boarden. Spotify-blockets egen bg är borttagen så ramen blir en
+                enda enhetlig box i stället för en nästlad ruta. */}
+            <View style={styles.mixerboardBox}>
             {gameMode !== 'remote-1v1' && !isSingleLobby && (
-            <View style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: Radius.sm, marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
+            <View style={{ marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
             {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
                 ÖVERST i boxen, ovanför ikon/rubrik-raden, synlig i BÅDA
-                attest-lägen. Switchen är controlled på spotifyConnected:
-                ON → handleConnectSpotify, OFF → handleDisconnectSpotify
-                (Cancel i disconnect-alerten lämnar den kvar i ON). Grå ram
-                runt text + switch så de läses som EN kontroll. */}
-            {/* marginRight: 28 + paddingRight: 4 → attest-switchens högerkant
-                hamnar 32px från boxkanten = samma kolumn som DJ-switchen i
-                rubrikraden (spotifyDJRow paddingRight 18 + controls margin 14).
-                Texten flex: 1 skjuter switchen mot ramens högerkant. */}
+                attest-lägen. Switchen är controlled på spotifyConnected och
+                går via handleSpotifyAttestToggle: en ändring bekräftas med
+                "Your Profile will be changed to Spotify ON/OFF" och propagerar
+                till profilen (registrerade users). Cancel lämnar switchen kvar
+                (controlled → flippar inte). Grå ram runt text + switch så de
+                läses som EN kontroll. */}
+            {/* Attest-boxen sträcks ut åt höger (marginRight 0) och får samma
+                paddingRight (18) som YouTube/Hints-raderna; switchen wrappas i
+                marginRight: spotifySwitchMR precis som de → attest-toggeln
+                linjerar med YouTube/Hints-togglarna (se mockup). */}
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: 4,
                 marginLeft: Spacing.sm,
-                marginRight: spotifyAttestMR,
+                marginRight: 0,
                 marginTop: 6,
                 borderWidth: 1,
                 // Ramfärg speglar attest-läget: grön = Yes, röd = No.
                 borderColor: spotifyConnected ? Colors.success : Colors.error,
                 borderRadius: Radius.sm,
                 paddingLeft: Spacing.sm,
-                // Smal höger-padding (2) — vid 4 slog attest-marginalens
-                // 0-golv i på 390pt-skärmar och switchen fastnade ~2pt vänster.
-                paddingRight: 2,
-                paddingVertical: 2,
+                paddingRight: 18,
+                paddingVertical: 6,
               }}
             >
+              {/* Kant-skärande badge, övre vänstra hörnet: spelarens namn.
+                  Grön bg = Spotify bekräftat (toggle on), röd bg = ej
+                  bekräftat. Vit text. bg speglar boxens ramfärg så badgen
+                  läses som en del av ramen (samma mönster som HOST/GUEST). */}
+              {ownSpotifyBadgeName !== '' && (
+                <View
+                  style={[
+                    styles.spotifyAttestBadge,
+                    { backgroundColor: spotifyConnected ? Colors.success : Colors.error },
+                  ]}
+                  pointerEvents="none"
+                >
+                  <Text style={styles.spotifyAttestBadgeText} numberOfLines={1}>
+                    {ownSpotifyBadgeName}
+                  </Text>
+                </View>
+              )}
               <Text
                 style={[styles.spotifyLinkText, { color: Colors.textPrimary, fontSize: FontSize.sm, flex: 1, textDecorationLine: 'none' }]}
               >
                 I have Spotify App on this device
               </Text>
-              <Switch
-                value={spotifyConnected}
-                onValueChange={(v) => (v ? handleConnectSpotify() : handleDisconnectSpotify())}
-                trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                thumbColor="#FFF"
-                ios_backgroundColor={spotifyConnected ? '#1DB954' : '#3C3C3C'}
-                style={styles.sourceMatrixSwitch}
-              />
+              <View style={{ marginRight: spotifySwitchMR }}>
+                <Switch
+                  value={spotifyConnected}
+                  onValueChange={(v) => { void handleSpotifyAttestToggle(v); }}
+                  trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
+                  thumbColor="#FFF"
+                  ios_backgroundColor={spotifyConnected ? '#1DB954' : '#3C3C3C'}
+                  style={styles.sourceMatrixSwitch}
+                />
+              </View>
             </View>
             <View style={[styles.spotifyDJRow, { backgroundColor: undefined, borderRadius: undefined, marginBottom: 0 }]}>
               <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 0, marginLeft: -2 }]}>
@@ -7413,31 +7683,38 @@ export default function LobbyScreen() {
                 // position är stabil i båda lägen.
                 <View style={[styles.spotifyHostControls, { marginRight: spotifySwitchMR, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
                   {/* Availability-pill: visas bara när Spotify är kopplat — annars tar pillen för mycket horisontellt utrymme och "Not activated"-texten tvingas ned på ny rad */}
-                  {spotifyConnected && (
-                    <View style={[
-                      styles.spotifyAvailPill,
-                      isSpotifyAvailable
-                        ? styles.spotifyAvailPillOn
-                        : styles.spotifyAvailPillOff,
-                    ]}>
-                      <Text style={[
-                        styles.spotifyAvailPillText,
-                        !isSpotifyAvailable && styles.spotifyAvailPillTextOff,
+                  {/* Pillen speglar det FAKTISKA på/av-läget (samma villkor som
+                      switchens value) — inte bara mode-tillgänglighet. Stänger
+                      host av toggeln ska pillen säga "Disabled". */}
+                  {spotifyConnected && (() => {
+                    const spotifyPillOn = spotifyEnabled && isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify);
+                    return (
+                      <View style={[
+                        styles.spotifyAvailPill,
+                        spotifyPillOn ? styles.spotifyAvailPillOn : styles.spotifyAvailPillOff,
                       ]}>
-                        {isSpotifyAvailable ? 'Enabled' : 'Disabled'}
-                      </Text>
-                    </View>
-                  )}
+                        <Text style={[
+                          styles.spotifyAvailPillText,
+                          !spotifyPillOn && styles.spotifyAvailPillTextOff,
+                        ]}>
+                          {spotifyPillOn ? 'Enabled' : 'Disabled'}
+                        </Text>
+                      </View>
+                    );
+                  })()}
+                  {/* Paket-läge: Spotify är valbart som KOMPLEMENT när paketet har
+                      Spotify-material (pkgHasSpotify). Tidigare hård-disable när
+                      paket aktivt → nu bara disabled om paketet saknar Spotify. */}
                   <Switch
-                    value={isSpotifyAvailable && spotifyEnabled && !pkgGraySpotify}
-                    onValueChange={isSpotifyAvailable && !anyPackageActive ? handleToggleSpotifyEnabled : undefined}
-                    disabled={!isSpotifyAvailable || anyPackageActive}
+                    value={spotifyEnabled && isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify)}
+                    onValueChange={isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify) ? handleToggleSpotifyEnabled : undefined}
+                    disabled={!isSpotifyAvailable || (anyPackageActive && !pkgHasSpotify)}
                     trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                    thumbColor={isSpotifyAvailable && !pkgGraySpotify ? '#FFF' : '#888'}
-                    ios_backgroundColor={isSpotifyAvailable && spotifyEnabled && !pkgGraySpotify ? '#1DB954' : '#3C3C3C'}
+                    thumbColor={isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify) ? '#FFF' : '#888'}
+                    ios_backgroundColor={spotifyEnabled && isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify) ? '#1DB954' : '#3C3C3C'}
                     style={[
                       styles.sourceMatrixSwitch,
-                      (!isSpotifyAvailable || pkgGraySpotify) && { opacity: 0.4 },
+                      (!isSpotifyAvailable || (anyPackageActive && !pkgHasSpotify)) && { opacity: 0.4 },
                     ]}
                   />
                 </View>
@@ -7458,15 +7735,16 @@ export default function LobbyScreen() {
 
             {/* ── Spotify answer type toggles (synliga bara när Spotify är aktiverat) ── */}
             {spotifyEnabled && (
-              // paddingLeft: 34 = samma x som "Spotify"-rubriken ovanför
-              // (8 row-padding − 2 ikon-margin + 28 ikon + 8 gap − 8
-              // kolumn-margin). "Type:" pinnas vänster; switch-gruppen
-              // behåller höger-ankring via marginLeft: 'auto'.
-              <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 34, paddingRight: 18, paddingTop: 2, paddingBottom: 2 }}>
+              // Hela Type-blocket höger-ställt (alignItems:'flex-end'): "Type:"-
+              // header + Year/Name-rader nära högerkanten, label direkt till
+              // vänster om sin toggle (gap 8). Togglarna (marginRight:
+              // spotifySwitchMR) linjerar under Spotify/YouTube/Hints-togglarna.
+              // Se mockup (to-be höger).
+              <View style={{ paddingRight: 18, paddingTop: 2, paddingBottom: 4, alignItems: 'flex-end' }}>
                 <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Type:</Text>
-                <View style={{ marginLeft: 'auto', marginRight: spotifySwitchMR, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                  <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
+                  <View style={{ marginRight: spotifySwitchMR }}>
                     <Switch
                       value={spotifyAnswerYear}
                       disabled={!hostMode}
@@ -7486,8 +7764,10 @@ export default function LobbyScreen() {
                       style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
                     />
                   </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Name</Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                  <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Name</Text>
+                  <View style={{ marginRight: spotifySwitchMR }}>
                     <Switch
                       value={spotifyAnswerName}
                       disabled={!hostMode}
@@ -7512,46 +7792,103 @@ export default function LobbyScreen() {
             </View>
             )}
 
-            {/* ── Source × Category Matrix ── */}
-            <View
-              style={styles.smGrid}
-              onLayout={(e) => {
-                const fullW = e.nativeEvent.layout.width;
-                if (fullW > 0 && fullW !== smGridW) setSmGridW(fullW);
-                const w = Math.round((fullW - 112) / 3);
-                if (w > 0 && w !== smColWidth) setSmColWidth(w);
-              }}
-            >
+            {/* Grått streck mellan Spotify-delen och YouTube-delen. Visas bara
+                när Spotify-blocket finns (multiplayer, ej remote/single). */}
+            {gameMode !== 'remote-1v1' && !isSingleLobby && (
+              <View style={styles.mixerboardDivider} />
+            )}
 
-              {/* ── Etikett-stack (vänster) ── */}
-              <View style={styles.smLabelStack}>
-                <View style={[styles.smHeaderCell, styles.smDataShift]}>
-                  <Text style={styles.sourceMatrixAllText}>All</Text>
+            {/* ── Music-källrader — visas bara UTAN aktivt paket ──
+                MUSIC-ONLY LAUNCH: Music/Film/Sport-kolumnerna borttagna.
+                Mixerboarden är per definition musik-only, så bara två
+                källtoggles (YouTube + Hints) kvar; båda styr Music-kategorin.
+                Non-host: read-only (disabled). Guest host: samma opacity 0.45 +
+                handlers guest-låser internt (guestLockAlert). Switcharna delar
+                spotifySwitchMR med Spotify-raden ovan → höger-kanterna linjerar. */}
+            {!anyPackageActive && (
+            <View>
+              {/* YouTube-rad — samma vänster-geometri som Spotify-raden
+                  (paddingLeft sm + 28-px connectionIconWrap marginLeft -2 +
+                  label marginLeft -8) så ikon + rubrik linjerar med Spotify. */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingVertical: 8, paddingRight: 18, paddingLeft: Spacing.sm }}>
+                <View style={[styles.connectionIconWrap, { marginLeft: -2 }]}>
+                  <YouTubeBrandIcon size={22} />
                 </View>
-                <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
+                <Text style={[styles.sourceMatrixSourceText, { marginLeft: -8 }]}>YouTube</Text>
+                <Pressable
+                  onPress={() => Alert.alert('YouTube', 'Music videos and audio clips — guess the release year.')}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+                <View style={{ marginLeft: 'auto', marginRight: spotifySwitchMR }}>
                   <Switch
-                    value={smAllValue}
-                    onValueChange={hostMode ? handleToggleAllSources : undefined}
-                    disabled={!hostMode || anyPackageActive}
+                    value={youtubeEnabledCategories.includes('Music')}
+                    onValueChange={hostMode ? handleToggleArtistsYoutube : undefined}
+                    disabled={!hostMode}
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
-                    ios_backgroundColor={smAllValue ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, (isGuestHost || (anyPackageActive && !pkgAllCovered)) && { opacity: 0.45 }]}
+                    ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
                   />
                 </View>
-                <View style={styles.smLabelSourceCell}>
+              </View>
+              {/* Hints-rad — samma vänster-geometri som Spotify/YouTube. */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingVertical: 8, paddingRight: 18, paddingLeft: Spacing.sm }}>
+                <View style={[styles.connectionIconWrap, { marginLeft: -2 }]}>
+                  <View style={styles.imagesIconWrap}>
+                    <Svg width={22} height={22} viewBox="24 22 32 32">
+                      <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
+                      <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
+                    </Svg>
+                    <Text style={styles.imagesQMark}>?</Text>
+                  </View>
+                </View>
+                <Text style={[styles.sourceMatrixSourceText, { marginLeft: -8 }]}>Hints</Text>
+                <Pressable
+                  onPress={() => Alert.alert('Hints', 'Guess the artist or band from a flag + progressive clues.')}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+                <View style={{ marginLeft: 'auto', marginRight: spotifySwitchMR }}>
+                  <Switch
+                    value={imagesEnabledCategories.includes('Music')}
+                    onValueChange={hostMode ? handleToggleArtistsGuessWho : undefined}
+                    disabled={!hostMode}
+                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
+                  />
+                </View>
+              </View>
+            </View>
+            )}
+
+            {/* ── Paket-läge: kollapsad mixerboard (YT + Hints aggregat-toggles) ──
+                Varje toggle styr HELA paketets material för den källan. Disabled
+                när paketet saknar material (pkgHasYoutube/pkgHasHints). Spotify
+                bor i sitt eget kort ovanför och kan aldrig vara enda källan. ── */}
+            {anyPackageActive && (
+              <View style={styles.pkgSourceBlock}>
+                <View style={styles.pkgSourceRow}>
                   <YouTubeBrandIcon size={22} />
                   <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
-                  <Pressable
-                    onPress={() => Alert.alert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers\n• Athletes – sport events')}
-                    hitSlop={8}
-                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  >
-                    <Text style={styles.infoIconText}>i</Text>
-                  </Pressable>
+                  <View style={{ flex: 1 }} />
+                  <Switch
+                    value={pkgYtActive}
+                    onValueChange={hostMode ? handleTogglePackageYoutube : undefined}
+                    disabled={!hostMode || !pkgHasYoutube}
+                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={pkgYtActive ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={[styles.sourceMatrixSwitch, (!hostMode || !pkgHasYoutube) && { opacity: 0.45 }]}
+                  />
                 </View>
-                <View style={styles.smAutoCell} />
-                <View style={styles.smLabelSourceCell}>
+                <View style={styles.pkgSourceRow}>
                   <View style={styles.imagesIconWrap}>
                     <Svg width={22} height={22} viewBox="24 22 32 32">
                       <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
@@ -7560,82 +7897,25 @@ export default function LobbyScreen() {
                     <Text style={styles.imagesQMark}>?</Text>
                   </View>
                   <Text style={styles.sourceMatrixSourceText}>Hints</Text>
-                  <Pressable
-                    onPress={() => Alert.alert('Hints', 'Person name guessing — currently being prepared. Switches are available for when the feature activates.')}
-                    hitSlop={8}
-                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  >
-                    <Text style={styles.infoIconText}>i</Text>
-                  </Pressable>
-                </View>
-              </View>
-
-              {/* ── Artists kolumn-stack ── */}
-              <View style={styles.smDataStack}>
-                <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Music</Text>
-                </View>
-                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
+                  <View style={{ flex: 1 }} />
                   <Switch
-                    value={smColValue('Music', artistsAllOn)}
-                    onValueChange={hostMode ? handleToggleArtistsColumn : undefined}
-                    disabled={!hostMode || anyPackageActive}
+                    value={pkgHintsActive}
+                    onValueChange={hostMode ? handleTogglePackageHints : undefined}
+                    disabled={!hostMode || !pkgHasHints}
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
-                    ios_backgroundColor={smColValue('Music', artistsAllOn) ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Music')) && { opacity: 0.45 }]}
+                    ios_backgroundColor={pkgHintsActive ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={[styles.sourceMatrixSwitch, (!hostMode || !pkgHasHints) && { opacity: 0.45 }]}
                   />
                 </View>
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'youtube')) && { opacity: 0.45 }]} />
-                </View>
-                <View style={[styles.smAutoCell, smCellStyle]} />
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'hints')) && { opacity: 0.45 }]} />
-                </View>
+                <Text style={styles.guestHostNote}>
+                  {hostMode
+                    ? 'Package sources — each toggle controls all of the package’s categories. Spotify (above) is optional and can never be the only source.'
+                    : 'Package sources — selected by the Host'}
+                </Text>
               </View>
-
-              {/* ── Actors kolumn-stack ── */}
-              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
-                <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Film</Text>
-                </View>
-                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={smColValue('Film', actorsAllOn)} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smColValue('Film', actorsAllOn) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Film')) && { opacity: 0.45 }]} />
-                </View>
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'youtube')) && { opacity: 0.45 }]} />
-                </View>
-                <View style={[styles.smAutoCell, smCellStyle]} />
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'hints')) && { opacity: 0.45 }]} />
-                </View>
-              </View>
-
-              {/* ── Athletes kolumn-stack ── */}
-              <View
-                style={[styles.smDataStack, styles.sourceMatrixColSep]}
-                onLayout={(e) => setSportStackX(e.nativeEvent.layout.x)}
-              >
-                <View style={[styles.smHeaderCell, smCellStyle]}>
-                  <Text style={styles.sourceMatrixHeaderText}>Sport</Text>
-                </View>
-                <View style={[styles.smAllToggleCell, smCellStyle, styles.smDataShift, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
-                  <Switch value={smColValue('Sport', athletesAllOn)} onValueChange={hostMode ? handleToggleAthletesColumn : undefined} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smColValue('Sport', athletesAllOn) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Sport')) && { opacity: 0.45 }]} />
-                </View>
-                <View
-                  onLayout={(e) => setSportCellCenter(e.nativeEvent.layout.x + e.nativeEvent.layout.width / 2)}
-                  style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}
-                >
-                  <Switch value={smCellValue('Sport', 'youtube', youtubeEnabledCategories.includes('Sport'))} onValueChange={handleToggleAthletesYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Sport', 'youtube', youtubeEnabledCategories.includes('Sport')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'youtube')) && { opacity: 0.45 }]} />
-                </View>
-                <View style={[styles.smAutoCell, smCellStyle]} />
-                <View style={[styles.smSwitchCell, smCellStyle, styles.smDataShift]}>
-                  <Switch value={smCellValue('Sport', 'hints', imagesEnabledCategories.includes('Sport'))} onValueChange={handleToggleAthletesGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Sport', 'hints', imagesEnabledCategories.includes('Sport')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Sport', 'hints')) && { opacity: 0.45 }]} />
-                </View>
-              </View>
-
-            </View>
+            )}
+            </View>{/* ── slut grå mixerboard-ram ── */}
 
             {/* 1vs1: Spotify-kortet göms helt (se toppen av mixerboarden) —
                 noten sitter under hela matrisen, ovanför Customized Host
@@ -7651,7 +7931,7 @@ export default function LobbyScreen() {
                 Host packages. När på filtrerar quiz.tsx bort YT-klipp taggade
                 parentControlled ur frågeurvalet. */}
             <View style={styles.parentControlRow}>
-              <View style={[styles.regionLabelRow, { flex: 1 }]}>
+              <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Parent Control</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
@@ -7668,7 +7948,7 @@ export default function LobbyScreen() {
                 trackColor={{ false: '#3C3C3C', true: Colors.success }}
                 thumbColor="#FFF"
                 ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
-                style={[styles.connectionSwitch, !hostMode && { opacity: 0.6 }]}
+                style={[styles.connectionSwitch, { marginLeft: 0 }, !hostMode && { opacity: 0.6 }]}
               />
             </View>
 
@@ -7690,7 +7970,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Customized Host packages',
-                      'Generic - Generic portfolio includes quiz from all main categories Music, Film and Sport.\n\nExtra Host Packages - specific themes for a customized game experience',
+                      'Generic - Generic portfolio includes the full music quiz (YouTube + Hints).\n\nExtra Host Packages - specific themes for a customized game experience',
                     )
                   }
                   hitSlop={8}
@@ -8070,21 +8350,17 @@ export default function LobbyScreen() {
                   <Text style={styles.eraGuestBoxText}>{displayEra[0]} – {displayEra[1]}</Text>
                 </View>
               </View>
-              {/* Guest host: era är låst till fulla spannet — ingen slider,
-                  bara info-not under display-boxen. */}
-              {isGuestHost && (
-                <Text style={styles.guestHostNote}>
-                  change Game era not available for Guest user
-                </Text>
-              )}
-              {/* Host-paket aktivt: era låst till paketets innehålls-span (samma
-                  låsta mönster som guest host) — ingen slider, bara info-not. */}
+              {/* Host-paket aktivt: era låst till paketets innehålls-span
+                  — ingen slider, bara info-not. Guest host har aldrig paket,
+                  så detta gäller bara registrerade hosts. */}
               {packageEraLocked && !isGuestHost && (
                 <Text style={styles.guestHostNote}>
                   Game era locked by selected package
                 </Text>
               )}
-              {hostMode && !isGuestHost && !packageEraLocked && (
+              {/* Slidern renderas för ALLA hosts (guest host inkluderad sedan
+                  2026-09-02) utom när ett paket låser eran. */}
+              {hostMode && !packageEraLocked && (
                 <View style={{ alignItems: 'center', position: 'relative', width: SLIDER_WIDTH, alignSelf: 'center' }}>
                   <MultiSlider
                     // values-propen hålls STABIL under drag (= committed
@@ -8201,8 +8477,8 @@ export default function LobbyScreen() {
                   <DecadeMarks />
                 </View>
               )}
-              {hostMode && !isGuestHost && eraAtToFloor && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ To-year can not be earlier than 1980</Text></View>}
-              {hostMode && !isGuestHost && eraAtMinInterval && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ Min interval 15 years</Text></View>}
+              {hostMode && !packageEraLocked && eraAtToFloor && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ To-year can not be earlier than 1980</Text></View>}
+              {hostMode && !packageEraLocked && eraAtMinInterval && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ Min interval 15 years</Text></View>}
               {eraWarning && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ {eraWarning}</Text></View>}
             </View>
 
@@ -8383,7 +8659,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Game Sequence',
-                      'Preview of which source (Spotify / YouTube / Image) and category (Music / Film / Sport) each round will use based on current settings.'
+                      'Preview of which source (Spotify / YouTube / Hints) each round will use based on current settings.'
                     )
                   }
                   hitSlop={8}
@@ -9349,7 +9625,7 @@ export default function LobbyScreen() {
               ]}
               onPress={() => {
                 setNoApprovedModalVisible(false);
-                setSinglePlayerDefault(true);
+                void handleSwitchToSingleLobby();
               }}
             >
               <Text style={styles.noApprovedBtnText}>
@@ -10591,6 +10867,27 @@ const styles = StyleSheet.create({
     color: '#1DB954',            // Spotify Green — bekräftar kopplat konto.
     marginTop: 2,
   },
+  // Kant-skärande namn-badge på attest-boxen (övre vänstra hörnet). bg sätts
+  // inline (grön = bekräftat, röd = ej). Speglar HOST/GUEST-badge-mönstret:
+  // position absolute + top: -8 skär boxramen, parent får ej overflow: hidden.
+  spotifyAttestBadge: {
+    position: 'absolute',
+    top: -8,
+    left: Spacing.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    // Rymmer det längsta playername-formatet (10 bokstäver + "-" + 7 siffror
+    // = 18 tecken, t.ex. "GuestAbcde-1234567") utan trunkering.
+    maxWidth: 240,
+    zIndex: 2,
+  },
+  spotifyAttestBadgeText: {
+    fontSize: FontSize.xs,
+    fontWeight: '700',
+    color: '#FFF',
+    letterSpacing: 0.3,
+  },
   spotifyNotActivatedRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -10936,6 +11233,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: Spacing.xs,
   },
+  // Paket-läge: kollapsad mixerboard (två aggregat-toggle-rader + not).
+  // MUSIC-ONLY LAUNCH: grå ram runt hela mixerboarden (Spotify + YouTube +
+  // Hints). En enda box-linje, se mockup. paddingVertical ger luft inuti;
+  // ingen horisontell padding så inre rader behåller sina egna vänster/höger-
+  // insättningar (switch-högerkanterna linjerar via spotifySwitchMR).
+  mixerboardBox: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  // Grått streck inuti mixerboarden mellan Spotify-delen och YouTube-delen.
+  mixerboardDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+    marginVertical: Spacing.xs,
+  },
+  pkgSourceBlock: {
+    paddingVertical: Spacing.xs,
+    gap: Spacing.sm,
+  },
+  pkgSourceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
   smLabelStack: {
     width: 112,
     minWidth: 112,
@@ -11065,8 +11391,9 @@ const styles = StyleSheet.create({
   // Parent Control-rad längst ner i Source Mixerboard (ovanför Customized
   // Host packages). Extra luft ovanför så den lossnar från matrisen.
   parentControlRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
     marginTop: Spacing.md,
   },
   usePackagesLabel: {

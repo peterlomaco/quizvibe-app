@@ -105,6 +105,16 @@ Deno.serve(async (req) => {
     password,
   });
 
+  // Email ej bekräftad än ("Confirm email" PÅ) → distinkt reason så klienten
+  // kan visa "bekräfta ditt mail" i stället för det generiska felet.
+  // Returneras med HTTP 200 (inte 4xx): supabase-js functions.invoke sväljer
+  // response-body:n vid non-2xx-status, så klienten läser detta via
+  // data.error. Tradeoff (accepterad): avslöjar att PlayerName:t finns men är
+  // obekräftat — liten enumereringsyta; PlayerName är ändå publikt synligt.
+  if (error?.code === 'email_not_confirmed') {
+    return jsonResponse({ error: 'email_not_confirmed' }, 200);
+  }
+
   // Fel lösenord (eller annan auth-fail) → samma generiska fel.
   if (error || !data.session || !data.user) {
     return jsonResponse({ error: 'invalid_credentials' }, 401);

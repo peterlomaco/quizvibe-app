@@ -58,12 +58,6 @@ items:
     probability: 84
     wikimediaSearchHints: ["Robin Hood 1973 Disney animated film fox"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "rekU76GG9Sk"
-        startSec: 0
-        endSec: 15
-        channelTitle: "Jim Margle"
-        notes: "Original 1973 teatral trailer (1:00) — Robin Hood + Maid Marian etableras."
 
   - id: lady-and-the-tramp
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]

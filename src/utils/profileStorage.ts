@@ -117,6 +117,20 @@ export interface ProfileData {
   // justeringar. Promotera till en profiles-kolumn (egen migration) först när
   // cross-device-HCP faktiskt behövs. Optional för bakåtkompat.
   hcp?: number;
+  // Per-kategori-HCP för den region scope spelaren senast spelade i (§1.3).
+  // AsyncStorage-only, samma rationale som `hcp`. `hcp` ovan = `total` här (den
+  // enda skalär lobby-kolumnen + legacy-läsare läser fortfarande `hcp`). Detta
+  // fält låter sköldarna läsa alla 4 värden synkront via getCachedProfile().
+  // Bara EN region lagras här (den senast spelade) — sköldarna är per-session;
+  // en per-region-map skulle blåsa upp profil-bloben i onödan. Speglas av
+  // hcpProgress.ts mirrorToProfile. Display-heltal (avrundade uppåt).
+  hcpByCategory?: {
+    region: string;
+    total: number;
+    music: number;
+    film: number;
+    sport: number;
+  };
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -455,6 +469,7 @@ async function loadProfileFresh(): Promise<ProfileData | null> {
         // AsyncStorage-only (ingen DB-kolumn) — alltid från cache.
         parentControlEnabled: cached?.parentControlEnabled,
         hcp: cached?.hcp,
+        hcpByCategory: cached?.hcpByCategory,
       };
     }
     const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
@@ -567,6 +582,7 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     spotifyAppConfirmed: cache?.spotifyAppConfirmed,
     parentControlEnabled: cache?.parentControlEnabled,
     hcp: cache?.hcp,
+    hcpByCategory: cache?.hcpByCategory,
   };
 
   // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha

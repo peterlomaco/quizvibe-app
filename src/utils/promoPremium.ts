@@ -123,6 +123,8 @@ export async function refreshOfferConfig(): Promise<void> {
         }
       }
     }
+    // Håll den synkrona spegeln i takt med den nyss hämtade konfigen.
+    await computePromoFlags();
   } catch (err) {
     console.warn('[promoPremium] refreshOfferConfig failed:', err);
   }
@@ -251,6 +253,8 @@ export async function refreshPromoGrants(): Promise<void> {
       owner,
     };
     await AsyncStorage.setItem(MIRROR_KEY, JSON.stringify(mirror));
+    // Spegeln vilar på granten — räkna om den synkrona flagg-spegeln nu.
+    await computePromoFlags();
   } catch (err) {
     console.warn('[promoPremium] refreshPromoGrants failed:', err);
   }
@@ -284,6 +288,59 @@ export async function getFreePremiumExpiry(): Promise<Date | null> {
 export async function getFreeMonthUsed(): Promise<boolean> {
   const mirror = await readOwnedMirror();
   return mirror?.freeMonthUsed ?? false;
+}
+
+// ─── Synkron spegel av Store-flaggorna ────────────────────────────────
+//
+// Samma mönster (och samma skäl) som subscriptionStorage:s `getCachedPremium`
+// och profileStorage:s `getCachedProfile`. StoreScreen:s flaggor (offerOpen
+// m.fl.) låg tidigare i `useState(false)` och fylldes först när en async
+// Promise.all-läsning resolvade — under den frame:n gav offerOpen=false att
+// voucher-/redeem-boxen (`showVoucher && !offerOpen`) renderades och sedan
+// försvann när kampanjen visade sig vara öppen (Peter 2026-09-02: "redeem
+// code flashar innan det bara visar Free"). Med en synkron spegel, VÄRMD vid
+// modul-load + räknad om vid varje refresh-punkt, är StoreScreen:s första
+// frame redan rätt.
+//
+// `undefined` = ännu inte utvärderad. Anropare faller då tillbaka på sin egen
+// async läsning (samma fail-safe som getCachedPremium).
+
+export interface PromoFlags {
+  /** isOfferWindowOpen() */
+  offerOpen: boolean;
+  /** hasActiveFreePremium() */
+  claimActive: boolean;
+  /** getFreePremiumExpiry() */
+  expiry: Date | null;
+  /** getFreeMonthUsed() */
+  freeMonthUsed: boolean;
+  /** isPaidSubscriptionEnabled() */
+  paidEnabled: boolean;
+}
+
+let cachedPromoFlags: PromoFlags | undefined = undefined;
+
+/** Senast kända Store-promo-flaggor, synkront. `undefined` = ej utvärderad än. */
+export function getCachedPromoFlags(): PromoFlags | undefined {
+  return cachedPromoFlags;
+}
+
+/**
+ * Läser alla fem promo-flaggorna och uppdaterar den synkrona spegeln. Anropas
+ * vid modul-load (värmning), efter refreshOfferConfig/refreshPromoGrants, och
+ * av StoreScreen vid varje mount. `premiumActive` ingår MEDVETET INTE — det
+ * bor i subscriptionStorage.getCachedPremium (undviker cirkulär import).
+ */
+export async function computePromoFlags(): Promise<PromoFlags> {
+  const [offerOpen, claimActive, expiry, freeMonthUsed, paidEnabled] = await Promise.all([
+    isOfferWindowOpen(),
+    hasActiveFreePremium(),
+    getFreePremiumExpiry(),
+    getFreeMonthUsed(),
+    isPaidSubscriptionEnabled(),
+  ]);
+  cachedPromoFlags = { offerOpen, claimActive, expiry, freeMonthUsed, paidEnabled };
+  return cachedPromoFlags;
 }
 
 // ── Claim / redeem-resultat ──────────────────────────────────────────
@@ -391,3 +448,10 @@ export function formatPromoDate(date: Date): string {
     return date.toISOString().slice(0, 10);
   }
 }
+
+// Värm den synkrona flagg-spegeln vid app-start så första Store-mounten seedar
+// rätt läge. Fire-and-forget — misslyckas den står spegeln kvar på `undefined`
+// och StoreScreen faller tillbaka på sin async läsning som förut. (Grant-
+// beroende flaggor kan vara "utloggade" här; de räknas om vid nästa
+// refreshPromoGrants — app-start + SIGNED_IN — innan Store nås.)
+void computePromoFlags();

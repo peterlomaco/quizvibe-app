@@ -105,6 +105,8 @@ export function buildRematchSettings(
     eraTo: last?.eraTo ?? opts.eraTo ?? CURRENT_YEAR,
     roundsCount: last?.roundsCount ?? opts.roundsCount ?? 4,
     selectedExtraPackages: last?.selectedExtraPackages ?? [],
+    packageYoutubeEnabled: true,
+    packageHintsEnabled: true,
     youtubeEnabledCategories:
       rawYt?.length === 0 ? [] : ytCats && ytCats.length > 0 ? ytCats : [...all],
     imagesEnabledCategories:

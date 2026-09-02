@@ -42,7 +42,7 @@ items:
     wikimediaSearchHints: ["Eminem rapper"]
     answerMethods: ["timeline", "name-letters"]
     inBaseCatalog: true
-    genrePackages: ["pkg-hiphop"]
+    genrePackages: ["Hip Hop"]
   - id: beyonce
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Beyoncé"
@@ -288,7 +288,7 @@ items:
     peakFrom: 1993
     peakTo: 2024
     probability: 82
-    region: ["unknown-region"]
+    region: ["global"]
     wikimediaSearchHints: ["Toni Braxton singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: ne-yo
@@ -298,7 +298,7 @@ items:
     peakFrom: 2006
     peakTo: 2024
     probability: 75
-    region: ["unknown-region"]
+    region: ["global"]
     wikimediaSearchHints: ["Ne-Yo singer", "Shaffer Smith singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: usher
@@ -318,7 +318,7 @@ items:
     peakFrom: 1992
     peakTo: 2024
     probability: 92
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Snoop Dogg rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: ll-cool-j
@@ -381,7 +381,6 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Tracy Chapman singer"]
     answerMethods: ["timeline", "name-letters"]
-  # === Svenska expansion 2026-05-27 ===
   - id: tove-lo
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tove Lo"
@@ -389,6 +388,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Tove Lo Swedish singer Habits Stay High"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: lykke-li
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lykke Li"
@@ -425,6 +425,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Petter Swedish rapper hip hop Mitt sjätte sinne"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: adam-tensta
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Adam Tensta"
@@ -439,7 +440,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Eagle-Eye Cherry Swedish singer Save Tonight"]
     answerMethods: ["timeline", "name-letters"]
-  # === Svenska genrer expansion 2026-05-27 — House/Hip Hop/Pop/Vemod ===
+    region: ["europe"]
   - id: steve-angello
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Steve Angello"
@@ -454,6 +455,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Axwell Swedish house DJ producer Axel Hedfors"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["global"]
   - id: eric-prydz
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eric Prydz"
@@ -461,6 +463,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Eric Prydz Swedish DJ producer Call on Me Pjanoo"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: timbuktu
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Timbuktu"
@@ -468,6 +471,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Timbuktu Swedish rapper Jason Diakité Alla vill till himmelen"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["100% in swedish"]
   - id: cleo
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     region: ["unknown-region"]
@@ -518,6 +522,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Måns Zelmerlöw Swedish singer Eurovision Heroes 2015"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["europe"]
   - id: darin
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Darin"
@@ -525,7 +530,6 @@ items:
     probability: 80
     wikimediaSearchHints: ["Darin Zanyar Swedish singer Idol 2004"]
     answerMethods: ["timeline", "name-letters"]
-  # === Vemod-batch 2026-05-27 — svenska millennials melankoli/indie/pop ===
   - id: melissa-horn
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Melissa Horn"
@@ -653,7 +657,6 @@ items:
     probability: 76
     wikimediaSearchHints: ["Daniel Adams-Ray Swedish singer rapper Snook"]
     answerMethods: ["timeline", "name-letters"]
-  # === Bred batch 2026-05-27 — tonårsidoler/house/hiphop/epa-dunk/cross-nordic ===
   - id: daniel-lindstrom
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Daniel Lindström"
@@ -675,6 +678,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Sanna Nielsen Swedish singer Eurovision 2014 Undo"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: robin-bengtsson
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Robin Bengtsson"
@@ -682,6 +686,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Robin Bengtsson Swedish singer Eurovision 2017 I Cant Go On"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: eric-saade
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eric Saade"
@@ -689,6 +694,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Eric Saade Swedish singer Eurovision Popular Melfest"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: kim-cesarion
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kim Cesarion"
@@ -718,6 +724,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Otto Knows Otto Jettmann Swedish DJ Million Voices"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["europe"]
   - id: sebastian-ingrosso
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sebastian Ingrosso"
@@ -755,6 +762,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Kygo Kyrre Gørvell-Dahll Norwegian DJ tropical house"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["europe"]
   - id: alexander-rybak
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alexander Rybak"
@@ -762,6 +770,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Alexander Rybak Norwegian singer Eurovision 2009 Fairytale"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["europe"]
   - id: marie-serneholt
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Marie Serneholt"
@@ -783,6 +792,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Sarah Dawn Finer Swedish singer Moving On Eurovision"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: lisa-miskovsky
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lisa Miskovsky"
@@ -811,7 +821,6 @@ items:
     probability: 76
     wikimediaSearchHints: ["Mariette Hansson Swedish singer Melodifestivalen Don't Stop Believing"]
     answerMethods: ["timeline", "name-letters"]
-  # === Batch C 2026-05-27 — svenska millennials artister ===
   - id: sabina-ddumba
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sabina Ddumba"
@@ -819,14 +828,6 @@ items:
     probability: 74
     wikimediaSearchHints: ["Sabina Ddumba Swedish singer Effortless"]
     answerMethods: ["timeline", "name-letters"]
-  - id: vincent-pontare
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Vincent"
-    correctYear: 1987
-    probability: 72
-    wikimediaSearchHints: ["Vincent Pontare Swedish singer Mapei Mariko"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Komplettering 2026-05-27 — Mello/Eurodance/Global hip-hop ===
   - id: danny-saucedo
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Danny Saucedo"
@@ -841,6 +842,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["E-Type Swedish eurodance Martin Eriksson Set the World on Fire"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["europe"]
   - id: kanye-west
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kanye West"
@@ -865,7 +867,7 @@ items:
     correctYear: 1994
     probability: 65
     region: ["global"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["Ava Max"]
     answerMethods: ["name-letters"]
   - id: carly-rae-jepsen
@@ -882,7 +884,7 @@ items:
     correctYear: 1989
     probability: 65
     region: ["global"]
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["Chris Brown"]
     answerMethods: ["name-letters"]
   - id: david-tavare
@@ -890,7 +892,7 @@ items:
     displayName: "David Tavaré"
     correctYear: 1984
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     genrePackages: ["Summer"]
     wikimediaSearchHints: ["David Tavaré"]
     answerMethods: ["name-letters"]
@@ -909,7 +911,7 @@ items:
     displayName: "Elena Tsagkrinou"
     correctYear: 1994
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Elena Tsagkrinou"]
@@ -919,7 +921,7 @@ items:
     displayName: "Eleni Foureira"
     correctYear: 1987
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Eleni Foureira"]
@@ -946,7 +948,7 @@ items:
     displayName: "Hadise"
     correctYear: 1985
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Hadise"]
@@ -983,7 +985,7 @@ items:
     correctYear: 1990
     probability: 65
     region: ["global"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["John Newman"]
     answerMethods: ["name-letters"]
   - id: katy-perry
@@ -1000,7 +1002,7 @@ items:
     correctYear: 1987
     probability: 65
     region: ["global"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["Kesha"]
     answerMethods: ["name-letters"]
   - id: lena
@@ -1008,7 +1010,7 @@ items:
     displayName: "Lena"
     correctYear: 1991
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Lena"]
@@ -1018,7 +1020,7 @@ items:
     displayName: "Marija Šerifović"
     correctYear: 1984
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Marija Šerifović"]
@@ -1045,6 +1047,6 @@ items:
     correctYear: 1993
     probability: 65
     region: ["global"]
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["ZAYN"]
     answerMethods: ["name-letters"]

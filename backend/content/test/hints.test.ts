@@ -49,7 +49,7 @@ describe('kön på svarsalternativ', () => {
   it('täcker person-items i den spelbara poolen', () => {
     // Icke-binära P21-värden ska MEDVETET sakna kön (se personGender.ts) —
     // frågan faller då tillbaka på subject-poolen istället för att låsas.
-    const KNOWN_NON_BINARY = new Set(['demi-lovato', 'miley-cyrus', 'dana-international', 'nemo']);
+    const KNOWN_NON_BINARY = new Set(['demi-lovato', 'miley-cyrus', 'dana-international', 'nemo', 'sam-smith']);
     const unknown = playablePersons.filter((q) => resolveGender(q.id) === null && !KNOWN_NON_BINARY.has(q.id));
     // Utan kön faller frågan tillbaka på subject-poolen (blandade alternativ),
     // så täckningen måste vara i stort sett total för att regeln ska bita.

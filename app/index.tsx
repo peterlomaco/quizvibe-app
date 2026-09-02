@@ -1,5 +1,6 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
+import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
@@ -16,6 +17,7 @@ import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom 
 import { buildRemoteQuizParams, getMatchByRoomCode, getOwnUserId, splitMatchForUser } from '@/src/utils/remoteMatches';
 import { MyMatchesSection } from '@/src/components/MyMatchesSection';
 import { HomeExtrasRow } from '@/src/components/HomeExtrasRow';
+import { useWaitingInviteSignal } from '@/src/hooks/useWaitingInviteSignal';
 import {
   appendPlayerNameDigit,
   appendPlayerNameLetter,
@@ -33,10 +35,10 @@ import {
   PLAYER_NAME_MAX_DIGITS,
   PLAYER_NAME_MAX_LETTERS,
 } from '@/src/utils/playerName';
-import { ensureAuthSession, signInWithPlayerName } from '@/src/utils/auth';
+import { ensureAuthSession, resendActivationByName, signInWithPlayerName } from '@/src/utils/auth';
 import { containsProfanity } from '@/src/utils/profanity';
-import { clearProfile, emailExists, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
-import { clearPremiumSubscription, hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
+import { clearProfile, emailExists, getCachedProfile, loadProfile, playerNameExists, type ProfileData } from '@/src/utils/profileStorage';
+import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
@@ -94,6 +96,14 @@ interface JoinModalProps {
   // när spelaren tryckt Cancel i auth-formuläret efter en Remote 1vs1-gate.
   // Rumskoden återställs INTE (se GuestJoinDraft).
   initialGuestDraft?: GuestJoinDraft | null;
+  // "New update"-signal: en ny Waiting Invite har mottagits sedan användaren
+  // senast öppnade listan. Driver det blinkande guld-märket på "Join Waiting
+  // Invites"-raden. Ägs av HomeScreen (useWaitingInviteSignal) så Home-knappen
+  // och modal-raden delar exakt samma signal.
+  hasNewInvite?: boolean;
+  // Markerar invites som sedda (släcker signalen) — anropas när användaren
+  // öppnar Waiting Invites-listan.
+  onInvitesSeen?: () => void;
 }
 
 /**
@@ -149,8 +159,8 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
  * "Premium option" — inga asterisker i värde-kolumnerna (Peter 2026-08-09).
  *
  * Källor för värdena: Remote 1vs1 är users-only; guest-hostade spel skriver
- * ingen Player history; guest host är låst till fast Game era / inga Extra
- * packages / max 1 Play Again; free host = FREE_CREDITS_DAILY_CAP (4) —
+ * ingen Player history; guest host kan välja Game era (sedan 2026-09-02) men
+ * har inga Extra packages / max 1 Play Again; free host = FREE_CREDITS_DAILY_CAP (4) —
  * både grant vid registrering och daglig top-up-cap, samma siffra som
  * Store:s "Basic: 4 games per day". Guest = ogated men trial-begränsat
  * spel.
@@ -160,7 +170,7 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
   { label: 'Head-to-head matches', user: true, guest: false },
   { label: 'Saved results & player history', user: true, guest: false },
   { label: 'Friends list & in-app invites', user: true, guest: false },
-  { label: 'Choose Game era', user: true, guest: false },
+  { label: 'Custom Game era', user: true, guest: true },
   { label: 'Select categories and source (Source mixerboard)', user: true, guest: false },
   { label: 'Spotify, YouTube and Hints', user: true, guest: true },
   { label: 'Host games per day', user: '4 free', guest: 'Trial' },
@@ -271,6 +281,27 @@ function formatBirthYear(year: number): string {
   return String(year);
 }
 
+/**
+ * Waiting-invite-tidsstämpel "YYYY-MM-DD HH:MM" (24h). Europe/Stockholm för
+ * att matcha appens CET-konvention (samma tidszon som daily-refresh + promo-
+ * datum). sv-SE-locale ger redan ISO-formatet YYYY-MM-DD HH:MM.
+ */
+function formatInviteTimestamp(ms: number): string {
+  try {
+    return new Intl.DateTimeFormat('sv-SE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Stockholm',
+    }).format(new Date(ms));
+  } catch {
+    // Fallback: ISO-slice (UTC) om Intl/tidszon inte stöds på enheten.
+    return new Date(ms).toISOString().slice(0, 16).replace('T', ' ');
+  }
+}
+
 // Visar "Lobby is full"-Alert med text som beror på host:s subscription-
 // status. Free host får upgrade-CTA-formulering; Premium host får bara
 // "remove players"-versionen (inget upselling-meddelande). Returnerar true
@@ -340,7 +371,7 @@ async function checkRematchLockedLobby(
   return true;
 }
 
-function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'multiplayer', onRemoteAccountRequired, initialGuestDraft }: JoinModalProps) {
+function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'multiplayer', onRemoteAccountRequired, initialGuestDraft, hasNewInvite = false, onInvitesSeen }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   const [code, setCode] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -507,6 +538,14 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
   }, [visible]);
 
+  // Släck "New update"-märket så snart användaren öppnar Waiting Invites-
+  // listan (samma "sett vid visning"-semantik som Marathon/H2H). onInvitesSeen
+  // skriver den delade seen-snapshotten i HomeScreen så BÅDE modal-raden och
+  // Home-knappens märke slocknar.
+  useEffect(() => {
+    if (visible && step === 'invites') onInvitesSeen?.();
+  }, [visible, step, onInvitesSeen]);
+
   // Realtime push av invites medan modalen är öppen. Lyssnar på BÅDA INSERT
   // (ny host-skickad invite med to_user_id som matchar oss — backfillas av
   // set_invite_to_user_id-triggern via profiles.player_name) OCH DELETE
@@ -578,9 +617,14 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     if (!(await isActiveRoom(invite.roomCode))) {
       const updated = await removeInvite(invite.id);
       setInvites(updated);
+      // Race-fallet: host deletar lobby:n i exakt samma stund som mottagaren
+      // trycker Accept. Samma copy som non-host:ens in-lobby-popup
+      // ("Game Lobby deleted") så språket är konsekvent i hela appen. Vi
+      // navigerar INTE — mottagaren blir kvar i Waiting Invites-listan
+      // (formuläret på Home) med den döda inviten bortstädad.
       Alert.alert(
-        'Lobby no longer available',
-        'This lobby has been deleted by the Host.',
+        'Game Lobby deleted',
+        'This Game Lobby has been deleted by Host.',
       );
       return;
     }
@@ -1083,6 +1127,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   label="Join Waiting Invites"
                   subtitle="See invites hosts have sent you"
                   disabled={invites.length === 0}
+                  showUpdate={hasNewInvite && invites.length > 0}
                   onPress={() => {
                     if (invites.length === 0) {
                       Alert.alert(
@@ -1194,12 +1239,36 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
               ) : (
                 invites.map((inv) => (
                   <View key={inv.id} style={modal.inviteRow}>
-                    <Text style={modal.inviteEmoji}>
-                      {getAvatarEmojiById(inv.fromAvatarId)}
-                    </Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={modal.inviteFrom}>{inv.fromPlayerName}</Text>
-                      <Text style={modal.inviteCode}>Room {formatRoomCode(inv.roomCode)}</Text>
+                    {/* Emoji + info på övre raden; Deny/Accept flyttade till egen
+                        rad längst ned (Peter 2026-09-02) så hela bredden är fri
+                        för PlayerName-raderna. */}
+                    <View style={modal.inviteMain}>
+                      {/* Avatar-ikonen för avsändaren (samma <Avatar> som
+                          leaderboard/PlayerRow — Q-marken som fallback för
+                          registrerade users, deras valda emoji annars). */}
+                      <Avatar
+                        emoji={getAvatarEmojiById(inv.fromAvatarId)}
+                        name={inv.fromPlayerName}
+                        size={40}
+                        useBrandFallback
+                      />
+                      <View style={{ flex: 1 }}>
+                        {/* Tidsstämpel för när inbjudan skickades (YYYY-MM-DD HH:MM). */}
+                        <Text style={modal.inviteTimestamp}>
+                          {formatInviteTimestamp(inv.sentAt)}
+                        </Text>
+                        {/* PlayerName på EN rad (krymper vid behov) — Room Code är
+                            det prominenta headline-elementet under. */}
+                        <Text
+                          style={modal.inviteFrom}
+                          numberOfLines={1}
+                          adjustsFontSizeToFit
+                          minimumFontScale={0.7}
+                        >
+                          {inv.fromPlayerName}
+                        </Text>
+                        <Text style={modal.inviteCode}>Room {formatRoomCode(inv.roomCode)}</Text>
+                      </View>
                     </View>
                     <View style={modal.inviteActions}>
                       <TouchableOpacity
@@ -1452,9 +1521,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     Delas av guest-JOIN och guest-HOST sedan 2026-08-08 —
                     guest host var tidigare låst till Full (visades som en
                     read-only "Fixed Guest settings"-ruta tillsammans med
-                    60s svarstid). Guest host väljer numera BÅDA fritt:
-                    nivån här, svarstiden i lobbyn. Kvar som fast för guest
-                    host är enbart Game era (fulla spannet).
+                    60s svarstid). Guest host väljer numera allt fritt:
+                    nivån här, svarstiden och Game era (default [födelseår,
+                    idag], editerbar) i lobbyn.
                     Guest-HOST har inga rumkods-celler — koden genereras vid
                     submit i handleStartGameAsGuestHost. */}
                 <Text
@@ -1669,12 +1738,42 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   );
 }
 
+// Blink-loop (samma fade-kurva + duration som MyMatchesSection/Competitions-
+// Button/Lobby) så "New update"-märket blinkar i exakt samma takt över hela
+// appen. Nollställs till 1 (fullt synligt) när det stängs av.
+function useBlink(active: boolean, duration = 600): Animated.Value {
+  const opacity = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (!active) {
+      opacity.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 0.3, duration, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1, duration, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => {
+      loop.stop();
+      opacity.setValue(1);
+    };
+  }, [active, opacity, duration]);
+  return opacity;
+}
+
 function ChoiceRow({
-  icon, label, subtitle, onPress, disabled = false,
+  icon, label, subtitle, onPress, disabled = false, showUpdate = false,
 }: {
   icon: string; label: string; subtitle: string;
   onPress: () => void; disabled?: boolean;
+  // Blinkande guld "New update"-märke till vänster om pilen (samma signal som
+  // Home:s Join-knapp) — driver flash för "Join Waiting Invites" när en ny
+  // invite mottagits.
+  showUpdate?: boolean;
 }) {
+  const blink = useBlink(showUpdate);
   return (
     <TouchableOpacity
       style={[modal.choiceRow, disabled && modal.choiceRowDisabled]}
@@ -1686,7 +1785,25 @@ function ChoiceRow({
         <Text style={[modal.choiceLabel, disabled && modal.choiceTextDisabled]}>{label}</Text>
         <Text style={[modal.choiceSubtitle, disabled && modal.choiceTextDisabled]}>{subtitle}</Text>
       </View>
-      <Text style={[modal.choiceArrow, disabled && modal.choiceTextDisabled]}>›</Text>
+      {showUpdate && (
+        <Animated.Text
+          style={[modal.choiceUpdateLabel, { opacity: blink }]}
+          numberOfLines={2}
+        >
+          {'New\nupdate'}
+        </Animated.Text>
+      )}
+      {/* Pilen delar samma blink-opacity som "New update" (samma Animated.Value)
+          så de blinkar i exakt takt — precis som H2H. */}
+      <Animated.Text
+        style={[
+          modal.choiceArrow,
+          disabled && modal.choiceTextDisabled,
+          showUpdate && { color: Colors.warning, opacity: blink },
+        ]}
+      >
+        ›
+      </Animated.Text>
     </TouchableOpacity>
   );
 }
@@ -1700,7 +1817,7 @@ function ChoiceRow({
 const TAGLINES = [
   'Challenge yourself. Play together.',
   'Invite Friends. Socialize.',
-  'Music. Film. Sport.',
+  'Music. Party & Hits.',
 ];
 
 export default function HomeScreen() {
@@ -1734,6 +1851,11 @@ export default function HomeScreen() {
   // utloggat läge under hela loadProfile:s Supabase-roundtrip innan det
   // hoppade till inloggat. Spegeln ger rätt läge redan på första framen.
   const [profile, setProfile] = useState<ProfileData | null>(() => getCachedProfile() ?? null);
+  // Waiting Invites "New update"-signal — delas mellan Home:s "Join with Room
+  // Code"-knapp och JoinModal:s "Join Waiting Invites"-rad. inviteBlink driver
+  // Home-knappens märke (samma takt som Marathon/H2H).
+  const inviteSignal = useWaitingInviteSignal();
+  const inviteBlink = useBlink(inviteSignal.hasNewInvite);
   const [profileMenuVisible, setProfileMenuVisible] = useState(false);
   const [profileMenuStep, setProfileMenuStep] = useState<'menu' | 'login' | 'register' | 'forgot'>('menu');
   // Pending-flagga för ?openRegister=1-deeplinken (guest-hostens "Activate
@@ -2328,6 +2450,31 @@ export default function HomeScreen() {
       const normalized = normalizePlayerName(trimmed);
       const result = await signInWithPlayerName(normalized, loginPassword);
       if (!result.ok) {
+        if (result.reason === 'email_not_confirmed') {
+          // Kontot finns men mailet är inte bekräftat än. Email:en hålls
+          // aldrig klient-side i PlayerName-läget → resend-by-name-funktionen
+          // slår upp den server-side och ber GoTrue skicka om länken.
+          Alert.alert(
+            'Confirm your email',
+            'Please confirm your email first. Check your inbox for the activation link.',
+            [
+              { text: 'OK', style: 'cancel' },
+              {
+                text: 'Resend link',
+                onPress: async () => {
+                  const res = await resendActivationByName(normalized);
+                  Alert.alert(
+                    res.ok ? 'Email sent' : 'Could not resend',
+                    res.ok
+                      ? 'If that Player Name has an unconfirmed account, a new activation link has been sent. Confirm via the link and then log in.'
+                      : 'Something went wrong. Please try again in a moment.',
+                  );
+                },
+              },
+            ],
+          );
+          return;
+        }
         // Generiskt fel för både "namnet finns inte" och "fel lösenord"
         // (function:n skiljer inte på dem — anti-enumerering).
         Alert.alert(
@@ -2343,6 +2490,33 @@ export default function HomeScreen() {
         email: trimmed,
         password: loginPassword,
       });
+      if (error?.code === 'email_not_confirmed') {
+        // Email ej bekräftad än — erbjud att skicka aktiveringslänken igen
+        // (vi har email:en här, till skillnad från PlayerName-läget).
+        Alert.alert(
+          'Confirm your email',
+          'Please confirm your email first. Check your inbox for the activation link.',
+          [
+            { text: 'OK', style: 'cancel' },
+            {
+              text: 'Resend link',
+              onPress: async () => {
+                const { error: resendErr } = await supabase.auth.resend({
+                  type: 'signup',
+                  email: trimmed,
+                });
+                Alert.alert(
+                  resendErr ? 'Could not resend' : 'Email sent',
+                  resendErr
+                    ? resendErr.message
+                    : 'A new activation link has been sent. Confirm via the link and then log in.',
+                );
+              },
+            },
+          ],
+        );
+        return;
+      }
       if (error || !data.user) {
         Alert.alert('Login failed', 'Invalid PlayerName/Email or password. Please check');
         return;
@@ -2599,28 +2773,50 @@ export default function HomeScreen() {
     setRegPasswordConfirmed(true);
   };
 
-  // När registreringen är klar — spara komplett profil + logga in.
-  // TODO (auth): trigga riktig aktiveringsmail via backend istället för
-  // mock-alerten nedan. Profilen bör då markeras som "pending verification"
-  // tills användaren klickat på länken.
+  // När registreringen är klar — skicka aktiveringsmail, logga INTE in.
+  // Email-verifiering (Supabase "Confirm email" PÅ): signUp() returnerar en
+  // user men INGEN session förrän användaren klickat på aktiveringslänken.
+  // Vi skapar därför INGEN lokal profil här (saveProfile skulle seeda
+  // login-spegeln → fantom-inloggat läge) och navigerar i stället till
+  // login-steget efter en bekräftelse-popup. Profiles-raden skapas server-
+  // side av handle_new_user-trigger:n (migration 0048) så PlayerName-login
+  // fungerar direkt efter bekräftelse.
   const handleRegisterSubmit = async () => {
     if (!isRegisterFormValid || regParsedBirthYear === null) return;
     const trimmedEmail = regEmail.trim();
     const normalizedPlayerName = normalizePlayerName(regPlayerName.trim());
-    // Fas 1 — Supabase auth (email + password). Profil-fält (playerName,
-    // birthYear, assistance, region) skickas som user_metadata så de
-    // sparas server-side direkt, men AsyncStorage-profilen behålls som
-    // local cache så övriga skärmar fungerar oförändrat tills Fas 2 byter
-    // dem mot Supabase profiles-tabellen.
+    // Beräkna default game era: från starten av spelarens generation till
+    // slutet av generation+2 (A=1950-64, B=1965-80, C=1981-96, D=1997-2012, E=2013-2026).
+    // Skickas som metadata så handle_new_user-trigger:n kan skriva exakt
+    // rätt era-default på profiles-raden redan vid signup.
+    const _regCurrentYear = new Date().getFullYear();
+    const _genEndYears = [1964, 1980, 1996, 2012, _regCurrentYear];
+    const _genIdx = regParsedBirthYear <= 1964 ? 0 : regParsedBirthYear <= 1980 ? 1 : regParsedBirthYear <= 1996 ? 2 : regParsedBirthYear <= 2012 ? 3 : 4;
+    const _defaultEraTo = _genEndYears[Math.min(_genIdx + 2, 4)];
+    // Rensa en ev. kvarvarande guest/anon-session innan signup så det nya
+    // kontot skapas rent (best-effort; no-op när ingen session finns).
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      /* best-effort */
+    }
+    // Supabase auth (email + password). Profil-fält skickas som user_metadata
+    // → handle_new_user-trigger:n (0048) skapar profiles-raden server-side.
     const { data, error } = await supabase.auth.signUp({
       email: trimmedEmail,
       password: regPassword,
       options: {
+        // Efter klick på aktiveringslänken redirectar Supabase hit (måste
+        // finnas i Auth → URL Configuration → Redirect URLs). Statisk sida i
+        // docs/ (email-confirmed.html), publiceras från master.
+        emailRedirectTo: 'https://quizvibe.se/email-confirmed.html',
         data: {
           playerName: normalizedPlayerName,
           birthYear: regParsedBirthYear,
           assistance: regAssistance,
           region: regRegion,
+          gameEraFrom: regParsedBirthYear,
+          gameEraTo: _defaultEraTo,
         },
       },
     });
@@ -2632,40 +2828,25 @@ export default function HomeScreen() {
       Alert.alert('Registration failed', 'Could not create account. Please try again.');
       return;
     }
-    // Beräkna default game era: från starten av spelarens generation till
-    // slutet av generation+2 (A=1950-64, B=1965-80, C=1981-96, D=1997-2012, E=2013-2026).
-    const _regCurrentYear = new Date().getFullYear();
-    const _genEndYears = [1964, 1980, 1996, 2012, _regCurrentYear];
-    const _genIdx = regParsedBirthYear <= 1964 ? 0 : regParsedBirthYear <= 1980 ? 1 : regParsedBirthYear <= 1996 ? 2 : regParsedBirthYear <= 2012 ? 3 : 4;
-    const _defaultEraTo = _genEndYears[Math.min(_genIdx + 2, 4)];
-    const newProfile: ProfileData = {
-      playerName: normalizedPlayerName,
-      email: trimmedEmail,
-      birthYear: regParsedBirthYear,
-      assistance: regAssistance,
-      region: regRegion,
-      avatarSource: 'default',
-      selectedAvatarId: '',
-      gameEraFrom: regParsedBirthYear,
-      gameEraTo: _defaultEraTo,
-      gameMode: 'pass-the-phone',
-      singlePlayerDefault: false,
-    };
-    await saveProfile(newProfile);
-    // Ett nyregistrerat konto har per definition ingen prenumeration. Den
-    // lokala premium-spegeln är per ENHET, så utan denna rensning ärvde det
-    // nya kontot ett tidigare kontos `true` och visade "Unlimited" i
-    // credits-pillen i stället för "Free: 4" (Peter 2026-08-13).
-    // Självläkande: har Apple-ID:t en giltig prenumeration sätter
-    // RevenueCats customer-info-listener i app/_layout.tsx tillbaka den
-    // direkt efter att SIGNED_IN kopplat RC till den nya user-id:n.
-    // (Kampanjens gratismånad hanteras separat — den är ägarstämplad, se
-    // promoPremium.CLAIM_KEY.)
-    await clearPremiumSubscription();
-    setProfile(newProfile);
+    // Redan-registrerad, bekräftad email: med "Confirm email" PÅ returnerar
+    // signUp tyst en user med tom identities[] och skickar INGET mail
+    // (GoTrue anti-enumerering). Visa då INTE "mail skickat"-popupen.
+    if ((data.user.identities?.length ?? 0) === 0) {
+      Alert.alert(
+        'Email already registered',
+        'This email is already registered. Please log in.',
+      );
+      setProfileMenuStep('login');
+      return;
+    }
     identify(data.user.id, { assistance: regAssistance, region: regRegion });
     track('user_registered', { assistance: regAssistance, region: regRegion });
-    setProfileMenuVisible(false);
+    // Ingen inloggning här — användaren måste bekräfta mailet först.
+    setProfileMenuStep('login');
+    Alert.alert(
+      'Check your email',
+      'Email has been sent to you with Activation link. Confirm via the link and then login to your new QuizVibe account.',
+    );
   };
 
   // Bekräftar och loggar ut. Rensar Supabase-sessionen + AsyncStorage-cachen.
@@ -2884,21 +3065,48 @@ export default function HomeScreen() {
           {isLoggedIn && hostTypeExpanded === 'none' && (
             <Animated.View style={{ transform: [{ scale: pulse }] }}>
               <TouchableOpacity
-                style={[styles.gameBtn, styles.gameBtnUser]}
+                style={[styles.gameBtn, styles.gameBtnJoinCode]}
                 activeOpacity={0.85}
                 onPress={() => openJoin('choose', { hideGuest: true })}
               >
-                <Text
+                {/* Titeln centreras via absolut overlay så den sitter still
+                    oavsett om "New update"-märket visas (annars förskjuts den
+                    när märket dyker upp). pointerEvents none → taps går vidare
+                    till knappen. */}
+                <View style={styles.joinCodeTitleWrap} pointerEvents="none">
+                  <Text
+                    style={[
+                      styles.gameBtnText,
+                      styles.gameBtnJoinCodeText,
+                      { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                    ]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                  >
+                    Join with Room Code
+                  </Text>
+                </View>
+                {/* Blinkande guld "New update" till höger — samma signal som
+                    Marathon/H2H när en ny Waiting Invite mottagits. */}
+                {inviteSignal.hasNewInvite && (
+                  <Animated.Text
+                    style={[styles.joinCodeUpdateLabel, { opacity: inviteBlink }]}
+                    numberOfLines={2}
+                  >
+                    {'New\nupdate'}
+                  </Animated.Text>
+                )}
+                {/* Guld-pil längst till höger (som H2H). Delar inviteBlink med
+                    "New update" så de blinkar i takt; står still (fast guld)
+                    utan update. */}
+                <Animated.Text
                   style={[
-                    styles.gameBtnText,
-                    styles.gameBtnUserText,
-                    { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                    styles.joinCodeChevron,
+                    inviteSignal.hasNewInvite && { opacity: inviteBlink },
                   ]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
                 >
-                  Join with Room Code
-                </Text>
+                  ›
+                </Animated.Text>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -3164,6 +3372,8 @@ export default function HomeScreen() {
         guestHostLobbyType={guestLobbyType}
         onRemoteAccountRequired={handleRemoteAccountRequired}
         initialGuestDraft={guestJoinDraft}
+        hasNewInvite={inviteSignal.hasNewInvite}
+        onInvitesSeen={inviteSignal.markInvitesSeen}
       />
 
       {/* Lobbytyp-väljaren är INLINE under respektive Start-knapp
@@ -4365,6 +4575,48 @@ const styles = StyleSheet.create({
   gameBtnUserText: {
     color: '#000000',
   },
+  // "Join with Room Code — user" (Peter 2026-09-02): mörk bakgrund + tunn
+  // guld-linje + guld text — särskiljs från den gold-FYLLDA "Start New
+  // Game"-knappen ovanför och lämnar plats för det blinkande "New
+  // update"-märket till höger (samma dark/outlined-språk som Marathon/H2H).
+  // Titeln centreras via joinCodeTitleWrap (absolut overlay); den enda
+  // flow-barnnoden är märket → justifyContent flex-end lägger det till höger.
+  gameBtnJoinCode: {
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.warning,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 6,
+    paddingRight: Spacing.md,
+  },
+  gameBtnJoinCodeText: {
+    color: Colors.warning,
+  },
+  // Absolut-fyllande wrapper som centrerar titeln i hela knappen (flex-
+  // centrering är plattformsoberoende, till skillnad från textAlignVertical).
+  joinCodeTitleWrap: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
+  },
+  // Blinkande guld "New update" — tvåradig + centrerad så den ryms inom
+  // knapphöjden (56) och läser som ETT märke (samma som MyMatchesSection).
+  // Rå fontSize (13 = FontSize.sm) — filen importerar inte FontSize.
+  joinCodeUpdateLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.warning,
+    lineHeight: 15,
+    textAlign: 'center',
+  },
+  // Guld-pil längst till höger (som H2H:s chevron). Fast guld i vila; delar
+  // "New update"-blinket när en ny invite mottagits.
+  joinCodeChevron: {
+    fontSize: 24,
+    color: Colors.warning,
+  },
   // Guest-knapparna (Join with Room Code — guest + Start Game as Guest) — helgrå
   // (bg + kant) i samma grå ton som Guest-rubrikens ruta (#6B7280).
   gameBtnGuest: {
@@ -4652,6 +4904,16 @@ const modal = StyleSheet.create({
   choiceLabel: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
   choiceSubtitle: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
   choiceArrow: { fontSize: 22, color: Colors.textSecondary },
+  // Blinkande guld "New update" i "Join Waiting Invites"-raden — tvåradig +
+  // centrerad, samma märke som Home-knappen. Rå fontSize (13 = FontSize.sm).
+  choiceUpdateLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.warning,
+    lineHeight: 15,
+    textAlign: 'center',
+    marginRight: Spacing.sm,
+  },
   choiceRowDisabled: {
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderColor: 'rgba(255,255,255,0.06)',
@@ -4943,8 +5205,9 @@ const modal = StyleSheet.create({
 
   // Invite-rader (waiting invites-listan)
   inviteRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    // Kolumn: emoji+info överst, Deny/Accept på egen rad längst ned så
+    // PlayerName-raderna får hela bredden (Peter 2026-09-02).
+    flexDirection: 'column',
     gap: Spacing.md,
     backgroundColor: Colors.background,
     borderWidth: 1,
@@ -4953,39 +5216,55 @@ const modal = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
   },
-  inviteEmoji: { fontSize: 24, width: 36, textAlign: 'center' },
-  inviteFrom: { fontSize: 15, fontWeight: '700', color: Colors.textPrimary },
-  inviteCode: {
-    fontSize: 12,
+  // Övre raden i invite-kortet: avatar-emoji + info-kolumn.
+  inviteMain: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  // Tidsstämpel ovanför PlayerName — när inbjudan skickades.
+  inviteTimestamp: {
+    fontSize: 11,
     color: Colors.textSecondary,
+    fontVariant: ['tabular-nums'],
+    marginBottom: 2,
+  },
+  // PlayerName — sekundär rad ovanför den prominenta Room Code-raden.
+  inviteFrom: { fontSize: 15, fontWeight: '700', color: Colors.textPrimary },
+  // Room Code — headline-elementet i kortet (Peter 2026-09-02): stort + vitt.
+  inviteCode: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
     letterSpacing: 1,
     marginTop: 2,
   },
   // Deny/Accept-knapparna (Peter 2026-08-27, ersatte hela-radens implicita
-  // accept + "Join ›"-texten).
+  // accept + "Join ›"-texten). Röd bakgrund (Deny) + grön bakgrund (Accept)
+  // per Peter 2026-09-02 — tidigare transparent/blå.
   inviteActions: {
     flexDirection: 'row',
+    // Deny längst till vänster, Accept längst till höger (Peter 2026-09-02).
+    justifyContent: 'space-between',
     gap: Spacing.sm,
   },
   inviteDenyBtn: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     borderRadius: Radius.full,
-    borderWidth: 1,
-    borderColor: Colors.borderStrong,
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.error,
   },
   inviteDenyText: {
     fontSize: 13,
     fontWeight: '700',
-    color: Colors.textSecondary,
+    color: '#fff',
   },
   inviteAcceptBtn: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     borderRadius: Radius.full,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.success,
   },
   inviteAcceptText: {
     fontSize: 13,

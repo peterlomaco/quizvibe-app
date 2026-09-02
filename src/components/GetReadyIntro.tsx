@@ -10,6 +10,8 @@ import {
   StyleSheet,
   Text,
   View,
+  type StyleProp,
+  type TextStyle,
 } from 'react-native';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
@@ -73,6 +75,36 @@ const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
   full: 'Full',
 };
 
+// Rad-höjd för leaderboard-spelarrader — något högre än rubriken så långa
+// PlayerNames ryms på två rader (bokstäver+"-" / siffror).
+const LB_ROW_H = 66;
+const LB_HEADER_H = 52;
+
+/** Renderar ett PlayerName i leaderboard-kolumnen. Format [Letters]-[Digits]:
+ *  bryt vid bindestrecket → bokstäver+"-" på rad 1, siffror på rad 2, så första
+ *  BOKSTAVEN står exakt ovanför första SIFFRAN (ingen emoji-prefix — emojin
+ *  renderas som ett eget element före namn-stacken). En rad utan bindestreck. */
+function renderLbName(name: string, style: StyleProp<TextStyle>): React.ReactNode {
+  const dashIdx = name.indexOf('-');
+  if (dashIdx === -1) {
+    return (
+      <Text style={style} numberOfLines={1}>
+        {name}
+      </Text>
+    );
+  }
+  return (
+    <>
+      <Text style={style} numberOfLines={1}>
+        {name.slice(0, dashIdx + 1)}
+      </Text>
+      <Text style={style} numberOfLines={1}>
+        {name.slice(dashIdx + 1)}
+      </Text>
+    </>
+  );
+}
+
 /** Media-källa per fråga, för IndDev:s media-source-kö. 'none' renderas som
  *  ❓ när YouTube inte är aktiv för frågan. */
 export type QuestionMediaType = PlayedMediaSource | 'none';
@@ -115,6 +147,11 @@ interface Props {
    *  Driver blå badge på currentMediaBox/currentPlayerBox i IndDev + Single.
    *  Om prop saknas faller logiken tillbaka till kategori-heuristik. */
   answerTypeByQuestion?: ('Year' | 'Name')[];
+  /** True medan host:s LOKALA gameQuestions ännu inte settlat (seen-historik /
+   *  epok-skuldbok / HCP laddas async vid mount → sekvensen kan byggas om och
+   *  badge:arna på "nästa fråga"-rutan hoppa). Behandlas som questionDataPending:
+   *  visa "Waiting for question data…" i stället för fel badge tills settlat. */
+  sequencePending?: boolean;
   /** 0-baserade frågeindex som är Spotify DJ-rundor. Driver speciell
    *  grön chip-rendering i kön (Spotify-ikon + "Spotify DJ"-label). */
   spotifyQuestionIndices?: number[];
@@ -305,6 +342,7 @@ export function GetReadyIntro({
   queueQuestionNumbers,
   categoryByQuestion,
   answerTypeByQuestion,
+  sequencePending,
   spotifyQuestionIndices,
   nextDJName,
   currentRound,
@@ -349,8 +387,12 @@ export function GetReadyIntro({
   // ankommit: quiz.tsx skickar då TOM mediaSourceByQuestion-array (hellre än
   // fel ikoner från lokal shuffle). Rendera "Waiting for question data…"
   // med tickande prickar istället för ❓/"Unknown"-fallback.
+  // Non-host i IndDev före broadcast ELLER host innan lokal gameQuestions
+  // settlat (sequencePending) → visa "Waiting for question data…" i stället för
+  // en badge som hoppar när sekvensen byggs om (se sequencePending-prop).
   const questionDataPending =
-    isIndDev && !isHost && (mediaSourceByQuestion?.length ?? 0) === 0;
+    (isIndDev && !isHost && (mediaSourceByQuestion?.length ?? 0) === 0) ||
+    !!sequencePending;
   // Single Player körs som Pass-the-Phone med exakt 1 spelare. I den vyn är
   // round-konceptet meningslöst (1 spelare ⇒ rounds = questions), så
   // Rounds-dotbar, Round-separators i kö och Round-del i footer-texten
@@ -650,12 +692,12 @@ export function GetReadyIntro({
             <Text style={styles.currentPlayerName} numberOfLines={1}>
               {playerName}
             </Text>
-            {currentAnswerType && (
+            {!questionDataPending && currentAnswerType && (
               <View style={styles.answerTypeBadge} pointerEvents="none">
                 <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
               </View>
             )}
-            {currentCategory && (
+            {!questionDataPending && currentCategory && (
               <View style={styles.categoryBadge} pointerEvents="none">
                 <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
               </View>
@@ -1051,11 +1093,9 @@ export function GetReadyIntro({
                         style={[styles.lbCell, styles.lbLeftCell]}
                       >
                         <Text style={styles.lbPos}>{index + 1}</Text>
+                        {entry.emoji ? <Text style={styles.lbNameEmoji}>{entry.emoji}</Text> : null}
                         <View style={styles.lbNameStack}>
-                          <Text style={styles.lbName} numberOfLines={1}>
-                            {entry.emoji ? `${entry.emoji} ` : ''}
-                            {entry.name}
-                          </Text>
+                          {renderLbName(entry.name, styles.lbName)}
                           {meta.length > 0 && (
                             <Text style={styles.lbNameMeta} numberOfLines={1}>
                               {meta}
@@ -1092,14 +1132,9 @@ export function GetReadyIntro({
                             <View style={styles.lbDisconnectedIconSlot}>
                               <WifiFanIcon size={14} color={Colors.textSecondary} />
                             </View>
+                            {entry.emoji ? <Text style={[styles.lbNameEmoji, styles.lbDisconnectedNameText]}>{entry.emoji}</Text> : null}
                             <View style={styles.lbNameStack}>
-                              <Text
-                                style={[styles.lbName, styles.lbDisconnectedNameText]}
-                                numberOfLines={1}
-                              >
-                                {entry.emoji ? `${entry.emoji} ` : ''}
-                                {entry.name}
-                              </Text>
+                              {renderLbName(entry.name, [styles.lbName, styles.lbDisconnectedNameText])}
                               {meta.length > 0 && (
                                 <Text style={styles.lbNameMeta} numberOfLines={1}>
                                   {meta}
@@ -1495,11 +1530,33 @@ export function GetReadyIntro({
                       </Text>
                     </>
                   )}
-                  {nextDJName && (
-                    <Text style={styles.nextDJLabel} numberOfLines={1}>
-                      Next DJ: {nextDJName}
-                    </Text>
-                  )}
+                  {nextDJName && (() => {
+                    // Splitta DJ-namnet [Letters]-[Digits] på två rader
+                    // (bokstäver + "-" rad 1, siffror rad 2), vänsterjusterat,
+                    // precis som leaderboard-PlayerRow. Ett långt namn brer då
+                    // inte ut sig horisontellt och täcker sekvensnumret +
+                    // Spotify-ikonen. Saknas bindestreck visas namnet på en rad.
+                    const dashIdx = nextDJName.indexOf('-');
+                    return (
+                      <View style={styles.nextDJWrap}>
+                        <Text style={styles.nextDJPrefix}>Next DJ:</Text>
+                        {dashIdx === -1 ? (
+                          <Text style={styles.nextDJLabel} numberOfLines={1}>
+                            {nextDJName}
+                          </Text>
+                        ) : (
+                          <View style={styles.nextDJNameSplit}>
+                            <Text style={styles.nextDJLabel} numberOfLines={1}>
+                              {nextDJName.slice(0, dashIdx + 1)}
+                            </Text>
+                            <Text style={styles.nextDJLabel} numberOfLines={1}>
+                              {nextDJName.slice(dashIdx + 1)}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })()}
                   {!questionDataPending && currentAnswerType && (
                     <View style={styles.answerTypeBadge} pointerEvents="none">
                       <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
@@ -2043,7 +2100,7 @@ const styles = StyleSheet.create({
   // Generisk cell — fixed höjd så header + alla spelar-rader linjerar
   // mellan kolumnerna.
   lbCell: {
-    height: 52,
+    height: LB_ROW_H,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
@@ -2051,6 +2108,7 @@ const styles = StyleSheet.create({
   },
   // Header-cell ärver lbCell + bg-toning så den sticker ut från data-rader.
   lbHeaderCell: {
+    height: LB_HEADER_H,
     backgroundColor: Colors.cardElevated,
   },
   lbHeaderText: {
@@ -2088,6 +2146,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 2,
   },
+  // Emoji-avataren renderas som eget element (inte i namn-texten) så bägge
+  // namn-raderna börjar på samma x → första bokstaven rakt ovanför första siffran.
+  lbNameEmoji: {
+    fontSize: FontSize.md,
+  },
   lbName: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
@@ -2105,7 +2168,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   lbMidRow: {
-    height: 52,
+    height: LB_ROW_H,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
@@ -2455,13 +2518,30 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
     textAlign: 'center',
   },
+  // "Next DJ:"-block: prefix + (ev. tvåradigt) namn i en flex-row som får
+  // krympa (flexShrink) så det aldrig pushar sekvensnumret/Spotify-ikonen.
+  nextDJWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    flexShrink: 1,
+  },
+  nextDJPrefix: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: '#1DB954',
+  },
+  // Bokstäver-rad ovanpå siffer-rad, vänsterjusterat (som leaderboard-namnet).
+  nextDJNameSplit: {
+    alignItems: 'flex-start',
+    flexShrink: 1,
+  },
   nextDJLabel: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
     color: '#1DB954',
-    textAlign: 'center',
+    textAlign: 'left',
     flexShrink: 1,
-    marginTop: 2,
   },
   // ── Kö-chips-rad (delas av IndDev + PtP) ─────────────────────────────
   // Vänster-packad rad: chips med 4pt gap mellan, slutmarkören inline efter

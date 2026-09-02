@@ -10,7 +10,7 @@
 // + initial-load via getLobbySettings.
 
 import { supabase } from './supabase';
-import { MainCategory, defaultEnabledMainCategories, isMainCategory, IMAGES_MANDATORY_CATEGORIES } from './mainCategory';
+import { MainCategory, defaultEnabledMainCategories, isMainCategory } from './mainCategory';
 
 export type LobbyGameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
 // UI använder capitalized strings; DB lagrar lowercase enligt CHECK-
@@ -43,6 +43,13 @@ export interface LobbySettings {
   eraTo: number;
   roundsCount: number;
   selectedExtraPackages: string[];
+  // Paket-läge: host:s aggregat-toggles när ett Host-paket är valt. Source
+  // Mixerboard kollapsar då till EN YT- + EN Hints-toggle (+ Spotify). Default
+  // true (paketets material spelas). Tolerant fallback via ?? true — ingen
+  // DB-migration krävs (skrivs INTE i settingsToRow, samma mönster som
+  // spotify_answer_*). Ignoreras när inget paket är aktivt.
+  packageYoutubeEnabled: boolean;
+  packageHintsEnabled: boolean;
   // Per-source profession-category-filter.
   // YouTube: alla tre är valbara, min 1 krävs (guard i handleToggleYoutubeCategory).
   // Guess Where? (platsfrågor): proxy via imagesEnabledCategories:
@@ -113,6 +120,10 @@ interface LobbySettingsRow {
   // Parent Control. Optional — kolumnen finns inte i DB (ingen migration).
   // Tolerant read via ?? false; skrivs INTE i settingsToRow.
   parent_control_enabled?: boolean;
+  // Paket-aggregat-toggles. Optional — kolumnerna finns inte i DB (ingen
+  // migration). Tolerant read via ?? true; skrivs INTE i settingsToRow.
+  package_youtube_enabled?: boolean;
+  package_hints_enabled?: boolean;
   // Optional tills migration 0033_lobby_settings_remote_assistance.sql körts
   // (tolerant read → 'full' som default).
   remote_assistance?: string | null;
@@ -158,11 +169,12 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     youtubeEnabledCategories: ytCats !== null
       ? ytCats
       : (row.youtube_enabled !== false ? defaultEnabledMainCategories() : []),
+    // ⚠ MUSIC-ONLY LAUNCH: legacy-fallbacken byggde tidigare
+    // [...IMAGES_MANDATORY_CATEGORIES(=Film,Sport), Music] = Film/Sport aktiva för
+    // pre-0014-rader. Music-only ⇒ spegla youtube-fallbacken (Music-only).
     imagesEnabledCategories: imgCats !== null
       ? imgCats
-      : [...new Set([...IMAGES_MANDATORY_CATEGORIES,
-          ...(row.images_enabled !== false ? (['Music'] as MainCategory[]) : []),
-        ]) as unknown as MainCategory[]],
+      : (row.images_enabled !== false ? defaultEnabledMainCategories() : []),
     // Tolerant: kolumnen kanske inte finns ännu (pre-migration) → default false.
     sketchEnabled: row.sketch_enabled ?? false,
     spotifyEnabled: row.spotify_enabled ?? false,
@@ -171,6 +183,9 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     spotifyAnswerName: row.spotify_answer_name ?? true,
     // Tolerant: kolumnen saknas i DB → default false (Parent Control av).
     parentControlEnabled: row.parent_control_enabled ?? false,
+    // Tolerant: kolumnerna saknas i DB → default true (paketets material spelas).
+    packageYoutubeEnabled: row.package_youtube_enabled ?? true,
+    packageHintsEnabled: row.package_hints_enabled ?? true,
     // Tolerant: kolumnen saknas pre-migration 0033 → 'full' (produktdefault).
     remoteAssistance: isRemoteAssistance(row.remote_assistance)
       ? row.remote_assistance

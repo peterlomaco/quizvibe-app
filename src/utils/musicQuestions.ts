@@ -49,34 +49,6 @@ export interface MusicQuestion {
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = [
   {
-    "id": "steamboat-willie-1928",
-    "displayName": "Steamboat Willie",
-    "correctYear": 1928,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "I5pG1wbRKOg",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Did You Catch This?",
-        "license": "standard",
-        "notes": "4K-remaster av Steamboat Willie (public domain sedan jan 2024). Ikononisk öppning med Mickey som visslar på ångbåten."
-      }
-    ]
-  },
-  {
     "id": "cab-calloway-minnie-the-moocher",
     "displayName": "Minnie the Moocher — Cab Calloway",
     "correctYear": 1931,
@@ -91,10 +63,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "7GASUbWzEnJKfgg4lz65qY",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "WtSLYrTKrEw",
+        "startSec": 48,
+        "endSec": 63,
+        "license": "standard"
+      },
+      {
+        "videoId": "8suquDgg0dw",
+        "startSec": 28,
+        "endSec": 43,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "fred-astaire-night-and-day",
@@ -167,7 +152,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -195,7 +180,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -223,112 +208,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Film edition"
     ],
     "spotifyTrackId": "1zzJOF5gOMXzqoUCbOg4JE",
-    "youtubeClips": []
-  },
-  {
-    "id": "the-wizard-of-oz-1939",
-    "displayName": "The Wizard of Oz",
-    "correctYear": 1939,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Judy Garland"
-    ],
-    "distractorNames": [
-      "Shirley Temple",
-      "Vivien Leigh",
-      "Katharine Hepburn",
-      "Ingrid Bergman"
-    ],
     "youtubeClips": [
       {
-        "videoId": "FfpF8UUVTeM",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Warner On Demand",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Officiell WB-trailer, titeln avslöjar varken skådespelare eller år."
-      }
-    ]
-  },
-  {
-    "id": "citizen-kane-1941",
-    "displayName": "Citizen Kane",
-    "correctYear": 1941,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 74,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Orson Welles"
-    ],
-    "distractorNames": [
-      "Humphrey Bogart",
-      "James Stewart",
-      "Cary Grant",
-      "Gary Cooper"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "fXf2LGhW66M",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Mackenzie Parker",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. OBS: fan-gjord 'modern trailer' på privat kanal — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
-      }
-    ]
-  },
-  {
-    "id": "bambi-1942",
-    "displayName": "Bambi",
-    "correctYear": 1942,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 86,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "YgNx5J0SROE",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Disney UK",
-        "license": "standard",
-        "notes": "Disney UK officiell Diamond Edition-trailer — Bambi i skogen, klassisk Disney-estetik."
+        "videoId": "oW2QZ7KuaxA",
+        "startSec": 52,
+        "endSec": 67,
+        "license": "standard"
       }
     ]
   },
@@ -347,10 +238,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "christmas"
+      "Christmas edition"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -361,45 +252,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bing Crosby - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
-      }
-    ]
-  },
-  {
-    "id": "casablanca-1942",
-    "displayName": "Casablanca",
-    "correctYear": 1942,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Humphrey Bogart",
-      "Ingrid Bergman"
-    ],
-    "distractorNames": [
-      "Cary Grant",
-      "James Stewart",
-      "Katharine Hepburn",
-      "Greta Garbo"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "0V1eoBH0Zcw",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "thecoolidge",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Original-trailer i HD, titeln avslöjar varken skådespelare eller år."
       }
     ]
   },
@@ -474,7 +326,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -558,7 +410,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -614,49 +466,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "spotifyTrackId": "5dae01pKNjRQtgOeAkFzPY",
     "youtubeClips": []
-  },
-  {
-    "id": "singin-in-the-rain-1952",
-    "displayName": "Singin' in the Rain",
-    "correctYear": 1952,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Gene Kelly",
-      "Debbie Reynolds"
-    ],
-    "distractorNames": [
-      "Fred Astaire",
-      "Frank Sinatra",
-      "Audrey Hepburn",
-      "Grace Kelly"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "D-NJHUasYVA",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Park Circus",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Officiell Park Circus-trailer (rättighetsdistributör), ren titel."
-      }
-    ]
   },
   {
     "id": "bill-haley-rock-around-the-clock",
@@ -673,7 +486,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -683,34 +496,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "OLD TAPES",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "lady-and-the-tramp",
-    "displayName": "Lady and the Tramp",
-    "correctYear": 1955,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "SAoLpLXvGN0",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Disney UK",
-        "license": "standard",
-        "notes": "Disney UK officiell Blu-ray-trailer — spagetti-scen + hundar etablerade."
       }
     ]
   },
@@ -729,7 +514,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "youtubeClips": [
       {
@@ -760,7 +545,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "58PSYdY0GFg0LFb2PxYk4T",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "2QoBR-F3tp4",
+        "startSec": 30,
+        "endSec": 45,
+        "license": "standard"
+      },
+      {
+        "videoId": "r2gu3ONNx-8",
+        "startSec": 6,
+        "endSec": 21,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "elvis-presley-heartbreak-hotel",
@@ -777,7 +575,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -805,7 +603,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -833,7 +631,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -861,7 +659,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -889,7 +687,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -899,34 +697,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ritchie Valens - Topic",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell single-version via YouTube Topic (1958 original, ej Los Lobos/film)."
-      }
-    ]
-  },
-  {
-    "id": "johansson-patterson-title-1959",
-    "displayName": "Ingemar Johansson besegrar Floyd Patterson — VM-titeln i tungvikt",
-    "correctYear": 1959,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "qfU54_O6cXI",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "FRIZALZ",
-        "license": "standard",
-        "notes": "Peter-curerat + validerat i in-app-spelaren 2026-08-05. YouTube Short (vertikalt format, svarta kanter i 16:9-spelaren OK). Ingen årtals-spoiler i titeln."
       }
     ]
   },
@@ -945,7 +715,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -973,7 +743,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1001,7 +771,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1029,7 +799,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1057,7 +827,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3SdTKo2uVsxFblQjpScoHy",
     "youtubeClips": [
@@ -1086,7 +856,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1114,7 +884,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1200,7 +970,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1228,7 +998,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1285,7 +1055,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1313,7 +1083,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1341,7 +1111,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1369,7 +1139,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1397,7 +1167,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1453,7 +1223,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1509,7 +1279,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1568,7 +1338,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "63T7DJ1AFDD6Bn8VzG6JE8",
@@ -1580,44 +1350,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "The Rolling Stones - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "the-good-the-bad-and-the-ugly-1966",
-    "displayName": "The Good, the Bad and the Ugly",
-    "correctYear": 1966,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Clint Eastwood"
-    ],
-    "distractorNames": [
-      "Charles Bronson",
-      "Steve McQueen",
-      "Lee Marvin",
-      "Yul Brynner"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "WCN5JJY_wiA",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Videotiteln lyder '... Official Trailer #1 - Clint Eastwood Movie (1966) HD'. Peter bedömde 2026-08-13 att slutet av titelraden inte hinner läsas i spelaren och BEHÖLL klippet medvetet — flagga inte om som spoiler. OBS att det som står där är rätt SKÅDESPELARE (frågan är actor-select, svaret = Clint Eastwood), inte bara årtalet. Vill man ta bort risken utan att byta klipp: sätt correctNames till Eli Wallach / Lee Van Cleef (också huvudroller, står inte i titeln)."
       }
     ]
   },
@@ -1636,7 +1368,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1646,6 +1378,41 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Aretha Franklin - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "beatles-all-you-need-is-love",
+    "displayName": "All You Need Is Love — The Beatles",
+    "correctYear": 1967,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Mki34tyoCp0",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
+      },
+      {
+        "videoId": "sHBOM8m4ygM",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
       }
     ]
   },
@@ -1664,7 +1431,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1721,7 +1488,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "7tqhbajSfrz2F7E1Z75ASX",
     "youtubeClips": [
@@ -1750,7 +1517,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "1BmVQ5RGqqtF5cnsv6cQYu",
     "youtubeClips": [
@@ -1781,6 +1548,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Dansband"
+    ],
     "spotifyTrackId": "19vrvFgXDghcRpCf5zrbFA",
     "youtubeClips": [
       {
@@ -1808,7 +1578,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1836,7 +1606,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1893,7 +1663,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1921,7 +1691,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1949,7 +1719,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -1977,7 +1747,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2005,7 +1775,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2033,7 +1803,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2061,7 +1831,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2121,7 +1891,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2156,7 +1926,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "2uzlv8PjqsVvF1DhEahyhy",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "wvUQcnfwUUM",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      },
+      {
+        "videoId": "s_VPt7228DU",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "simon-garfunkel-bridge-over-troubled-water",
@@ -2173,7 +1956,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2204,7 +1987,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "1k1Bqnv2R0uJXQN4u6LKYt",
     "youtubeClips": []
@@ -2224,7 +2007,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2252,7 +2035,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "1QbOvACeYanja5pbnJbAmk",
     "youtubeClips": [
@@ -2281,7 +2064,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2309,7 +2092,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2337,7 +2120,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2365,7 +2148,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -2400,11 +2183,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "0cKk8BKEi7zXbdrYdyqBP5",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "uA2zODu1nJw",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "bill-withers-lean-on-me",
@@ -2421,7 +2211,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2449,7 +2239,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2459,34 +2249,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Deep Purple - Topic",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (2024 remaster av 1972-originalet, ej Rock Aid Armenia-versionen)."
-      }
-    ]
-  },
-  {
-    "id": "spitz-1972-munich-olympics",
-    "displayName": "Mark Spitz tar 7 OS-guld i München",
-    "correctYear": 1972,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "1Q-tBLGGSkc",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Olympic Games",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1972' vid tecken 34. Officiella IOC-kanalen, ren titel."
       }
     ]
   },
@@ -2505,7 +2267,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2515,45 +2277,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Weedy Weed Smoker",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
-      }
-    ]
-  },
-  {
-    "id": "the-godfather",
-    "displayName": "The Godfather",
-    "correctYear": 1972,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Marlon Brando",
-      "Al Pacino"
-    ],
-    "distractorNames": [
-      "Jack Nicholson",
-      "Robert Redford",
-      "Dustin Hoffman",
-      "Steve McQueen"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "UaVTIH8mujA",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Paramount Pictures",
-        "license": "standard",
-        "notes": "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener."
       }
     ]
   },
@@ -2572,7 +2295,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -2604,7 +2327,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "1GUpCVoNqQoriLkftXc3S3",
     "youtubeClips": [
@@ -2633,7 +2356,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -2665,7 +2388,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2693,7 +2416,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2753,7 +2476,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2763,34 +2486,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "RHINO",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (3)."
-      }
-    ]
-  },
-  {
-    "id": "robin-hood-1973",
-    "displayName": "Robin Hood",
-    "correctYear": 1973,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "rekU76GG9Sk",
-        "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "Jim Margle",
-        "license": "standard",
-        "notes": "Original 1973 teatral trailer (1:00) — Robin Hood + Maid Marian etableras."
       }
     ]
   },
@@ -2809,7 +2504,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -2840,7 +2535,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "dansband"
+      "Dansband"
     ],
     "spotifyTrackId": "7915ILGV5otD6Oq3rOcKBR",
     "youtubeClips": [
@@ -2901,7 +2596,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision",
@@ -2920,34 +2615,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "ali-rumble-jungle-1974",
-    "displayName": "Muhammad Ali 'Rumble in the Jungle' mot Foreman",
-    "correctYear": 1974,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "M22nWSzyccE",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "ElTerribleProduction",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — Ali vs Foreman highlights HD (1974)."
-      }
-    ]
-  },
-  {
     "id": "bob-marley-no-woman-no-cry",
     "displayName": "No Woman, No Cry — Bob Marley & The Wailers",
     "correctYear": 1974,
@@ -2962,7 +2629,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3PQLYVskjUeRmRIfECsL0X",
     "youtubeClips": [
@@ -2972,34 +2639,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "channelTitle": "Bob Marley",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "edstrom-vm-74-vasttyskland",
-    "displayName": "Ralf Edströms volley mot Västtyskland i VM",
-    "correctYear": 1974,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "53PhRbbH1QY",
-        "startSec": 2,
-        "endSec": 22,
-        "channelTitle": "NickDangah",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25. startSec 2 angiven av Peter. SD men REN TITEL - Peters egna LgEmL37z6H0 har '1974' vid tecken 31 av 35 = fullt synligt i spelaren. SD ar bara en note i youtube-validate, en spoilad titel gor fragan trasig; 1974-material ar SD i kallan anda."
       }
     ]
   },
@@ -3018,7 +2657,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3046,7 +2685,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2TxCwUlqaOH3TIyJqGgR91",
     "youtubeClips": [
@@ -3104,7 +2743,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3114,45 +2753,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bruce Springsteen - Topic",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1975 studio-version)."
-      }
-    ]
-  },
-  {
-    "id": "jaws",
-    "displayName": "Jaws",
-    "correctYear": 1975,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "unknown-region"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Roy Scheider",
-      "Richard Dreyfuss"
-    ],
-    "distractorNames": [
-      "Robert Redford",
-      "Dustin Hoffman",
-      "Jack Nicholson",
-      "Gene Hackman"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "qCzncv0ISaE",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Universal Pictures",
-        "license": "standard",
-        "notes": "Official Universal Pictures-klipp — 'Bigger Boat'-scenen i 4K HDR."
       }
     ]
   },
@@ -3231,7 +2831,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3291,7 +2891,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -3323,7 +2923,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0GjEhVFGZW8afUYGChu3Rr",
     "youtubeClips": [
@@ -3352,10 +2952,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "spotifyTrackId": "4GkOfUKUqDDgoeiov8Uqyi",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "09839DpTctU",
+        "startSec": 28,
+        "endSec": 43,
+        "license": "standard"
+      },
+      {
+        "videoId": "8y7WGPWYsa0",
+        "startSec": 51,
+        "endSec": 66,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "fleetwood-mac-go-your-own-way",
@@ -3372,7 +2988,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3382,103 +2998,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Fleetwood Mac",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (3)."
-      }
-    ]
-  },
-  {
-    "id": "nadia-comaneci-montreal-1976",
-    "displayName": "Nadia Comăneci perfekta 10:or i Montreal",
-    "correctYear": 1976,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "5OCVWRFQbss",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Olympics Gymnastics",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1976' vid tecken 45. Officiella IOC-kanalen, ren titel."
-      }
-    ]
-  },
-  {
-    "id": "rocky",
-    "displayName": "Rocky",
-    "correctYear": 1976,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Sylvester Stallone"
-    ],
-    "distractorNames": [
-      "Burt Reynolds",
-      "Steve McQueen",
-      "James Caan",
-      "Gene Hackman"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "-Hk-LYcavrw",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Amazon MGM Studios",
-        "license": "standard",
-        "notes": "MGM Official trailer — Bill Conti's Gonna Fly Now-tema + training-montage."
-      }
-    ]
-  },
-  {
-    "id": "salming-canada-cup-ovation-1976",
-    "displayName": "Stående ovationer till Börje Salming — Canada Cup",
-    "correctYear": 1976,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "lKIVRfCN9jA",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Jeff The Leafs Fan",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1976' vid tecken 49. VERIFIERA I SPELAREN: har star '1976' vid tecken 63 av 95 - bor kapas bort."
       }
     ]
   },
@@ -3525,7 +3044,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "4UDmDIqJIbrW0hMBQMFOsM",
     "youtubeClips": [
@@ -3582,10 +3101,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "spotifyTrackId": "1Y7VG310Lf5IYP7sVOob4X",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "bEOl38y8Nj8",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      },
+      {
+        "videoId": "87PPOZUxEu8",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "fleetwood-mac-dreams",
@@ -3602,7 +3137,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3630,7 +3165,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -3662,7 +3197,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport"
@@ -3710,45 +3245,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "star-wars-new-hope",
-    "displayName": "Star Wars: A New Hope",
-    "correctYear": 1977,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Mark Hamill",
-      "Harrison Ford"
-    ],
-    "distractorNames": [
-      "Donald Sutherland",
-      "Jack Nicholson",
-      "Robert Redford",
-      "Warren Beatty"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "vZ734NWnAHA",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Star Wars",
-        "license": "standard",
-        "notes": "Official Star Wars channel — A New Hope trailer. John Williams theme."
-      }
-    ]
-  },
-  {
     "id": "blondie-heart-of-glass",
     "displayName": "Heart of Glass — Blondie",
     "correctYear": 1978,
@@ -3763,7 +3259,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3790,7 +3286,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3854,7 +3350,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -3864,45 +3360,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Gloria Gaynor - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "grease-1978",
-    "displayName": "Grease",
-    "correctYear": 1978,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "John Travolta",
-      "Olivia Newton-John"
-    ],
-    "distractorNames": [
-      "Elvis Presley",
-      "Burt Reynolds",
-      "Farrah Fawcett",
-      "Brooke Shields"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ZW0DfsCzfq4",
-        "startSec": 0,
-        "endSec": 20,
-        "channelTitle": "Kurt Harmsworth",
-        "license": "standard",
-        "notes": "Summer Nights-scen med Travolta + Newton-John — ikonisk strandbild."
       }
     ]
   },
@@ -3953,7 +3410,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4009,7 +3466,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "54OR1VDpfkBuOY5zZjhZAY",
     "youtubeClips": [
@@ -4069,7 +3526,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "2zYzyRzz6pRmhPzyfMEC8s",
@@ -4081,6 +3538,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "AC/DC - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "bette-midler-the-rose",
+    "displayName": "The Rose — Bette Midler",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "jxvPjuREDpE",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -4099,7 +3585,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -4131,14 +3617,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "2XbwFs07dfm2MGQuYmRMZT",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "H8yUxDOHlh8",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
+      },
+      {
+        "videoId": "WjE4Vxe5-Ak",
+        "startSec": 35,
+        "endSec": 50,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "vikingarna-djingis-kan",
@@ -4170,34 +3669,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "borg-mcenroe-wimbledon-1980",
-    "displayName": "Borg-McEnroe Wimbledon-final",
-    "correctYear": 1980,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "nFeLpTjH2pk",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Wimbledon",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1980' vid tecken 33. Officiella Wimbledon-kanalen, ren titel."
-      }
-    ]
-  },
-  {
     "id": "bruce-springsteen-the-river",
     "displayName": "The River — Bruce Springsteen",
     "correctYear": 1980,
@@ -4215,7 +3686,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "7HrzErXq3TsKOY1gmdIShB",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "_Jw8P7gHxzI",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "george-benson-give-me-the-night",
@@ -4232,7 +3710,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4259,7 +3737,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -4273,34 +3751,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1980 vinnare — Irland."
-      }
-    ]
-  },
-  {
-    "id": "miracle-on-ice-1980",
-    "displayName": "Miracle on Ice — USA besegrar Sovjet",
-    "correctYear": 1980,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "aJ6itnbs7Yg",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "ESPN Throwback",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln inleddes med '1980'. ESPN, sista minuten av matchen, ren titel. SD = bara note."
       }
     ]
   },
@@ -4319,7 +3769,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5HkFTCxSeJ3kGNyQJbT4rJ",
     "youtubeClips": [
@@ -4330,125 +3780,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Queen Official",
         "license": "standard",
         "notes": "Bytt 2026-08-10: gamla klippet (Y09uL2qbYCg, Queen - Topic) hade allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster från rättsinnehavarens kanal, HD, blockerad enbart i RU."
-      }
-    ]
-  },
-  {
-    "id": "raging-bull-1980",
-    "displayName": "Raging Bull",
-    "correctYear": 1980,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Robert De Niro"
-    ],
-    "distractorNames": [
-      "Sylvester Stallone",
-      "Jack Nicholson",
-      "Burt Reynolds",
-      "Jon Voight"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "F2UKuKxCJqc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Amazon MGM Studios",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
-      }
-    ]
-  },
-  {
-    "id": "sallskapsresan",
-    "displayName": "Sällskapsresan",
-    "correctYear": 1980,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Lasse Åberg"
-    ],
-    "distractorNames": [
-      "Stig Grybe",
-      "Magnus Härenstam",
-      "Gösta Ekman",
-      "Björn Skifs",
-      "Per Oscarsson"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "3WD7f7pvoSY",
-        "startSec": 10,
-        "endSec": 45,
-        "channelTitle": "HD Retro Trailers",
-        "license": "standard",
-        "notes": "HD originaltrailer. Uno Svenningsson + Lasse Åberg ikonisk öppning."
-      }
-    ]
-  },
-  {
-    "id": "star-wars-empire-strikes-back-1980",
-    "displayName": "Star Wars: The Empire Strikes Back",
-    "correctYear": 1980,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Mark Hamill",
-      "Harrison Ford"
-    ],
-    "distractorNames": [
-      "Kurt Russell",
-      "Christopher Reeve",
-      "Michael Douglas",
-      "Richard Dreyfuss"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "JNwNXF9Y6kY",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Star Wars",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Officiella Star Wars-kanalen, ren titel utan skådespelar- eller års-spoiler."
       }
     ]
   },
@@ -4522,34 +3853,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "wassberg-os-guld-1980",
-    "displayName": "Thomas Wassberg OS-guld 15 km (0.01 sekund!) Lake Placid",
-    "correctYear": 1980,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "ZtaY0UckhVI",
-        "startSec": 30,
-        "endSec": 55,
-        "channelTitle": "Jari Isometsä",
-        "license": "standard",
-        "notes": "HD documentary om Wassberg — inkl. OS-guld 1980 med 0.01s marginal. Ersatte SD-klipp (qj-CaxQ6bMM)."
-      }
-    ]
-  },
-  {
     "id": "bjorn-skifs-fangad-i-en-drom",
     "displayName": "Fångad i en dröm — Björn Skifs",
     "correctYear": 1981,
@@ -4596,7 +3899,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "youtubeClips": [
       {
@@ -4606,44 +3909,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1981 vinnare — Storbritannien."
-      }
-    ]
-  },
-  {
-    "id": "gota-kanal",
-    "displayName": "Göta kanal — eller vem drog ur proppen?",
-    "correctYear": 1981,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Janne Carlsson"
-    ],
-    "distractorNames": [
-      "Lasse Åberg",
-      "Stig Grybe",
-      "Gösta Ekman",
-      "Allan Edwall"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "qx7zpGYSm0s",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "NjutafilmsStudioS",
-        "license": "standard",
-        "notes": "Officiell NjutaFilms-trailer. Karaktärerna + kanalscenerna väl representerade."
       }
     ]
   },
@@ -4697,10 +3962,24 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Melodifestivalen"
+      "Melodifestivalen",
+      "100% in swedish"
     ],
     "spotifyTrackId": "6EnNjWkk1YX3fsTXtwO773",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "fDQRShw-Vdc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      },
+      {
+        "videoId": "1SudSj4156A",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "human-league-dont-you-want-me",
@@ -4717,7 +3996,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4726,44 +4005,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
-      }
-    ]
-  },
-  {
-    "id": "indiana-jones-raiders",
-    "displayName": "Indiana Jones: Raiders of the Lost Ark",
-    "correctYear": 1981,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Harrison Ford"
-    ],
-    "distractorNames": [
-      "Tom Selleck",
-      "Mel Gibson",
-      "Bruce Willis",
-      "Kurt Russell"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "0xQSIdSRlAk",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Paramount Movies",
-        "license": "standard",
-        "notes": "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
       }
     ]
   },
@@ -4782,7 +4023,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4810,7 +4051,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4866,7 +4107,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -4896,7 +4137,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -4938,45 +4179,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "e-t-the-extra-terrestrial",
-    "displayName": "E.T. the Extra-Terrestrial",
-    "correctYear": 1982,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Henry Thomas",
-      "Drew Barrymore"
-    ],
-    "distractorNames": [
-      "Macaulay Culkin",
-      "River Phoenix",
-      "Elijah Wood",
-      "Jake Gyllenhaal"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "2tK7AMgLvv0",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "IMAX",
-        "license": "standard",
-        "notes": "IMAX official trailer — John Williams theme + iconic bicycle/moon-scen."
-      }
-    ]
-  },
-  {
     "id": "marvin-gaye-sexual-healing",
     "displayName": "Sexual Healing — Marvin Gaye",
     "correctYear": 1982,
@@ -4991,7 +4193,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5019,7 +4221,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5075,7 +4277,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "youtubeClips": [
       {
@@ -5103,7 +4305,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5130,7 +4332,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5157,7 +4359,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5185,7 +4387,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5216,7 +4418,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska",
+      "100% in swedish",
       "Summer"
     ],
     "youtubeClips": [
@@ -5245,7 +4447,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5307,7 +4509,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -5336,10 +4538,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "spotifyTrackId": "63nyotHMEI8PrEZB2FL4DZ",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "lcOxhH8N3Bo",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "bowie-lets-dance",
@@ -5413,7 +4625,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5441,7 +4653,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5469,7 +4681,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5497,10 +4709,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "spotifyTrackId": "4czNORk5MjW5WOn98bki32",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "nqAvFx3NxUM",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "police-every-breath-you-take",
@@ -5517,7 +4739,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5545,7 +4767,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5575,8 +4797,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "z-tEuBTbobc",
@@ -5602,7 +4826,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5632,7 +4856,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -5660,7 +4884,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "4dhPbGPssNpV6pSEtgTmO7",
     "youtubeClips": [
@@ -5689,7 +4913,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0GONea6G2XdnHWjNZd6zt3",
     "youtubeClips": [
@@ -5717,7 +4941,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5744,7 +4968,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5754,34 +4978,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "George Michael - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "gunde-svan-os-guld-1984",
-    "displayName": "Gunde Svan OS-guld 15 km Sarajevo",
-    "correctYear": 1984,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "U4FVIDWttIs",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "GundeWassberg",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -5800,7 +4996,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision",
@@ -5835,46 +5031,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Power Ballads"
+      "Soft & Love"
     ],
     "spotifyTrackId": "18DfMhEx4ddoreHrvZDF6Q",
-    "youtubeClips": []
-  },
-  {
-    "id": "jonssonligan-far-guldfeber",
-    "displayName": "Jönssonligan får guldfeber",
-    "correctYear": 1984,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 83,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Gösta Ekman"
-    ],
-    "distractorNames": [
-      "Lasse Åberg",
-      "Stig Grybe",
-      "Magnus Härenstam",
-      "Per Oscarsson"
-    ],
     "youtubeClips": [
       {
-        "videoId": "FD3jK0gWbPc",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "ZorbaMovies",
-        "license": "standard",
-        "notes": "Trailer. Jönssonligan-gänget tydliga."
+        "videoId": "b_zHQ6kFuQ0",
+        "startSec": 39,
+        "endSec": 54,
+        "license": "standard"
       }
     ]
   },
@@ -5893,7 +5058,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "youtubeClips": [
       {
@@ -5920,7 +5085,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -5976,7 +5141,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6004,7 +5169,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6031,7 +5196,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6058,7 +5223,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6086,7 +5251,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6114,7 +5279,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2W8J9Gfw5q8tSvsuWSnMBl",
     "youtubeClips": [
@@ -6142,7 +5307,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6151,72 +5316,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
-      }
-    ]
-  },
-  {
-    "id": "the-karate-kid-1984",
-    "displayName": "The Karate Kid",
-    "correctYear": 1984,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "bgBy0_y-Ktw",
-        "startSec": 0,
-        "endSec": 30,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Karate Kid: Crane Kick Final Fight Scene (Ralph Macchio, William Zabka)'."
-      }
-    ]
-  },
-  {
-    "id": "the-terminator-1984",
-    "displayName": "The Terminator",
-    "correctYear": 1984,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Arnold Schwarzenegger",
-      "Linda Hamilton"
-    ],
-    "distractorNames": [
-      "Mel Gibson",
-      "Tom Cruise",
-      "Bruce Willis",
-      "Kurt Russell"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "nGrW-OR2uDk",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Amazon MGM Studios",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell 1984-trailer (MGM)."
       }
     ]
   },
@@ -6235,7 +5334,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3ErsOxqe2RmXkR65wkygDz",
     "youtubeClips": [
@@ -6267,7 +5366,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -6296,10 +5395,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "Christmas"
+      "Christmas edition"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -6364,7 +5463,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6374,44 +5473,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "a-ha",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Officiella rotoscope-musikvideon på bandets egen kanal — ersatte Topic-audion (statisk albumkonst)."
-      }
-    ]
-  },
-  {
-    "id": "back-to-the-future",
-    "displayName": "Back to the Future",
-    "correctYear": 1985,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Michael J. Fox"
-    ],
-    "distractorNames": [
-      "Rob Lowe",
-      "Tom Hanks",
-      "Emilio Estevez",
-      "Patrick Swayze"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "T_WSXXPQYeY",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Universal Pictures",
-        "license": "standard",
-        "notes": "Official Universal Pictures-klipp — Johnny B. Goode-scenen. BEHÅLLET 2026-08-12: Peters förslag 2LnShmQ_hLc är en privat re-upload av teaser-trailern; rättsinnehavarens klipp är stabilare."
       }
     ]
   },
@@ -6430,7 +5491,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "youtubeClips": [
       {
@@ -6458,7 +5519,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "6FnuMo55jNECTDdS1nD5H0",
     "youtubeClips": [
@@ -6486,7 +5547,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6513,7 +5574,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6540,7 +5601,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6567,7 +5628,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6627,7 +5688,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6654,7 +5715,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6710,7 +5771,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3Z2tPWiNiIpg8UMMoowHIk",
     "youtubeClips": [
@@ -6781,6 +5842,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "cyndi-lauper-true-colors",
+    "displayName": "True Colors — Cyndi Lauper",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "LPn0KFlbqX8",
+        "startSec": 10,
+        "endSec": 25,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "europe-the-final-countdown",
     "displayName": "The Final Countdown — Europe",
     "correctYear": 1986,
@@ -6795,7 +5882,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6826,7 +5913,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Film"
+      "Film edition"
     ],
     "spotifyTrackId": "3TnJ7M6in8Pb5EyGBUK02Y",
     "youtubeClips": [
@@ -6855,7 +5942,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6885,8 +5972,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Film",
-      "Soft & Ballads"
+      "Film edition",
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -6915,7 +6002,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -6946,10 +6033,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Summer",
-      "100% svenska"
+      "100% in swedish"
     ],
     "spotifyTrackId": "01LWBjJwFdRSCeovqipb3D",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "gM3N67a-x1U",
+        "startSec": 12,
+        "endSec": 27,
+        "license": "standard"
+      },
+      {
+        "videoId": "-R4rbXlrOdI",
+        "startSec": 8,
+        "endSec": 23,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "prince-kiss",
@@ -6969,7 +6069,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -6997,7 +6097,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -7011,45 +6111,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1986 vinnare — Belgien."
-      }
-    ]
-  },
-  {
-    "id": "top-gun",
-    "displayName": "Top Gun",
-    "correctYear": 1986,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Tom Cruise",
-      "Val Kilmer"
-    ],
-    "distractorNames": [
-      "Kevin Bacon",
-      "Mel Gibson",
-      "Patrick Swayze",
-      "Matthew Modine"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "xa_z57UatDY",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Official 1986-trailer — Danger Zone-tema + jet-action."
       }
     ]
   },
@@ -7071,11 +6132,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Summer"
+      "Summer",
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "5lRvBRQJFVWZGRqDm7YkL4",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "BqgcUydlJvg",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "def-leppard-pour-some-sugar-on-me",
@@ -7095,7 +6164,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -7124,7 +6193,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7151,7 +6220,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7178,7 +6247,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7205,7 +6274,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7235,7 +6304,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -7293,7 +6362,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -7328,7 +6397,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "4orJQkF2exPD4xSFmMY00U",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "fFwqvkav4ys",
+        "startSec": 5,
+        "endSec": 20,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "lotta-engberg-fyra-bugg",
@@ -7434,7 +6510,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7443,34 +6519,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
-      }
-    ]
-  },
-  {
-    "id": "tre-kronor-vm-1987-vien",
-    "displayName": "Tre Kronor VM-guld Wien",
-    "correctYear": 1987,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 75,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "dUQg2eu6lf4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "HockeySverige",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -7489,7 +6537,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7499,6 +6547,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "U2 - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "whitesnake-here-i-go-again",
+    "displayName": "Here I Go Again — Whitesnake",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Rock & Punk",
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "WyF8RHM1OCg",
+        "startSec": 10,
+        "endSec": 25,
+        "license": "standard"
       }
     ]
   },
@@ -7545,7 +6623,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7573,7 +6651,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -7605,7 +6683,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7688,7 +6766,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2sDaqQj5VptFuLztuKxMSU",
     "youtubeClips": [
@@ -7717,7 +6795,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "79LdvxXi5JYUjhnO7v9Fi3",
     "youtubeClips": [
@@ -7749,7 +6827,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "youtubeClips": [
       {
@@ -7781,7 +6859,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Melodifestivalen",
-      "100% svenska"
+      "100% in swedish"
     ],
     "spotifyTrackId": "7bVwUOySQGO2afJ0LArAMi",
     "youtubeClips": [
@@ -7818,7 +6896,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7828,34 +6906,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Tracy Chapman",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
-      }
-    ]
-  },
-  {
-    "id": "vinnie-jones-gascoigne-grab",
-    "displayName": "Vinnie Jones griper Gascoigne — det berömda greppet",
-    "correctYear": 1988,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 76,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "FyCw5RLDyYw",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Deadball Diaries",
-        "license": "standard",
-        "notes": "Ikonisk fotbollsmoment — Vinnie Jones (Wimbledon) griper Gascoigne (Newcastle) 1988. Sport-kategori via contentSubject: sport-event."
       }
     ]
   },
@@ -7874,11 +6924,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "4Yp2eZ-TMuI",
@@ -7905,7 +6957,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -7914,44 +6966,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
-      }
-    ]
-  },
-  {
-    "id": "field-of-dreams-1989",
-    "displayName": "Field of Dreams",
-    "correctYear": 1989,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Kevin Costner"
-    ],
-    "distractorNames": [
-      "Tom Hanks",
-      "Patrick Swayze",
-      "Tom Cruise",
-      "Mel Gibson"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Ut06d4dptWo",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Movieclips",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
       }
     ]
   },
@@ -7973,8 +6987,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "eToFpwpVJ1k",
@@ -8001,7 +7017,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Summer"
@@ -8033,7 +7049,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8060,7 +7076,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8091,7 +7107,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "0fN96hLpE08LmXFfS5VmdE",
@@ -8112,7 +7128,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8204,7 +7220,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "6pPWRBubXOBAHnjl5ZIujB",
     "youtubeClips": [
@@ -8235,11 +7251,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision",
+      "100% in swedish",
       "Melodifestivalen"
     ],
     "spotifyTrackId": "4y81ov9ojdBPu5eLhDKxS9",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "BqplQcbdWtI",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "acdc-thunderstruck",
@@ -8256,10 +7279,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
+    ],
+    "genrePackages": [
+      "Rock & Punk"
     ],
     "spotifyTrackId": "57bgtoPSgt236HzfBOd8kj",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "v2AC41dglnM",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "dr-alban-no-coke",
@@ -8279,7 +7312,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -8289,44 +7322,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Dr. Alban",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Dr. Alban - No Coke (Official 4K Video)' — inget ar i titeln."
-      }
-    ]
-  },
-  {
-    "id": "home-alone",
-    "displayName": "Home Alone",
-    "correctYear": 1990,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Macaulay Culkin"
-    ],
-    "distractorNames": [
-      "Jake Lloyd",
-      "Haley Joel Osment",
-      "Elijah Wood",
-      "Freddie Highmore"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "NOIgZYlYvyk",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "NOW PLAYING",
-        "license": "standard",
-        "notes": "Home Alone (1990) officiell trailer — Kevin McCallister + booby traps etableras."
       }
     ]
   },
@@ -8374,7 +7369,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8405,7 +7400,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -8435,11 +7430,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "T8T1a45HX4o",
@@ -8469,7 +7466,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -8497,7 +7494,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8525,7 +7522,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8581,7 +7578,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -8676,12 +7673,25 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Summer",
-      "hiphop"
+      "Hip Hop"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
     "spotifyTrackId": "20XdEFyaUR9C7aDIdq2OAd",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "Kr0tTbTbmVA",
+        "startSec": 5,
+        "endSec": 20,
+        "license": "standard"
+      },
+      {
+        "videoId": "bBs60R9qahI",
+        "startSec": 4,
+        "endSec": 19,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "metallica-enter-sandman",
@@ -8698,7 +7708,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8726,7 +7736,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8757,7 +7767,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -8788,8 +7798,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Power Ballads"
+      "Soft & Love"
     ],
     "spotifyTrackId": "3bP47tw8MOgtrwdO1iahVl",
     "youtubeClips": [
@@ -8818,7 +7827,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8880,7 +7889,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock",
+      "Rock & Punk",
       "Mega Hits"
     ],
     "youtubeClips": [
@@ -8909,7 +7918,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8965,7 +7974,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -8993,7 +8002,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9052,7 +8061,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "1wzggqX4y7amR0xdJIekwE",
     "youtubeClips": [
@@ -9081,7 +8090,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9124,34 +8133,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "aladdin-1992",
-    "displayName": "Aladdin",
-    "correctYear": 1992,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "GacgWYqL-Bc",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "Marcus R",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-27. Ersatte XBrfbWtmvWs vars titel hade 1992 vid tecken 9 av 53 = spoiler. Svenskt tal."
-      }
-    ]
-  },
-  {
     "id": "bon-jovi-bed-of-roses",
     "displayName": "Bed of Roses — Bon Jovi",
     "correctYear": 1992,
@@ -9169,8 +8150,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Power Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9198,7 +8178,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9229,7 +8209,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "spotifyTrackId": "6bjl81yfCztuBXLC9Mqs2N",
     "youtubeClips": [
@@ -9261,7 +8241,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -9289,7 +8269,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9344,7 +8324,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9372,7 +8352,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -9437,7 +8417,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Summer",
-      "100% svenska"
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "39ADGrzCrbWwTFlhDcsf9P",
@@ -9461,7 +8441,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -9492,8 +8472,24 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "5lnz9DbNfzJWiiUudfG6IW",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "27eClHQxXls",
+        "startSec": 5,
+        "endSec": 20,
+        "license": "standard"
+      },
+      {
+        "videoId": "cBwX6I0ShhM",
+        "startSec": 6,
+        "endSec": 21,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "shakespears-sister-stay",
@@ -9510,7 +8506,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9541,7 +8537,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -9571,7 +8567,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9633,6 +8629,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "6gAPl8snSQiUoAOpLUDIqA",
     "youtubeClips": [
       {
@@ -9641,72 +8638,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "channelTitle": "Svenne Rubins - Topic",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "sverige-em-1992-semifinal",
-    "displayName": "Sverige semifinal hemma-EM mot Tyskland",
-    "correctYear": 1992,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "8LkwRue9aK4",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "hejatysklanduuups",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
-    "id": "the-bodyguard-1992",
-    "displayName": "The Bodyguard",
-    "correctYear": 1992,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Kevin Costner",
-      "Whitney Houston"
-    ],
-    "distractorNames": [
-      "Tom Cruise",
-      "Mel Gibson",
-      "Julia Roberts",
-      "Demi Moore"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "v4qauDAr_hA",
-        "startSec": 0,
-        "endSec": 30,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Bodyguard - Theatrical Trailer' — avslojar varken skadespelare eller ar."
       }
     ]
   },
@@ -9728,8 +8659,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads",
-      "Film"
+      "Soft & Love",
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -9757,7 +8688,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -9816,7 +8747,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0hrBpAOgrt8RXigk83LLNE",
     "youtubeClips": [
@@ -9845,10 +8776,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
-      "Eurovision",
+      "Dansband",
       "Melodifestivalen"
     ],
     "youtubeClips": [
@@ -9880,8 +8811,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9912,7 +8842,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9922,47 +8852,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "CelineDionVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "cool-runnings-1993",
-    "displayName": "Cool Runnings",
-    "correctYear": 1993,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "John Candy"
-    ],
-    "distractorNames": [
-      "Robin Williams",
-      "Bill Murray",
-      "Eddie Murphy",
-      "Chris Farley"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "3mS-l1F5Xvs",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "DVDizzydotcom",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — original 1993-trailer (1080p HD-upscale)."
       }
     ]
   },
@@ -9984,7 +8873,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "youtubeClips": [
@@ -10016,7 +8905,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -10047,7 +8936,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -10057,45 +8946,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "JanetJacksonVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "jurassic-park",
-    "displayName": "Jurassic Park",
-    "correctYear": 1993,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Sam Neill",
-      "Jeff Goldblum"
-    ],
-    "distractorNames": [
-      "Kevin Costner",
-      "Mel Gibson",
-      "Kurt Russell",
-      "Bruce Willis"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "VzZN9AVBS1I",
-        "startSec": 60,
-        "endSec": 75,
-        "channelTitle": "Universal Pictures At Home",
-        "license": "standard",
-        "notes": "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
       }
     ]
   },
@@ -10145,7 +8995,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -10209,7 +9059,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "youtubeClips": [
@@ -10220,44 +9070,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SnoopDoggVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
-      }
-    ]
-  },
-  {
-    "id": "sunes-sommar",
-    "displayName": "Sunes sommar",
-    "correctYear": 1993,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Peter Haber"
-    ],
-    "distractorNames": [
-      "Mikael Persbrandt",
-      "Lasse Åberg",
-      "Gösta Ekman",
-      "Johan Ulveson"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "88B9JxorPcI",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "ZorbaMovies",
-        "license": "standard",
-        "notes": "Trailer. Familjefilm, stark igenkänning hos millennials som barn."
       }
     ]
   },
@@ -10279,8 +9091,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -10312,8 +9123,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -10324,34 +9134,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "BonJoviVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "brolin-vm-94-rumanien",
-    "displayName": "Tomas Brolins frisparksmål mot Rumänien i VM",
-    "correctYear": 1994,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "M5QLO0z0K0A",
-        "startSec": 8,
-        "endSec": 27,
-        "channelTitle": "Retro Calcio",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25. HD. VERIFIERA I SPELAREN: titeln ar 77 tecken och '94' star vid tecken 65 - bor kapas bort, men kolla. Peters egna 48x5dX-x7r4 har '1994' vid tecken 25 av 29 = garanterat synligt."
       }
     ]
   },
@@ -10373,10 +9155,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish",
+      "Soft & Love"
     ],
     "spotifyTrackId": "1QJcdzMUidsBaMTHoZZRGn",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "MDNeDz-I9mE",
+        "startSec": 7,
+        "endSec": 22,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "corona-the-rhythm-of-the-night",
@@ -10396,7 +9186,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -10424,7 +9214,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -10455,7 +9245,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -10486,7 +9276,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -10517,7 +9307,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -10548,7 +9338,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -10579,7 +9369,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -10589,72 +9379,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "EBTGVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
-      }
-    ]
-  },
-  {
-    "id": "forrest-gump",
-    "displayName": "Forrest Gump",
-    "correctYear": 1994,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Tom Hanks"
-    ],
-    "distractorNames": [
-      "Kevin Costner",
-      "Robin Williams",
-      "Mel Gibson",
-      "Jim Carrey"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "bSMxl1V8FSg",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Movieclips",
-        "license": "standard",
-        "notes": "Movieclips 'Run, Forrest, Run!'-scenen — iconic moment + theme."
-      }
-    ]
-  },
-  {
-    "id": "forsberg-foppa-flick-lillehammer-1994",
-    "displayName": "Peter Forsbergs straff-flick Lillehammer",
-    "correctYear": 1994,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 96,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "Fsc7CqCG8Jc",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Spittin' Chiclets",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1994' vid tecken 17. Ren titel, visar sjalva straffen."
       }
     ]
   },
@@ -10679,6 +9403,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "3iAJRvvn8pywXZtvBNNP71",
     "youtubeClips": [
       {
@@ -10709,7 +9434,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock"
+      "Rock & Punk"
     ],
     "youtubeClips": [
       {
@@ -10740,7 +9465,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -10768,7 +9493,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -10782,45 +9507,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1994 vinnare — Irland."
-      }
-    ]
-  },
-  {
-    "id": "pulp-fiction",
-    "displayName": "Pulp Fiction",
-    "correctYear": 1994,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "John Travolta",
-      "Samuel L. Jackson"
-    ],
-    "distractorNames": [
-      "Kevin Costner",
-      "Tom Hanks",
-      "Nicolas Cage",
-      "Denzel Washington"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "s7EdQ4FqbhY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Movieclips",
-        "license": "standard",
-        "notes": "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots. BEHÅLLET 2026-08-12: Peters förslag tGpTpVyI_OQ (Miramax) har titeln 'John Travolta, Uma Thurman, Samuel L. Jackson' = direkt spoiler för actor-select."
       }
     ]
   },
@@ -10839,7 +9525,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "0Jg602cHeMCnPez9baacIe",
     "youtubeClips": [
@@ -10871,7 +9557,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "1zeqAF6Hf1lPJoNkkmNA9j",
     "youtubeClips": []
@@ -10891,7 +9577,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -10922,8 +9608,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Film"
+      "Soft & Love",
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -10955,7 +9641,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Summer",
-      "100% svenska"
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "7s8EmGKCWKHsKXhhEZBdaM",
@@ -10967,44 +9653,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Parlophone Sweden",
         "license": "standard",
         "notes": "Officiell Parlophone/WM Group. Album Byns enda blondin (1994)."
-      }
-    ]
-  },
-  {
-    "id": "the-lion-king-1994",
-    "displayName": "The Lion King",
-    "correctYear": 1994,
-    "contentSubject": "movie",
-    "questionText": "What is the name of the main character in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": true,
-    "correctNames": [
-      "Simba"
-    ],
-    "distractorNames": [
-      "Mufasa",
-      "Scar",
-      "Nala",
-      "Timon"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "lfiprM5l_cE",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "Aarush Boi",
-        "license": "standard",
-        "notes": "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
       }
     ]
   },
@@ -11026,7 +9674,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -11087,34 +9735,16 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "7zrpoAJte9o12TzawqgdD0",
-    "youtubeClips": []
-  },
-  {
-    "id": "cantona-kungfu-kick-1995",
-    "displayName": "Cantonas kung-fu-spark mot Crystal Palace-fan",
-    "correctYear": 1995,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
     "youtubeClips": [
       {
-        "videoId": "C7PSY7KYThk",
+        "videoId": "nVUHHW1tJYA",
         "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Cinematheque Universelle",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1995' vid tecken 42. Ren titel. Detta ar samma klipp som byttes BORT 2026-05 for att vara SD - SD ar bara en note i youtube-validate, en spoilad titel gor fragan trasig. HD-alternativet -qV6bp5cZMU ar aldersbegransat (blockerat)."
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -11133,7 +9763,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11164,8 +9794,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -11196,8 +9825,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "QgppLdY0QjU",
@@ -11255,7 +9886,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -11283,7 +9914,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11313,9 +9944,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
-    "genrePackages": [
-      "Mega Hits"
-    ],
     "youtubeClips": [
       {
         "videoId": "DvyCbevQbtI",
@@ -11342,10 +9970,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -11391,34 +10019,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "ali-olympic-torch-atlanta-1996",
-    "displayName": "Muhammad Ali tänder OS-elden i Atlanta",
-    "correctYear": 1996,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 86,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "JOYJA3B4_TA",
-        "startSec": 0,
-        "endSec": 19,
-        "channelTitle": "Fight Greats",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1996' vid tecken 45. Ren titel."
-      }
-    ]
-  },
-  {
     "id": "blackstreet-no-diggity",
     "displayName": "No Diggity — Blackstreet feat. Dr. Dre",
     "correctYear": 1996,
@@ -11436,7 +10036,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "youtubeClips": [
@@ -11465,7 +10065,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "spotifyTrackId": "7aQjPecQdIuNd1sz3KCDhD",
     "youtubeClips": [
@@ -11497,7 +10097,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "youtubeClips": [
       {
@@ -11525,7 +10125,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -11560,7 +10160,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "1EZypwk0xcj64ZLAglhLs2",
     "youtubeClips": [
@@ -11621,7 +10221,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Hits",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -11652,8 +10252,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "xm7et8ecVjM",
@@ -11767,10 +10369,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "5PQmSHzWnlgG4EBuIqjac2",
@@ -11830,7 +10432,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -11861,11 +10463,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "6WhseDHUvM0lOk5oavjztk",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "DTraekuMxd4",
+        "startSec": 28,
+        "endSec": 43,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "spice-girls-wannabe",
@@ -11885,7 +10494,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -11916,10 +10525,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish",
+      "Summer"
     ],
     "spotifyTrackId": "2eIe720mhOM77Gfa6I4Url",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "2DWUpLh9AbQ",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "toni-braxton-un-break-my-heart",
@@ -11939,7 +10556,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -12002,7 +10619,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Eurodance & pop"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -12058,7 +10675,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Summer"
@@ -12090,12 +10707,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "SSbBvKaM6sk",
@@ -12181,7 +10799,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -12244,7 +10862,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -12272,7 +10890,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -12332,10 +10950,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "5eJ314ozT4CTPlyjdsGq78",
     "youtubeClips": [
@@ -12395,7 +11013,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -12455,8 +11073,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads",
-      "Love & Peace"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -12485,7 +11102,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12495,45 +11112,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Frank Rovers",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-11. OBS: re-upload, inte officiell VEVO-kanal - hogre takedown-risk, nightly autofix-cron plockar upp om den forsvinner."
-      }
-    ]
-  },
-  {
-    "id": "titanic",
-    "displayName": "Titanic",
-    "correctYear": 1997,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Leonardo DiCaprio",
-      "Kate Winslet"
-    ],
-    "distractorNames": [
-      "Brad Pitt",
-      "Matt Damon",
-      "Julia Roberts",
-      "Sandra Bullock"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "I7c1etV7D7g",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "20th Century Studios",
-        "license": "standard",
-        "notes": "Official 25th Anniversary trailer — Celine Dion theme + iconic scenes."
       }
     ]
   },
@@ -12607,7 +11185,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft Hits"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -12635,10 +11213,17 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "7p9dd71JR2ucoAuO1Sy0VZ",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "_W2jONIjrM0",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "cher-believe",
@@ -12655,7 +11240,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12682,7 +11267,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -12715,12 +11300,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "59mdyQniSaNFeXaKMGu9RB",
     "youtubeClips": [
       {
@@ -12797,34 +11383,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "jordan-last-shot-1998",
-    "displayName": "Michael Jordans 'Last Shot' i NBA-finalen",
-    "correctYear": 1998,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "MlzL6bT1C2U",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Coach Brock",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '1998' vid tecken 41. Ren titel."
-      }
-    ]
-  },
-  {
     "id": "lenny-kravitz-fly-away",
     "displayName": "Fly Away — Lenny Kravitz",
     "correctYear": 1998,
@@ -12867,7 +11425,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -12911,34 +11469,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "mulan-1998",
-    "displayName": "Mulan",
-    "correctYear": 1998,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "sRtZaSkBp58",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Allen Theatres Inc",
-        "license": "standard",
-        "notes": "Original 1998 teatral trailer — Mulan som krigare + Make a Man Out of You-känsla."
-      }
-    ]
-  },
-  {
     "id": "offspring-pretty-fly",
     "displayName": "Pretty Fly (For a White Guy) — The Offspring",
     "correctYear": 1998,
@@ -12956,7 +11486,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock"
+      "Rock & Punk"
     ],
     "youtubeClips": [
       {
@@ -12986,8 +11516,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
     "spotifyTrackId": "2XkMVyMLZhrUivl7XuhidO",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "gITjhYfdjvs",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "scooter-how-much-is-the-fish",
@@ -13035,7 +11575,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5kW0BW8B5hjrbpe0OuFUr9",
     "youtubeClips": [
@@ -13067,7 +11607,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -13098,7 +11638,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -13108,6 +11648,62 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "whitneyhoustonVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "antique-dinata-dinata",
+    "displayName": "Dinata Dinata — Antique",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Club & Dance"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "474UjAuu0mc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "antique-opa-opa",
+    "displayName": "Opa Opa — Antique",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HiWQC4Ynu2k",
+        "startSec": 23,
+        "endSec": 38,
+        "license": "standard"
       }
     ]
   },
@@ -13185,7 +11781,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13212,7 +11808,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision",
@@ -13275,10 +11871,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "4LwU4Vp6od3Sb08CsP99GC",
@@ -13307,7 +11903,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13334,14 +11930,27 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "75IN3CtuZwTHTnZvYM4qnJ",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "sNPnbI1arSE",
+        "startSec": 10,
+        "endSec": 25,
+        "license": "standard"
+      },
+      {
+        "videoId": "EAKfXCRmhq8",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "enrique-iglesias-bailamos",
@@ -13361,7 +11970,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Film"
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -13392,8 +12001,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -13509,7 +12117,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Punk & Rock"
+      "Rock & Punk"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -13520,45 +12128,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SmashMouthVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1999 = albumet Astro Lounge (MusicBrainz gav felaktigt 1997)."
-      }
-    ]
-  },
-  {
-    "id": "the-matrix",
-    "displayName": "The Matrix",
-    "correctYear": 1999,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Keanu Reeves",
-      "Laurence Fishburne"
-    ],
-    "distractorNames": [
-      "Brad Pitt",
-      "Nicolas Cage",
-      "Hugh Jackman",
-      "Will Smith"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "vKQi3bBA1y8",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Official 1999-trailer — bullet-time + Neo/Trinity-scener."
       }
     ]
   },
@@ -13577,12 +12146,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "sport",
-      "football"
+      "Club & Dance",
+      "Sport"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "SxhwbXYe1XE",
@@ -13638,7 +12208,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13666,7 +12236,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13693,7 +12263,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13702,44 +12272,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 273,
         "channelTitle": "Coldplay",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "gladiator-2000",
-    "displayName": "Gladiator",
-    "correctYear": 2000,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Russell Crowe"
-    ],
-    "distractorNames": [
-      "Mel Gibson",
-      "Tom Cruise",
-      "Kevin Costner",
-      "Brad Pitt"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "gDbltV8z7dQ",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Paramount Movies",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
       }
     ]
   },
@@ -13761,8 +12293,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -13790,7 +12321,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -13850,7 +12381,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -13881,10 +12412,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "youtubeClips": [
@@ -13931,48 +12462,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "snatch-2000",
-    "displayName": "Snatch",
-    "correctYear": 2000,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Brad Pitt",
-      "Jason Statham"
-    ],
-    "distractorNames": [
-      "Vin Diesel",
-      "Dwayne Johnson",
-      "Gerard Butler",
-      "Mark Wahlberg"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "9Jar2XkBboo",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "Movieclips Classic Trailers",
-        "license": "standard",
-        "notes": "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."
-      }
-    ]
-  },
-  {
     "id": "the-hives-hate-to-say",
     "displayName": "Hate to Say I Told You So — The Hives",
     "correctYear": 2000,
@@ -13987,7 +12476,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "6xxXrNJnnsQNLdgNk8S4y8",
     "youtubeClips": []
@@ -14007,7 +12496,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14048,6 +12537,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Antique",
         "license": "standard",
         "notes": "Official music video. ESC 2001 Greece entry (3rd place)."
+      },
+      {
+        "videoId": "VVLfuW3KiLY",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -14111,45 +12606,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "harry-potter-philosophers-stone-2001",
-    "displayName": "Harry Potter and the Philosopher's Stone",
-    "correctYear": 2001,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 91,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Daniel Radcliffe",
-      "Emma Watson"
-    ],
-    "distractorNames": [
-      "Tobey Maguire",
-      "Elijah Wood",
-      "Macaulay Culkin",
-      "Jake Lloyd"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "iSItf2y7hgs",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "ClipZone: Heroes & Villains",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — scen ur 2001-filmen (ej 2026 HBO-reboot-teaser)."
-      }
-    ]
-  },
-  {
     "id": "kylie-minogue-cant-get-you-out-of-my-head",
     "displayName": "Can't Get You Out of My Head — Kylie Minogue",
     "correctYear": 2001,
@@ -14164,7 +12620,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14191,7 +12647,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14201,45 +12657,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MUSIC EVOLUTION",
         "license": "standard",
         "notes": "Official Video 4K 60fps remaster — HD-fix av tidigare SD-klipp 2026-05-22. Refrängområde."
-      }
-    ]
-  },
-  {
-    "id": "lotr-fellowship-2001",
-    "displayName": "The Lord of the Rings: The Fellowship of the Ring",
-    "correctYear": 2001,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 89,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Elijah Wood",
-      "Ian McKellen"
-    ],
-    "distractorNames": [
-      "Tobey Maguire",
-      "Daniel Radcliffe",
-      "Brendan Fraser",
-      "Ewan McGregor"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "_nZdmwHrcnw",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Warner Bros. Entertainment",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12 — ersatte Movieclips-trailern (V75dMMIW2B4) med rättsinnehavarens 4K Ultra HD-klipp."
       }
     ]
   },
@@ -14314,12 +12731,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "2ZlJLzKzRGA",
@@ -14328,34 +12746,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Planet Funk",
         "license": "standard",
         "notes": "Official video 2001."
-      }
-    ]
-  },
-  {
-    "id": "shrek-2001",
-    "displayName": "Shrek",
-    "correctYear": 2001,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "s9nVUOP3Oik",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Dreamworks",
-        "license": "standard",
-        "notes": "DreamWorks officiell trailer (1:48) — Shrek + Åsnon i träsket. Allsvars DreamWorks-kanal."
       }
     ]
   },
@@ -14374,7 +12764,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -14388,6 +12778,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2001 vinnare — Estland."
+      }
+    ]
+  },
+  {
+    "id": "antique-follow-me",
+    "displayName": "Follow Me — Antique",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Club & Dance"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "ywH2os9XB88",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -14406,7 +12826,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14436,7 +12856,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -14464,7 +12884,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14492,7 +12912,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14522,7 +12942,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -14553,7 +12973,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -14581,10 +13001,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "7iL6o9tox1zgHpKUfh9vuC",
@@ -14658,34 +13078,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "finding-nemo",
-    "displayName": "Finding Nemo",
-    "correctYear": 2003,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "6fHR58bSwpg",
-        "startSec": 20,
-        "endSec": 35,
-        "channelTitle": "Saskia Rice",
-        "license": "standard",
-        "notes": "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
-      }
-    ]
-  },
-  {
     "id": "outkast-hey-ya",
     "displayName": "Hey Ya! — OutKast",
     "correctYear": 2003,
@@ -14700,7 +13092,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14760,7 +13152,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -14792,7 +13184,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -14848,7 +13240,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "youtubeClips": [
       {
@@ -14907,7 +13299,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club Hits"
+      "Club & Dance"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -14920,45 +13312,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eric Prydz",
         "license": "standard",
         "notes": "Peter-bytt 2026-08-28 (officiella musikvideon). parentControlled pga aerobics-motivet."
-      }
-    ]
-  },
-  {
-    "id": "eternal-sunshine-of-the-spotless-mind-2004",
-    "displayName": "Eternal Sunshine of the Spotless Mind",
-    "correctYear": 2004,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 76,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Jim Carrey",
-      "Kate Winslet"
-    ],
-    "distractorNames": [
-      "Adam Sandler",
-      "Ben Stiller",
-      "Cameron Diaz",
-      "Julia Roberts"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "86NjzbHhZOE",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Max Caulfield",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. OBS: privat kanal-uppladdning av trailern — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
       }
     ]
   },
@@ -14980,7 +13333,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "2LELFaNglE9B5xlcmd4qtQ",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "SZNVTkT1DNs",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "lena-philipsson-det-gor-ont",
@@ -15031,8 +13391,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "miPLp_U0sMU",
@@ -15041,48 +13403,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Markoolio - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-      }
-    ]
-  },
-  {
-    "id": "million-dollar-baby-2004",
-    "displayName": "Million Dollar Baby",
-    "correctYear": 2004,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Hilary Swank",
-      "Clint Eastwood"
-    ],
-    "distractorNames": [
-      "Sandra Bullock",
-      "Charlize Theron",
-      "Tom Hanks",
-      "Denzel Washington"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "5_RsHRmIRBY",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell 2004-trailer (Swank/Eastwood). Ej Ava Max-låten."
       }
     ]
   },
@@ -15101,7 +13421,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "youtubeClips": [
       {
@@ -15128,7 +13448,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -15142,72 +13462,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ruslana",
         "license": "standard",
         "notes": "ESC 2004 vinnare — Ukraina. Officiell remastered MV."
-      }
-    ]
-  },
-  {
-    "id": "sa-som-i-himmelen",
-    "displayName": "Så som i himmelen",
-    "correctYear": 2004,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Mikael Nyqvist"
-    ],
-    "distractorNames": [
-      "Rolf Lassgård",
-      "Björn Skifs",
-      "Mikael Persbrandt",
-      "Peter Haber"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "FT5A0rYUSVE",
-        "startSec": 10,
-        "endSec": 45,
-        "channelTitle": "NuovoCinemaGiornico",
-        "license": "standard",
-        "notes": "Originaltrailer. Oscar-nominerad svensk film. Mikael Nyqvist."
-      }
-    ]
-  },
-  {
-    "id": "stefan-holm-os-guld-2004",
-    "displayName": "Stefan Holm OS-guld höjdhopp Aten",
-    "correctYear": 2004,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "2ubAsMWGoBI",
-        "startSec": 0,
-        "endSec": 14,
-        "channelTitle": "Olympic Games",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2004' vid tecken 33. Officiella IOC-kanalen; '#Athens2004' star vid tecken 96 av 100 = kapas bort."
       }
     ]
   },
@@ -15226,7 +13480,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15235,39 +13489,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 251,
         "channelTitle": "7clouds",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "zlatan-heel-italy-em-2004",
-    "displayName": "Zlatans häl-mål mot Italien EM-04",
-    "correctYear": 2004,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport",
-      "football"
-    ],
-    "inBaseCatalog": false,
-    "youtubeClips": [
-      {
-        "videoId": "Z8iQiYSMXi4",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "TV4 Sport",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25. Rattsinnehavarens egen kanal. SD (bara en note i youtube-validate). Titeln ar 69 tecken med '2004' vid tecken 53 - bor kapas bort i spelaren; Peters egen matning 2026-08-13 visade att tecken 54 inte syns."
       }
     ]
   },
@@ -15286,7 +13507,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15313,7 +13534,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -15345,7 +13566,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15493,7 +13714,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "youtubeClips": [
       {
@@ -15524,7 +13745,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -15614,7 +13835,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15641,7 +13862,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision"
@@ -15675,7 +13896,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -15706,7 +13927,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -15762,7 +13983,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -15772,34 +13993,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Mix Sabrosura",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
-      }
-    ]
-  },
-  {
-    "id": "tre-kronor-os-turin-2006",
-    "displayName": "Tre Kronor OS-guld Turin",
-    "correctYear": 2006,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "StClSX9cNVY",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "simmerpuck",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2006' vid tecken 41. Ren titel."
       }
     ]
   },
@@ -15821,7 +14014,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -15852,7 +14045,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -15915,7 +14108,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -15946,7 +14139,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -15977,7 +14170,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -16005,7 +14198,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16032,7 +14225,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "0NEw29HKkDkt1yDyBJOgXe",
     "youtubeClips": []
@@ -16052,7 +14245,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Melodifestivalen"
@@ -16083,7 +14276,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16113,7 +14306,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -16144,7 +14337,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -16172,11 +14365,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Hits",
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -16244,7 +14437,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16253,34 +14446,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 243,
         "channelTitle": "Coldplay",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "federer-nadal-wimbledon-2008",
-    "displayName": "Federer-Nadal Wimbledon-final ('greatest match')",
-    "correctYear": 2008,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "k6k3TDXbmGM",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Secret Base",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2008' vid tecken 42. VERIFIERA I SPELAREN: har star '2008' vid tecken 72 av 76 - bor kapas bort. Enda ratt-event-klippet utan tidigt artal."
       }
     ]
   },
@@ -16327,7 +14492,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16354,10 +14519,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5vQXxfGn1bjv5WESrYVVpw",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "2Abk1jAONjw",
+        "startSec": 4,
+        "endSec": 19,
+        "license": "standard"
+      },
+      {
+        "videoId": "zVH638r_X_I",
+        "startSec": 6,
+        "endSec": 21,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "lady-gaga-poker-face",
@@ -16374,7 +14552,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16384,34 +14562,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "LadyGagaVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Ersatte Topic-audion oG-4Uvhm4lI med officiella musikvideon."
-      }
-    ]
-  },
-  {
-    "id": "phelps-beijing-8-guld-2008",
-    "displayName": "Michael Phelps 8 OS-guld Peking",
-    "correctYear": 2008,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "sftrI-e8nHg",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Bao Highlights",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -16449,45 +14599,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "the-dark-knight-2008",
-    "displayName": "The Dark Knight",
-    "correctYear": 2008,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Christian Bale",
-      "Heath Ledger"
-    ],
-    "distractorNames": [
-      "Ben Affleck",
-      "Robert Downey Jr.",
-      "Hugh Jackman",
-      "Ryan Reynolds"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "EXeTwQWrcwY",
-        "startSec": 15,
-        "endSec": 30,
-        "channelTitle": "Rotten Tomatoes Classic Trailers",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — officiell 2008-trailer #1 (Nolan)."
-      }
-    ]
-  },
-  {
     "id": "alexander-rybak-fairytale",
     "displayName": "Fairytale — Alexander Rybak",
     "correctYear": 2009,
@@ -16502,7 +14613,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "youtubeClips": [
       {
@@ -16512,45 +14623,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2009 vinnare — Norge."
-      }
-    ]
-  },
-  {
-    "id": "avatar",
-    "displayName": "Avatar",
-    "correctYear": 2009,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Sam Worthington",
-      "Zoe Saldana"
-    ],
-    "distractorNames": [
-      "Matt Damon",
-      "Chris Pratt",
-      "Mila Kunis",
-      "Scarlett Johansson"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "5PSNL1qE6VY",
-        "startSec": 60,
-        "endSec": 75,
-        "channelTitle": "20th Century Studios",
-        "license": "standard",
-        "notes": "20th Century Studios official 2009-trailer — Pandora-värld, Na'vi-action."
       }
     ]
   },
@@ -16569,7 +14641,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16587,34 +14659,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Popular Music",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-27. Ersatte Topic-klippet OIPmhkzN2ug. Lyrics-version. startSec 15 angiven av Peter."
-      }
-    ]
-  },
-  {
-    "id": "bolt-100m-world-record-2009",
-    "displayName": "Usain Bolt slår 100m-VR (9.58s)",
-    "correctYear": 2009,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 92,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "DiJKCQSkjOw",
-        "startSec": 60,
-        "endSec": 75,
-        "channelTitle": "World Athletics",
-        "license": "standard",
-        "notes": "World Athletics official channel — Berlin 2009 100m WR 9.58s."
       }
     ]
   },
@@ -16695,7 +14739,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2igwFfvr1OAGX9SKDCPBwO",
     "youtubeClips": [
@@ -16727,7 +14771,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -16755,7 +14799,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16782,7 +14826,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -16843,7 +14887,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16871,7 +14915,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision",
@@ -16903,7 +14947,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -16962,7 +15006,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -16990,7 +15034,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17020,7 +15064,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -17109,7 +15153,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -17144,7 +15188,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -17172,7 +15216,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "6aqNCrRA7vs7v6QvRpI50t",
     "youtubeClips": [
@@ -17204,10 +15248,18 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "dansband"
+      "Dansband",
+      "100% in swedish"
     ],
     "spotifyTrackId": "6kKJbnWfmVUKnhqa8n17xT",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "rU-ngQ5hSF8",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "shakira-waka-waka",
@@ -17224,7 +15276,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17259,10 +15311,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -17272,45 +15324,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MrWeiird",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
-      }
-    ]
-  },
-  {
-    "id": "the-social-network-2010",
-    "displayName": "The Social Network",
-    "correctYear": 2010,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Jesse Eisenberg",
-      "Andrew Garfield"
-    ],
-    "distractorNames": [
-      "Michael Cera",
-      "Joseph Gordon-Levitt",
-      "Shia LaBeouf",
-      "Anton Yelchin"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "rBCNU0XT9GY",
-        "startSec": 5,
-        "endSec": 35,
-        "channelTitle": "Sony Pictures Releasing UK",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-08-12. Officiell Sony-trailer. Titeln innehåller '15 October 2010' men frågan är actor-select, så året är inte svaret — får INTE bytas till timeline utan nytt klipp."
       }
     ]
   },
@@ -17360,7 +15373,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17388,7 +15401,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5UqCQaDshqbIk3pkhy4Pjg",
     "youtubeClips": [
@@ -17419,7 +15432,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -17447,7 +15460,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -17479,7 +15492,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -17511,7 +15524,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17623,7 +15636,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17665,47 +15678,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "moneyball-2011",
-    "displayName": "Moneyball",
-    "correctYear": 2011,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Brad Pitt"
-    ],
-    "distractorNames": [
-      "Matt Damon",
-      "George Clooney",
-      "Ryan Gosling",
-      "Christian Bale"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "-4QPVo0UIzc",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Rotten Tomatoes Trailers",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "rihanna-we-found-love",
     "displayName": "We Found Love — Rihanna feat. Calvin Harris",
     "correctYear": 2011,
@@ -17723,7 +15695,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -17754,7 +15726,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -17811,7 +15783,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -17839,7 +15811,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "spotifyTrackId": "2bU3gg0M8GGBs7ItBKsJX9",
     "youtubeClips": [
@@ -18006,7 +15978,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18033,7 +16005,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "1z9kQ14XBSN0r2v6fx4IdG",
     "youtubeClips": [
@@ -18061,7 +16033,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3zu2CuVTJwaZn2m4rBzaUO",
     "youtubeClips": [
@@ -18072,34 +16044,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Aernoron",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
-      }
-    ]
-  },
-  {
-    "id": "zlatan-bicycle-kick-england-2012",
-    "displayName": "Zlatans bicycle kick mot England",
-    "correctYear": 2012,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 95,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "RM_5tJncHww",
-        "startSec": 0,
-        "endSec": 25,
-        "channelTitle": "GOAL",
-        "license": "standard",
-        "notes": "GOAL-kanal. Zlatans bicycle kick mot England 14/11-2012. Ersatte blockerat klipp."
       }
     ]
   },
@@ -18118,7 +16062,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "4lhqb6JvbHId48OUJGwymk",
     "youtubeClips": [
@@ -18147,7 +16091,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0nrRP2bk19rLc0orkWPQk2",
     "youtubeClips": [
@@ -18176,7 +16120,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "2Foc5Q5nqNiosCNqttzHof",
     "youtubeClips": [
@@ -18204,7 +16148,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision"
@@ -18249,44 +16193,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "hundraringen-klev-ut",
-    "displayName": "Hundraåringen som klev ut genom fönstret och försvann",
-    "correctYear": 2013,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Robert Gustafsson"
-    ],
-    "distractorNames": [
-      "Rolf Lassgård",
-      "Mikael Nyqvist",
-      "Peter Haber",
-      "Mikael Persbrandt"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "pjiJ1cL3Uss",
-        "startSec": 10,
-        "endSec": 45,
-        "channelTitle": "Buena Vista Sverige",
-        "license": "standard",
-        "notes": "Officiell svensk trailer. Buena Vista Sverige. Robert Gustafsson."
-      }
-    ]
-  },
-  {
     "id": "john-newman-love-me-again",
     "displayName": "Love Me Again — John Newman",
     "correctYear": 2013,
@@ -18304,7 +16210,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "spotifyTrackId": "5TbzAWWc5eJaANpA9kfGCd",
     "youtubeClips": []
@@ -18383,7 +16289,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18414,7 +16320,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -18424,6 +16330,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "PitbullVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "poodles-en-for-alla-for-en",
+    "displayName": "En för alla, för en — Tre Kronor & The Poodles",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport",
+      "sport-anthems"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "MxUhHQKZRGs",
+        "startSec": 14,
+        "endSec": 29,
+        "license": "standard"
       }
     ]
   },
@@ -18442,7 +16379,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Melodifestivalen"
@@ -18473,7 +16410,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "youtubeClips": [
       {
@@ -18501,7 +16438,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "5HOpkTTVcmZHnthgyxrIL8",
     "youtubeClips": [
@@ -18562,7 +16499,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "spotifyTrackId": "7HE1FnMtSsRotzIAQPXpr5",
     "youtubeClips": [
@@ -18622,7 +16559,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -18654,7 +16591,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18664,34 +16601,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ed Sheeran",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
-      }
-    ]
-  },
-  {
-    "id": "kalla-os-guld-stafett-2014",
-    "displayName": "Charlotte Kalla OS-guld stafett Sochi",
-    "correctYear": 2014,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "mlLqT65ADys",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Olympic Games",
-        "license": "standard",
-        "notes": "Bytt 2026-08-26 (spoiler-pass): gamla titeln hade '2014' vid tecken 32. Officiella IOC-kanalen, ren titel - Kallas comeback pa sista strackan."
       }
     ]
   },
@@ -18710,7 +16619,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18766,7 +16675,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Melodifestivalen"
@@ -18825,7 +16734,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18852,7 +16761,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -18945,44 +16854,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "EllieGouldingVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 20 angiven av Peter."
-      }
-    ]
-  },
-  {
-    "id": "en-man-som-heter-ove",
-    "displayName": "En man som heter Ove",
-    "correctYear": 2015,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Rolf Lassgård"
-    ],
-    "distractorNames": [
-      "Robert Gustafsson",
-      "Mikael Nyqvist",
-      "Mikael Persbrandt",
-      "Peter Haber"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "q84plEEyGZY",
-        "startSec": 12,
-        "endSec": 47,
-        "channelTitle": "MovieZine",
-        "license": "standard",
-        "notes": "Officiell svensk trailer. Rolf Lassgård. SF Studios-produktion."
       }
     ]
   },
@@ -19117,7 +16988,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3S4px9f4lceWdKf0gWciFu",
     "youtubeClips": [
@@ -19154,7 +17025,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19181,7 +17052,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19191,34 +17062,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ZaraLarssonMusicVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Ersatte Topic-klippet 8BmMB3i--FM med officiella musikvideon (samma langd 3:22, sa startSec 30 traffar samma parti)."
-      }
-    ]
-  },
-  {
-    "id": "angry-birds",
-    "displayName": "The Angry Birds Movie",
-    "correctYear": 2016,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "e4sdQBmqnuA",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Sony Pictures Releasing UK",
-        "license": "standard",
-        "notes": "Sony Pictures UK — officiell 2016-trailer. Red + Bomb + Chuck i fokus. Ej embed-blockerad."
       }
     ]
   },
@@ -19293,7 +17136,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19379,7 +17222,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19406,7 +17249,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "youtubeClips": [
       {
@@ -19434,11 +17277,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "sport-anthems"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "46NBoIAHrmR7qcUGCIFEjR",
     "youtubeClips": [
       {
@@ -19466,7 +17311,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "unknown-region"
     ],
     "genrePackages": [
       "Eurovision"
@@ -19529,7 +17374,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% svenska"
+      "100% in swedish"
     ],
     "spotifyTrackId": "2FnUyLhe7sjXgnZlK9sc0z",
     "youtubeClips": [
@@ -19540,34 +17385,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Laleh",
         "license": "standard",
         "notes": "Official music video. 85M+ streams."
-      }
-    ]
-  },
-  {
-    "id": "leicester-premier-league-2016",
-    "displayName": "Leicester City vinner Premier League",
-    "correctYear": 2016,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "7MHy3eS43FE",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Sky Sports Retro",
-        "license": "standard",
-        "notes": "Curerad 2026-05-29 — ögonblicket Leicester blev mästare 2016 (Sky Sports)."
       }
     ]
   },
@@ -19687,34 +17504,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "simone-biles-rio-2016",
-    "displayName": "Simone Biles 4 OS-guld i Rio",
-    "correctYear": 2016,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 85,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "aBrmCgCuwno",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "TNT Sports",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
-      }
-    ]
-  },
-  {
     "id": "weeknd-starboy",
     "displayName": "Starboy — The Weeknd",
     "correctYear": 2016,
@@ -19729,7 +17518,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -19791,7 +17580,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -19802,86 +17591,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ZaynVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "zootopia-2016",
-    "displayName": "Zootopia",
-    "correctYear": 2016,
-    "contentSubject": "movie",
-    "questionText": "What is the name of the main character in this film?",
-    "itemHcp": 86,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": true,
-    "correctNames": [
-      "Judy Hopps"
-    ],
-    "distractorNames": [
-      "Simba",
-      "Nemo",
-      "Shrek",
-      "Mulan"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "CzvH6_e2a-U",
-        "startSec": 10,
-        "endSec": 25,
-        "channelTitle": "Zero Media",
-        "license": "standard",
-        "notes": "Scen: Judy Hopps anländer till Zootopia — Try Everything (Shakira) i bakgrunden. HD trailer."
-      }
-    ]
-  },
-  {
-    "id": "borg-vs-mcenroe-2017",
-    "displayName": "Borg vs McEnroe",
-    "correctYear": 2017,
-    "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "sport"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Sverrir Gudnason",
-      "Shia LaBeouf"
-    ],
-    "distractorNames": [
-      "Tom Hanks",
-      "Benedict Cumberbatch",
-      "Michael Fassbender",
-      "Joel Edgerton"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "yQgWMs0TBKU",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "SF Studios",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
       }
     ]
   },
@@ -19984,10 +17693,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "Christmas Edition"
+      "Christmas edition"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "0tgVpDi06FyKpA1z0VMD4v",
@@ -19999,34 +17708,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ed Sheeran",
         "license": "standard",
         "notes": "Officiell musikvideo (Ed Sheeran-kanalen)."
-      }
-    ]
-  },
-  {
-    "id": "federer-australian-open-2017",
-    "displayName": "Federers comeback-vinst Australian Open",
-    "correctYear": 2017,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "TzA0pe2DQ_s",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Australian Open",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -20045,10 +17726,17 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0pqnGHJpmpxLKifKRmU6WP",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "7wtfhZwyrcc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "kygo-for-life",
@@ -20094,7 +17782,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -20121,7 +17809,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -20180,7 +17868,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -20222,34 +17910,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "tre-kronor-vm-2017-koln",
-    "displayName": "Tre Kronor VM-guld Köln",
-    "correctYear": 2017,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 75,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "EjxAdkmx3vs",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "IIHF",
-        "license": "standard",
-        "notes": "IIHF official channel — Canada-Sweden 2017 World Championship final highlights. Curerad 2026-05-27 via refined query."
-      }
-    ]
-  },
-  {
     "id": "zayn-dusk-till-dawn",
     "displayName": "Dusk Till Dawn — ZAYN feat. Sia",
     "correctYear": 2017,
@@ -20267,7 +17927,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -20298,7 +17958,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft Hits"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -20328,8 +17988,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Eurovision",
+      "Melodifestivalen"
+    ],
     "spotifyTrackId": "0s3P5PImfDZYWIseR3b39D",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "U2UmYBkszOA",
+        "startSec": 5,
+        "endSec": 20,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "clean-bandit-solo",
@@ -20374,10 +18045,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "hiphop"
+      "Hip Hop"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -20397,34 +18068,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "BEST ARTIST ALIVE OVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-27. Lyric video. startSec 3 angiven av Peter."
-      }
-    ]
-  },
-  {
-    "id": "emil-forsberg-vs-schweiz-vm-2018",
-    "displayName": "Emil Forsbergs mål mot Schweiz åttondelsfinal",
-    "correctYear": 2018,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 84,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "6jvU9naWHV0",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Sports Heroes",
-        "license": "standard",
-        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
       }
     ]
   },
@@ -20467,7 +18110,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -20503,11 +18146,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
-      "Love & Peace",
-      "Soft & Ballads"
+      "Soft & Love"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -20544,7 +18186,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -20577,8 +18219,16 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "1p0RjMued7Tmm0o7CjzoHY",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "vBoOpjGx-Qc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "netta-toy",
@@ -20595,7 +18245,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -20656,7 +18306,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -20683,12 +18333,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "3HTgmcqR7nYtD7EmJ4hOLi",
     "youtubeClips": [
       {
@@ -20715,7 +18366,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -20743,7 +18394,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -20775,7 +18426,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -20802,7 +18453,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Eurovision",
@@ -20986,7 +18637,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -21014,7 +18665,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "0VjIjW4GlUZAMYd2vXMi3b",
     "youtubeClips": [
@@ -21046,7 +18697,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "youtubeClips": [
       {
@@ -21074,7 +18725,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -21107,7 +18758,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen"
     ],
     "spotifyTrackId": "4RcEx6TvICENelSh3O7gvu",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "faIF5Ej_VHI",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "dua-lipa-break-my-heart",
@@ -21155,7 +18813,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -21186,7 +18844,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Love & Peace"
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -21196,34 +18854,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Dua Lipa",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "duplantis-stavhopp-vr-2020",
-    "displayName": "Armand Duplantis sätter stavhopps-VR (6.17m)",
-    "correctYear": 2020,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "aeKnFJS8orA",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "World Athletics",
-        "license": "standard",
-        "notes": "World Athletics official channel — Duplantis 6.17m world record Toruń 2020. Curerad 2026-05-27 via refined query."
       }
     ]
   },
@@ -21242,10 +18872,23 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "3USxtqRwSYz57Ewm6wWRMp",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "mRD0-GxqHVo",
+        "startSec": 29,
+        "endSec": 44,
+        "license": "standard"
+      },
+      {
+        "videoId": "rfTgO9rpqck",
+        "startSec": 41,
+        "endSec": 56,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "jason-derulo-take-you-dancing",
@@ -21356,14 +18999,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "sport",
       "football"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "2iL0W5qi0ivZ9WRXbZ74cS",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "kGT73GcwhCU",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "el-diablo-elena-tsagkrinou",
@@ -21413,7 +19064,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -21440,7 +19091,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -21472,7 +19123,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -21499,7 +19150,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -21555,7 +19206,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -21587,7 +19238,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "youtubeClips": [
       {
@@ -21650,7 +19301,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance Hits"
+      "Club & Dance"
     ],
     "spotifyTrackId": "4uUG5RXrOk84mYEfFvj3cK",
     "youtubeClips": [
@@ -21679,7 +19330,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -21706,7 +19357,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -21770,7 +19421,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Film"
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -21798,7 +19449,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -21826,7 +19477,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -21884,7 +19535,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -21917,7 +19568,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -22000,7 +19651,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -22083,7 +19734,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "spotifyTrackId": "7nEHTOQJqKCx7Dvgng3l8t",
     "youtubeClips": [
@@ -22111,7 +19762,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "nordic"
     ],
     "genrePackages": [
       "Melodifestivalen"
@@ -22124,34 +19775,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2024 vinnare. ESC 2024 official music video."
-      }
-    ]
-  },
-  {
-    "id": "moregard-os-brons-paris-2024",
-    "displayName": "Truls Möregård OS-brons bordtennis Paris",
-    "correctYear": 2024,
-    "contentSubject": "sport-event",
-    "questionText": "Which Year did this happen?",
-    "itemHcp": 72,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "npkVrfT11zQ",
-        "startSec": 80,
-        "endSec": 110,
-        "channelTitle": "Kanal 5 Sverige",
-        "license": "standard",
-        "notes": "Kanal 5 Sverige — Truls Möregårds OS-brons i bordtennis Paris 2024."
       }
     ]
   },
@@ -22170,7 +19793,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -22202,7 +19825,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -22230,7 +19853,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -22313,7 +19936,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "genrePackages": [
       "Eurovision"
@@ -22436,7 +20059,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {
@@ -22505,7 +20128,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "3AGFGLUAhu0Cwv1Mkea3d4",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "c37GL5IZG-o",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "dara-bangaranga",
@@ -22522,7 +20152,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision"
@@ -22588,7 +20218,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "europe"
     ],
     "genrePackages": [
       "Eurovision",
@@ -22620,7 +20250,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "gen-alpha"
     ],
     "region": [
-      "sweden"
+      "global"
     ],
     "youtubeClips": [
       {

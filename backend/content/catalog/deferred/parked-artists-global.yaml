@@ -186,3 +186,35 @@ items:
     probability: 90
     wikimediaSearchHints: ["Andrea Bocelli tenor"]
     answerMethods: ["timeline", "name-letters"]
+  - id: barbro-horberg
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Barbro Hörberg"
+    correctYear: 1932
+    probability: 70
+    wikimediaSearchHints: ["Barbro Hörberg Swedish singer songwriter Man borde inte sova"]
+    answerMethods: ["timeline", "name-letters"]
+    region: ["sweden"]
+  - id: bill-withers
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bill Withers"
+    correctYear: 1938
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Bill Withers"]
+    answerMethods: ["name-letters"]
+  - id: snow
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Snow"
+    correctYear: 1969
+    probability: 65
+    region: ["global"]
+    wikimediaSearchHints: ["Snow"]
+    answerMethods: ["name-letters"]
+  - id: vincent-pontare
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Vincent"
+    correctYear: 1987
+    probability: 72
+    wikimediaSearchHints: ["Vincent Pontare Swedish singer Mapei Mariko"]
+    answerMethods: ["timeline", "name-letters"]
+    region: ["sweden"]

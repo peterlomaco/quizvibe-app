@@ -29,7 +29,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Aqua Barbie Girl 1997"]
     answerMethods: ["timeline"]
-    genrePackages: ["Eurodance & pop"]
+    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "twW5slEK8wY"
         startSec: 0
@@ -50,6 +50,7 @@ items:
         startSec: 0
         endSec: 237
         channelTitle: "Cher"
+    region: ["global"]
   - id: madonna-frozen
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Frozen — Madonna"
@@ -62,6 +63,7 @@ items:
         startSec: 0
         endSec: 329
         channelTitle: "Madonna"
+    region: ["global"]
   - id: petter-vinden-har-vant
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vinden har vänt — Petter"
@@ -71,6 +73,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "2XkMVyMLZhrUivl7XuhidO"
   # 1999
+    genrePackages: ["Hip Hop"]
+    youtubeClips:
+      - videoId: "gITjhYfdjvs"
+        startSec: 0
+        endSec: 15
   - id: lou-bega-mambo-no-5
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mambo No. 5 — Lou Bega"
@@ -98,6 +105,7 @@ items:
         endSec: 220
         channelTitle: "Eiffel 65 - Topic"
   # 2000
+    region: ["global"]
   - id: britney-spears-oops-i-did-it-again
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Oops!... I Did It Again — Britney Spears"
@@ -110,6 +118,7 @@ items:
         startSec: 0
         endSec: 211
         channelTitle: "Unique Sound"
+    region: ["global"]
   - id: coldplay-yellow
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Yellow — Coldplay"
@@ -122,6 +131,7 @@ items:
         startSec: 0
         endSec: 273
         channelTitle: "Coldplay"
+    region: ["global"]
   - id: dr-dre-the-next-episode
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Next Episode — Dr. Dre ft. Snoop Dogg"
@@ -129,7 +139,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Dr Dre The Next Episode 2001"]
     answerMethods: ["timeline"]
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     parentControlled: true
     spotifyTrackId: "4LwU4Vp6od3Sb08CsP99GC"
     youtubeClips:
@@ -138,6 +148,7 @@ items:
         endSec: 30
         channelTitle: "Dr. Dre"
   # 2001
+    region: ["global"]
   - id: lady-marmalade-2001
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lady Marmalade — Christina Aguilera, Lil' Kim, Mýa & Pink"
@@ -151,6 +162,7 @@ items:
         endSec: 45
         channelTitle: "MUSIC EVOLUTION"
         notes: "Official Video 4K 60fps remaster — HD-fix av tidigare SD-klipp 2026-05-22. Refrängområde."
+    region: ["global"]
   - id: alicia-keys-fallin
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fallin' — Alicia Keys"
@@ -164,6 +176,7 @@ items:
         endSec: 211
         channelTitle: "Bussin"
   # 2002
+    region: ["global"]
   - id: eminem-without-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Without Me — Eminem"
@@ -176,6 +189,7 @@ items:
         startSec: 0
         endSec: 291
         channelTitle: "Solitude Songs"
+    region: ["global"]
   - id: avril-lavigne-complicated
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Complicated — Avril Lavigne"
@@ -189,6 +203,7 @@ items:
         endSec: 244
         channelTitle: "7clouds"
   # 2003
+    region: ["global"]
   - id: 50-cent-in-da-club
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In da Club — 50 Cent"
@@ -196,7 +211,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["50 Cent In da Club Get Rich or Die Tryin"]
     answerMethods: ["timeline"]
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     parentControlled: true
     spotifyTrackId: "7iL6o9tox1zgHpKUfh9vuC"
     youtubeClips:
@@ -204,6 +219,7 @@ items:
         startSec: 0
         endSec: 194
         channelTitle: "50 Cent - Topic"
+    region: ["global"]
   - id: sarek-genom-eld-och-vatten
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Genom eld och vatten — Sarek"
@@ -232,6 +248,7 @@ items:
         startSec: 0
         endSec: 251
         channelTitle: "7clouds"
+    region: ["global"]
   - id: o-zone-dragostea-din-tei
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dragostea Din Tei — O-Zone"
@@ -245,6 +262,7 @@ items:
         endSec: 224
         channelTitle: "Lyrixa"
   # 2005
+    region: ["europe"]
   - id: madonna-hung-up
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hung Up — Madonna"
@@ -257,6 +275,7 @@ items:
         startSec: 63
         endSec: 93
         channelTitle: "Madonna"
+    region: ["global"]
   - id: gorillaz-feel-good-inc
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Feel Good Inc. — Gorillaz"
@@ -270,6 +289,7 @@ items:
         endSec: 255
         channelTitle: "Gorillaz"
   # 2006
+    region: ["global"]
   - id: gnarls-barkley-crazy
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Crazy — Gnarls Barkley"
@@ -282,6 +302,7 @@ items:
         startSec: 0
         endSec: 181
         channelTitle: "Gnarls Barkley Official"
+    region: ["global"]
   - id: shakira-hips-dont-lie
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hips Don't Lie — Shakira"
@@ -296,6 +317,7 @@ items:
         channelTitle: "Mix Sabrosura"
         notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
   # 2007
+    region: ["global"]
   - id: rihanna-umbrella
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Umbrella — Rihanna"
@@ -308,6 +330,7 @@ items:
         startSec: 6
         endSec: 273
         channelTitle: "Pillow"
+    region: ["global"]
   - id: timbaland-onerepublic-apologize
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Apologize — Timbaland & OneRepublic"
@@ -321,6 +344,7 @@ items:
         endSec: 45
         channelTitle: "Lost Panda"
   # 2008
+    region: ["global"]
   - id: coldplay-viva-la-vida
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Viva la Vida — Coldplay"
@@ -333,6 +357,7 @@ items:
         startSec: 0
         endSec: 243
         channelTitle: "Coldplay"
+    region: ["global"]
   - id: katy-perry-i-kissed-a-girl
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Kissed a Girl — Katy Perry"
@@ -346,6 +371,7 @@ items:
         endSec: 180
         channelTitle: "Katy Perry - Topic"
   # 2009
+    region: ["global"]
   - id: lady-gaga-bad-romance
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bad Romance — Lady Gaga"
@@ -358,6 +384,7 @@ items:
         startSec: 0
         endSec: 293
         channelTitle: "7clouds"
+    region: ["global"]
   - id: black-eyed-peas-i-gotta-feeling
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Gotta Feeling — The Black Eyed Peas"
@@ -377,6 +404,7 @@ items:
         channelTitle: "Popular Music"
         notes: "Peter-kurerad 2026-08-27. Ersatte Topic-klippet OIPmhkzN2ug. Lyrics-version. startSec 15 angiven av Peter."
   # 2010
+    region: ["global"]
   - id: shakira-waka-waka
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Waka Waka (This Time for Africa) — Shakira"
@@ -394,6 +422,7 @@ items:
         startSec: 0
         endSec: 202
         channelTitle: "7clouds"
+    region: ["global"]
   - id: eminem-rihanna-love-the-way-you-lie
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Love the Way You Lie — Eminem & Rihanna"
@@ -406,6 +435,7 @@ items:
         startSec: 0
         endSec: 264
         channelTitle: "Eminem - Topic"
+    region: ["global"]
   - id: timoteij-kom
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kom — Timoteij"
@@ -436,6 +466,7 @@ items:
         endSec: 35
         channelTitle: "Kontor.TV"
   # 2012
+    region: ["global"]
   - id: psy-gangnam-style
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gangnam Style — PSY"
@@ -448,6 +479,7 @@ items:
         startSec: 0
         endSec: 253
         channelTitle: "officialpsy"
+    region: ["global"]
   - id: carly-rae-jepsen-call-me-maybe
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Call Me Maybe — Carly Rae Jepsen"
@@ -462,6 +494,7 @@ items:
         channelTitle: "CarlyRaeJepsenVEVO"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Ersatte reuploaden 47EG91_XHic (Unique Vibes) med officiella Vevo-klippet."
   # === Content-expansion 2026-05-29: fler ikoniska 00-10-tals-låtar ===
+    region: ["global"]
   - id: white-stripes-seven-nation-army
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Seven Nation Army — The White Stripes"
@@ -475,6 +508,7 @@ items:
         endSec: 45
         channelTitle: "The White Stripes"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["europe"]
   - id: outkast-hey-ya
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hey Ya! — OutKast"
@@ -488,6 +522,7 @@ items:
         endSec: 45
         channelTitle: "MASTER RJ"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["global"]
   - id: the-killers-mr-brightside
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mr. Brightside — The Killers"
@@ -501,6 +536,7 @@ items:
         endSec: 45
         channelTitle: "Rock Preservation Society"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["global"]
   - id: adele-rolling-in-the-deep
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rolling in the Deep — Adele"
@@ -514,6 +550,7 @@ items:
         endSec: 45
         channelTitle: "Adele"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["global"]
   - id: lmfao-party-rock-anthem
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Party Rock Anthem — LMFAO"
@@ -527,6 +564,7 @@ items:
         endSec: 45
         channelTitle: "Musikmix Germany"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["global"]
   - id: gotye-somebody-that-i-used-to-know
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Somebody That I Used to Know — Gotye"
@@ -540,6 +578,7 @@ items:
         endSec: 105
         channelTitle: "Gotye"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["global"]
   - id: coldplay-the-scientist
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Scientist — Coldplay"
@@ -553,6 +592,7 @@ items:
         endSec: 45
         channelTitle: "Coldplay"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (13)."
+    region: ["global"]
   - id: robyn-dancing-on-my-own
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dancing on My Own — Robyn"
@@ -567,6 +607,7 @@ items:
         endSec: 45
         channelTitle: "Embassy One"
         notes: "Officiell MV via Embassy One (Robyns label). Ersätter Topic-versionen (statisk albumkonst)."
+    region: ["nordic"]
   - id: swedish-house-mafia-dont-you-worry-child
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don't You Worry Child — Swedish House Mafia"
@@ -581,6 +622,7 @@ items:
         endSec: 30
         channelTitle: "Aernoron"
         notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
+    region: ["global"]
   - id: eric-prydz-call-on-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Call on Me — Eric Prydz"
@@ -590,7 +632,7 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "1As4KC3YYpu89aBt7EqL2m"
     region: ["europe"]
-    genrePackages: ["Club Hits"]
+    genrePackages: ["Club & Dance"]
     inBaseCatalog: false
     parentControlled: true
     youtubeClips:
@@ -638,7 +680,8 @@ items:
         endSec: 35
         channelTitle: "GlyphoricVibes"
         notes: "Peter-kurerad 2026-08-27. Lyrics. startSec 5 angiven av Peter."
-    genrePackages: ["Hits", "Love & Peace"]
+    genrePackages: ["Hits", "Soft & Love"]
+    region: ["global"]
   - id: bruno-mars-just-the-way-you-are
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Just the Way You Are — Bruno Mars"
@@ -652,6 +695,7 @@ items:
         endSec: 45
         channelTitle: "Bruno Mars"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["global"]
   - id: bon-jovi-its-my-life
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "It's My Life — Bon Jovi"
@@ -665,6 +709,7 @@ items:
         endSec: 45
         channelTitle: "Jon Bon Jovi - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: veronica-maggio-jag-kommer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jag kommer — Veronica Maggio"
@@ -687,6 +732,7 @@ items:
     wikimediaSearchHints: ["The Hives Hate to Say I Told You So 2000"]
     answerMethods: ["timeline"]
     spotifyTrackId: "6xxXrNJnnsQNLdgNk8S4y8" # bytt 2026-07-18 — gamla ID:t 404:ade (track borttagen/relinkad av Spotify)
+    region: ["nordic"]
   - id: timbuktu-alla-vill-till-himlen
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alla vill till himlen — Timbuktu"
@@ -708,6 +754,7 @@ items:
     wikimediaSearchHints: ["Robyn With Every Heartbeat 2007"]
     answerMethods: ["timeline"]
     spotifyTrackId: "0NEw29HKkDkt1yDyBJOgXe"
+    region: ["nordic"]
   - id: lady-gaga-poker-face
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Poker Face — Lady Gaga"
@@ -721,6 +768,7 @@ items:
         endSec: 60
         channelTitle: "LadyGagaVEVO"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Ersatte Topic-audion oG-4Uvhm4lI med officiella musikvideon."
+    region: ["global"]
   - id: mando-diao-dance-with-somebody
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dance with Somebody — Mando Diao"
@@ -748,6 +796,7 @@ items:
         endSec: 67
         channelTitle: "PremiunMusicHD"
     spotifyTrackId: "1z9kQ14XBSN0r2v6fx4IdG"
+    region: ["global"]
   - id: first-aid-kit-emmylou
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Emmylou — First Aid Kit"
@@ -762,6 +811,7 @@ items:
         endSec: 45
         channelTitle: "First Aid Kit"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["nordic"]
   - id: icona-pop-i-love-it
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Love It — Icona Pop"
@@ -811,6 +861,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1999 vinnare, ESC-vinnare 1999. ESC-version på engelska (Take Me To Your Heaven)."
     genrePackages: ["Eurovision", "Melodifestivalen"]
+    region: ["nordic"]
   - id: roger-pontare-vindarna-viskar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "När vindarna viskar mitt namn — Roger Pontare"
@@ -881,6 +932,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2007 vinnare. ESC 2007 performance."
     genrePackages: ["Melodifestivalen"]
+    region: ["nordic"]
   - id: charlotte-perrelli-hero
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hero — Charlotte Perrelli"
@@ -909,6 +961,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 2009 vinnare. ESC 2009 performance."
     genrePackages: ["Eurovision", "Melodifestivalen"]
+    region: ["europe"]
   - id: anna-bergendahl-this-is-my-life
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "This Is My Life — Anna Bergendahl"
@@ -923,6 +976,7 @@ items:
         channelTitle: "Anakina_Skywalker"
         notes: "Melodifestivalen 2010 vinnare."
     genrePackages: ["Eurovision", "Melodifestivalen"]
+    region: ["nordic"]
   - id: eric-saade-popular
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Popular — Eric Saade"
@@ -937,6 +991,7 @@ items:
         channelTitle: "Eric Saade"
         notes: "Melodifestivalen 2011 vinnare. Officiell music video (Director's Cut)."
     genrePackages: ["Eurovision", "Melodifestivalen"]
+    region: ["europe"]
   # ===== Eurovision Song Contest vinnare =====
   - id: katrina-waves-love-shine-a-light
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -953,6 +1008,7 @@ items:
         notes: "ESC 1997 vinnare — Storbritannien."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["europe"]
   - id: dana-international-diva
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Diva — Dana International"
@@ -969,6 +1025,7 @@ items:
         notes: "ESC 1998 vinnare — Israel."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["europe"]
   - id: olsen-brothers-fly-on-wings-of-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fly on the Wings of Love — Olsen Brothers"
@@ -983,6 +1040,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2000 vinnare — Danmark."
     genrePackages: ["Eurovision"]
+    region: ["europe"]
   - id: tanel-padar-everybody
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Everybody — Tanel Padar, Dave Benton & 2XL"
@@ -998,6 +1056,7 @@ items:
         notes: "ESC 2001 vinnare — Estland."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["unknown-region"]
   - id: marie-n-i-wanna
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Wanna — Marie N"
@@ -1009,6 +1068,7 @@ items:
     # Itemet ar utan media tills ersattning finns.
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["unknown-region"]
   - id: sertab-erener-everyway-that-i-can
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Everyway That I Can — Sertab Erener"
@@ -1024,6 +1084,7 @@ items:
         notes: "ESC 2003 vinnare — Turkiet."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["europe"]
   - id: ruslana-wild-dances
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Wild Dances — Ruslana"
@@ -1039,6 +1100,7 @@ items:
         notes: "ESC 2004 vinnare — Ukraina. Officiell remastered MV."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["europe"]
   - id: helena-paparizou-my-number-one
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My Number One — Helena Paparizou"
@@ -1054,6 +1116,7 @@ items:
         notes: "ESC 2005 vinnare — Grekland."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["europe"]
   - id: lordi-hard-rock-hallelujah
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hard Rock Hallelujah — Lordi"
@@ -1068,6 +1131,7 @@ items:
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2006 vinnare — Finland."
     genrePackages: ["Eurovision"]
+    region: ["nordic"]
   - id: marija-serifovic-molitva
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Molitva — Marija Šerifović"
@@ -1097,6 +1161,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "ESC 2009 vinnare — Norge."
+    region: ["europe"]
   - id: lena-satellite
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Satellite — Lena"
@@ -1112,6 +1177,7 @@ items:
         notes: "ESC 2010 vinnare — Tyskland. Officiell music video."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["unknown-region"]
   - id: ell-nikki-running-scared
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Running Scared — Ell & Nikki"
@@ -1127,6 +1193,7 @@ items:
         notes: "ESC 2011 vinnare — Azerbajdzjan. Officiell music video."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["global"]
   - id: barbados-kom-hem
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kom hem — Barbados"
@@ -1203,6 +1270,7 @@ items:
         endSec: 30
         channelTitle: "Bellini_Music_Official"
         notes: "Officiell artist-kanal Bellini_Music_Official."
+    region: ["global"]
   - id: rolandz-jajamen
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jajamen — Rolandz"
@@ -1210,8 +1278,12 @@ items:
     probability: 80
     wikimediaSearchHints: ["Rolandz Jajamen 2010 Swedish dansband"]
     answerMethods: ["timeline"]
-    genrePackages: ["dansband"]
+    genrePackages: ["Dansband", "100% in swedish"]
     spotifyTrackId: "6kKJbnWfmVUKnhqa8n17xT"
+    youtubeClips:
+      - videoId: "rU-ngQ5hSF8"
+        startSec: 0
+        endSec: 15
   - id: hadise-dum-tek-tek
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dum Tek Tek — Hadise"
@@ -1243,6 +1315,7 @@ items:
         endSec: 30
         channelTitle: "Southside Spinners"
         notes: "Official video 2000."
+    region: ["global"]
   - id: antique-die-for-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "(I Would) Die for You — Antique"
@@ -1257,6 +1330,9 @@ items:
         endSec: 30
         channelTitle: "Antique"
         notes: "Official music video. ESC 2001 Greece entry (3rd place)."
+      - videoId: "VVLfuW3KiLY"
+        startSec: 0
+        endSec: 15
     inBaseCatalog: false
   - id: eminem-my-name-is
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1265,12 +1341,20 @@ items:
     probability: 86
     wikimediaSearchHints: ["Eminem My Name Is 1999 Slim Shady LP hip hop"]
     answerMethods: ["timeline"]
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     parentControlled: true
     spotifyTrackId: "75IN3CtuZwTHTnZvYM4qnJ"
     # youtubeClips borttagna 2026-08-10: EAKfXCRmhq8 (Eminem, officiell kanal) har
     # embedding avstängd → "Video unavailable" i spelaren. Lever vidare som
     # Spotify-only DJ-runda. Ersättningsklipp krävs.
+    region: ["global"]
+    youtubeClips:
+      - videoId: "sNPnbI1arSE"
+        startSec: 10
+        endSec: 25
+      - videoId: "EAKfXCRmhq8"
+        startSec: 0
+        endSec: 15
   - id: outkast-ms-jackson
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ms. Jackson — OutKast"
@@ -1278,7 +1362,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["OutKast Ms. Jackson 2000 Stankonia hip hop"]
     answerMethods: ["timeline"]
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     parentControlled: true
     youtubeClips:
       - videoId: "EUVo8epKwv0"
@@ -1292,6 +1376,7 @@ items:
   # annat. correctYear 1994 = debutalbumet Cajsa Stina + singeln samma år.
   # OBS: filen är songs-gen-z men release-året är 1994 (millennials-eran) —
   # flytt lämnad åt en curation-pass; audience är ändå item-taggad.
+    region: ["global"]
   - id: cajsa-stina-akerstrom-fraga-stjarnorna
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fråga stjärnorna — Cajsa Stina Åkerström"
@@ -1299,13 +1384,17 @@ items:
     probability: 75
     wikimediaSearchHints: ["Cajsa Stina Åkerström Fråga stjärnorna 1994 Swedish"]
     answerMethods: ["timeline"]
-    genrePackages: ["100% svenska"]
+    genrePackages: ["100% in swedish", "Soft & Love"]
     spotifyTrackId: "1QJcdzMUidsBaMTHoZZRGn"
   # Titeln rättad 2026-08-19 (spotify-identity-audit): itemet hette
   # "Ding Ding Dong" — låten heter "Ding Dong Song" (Günther & The Sunshine
   # Girls, a.k.a. "Tu es foutu"). Rätt spår hela tiden, bara reveal-kortets
   # titel var fel. Spotify-ID:t bär suffixet "- Radio Edit" som auditens
   # normalisering skalar bort.
+    youtubeClips:
+      - videoId: "MDNeDz-I9mE"
+        startSec: 7
+        endSec: 22
   - id: gunther-ding-dong-song
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ding Dong Song — Günther"
@@ -1317,6 +1406,10 @@ items:
     # youtubeClips borttagna 2026-08-10: uUYplyWPKGk (Günther) är raderad/privat →
     # "Video unavailable" i spelaren. Lever vidare som Spotify-only DJ-runda.
     # Ersättningsklipp krävs.
+    youtubeClips:
+      - videoId: "SZNVTkT1DNs"
+        startSec: 0
+        endSec: 15
   - id: jay-z-empire-state-of-mind
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Empire State of Mind — Jay-Z ft. Alicia Keys"
@@ -1335,6 +1428,7 @@ items:
   # Flyttad hit från songs-millennials.yaml 2026-08-11: correctYear rättat
   # 1996 → 1999 (låten fanns först på singeln "Musik non stop" 15 nov 1999
   # / albumet Hagnesta Hill 6 dec 1999), vilket flyttar den till gen-z-eran.
+    region: ["global"]
   - id: kent-music-non-stop
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Music Non Stop — Kent"
@@ -1374,6 +1468,7 @@ items:
         endSec: 30
         channelTitle: "Frank Rovers"
         notes: "Peter-kurerad 2026-08-11. OBS: re-upload, inte officiell VEVO-kanal - hogre takedown-risk, nightly autofix-cron plockar upp om den forsvinner."
+    region: ["global"]
   - id: bryan-adams-when-youre-gone
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "When You're Gone — Bryan Adams & Melanie C"
@@ -1382,7 +1477,11 @@ items:
     wikimediaSearchHints: ["Bryan Adams Melanie C When Youre Gone 1998"]
     answerMethods: ["timeline"]
     spotifyTrackId: "7p9dd71JR2ucoAuO1Sy0VZ"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "_W2jONIjrM0"
+        startSec: 0
+        endSec: 15
+    region: ["global"]
   - id: lady-gaga-just-dance
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Just Dance — Lady Gaga"
@@ -1391,7 +1490,14 @@ items:
     wikimediaSearchHints: ["Lady Gaga Just Dance 2008 The Fame"]
     answerMethods: ["timeline"]
     spotifyTrackId: "5vQXxfGn1bjv5WESrYVVpw"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "2Abk1jAONjw"
+        startSec: 4
+        endSec: 19
+      - videoId: "zVH638r_X_I"
+        startSec: 6
+        endSec: 21
+    region: ["global"]
   # === Tillagg 2026-08-14 (Peters lista) ===
   - id: bloodhound-gang-the-bad-touch
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1406,6 +1512,7 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = albumet Hooray for Boobies (okt 1999 i Europa), forsta gangen laten gick att hora. Singeln kom i nov 1999."
+    region: ["global"]
   - id: kylie-minogue-spinning-around
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Spinning Around — Kylie Minogue"
@@ -1419,6 +1526,7 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (juni 2000), fore albumet Light Years (sept 2000)."
+    region: ["global"]
   - id: kylie-minogue-cant-get-you-out-of-my-head
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Can't Get You Out of My Head — Kylie Minogue"
@@ -1433,6 +1541,7 @@ items:
         notes: "Peter-kurerad 2026-08-14. Kanal ej verifierad."
     notes: "correctYear = singeln (sept 2001), fore albumet Fever (okt 2001)."
   # === Tillagg 2026-08-14 (Peters global-lista) ===
+    region: ["global"]
   - id: ricky-martin-livin-la-vida-loca
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Livin' la Vida Loca — Ricky Martin"
@@ -1454,10 +1563,10 @@ items:
     displayName: "One (Your Name) — Swedish House Mafia"
     correctYear: 2010
     probability: 80
-    region: ["sweden"]
+    region: ["global"]
     wikimediaSearchHints: ["Swedish House Mafia One Your Name Pharrell"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "RVnsoTsG1Rg"
         startSec: 30
@@ -1472,7 +1581,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["David Guetta Gettin Over You"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "hWjrMTWXH28"
         startSec: 8
@@ -1484,10 +1593,10 @@ items:
     displayName: "Utan dina andetag — Kent"
     correctYear: 1997
     probability: 80
-    region: ["sweden"]
+    region: ["nordic"]
     wikimediaSearchHints: ["Kent Utan dina andetag Isola"]
     answerMethods: ["timeline"]
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
     spotifyTrackId: "5eJ314ozT4CTPlyjdsGq78"
     youtubeClips:
       - videoId: "Q-qnIk9Oxlg"
@@ -1519,7 +1628,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Alex Gaudino Destination Calabria Crystal Waters"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "Kq4OtRsdXls"
         startSec: 0
@@ -1534,7 +1643,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Benny Benassi Satisfaction Hypnotica"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "y4gm5MdWg3M"
         startSec: 0
@@ -1549,7 +1658,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Vengaboys Boom Boom Boom Boom"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "llyiQ4I-mcQ"
         startSec: 0
@@ -1578,7 +1687,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Enrique Iglesias Bailamos Wild Wild West"]
     answerMethods: ["timeline"]
-    genrePackages: ["Film"]
+    genrePackages: ["Film edition"]
     youtubeClips:
       - videoId: "bJE308E1gTk"
         startSec: 15
@@ -1622,7 +1731,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Yves Larock Rise Up Jaba"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "zwcmZ0mGQno"
         startSec: 0
@@ -1651,7 +1760,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Kate Ryan Desenchantee"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "f_vyYpNDXkI"
         startSec: 0
@@ -1666,7 +1775,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Kate Ryan Voyage Voyage"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "XT9IDo-vF5k"
         startSec: 0
@@ -1956,7 +2065,7 @@ items:
         endSec: 46
         channelTitle: "RihannaVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
   - id: katy-perry-california-gurls
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "California Gurls — Katy Perry feat. Snoop Dogg"
@@ -1971,7 +2080,7 @@ items:
         endSec: 32
         channelTitle: "KatyPerryVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
   - id: rihanna-dont-stop-the-music
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don’t Stop the Music — Rihanna"
@@ -1986,7 +2095,7 @@ items:
         endSec: 41
         channelTitle: "RihannaVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
   - id: jessie-j-price-tag
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Price Tag — Jessie J feat. B.o.B"
@@ -2015,7 +2124,7 @@ items:
         endSec: 33
         channelTitle: "NellyFurtadoVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
   - id: kesha-tik-tok
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "TiK ToK — Kesha"
@@ -2030,7 +2139,7 @@ items:
         endSec: 39
         channelTitle: "keshaVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
   - id: selena-gomez-love-you-like-a-love-song
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Love You Like a Love Song — Selena Gomez & the Scene"
@@ -2045,7 +2154,7 @@ items:
         endSec: 50
         channelTitle: "SelenaGomezVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
   - id: whitney-houston-when-you-believe
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "When You Believe — Whitney Houston & Mariah Carey"
@@ -2060,7 +2169,7 @@ items:
         endSec: 60
         channelTitle: "whitneyhoustonVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
   - id: ne-yo-because-of-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Because of You — Ne-Yo"
@@ -2075,7 +2184,7 @@ items:
         endSec: 40
         channelTitle: "NeYoVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
   - id: chris-brown-with-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "With You — Chris Brown"
@@ -2090,7 +2199,7 @@ items:
         endSec: 30
         channelTitle: "ChrisBrownVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
   - id: k-ci-and-jojo-all-my-life
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "All My Life — K-Ci & JoJo"
@@ -2105,7 +2214,7 @@ items:
         endSec: 37
         channelTitle: "KCiAndJoJoVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
   - id: rihanna-hate-that-i-love-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hate That I Love You — Rihanna feat. Ne-Yo"
@@ -2120,7 +2229,7 @@ items:
         endSec: 60
         channelTitle: "RihannaVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
   - id: beyonce-love-on-top
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Love On Top — Beyoncé"
@@ -2135,7 +2244,7 @@ items:
         endSec: 30
         channelTitle: "BeyoncéVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
   - id: nelly-dilemma
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dilemma — Nelly feat. Kelly Rowland"
@@ -2150,7 +2259,7 @@ items:
         endSec: 53
         channelTitle: "NellyVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
   - id: timbaland-the-way-i-are
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Way I Are — Timbaland feat. Keri Hilson"
@@ -2165,7 +2274,7 @@ items:
         endSec: 38
         channelTitle: "TimbalandVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
   - id: nelly-furtado-maneater
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Maneater — Nelly Furtado"
@@ -2180,7 +2289,7 @@ items:
         endSec: 117
         channelTitle: "NellyFurtadoVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
   - id: rihanna-we-found-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Found Love — Rihanna feat. Calvin Harris"
@@ -2195,7 +2304,7 @@ items:
         endSec: 82
         channelTitle: "RihannaVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
   - id: britney-spears-me-against-the-music
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Me Against the Music — Britney Spears feat. Madonna"
@@ -2270,7 +2379,7 @@ items:
         endSec: 49
         channelTitle: "Brandy Videos"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Soft Hits"]
+    genrePackages: ["Soft & Love"]
   - id: blink-182-all-the-small-things
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "All the Small Things — blink-182"
@@ -2300,7 +2409,7 @@ items:
         endSec: 33
         channelTitle: "OffspringVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Punk & Rock"]
+    genrePackages: ["Rock & Punk"]
   - id: jennifer-lopez-love-dont-cost-a-thing
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Love Don’t Cost a Thing — Jennifer Lopez"
@@ -2315,7 +2424,7 @@ items:
         endSec: 65
         channelTitle: "JenniferLopezVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace", "Soft & Ballads"]
+    genrePackages: ["Soft & Love"]
   - id: jennifer-lopez-if-you-had-my-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "If You Had My Love — Jennifer Lopez"
@@ -2330,7 +2439,7 @@ items:
         endSec: 60
         channelTitle: "JenniferLopezVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Love & Peace", "Soft & Ballads"]
+    genrePackages: ["Soft & Love"]
     inBaseCatalog: false
   - id: goo-goo-dolls-iris
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2361,7 +2470,7 @@ items:
         endSec: 34
         channelTitle: "SavageGardenVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Soft & Ballads"]
+    genrePackages: ["Soft & Love"]
     inBaseCatalog: false
   - id: eagle-eye-cherry-save-tonight
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2377,7 +2486,7 @@ items:
         endSec: 33
         channelTitle: "EagleEyeCherryVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). xlsx hade artist och lat i omvand ordning."
-    genrePackages: ["Soft & Ballads"]
+    genrePackages: ["Soft & Love"]
     inBaseCatalog: false
   - id: shania-twain-youre-still-the-one
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2393,7 +2502,7 @@ items:
         endSec: 35
         channelTitle: "ShaniaTwainVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1997 = albumet Come On Over (nov 1997); singeln kom 1998."
-    genrePackages: ["Soft & Ballads", "Love & Peace"]
+    genrePackages: ["Soft & Love"]
     inBaseCatalog: false
   - id: smash-mouth-all-star
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2409,7 +2518,7 @@ items:
         endSec: 67
         channelTitle: "SmashMouthVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1999 = albumet Astro Lounge (MusicBrainz gav felaktigt 1997)."
-    genrePackages: ["Punk & Rock"]
+    genrePackages: ["Rock & Punk"]
     inBaseCatalog: false
   - id: hanson-mmmbop
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2440,4 +2549,44 @@ items:
         endSec: 34
         channelTitle: "Timbuktu"
         notes: "Peter-kurerad 2026-08-27. startSec 4 angiven av Peter. NYTT item - katalogen hade bara artist-itemet timbuktu (hints), ingen lat. correctYear 2005 = albumet med samma namn (23 feb 2005)."
-    genrePackages: ["100% svenska"]
+    genrePackages: ["100% in swedish"]
+  - id: antique-opa-opa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Opa Opa — Antique"
+    correctYear: 1999
+    probability: 70
+    region: ["sweden"]
+    wikimediaSearchHints: ["Antique Opa Opa"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "HiWQC4Ynu2k"
+        startSec: 23
+        endSec: 38
+  - id: antique-dinata-dinata
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dinata Dinata — Antique"
+    correctYear: 1999
+    probability: 70
+    region: ["sweden"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Antique Dinata Dinata"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance"]
+    youtubeClips:
+      - videoId: "474UjAuu0mc"
+        startSec: 0
+        endSec: 15
+  - id: antique-follow-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Follow Me — Antique"
+    correctYear: 2002
+    probability: 70
+    region: ["sweden"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Antique Follow Me"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance"]
+    youtubeClips:
+      - videoId: "ywH2os9XB88"
+        startSec: 0
+        endSec: 15

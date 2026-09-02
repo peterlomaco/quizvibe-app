@@ -36,6 +36,7 @@ items:
         endSec: 45
         channelTitle: "PhilGoodFactor1"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+    region: ["global"]
   - id: beatles-all-you-need-is-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "All You Need Is Love — The Beatles"
@@ -43,6 +44,15 @@ items:
     probability: 90
     wikimediaSearchHints: ["The Beatles All You Need Is Love"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "Mki34tyoCp0"
+        startSec: 8
+        endSec: 23
+      - videoId: "sHBOM8m4ygM"
+        startSec: 8
+        endSec: 23
     # youtubeClips borttagna 2026-08-10: Lm9Uy7_EqNc (MusicClub80s, re-upload) är
     # raderad/privat → "Video unavailable" i spelaren. Ersättningsklipp krävs.
   - id: beatles-hey-jude
@@ -58,6 +68,7 @@ items:
         endSec: 30
         channelTitle: "The Beatles - Topic"
         notes: "Officiell album-audio via YouTube Topic (Remastered 2015). Opening 'Hey Jude'-hook."
+    region: ["global"]
   - id: elvis-presley-suspicious-minds
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Suspicious Minds — Elvis Presley"
@@ -71,6 +82,7 @@ items:
         endSec: 45
         channelTitle: "Elvis Presley - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: simon-garfunkel-bridge-over-troubled-water
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bridge Over Troubled Water — Simon & Garfunkel"
@@ -84,6 +96,7 @@ items:
         endSec: 75
         channelTitle: "Simon & Garfunkel - Topic"
         notes: "Officiell album-audio via YouTube Topic. Chorus area."
+    region: ["global"]
   - id: john-lennon-imagine
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Imagine — John Lennon"
@@ -97,6 +110,7 @@ items:
         endSec: 45
         channelTitle: "John Lennon - Topic"
         notes: "Officiell album-audio via YouTube Topic (Ultimate Mix). Mid-song."
+    region: ["global"]
   - id: bill-withers-lean-on-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lean on Me — Bill Withers"
@@ -110,6 +124,7 @@ items:
         endSec: 45
         channelTitle: "Bill Withers - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: roberta-flack-killing-me-softly
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Killing Me Softly with His Song — Roberta Flack"
@@ -123,6 +138,7 @@ items:
         endSec: 45
         channelTitle: "RHINO"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (3)."
+    region: ["global"]
   - id: abba-waterloo
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Waterloo — ABBA"
@@ -138,6 +154,7 @@ items:
         channelTitle: "AbbaVEVO"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Officiell musikvideo; ersatte Topic-audion 9y-8ZiAJiQo. Titeln namner inte Eurovision/artal."
     genrePackages: ["Eurovision", "Melodifestivalen"]
+    region: ["global"]
   # Bohemian Rhapsody flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   # Hotel California flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: bee-gees-stayin-alive
@@ -154,6 +171,7 @@ items:
         endSec: 45
         channelTitle: "beegees"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["global"]
   - id: chic-le-freak
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Le Freak — Chic"
@@ -172,6 +190,7 @@ items:
         endSec: 34
         channelTitle: "Justified Melody"
         notes: "Peter-kurerad 2026-08-27. Lyrics. startSec 4 angiven av Peter. Peters egna 3Mdh3IrLV0c gick INTE att badda in (embeddable=false)."
+    region: ["global"]
   - id: queen-another-one-bites-the-dust
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Another One Bites the Dust — Queen"
@@ -185,12 +204,11 @@ items:
         startSec: 0
         endSec: 15
         channelTitle: "Queen Official"
-        notes: "Bytt 2026-08-10: gamla klippet (Y09uL2qbYCg, Queen - Topic) hade
-          allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster
-          från rättsinnehavarens kanal, HD, blockerad enbart i RU."
+        notes: "Bytt 2026-08-10: gamla klippet (Y09uL2qbYCg, Queen - Topic) hade allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster från rättsinnehavarens kanal, HD, blockerad enbart i RU."
   # Expansion 2026-05-26: 16 nya iconic items för 1965-1978 så density blir
   # 2/år (matchar songs-millennials/gen-z/gen-alpha). Bohemian Rhapsody +
   # Hotel California + Dancing Queen utelämnade — finns i songs-all.yaml.
+    region: ["global"]
   - id: the-who-my-generation
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "My Generation — The Who"
@@ -213,7 +231,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Rolling Stones Paint It Black 1966"]
     answerMethods: ["timeline"]
-    genrePackages: ["rock"]
+    genrePackages: ["Rock & Punk"]
     spotifyTrackId: "63T7DJ1AFDD6Bn8VzG6JE8"
     youtubeClips:
       - videoId: "170sceOWWXc"
@@ -234,6 +252,7 @@ items:
         endSec: 45
         channelTitle: "Jimi Hendrix - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: aretha-franklin-respect
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Respect — Aretha Franklin"
@@ -247,6 +266,7 @@ items:
         endSec: 45
         channelTitle: "Aretha Franklin - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: steppenwolf-born-to-be-wild
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Born to Be Wild — Steppenwolf"
@@ -260,6 +280,7 @@ items:
         endSec: 45
         channelTitle: "Steppenwolf - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: simon-garfunkel-mrs-robinson
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mrs. Robinson — Simon & Garfunkel"
@@ -273,6 +294,7 @@ items:
         endSec: 45
         channelTitle: "Simon & Garfunkel - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: archies-sugar-sugar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sugar, Sugar — The Archies"
@@ -286,6 +308,7 @@ items:
         endSec: 45
         channelTitle: "The Archies - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: beatles-let-it-be
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Let It Be — The Beatles"
@@ -299,6 +322,7 @@ items:
         endSec: 45
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: led-zeppelin-stairway-to-heaven
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stairway to Heaven — Led Zeppelin"
@@ -312,6 +336,7 @@ items:
         endSec: 45
         channelTitle: "Led Zeppelin - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: don-mclean-american-pie
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "American Pie — Don McLean"
@@ -325,6 +350,7 @@ items:
         endSec: 45
         channelTitle: "Don McLean - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: elton-john-crocodile-rock
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Crocodile Rock — Elton John"
@@ -338,6 +364,7 @@ items:
         endSec: 45
         channelTitle: "Elton John - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: lynyrd-skynyrd-sweet-home-alabama
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sweet Home Alabama — Lynyrd Skynyrd"
@@ -351,6 +378,7 @@ items:
         endSec: 45
         channelTitle: "Lynyrd Skynyrd - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: bruce-springsteen-born-to-run
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Born to Run — Bruce Springsteen"
@@ -364,6 +392,7 @@ items:
         endSec: 45
         channelTitle: "Bruce Springsteen - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1975 studio-version)."
+    region: ["global"]
   - id: abba-mamma-mia
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mamma Mia — ABBA"
@@ -378,6 +407,7 @@ items:
         endSec: 45
         channelTitle: "ABBA - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (ABBA studio-version, ej film-soundtrack)."
+    region: ["global"]
   - id: abba-gimme-gimme-gimme
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gimme! Gimme! Gimme! (A Man After Midnight) — ABBA"
@@ -419,11 +449,7 @@ items:
         startSec: 0
         endSec: 15
         channelTitle: "Queen Official"
-        notes: "Bytt 2026-08-10: gamla klippet (vDRVTnbuGec, Queen - Topic) hade
-          allow-list utan SE → 'Video unavailable' i Sverige. Officiell video.
-          SD valdes MEDVETET framför HD-remastern (ipDEXJHEfTI) vars titel lyder
-          '1978 Edit' — årtal i titelraden spoilar/vilseleder en Year-fråga
-          (rätt svar är 1977)."
+        notes: "Bytt 2026-08-10: gamla klippet (vDRVTnbuGec, Queen - Topic) hade allow-list utan SE → 'Video unavailable' i Sverige. Officiell video. SD valdes MEDVETET framför HD-remastern (ipDEXJHEfTI) vars titel lyder '1978 Edit' — årtal i titelraden spoilar/vilseleder en Year-fråga (rätt svar är 1977)."
     genrePackages: ["sport"]
   - id: village-people-ymca
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -440,6 +466,7 @@ items:
         channelTitle: "Village People"
         notes: "Peter-kurerad 2026-08-30 (ersatte fvzs2ozG-mc)."
   # === Content-expansion 2026-05-29: fler ikoniska 60-70-tals-låtar ===
+    region: ["global"]
   - id: the-doors-light-my-fire
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Light My Fire — The Doors"
@@ -453,6 +480,7 @@ items:
         endSec: 15
         channelTitle: "The Doors - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: marvin-gaye-whats-going-on
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What's Going On — Marvin Gaye"
@@ -466,6 +494,7 @@ items:
         endSec: 45
         channelTitle: "Marvin Gaye - Topic"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (2)."
+    region: ["global"]
   - id: stevie-wonder-superstition
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Superstition — Stevie Wonder"
@@ -479,6 +508,7 @@ items:
         endSec: 45
         channelTitle: "Weedy Weed Smoker"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+    region: ["global"]
   - id: deep-purple-smoke-on-the-water
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Smoke on the Water — Deep Purple"
@@ -492,6 +522,7 @@ items:
         endSec: 45
         channelTitle: "Deep Purple - Topic"
         notes: "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (2024 remaster av 1972-originalet, ej Rock Aid Armenia-versionen)."
+    region: ["global"]
   - id: fleetwood-mac-go-your-own-way
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Go Your Own Way — Fleetwood Mac"
@@ -505,6 +536,7 @@ items:
         endSec: 45
         channelTitle: "Fleetwood Mac"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (3)."
+    region: ["global"]
   - id: gloria-gaynor-i-will-survive
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "I Will Survive — Gloria Gaynor"
@@ -518,6 +550,7 @@ items:
         endSec: 45
         channelTitle: "Gloria Gaynor - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: beatles-yesterday
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Yesterday — The Beatles"
@@ -531,6 +564,7 @@ items:
         endSec: 45
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: beatles-come-together
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Come Together — The Beatles"
@@ -544,6 +578,7 @@ items:
         endSec: 45
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: led-zeppelin-whole-lotta-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Whole Lotta Love — Led Zeppelin"
@@ -557,6 +592,7 @@ items:
         endSec: 45
         channelTitle: "Led Zeppelin - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: elton-john-your-song
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Your Song — Elton John"
@@ -570,6 +606,7 @@ items:
         endSec: 45
         channelTitle: "Elton John - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: john-denver-country-roads
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Take Me Home, Country Roads — John Denver"
@@ -584,6 +621,7 @@ items:
         endSec: 30
         channelTitle: "7clouds"
         notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
+    region: ["global"]
   - id: bob-marley-no-woman-no-cry
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "No Woman, No Cry — Bob Marley & The Wailers"
@@ -597,6 +635,7 @@ items:
         endSec: 50
         channelTitle: "Bob Marley"
     spotifyTrackId: "3PQLYVskjUeRmRIfECsL0X"
+    region: ["global"]
   - id: fleetwood-mac-dreams
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dreams — Fleetwood Mac"
@@ -610,6 +649,7 @@ items:
         endSec: 45
         channelTitle: "FLEETWOOD MAC - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: queen-we-are-the-champions
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "We Are the Champions — Queen"
@@ -622,10 +662,9 @@ items:
         startSec: 30
         endSec: 45
         channelTitle: "Queen Official"
-        notes: "Bytt 2026-08-10: gamla klippet (lxHuY6DgSJQ, Queen - Topic) hade
-          allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster
-          från rättsinnehavarens kanal, HD, blockerad enbart i RU."
+        notes: "Bytt 2026-08-10: gamla klippet (lxHuY6DgSJQ, Queen - Topic) hade allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster från rättsinnehavarens kanal, HD, blockerad enbart i RU."
     genrePackages: ["sport"]
+    region: ["global"]
   - id: boney-m-ma-baker
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ma Baker — Boney M."
@@ -668,6 +707,7 @@ items:
         endSec: 45
         channelTitle: "The Police - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: acdc-highway-to-hell
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Highway to Hell — AC/DC"
@@ -677,7 +717,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["AC/DC Highway to Hell 1979"]
     answerMethods: ["timeline"]
-    genrePackages: ["rock"]
+    genrePackages: ["Rock & Punk"]
     spotifyTrackId: "2zYzyRzz6pRmhPzyfMEC8s"
     youtubeClips:
       - videoId: "ikFFVfObwss"
@@ -698,6 +738,7 @@ items:
         endSec: 45
         channelTitle: "Dolly Parton - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: bob-dylan-like-a-rolling-stone
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Like a Rolling Stone — Bob Dylan"
@@ -711,6 +752,7 @@ items:
         endSec: 45
         channelTitle: "Bob Dylan - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: beatles-help
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Help! — The Beatles"
@@ -724,6 +766,7 @@ items:
         endSec: 45
         channelTitle: "The Beatles - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: simon-garfunkel-sound-of-silence
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Sound of Silence — Simon & Garfunkel"
@@ -737,6 +780,7 @@ items:
         endSec: 45
         channelTitle: "Simon & Garfunkel - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: rolling-stones-angie
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Angie — The Rolling Stones"
@@ -750,6 +794,7 @@ items:
         endSec: 45
         channelTitle: "The Rolling Stones - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: led-zeppelin-kashmir
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kashmir — Led Zeppelin"
@@ -763,6 +808,7 @@ items:
         endSec: 45
         channelTitle: "Led Zeppelin - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+    region: ["global"]
   - id: tomas-ledin-just-nu
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Just nu! — Tomas Ledin"
@@ -828,6 +874,7 @@ items:
         notes: "ESC 1971 vinnare — Monaco."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["unknown-region"]
   - id: vicky-leandros-apres-toi
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Après toi — Vicky Leandros"
@@ -843,6 +890,7 @@ items:
         notes: "ESC 1972 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["unknown-region"]
   - id: anne-marie-david-tu-te-reconnaitras
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tu te reconnaîtras — Anne-Marie David"
@@ -858,6 +906,7 @@ items:
         notes: "ESC 1973 vinnare — Luxemburg."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["unknown-region"]
   - id: teach-in-ding-a-dong
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ding-a-dong — Teach-In"
@@ -888,6 +937,7 @@ items:
         notes: "ESC 1976 vinnare — Storbritannien."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["europe"]
   - id: marie-myriam-loiseau-et-lenfant
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "L'Oiseau et l'Enfant — Marie Myriam"
@@ -903,6 +953,7 @@ items:
         notes: "ESC 1977 vinnare — Frankrike."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["unknown-region"]
   - id: izhar-cohen-a-ba-ni-bi
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "A-Ba-Ni-Bi — Izhar Cohen & The Alphabeta"
@@ -933,6 +984,7 @@ items:
         notes: "ESC 1979 vinnare — Israel."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["global"]
   - id: johnny-logan-whats-another-year
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "What's Another Year — Johnny Logan"
@@ -948,6 +1000,7 @@ items:
         notes: "ESC 1980 vinnare — Irland."
     genrePackages: ["Eurovision"]
     inBaseCatalog: false
+    region: ["europe"]
   - id: lill-lindfors-en-san-karl
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "En sån karl — Lill Lindfors"
@@ -976,6 +1029,7 @@ items:
         endSec: 30
         channelTitle: "Sven Ingvars - Topic"
         notes: "Officiell Topic-kanal. Studio 1967. Ersatte fan-uppladdning (z0CDj6vwQ5s)."
+    genrePackages: ["Dansband"]
   - id: abba-ring-ring
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ring Ring — ABBA"
@@ -990,6 +1044,7 @@ items:
         endSec: 30
         channelTitle: "ABBA"
         notes: "Officiell music video ℗ 1973 Polar Music International AB."
+    region: ["global"]
   - id: lasse-berghagen-ding-dong
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ding Dong — Lasse Berghagen"
@@ -1012,7 +1067,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Streaplers Vad har du under blusen Rut 1973 Swedish dansband"]
     answerMethods: ["timeline"]
-    genrePackages: ["dansband"]
+    genrePackages: ["Dansband"]
     spotifyTrackId: "7915ILGV5otD6Oq3rOcKBR"
     youtubeClips:
       - videoId: "LdZuxKYJW3I"
@@ -1078,6 +1133,7 @@ items:
         endSec: 30
         channelTitle: "Neil Diamond"
         notes: "Neil Diamond - Girl You'll Be a Woman Soon (1967)."
+    region: ["global"]
   - id: lasse-berghagen-en-kvall-i-juni
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "En kväll i juni — Lasse Berghagen"
@@ -1100,10 +1156,18 @@ items:
     probability: 85
     wikimediaSearchHints: ["Sugarhill Gang Rapper's Delight 1979 hip hop"]
     answerMethods: ["timeline"]
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     parentControlled: true
     spotifyTrackId: "2XbwFs07dfm2MGQuYmRMZT"
   # === Tillägg 2026-08-11 (Peters lista) ===
+    region: ["global"]
+    youtubeClips:
+      - videoId: "H8yUxDOHlh8"
+        startSec: 15
+        endSec: 30
+      - videoId: "WjE4Vxe5-Ak"
+        startSec: 35
+        endSec: 50
   - id: marvin-gaye-tammi-terrell-aint-no-mountain-high-enough
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ain't No Mountain High Enough — Marvin Gaye & Tammi Terrell"
@@ -1118,6 +1182,7 @@ items:
         endSec: 30
         channelTitle: "Doc Rudy | Soul Studios"
         notes: "Peter-kurerad 2026-08-25 ur Peters YT- och Spotify-lista."
+    region: ["global"]
   - id: the-who-behind-blue-eyes
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Behind Blue Eyes — The Who"
@@ -1127,9 +1192,12 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["The Who Behind Blue Eyes 1971 Whos Next"]
     answerMethods: ["timeline"]
-    genrePackages: ["rock"]
+    genrePackages: ["Rock & Punk"]
     spotifyTrackId: "0cKk8BKEi7zXbdrYdyqBP5"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "uA2zODu1nJw"
+        startSec: 8
+        endSec: 23
   - id: bonnie-tyler-its-a-heartache
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "It's a Heartache — Bonnie Tyler"
@@ -1138,7 +1206,15 @@ items:
     wikimediaSearchHints: ["Bonnie Tyler Its a Heartache 1977"]
     answerMethods: ["timeline"]
     spotifyTrackId: "1Y7VG310Lf5IYP7sVOob4X"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "bEOl38y8Nj8"
+        startSec: 0
+        endSec: 15
+      - videoId: "87PPOZUxEu8"
+        startSec: 8
+        endSec: 23
+    genrePackages: ["Soft & Love"]
+    region: ["global"]
   - id: bette-midler-the-rose
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Rose — Bette Midler"
@@ -1146,9 +1222,14 @@ items:
     probability: 80
     wikimediaSearchHints: ["Bette Midler The Rose 1979 soundtrack"]
     answerMethods: ["timeline"]
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "jxvPjuREDpE"
+        startSec: 0
+        endSec: 15
     notes: "SAKNAR MEDIA - Peter angav ingen lank. Alla Spotify-traffar jag hittade ar samlingsskivor (2008/2009/2015), vilket bryter mot single-release-regeln for deep-link-kontext. Behover kurerat track-ID eller YT-klipp innan den exporteras."
   # === Tillagg 2026-08-14 (Peters 80-talslista, titlar fore 1981) ===
+    genrePackages: ["Soft & Love"]
+    region: ["global"]
   - id: blondie-heart-of-glass
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Heart of Glass — Blondie"
@@ -1162,6 +1243,7 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14 ur hans 80-talsspellista. Kanal ej verifierad."
     notes: "correctYear = albumet Parallel Lines (23 sept 1978), forsta gangen laten gick att hora. Singeln kom forst i jan 1979."
+    region: ["global"]
   - id: george-benson-give-me-the-night
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Give Me the Night — George Benson"
@@ -1175,6 +1257,7 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14 ur hans 80-talsspellista. Kanal ej verifierad."
   # === Tillagg 2026-08-14 (Peters global-lista) ===
+    region: ["global"]
   - id: travolta-newton-john-youre-the-one-that-i-want
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "You're the One That I Want — John Travolta & Olivia Newton-John"
@@ -1229,7 +1312,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Bill Withers Aint No Sunshine Just As I Am"]
     answerMethods: ["timeline"]
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
     spotifyTrackId: "1k1Bqnv2R0uJXQN4u6LKYt"
     youtubeClips: []
   - id: bruce-springsteen-the-river
@@ -1241,7 +1324,10 @@ items:
     wikimediaSearchHints: ["Bruce Springsteen The River"]
     answerMethods: ["timeline"]
     spotifyTrackId: "7HrzErXq3TsKOY1gmdIShB"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "_Jw8P7gHxzI"
+        startSec: 15
+        endSec: 30
   - id: nancy-sinatra-these-boots-are-made-for-walkin
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "These Boots Are Made for Walkin' — Nancy Sinatra"

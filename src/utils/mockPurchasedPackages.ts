@@ -36,14 +36,28 @@ export interface MusicPackage {
   // (idag inga). Optional för bakåtkompat — köpta paket lämnar fältet
   // undefined.
   free?: boolean;
+  // True = Spotify FÅR vara den ENDA aktiva källan för paketet (host kan då
+  // stänga av både YT och Hints). Passar rena musik-genre-paket där allt
+  // innehåll finns på Spotify. Sätts INTE (=false) för t.ex. Sport/Football-
+  // paket, där sport-events saknar Spotify-spår → Spotify-only ger tom pool.
+  allowSpotifyOnly?: boolean;
 }
 
 // Första riktiga tema-paketen (2026-08-28). Båda är Music-only. `id` bär
 // `pkg-`-prefix (plockas INTE av LEGACY_GEN_PKG_IDS-strippningen som bara
 // matchar `pkg-gen-*`). `tags` speglar genrePackages-strängarna i katalogen.
 export const PURCHASED_PACKAGES: MusicPackage[] = [
-  { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'] },
-  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['hiphop'] },
+  { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'], allowSpotifyOnly: true },
+  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['Hip Hop'], allowSpotifyOnly: true },
+  // Sport Anthems (music-only launch 2026-09): sport-relaterad MUSIK (fotbolls-/
+  // hockey-VM-låtar, idrottare som gjort musik) som Peter märkt "Music" i
+  // Musik sport.xlsx. Items bär genrePackages: [..., "sport-anthems"] +
+  // inBaseCatalog: false i songs-sport.yaml. allowSpotifyOnly UTELÄMNAT (=false):
+  // flera anthems är YouTube-only (saknar spotifyTrackId), så Spotify-only skulle
+  // tappa dem — host måste hålla YT (eller Hints) på. OBS: artist/band-Hints i
+  // paketet kräver separat infra (image-export emitterar inga genrePackages +
+  // quiz.tsx tömmer Hints-poolen i paket-läge) → låt-only tills vidare.
+  { id: 'pkg-sport-anthems', name: 'Sport Anthems', tags: ['sport-anthems'] },
 ];
 
 // ─── Generation-key (för audience-filter) ────────────────────────────

@@ -28,16 +28,14 @@ import { track } from '../utils/analytics';
 import { loadProfile, saveProfile } from '../utils/profileStorage';
 import {
   claimFreeMonth,
+  computePromoFlags,
   formatPromoDate,
-  getFreeMonthUsed,
-  getFreePremiumExpiry,
-  hasActiveFreePremium,
-  isOfferWindowOpen,
-  isPaidSubscriptionEnabled,
+  getCachedPromoFlags,
   redeemVoucher,
   refreshPromoGrants,
 } from '../utils/promoPremium';
 import {
+  getCachedPremium,
   hasPremiumSubscription,
   refreshPremiumMirror,
   setPremiumActive,
@@ -238,12 +236,20 @@ export default function StoreScreen() {
   //                   "Store läser inte hasPremiumSubscription" — vi visar
   //                   fortfarande promo-UI, men måste kunna blockera aktivering
   //                   när premium redan är igång.
-  const [offerOpen, setOfferOpen] = useState(false);
-  const [claimActive, setClaimActive] = useState(false);
-  const [promoExpiry, setPromoExpiry] = useState<Date | null>(null);
-  const [freeMonthUsed, setFreeMonthUsed] = useState(false);
-  const [paidEnabled, setPaidEnabled] = useState(false);
-  const [premiumActive, setPremiumActiveFlag] = useState(false);
+  // Seeda synkront ur spegeln så första framen är rätt — annars renderade
+  // offerOpen=false voucher-/redeem-boxen (`showVoucher && !offerOpen`) en
+  // frame innan den async läsningen visade att kampanjen är öppen (Peter
+  // 2026-09-02: redeem-koden flashade förbi innan bara Free visades).
+  // `undefined` (kall spegel) → false-defaults + promoLoaded=false gatar
+  // tier-regionen så vi aldrig visar FEL kort under den korta cold-window.
+  const seedFlags = getCachedPromoFlags();
+  const [offerOpen, setOfferOpen] = useState(seedFlags?.offerOpen ?? false);
+  const [claimActive, setClaimActive] = useState(seedFlags?.claimActive ?? false);
+  const [promoExpiry, setPromoExpiry] = useState<Date | null>(seedFlags?.expiry ?? null);
+  const [freeMonthUsed, setFreeMonthUsed] = useState(seedFlags?.freeMonthUsed ?? false);
+  const [paidEnabled, setPaidEnabled] = useState(seedFlags?.paidEnabled ?? false);
+  const [premiumActive, setPremiumActiveFlag] = useState(getCachedPremium() ?? false);
+  const [promoLoaded, setPromoLoaded] = useState(seedFlags !== undefined);
   const [claiming, setClaiming] = useState(false);
   const [voucherCode, setVoucherCode] = useState('');
   const [redeeming, setRedeeming] = useState(false);
@@ -257,24 +263,23 @@ export default function StoreScreen() {
   const voucherFocusedRef = useRef(false);
 
   const loadPromoState = async () => {
-    const [open, active, expiry, used, paid, premium] = await Promise.all([
-      isOfferWindowOpen(),
-      hasActiveFreePremium(),
-      getFreePremiumExpiry(),
-      getFreeMonthUsed(),
-      isPaidSubscriptionEnabled(),
+    // computePromoFlags() uppdaterar den synkrona spegeln så nästa Store-mount
+    // seedar rätt; premiumActive kommer separat (bor i subscriptionStorage).
+    const [flags, premium] = await Promise.all([
+      computePromoFlags(),
       hasPremiumSubscription(),
     ]);
-    return { open, active, expiry, used, paid, premium };
+    return { flags, premium };
   };
 
   const applyPromoState = (s: Awaited<ReturnType<typeof loadPromoState>>) => {
-    setOfferOpen(s.open);
-    setClaimActive(s.active);
-    setPromoExpiry(s.expiry);
-    setFreeMonthUsed(s.used);
-    setPaidEnabled(s.paid);
+    setOfferOpen(s.flags.offerOpen);
+    setClaimActive(s.flags.claimActive);
+    setPromoExpiry(s.flags.expiry);
+    setFreeMonthUsed(s.flags.freeMonthUsed);
+    setPaidEnabled(s.flags.paidEnabled);
     setPremiumActiveFlag(s.premium);
+    setPromoLoaded(true);
   };
 
   useEffect(() => {
@@ -709,8 +714,12 @@ export default function StoreScreen() {
       {/* Pris-tiers. Under launch-kampanjen (offerOpen) visas Free-kortet;
           det betalda 79 kr-kortet gatas på paidEnabled (feature-flagga,
           default AV i v1 — förberett men inte submittat). När Peter stänger
-          kampanjen OCH slår på paidEnabled visas betal-kortet i stället. */}
-      {offerOpen ? (
+          kampanjen OCH slår på paidEnabled visas betal-kortet i stället.
+          promoLoaded-gaten: vid en kall spegel (seedFlags undefined) hålls
+          hela pris-regionen tom tills första läsningen landat, i stället för
+          att gissa fram FEL kort (redeem-box) och byta — se seed-noten. */}
+      {promoLoaded &&
+        (offerOpen ? (
         <View style={styles.tierList}>
           <PromoTierCard
             expiry={promoExpiry}
@@ -761,13 +770,13 @@ export default function StoreScreen() {
             />
           ))}
         </View>
-      ) : null}
+        ) : null)}
 
       {/* Voucher fristående BARA post-kampanj — under kampanjen bäddas det in i
           Single month-kortet (PromoTierCard). Utan detta försvinner voucher-
           vägen när kampanjen stängts (showVoucher = freeMonthUsed || !offerOpen,
           och Single month-kortet renderas inte då). */}
-      {showVoucher && !offerOpen && (
+      {promoLoaded && showVoucher && !offerOpen && (
         <VoucherBox
           voucherCode={voucherCode}
           onChangeText={setVoucherCode}

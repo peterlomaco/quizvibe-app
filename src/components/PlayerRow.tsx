@@ -7,7 +7,7 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
 import { Avatar } from './Avatar';
-import { HCPShield } from './HCPShield';
+import { HCPShieldCard } from './HCPShield';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { WifiFanIcon } from './WifiFanIcon';
 
@@ -77,6 +77,11 @@ interface PlayerRowProps {
   // Utelämnas båda → ingen sköld renderas (t.ex. spelare utan age/assistance).
   hcp?: number;
   hcpNotDefined?: boolean;
+  // Per-kategori-HCP (§1.3) — visas i "+"-utfällningen bredvid Total-skölden.
+  // Utelämnade → kategori-sköld faller till 99.
+  hcpMusic?: number;
+  hcpFilm?: number;
+  hcpSport?: number;
 }
 
 export function PlayerRow({
@@ -104,6 +109,9 @@ export function PlayerRow({
   showSpotifyBadge = true,
   hcp,
   hcpNotDefined,
+  hcpMusic,
+  hcpFilm,
+  hcpSport,
 }: PlayerRowProps) {
   // "Details +/-"-toggle per spelarkort — gömmer Assistance + Age-pillarna
   // tills man fäller ut. Default hopfällt (Details +).
@@ -185,22 +193,46 @@ export function PlayerRow({
             uri={player.avatarUri}
             emoji={player.emoji}
             name={player.name}
-            size={40}
+            size={34}
             useBrandFallback={!isGuest}
           />
         </View>
 
-        {/* Player-HCP-sköld bredvid avataren (§2 UI). Döljs för left-spelare
-            (kortet är då nedtonat/"borta"). Gäst → "Not Defined"-vattenstämpel. */}
+        {/* HCP-sköld bredvid avataren. MUSIC-ONLY LAUNCH: en enda sköld
+            (Total = musik-HCP), ingen kategori-badge (`label` utelämnad), inga
+            Music/Film/Sport-subsköldar. Döljs för left-spelare; gäst →
+            "Not Defined"-vattenstämpel. */}
         {!hasLeft && (hcpNotDefined || hcp !== undefined) && (
           <View style={styles.hcpShieldWrap}>
-            <HCPShield hcp={hcp ?? 99} size={40} notDefined={hcpNotDefined} />
+            <HCPShieldCard hcp={hcp ?? 99} size={40} notDefined={hcpNotDefined} />
           </View>
         )}
 
         <View style={styles.info}>
           <View style={styles.nameRow}>
-            <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>{player.name}</Text>
+            {(() => {
+              // PlayerName-format [Letters]-[Digits]: bryt vid bindestrecket så
+              // bokstäverna + "-" står på rad 1 och siffrorna under. Saknar
+              // namnet bindestreck (inga siffror) visas det på en rad.
+              const dashIdx = player.name.indexOf('-');
+              if (dashIdx === -1) {
+                return (
+                  <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>
+                    {player.name}
+                  </Text>
+                );
+              }
+              return (
+                <View style={styles.nameSplit}>
+                  <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>
+                    {player.name.slice(0, dashIdx + 1)}
+                  </Text>
+                  <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>
+                    {player.name.slice(dashIdx + 1)}
+                  </Text>
+                </View>
+              );
+            })()}
           </View>
           {/* Guest alias — kontot bakom guest-namnet. Visas bara när det
               faktiskt skiljer sig från visningsnamnet. */}
@@ -390,6 +422,10 @@ export function PlayerRow({
         </View>
       )}
 
+      {/* MUSIC-ONLY LAUNCH: per-kategori-HCP-raden (Music/Film/Sport-subsköldar)
+          borttagen — bara Total-skölden bredvid avataren visas. "Details"-
+          toggeln styr fortsatt Assistance/Age-pillerna. */}
+
       </View>
 
       {/* ── HOST-tag som skär kantlinjen ──────────────────────── */}
@@ -493,8 +529,19 @@ const styles = StyleSheet.create({
   hcpShieldWrap: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: Spacing.sm,
+    marginLeft: -Spacing.lg,
     marginRight: Spacing.xs,
+  },
+  // Full-bredds-rad med Music/Film/Sport-sköldarna under meta-raden.
+  // marginBottom ger plats åt de kant-skärande etikett-badgarna (bottom: -9)
+  // så kortets nederkant inte klipper "Music/Film/Sport".
+  hcpCatRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-start',
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.md,
+    paddingHorizontal: Spacing.sm,
   },
   // Avatar-wrapper när spelaren har left: dimmas via opacity så själva
   // emoji/foto kvarstår men signalerar nedprioritet.
@@ -617,7 +664,7 @@ const styles = StyleSheet.create({
   approveSlotApproved: {
     position: 'absolute',
     right: Spacing.lg,
-    bottom: Spacing.md,
+    bottom: Spacing.xs,
   },
 
   // Turn-order column (only shown in Pass-the-Phone mode):
@@ -673,7 +720,11 @@ const styles = StyleSheet.create({
     lineHeight: 14,
   },
 
-  info: { flex: 1, minWidth: 0 },
+  // Top-aligned så namn + "Details" sitter högt upp (bredvid sköldens topp)
+  // och lämnar kortets nedre högra hörn fritt åt approve-toggeln (approved
+  // non-host) — annars hamnar en vertikalt centrerad "Details" i vägen för
+  // toggeln på den höga sköld-raden.
+  info: { flex: 1, minWidth: 0, alignSelf: 'flex-start', paddingTop: Spacing.xs },
   // Wifi-ikon-rad direkt under playername. marginTop bara tillräckligt
   // för subtil separation från namnet utan att skapa stor luftig gap.
   healthIconRow: {
@@ -700,6 +751,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     marginBottom: 3,
+  },
+  // Namn brutet vid bindestrecket: bokstäver+"-" på rad 1, siffror på rad 2.
+  nameSplit: {
+    flexDirection: 'column',
+    flexShrink: 1,
   },
   name: {
     fontSize: FontSize.md,

@@ -183,6 +183,32 @@ export async function signInWithPlayerName(
 }
 
 /**
+ * Skicka om aktiveringsmailet givet ett PlayerName (email:en hålls aldrig
+ * klient-side). Anropar Edge Function 'resend-by-name' som slår upp email:en
+ * server-side och ber GoTrue skicka om signup-bekräftelsen. Funktionen
+ * returnerar alltid generiskt ok server-side (anti-enumerering); { ok } här
+ * speglar bara om anropet gick fram, inte om ett mail faktiskt skickades.
+ */
+export async function resendActivationByName(
+  playerName: string,
+): Promise<{ ok: boolean }> {
+  try {
+    const { error } = await supabase.functions.invoke('resend-by-name', {
+      method: 'POST',
+      body: { playerName },
+    });
+    if (error) {
+      console.warn('[auth] resend-by-name invoke failed:', error.message);
+      return { ok: false };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.warn('[auth] resendActivationByName threw:', err);
+    return { ok: false };
+  }
+}
+
+/**
  * Permanent radering av inloggad user — driver "Delete Account"-knappen
  * i Profile-skärmens logout-sheet. Krav från Apple App Store Guideline
  * 5.1.1(v): apps med kontoflow måste erbjuda in-app deletion.

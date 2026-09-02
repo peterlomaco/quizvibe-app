@@ -14,6 +14,7 @@ items:
     peakTo: 2023
     wikimediaSearchHints: ["Arvingarna dansband"]
     answerMethods: ["name-letters"]
+    region: ["nordic"]
   - id: alcazar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alcazar"
@@ -30,6 +31,7 @@ items:
     peakTo: 2026
     wikimediaSearchHints: ["Marcus Martinus Norwegian pop duo"]
     answerMethods: ["name-letters"]
+    region: ["nordic"]
   - id: ace-of-base
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ace of Base"
@@ -78,7 +80,7 @@ items:
     displayName: "Europe"
     correctYear: 1978
     probability: 65
-    region: ["sweden"]
+    region: ["global"]
     wikimediaSearchHints: ["Europe"]
     answerMethods: ["name-letters"]
   - id: ges
@@ -104,7 +106,7 @@ items:
     displayName: "Icona Pop"
     correctYear: 2009
     probability: 65
-    region: ["sweden"]
+    region: ["nordic"]
     genrePackages: ["Hits"]
     wikimediaSearchHints: ["Icona Pop"]
     answerMethods: ["name-letters"]
@@ -113,7 +115,7 @@ items:
     displayName: "Rednex"
     correctYear: 1994
     probability: 65
-    region: ["sweden"]
+    region: ["nordic"]
     wikimediaSearchHints: ["Rednex"]
     answerMethods: ["name-letters"]
   - id: rolandz
@@ -122,7 +124,7 @@ items:
     correctYear: 2008
     probability: 65
     region: ["sweden"]
-    genrePackages: ["dansband"]
+    genrePackages: ["Dansband"]
     wikimediaSearchHints: ["Rolandz"]
     answerMethods: ["name-letters"]
   - id: sarek
@@ -140,7 +142,7 @@ items:
     correctYear: 1959
     probability: 65
     region: ["sweden"]
-    genrePackages: ["dansband"]
+    genrePackages: ["Dansband"]
     wikimediaSearchHints: ["Streaplers"]
     answerMethods: ["name-letters"]
   - id: sven-ingvars
@@ -151,12 +153,13 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Sven-Ingvars"]
     answerMethods: ["name-letters"]
+    genrePackages: ["Dansband"]
   - id: the-cardigans
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Cardigans"
     correctYear: 1992
     probability: 65
-    region: ["sweden"]
+    region: ["nordic"]
     wikimediaSearchHints: ["The Cardigans"]
     answerMethods: ["name-letters"]
   - id: the-mamas

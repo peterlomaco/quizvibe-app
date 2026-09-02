@@ -75,7 +75,7 @@ items:
     peakFrom: 1956
     peakTo: 2006
     probability: 85
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["James Brown singer Godfather of Soul"]
     answerMethods: ["timeline", "name-letters"]
   - id: stevie-wonder
@@ -125,7 +125,7 @@ items:
     peakFrom: 1962
     peakTo: 1967
     probability: 78
-    region: ["unknown-region"]
+    region: ["global"]
     wikimediaSearchHints: ["Otis Redding soul singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: dolly-parton
@@ -255,7 +255,7 @@ items:
     peakFrom: 1955
     peakTo: 2017
     probability: 88
-    region: ["unknown-region"]
+    region: ["global"]
     wikimediaSearchHints: ["Chuck Berry musician"]
     answerMethods: ["timeline", "name-letters"]
   - id: ella-fitzgerald
@@ -275,7 +275,7 @@ items:
     peakFrom: 1953
     peakTo: 2023
     probability: 78
-    region: ["unknown-region"]
+    region: ["global"]
     wikimediaSearchHints: ["Harry Belafonte singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: donna-summer
@@ -308,7 +308,6 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Barbra Streisand singer"]
     answerMethods: ["timeline", "name-letters"]
-  # === Svenska expansion 2026-05-27 ===
   - id: lill-babs
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lill-Babs"
@@ -316,6 +315,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Lill-Babs Swedish singer Barbro Svensson"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["100% in swedish"]
   - id: lill-lindfors
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lill Lindfors"
@@ -323,6 +323,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Lill Lindfors Swedish singer Eurovision host"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["100% in swedish"]
   - id: monica-zetterlund
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Monica Zetterlund"
@@ -330,6 +331,7 @@ items:
     probability: 75
     wikimediaSearchHints: ["Monica Zetterlund Swedish jazz singer"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["100% in swedish"]
   - id: tomas-ledin
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Tomas Ledin"
@@ -337,6 +339,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Tomas Ledin Swedish singer Sommaren är kort"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: magnus-uggla
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Magnus Uggla"
@@ -351,7 +354,6 @@ items:
     probability: 76
     wikimediaSearchHints: ["Lasse Berghagen Swedish singer Allsång på Skansen"]
     answerMethods: ["timeline", "name-letters"]
-  # === Cross-nordic expansion 2026-05-27 ===
   - id: kim-larsen
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kim Larsen"
@@ -359,7 +361,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Kim Larsen Danish singer Gasolin Midt om natten"]
     answerMethods: ["timeline", "name-letters"]
-  # === Vemod-batch 2026-05-27 — svenska klassiker ===
+    region: ["nordic"]
   - id: cornelis-vreeswijk
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cornelis Vreeswijk"
@@ -395,14 +397,6 @@ items:
     probability: 84
     wikimediaSearchHints: ["Evert Taube Swedish poet singer Sjösala vals"]
     answerMethods: ["timeline", "name-letters"]
-  - id: barbro-horberg
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Barbro Hörberg"
-    correctYear: 1932
-    probability: 70
-    wikimediaSearchHints: ["Barbro Hörberg Swedish singer songwriter Man borde inte sova"]
-    answerMethods: ["timeline", "name-letters"]
-  # === Bred batch 2026-05-27 — dansband-elder/cross-nordic/vemod ===
   - id: christer-sjogren
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Christer Sjögren"
@@ -424,6 +418,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Arja Saijonmaa Finnish singer Jag vill tacka livet"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: sanne-salomonsen
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sanne Salomonsen"
@@ -431,7 +426,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Sanne Salomonsen Danish singer rock pop"]
     answerMethods: ["timeline", "name-letters"]
-  # === Batch B 2026-05-27 — Björn Skifs ===
+    region: ["nordic"]
   - id: bjorn-skifs
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Björn Skifs"
@@ -493,14 +488,6 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Bette Midler"]
     answerMethods: ["name-letters"]
-  - id: bill-withers
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Bill Withers"
-    correctYear: 1938
-    probability: 65
-    region: ["global"]
-    wikimediaSearchHints: ["Bill Withers"]
-    answerMethods: ["name-letters"]
   - id: billy-idol
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Billy Idol"
@@ -508,7 +495,7 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["rock"]
+    genrePackages: ["Rock & Punk"]
     wikimediaSearchHints: ["Billy Idol"]
     answerMethods: ["name-letters"]
   - id: bing-crosby
@@ -564,7 +551,7 @@ items:
     displayName: "Corinne Hermès"
     correctYear: 1961
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Corinne Hermès"]
@@ -592,7 +579,7 @@ items:
     displayName: "Don McLean"
     correctYear: 1945
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Don McLean"]
     answerMethods: ["name-letters"]
   - id: dooley-wilson
@@ -600,7 +587,7 @@ items:
     displayName: "Dooley Wilson"
     correctYear: 1886
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Dooley Wilson"]
     answerMethods: ["name-letters"]
   - id: doris-day
@@ -616,8 +603,8 @@ items:
     displayName: "Dr. Alban"
     correctYear: 1957
     probability: 65
-    region: ["global"]
-    genrePackages: ["Eurodance & pop"]
+    region: ["europe"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["Dr. Alban"]
     answerMethods: ["name-letters"]
   - id: duke-ellington
@@ -625,7 +612,7 @@ items:
     displayName: "Duke Ellington"
     correctYear: 1899
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Duke Ellington"]
     answerMethods: ["name-letters"]
   - id: dusty-springfield
@@ -650,7 +637,7 @@ items:
     correctYear: 1963
     probability: 65
     region: ["global"]
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["Eros Ramazzotti"]
     answerMethods: ["name-letters"]
   - id: ethel-waters
@@ -714,7 +701,7 @@ items:
     displayName: "Irene Cara"
     correctYear: 1959
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Irene Cara"]
     answerMethods: ["name-letters"]
   - id: jan-hammer
@@ -723,7 +710,7 @@ items:
     correctYear: 1948
     probability: 65
     region: ["global"]
-    genrePackages: ["Film"]
+    genrePackages: ["Film edition"]
     wikimediaSearchHints: ["Jan Hammer"]
     answerMethods: ["name-letters"]
   - id: jennifer-rush
@@ -732,7 +719,7 @@ items:
     correctYear: 1960
     probability: 65
     region: ["global"]
-    genrePackages: ["Power Ballads"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["Jennifer Rush"]
     answerMethods: ["name-letters"]
   - id: jimi-hendrix
@@ -748,7 +735,7 @@ items:
     displayName: "Jo Stafford"
     correctYear: 1917
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Jo Stafford"]
     answerMethods: ["name-letters"]
   - id: john-denver
@@ -756,7 +743,7 @@ items:
     displayName: "John Denver"
     correctYear: 1943
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["John Denver"]
     answerMethods: ["name-letters"]
   - id: john-lennon
@@ -772,7 +759,7 @@ items:
     displayName: "Johnnie Ray"
     correctYear: 1927
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Johnnie Ray"]
     answerMethods: ["name-letters"]
   - id: johnny-logan
@@ -781,7 +768,6 @@ items:
     correctYear: 1954
     probability: 65
     region: ["global"]
-    inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Johnny Logan"]
     answerMethods: ["name-letters"]
@@ -791,7 +777,7 @@ items:
     correctYear: 1961
     probability: 65
     region: ["global"]
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["Jon Secada"]
     answerMethods: ["name-letters"]
   - id: kim-carnes
@@ -799,7 +785,7 @@ items:
     displayName: "Kim Carnes"
     correctYear: 1945
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Kim Carnes"]
     answerMethods: ["name-letters"]
   - id: laura-branigan
@@ -807,7 +793,7 @@ items:
     displayName: "Laura Branigan"
     correctYear: 1952
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Laura Branigan"]
     answerMethods: ["name-letters"]
   - id: linda-martin
@@ -825,7 +811,7 @@ items:
     displayName: "Marie Myriam"
     correctYear: 1957
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Marie Myriam"]
@@ -837,7 +823,7 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     wikimediaSearchHints: ["MC Hammer"]
     answerMethods: ["name-letters"]
   - id: muddy-waters
@@ -869,7 +855,7 @@ items:
     displayName: "Nick Borgen"
     correctYear: 1952
     probability: 65
-    region: ["global"]
+    region: ["nordic"]
     genrePackages: ["sport"]
     wikimediaSearchHints: ["Nick Borgen"]
     answerMethods: ["name-letters"]
@@ -878,7 +864,7 @@ items:
     displayName: "Nicole"
     correctYear: 1964
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Nicole"]
     answerMethods: ["name-letters"]
   - id: patti-page
@@ -902,7 +888,7 @@ items:
     displayName: "Perry Como"
     correctYear: 1912
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Perry Como"]
     answerMethods: ["name-letters"]
   - id: peter-cetera
@@ -910,7 +896,7 @@ items:
     displayName: "Peter Cetera"
     correctYear: 1944
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Peter Cetera"]
     answerMethods: ["name-letters"]
   - id: peter-gabriel
@@ -926,7 +912,7 @@ items:
     displayName: "Ritchie Valens"
     correctYear: 1941
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Ritchie Valens"]
     answerMethods: ["name-letters"]
   - id: roberta-flack
@@ -950,7 +936,7 @@ items:
     displayName: "Sertab Erener"
     correctYear: 1964
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Sertab Erener"]
@@ -960,7 +946,7 @@ items:
     displayName: "Séverine"
     correctYear: 1948
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Séverine"]
@@ -972,7 +958,7 @@ items:
     probability: 65
     region: ["global"]
     inBaseCatalog: false
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     wikimediaSearchHints: ["Sir Mix-a-Lot"]
     answerMethods: ["name-letters"]
   - id: toto-cutugno
@@ -980,7 +966,7 @@ items:
     displayName: "Toto Cutugno"
     correctYear: 1943
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Toto Cutugno"]
@@ -990,7 +976,7 @@ items:
     displayName: "Vicky Leandros"
     correctYear: 1949
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Vicky Leandros"]

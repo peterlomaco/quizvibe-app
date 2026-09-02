@@ -25,8 +25,6 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Madonna singer"]
     answerMethods: ["timeline", "name-letters"]
-  # Metallica (band) flyttad till framtida bands-classics-utbyggnad (band-subject)
-  # — solo-artist-filen ska bara ha solister.
   - id: carola-haggkvist
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Carola Häggkvist"
@@ -219,7 +217,7 @@ items:
     peakFrom: 1975
     peakTo: 2024
     probability: 75
-    region: ["unknown-region"]
+    region: ["global"]
     wikimediaSearchHints: ["Patti Smith singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: ozzy-osbourne
@@ -341,7 +339,6 @@ items:
     probability: 75
     wikimediaSearchHints: ["Neneh Cherry singer Sweden"]
     answerMethods: ["timeline", "name-letters"]
-  # === Svenska expansion 2026-05-27 ===
   - id: per-gessle
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Per Gessle"
@@ -391,6 +388,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Titiyo Swedish singer Come Along"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: lisa-ekdahl
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lisa Ekdahl"
@@ -412,7 +410,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Sissel Kyrkjebø Norwegian soprano singer Titanic"]
     answerMethods: ["timeline", "name-letters"]
-  # === Vemod-batch 2026-05-27 — svenska gen-x trubadurer/rock/Eurovision ===
+    region: ["nordic"]
   - id: ted-gardestad
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ted Gärdestad"
@@ -434,6 +432,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Thåström Swedish singer Ebba Grön Imperiet Joakim Thåström"]
     answerMethods: ["timeline", "name-letters"]
+    genrePackages: ["100% in swedish"]
   - id: dan-hylander
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dan Hylander"
@@ -441,6 +440,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Dan Hylander Swedish singer Raj Montana Band"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["unknown-region"]
   - id: py-backman
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Py Bäckman"
@@ -469,6 +469,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Tommy Körberg Swedish singer Chess Eurovision"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: lasse-tennander
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lasse Tennander"
@@ -512,7 +513,6 @@ items:
     probability: 74
     wikimediaSearchHints: ["Jan Johansen Swedish singer Eurovision Se på mig 1995"]
     answerMethods: ["timeline", "name-letters"]
-  # === Bred batch 2026-05-27 — gen-x dansband/r&b/vemod/cross-nordic ===
   - id: lotta-engberg
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Lotta Engberg"
@@ -527,6 +527,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Wenche Myhre Norwegian singer Eurovision La det swinge"]
     answerMethods: ["timeline", "name-letters"]
+    region: ["nordic"]
   - id: anne-linnet
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Anne Linnet"
@@ -534,7 +535,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Anne Linnet Danish singer Marquis de Sade"]
     answerMethods: ["timeline", "name-letters"]
-  # === Batch B 2026-05-27 — kvinnliga svenska sångerskor ===
+    region: ["unknown-region"]
   - id: pernilla-wahlgren
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pernilla Wahlgren"
@@ -563,8 +564,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Shirley Clamp Swedish singer Min kärlek Eurovision"]
     answerMethods: ["timeline", "name-letters"]
-  # === Batch C 2026-05-27 — international solo gen-x + svensk gen-x ===
-  # (george-michael borttagen — dupli av existing i samma fil)
+    region: ["nordic"]
   - id: caroline-af-ugglas
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Caroline af Ugglas"
@@ -597,7 +597,7 @@ items:
     correctYear: 1975
     probability: 65
     region: ["global"]
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     wikimediaSearchHints: ["50 Cent"]
     answerMethods: ["name-letters"]
   - id: alexia
@@ -623,7 +623,7 @@ items:
     correctYear: 1967
     probability: 65
     region: ["global"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["Benny Benassi"]
     answerMethods: ["name-letters"]
   - id: dana-international
@@ -650,7 +650,7 @@ items:
     displayName: "Eimear Quinn"
     correctYear: 1972
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Eimear Quinn"]
@@ -669,7 +669,7 @@ items:
     correctYear: 1965
     probability: 65
     region: ["global"]
-    genrePackages: ["Eurodance & pop"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["Haddaway"]
     answerMethods: ["name-letters"]
   - id: janet-jackson
@@ -678,7 +678,7 @@ items:
     correctYear: 1966
     probability: 65
     region: ["global"]
-    genrePackages: ["Love & Peace"]
+    genrePackages: ["Soft & Love"]
     wikimediaSearchHints: ["Janet Jackson"]
     answerMethods: ["name-letters"]
   - id: knaan
@@ -697,7 +697,7 @@ items:
     correctYear: 1980
     probability: 65
     region: ["global"]
-    genrePackages: ["Club & Dance Hits"]
+    genrePackages: ["Club & Dance"]
     wikimediaSearchHints: ["Kate Ryan"]
     answerMethods: ["name-letters"]
   - id: lou-bega
@@ -713,7 +713,7 @@ items:
     displayName: "Marie N"
     correctYear: 1973
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Marie N"]
@@ -739,7 +739,7 @@ items:
     displayName: "Niamh Kavanagh"
     correctYear: 1968
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Niamh Kavanagh"]
@@ -758,7 +758,6 @@ items:
     correctYear: 1969
     probability: 65
     region: ["global"]
-    genrePackages: ["Mega Hits"]
     wikimediaSearchHints: ["Robert Miles"]
     answerMethods: ["name-letters"]
   - id: ruslana
@@ -766,7 +765,7 @@ items:
     displayName: "Ruslana"
     correctYear: 1973
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Ruslana Lyzhychko"]
@@ -776,7 +775,7 @@ items:
     displayName: "Sandra Kim"
     correctYear: 1972
     probability: 65
-    region: ["global"]
+    region: ["unknown-region"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Sandra Kim"]
@@ -803,14 +802,6 @@ items:
     correctYear: 1971
     probability: 65
     region: ["global"]
-    genrePackages: ["hiphop"]
+    genrePackages: ["Hip Hop"]
     wikimediaSearchHints: ["Snoop Doggy Dogg"]
-    answerMethods: ["name-letters"]
-  - id: snow
-    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Snow"
-    correctYear: 1969
-    probability: 65
-    region: ["global"]
-    wikimediaSearchHints: ["Snow"]
     answerMethods: ["name-letters"]

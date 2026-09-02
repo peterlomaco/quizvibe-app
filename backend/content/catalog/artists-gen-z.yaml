@@ -124,7 +124,7 @@ items:
     peakFrom: 2012
     peakTo: 2024
     probability: 82
-    region: ["global"]
+    region: ["europe"]
     wikimediaSearchHints: ["Loreen singer Sweden Eurovision"]
     answerMethods: ["timeline", "name-letters"]
   - id: justin-bieber
@@ -194,7 +194,7 @@ items:
     peakFrom: 2017
     peakTo: 2024
     probability: 82
-    region: ["unknown-region"]
+    region: ["global"]
     wikimediaSearchHints: ["SZA singer Solana Rowe"]
     answerMethods: ["timeline", "name-letters"]
   - id: nicki-minaj
@@ -214,7 +214,7 @@ items:
     peakFrom: 2012
     peakTo: 2024
     probability: 78
-    region: ["unknown-region"]
+    region: ["europe"]
     wikimediaSearchHints: ["Frank Ocean singer"]
     answerMethods: ["timeline", "name-letters"]
   - id: shawn-mendes
@@ -244,7 +244,7 @@ items:
     peakFrom: 2018
     peakTo: 2024
     probability: 78
-    region: ["unknown-region"]
+    region: ["global"]
     wikimediaSearchHints: ["Megan Thee Stallion rapper"]
     answerMethods: ["timeline", "name-letters"]
   - id: sabrina-carpenter
@@ -300,7 +300,7 @@ items:
     displayName: "DARA"
     correctYear: 1998
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["DARA"]
@@ -320,7 +320,7 @@ items:
     displayName: "Joost Klein"
     correctYear: 1997
     probability: 65
-    region: ["global"]
+    region: ["europe"]
     inBaseCatalog: false
     genrePackages: ["Eurovision"]
     wikimediaSearchHints: ["Joost Klein"]

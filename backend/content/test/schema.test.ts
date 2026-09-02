@@ -16,20 +16,20 @@ describe('content catalog', () => {
     expect(() => loadCatalog()).not.toThrow();
   });
 
-  it('default load contains active V1-categories post-purge + V2-parking', () => {
+  it('default load is MUSIC-ONLY (Film/Sport parkerade i deferred/)', () => {
     const { files } = loadCatalog();
     const categories = new Set(
       Array.from(files.values()).map((f) => f.category),
     );
+    // MUSIC-ONLY LAUNCH (2026-09): bara musik-kategorier laddas som default.
     expect(categories.has('artists')).toBe(true);
     expect(categories.has('songs')).toBe(true);
-    expect(categories.has('actors')).toBe(true);
-    expect(categories.has('sport')).toBe(true);
-    // persons-* raderade vid politiker-purge:n (2026-05-21) — items
-    // omkategoriserade till artists/actors/athletes eller strikna.
+    // Film (actors) + Sport (athletes/sport-events) flyttade till deferred/.
+    expect(categories.has('actors')).toBe(false);
+    expect(categories.has('sport')).toBe(false);
+    // persons-* raderade vid politiker-purge:n (2026-05-21).
     expect(categories.has('persons')).toBe(false);
-    // capitals (städer + länder) parkerade till deferred/ 2026-05-22 —
-    // svår att definiera vilken generation som faktiskt kan dem. V2-task.
+    // capitals (städer + länder) parkerade till deferred/ 2026-05-22.
     expect(categories.has('capitals')).toBe(false);
   });
 
@@ -118,14 +118,13 @@ describe('content catalog', () => {
   });
 
   it('findItemsById finds cross-audience figure via audience-array', () => {
-    // Modern fotbollsstjärnor (Zlatan/Cristiano/Messi) ligger nu i ett
-    // enskilt athletes-modern.yaml med audience-array ["millennials",
-    // "gen-z", "gen-alpha"] istället för dupliceras över flera filer.
-    // findItemsById ska hitta dem som single match.
+    // MUSIC-ONLY LAUNCH: athletes-modern.yaml (Zlatan m.fl.) är parkerad i
+    // deferred/. Testet använder nu ett musik-item (ABBA i bands-classics.yaml)
+    // med cross-gen audience-array. findItemsById ska hitta det som single match.
     const catalog = loadCatalog();
-    const zlatan = findItemsById(catalog, 'zlatan-ibrahimovic');
-    expect(zlatan.length).toBe(1);
-    const file = catalog.files.get(zlatan[0].filename);
+    const abba = findItemsById(catalog, 'abba');
+    expect(abba.length).toBe(1);
+    const file = catalog.files.get(abba[0].filename);
     expect(file?.audience).toContain('millennials');
     expect(file?.audience).toContain('gen-z');
     expect(file?.audience).toContain('gen-alpha');
