@@ -1389,7 +1389,7 @@ items:
   - id: gyllene-tider-juni-juli-augusti
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Juni, juli, augusti — Gyllene Tider"
-    correctYear: 1981
+    correctYear: 1996
     probability: 90
     wikimediaSearchHints: ["Gyllene Tider Swedish pop rock band Per Gessle"]
     answerMethods: ["timeline"]

@@ -3913,38 +3913,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "gyllene-tider-juni-juli-augusti",
-    "displayName": "Juni, juli, augusti — Gyllene Tider",
-    "correctYear": 1981,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 90,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Summer"
-    ],
-    "spotifyTrackId": "2AXTRWWGTwgp0Ud8cPzT5S",
-    "youtubeClips": [
-      {
-        "videoId": "LksWsiCKqSQ",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Gyllene Tider - Topic",
-        "license": "standard",
-        "notes": "Studio-audio från officiell Topic-kanal."
-      }
-    ]
-  },
-  {
     "id": "hasse-andersson-guld-och-groena-skogar",
     "displayName": "Guld och gröna skogar — Hasse Andersson",
     "correctYear": 1981,
@@ -10231,6 +10199,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "TheFugeesVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "gyllene-tider-juni-juli-augusti",
+    "displayName": "Juni, juli, augusti — Gyllene Tider",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "spotifyTrackId": "2AXTRWWGTwgp0Ud8cPzT5S",
+    "youtubeClips": [
+      {
+        "videoId": "LksWsiCKqSQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Gyllene Tider - Topic",
+        "license": "standard",
+        "notes": "Studio-audio från officiell Topic-kanal."
       }
     ]
   },
