@@ -158,9 +158,31 @@ export function LeaderboardTable({
                 </Text>
                 <Avatar uri={entry.avatarUri} emoji={entry.emoji} name={entry.name} size={26} useBrandFallback />
                 <View style={styles.lbNameStack}>
-                  <Text style={styles.lbName} numberOfLines={2}>
-                    {entry.name}
-                  </Text>
+                  {(() => {
+                    // PlayerName-format [Letters]-[Digits]: håll namnet på EN rad
+                    // när det får plats, men bryt vid bindestrecket när det inte
+                    // gör det (bokstäver + "-" rad 1, siffror rad 2) i stället för
+                    // att RN bryter mitt i siffrorna. flexWrap gör att digit-delen
+                    // wrappar som ETT block till nästa rad, vänsterjusterat.
+                    const dashIdx = entry.name.indexOf('-');
+                    if (dashIdx === -1) {
+                      return (
+                        <Text style={styles.lbName} numberOfLines={1}>
+                          {entry.name}
+                        </Text>
+                      );
+                    }
+                    return (
+                      <View style={styles.lbNameSplit}>
+                        <Text style={styles.lbName} numberOfLines={1}>
+                          {entry.name.slice(0, dashIdx + 1)}
+                        </Text>
+                        <Text style={styles.lbName} numberOfLines={1}>
+                          {entry.name.slice(dashIdx + 1)}
+                        </Text>
+                      </View>
+                    );
+                  })()}
                   {meta.length > 0 && (
                     <Text style={styles.lbNameMeta} numberOfLines={1}>
                       {meta}
@@ -357,6 +379,14 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
+  },
+  // [Letters]-[Digits]-namn: en rad när det ryms, annars wrappar digit-delen
+  // som ett block till nästa rad (vänsterjusterat) — bryter aldrig mitt i
+  // siffrorna.
+  lbNameSplit: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
   lbNameMeta: {
     fontSize: FontSize.xs,

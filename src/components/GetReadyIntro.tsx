@@ -1530,11 +1530,33 @@ export function GetReadyIntro({
                       </Text>
                     </>
                   )}
-                  {nextDJName && (
-                    <Text style={styles.nextDJLabel} numberOfLines={1}>
-                      Next DJ: {nextDJName}
-                    </Text>
-                  )}
+                  {nextDJName && (() => {
+                    // Splitta DJ-namnet [Letters]-[Digits] på två rader
+                    // (bokstäver + "-" rad 1, siffror rad 2), vänsterjusterat,
+                    // precis som leaderboard-PlayerRow. Ett långt namn brer då
+                    // inte ut sig horisontellt och täcker sekvensnumret +
+                    // Spotify-ikonen. Saknas bindestreck visas namnet på en rad.
+                    const dashIdx = nextDJName.indexOf('-');
+                    return (
+                      <View style={styles.nextDJWrap}>
+                        <Text style={styles.nextDJPrefix}>Next DJ:</Text>
+                        {dashIdx === -1 ? (
+                          <Text style={styles.nextDJLabel} numberOfLines={1}>
+                            {nextDJName}
+                          </Text>
+                        ) : (
+                          <View style={styles.nextDJNameSplit}>
+                            <Text style={styles.nextDJLabel} numberOfLines={1}>
+                              {nextDJName.slice(0, dashIdx + 1)}
+                            </Text>
+                            <Text style={styles.nextDJLabel} numberOfLines={1}>
+                              {nextDJName.slice(dashIdx + 1)}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })()}
                   {!questionDataPending && currentAnswerType && (
                     <View style={styles.answerTypeBadge} pointerEvents="none">
                       <Text style={styles.answerTypeBadgeText}>{currentAnswerType}</Text>
@@ -2496,13 +2518,30 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
     textAlign: 'center',
   },
+  // "Next DJ:"-block: prefix + (ev. tvåradigt) namn i en flex-row som får
+  // krympa (flexShrink) så det aldrig pushar sekvensnumret/Spotify-ikonen.
+  nextDJWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    flexShrink: 1,
+  },
+  nextDJPrefix: {
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: '#1DB954',
+  },
+  // Bokstäver-rad ovanpå siffer-rad, vänsterjusterat (som leaderboard-namnet).
+  nextDJNameSplit: {
+    alignItems: 'flex-start',
+    flexShrink: 1,
+  },
   nextDJLabel: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
     color: '#1DB954',
-    textAlign: 'center',
+    textAlign: 'left',
     flexShrink: 1,
-    marginTop: 2,
   },
   // ── Kö-chips-rad (delas av IndDev + PtP) ─────────────────────────────
   // Vänster-packad rad: chips med 4pt gap mellan, slutmarkören inline efter
