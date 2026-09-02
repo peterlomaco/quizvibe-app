@@ -153,11 +153,14 @@ function FullNamesView({
           //                     green Correct-badge på rätta raden
           //   • Time-out:       green Correct-badge på rätta raden +
           //                     röd ✗-badge på ALLA andra (wrong-reveal)
+          // Spelarens EGEN rad graderas redan vid 'awaiting' (= isLocked) så
+          // ✓/✗ syns direkt när svaret låsts. Facit (separat correct-rad +
+          // wrong-reveal på övriga rader) hålls kvar till 'reveal'.
           let badgeType: 'correct' | 'wrong' | 'wrongReveal' | null = null;
-          if (isRevealing) {
-            if (isPlayerRow && confirmedName) {
-              badgeType = wasPlayerCorrect ? 'correct' : 'wrong';
-            } else if (isCorrectRevealRow) {
+          if (isPlayerRow && confirmedName && isLocked) {
+            badgeType = wasPlayerCorrect ? 'correct' : 'wrong';
+          } else if (isRevealing) {
+            if (isCorrectRevealRow) {
               badgeType = 'correct';
             } else if (isWrongRevealRow) {
               badgeType = 'wrongReveal';
@@ -395,11 +398,14 @@ function PrefixView({
           //                     green "Correct"-badge på rätta raden
           //   • Time-out:       green "Correct"-badge på rätta raden +
           //                     röd "✗"-badge på ALLA andra (wrong-reveal)
+          // Spelarens EGEN rad graderas redan vid 'awaiting' (= isLocked) så
+          // ✓/✗ syns direkt när svaret låsts. Facit (separat correct-rad +
+          // wrong-reveal på övriga rader) hålls kvar till 'reveal'.
           let badgeType: 'correct' | 'wrong' | 'wrongReveal' | null = null;
-          if (isRevealing) {
-            if (isPlayerRow && confirmedName) {
-              badgeType = wasPlayerCorrect ? 'correct' : 'wrong';
-            } else if (isCorrectRevealRow) {
+          if (isPlayerRow && confirmedName && isLocked) {
+            badgeType = wasPlayerCorrect ? 'correct' : 'wrong';
+          } else if (isRevealing) {
+            if (isCorrectRevealRow) {
               badgeType = 'correct';
             } else if (isWrongRevealRow) {
               badgeType = 'wrongReveal';

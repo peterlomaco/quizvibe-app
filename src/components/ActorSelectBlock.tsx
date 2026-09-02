@@ -101,7 +101,7 @@ export function ActorSelectBlock({
         const isPlayerRow = confirmedName === name;
         const isCorrectRevealRow = isRevealing && isCorrectName;
         const wasPlayerCorrect = isPlayerRow && isCorrectName;
-        const showWrongForPlayer = isPlayerRow && isRevealing && !isCorrectName;
+        const showWrongForPlayer = isPlayerRow && isLocked && !isCorrectName;
         const showWrongTimeout = isRevealing && isTimedOut && !isCorrectName;
         const isDimmed =
           isRevealing && !isPlayerRow && !isCorrectRevealRow && !isTimedOut;
@@ -110,16 +110,22 @@ export function ActorSelectBlock({
         const isConfirmedRow = isLocked && confirmedName === name;
         const isSelected = isPending || isConfirmedRow;
 
-        // Kantlinje-färg (delas av prefix-knapp och namnkort)
+        // Kantlinje-färg (delas av prefix-knapp och namnkort). Spelarens EGEN
+        // låsta rad färgas grön/röd redan vid 'awaiting' så rätt/fel syns direkt
+        // — facit-raderna (separat correct + time-out-röd) hålls till 'reveal'.
         let borderColor: string = Colors.border;
         if (isPending) borderColor = Colors.primary;
-        else if (isConfirmedRow && !isRevealing) borderColor = Colors.warning;
+        else if (isConfirmedRow) borderColor = wasPlayerCorrect ? Colors.success : QUIZ_ERROR_RED;
         else if (isCorrectRevealRow) borderColor = Colors.success;
-        else if (showWrongForPlayer || showWrongTimeout) borderColor = QUIZ_ERROR_RED;
+        else if (showWrongTimeout) borderColor = QUIZ_ERROR_RED;
 
         const textColor = isDimmed ? Colors.textDisabled : Colors.textPrimary;
+        // Spelarens egen ✓ visas vid lås (awaiting); time-out-facitets ✓ på
+        // rätta raden hålls kvar till reveal. showWrongBadge läser det nu
+        // isLocked-gatade showWrongForPlayer + reveal-only showWrongTimeout.
         const showCorrectBadge =
-          isRevealing && (wasPlayerCorrect || (isCorrectRevealRow && isTimedOut));
+          (isPlayerRow && wasPlayerCorrect && isLocked) ||
+          (isRevealing && isCorrectRevealRow && isTimedOut);
         const showWrongBadge = showWrongForPlayer || showWrongTimeout;
 
         const onPress = () => {

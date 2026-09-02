@@ -3421,6 +3421,10 @@ export default function QuizScreen() {
   // svaret poppa in. Kopierad logik från den borttagna RevealScreen-komponenten.
   const revealScale = useRef(new Animated.Value(0.6)).current;
   const revealOpacity = useRef(new Animated.Value(0)).current;
+  // One-shot-guard så reveal-boxens spring-in bara körs EN gång per fråga.
+  // Boxen blir synlig redan vid 'awaiting' (efter confirm) och ska inte
+  // poppa om vid 'awaiting' → 'reveal'-övergången när facit-texten fylls i.
+  const revealCardAnimatedRef = useRef(false);
   // Confirm-knappens blue glow + scale-pulse — körs i loop medan question-
   // fasen är aktiv och pendingYear är giltig (knappen är tappbar). Speglar
   // Lobby:s Start Game-CTA + GetReady:s play-knapp.
@@ -4357,17 +4361,26 @@ export default function QuizScreen() {
     }
   }, [timeLeft, phase]);
 
-  // Spring-in inline-reveal när phase växlar till 'reveal'. Reset:ar värdena
-  // varje gång så animationen körs på varje frågetransition (inte bara första).
+  // Spring-in inline-reveal när reveal-boxen först blir synlig. Boxen visas
+  // numera redan vid 'awaiting' (efter confirm, med bara ✓/✗-badge) och vid
+  // 'reveal' (time-out/DJ, som aldrig passerar 'awaiting'). One-shot-guarden
+  // gör att animationen körs EN gång per fråga och inte poppar om vid
+  // 'awaiting' → 'reveal'-övergången. Guarden re-armas automatiskt så fort
+  // fasen lämnar boxens synliga tillstånd (intro/countdown/question).
   useEffect(() => {
-    if (phase === 'reveal') {
-      revealScale.setValue(0.6);
-      revealOpacity.setValue(0);
-      Animated.parallel([
-        Animated.spring(revealScale, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }),
-        Animated.timing(revealOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-      ]).start();
+    const cardVisible = phase === 'awaiting' || phase === 'reveal';
+    if (!cardVisible) {
+      revealCardAnimatedRef.current = false;
+      return;
     }
+    if (revealCardAnimatedRef.current) return;
+    revealCardAnimatedRef.current = true;
+    revealScale.setValue(0.6);
+    revealOpacity.setValue(0);
+    Animated.parallel([
+      Animated.spring(revealScale, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }),
+      Animated.timing(revealOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+    ]).start();
   }, [phase, revealScale, revealOpacity]);
 
   // Pulserande ring + glow runt sekund-räknaren — körs i alla aktiva timer-
@@ -10498,7 +10511,7 @@ export default function QuizScreen() {
                 </View>
               );
             })()}
-            {phase === 'reveal' && question.type === 'timeline' && (() => {
+            {(phase === 'awaiting' || phase === 'reveal') && question.type === 'timeline' && (() => {
               // Name-svar (non-DJ): ImageAnswerBlock renderar inline reveal (badges per prefix-rad) → skippa kort
               // DJ på Spotify/Name renderas av blocket ovanför
               if (isSpotifyNameQuestion) return null;
@@ -10532,27 +10545,48 @@ export default function QuizScreen() {
                         {wasCorrect ? '✓ Correct Answer' : '✗ Wrong Answer'}
                       </Text>
                     )}
-                    <Text style={rv.feedbackCorrectYear}>
-                      {correctLabel}{' '}
-                      <Text style={rv.feedbackCorrectYearBold}>
-                        {correctValue}
-                      </Text>
-                    </Text>
-                    {/* Låt-titel + artist från question.hint (format
-                        "Title — Artist" från MUSIC_QUESTIONS.displayName).
-                        FontSize.xs + tight lineHeight håller raden kompakt
-                        så feedback-kortet inte växer märkbart. numberOfLines=1
-                        + ellipsizeMode='tail' skyddar mot långa titlar som
-                        annars skulle wrappa och pusha kortet längre ner. */}
-                    {question.hint && (
+                    {/* Facit-texten (år + låt/artist) hålls tillbaka tills
+                        nedräkningen tagit slut. Under 'awaiting' renderas texten
+                        DOLD (opacity 0) så kortet reserverar exakt samma höjd som
+                        vid reveal, och en QuizVibe-logo läggs centrerad ovanpå så
+                        boxen inte ser tom/hopklämd ut medan spelaren väntar. Vid
+                        'reveal' fylls texten i och kortet ser ut precis som förut. */}
+                    <View style={rv.feedbackBody}>
                       <Text
-                        style={rv.feedbackSongMeta}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
+                        style={[
+                          rv.feedbackCorrectYear,
+                          phase !== 'reveal' && rv.feedbackTextHidden,
+                        ]}
                       >
-                        {question.hint}
+                        {correctLabel}{' '}
+                        <Text style={rv.feedbackCorrectYearBold}>
+                          {correctValue}
+                        </Text>
                       </Text>
-                    )}
+                      {/* Låt-titel + artist från question.hint (format
+                          "Title — Artist" från MUSIC_QUESTIONS.displayName).
+                          FontSize.xs + tight lineHeight håller raden kompakt
+                          så feedback-kortet inte växer märkbart. numberOfLines=1
+                          + ellipsizeMode='tail' skyddar mot långa titlar som
+                          annars skulle wrappa och pusha kortet längre ner. */}
+                      {question.hint && (
+                        <Text
+                          style={[
+                            rv.feedbackSongMeta,
+                            phase !== 'reveal' && rv.feedbackTextHidden,
+                          ]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {question.hint}
+                        </Text>
+                      )}
+                      {phase !== 'reveal' && (
+                        <View style={rv.feedbackLogoOverlay} pointerEvents="none">
+                          <QuizVibeLogo size={52} />
+                        </View>
+                      )}
+                    </View>
                   </Animated.View>
                 </View>
               );
@@ -12008,6 +12042,20 @@ const rv = StyleSheet.create({
   // "Correct year: 1980" — fortfarande primärt fokus i reveal-vyn men
   // krympt så hela kortet håller låg höjd oavsett assistance-nivå (kortet
   // ska bara vara så högt att badge + correct-year-raden får plats).
+  // Wrapper runt facit-texten så awaiting-boxen kan reservera exakt reveal-höjd
+  // (dold text) medan QuizVibe-logon overlay:as centrerad ovanpå.
+  feedbackBody: {
+    position: 'relative',
+    gap: 2,
+  },
+  feedbackTextHidden: {
+    opacity: 0,
+  },
+  feedbackLogoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   feedbackCorrectYear: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.medium,
