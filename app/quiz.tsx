@@ -4790,9 +4790,13 @@ export default function QuizScreen() {
     // Markera own confirm lokalt + broadcast till andra devices så deras
     // timer-bar uppdaterar avatar-positionen för denna spelare. Gated på
     // IndDev — i Pass-the-Phone delar alla samma enhet/markör.
-    if (gameMode === 'individual-devices' && selfPlayerId) {
+    // Frys own avatar-markör lokalt i alla non-PtP-lägen (IndDev + remote-1v1;
+    // PtP delar enhet/markör via confirmedTimeUsed). Broadcasten är däremot
+    // IndDev-only — remote-1v1 har ingen quiz_sync-kanal, så self-markören där
+    // sätts enbart lokalt.
+    if (gameMode !== 'pass-the-phone' && selfPlayerId) {
       setPlayerConfirms((prev) => ({ ...prev, [selfPlayerId]: exactElapsedSec }));
-      if (syncChannelRef.current) {
+      if (gameMode === 'individual-devices' && syncChannelRef.current) {
         syncChannelRef.current
           .broadcastPlayerAnswerConfirmed({
             player_id: selfPlayerId,
@@ -4885,9 +4889,13 @@ export default function QuizScreen() {
       },
     ]);
     recordRoundScore(pts, correct, exactElapsedSec);
-    if (gameMode === 'individual-devices' && selfPlayerId) {
+    // Frys own avatar-markör lokalt i alla non-PtP-lägen (IndDev + remote-1v1;
+    // PtP delar enhet/markör via confirmedTimeUsed). Broadcasten är däremot
+    // IndDev-only — remote-1v1 har ingen quiz_sync-kanal, så self-markören där
+    // sätts enbart lokalt.
+    if (gameMode !== 'pass-the-phone' && selfPlayerId) {
       setPlayerConfirms((prev) => ({ ...prev, [selfPlayerId]: exactElapsedSec }));
-      if (syncChannelRef.current) {
+      if (gameMode === 'individual-devices' && syncChannelRef.current) {
         syncChannelRef.current
           .broadcastPlayerAnswerConfirmed({
             player_id: selfPlayerId,
@@ -4933,9 +4941,13 @@ export default function QuizScreen() {
       },
     ]);
     recordRoundScore(pts, correct, exactElapsedSec);
-    if (gameMode === 'individual-devices' && selfPlayerId) {
+    // Frys own avatar-markör lokalt i alla non-PtP-lägen (IndDev + remote-1v1;
+    // PtP delar enhet/markör via confirmedTimeUsed). Broadcasten är däremot
+    // IndDev-only — remote-1v1 har ingen quiz_sync-kanal, så self-markören där
+    // sätts enbart lokalt.
+    if (gameMode !== 'pass-the-phone' && selfPlayerId) {
       setPlayerConfirms((prev) => ({ ...prev, [selfPlayerId]: exactElapsedSec }));
-      if (syncChannelRef.current) {
+      if (gameMode === 'individual-devices' && syncChannelRef.current) {
         syncChannelRef.current
           .broadcastPlayerAnswerConfirmed({
             player_id: selfPlayerId,
