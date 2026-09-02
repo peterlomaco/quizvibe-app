@@ -159,8 +159,8 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
  * "Premium option" — inga asterisker i värde-kolumnerna (Peter 2026-08-09).
  *
  * Källor för värdena: Remote 1vs1 är users-only; guest-hostade spel skriver
- * ingen Player history; guest host är låst till fast Game era / inga Extra
- * packages / max 1 Play Again; free host = FREE_CREDITS_DAILY_CAP (4) —
+ * ingen Player history; guest host kan välja Game era (sedan 2026-09-02) men
+ * har inga Extra packages / max 1 Play Again; free host = FREE_CREDITS_DAILY_CAP (4) —
  * både grant vid registrering och daglig top-up-cap, samma siffra som
  * Store:s "Basic: 4 games per day". Guest = ogated men trial-begränsat
  * spel.
@@ -170,7 +170,7 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
   { label: 'Head-to-head matches', user: true, guest: false },
   { label: 'Saved results & player history', user: true, guest: false },
   { label: 'Friends list & in-app invites', user: true, guest: false },
-  { label: 'Choose Game era', user: true, guest: false },
+  { label: 'Custom Game era', user: true, guest: true },
   { label: 'Select categories and source (Source mixerboard)', user: true, guest: false },
   { label: 'Spotify, YouTube and Hints', user: true, guest: true },
   { label: 'Host games per day', user: '4 free', guest: 'Trial' },
@@ -1521,9 +1521,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     Delas av guest-JOIN och guest-HOST sedan 2026-08-08 —
                     guest host var tidigare låst till Full (visades som en
                     read-only "Fixed Guest settings"-ruta tillsammans med
-                    60s svarstid). Guest host väljer numera BÅDA fritt:
-                    nivån här, svarstiden i lobbyn. Kvar som fast för guest
-                    host är enbart Game era (fulla spannet).
+                    60s svarstid). Guest host väljer numera allt fritt:
+                    nivån här, svarstiden och Game era (default [födelseår,
+                    idag], editerbar) i lobbyn.
                     Guest-HOST har inga rumkods-celler — koden genereras vid
                     submit i handleStartGameAsGuestHost. */}
                 <Text

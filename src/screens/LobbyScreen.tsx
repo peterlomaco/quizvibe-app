@@ -1560,9 +1560,13 @@ export default function LobbyScreen() {
       // "Play Again + keep players" bevarar guest-hostens val — quiz.tsx:s
       // goToNewLobby skriver carry-over-settings till nya rumkoden innan
       // navigation. Fresh lobby saknar stored-rad → defaults nedan.
-      // Låsta fält förblir ALLTID hårdkodade (maxPlayers 4, full era, inga
-      // paket, alla source-kategorier ON — Mixerboard är guest-låst).
+      // Låsta fält förblir ALLTID hårdkodade (maxPlayers 4, inga paket,
+      // alla source-kategorier ON — Mixerboard är guest-låst).
       // answerResponseSeconds är guest-VARIABEL sedan 2026-08-08 (30/45/60).
+      // Game era är guest-VARIABEL sedan 2026-09-02 (Peter): fresh guest-
+      // lobby defaultar till [birthYear, idag] och slidern är editerbar
+      // precis som för en registrerad host — carry-over av stored.eraFrom/To
+      // respekteras vid Play Again.
       getLobbySettings(roomCode).then((stored) => {
         if (cancelled) return;
         // 1v1: singlePlayerDefault MÅSTE vara false — alla remote-guards
@@ -1602,7 +1606,18 @@ export default function LobbyScreen() {
               ? 60
               : 30,
         );
-        setEraValues([ERA_MIN, ERA_MAX]);
+        // Fresh guest-lobby: [födelseår, idag]. Carry-over (Play Again) läser
+        // stored.eraFrom/To. Clampa som i registrerade grenen: to golvas till
+        // ERA_TO_MIN (1980), from till [ERA_MIN, to − intervall].
+        const guestEraFrom =
+          stored?.eraFrom ?? (guestBirthYear ? parseInt(guestBirthYear, 10) : 1981);
+        const guestEraTo = stored?.eraTo ?? ERA_MAX;
+        const guestClampTo = Math.max(ERA_TO_MIN, Math.min(ERA_MAX, guestEraTo));
+        const guestClampFrom = Math.max(
+          ERA_MIN,
+          Math.min(guestEraFrom, guestClampTo - ERA_MIN_INTERVAL),
+        );
+        setEraValues([guestClampFrom, guestClampTo]);
         // Clampa mot guest-utbudet {2, 4} — defensivt mot oväntade värden.
         setRoundsCount(
           stored?.roundsCount === 2 ? 2 : stored?.roundsCount === 4 ? 4 : ROUNDS_DEFAULT,
@@ -8339,21 +8354,17 @@ export default function LobbyScreen() {
                   <Text style={styles.eraGuestBoxText}>{displayEra[0]} – {displayEra[1]}</Text>
                 </View>
               </View>
-              {/* Guest host: era är låst till fulla spannet — ingen slider,
-                  bara info-not under display-boxen. */}
-              {isGuestHost && (
-                <Text style={styles.guestHostNote}>
-                  change Game era not available for Guest user
-                </Text>
-              )}
-              {/* Host-paket aktivt: era låst till paketets innehålls-span (samma
-                  låsta mönster som guest host) — ingen slider, bara info-not. */}
+              {/* Host-paket aktivt: era låst till paketets innehålls-span
+                  — ingen slider, bara info-not. Guest host har aldrig paket,
+                  så detta gäller bara registrerade hosts. */}
               {packageEraLocked && !isGuestHost && (
                 <Text style={styles.guestHostNote}>
                   Game era locked by selected package
                 </Text>
               )}
-              {hostMode && !isGuestHost && !packageEraLocked && (
+              {/* Slidern renderas för ALLA hosts (guest host inkluderad sedan
+                  2026-09-02) utom när ett paket låser eran. */}
+              {hostMode && !packageEraLocked && (
                 <View style={{ alignItems: 'center', position: 'relative', width: SLIDER_WIDTH, alignSelf: 'center' }}>
                   <MultiSlider
                     // values-propen hålls STABIL under drag (= committed
@@ -8470,8 +8481,8 @@ export default function LobbyScreen() {
                   <DecadeMarks />
                 </View>
               )}
-              {hostMode && !isGuestHost && eraAtToFloor && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ To-year can not be earlier than 1980</Text></View>}
-              {hostMode && !isGuestHost && eraAtMinInterval && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ Min interval 15 years</Text></View>}
+              {hostMode && !packageEraLocked && eraAtToFloor && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ To-year can not be earlier than 1980</Text></View>}
+              {hostMode && !packageEraLocked && eraAtMinInterval && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ Min interval 15 years</Text></View>}
               {eraWarning && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ {eraWarning}</Text></View>}
             </View>
 
