@@ -26,6 +26,13 @@ import {
 import { loadDistractorPool } from '../content/distractor-pool';
 import { HINTS_LIBRARY } from '../../src/utils/hintsData';
 import { meetsHintsThreshold, MIN_RAW_HINTS, MIN_RENDER_ENTRIES } from '../../src/utils/hintsText';
+import { resolvePeakWindow, PERSON_SUBJECTS } from '../../src/utils/peakWindow';
+
+const CURRENT_YEAR = new Date().getFullYear();
+
+// Person-items som saknade allt peak-underlag (ingen katalog-peak, ingen
+// peak_year-ledtråd, inget correctYear) → förblir era-agnostiska. Loggas i main.
+const residualNoPeakIds: string[] = [];
 
 const OUTPUT_PATH = path.join(
   __dirname,
@@ -91,14 +98,31 @@ function buildExportedQuestion(
 
   const item = matches[0].item;
 
+  // Härled ett aktiv-era-fönster: katalog-peak > curated peak_year-ledtråd >
+  // correctYear-fallback. Utan fönster förblir person-items era-agnostiska
+  // (bug: gamla artister som Jo Stafford dök upp i sentida era-spann).
+  const peakYearHint = HINTS_LIBRARY[item.id]?.hints.find(
+    (h) => h.type === 'peak_year',
+  )?.value;
+  const peak = resolvePeakWindow({
+    catalogPeakFrom: item.peakFrom,
+    catalogPeakTo: item.peakTo,
+    peakYearHint,
+    correctYear: item.correctYear,
+    contentSubject,
+    currentYear: CURRENT_YEAR,
+  });
+  if (!peak && PERSON_SUBJECTS.has(contentSubject)) {
+    residualNoPeakIds.push(item.id);
+  }
+
   return {
     id: item.id,
     displayName: item.displayName,
     category,
     contentSubject,
     ...(item.correctYear !== undefined ? { correctYear: item.correctYear } : {}),
-    ...(item.peakFrom !== undefined ? { peakFrom: item.peakFrom } : {}),
-    ...(item.peakTo !== undefined ? { peakTo: item.peakTo } : {}),
+    ...(peak ? { peakFrom: peak.peakFrom, peakTo: peak.peakTo } : {}),
     audiences: Array.from(audiencesSet),
     region: Array.from(regionSet),
     questionText: FIXED_QUESTION_TEXT[contentSubject],
@@ -263,6 +287,14 @@ async function main(): Promise<void> {
   await fs.promises.mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
   await fs.promises.writeFile(OUTPUT_PATH, renderTsModule(questions, pool.names));
   console.log(`\nWrote ${questions.length} questions to ${OUTPUT_PATH}`);
+
+  if (residualNoPeakIds.length > 0) {
+    console.warn(
+      `\n⚠ ${residualNoPeakIds.length} person-items have no peak window ` +
+        `(no catalog peak, no peak_year hint, no correctYear) — they stay ERA-AGNOSTIC:\n  ` +
+        residualNoPeakIds.join(', '),
+    );
+  }
 }
 
 main().catch((err) => {
