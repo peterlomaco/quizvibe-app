@@ -118,11 +118,12 @@ export default function MyMatchesScreen() {
   const [isGuestSession, setIsGuestSession] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [resultMatchId, setResultMatchId] = useState<string | null>(null);
-  // Historiken startar kollapsad så de spelbara matcherna syns direkt;
-  // de två aktiva sektionerna är utfällda från start.
+  // Alla huvudrubriker startar ihopfällda (Peter 2026-09-02) — spelaren
+  // tappar sig manuellt vidare i varje sektion. Flash-guiden fäller INTE
+  // längre ut sektioner automatiskt; den blinkar bara rubriken + scrollar dit.
   const [expanded, setExpanded] = useState<Record<SectionKey, boolean>>({
-    notStarted: true,
-    ongoing: true,
+    notStarted: false,
+    ongoing: false,
     history: false,
   });
 
@@ -226,9 +227,10 @@ export default function MyMatchesScreen() {
   }, [reload]);
 
   // Konsumera flash-guiden EN gång per paramvärde när datan laddats: markera
-  // matcherna, fäll ut sektionen (+ ev. motståndar-grupp) de ligger i, och köa
-  // scroll till första träffade sektionen. Rensa paramet så det bara fyrar en
-  // gång (blinket lever kvar i flashIds-state).
+  // matcherna och köa scroll till första träffade sektionen. Fäller INTE ut
+  // någon sektion — spelaren tappar sig manuellt vidare (Peter 2026-09-02);
+  // blinket på sektionsrubriken pekar ut vart hen ska. Rensa paramet så det
+  // bara fyrar en gång (blinket lever kvar i flashIds-state).
   useEffect(() => {
     if (!focusMatchIds || !loaded) return;
     if (consumedFocusRef.current === focusMatchIds) return;
@@ -246,29 +248,12 @@ export default function MyMatchesScreen() {
 
     const order: SectionKey[] = ['notStarted', 'ongoing', 'history'];
     const hitSections = new Set<SectionKey>();
-    const hitOpponents = new Set<string>();
     for (const m of matches) {
       if (!ids.has(m.match.id)) continue;
-      const key = classify(m);
-      hitSections.add(key);
-      if (key === 'history') hitOpponents.add(m.opponent?.userId ?? 'unknown-opponent');
+      hitSections.add(classify(m));
     }
 
     setFlashIds(ids);
-    if (hitSections.size > 0) {
-      setExpanded((prev) => {
-        const next = { ...prev };
-        for (const k of hitSections) next[k] = true;
-        return next;
-      });
-    }
-    if (hitOpponents.size > 0) {
-      setExpandedOpponents((prev) => {
-        const next = { ...prev };
-        for (const k of hitOpponents) next[k] = true;
-        return next;
-      });
-    }
     pendingScrollRef.current = order.find((k) => hitSections.has(k)) ?? null;
     maybeScroll();
   }, [focusMatchIds, loaded, matches, answeredIds, maybeScroll]);
