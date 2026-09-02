@@ -7,9 +7,9 @@ description: QuizVibe is developed and operated by LoMaCo AB, a limited company 
 
 ## The app
 
-QuizVibe is a mobile app for social music, film and sport quizzes, where friends and family compete against each other — on the same phone, on separate devices, or in a head-to-head duel.
+QuizVibe is a mobile app for social music quizzes, where friends and family compete against each other — on the same phone, on separate devices, or in a head-to-head duel.
 
-The app is built around the idea that a quiz should include everyone at the table. Questions are drawn from music clips, film scenes, sporting moments and progressively revealed hints, and the content adapts to the ages of the people playing, so that players from different generations compete on equal terms in the same round.
+The app is built around the idea that a quiz should include everyone at the table. Questions are drawn from music clips and progressively revealed hints, and the content adapts to the ages of the people playing, so that players from different generations compete on equal terms in the same round.
 
 QuizVibe offers four ways to play:
 

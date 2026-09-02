@@ -157,7 +157,7 @@ We will respond within a reasonable time and remove infringing content if the cl
 QuizVibe offers the following one-time and recurring purchases via Apple StoreKit:
 
 - **Host Game Credits** — one-time purchases (e.g., 5, 10, or 20 credits) that let you host additional games beyond your daily free allowance.
-- **Customized Host Packages** — one-time purchases that unlock themed content packages (e.g., Hip Hop, Rock, Film & Actors).
+- **Customized Host Packages** — one-time purchases that unlock themed content packages (e.g., Hip Hop, Rock).
 - **QuizVibe membership subscriptions** — monthly, quarterly, half-yearly, or annual auto-renewing subscriptions that unlock multiplayer features (Individual Devices mode, up to 12 players, up to 20 rounds, etc.).
 
 Prices are displayed in the app at the time of purchase, in your local currency as provided by Apple.

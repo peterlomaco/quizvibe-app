@@ -108,7 +108,7 @@ Supabase has its own privacy policy: https://supabase.com/privacy
 
 ### 4.2 YouTube IFrame Player (video playback)
 
-Quiz questions include embedded YouTube video clips (songs, movie scenes, sport events). When a video plays, your device communicates directly with YouTube's servers to stream the content. This means **Google receives information about your device** (IP address, browser-like info, the video being watched) per their own data collection practices.
+Quiz questions include embedded YouTube music clips. When a video plays, your device communicates directly with YouTube's servers to stream the content. This means **Google receives information about your device** (IP address, browser-like info, the video being watched) per their own data collection practices.
 
 We do **not** send YouTube any of your QuizVibe account information. The YouTube player runs in a sandboxed view inside the app.
 
