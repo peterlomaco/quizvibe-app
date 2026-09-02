@@ -617,9 +617,14 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     if (!(await isActiveRoom(invite.roomCode))) {
       const updated = await removeInvite(invite.id);
       setInvites(updated);
+      // Race-fallet: host deletar lobby:n i exakt samma stund som mottagaren
+      // trycker Accept. Samma copy som non-host:ens in-lobby-popup
+      // ("Game Lobby deleted") så språket är konsekvent i hela appen. Vi
+      // navigerar INTE — mottagaren blir kvar i Waiting Invites-listan
+      // (formuläret på Home) med den döda inviten bortstädad.
       Alert.alert(
-        'Lobby no longer available',
-        'This lobby has been deleted by the Host.',
+        'Game Lobby deleted',
+        'This Game Lobby has been deleted by Host.',
       );
       return;
     }

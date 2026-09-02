@@ -4775,6 +4775,16 @@ export default function LobbyScreen() {
     // upptäcker det inom ~2s (även medan host:s loading-overlay
     // visas — det är realistiskt async-beteende).
     await deactivateRoom(roomCode);
+    // Rensa stale waiting_invites EXPLICIT — förlita oss inte enbart på
+    // ON DELETE CASCADE (rooms → waiting_invites). Om FK-cascaden inte
+    // fyrar (t.ex. i ett projekt där migrationen inte är applicerad) skulle
+    // en redan skickad invite ligga kvar i mottagarens Waiting Invites-lista
+    // och fortsatt gå att tacka ja till fast lobbyn är borta. DELETE:n
+    // triggar Realtime-events som BÅDE JoinModal:s öppna lista och Home:s
+    // "Waiting Invites"-signal lyssnar på → inviten försvinner live, och en
+    // stängd modal visar den inte vid nästa load. Samma mekanism som
+    // game-start-pathen redan använder (2026-09-02). Best-effort, kastar ej.
+    void clearWaitingInvitesForRoom(roomCode).catch(() => { /* loggas i waitingInvites */ });
     clearLobbyPlayers(roomCode);
     clearLobbySettings(roomCode);
     clearEjected(roomCode);

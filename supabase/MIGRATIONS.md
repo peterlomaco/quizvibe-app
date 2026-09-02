@@ -67,7 +67,7 @@ applied (the app depends on it) but not individually re-verified · `—` env no
 | 0036_drop_quiz_image_assets | ✅? | ✅ 2026-08-30 | drop |
 | 0037_aggregate_leaderboards | ✅? | ✅ 2026-08-30 | |
 | 0038_waiting_invites_already_friend | ✅? | ✅ 2026-08-30 | |
-| 0039_waiting_invites_replica_identity_full | ✅? | ✅ 2026-08-30 | |
+| 0039_waiting_invites_replica_identity_full | ✅ 2026-09-02 | ✅ 2026-08-30 | prod verified: `relreplident = 'f'` on `waiting_invites` |
 | 0040_email_exists | ✅? | ✅ 2026-08-30 | |
 | 0041_competition_rematch_requests | ✅? | ✅ 2026-08-30 | |
 | 0042_lobby_players_hcp | ✅? | ✅ 2026-08-30 | |
