@@ -91,6 +91,14 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
   const bracketRight = ((RULER_MAX - min) / range) * RULER_WIDTH + 13;
   const bracketWidth = bracketRight - bracketLeft;
 
+  // FREE-klammer: spänner över gratis-tier-rangen (min → ROUNDS_MAX_PASS),
+  // dvs 2–4 rundor. Speglar premium-klammerns +13/-13-offsetmönster så de två
+  // klammrarna ligger direkt intill varandra. FREE-badgen är ALLTID grön
+  // (2–4 rundor är gratis oavsett subscription-status).
+  const freeBracketLeft = ((min - min) / range) * RULER_WIDTH - 13;
+  const freeBracketRight = ((ROUNDS_MAX_PASS - min) / range) * RULER_WIDTH + 13;
+  const freeBracketWidth = freeBracketRight - freeBracketLeft;
+
   return (
     <View style={{ width: RULER_WIDTH, marginTop: 6 }}>
       {/* Tunn track-linje + filled-portion */}
@@ -158,6 +166,28 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
               sitter i en absolutpositionerad centrerad wrapper över samma
               bracket-bredd så den auto-centrerar oavsett innehållsbredd. */}
           <View style={{ marginTop: 0, height: 34 }}>
+            {/* FREE-klammer (2–4 rundor) — direkt intill premium-klammern.
+                Alltid grön, ingen press-handler (gratis-tier kräver inget). */}
+            <View style={[roundsRulerStyles.bracket, {
+              left: freeBracketLeft,
+              width: freeBracketWidth,
+              borderColor: Colors.success,
+            }]} />
+            <View
+              style={{
+                position: 'absolute',
+                top: 14,
+                left: freeBracketLeft,
+                width: freeBracketWidth,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <View style={roundsRulerStyles.freeBadge}>
+                <Text style={roundsRulerStyles.freeBadgeText}>FREE</Text>
+              </View>
+            </View>
             <View style={[roundsRulerStyles.bracket, {
               left: bracketLeft,
               width: bracketWidth,
@@ -265,6 +295,20 @@ const roundsRulerStyles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     color: '#000',
+    letterSpacing: 0.6,
+  },
+  // FREE-CTA under FREE-klammern — speglar premiumBadge:s form (borderRadius 4,
+  // 8/2 padding, 10px/700/0.6 text) men grön bg + vit text. Alltid grön.
+  freeBadge: {
+    backgroundColor: Colors.success,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  freeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
     letterSpacing: 0.6,
   },
   // "Individual device +" framför PREMIUM-badgen under klammern.
