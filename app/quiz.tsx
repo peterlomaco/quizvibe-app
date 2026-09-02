@@ -9288,8 +9288,8 @@ export default function QuizScreen() {
     // Frågans rubrik: solo aggregerar en SCORE (en spelare), flerspelar en
     // LEADERBOARD. Kan inte använda aggregateLabel() — serien finns inte än.
     const replayTitle = isLocalSoloGame
-      ? 'Replay & Marathon score?'
-      : 'Re-match with Marathon table?';
+      ? 'Replay and add to marathon table?'
+      : 'Re-match and add to marathon table?';
     // "Start New Game" visas när det inte finns någon re-match-fråga att
     // besvara (guest host, eller ett obehörigt PtP-spel), och annars först
     // när host svarat No. Guest host får den BARA om enheten är inloggad —
