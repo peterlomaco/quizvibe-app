@@ -9,7 +9,7 @@ import {
 import { BottomBanner } from '@/src/components/BottomBanner';
 import { Colors } from '@/src/theme';
 import { refreshOfferConfig, refreshPromoGrants } from '@/src/utils/promoPremium';
-import { refreshPremiumMirror, setPremiumActive } from '@/src/utils/subscriptionStorage';
+import { clearPremiumSubscription, refreshPremiumMirror, setPremiumActive } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -77,13 +77,25 @@ export default function RootLayout() {
         console.log('[supabase] auth event:', event);
       }
       if (event === 'SIGNED_IN' && session?.user?.id && !session.user.is_anonymous) {
-        // Real user-id — koppla RC till Supabase user för cross-device sync.
-        // is_anonymous-check så vi inte associerar RC med en throw-away anon user.
-        void configurePurchases(session.user.id);
-        // Hämta det inloggade kontots promo-/voucher-grant (per KONTO) och
-        // räkna om premium-spegeln så en gratismånad som lever på ett annat
-        // login syns direkt.
-        void refreshPromoGrants().then(refreshPremiumMirror);
+        const uid = session.user.id;
+        // Rensa den per-ENHET betalda premium-spegeln INNAN RC pekas om till
+        // det inloggade kontot, så ett nyregistrerat/icke-premium-konto aldrig
+        // ärver ett tidigare kontos stale `true` (som annars blinkar
+        // "Unlimited" i credits-pillen tills RC:s async customer-info-callback
+        // hinner korrigera). clearPremiumSubscription nollar BARA det betalda
+        // lagret och räknar om — den ägarstämplade gratismånaden (lager 2)
+        // överlever. KEDJAT så wipe:n är klar FÖRE Purchases.logIn: annars
+        // kan RC:s callback sätta rätt värde och wipe:n sedan racea in bakom
+        // och droppa det. RC + promo återställer sedan kontots verkliga läge.
+        void clearPremiumSubscription()
+          // Real user-id — koppla RC till Supabase user för cross-device sync.
+          // is_anonymous-check så vi inte associerar RC med en throw-away anon user.
+          .then(() => configurePurchases(uid))
+          // Hämta det inloggade kontots promo-/voucher-grant (per KONTO) och
+          // räkna om premium-spegeln så en gratismånad som lever på ett annat
+          // login syns direkt.
+          .then(() => refreshPromoGrants())
+          .then(refreshPremiumMirror);
       } else if (event === 'SIGNED_OUT') {
         void logOutPurchases();
       }
