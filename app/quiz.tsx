@@ -89,7 +89,7 @@ import {
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
-import { isMainCategory, subjectToMainCategory, itemMatchesEnabledCategories, displayCategoryForItem, MAIN_CATEGORIES, type MainCategory } from '@/src/utils/mainCategory';
+import { isMainCategory, subjectToMainCategory, itemInEnabledCategories, displayCategoryForItem, MAIN_CATEGORIES, type MainCategory } from '@/src/utils/mainCategory';
 import { buildMatchHighlights } from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
@@ -185,8 +185,9 @@ interface TimelineQuestion {
   correctYear: number;
   hint: string;
   /** Genre/tema-paket-taggar (t.ex. ["sport"]) från backend-katalogen. Driver
-   *  crossover-filter: sport-musik (subject=song → mainCategory='Music') surfar
-   *  ÄVEN under Sport-toggeln. Se itemMatchesEnabledCategories. */
+   *  Host-paket-matchningen (itemInActivePackages). Crossover till Sport/Film via
+   *  dessa taggar är BORTTAGET i källfiltret (music-only 2026-09) — sport-taggad
+   *  musik är Music och surfar bara via paket, inte via generisk Sport-toggle. */
   genrePackages?: readonly string[];
   /** false = paket-exklusiv (spelas bara när matchande Host-paket aktivt).
    *  Utelämnat = default true = med i baspoolen. Driver tema-pool-filtret. */
@@ -809,6 +810,7 @@ const START_GATE_TIMEOUT_MS = 8000;
 // Energisk färg för svarsrutan (används oavsett assistance-nivå)
 const BOX_COLOR = '#F5A623';       // gyllene
 const BOX_BG = 'rgba(26,48,80,0.92)'; // mörkare navy – tydligt distinkt mot bakgrund #0B1220
+const BOX_BG_OPAQUE = '#1A3050';   // helt ogenomskinlig variant av BOX_BG (reveal-knappar)
 
 // ─── Timeline Selector ────────────────────────────────────────────────────────
 
@@ -1817,12 +1819,21 @@ export default function QuizScreen() {
             })()
           : [])
       : youtubeEnabledCategories;
+    // EFFEKTIV YouTube-källa: styr om YouTube alls är en vald spelbar källa.
+    // I paket-läge ignoreras host:s råa youtubeEnabledCategories — det är
+    // packageYoutubeEnabled + paketets täckning som gäller. Utan paket = host:s
+    // toggle. Använd DENNA (inte råa youtubeEnabled) överallt där vi avgör om
+    // YouTube ska byggas/serveras — annars kan ett Hints-only-paketspel falla
+    // tillbaka på SEED_QUESTIONS (all YouTube) trots att YouTube är avstängt.
+    const youtubeActive = packageActive
+      ? packageYoutubeEnabled && effectiveYoutubeCategories.length > 0
+      : youtubeEnabled;
 
     // ── Music-pool ────────────────────────────────────────────────────
     // Era HÅRD: filtrera SEED_QUESTIONS på correctYear ∈ [eraFrom, eraTo].
     // Bygg music-pool när YT är aktivt ELLER Spotify är aktivt — Spotify DJ
     // är en separat toggle och ska fungera även när youtubeEnabledCategories=[].
-    const inEraMusic = (youtubeEnabled || spotifyEnabled || (packageActive && effectiveYoutubeCategories.length > 0))
+    const inEraMusic = (youtubeActive || spotifyEnabled)
       ? packagedMusic.filter(
           (q) =>
             // Parent Control: host har slagit på filtret → items taggade
@@ -1920,11 +1931,10 @@ export default function QuizScreen() {
     const youtubePool = isAllYoutubeCats
       ? youtubePoolPreCategory
       : youtubePoolPreCategory.filter((q) =>
-          itemMatchesEnabledCategories(
-            q.mainCategory,
-            effectiveYoutubeCategories,
-            q.type === 'timeline' ? q.genrePackages : undefined,
-          ),
+          // NATIV mainCategory, ingen genrePackages-crossover — samma helper som
+          // lobby-previewen. Ett sport-/film-taggat MUSIK-item surfar bara under
+          // Music (native) eller via ett Host-paket, aldrig via generisk Sport/Film.
+          itemInEnabledCategories(q.mainCategory, effectiveYoutubeCategories),
         );
     // Hints-pool: alla image-items renderas via HintsQuizCard (flagga + progressiva
     // ledtrådar). Items med data i HINTS_LIBRARY får faktiska hints; övriga visar
@@ -1936,10 +1946,9 @@ export default function QuizScreen() {
       imagesEnabledCategories.includes('Sport');
     const imagePool: QuizQuestion[] = applyItemHcp(isAllImageCats
       ? imagePoolPreCategory
-      : imagePoolPreCategory.filter((q) => {
-          const mc = q.mainCategory;
-          return isAllImageCats ? true : mc !== null && imagesEnabledCategories.includes(mc);
-        }));
+      : imagePoolPreCategory.filter((q) =>
+          itemInEnabledCategories(q.mainCategory, imagesEnabledCategories),
+        ));
 
     // ── Spotify-pool (separat tredje pool) ──────────────────────────────
     // Byggs från pre-category-poolen (youtubePoolPreCategory) för att vara
@@ -1972,7 +1981,9 @@ export default function QuizScreen() {
     // annars returnera bildpool ignorerandes era (era-filter kan ha tömt poolen).
     if (!hasSpotify && !hasPureYoutube && !hasImage) {
       // Shufflas — även nödfallback ska vara slumpad, inte katalog-ordning.
-      if (youtubeEnabled) return shuffleArray(SEED_QUESTIONS);
+      // youtubeActive (INTE råa youtubeEnabled): serva ALDRIG YouTube-seed när
+      // YouTube inte är en effektivt vald källa (t.ex. Hints-only-paketspel).
+      if (youtubeActive) return shuffleArray(SEED_QUESTIONS);
       // YouTube av, Hints tom pga era-filter eller saknad data → visa alla
       // person-items utan era-filter som nödlösning.
       const fallbackImages = IMAGE_SEED_QUESTIONS.filter(
@@ -2287,7 +2298,9 @@ export default function QuizScreen() {
     // Nödfallback: alla pools tomma (t.ex. source-toggle av + era utan träffar).
     // Shufflas — även nödfallback ska vara slumpad, inte katalog-ordning.
     if (mixed.length === 0) {
-      if (!youtubeEnabled) {
+      // youtubeActive (INTE råa youtubeEnabled): en Hints-only-källa får aldrig
+      // falla tillbaka på SEED_QUESTIONS (YouTube) — se youtubeActive ovan.
+      if (!youtubeActive) {
         const personFallback = IMAGE_SEED_QUESTIONS.filter(
           (q) => PERSON_SUBJECTS.has(q.source.contentSubject),
         );
@@ -2678,8 +2691,12 @@ export default function QuizScreen() {
   const [djHandedOver, setDjHandedOver] = useState(false);
   // A1-fix: host har väntat för länge på DJ:ns handover i reveal (DJ tappade
   // kontakt/quittade utan att trycka "End DJ", eller broadcasten tappades) →
-  // visa en manuell "Continue without DJ →"-escape så spelet aldrig fastnar.
+  // visa en manuell "Force DJ quit"-escape så spelet aldrig fastnar.
   const [djHandoverStuck, setDjHandoverStuck] = useState(false);
+  // När escapen armas (djHandoverStuck true) räknar denna ned från 30 → 0
+  // innan "Force DJ quit"-knappen blir tappbar. Ger DJ:n en sista chans att
+  // trycka sin egen knapp innan host tvångsavslutar. 0 = tappbar.
+  const [djForceQuitCountdown, setDjForceQuitCountdown] = useState(0);
   // DJ har tryckt × på overlay → aktiverar steg 5 i guiden (utan att låsa upp host:s Next ännu).
   const [djDismissedOverlay, setDjDismissedOverlay] = useState(false);
   // ── FUTURE VERSION 2 — Automated API Flow (archived states) ─────────────────────
@@ -3414,6 +3431,11 @@ export default function QuizScreen() {
   // CTA-pulse (1 ↔ 1.03 over 900ms). Körs kontinuerligt — vid mount och
   // framåt — eftersom knapparna bara renderas i reveal-fasen ändå.
   const nextTabPulse = useRef(new Animated.Value(1)).current;
+  // "Force DJ to end"-knappens EGNA pulse. Egen loop (inte nextTabPulse) som
+  // STARTAS först när knappen låses upp — en Animated.View som monteras mitt i
+  // ett redan pågående native-loop plockar inte alltid upp drivningen, så
+  // knappen stod still efter nedräkningen. Kraftigare (1 ↔ 1.06) så den syns.
+  const djForceQuitPulse = useRef(new Animated.Value(1)).current;
   // Next-tab:ens EGNA pulse — medvetet kraftigare än nextTabPulse (1 ↔ 1.08
   // på 650 ms + halo som andas 0.15 ↔ 0.55) eftersom den är reveal-vyns enda
   // vägen-vidare-CTA och måste läsas som pulserande på en blick (Peter
@@ -4271,6 +4293,49 @@ export default function QuizScreen() {
     };
   }, [isHost, phase, isSpotifyQuestion, isCurrentPlayerDJ, djHandedOver]);
 
+  // "Force DJ quit"-nedräkning: när escapen armas (djHandoverStuck true) syns
+  // knappen direkt men är LÅST och räknar ned 30 → 0 innan den blir tappbar.
+  // Nollställs automatiskt när djHandoverStuck faller (per-frågas reset).
+  useEffect(() => {
+    if (!djHandoverStuck) {
+      setDjForceQuitCountdown(0);
+      return;
+    }
+    setDjForceQuitCountdown(30);
+    const iv = setInterval(() => {
+      setDjForceQuitCountdown((n) => {
+        if (n <= 1) {
+          clearInterval(iv);
+          return 0;
+        }
+        return n - 1;
+      });
+    }, 1000);
+    return () => clearInterval(iv);
+  }, [djHandoverStuck]);
+
+  // Starta "Force DJ to end"-pulsen FÖRST när knappen låses upp (nedräkningen
+  // klar). Effekten kör efter render → den redan monterade Animated.View
+  // drivs pålitligt. Stoppas + pinnas till 1 medan låst/ej relevant.
+  useEffect(() => {
+    const unlocked = isHost && djHandoverStuck && djForceQuitCountdown === 0;
+    if (!unlocked) {
+      djForceQuitPulse.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(djForceQuitPulse, { toValue: 1.06, duration: 700, useNativeDriver: true }),
+        Animated.timing(djForceQuitPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => {
+      loop.stop();
+      djForceQuitPulse.setValue(1);
+    };
+  }, [isHost, djHandoverStuck, djForceQuitCountdown, djForceQuitPulse]);
+
   useEffect(() => {
     // Pulsa progress-barens opacity (1 → 0.55 → 1) när ≤5s kvar för att
     // signalera att tiden är kritisk. Native driver eftersom det är ren
@@ -4355,6 +4420,10 @@ export default function QuizScreen() {
   const nextTabPulseStyle = useMemo(
     () => ({ transform: [{ scale: nextTabPulse }] }),
     [nextTabPulse],
+  );
+  const djForceQuitPulseStyle = useMemo(
+    () => ({ transform: [{ scale: djForceQuitPulse }] }),
+    [djForceQuitPulse],
   );
 
   // Next-tab:ens kraftigare pulse: scale + halo-opacity i parallell så
@@ -10492,29 +10561,27 @@ export default function QuizScreen() {
                   {answersExpanded && (
                   <>
                   {revealAnswerSummary.dj && (
-                    <View>
-                      <Text style={[rv.answersHeading, rv.answersHeadingDJ]}>
-                        DJ
+                    // "DJ" (grå) + spelarnamn på SAMMA rad överst — inget eget
+                    // grönt heading-block ovanför längre.
+                    <View style={rv.answerRow}>
+                      {revealAnswerSummary.dj.avatarUri ? (
+                        <Image
+                          source={{ uri: revealAnswerSummary.dj.avatarUri }}
+                          style={rv.answerAvatar}
+                        />
+                      ) : (
+                        <View style={[rv.answerAvatar, rv.answerAvatarFallback]}>
+                          <Text style={rv.answerAvatarEmoji}>
+                            {revealAnswerSummary.dj.emoji ?? '👤'}
+                          </Text>
+                        </View>
+                      )}
+                      <Text style={rv.answersHeadingDJInline}>DJ</Text>
+                      <Text style={rv.answerName} numberOfLines={1} ellipsizeMode="tail">
+                        {revealAnswerSummary.dj.name}
+                        {revealAnswerSummary.dj.id === selfPlayerId ? ' (You)' : ''}
                       </Text>
-                      <View style={rv.answerRow}>
-                        {revealAnswerSummary.dj.avatarUri ? (
-                          <Image
-                            source={{ uri: revealAnswerSummary.dj.avatarUri }}
-                            style={rv.answerAvatar}
-                          />
-                        ) : (
-                          <View style={[rv.answerAvatar, rv.answerAvatarFallback]}>
-                            <Text style={rv.answerAvatarEmoji}>
-                              {revealAnswerSummary.dj.emoji ?? '👤'}
-                            </Text>
-                          </View>
-                        )}
-                        <Text style={rv.answerName} numberOfLines={1} ellipsizeMode="tail">
-                          {revealAnswerSummary.dj.name}
-                          {revealAnswerSummary.dj.id === selfPlayerId ? ' (You)' : ''}
-                        </Text>
-                        <SpotifyBrandIcon size={16} variant="white" />
-                      </View>
+                      <SpotifyBrandIcon size={16} variant="white" />
                     </View>
                   )}
                   <View>
@@ -10702,19 +10769,38 @@ export default function QuizScreen() {
                 </Animated.View>
               ) : null /* knappar ligger i scroll-zonen ovan */
             ) : isHost && djHandoverStuck ? (
-              // A1-fix: DJ:ns handover kom aldrig → ge host en manuell väg vidare
-              // så spelet inte fastnar permanent i reveal.
-              <Animated.View style={nextTabPulseStyle}>
-                <TouchableOpacity
-                  style={rv.djHandoverBtn}
-                  onPress={isLastQuestion ? handleHostShowLeaderboard : handleHostAdvanceFromReveal}
-                  activeOpacity={0.85}
-                >
-                  <Text style={rv.djHandoverBtnText}>
-                    {isLastQuestion ? 'Continue without DJ — Final Leaderboard' : 'Continue without DJ  →'}
-                  </Text>
-                </TouchableOpacity>
-              </Animated.View>
+              // A1-fix: DJ:ns handover kom aldrig → ge host en manuell "Force DJ
+              // to end"-väg vidare så spelet inte fastnar permanent i reveal.
+              // Knappen syns direkt men är LÅST tills 30s-nedräkningen når 0
+              // (djForceQuitCountdown), så DJ:n får en sista chans att avsluta
+              // själv. Låst: ingen puls (undviker "tryck här"-signal). Upplåst:
+              // pulsar. Två SKILDA grenar (inte style-swap på samma Animated.View)
+              // så den pulsande vyn monteras FRESH vid upplåsning — att bara byta
+              // style mellan undefined ↔ native-driven transform kopplar inte om
+              // native-noden pålitligt (samma gotcha som nextTabPulseStyle-memon).
+              djForceQuitCountdown > 0 ? (
+                <View>
+                  <TouchableOpacity
+                    style={rv.djHandoverBtn}
+                    disabled
+                    activeOpacity={0.85}
+                  >
+                    <Text style={rv.djHandoverBtnText}>
+                      {`Force DJ to end (${djForceQuitCountdown}s)`}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <Animated.View style={djForceQuitPulseStyle}>
+                  <TouchableOpacity
+                    style={rv.djHandoverBtn}
+                    onPress={isLastQuestion ? handleHostShowLeaderboard : handleHostAdvanceFromReveal}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={rv.djHandoverBtnText}>Force DJ to end</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              )
             ) : (
               <View style={rv.waitingForHostPill}>
                 <Text style={rv.waitingForHostPillText}>
@@ -11983,8 +12069,14 @@ const rv = StyleSheet.create({
   answersHeadingWrong: {
     color: QUIZ_ERROR_RED,
   },
-  answersHeadingDJ: {
-    color: '#1DB954',
+  // "DJ"-etikett inline med spelarnamnet på DJ-raden i All Players-facitet.
+  // Grå (Colors.textSecondary), ingen marginBottom (sitter i en center-radad
+  // flex-row, inte som heading ovanför).
+  answersHeadingDJInline: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.5,
+    color: Colors.textSecondary,
   },
   answersEmpty: {
     fontSize: FontSize.xs,
@@ -12077,7 +12169,7 @@ const rv = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 3,
     borderColor: BOX_COLOR,
-    backgroundColor: BOX_BG,
+    backgroundColor: BOX_BG_OPAQUE,
     alignItems: 'center',
     justifyContent: 'center',
   },

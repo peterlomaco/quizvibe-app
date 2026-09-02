@@ -76,50 +76,39 @@ export function defaultEnabledMainCategories(): MainCategory[] {
 }
 
 /**
- * Avgör om ett item ska visas givet host:s aktiverade person-typer
- * (Artists / Actors / Athletes — mappar 1:1 till Music / Film / Sport).
+ * Kanonisk källmedlemskaps-check: ska ett item spelas givet host:s aktiverade
+ * kategorier? NATIV mainCategory (härledd från contentSubject) måste finnas i
+ * `enabled`. INGEN genrePackages-crossover.
  *
- * Bas-regeln: item:ets `mainCategory` (härledd från contentSubject) måste
- * finnas i `enabled`. Items med null mainCategory (capitals/places) matchar
- * aldrig här (de hanteras separat av "alla 3 enabled = no-op"-specialfallet
- * i quiz.tsx).
+ * ⚠ Crossover BORTTAGET (2026-09, music-only launch): tidigare surfade ett
+ * sport-/film-taggat item ÄVEN under Sport/Film via `genrePackages`. Men efter
+ * music-only-pivoten är allt innehåll Music (movies/sport-events/actors/athletes
+ * ligger i deferred/), och ett sport-taggat MUSIK-item (t.ex. songs-sport.yaml:
+ * "How Much Is the Fish", `mainCategory: Music` + `genrePackages: ['sport']`) är
+ * MUSIK. Crossover lät en generisk Sport-YouTube-toggle dra in det under Sport —
+ * medan lobby-previewen (som aldrig crossovade) visade Hints. Preview och quiz
+ * driftade isär. Regeln nu (Peters modell): sport-/film-taggad musik är Music,
+ * surfar bara under Music (native) eller via ett Host-PAKET — aldrig via en
+ * generisk Sport/Film-toggle. DENNA helper är den ENDA källmedlemskaps-logiken;
+ * både [gameSequencePreview](../screens/LobbyScreen.tsx) och quiz-poolen
+ * (app/quiz.tsx) använder den så de aldrig kan drifta isär igen.
  *
- * Crossover-regler — baserade på personens PRIMÄRPROFESSION:
- *
- *   genrePackages: ["sport"]
- *     → surfar ÄVEN under Sport/Athletes.
- *     Används på: Film- eller Music-items som gestaltar en ATLET (primär
- *     profession: sport) i en annan kontext — sport-film (Rocky, Rush,
- *     Snatch med Vinnie Jones), sport-musik, låt av känd atlet.
- *
- *   genrePackages: ["music"]
- *     → surfar ÄVEN under Music/Artists.
- *     Används på: Film-items som gestaltar en ARTIST (primär profession:
- *     musik) — t.ex. musikerbiopic, film där en känd artist spelar sig
- *     själv i bärande roll.
- *
- *   genrePackages: ["film"]
- *     → surfar ÄVEN under Film/Actors.
- *     Används på: Music-items gjorda av en SKÅDESPELARE (primär profession:
- *     film) — t.ex. en känd skådespelares hit-låt.
- *     OBS: används INTE på sport-events — det finns inga kända skådespelare
- *     vars primärprofession gjorde dem berömda atleter.
- *
- * Taggar baseras alltid på vem PERSONEN är i grunden, inte innehållets typ.
- * Items crossovar INTE automatiskt till sin nativa kategori — bas-regeln täcker det.
+ * Items med null mainCategory (capitals/places) matchar aldrig här (de hanteras
+ * separat av "alla 3 enabled = no-op"-specialfallet i quiz.tsx).
  */
-export function itemMatchesEnabledCategories(
+export function itemInEnabledCategories(
   mainCategory: MainCategory | null,
   enabled: readonly MainCategory[],
-  genrePackages?: readonly string[],
 ): boolean {
-  // Nativ kategori
-  if (mainCategory !== null && enabled.includes(mainCategory)) return true;
-  // Crossover: person från annan profession gör item relevant i ytterligare kategori
-  if (genrePackages?.includes('sport') && enabled.includes('Sport')) return true;
-  if (genrePackages?.includes('film') && enabled.includes('Film')) return true;
-  if (genrePackages?.includes('music') && enabled.includes('Music')) return true;
-  return false;
+  return mainCategory !== null && enabled.includes(mainCategory);
+}
+
+/** contentSubject-baserad bekvämlighets-wrapper kring itemInEnabledCategories. */
+export function subjectInEnabledCategories(
+  subject: string | undefined,
+  enabled: readonly MainCategory[],
+): boolean {
+  return itemInEnabledCategories(subjectToMainCategory(subject), enabled);
 }
 
 /**
@@ -137,9 +126,13 @@ export function itemMatchesEnabledCategories(
  *   • Bas-kategorin är BORTFILTRERAD men itemet kom in via en crossover-tagg
  *     som matchar en aktiverad kategori → visa den matchade kategorin.
  *
- * Spegling av `itemMatchesEnabledCategories` — samma prioritet (sport→film→music)
- * på crossover-fallbacken. `enabled` = source-relevanta kategorier (YouTube-
- * frågor: youtubeEnabledCategories; Hints/image: imagesEnabledCategories).
+ * OBS: källmedlemskaps-filtret (itemInEnabledCategories) crossovar INTE längre
+ * (music-only launch 2026-09), så ett item hamnar i poolen bara under sin NATIVA
+ * kategori. Crossover-grenarna nedan är därmed onåbara för poolade items (basen
+ * är alltid aktiverad då) → badgen blir alltid bas-kategorin. Grenarna behålls
+ * defensivt ifall badge-funktionen återanvänds i ett framtida crossover-läge.
+ * `enabled` = source-relevanta kategorier (YouTube-frågor: youtubeEnabledCategories;
+ * Hints/image: imagesEnabledCategories).
  */
 export function displayCategoryForItem(
   mainCategory: MainCategory | null,

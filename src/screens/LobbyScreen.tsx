@@ -68,7 +68,7 @@ import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
 import { createRemoteMatch, getMatchByRoomCode, getOwnUserId, hasRemote1v1RelationshipWith } from '../utils/remoteMatches';
 import { saveLobby } from '../utils/savedLobbies';
-import { defaultEnabledMainCategories, subjectToMainCategory, MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
+import { defaultEnabledMainCategories, subjectToMainCategory, subjectInEnabledCategories, MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
 import { supabase } from '../utils/supabase';
@@ -6592,20 +6592,16 @@ export default function LobbyScreen() {
     const effYtCats: MainCategory[] = cov
       ? MAIN_CATEGORIES.filter((mc) => cov[mc].youtube)
       : youtubeEnabledCategories;
-    const ytFiltered = MUSIC_QUESTIONS.filter(q => {
-      if (!inPkg(q.genrePackages)) return false;
-      if (q.contentSubject === 'song') return effYtCats.includes('Music');
-      if (q.contentSubject === 'movie') return effYtCats.includes('Film');
-      if (q.contentSubject === 'sport-event') return effYtCats.includes('Sport');
-      return false;
-    });
-    const imgFiltered = pkgActive ? [] : IMAGE_QUIZ_QUESTIONS.filter(q => {
-      const s = q.contentSubject;
-      if (s === 'artist' || s === 'band') return imagesEnabledCategories.includes('Music');
-      if (s === 'actor' || s === 'character') return imagesEnabledCategories.includes('Film');
-      if (s === 'athlete') return imagesEnabledCategories.includes('Sport');
-      return false;
-    });
+    // Källmedlemskap via DELAD helper (native mainCategory, ingen crossover) —
+    // samma logik som quiz-poolen (app/quiz.tsx) så preview och spel aldrig driftar.
+    const ytFiltered = MUSIC_QUESTIONS.filter(
+      (q) => inPkg(q.genrePackages) && subjectInEnabledCategories(q.contentSubject, effYtCats),
+    );
+    const imgFiltered = pkgActive
+      ? []
+      : IMAGE_QUIZ_QUESTIONS.filter((q) =>
+          subjectInEnabledCategories(q.contentSubject, imagesEnabledCategories),
+        );
     // Spotify bara i IndDev — PtP och Single Player kör utan Spotify DJ.
     const spotifyActive = spotifyEnabled && gameMode === 'individual-devices' && !singlePlayerDefault;
     const spotifyPool = spotifyActive ? MUSIC_QUESTIONS.filter(q => q.spotifyTrackId && inPkg(q.genrePackages)) : [];
