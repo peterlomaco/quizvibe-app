@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
-import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing, Typography, TIGHT_TEXT_MAX_SCALE } from '../theme';
 import Confetti from './Confetti';
 import SparkleDrawQ, { DRAW_MS } from './SparkleDrawQ';
 import SparklerSound from './SparklerSound';
@@ -512,6 +512,8 @@ export default function FinalCelebration({
             { opacity: contentOpacity, transform: [{ scale: contentScale }] },
           ]}
           numberOfLines={1}
+          adjustsFontSizeToFit
+          maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}
         >
           QuizVibe
         </Animated.Text>

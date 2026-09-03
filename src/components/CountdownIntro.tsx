@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '../theme';
 import { type MainCategory } from '../utils/mainCategory';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
@@ -389,8 +389,8 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
             Alla spelare på sina egna enheter — ingen specifik spelare att namnge. */}
         {isIndDev ? (
           <View style={styles.playerBlock}>
-            <Text style={styles.getReadyHeadline}>Get Ready to</Text>
-            <Text style={[styles.getReadyBrandHeadline, brandFont && { fontFamily: brandFont }]}>
+            <Text style={styles.getReadyHeadline} numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>Get Ready to</Text>
+            <Text style={[styles.getReadyBrandHeadline, brandFont && { fontFamily: brandFont }]} numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
               QuizVibe
             </Text>
             {mediaSourceBlock}

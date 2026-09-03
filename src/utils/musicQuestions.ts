@@ -1845,6 +1845,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "curtis-mayfield-move-on-up",
+    "displayName": "Move On Up — Curtis Mayfield",
+    "correctYear": 1970,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "0MHXrqn909p0LRTPsNsGEi",
+    "youtubeClips": [
+      {
+        "videoId": "xGR9bQh-kpk",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1281)."
+      }
+    ]
+  },
+  {
     "id": "dana-all-kinds-of-everything",
     "displayName": "All Kinds of Everything — Dana",
     "correctYear": 1970,
@@ -7809,6 +7837,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "pearl-jam-alive",
+    "displayName": "Alive — Pearl Jam",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Rock"
+    ],
+    "spotifyTrackId": "1L94M3KIu7QluZe63g64rv",
+    "youtubeClips": [
+      {
+        "videoId": "qM0zINtulhM",
+        "startSec": 10,
+        "endSec": 40,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1277)."
+      }
+    ]
+  },
+  {
     "id": "queen-the-show-must-go-on",
     "displayName": "The Show Must Go On — Queen",
     "correctYear": 1991,
@@ -9656,6 +9715,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "2pac-california-love",
+    "displayName": "California Love — 2Pac feat. Dr. Dre",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "spotifyTrackId": "3ia3dJETSOllPsv3LJkE35",
+    "youtubeClips": [
+      {
+        "videoId": "99zZ4fGZlgk",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1280)."
+      }
+    ]
+  },
+  {
     "id": "alanis-morissette-ironic",
     "displayName": "Ironic — Alanis Morissette",
     "correctYear": 1995,
@@ -10814,6 +10904,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "foo-fighters-everlong",
+    "displayName": "Everlong — Foo Fighters",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Rock"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "eBG7P-K-r1Y",
+        "startSec": 3,
+        "endSec": 33,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1278)."
+      }
+    ]
+  },
+  {
     "id": "hanson-mmmbop",
     "displayName": "MMMBop — Hanson",
     "correctYear": 1997,
@@ -11857,6 +11978,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dr-dre-still-dre",
+    "displayName": "Still D.R.E. — Dr. Dre feat. Snoop Dogg",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "503OTo2dSqe7qk76rgsbep",
+    "youtubeClips": [
+      {
+        "videoId": "_CL6n0FJZpk",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1279)."
+      }
+    ]
+  },
+  {
     "id": "dr-dre-the-next-episode",
     "displayName": "The Next Episode — Dr. Dre ft. Snoop Dogg",
     "correctYear": 1999,
@@ -12161,6 +12314,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Zombie Nation",
         "license": "standard",
         "notes": "Official video 1999."
+      }
+    ]
+  },
+  {
+    "id": "alcazar-crying-at-the-discoteque",
+    "displayName": "Crying at the Discoteque — Alcazar",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "1ahgFXU3pVMgREuWEG5V4A",
+    "youtubeClips": [
+      {
+        "videoId": "7CiOWcUVGJM",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1275)."
       }
     ]
   },
@@ -12482,6 +12663,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "thomas-rusiak-hiphopper",
+    "displayName": "Hiphopper — Thomas Rusiak",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "0x33TsFwcpAZBxePZmokvu",
+    "youtubeClips": [
+      {
+        "videoId": "Jvf7I7ypTIc",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1283)."
+      }
+    ]
+  },
+  {
     "id": "alicia-keys-fallin",
     "displayName": "Fallin' — Alicia Keys",
     "correctYear": 2001,
@@ -12657,6 +12870,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MUSIC EVOLUTION",
         "license": "standard",
         "notes": "Official Video 4K 60fps remaster — HD-fix av tidigare SD-klipp 2026-05-22. Refrängområde."
+      }
+    ]
+  },
+  {
+    "id": "manu-chao-me-gustas-tu",
+    "displayName": "Me Gustas Tu — Manu Chao",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "spotifyTrackId": "6b37xrsNCWYIUphFBazqD6",
+    "youtubeClips": [
+      {
+        "videoId": "b22wgo919FM",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1284)."
       }
     ]
   },
@@ -13254,6 +13498,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "alcazar-this-is-the-world-we-live-in",
+    "displayName": "This Is the World We Live In — Alcazar",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "t65NQg6iXDw",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1276)."
+      }
+    ]
+  },
+  {
     "id": "anastacia-left-outside-alone",
     "displayName": "Left Outside Alone — Anastacia",
     "correctYear": 2004,
@@ -13665,6 +13936,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ThePussycatDollsVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "the-game-hate-it-or-love-it",
+    "displayName": "Hate It or Love It — The Game feat. 50 Cent",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "6gQaf0ANLks2uWl2AHhU26",
+    "youtubeClips": [
+      {
+        "videoId": "BuMBmK5uksg",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1282)."
       }
     ]
   },
@@ -15964,6 +16267,52 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "norlie-kkv-dar-jag-hanger-min-hatt",
+    "displayName": "Där jag hänger min hatt — Norlie & KKV",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "2Sl83ewoJgUBQCb3dvSTma",
+    "youtubeClips": []
+  },
+  {
+    "id": "norlie-kkv-trojan-du-hatar",
+    "displayName": "Tröjan du hatar — Norlie & KKV",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "17qZsun9q3L8ceIa3kPz4A",
+    "youtubeClips": []
+  },
+  {
     "id": "psy-gangnam-style",
     "displayName": "Gangnam Style — PSY",
     "correctYear": 2012,
@@ -16601,6 +16950,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ed Sheeran",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "hoffmaestro-highway-man",
+    "displayName": "Highway Man — Hoffmaestro",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pHo97vRiS5w",
+        "startSec": 10,
+        "endSec": 40,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1272)."
       }
     ]
   },

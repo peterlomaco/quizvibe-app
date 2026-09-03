@@ -8,11 +8,13 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type TextStyle,
 } from 'react-native';
+// Intro/kö/leaderboard är enbart korta etiketter, namn och siffror (ingen
+// brödtext) → capped mot Dynamic Type.
+import { CappedText as Text } from './CappedText';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { MainCategory } from '../utils/mainCategory';

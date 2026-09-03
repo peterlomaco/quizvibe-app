@@ -43,6 +43,7 @@ import { TopUserBanner } from '../components/TopUserBanner';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { resetIdentity, track } from '../utils/analytics';
 import { deleteAccount } from '../utils/auth';
+import { TRACK_VIEWPORT_W } from '../utils/responsive';
 import { supabase } from '../utils/supabase';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import {
@@ -187,7 +188,9 @@ const ANSWER_RESPONSE_OPTIONS: { id: AnswerResponse; label: string }[] = [
 // vad rutan ovan visade. Nu mappar 0 % → 1930 och 100 % → currentYear.
 const ERA_MIN = 1950;
 const ERA_MAX = new Date().getFullYear();
-const ERA_SLIDER_WIDTH = 280;
+// Skärmbredds-härledd (delad med Lobby:s era-slider + RoundsRuler, se
+// responsive.ts) — fyller kortet på alla telefoner i stället för fast 280 px.
+const ERA_SLIDER_WIDTH = TRACK_VIEWPORT_W;
 // SLIDER_INSET = pixel-buffer på vardera sida så thumb-cirklarna inte
 // sticker ut förbi slider-trackens kanter. MultiSlider:s sliderLength
 // sätts till INNER_WIDTH och DecadeMarks-positionen offset:as med INSET.

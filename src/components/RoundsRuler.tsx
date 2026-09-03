@@ -1,7 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+// Linjemätaren är bara siffror + FREE/PREMIUM-badges → capped mot Dynamic Type.
+import { CappedText as Text } from './CappedText';
 import { TouchableOpacity } from '@/src/components/haptic';
 import { Colors, Radius } from '../theme';
+import { TRACK_VIEWPORT_W } from '../utils/responsive';
 
 // Antal rundor:
 //   • Pass-the-Phone: 2–4 (telefonen rör sig fysiskt mellan spelare så
@@ -15,8 +18,8 @@ export const ROUNDS_MAX_INDIV = 20;
 export const ROUNDS_STEP = 2;
 export const ROUNDS_DEFAULT = 4;
 // Bredd-konstant för linjemätaren — håller pixel-positionerna i sync med
-// Lobby:s era-slider (samma 280 px viewport).
-const RULER_WIDTH = 280;
+// Lobby:s era-slider (delad, skärmbredds-härledd viewport, se responsive.ts).
+const RULER_WIDTH = TRACK_VIEWPORT_W;
 
 /**
  * Linjemätare för Number of Rounds — tunn horisontell linje över intervallet

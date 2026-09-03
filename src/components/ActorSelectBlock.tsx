@@ -11,7 +11,9 @@
 //   • reveal    → correct grön, spelarens fel röd, timeout alla röda
 
 import { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+// Svarsalternativ (prefix + korta namn) + reveal-badges → capped mot Dynamic Type.
+import { CappedText as Text } from './CappedText';
 import { Pressable } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { createSeededRng } from '@/src/utils/seededRandom';

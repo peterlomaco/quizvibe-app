@@ -25,7 +25,7 @@ import {
 } from '../content/schema';
 import { loadDistractorPool } from '../content/distractor-pool';
 import { HINTS_LIBRARY } from '../../src/utils/hintsData';
-import { meetsHintsThreshold, MIN_RAW_HINTS, MIN_RENDER_ENTRIES } from '../../src/utils/hintsText';
+import { meetsHintsThreshold, MIN_RAW_HINTS } from '../../src/utils/hintsText';
 import { resolvePeakWindow, PERSON_SUBJECTS } from '../../src/utils/peakWindow';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -245,12 +245,11 @@ export function getImageQuestionsForGeneration(
  * Katalog-items som har ett tillräckligt spelbart hints-bibliotek.
  *
  * Gaten (se meetsHintsThreshold i hintsText.ts, delad med quiz.tsx:s runtime-
- * filter): rått antal ledtrådar ≥ MIN_RAW_HINTS (10), ELLER — om ledtrådarna
- * grupperar snyggt under rubriker (Birth/Career History/Film History/Titles/
- * Trophies) — ≥ MIN_RENDER_ENTRIES (5) topp-nivå-bullets. Peter 2026-08-27:
- * ett item med få råa fakta som ändå grupperar (t.ex. Birth + Career History
- * + Trophies = 3 grupper av 7 fakta) kan vara lika spelbart som ett med 10
- * lösa fakta.
+ * filter): rått antal ledtrådar ≥ MIN_RAW_HINTS (8) OCH en riktig landsflagga
+ * (hasCountryFlag — inte den grå `🏳️`-platshållaren). Peter 2026-09-03: en
+ * Hints-fråga med färre än 8 ledtrådar eller utan synlig flagga får inte
+ * visas (ersätter 2026-08-27-gaten som släppte in items med bara ≥5
+ * grupperade bullets).
  *
  * ⚠ Urvalet gick t.o.m. 2026-08-17 på "har en webp i assets/quiz-images/".
  * Det var en kvarleva: sedan person-bilderna parkerades juridiskt renderar en
@@ -265,7 +264,7 @@ function listHintItemIds(catalog: ReturnType<typeof loadCatalog>): string[] {
   for (const file of catalog.files.values()) {
     if (file.contentForm !== 'image') continue;
     for (const item of file.items) {
-      if (meetsHintsThreshold(HINTS_LIBRARY[item.id], item.displayName)) ids.add(item.id);
+      if (meetsHintsThreshold(HINTS_LIBRARY[item.id])) ids.add(item.id);
     }
   }
   return [...ids].sort();
@@ -274,7 +273,7 @@ function listHintItemIds(catalog: ReturnType<typeof loadCatalog>): string[] {
 async function main(): Promise<void> {
   const catalog = loadCatalog();
   const ids = listHintItemIds(catalog);
-  console.log(`Found ${ids.length} image items with >= ${MIN_RAW_HINTS} hints (or >= ${MIN_RENDER_ENTRIES} grouped entries)`);
+  console.log(`Found ${ids.length} image items with >= ${MIN_RAW_HINTS} hints AND a real country flag`);
 
   const questions: ExportedQuestion[] = [];
   for (const id of ids) {

@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+// Spelarkortet är bara namn, badges, meta-pills och status (ingen brödtext)
+// → capped mot Dynamic Type.
+import { CappedText as Text } from './CappedText';
 import { Pressable } from '@/src/components/haptic';
 import Svg, { Path } from 'react-native-svg';
 import type { PeerHealth } from '../lib/realtime/lobbyHealthChannel';

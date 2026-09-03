@@ -15,11 +15,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   StyleSheet,
-  Text,
   TextStyle,
   View,
   ViewStyle,
 } from 'react-native';
+// Svarsalternativ (prefix + korta namn) + reveal-badges → capped mot Dynamic Type.
+import { CappedText as Text } from './CappedText';
 import { Pressable } from '@/src/components/haptic';
 import {
   Colors,

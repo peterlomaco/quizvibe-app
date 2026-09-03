@@ -427,11 +427,9 @@ export function buildRenderEntries(hints: ResolvedHint[]): RenderEntry[] {
 
 /**
  * Antal TOPP-nivå-bullets en fråga skulle visa (grupper räknas som EN),
- * givet ALLA ledtrådar i biblioteket. Används av spelbarhets-gaten i
- * export-image-questions.ts (se MIN_HINTS_REQUIRED/MIN_RENDER_ENTRIES där) —
- * ett item med få råa fakta som ändå grupperar snyggt (Birth + Career History
- * + Trophies = 3 grupper av kanske 7 rader) kan vara lika spelbart som ett
- * med 10 lösa fakta.
+ * givet ALLA ledtrådar i biblioteket. Ingår INTE längre i spelbarhets-gaten
+ * (den kräver ≥8 råa ledtrådar + riktig flagga, se meetsHintsThreshold i
+ * hintsText.ts, Peter 2026-09-03) — behålls som ren hjälpfunktion.
  */
 export function countRenderEntries(hints: ResolvedHint[]): number {
   return buildRenderEntries(hints).length;

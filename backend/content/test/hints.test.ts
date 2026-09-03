@@ -37,7 +37,7 @@ const resolveGender = (id: string) => resolveItemGender(id, HINTS_LIBRARY[id]);
 const playable = IMAGE_QUIZ_QUESTIONS.filter(
   (q) =>
     isItemInRegionScope(q.region, PLAYER_COUNTRY) &&
-    meetsHintsThreshold(HINTS_LIBRARY[q.id], q.displayName),
+    meetsHintsThreshold(HINTS_LIBRARY[q.id]),
 );
 const playablePersons = playable.filter((q) => GENDERED_SUBJECTS.has(q.contentSubject));
 

@@ -1,6 +1,8 @@
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+// Login-pill + back-label är korta etiketter → capped mot Dynamic Type.
+import { CappedText as Text } from './CappedText';
 import { TouchableOpacity } from '@/src/components/haptic';
 import { Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';

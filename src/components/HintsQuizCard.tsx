@@ -17,6 +17,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
+  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
@@ -25,7 +26,7 @@ import {
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { HintCategoryLabel, HintLibrary } from '../utils/hintsData';
 import { countryToFlagEmoji } from '../utils/hintsData';
-import { buildRenderEntries, selectHints, type GroupEntry, type SingleEntry } from '../utils/hintsGenerator';
+import { buildRenderEntries, HINT_MAX_CHARS, HINT_SUB_MAX_CHARS, selectHints, type GroupEntry, type SingleEntry } from '../utils/hintsGenerator';
 import { resolveHints } from '../utils/hintsText';
 import { createSeededRng } from '../utils/seededRandom';
 import { ProgressiveCover } from './ProgressiveCover';
@@ -34,7 +35,27 @@ type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
 const HINTS_ALL_OUT_FRACTION = 2 / 3; // alla hints synliga vid T×2/3
 const MAX_HINTS = 15;
-const RIGHT_COL_W = 110; // px — flagga + namn-kolumn
+const RIGHT_COL_W = 80; // px — flagga + namn-kolumn (smalare → mer plats åt ledtrådstext)
+
+// Skärmbredds-härledd radbudget (Peter 2026-09-03). De statiska
+// HINT_MAX_CHARS/HINT_SUB_MAX_CHARS är tunade för smalaste iPhone (SE) och
+// kapade ledtrådstext med "…" i onödan på breda telefoner. hintsCol får hela
+// bredden UTOM flagg-/namn-kolumnen (RIGHT_COL_W), sin egen h-padding
+// (paddingLeft 10 + paddingRight 6 = 16) och bullet-zonen (bullet 10 + gap 5 =
+// 15). ~8.7 px/tecken vid fontSize 16 är konservativt mot de ~8.1 som faktiskt
+// får plats, så fitHintText hinner korta på ordgräns inom EN rad (numberOfLines
+// = 1 klipper annars mitt i ordet med native-ellips). Golv vid det gamla säkra
+// värdet så inget smalt läge regredierar. Läses en gång per session — appen är
+// porträttlåst (app.json), så bredden ändras inte under körning.
+const SCREEN_W = Dimensions.get('window').width;
+const HINT_TEXT_W = SCREEN_W - RIGHT_COL_W - 16 - 15;
+const HINT_MAX_CHARS_DYNAMIC = Math.max(HINT_MAX_CHARS, Math.round(HINT_TEXT_W / 8.7));
+// Underrader (↳, fontSize 12) beräknas ur SIN EGEN bredd — de äter mer horisontell
+// chrome än huvudraderna (paddingLeft 15 + arrow 12 + gap 4 = 31 mot bullet-zonens
+// 15), så den enkla font-ratio-skalningen (×16/12) överskattar. ~6.6 px/tecken vid
+// fontSize 12. Golv vid det gamla säkra värdet.
+const HINT_SUB_TEXT_W = SCREEN_W - RIGHT_COL_W - 16 - 31;
+const HINT_SUB_MAX_CHARS_DYNAMIC = Math.max(HINT_SUB_MAX_CHARS, Math.round(HINT_SUB_TEXT_W / 6.6));
 
 interface Props {
   library?: HintLibrary;
@@ -150,6 +171,8 @@ function HintsQuizCardBase({
             selectHints(library, MAX_HINTS, hintsSeed ? createSeededRng(hintsSeed) : undefined),
             displayName,
             primaryLabel,
+            HINT_MAX_CHARS_DYNAMIC,
+            HINT_SUB_MAX_CHARS_DYNAMIC,
           )
         : [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -505,10 +528,10 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   flagEmoji: {
-    fontSize: 100,
+    fontSize: 66,
     textAlign: 'center',
-    lineHeight: 108,
-    marginTop: -8,
+    lineHeight: 72,
+    marginTop: -5,
     marginLeft: -2,
   },
 
