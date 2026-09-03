@@ -423,6 +423,20 @@ export function countryToFlagEmoji(nationality: string): string {
 }
 
 /**
+ * Har nationaliteten en RIKTIG landsflagga i FLAG_MAP? `false` = countryToFlagEmoji
+ * skulle falla tillbaka på den grå/vita `🏳️`-platshållaren (t.ex. nationality
+ * 'unknown' eller ett land vi inte mappar). Driver spelbarhets-gaten
+ * (meetsHintsThreshold i hintsText.ts) — en Hints-fråga vars enda visuella
+ * ledtråd är en grå flagga får inte visas (Peter 2026-09-03).
+ * OBS: anropas med den slut-överridade nationaliteten (NATIONALITY_OVERRIDES
+ * appliceras när HINTS_LIBRARY byggs), så items med korrigerbar nationalitet
+ * behåller sin flagga i stället för att gallras bort.
+ */
+export function hasCountryFlag(nationality: string | undefined): boolean {
+  return !!nationality && FLAG_MAP[nationality.toLowerCase()] !== undefined;
+}
+
+/**
  * Härleder kön från pronomen i hints-texterna.
  * Räknar förekomster av he/his/him (manlig) vs she/her/hers (kvinnlig).
  * Returnerar null om otydligt eller inga pronomen hittats.
@@ -8903,7 +8917,8 @@ const NATIONALITY_OVERRIDES: Record<string, string> = {
   'backstreet-boys': 'usa',   'eagles': 'usa',            'edward-norton': 'usa',
   'green-day': 'usa',         'guns-n-roses': 'usa',      'journey': 'usa',
   'kiss': 'usa',              'maroon-5': 'usa',          'metallica': 'usa',
-  'nicki-minaj': 'usa',       'the-doors': 'usa',
+  'nicki-minaj': 'usa',       'the-doors': 'usa',         'imagine-dragons': 'usa',
+  'r-e-m': 'usa',             'the-beach-boys': 'usa',
   // Brasilianska
   'bebeto': 'brazil',         'fred': 'brazil',           'marcelo': 'brazil',
   'oscar': 'brazil',          'ronaldinho': 'brazil',
@@ -8923,7 +8938,7 @@ const NATIONALITY_OVERRIDES: Record<string, string> = {
   // Afrika / Mellanöstern / Asien
   'didier-drogba': 'ivory-coast', 'emmanuel-adebayor': 'togo',
   'charlize-theron': 'south-africa', 'netta-barzilai': 'israel',
-  'yao-ming': 'china',
+  'yao-ming': 'china',        'bts': 'south-korea',
 };
 
 // HINTS_LIBRARY: auto-genererade hints + manuellt kuraterade (manuella åsidosätter).

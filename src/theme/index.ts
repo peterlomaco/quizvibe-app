@@ -12,5 +12,5 @@ export type { SpacingKey } from './spacing';
 export { Radius } from './radius';
 export type { RadiusKey } from './radius';
  
-export { FontSize, FontWeight, LineHeight, Typography } from './typography';
+export { FontSize, FontWeight, LineHeight, Typography, TIGHT_TEXT_MAX_SCALE } from './typography';
  

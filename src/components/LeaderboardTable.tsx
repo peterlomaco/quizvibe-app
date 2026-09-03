@@ -1,5 +1,7 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+// Alla texter i den här tabellen är trånga celler → capped mot Dynamic Type.
+import { CappedText as Text } from './CappedText';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from './RoundLeaderboard';
 import { Avatar } from './Avatar';
@@ -153,7 +155,7 @@ export function LeaderboardTable({
                     ändå (tom) så `lbPos`:ens fasta bredd håller kolumnen
                     i linje. Sorteringen lägger dem sist, så `index + 1`
                     förblir korrekt för de spelare som FÅR en siffra. */}
-                <Text style={styles.lbPos}>
+                <Text style={styles.lbPos} numberOfLines={1}>
                   {entry.hasLeft ? '' : index + 1}
                 </Text>
                 <Avatar uri={entry.avatarUri} emoji={entry.emoji} name={entry.name} size={26} useBrandFallback />
@@ -307,7 +309,7 @@ export function LeaderboardTable({
               key={entry.playerId}
               style={[styles.lbCell, styles.lbRightCell]}
             >
-              <Text style={styles.lbPoints}>
+              <Text style={styles.lbPoints} numberOfLines={1}>
                 {entry.hasLeft ? '—' : entry.points}
               </Text>
             </View>

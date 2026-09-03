@@ -23,7 +23,7 @@ import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
 import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload, type PlayerHcpChangedPayload, type QuestionAdvancePayload } from '@/src/lib/realtime/syncChannel';
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
 import {
   aggregateLabel,
@@ -348,13 +348,12 @@ function professionFromSubject(subject: string | undefined): string {
 // Region-filter via EXAKT samma regel och samma datakälla som SEED_QUESTIONS:
 // katalogens `region`, numera exporterad även för bild-items (migration
 // 2026-08-11). Spelbarhets-gaten (meetsHintsThreshold, hintsText.ts) kräver
-// antingen ≥10 råa ledtrådar ELLER ≥5 grupperade topp-nivå-bullets — samma
-// regel som export-image-questions.ts, belt-and-suspenders mot en icke-
-// omkörd export.
+// ≥8 råa ledtrådar OCH en riktig landsflagga — samma regel som
+// export-image-questions.ts, belt-and-suspenders mot en icke-omkörd export.
 const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
   .filter((q) =>
     isItemInRegionScope(q.region, PLAYER_COUNTRY) &&
-    meetsHintsThreshold(HINTS_LIBRARY[q.id], q.displayName),
+    meetsHintsThreshold(HINTS_LIBRARY[q.id]),
   )
   .map((q, i, arr) => ({
     type: 'image',
@@ -1002,7 +1001,7 @@ function TimelineSelector({
                 }} />
 
                 {/* Årstext – alla på samma Y */}
-                <Text style={{
+                <Text maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE} style={{
                   position: 'absolute',
                   top: YEAR_TEXT_Y,
                   fontSize: 10,
@@ -1044,7 +1043,7 @@ function TimelineSelector({
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <Text style={{
+            <Text numberOfLines={1} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE} style={{
               fontSize: textFontSize,
               fontWeight: '700',
               color: BOX_COLOR,
@@ -1070,7 +1069,7 @@ function TimelineSelector({
             opacity: arrowPulse,
             transform: [{ scale: arrowScale }],
           }}>
-            <Text style={tl.swipeArrow}>‹</Text>
+            <Text style={tl.swipeArrow} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>‹</Text>
           </Animated.View>
 
           {/* Höger swipe-pil — speglar vänster, left: '50%' + marginLeft */}
@@ -1086,7 +1085,7 @@ function TimelineSelector({
             opacity: arrowPulse,
             transform: [{ scale: arrowScale }],
           }}>
-            <Text style={tl.swipeArrow}>›</Text>
+            <Text style={tl.swipeArrow} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>›</Text>
           </Animated.View>
         </View>
       </View>
@@ -1254,10 +1253,10 @@ const AnswerStopwatch = React.memo(function AnswerStopwatch({
         <View style={styles.decimalTimerIconWrap}>
           <StopwatchIcon size={iconSize} color={stopwatchColor} />
         </View>
-        <Text style={[styles.decimalTimerInt, { color: stopwatchColor }]}>
+        <Text maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE} style={[styles.decimalTimerInt, { color: stopwatchColor }]}>
           {String(Math.floor(ms / 1000)).padStart(2, '0')}
         </Text>
-        <Text style={[styles.decimalTimerDec, { color: Colors.textSecondary }]}>
+        <Text maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE} style={[styles.decimalTimerDec, { color: Colors.textSecondary }]}>
           .{String(Math.floor((ms % 1000) / 10)).padStart(2, '0')}
         </Text>
       </View>
@@ -10205,6 +10204,7 @@ export default function QuizScreen() {
                 />
                 <View style={[styles.timerRing, { borderColor: timerColor }]}>
                   <Animated.Text
+                    maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}
                     style={[
                       styles.timerRingNum,
                       { color: timerColor, opacity: pulseAnim },
@@ -10244,7 +10244,7 @@ export default function QuizScreen() {
                 {gameMode === 'pass-the-phone' && currentPlayerName && (
                   <View style={styles.answeringStack}>
                     <Text style={styles.answeringLabel}>Answering:</Text>
-                    <Text style={styles.answeringPlayerName} numberOfLines={1}>
+                    <Text style={styles.answeringPlayerName} numberOfLines={1} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
                       {currentPlayerName}
                     </Text>
                   </View>
@@ -10549,6 +10549,8 @@ export default function QuizScreen() {
                   >
                     {!isCurrentPlayerDJ && (
                       <Text
+                        numberOfLines={1}
+                        maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}
                         style={[
                           rv.feedbackBadge,
                           wasCorrect ? rv.feedbackBadgeCorrect : rv.feedbackBadgeWrong,
@@ -10792,7 +10794,7 @@ export default function QuizScreen() {
                       stegen (välj svar, bekräfta) så spelaren inte tror att
                       Qonfirm ensamt räcker. Samma gold-stil som "onfirm" så
                       hela etiketten läses som en enhet. */}
-                  <Text style={styles.actionBtnPrefix}>Select +</Text>
+                  <Text style={styles.actionBtnPrefix} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>Select +</Text>
                   <Svg width={24} height={24} viewBox="23 18 34 37">
                     <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.warning} strokeWidth="6.5" />
                     <Path d="M49 47 L53 51" stroke={Colors.warning} strokeWidth="6.5" strokeLinecap="round" />
@@ -10809,14 +10811,14 @@ export default function QuizScreen() {
                       <Path d="M 36 35 A 6 6 0 0 1 44 35" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
                     </G>
                   </Svg>
-                  <Text style={styles.actionBtnText}>onfirm</Text>
+                  <Text style={styles.actionBtnText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>onfirm</Text>
                 </View>
               </TouchableOpacity>
             </Animated.View>
           )}
           {phase === 'awaiting' && (
             <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
-              <Text style={styles.actionBtnAwaitingText}>
+              <Text style={styles.actionBtnAwaitingText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
                 ✓ Confirmed — waiting for time
               </Text>
             </View>
@@ -10913,11 +10915,11 @@ export default function QuizScreen() {
                     "Next  →"/"🏆  Final Leaderboard" i samma sekund som
                     spelaren ska sikta på den. Siffran ligger absolut ovanpå. */}
                 <View style={rv.nextTabLabelWrap}>
-                  <Text style={[rv.nextTabText, isNextCtaLocked && rv.nextTabTextHidden]}>
+                  <Text style={[rv.nextTabText, isNextCtaLocked && rv.nextTabTextHidden]} numberOfLines={1} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
                     {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
                   </Text>
                   {isNextCtaLocked && (
-                    <Text style={[rv.nextTabText, rv.nextTabCountdownText]}>
+                    <Text style={[rv.nextTabText, rv.nextTabCountdownText]} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
                       {revealNextCountdown}
                     </Text>
                   )}

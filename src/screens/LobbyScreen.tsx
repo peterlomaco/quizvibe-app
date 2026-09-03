@@ -68,6 +68,7 @@ import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
 import { createRemoteMatch, getMatchByRoomCode, getOwnUserId, hasRemote1v1RelationshipWith } from '../utils/remoteMatches';
 import { saveLobby } from '../utils/savedLobbies';
+import { TRACK_VIEWPORT_W } from '../utils/responsive';
 import { defaultEnabledMainCategories, subjectToMainCategory, subjectInEnabledCategories, MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
@@ -271,7 +272,9 @@ const REGION_FLAGS: Record<Region, string> = {
 // vad rutan ovan visade. Nu mappar 0 % → 1930 och 100 % → currentYear.
 const ERA_MIN = 1950;
 const ERA_MAX = new Date().getFullYear();
-const SLIDER_WIDTH = 280;
+// Skärmbredds-härledd (delad med RoundsRuler + Profile:s era-slider, se
+// responsive.ts) — fyller kortet på alla telefoner i stället för fast 280 px.
+const SLIDER_WIDTH = TRACK_VIEWPORT_W;
 // SLIDER_INSET = pixel-buffer på vardera sida så thumb-cirklarna (24px,
 // extends 12px från center) inte sticker ut förbi slider-trackens kanter
 // vid ERA_MIN/ERA_MAX. MultiSlider:s sliderLength sätts till INNER_WIDTH

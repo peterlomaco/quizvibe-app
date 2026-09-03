@@ -13,12 +13,15 @@
 // kommentar för varför det måste ske sist och inte på råvärdet.
 
 import type { HintCategoryLabel, HintItem, HintLibrary } from './hintsData';
+import { hasCountryFlag } from './hintsData';
 import {
   buildRenderEntries,
   fitClubText,
   fitFilmText,
   fitHintText,
   formatHintText,
+  HINT_MAX_CHARS,
+  HINT_SUB_MAX_CHARS,
   selectHints,
   type ResolvedHint,
 } from './hintsGenerator';
@@ -199,11 +202,19 @@ export function censorForAnswer(text: string, answer: string): string | null {
  * sig från library.categoryLabel vid crossover, se HintsQuizCard:s
  * `primaryLabel`). Krävs bara för `type === 'profession'`; utelämnad → ingen
  * redundans-strippning körs (profession-hinten visas som den är).
+ *
+ * `maxChars`/`subMaxChars` = radbudget för huvud- resp. underrader. Default är
+ * de konservativa build-tidskonstanterna (HINT_MAX_CHARS/HINT_SUB_MAX_CHARS);
+ * HintsQuizCard skickar i stället ett skärmbredds-härlett värde så breda
+ * telefoner visar mer text på en rad (se dess kommentar). Backend-export +
+ * tester använder default.
  */
 export function resolveHintText(
   hint: HintItem,
   answer: string,
   professionLabel?: HintCategoryLabel,
+  maxChars: number = HINT_MAX_CHARS,
+  subMaxChars: number = HINT_SUB_MAX_CHARS,
 ): string | null {
   if (hint.type === 'club' || hint.type === 'movie') {
     const noSensitive = censorSensitive(hint.value);
@@ -212,7 +223,7 @@ export function resolveHintText(
     if (censored === null) return null;
     // Klubbnamnet/filmtiteln kortas men årtalen behålls — de bär kronologin
     // i Career History / Film History-grupperingen (se hintsGenerator.ts).
-    const fitted = hint.type === 'club' ? fitClubText(censored) : fitFilmText(censored);
+    const fitted = hint.type === 'club' ? fitClubText(censored, subMaxChars) : fitFilmText(censored, subMaxChars);
     return hasSubstance(fitted) ? fitted : null;
   }
 
@@ -232,8 +243,8 @@ export function resolveHintText(
   if (censored === null) return null;
   // Radanpassning SIST — censureringen ovan kan redan ha kortat texten.
   // Sista, defensiva substanskoll: fitHintText/truncateWords kan i extrema
-  // edge-cases (mycket kort HINT_MAX_CHARS) landa på en ren skiljetecken-rad.
-  const fitted = fitHintText(censored);
+  // edge-cases (mycket kort maxChars) landa på en ren skiljetecken-rad.
+  const fitted = fitHintText(censored, maxChars);
   return hasSubstance(fitted) ? fitted : null;
 }
 
@@ -259,11 +270,13 @@ export function resolveHints(
   hints: HintItem[],
   answer: string,
   professionLabel?: HintCategoryLabel,
+  maxChars: number = HINT_MAX_CHARS,
+  subMaxChars: number = HINT_SUB_MAX_CHARS,
 ): ResolvedHint[] {
   const seen = new Set<string>();
   const out: ResolvedHint[] = [];
   for (const hint of hints) {
-    const text = resolveHintText(hint, answer, professionLabel);
+    const text = resolveHintText(hint, answer, professionLabel, maxChars, subMaxChars);
     if (text === null) continue;
     const key = text.toLowerCase().trim();
     if (seen.has(key)) continue;
@@ -323,17 +336,28 @@ function dropTruncatedNearDupes(entries: ResolvedHint[]): ResolvedHint[] {
   });
 }
 
-// ── Spelbarhets-gate (Peter 2026-08-27) ──────────────────────────────────────
+// ── Spelbarhets-gate (Peter 2026-09-03) ──────────────────────────────────────
 //
-// Tidigare gate: rått antal HintItem ≥ 10 (quiz.tsx / export-image-
-// questions.ts). Nu grupperas ledtrådar under rubriker (Birth/Career History/
-// Film History/Titles/Trophies, se buildRenderEntries i hintsGenerator.ts),
-// så ett item med FÅ råa fakta som ändå grupperar snyggt — t.ex. Birth (2) +
-// Career History (3) + Trophies (2) = bara 3 TOPP-nivå-bullets av 7 råa
-// fakta — kan vara lika läsbart/spelbart som ett med 10 lösa enskilda bullets.
-// Den råa 10-gränsen behålls som ALTERNATIV väg in (ett item med 10+ lösa
-// fakta behöver inte gruppera för att kvala in).
-export const MIN_RAW_HINTS = 10;
+// TVÅ hårda krav — bägge måste hålla för att en Hints-fråga ska visas:
+//   1. ≥ 8 råa ledtrådar (MIN_RAW_HINTS). En fråga med färre är för tunn.
+//   2. En RIKTIG landsflagga (hasCountryFlag). Flaggan är kärn-ledtråden;
+//      en fråga vars enda visuella signal skulle bli den grå `🏳️`-
+//      platshållaren (nationality 'unknown' eller ett omappat land) får inte
+//      visas. NATIONALITY_OVERRIDES i hintsData.ts appliceras innan
+//      HINTS_LIBRARY byggs, så items med korrigerbar nationalitet behåller
+//      sin flagga i stället för att gallras bort.
+//
+// ⚠ Detta ERSÄTTER 2026-08-27-gaten som släppte in items med bara ≥5
+// grupperade topp-nivå-bullets. Den vägen lät tunna items (t.ex. `rolandz` =
+// 5 lösa fakta + grå flagga) nå spelaren. countPlayableEntries/
+// MIN_RENDER_ENTRIES behålls exporterade för ev. framtida bruk men ingår inte
+// längre i gaten.
+//
+// Håll de tre call-sites i synk om regeln ändras: den här funktionen,
+// export-image-questions.ts (vad som bakas in i bundlen) och quiz.tsx:s
+// runtime-filter (belt-and-suspenders mot en icke-omkörd export) anropar alla
+// meetsHintsThreshold, så en ändring här räcker.
+export const MIN_RAW_HINTS = 8;
 export const MIN_RENDER_ENTRIES = 5;
 
 /**
@@ -341,7 +365,8 @@ export const MIN_RENDER_ENTRIES = 5;
  * givet ALLA ledtrådar i biblioteket (inget urval/slump — vi vill veta
  * bästa-fall-antalet, inte en enskild runda). `displayName` används bara som
  * censur-referens (samma som runtime) och `library.categoryLabel` som
- * profession-kontext.
+ * profession-kontext. Ingår inte längre i gaten (se ovan) men behålls som
+ * publik hjälpfunktion.
  */
 export function countPlayableEntries(library: HintLibrary, displayName: string): number {
   const all = selectHints(library, library.hints.length);
@@ -352,10 +377,10 @@ export function countPlayableEntries(library: HintLibrary, displayName: string):
 /**
  * Spelbarhets-gaten själv — används av BÅDE export-image-questions.ts
  * (vad som bakas in i bundlen) och quiz.tsx:s egen runtime-filter (belt-and-
- * suspenders mot en icke-omkörd export). Håll de tre i synk om regeln ändras.
+ * suspenders mot en icke-omkörd export). Håll dem i synk om regeln ändras.
  */
-export function meetsHintsThreshold(library: HintLibrary | undefined, displayName: string): boolean {
+export function meetsHintsThreshold(library: HintLibrary | undefined): boolean {
   if (!library) return false;
-  if (library.hints.length >= MIN_RAW_HINTS) return true;
-  return countPlayableEntries(library, displayName) >= MIN_RENDER_ENTRIES;
+  if (library.hints.length < MIN_RAW_HINTS) return false;
+  return hasCountryFlag(library.nationality);
 }

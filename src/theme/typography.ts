@@ -25,6 +25,17 @@ export const LineHeight = {
   normal: 20,
   relaxed: 24,
 } as const;
+
+/**
+ * Tak för iOS Dynamic Type ("Larger Text") på TRÅNGA UI-element — badges,
+ * pills, tabell-celler, timer-siffror och andra en-rads/fixhöjds-ytor där
+ * obegränsad fontskalning klipper layouten. Appliceras som
+ * `maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}`. Lämna brödtext/läsbar text
+ * (frågetext, ledtrådar, FAQ, beskrivningar) UTAN tak så de fortsatt skalar
+ * fullt för tillgänglighet. 1.3 = låter text växa ett steg eller två men
+ * hindrar de största accessibility-nivåerna från att spränga fasta boxar.
+ */
+export const TIGHT_TEXT_MAX_SCALE = 1.3;
  
 /**
  * Pre-composed text styles — apply directly with spread or StyleSheet
