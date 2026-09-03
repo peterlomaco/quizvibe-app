@@ -3135,3 +3135,33 @@ items:
         channelTitle: "apelsiiinen12"
         notes: "Peter-kurerad 2026-08-27. startSec 3 angiven av Peter. correctYear 1982 enligt MusicBrainz."
     genrePackages: ["100% in swedish", "Summer"]
+  - id: pearl-jam-alive
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Alive — Pearl Jam"
+    correctYear: 1991
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Pearl Jam Alive 1991"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1L94M3KIu7QluZe63g64rv"
+    genrePackages: ["Rock"]
+    youtubeClips:
+      - videoId: "qM0zINtulhM"
+        startSec: 10
+        endSec: 40
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1277)."
+  - id: 2pac-california-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "California Love — 2Pac feat. Dr. Dre"
+    correctYear: 1995
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["2Pac Dr. Dre California Love 1995"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3ia3dJETSOllPsv3LJkE35"
+    genrePackages: ["Hip Hop"]
+    youtubeClips:
+      - videoId: "99zZ4fGZlgk"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1280)."

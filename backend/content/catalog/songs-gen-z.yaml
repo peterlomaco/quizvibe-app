@@ -2590,3 +2590,128 @@ items:
       - videoId: "ywH2os9XB88"
         startSec: 0
         endSec: 15
+  - id: foo-fighters-everlong
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Everlong — Foo Fighters"
+    correctYear: 1997
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Foo Fighters Everlong 1997"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "eBG7P-K-r1Y"
+        startSec: 3
+        endSec: 33
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1278)."
+  - id: dr-dre-still-dre
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Still D.R.E. — Dr. Dre feat. Snoop Dogg"
+    correctYear: 1999
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Dr. Dre Snoop Dogg Still D.R.E. 1999"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "503OTo2dSqe7qk76rgsbep"
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "_CL6n0FJZpk"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1279)."
+  - id: thomas-rusiak-hiphopper
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hiphopper — Thomas Rusiak"
+    correctYear: 2000
+    probability: 72
+    region: ["sweden"]
+    wikimediaSearchHints: ["Thomas Rusiak Hiphopper Teddybears 2000"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "0x33TsFwcpAZBxePZmokvu"
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "Jvf7I7ypTIc"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1283)."
+  - id: alcazar-crying-at-the-discoteque
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Crying at the Discoteque — Alcazar"
+    correctYear: 2000
+    probability: 80
+    region: ["sweden"]
+    wikimediaSearchHints: ["Alcazar Crying at the Discoteque 2000"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1ahgFXU3pVMgREuWEG5V4A"
+    youtubeClips:
+      - videoId: "7CiOWcUVGJM"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1275)."
+  - id: manu-chao-me-gustas-tu
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Me Gustas Tu — Manu Chao"
+    correctYear: 2001
+    probability: 80
+    region: ["sweden"]
+    wikimediaSearchHints: ["Manu Chao Me Gustas Tu 2001"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6b37xrsNCWYIUphFBazqD6"
+    genrePackages: ["Soft & Love"]
+    youtubeClips:
+      - videoId: "b22wgo919FM"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1284)."
+  - id: alcazar-this-is-the-world-we-live-in
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "This Is the World We Live In — Alcazar"
+    correctYear: 2004
+    probability: 76
+    region: ["sweden"]
+    wikimediaSearchHints: ["Alcazar This Is the World We Live In 2004"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "t65NQg6iXDw"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1276)."
+  - id: the-game-hate-it-or-love-it
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hate It or Love It — The Game feat. 50 Cent"
+    correctYear: 2005
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["The Game 50 Cent Hate It or Love It 2005"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6gQaf0ANLks2uWl2AHhU26"
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "BuMBmK5uksg"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1282)."
+  - id: norlie-kkv-trojan-du-hatar
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Tröjan du hatar — Norlie & KKV"
+    correctYear: 2012
+    probability: 78
+    region: ["sweden"]
+    wikimediaSearchHints: ["Norlie KKV Tröjan du hatar 2012"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "17qZsun9q3L8ceIa3kPz4A"
+    genrePackages: ["100% in swedish"]
+  - id: norlie-kkv-dar-jag-hanger-min-hatt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Där jag hänger min hatt — Norlie & KKV"
+    correctYear: 2012
+    probability: 76
+    region: ["sweden"]
+    wikimediaSearchHints: ["Norlie KKV Där jag hänger min hatt 2012"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2Sl83ewoJgUBQCb3dvSTma"
+    genrePackages: ["100% in swedish"]

@@ -1342,3 +1342,17 @@ items:
         endSec: 30
         channelTitle: "NancySinatraVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\". correctYear 1966 enligt MusicBrainz tidigaste release + albumet Boots (mars 1966)."
+  - id: curtis-mayfield-move-on-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Move On Up — Curtis Mayfield"
+    correctYear: 1970
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Curtis Mayfield Move On Up 1970"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "0MHXrqn909p0LRTPsNsGEi"
+    youtubeClips:
+      - videoId: "xGR9bQh-kpk"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1281)."

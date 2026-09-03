@@ -1967,3 +1967,16 @@ items:
         channelTitle: "Taylor Swift"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
     genrePackages: ["Hits"]
+  - id: hoffmaestro-highway-man
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Highway Man — Hoffmaestro"
+    correctYear: 2014
+    probability: 72
+    region: ["sweden"]
+    wikimediaSearchHints: ["Hoffmaestro Highway Man 2014"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "pHo97vRiS5w"
+        startSec: 10
+        endSec: 40
+        notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1272)."
