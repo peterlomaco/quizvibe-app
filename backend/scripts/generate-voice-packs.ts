@@ -44,42 +44,46 @@ interface PackConfig {
   instructions: string;
 }
 
+// Gentle/less-shouty direction (Peter 2026-09-07): positive and pleasant but
+// soft-spoken and calm — NOT loud, shouting, intense or theatrical. Each pack
+// keeps a distinct warm character. Say the word softly, relaxed, at a natural
+// conversational volume.
 const PACKS: PackConfig[] = [
   {
     id: 'hype',
     voice: 'shimmer',
     instructions:
-      'MAXIMUM high-energy hype voice. Thrilled, excited, almost shouting with joy — like the crowd is about to erupt. Big, bright, fast and punchy. One short word.',
+      'Warm and gently upbeat, like a friendly host smiling. Positive and lively but soft-spoken and relaxed. Do NOT shout or raise your voice. One short word, said calmly.',
   },
   {
     id: 'cheer',
     voice: 'coral',
     instructions:
-      'Warm, cheerful, super positive and encouraging — like a friendly host who is genuinely rooting for you. Upbeat and smiling. One short word.',
+      'Gentle, warm and encouraging, like a kind friend quietly cheering you on. Soft, positive and relaxed. Never loud or shouting. One short word, said softly.',
   },
   {
     id: 'bright',
     voice: 'nova',
     instructions:
-      'Bright, energetic, upbeat game-show host. Cheerful, clear and lively. One short word.',
+      'Light, friendly and pleasant. Clear and cheerful but calm and easy-going, at a soft conversational volume. Not energetic, not loud. One short word.',
   },
   {
     id: 'announcer',
     voice: 'fable',
     instructions:
-      'Classic bold game-show announcer. Exciting, theatrical and confident, big broadcast energy. One short word.',
+      'Smooth, warm narrator. Calm and quietly confident, gently engaging. A soft, pleasant announcer — not theatrical, not loud. One short word, said softly.',
   },
   {
     id: 'coach',
     voice: 'ash',
     instructions:
-      'Pumped-up motivational coach. Loud, punchy and driving, firing up the players. Positive and intense. One short word.',
+      'Calm, reassuring and steady, like a supportive mentor speaking quietly. Confident but soft and gentle, never intense or shouting. One short word.',
   },
   {
     id: 'deep',
     voice: 'onyx',
     instructions:
-      'Deep, dramatic, slow game-show countdown announcer. Punchy and confident. One short word.',
+      'Deep, calm and soothing. Slow, gentle and warm, at a soft, relaxed volume. One short word.',
   },
 ];
 
