@@ -311,20 +311,20 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
       addTimerAt(() => {
         const next = current <= 1 ? 0 : current - 1;
 
-        // Tala VOICE_LEAD_MS ms INNAN det visuella uppdateras (bara host).
+        // Tala numret VOICE_LEAD_MS ms INNAN det visuella uppdateras (bara host).
+        // Slut-ordet (When/Who) talas INTE — nedräkningen är "3, 2, 1" och sedan
+        // visas "?" TYST (Peter 2026-09-07). `finalWord` styr fortfarande
+        // CountdownIntro:s nedräknings-ord i talet var borttaget; propen behålls
+        // (påverkar inte annat) men läses inte längre här.
         // Röstpack → spela klippet; Default/okänt pack → expo-speech.
-        if (!silent && next <= voiceFrom && (next > 0 || finalWord != null)) {
-          const token = (next === 0 ? (finalWord ?? 'Who').toLowerCase() : String(next)) as VoiceToken;
+        if (!silent && next > 0 && next <= voiceFrom) {
+          const token = String(next) as VoiceToken;
           const player = pack ? playersRef.current[token] : undefined;
           if (player) {
             try { player.seekTo(0); player.play(); } catch (_) {}
           } else {
             try {
-              Speech.speak(next === 0 ? (finalWord ?? 'Who') : String(next), {
-                language: 'en-US',
-                pitch: 0.01,
-                rate: 0.42,
-              });
+              Speech.speak(String(next), { language: 'en-US', pitch: 0.01, rate: 0.42 });
             } catch (_) {}
           }
         }
