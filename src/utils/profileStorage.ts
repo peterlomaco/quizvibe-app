@@ -131,6 +131,12 @@ export interface ProfileData {
     film: number;
     sport: number;
   };
+  // Vald countdown-röst (röstpack-id, eller DEFAULT_VOICE_ID = system-TTS).
+  // Styr vilken röst som talar 3-2-1 + "When"/"Who" i CountdownIntro. Läses
+  // per enhet ur den lokala profil-spegeln vid speltid (device-lokal audio-
+  // preferens, som "Audio this device"). AsyncStorage-ONLY (ingen DB-kolumn —
+  // samma mönster som parentControlEnabled). Default 'default' i UI.
+  voice?: string;
 }
 
 // Dual-read mapping för profiler skapade innan rename
@@ -470,6 +476,7 @@ async function loadProfileFresh(): Promise<ProfileData | null> {
         parentControlEnabled: cached?.parentControlEnabled,
         hcp: cached?.hcp,
         hcpByCategory: cached?.hcpByCategory,
+        voice: cached?.voice,
       };
     }
     const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);

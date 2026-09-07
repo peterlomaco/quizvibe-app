@@ -114,6 +114,7 @@ import {
   type ProfileData,
 } from '@/src/utils/profileStorage';
 import { recordQuestionAnswer } from '@/src/utils/questionStats';
+import { DEFAULT_VOICE_ID } from '@/src/utils/voicePacks';
 import {
   IMAGE_QUIZ_QUESTIONS,
   DISTRACTOR_POOL_NAMES,
@@ -9187,10 +9188,15 @@ export default function QuizScreen() {
   // anchorar nedräkningen till rätt spelare även medan telefonen lämnas över.
   if (phase === 'countdown') {
     const countdownPlayer = turnOrder[currentPlayerIndex];
+    // Countdown-röst: device-lokal preferens ur profil-spegeln (som "Audio this
+    // device"). Bara den talande enheten läser den — non-hosts är silent ändå.
+    // Gäst/ohydrerad → Default (system-TTS).
+    const countdownVoice = getCachedProfile()?.voice ?? DEFAULT_VOICE_ID;
     return (
       <View style={styles.touchWrap} onTouchStart={signalHostActivity}>
       <CountdownIntro
         mode={gameMode}
+        voice={countdownVoice}
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         mediaSource={effectiveMediaSourceByQuestion[questionIndex] ?? null}

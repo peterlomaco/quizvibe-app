@@ -94,6 +94,8 @@ import { clearGameStarted } from '../utils/mockStartedGames';
 import { generateRoomCode } from '../utils/roomCode';
 import { checkSpotifyInstalled } from '../utils/spotifyDJ';
 import { resolveDisplayHcp } from '../utils/hcpEngine';
+import { DEFAULT_VOICE_ID, VOICE_OPTIONS } from '../utils/voicePacks';
+import { previewVoice } from '../utils/voicePlayback';
 import { refreshOwnHcpDecay } from '../utils/hcpProgress';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -272,6 +274,8 @@ export default function ProfileScreen() {
   const [email, setEmail]                     = useState<string>('');
   const [birthYear, setBirthYear]         = useState<number | null>(null);
   const [assistance, setAssistance]       = useState<AssistanceLevel | null>(null);
+  // Countdown-röst (röstpack-id, eller DEFAULT_VOICE_ID = system-TTS).
+  const [voice, setVoice]                 = useState<string>(DEFAULT_VOICE_ID);
   const [region, setRegion]               = useState<Region | null>(null);
   // gameCredits (engångsköpta Extras) är LEGACY sedan 2026-07-07 — visas
   // inte i UI och köps inte i Store längre. State:n finns kvar enbart som
@@ -468,6 +472,7 @@ export default function ProfileScreen() {
 
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
+  const [voicePickerOpen, setVoicePickerOpen]   = useState(false);
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
   const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -532,8 +537,10 @@ export default function ProfileScreen() {
     youtubeEnabledCategories.includes('Sport') || imagesEnabledCategories.includes('Sport');
   const athletesAllOn =
     youtubeEnabledCategories.includes('Sport') && imagesEnabledCategories.includes('Sport');
-  const sourcesAllEnabled = artistsAllOn && actorsAllOn && athletesAllOn;
-  const enabledSourceColumnsCount = [artistsEnabled, actorsEnabled, athletesEnabled].filter(Boolean).length;
+  // Sport parkerat (ingen kolumn i mixerboarden) — athletesEnabled/athletesAllOn
+  // behålls som inert dead code och ingår ej i All-mastern/kolumn-räkningen.
+  const sourcesAllEnabled = artistsAllOn && actorsAllOn;
+  const enabledSourceColumnsCount = [artistsEnabled, actorsEnabled].filter(Boolean).length;
   // Alias som matchar Lobby-namngivningen (används i porterade handlers).
   const enabledColumnsCount = enabledSourceColumnsCount;
 
@@ -564,8 +571,9 @@ export default function ProfileScreen() {
       Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
       return;
     }
-    setYoutubeEnabledCategories(value ? ['Music', 'Film', 'Sport'] : []);
-    setImagesEnabledCategories(value ? ['Music', 'Film', 'Sport'] : []);
+    // Music + Film (Sport parkerat) — lägg tillbaka 'Sport' när kolumnen återinförs.
+    setYoutubeEnabledCategories(value ? ['Music', 'Film'] : []);
+    setImagesEnabledCategories(value ? ['Music', 'Film'] : []);
     if (value && spotifyConnected) setSpotifyEnabled(true);
   };
 
@@ -832,6 +840,7 @@ export default function ProfileScreen() {
           ...data,
           birthYear: resolvedBirthYear,
           assistance: data.assistance ?? 'standard',
+          voice: data.voice ?? DEFAULT_VOICE_ID,
           // V1: bara Sweden. Coerce sparad 'nordics'/'global' (från innan
           // v1-launch-scopet) till 'sweden' så UI:t och persisterad state
           // alltid stämmer. wasIncomplete-checken nedan upptäcker att fältet
@@ -880,6 +889,7 @@ export default function ProfileScreen() {
         const wasIncomplete = (
           data.birthYear == null ||
           data.assistance == null ||
+          data.voice == null ||
           // null ELLER non-sweden → coerce-write krävs (v1 Sweden-only)
           data.region !== 'sweden' ||
           data.gameEraFrom == null ||
@@ -903,6 +913,7 @@ export default function ProfileScreen() {
         setEmail(augmented.email ?? '');
         setBirthYear(augmented.birthYear);
         setAssistance(augmented.assistance);
+        setVoice(augmented.voice ?? DEFAULT_VOICE_ID);
         setRegion(augmented.region);
         setSource(augmented.avatarSource);
         setSelectedId(augmented.selectedAvatarId);
@@ -953,6 +964,7 @@ export default function ProfileScreen() {
         savedSnapshotRef.current = JSON.stringify({
           birthYear: augmented.birthYear,
           assistance: augmented.assistance,
+          voice: augmented.voice ?? DEFAULT_VOICE_ID,
           gameEraFrom: augmented.gameEraFrom ?? 1981,
           gameEraTo: augmented.gameEraTo ?? ERA_MAX,
           gameMode: loadedGameMode,
@@ -1111,6 +1123,7 @@ export default function ProfileScreen() {
   const selectedAvatar = AVATARS.find((a) => a.id === selectedAvatarId);
   const age = birthYear !== null ? CURRENT_YEAR - birthYear : null;
   const assistanceLabel  = ASSISTANCE_OPTIONS.find((s) => s.id === assistance)?.label;
+  const voiceLabel       = VOICE_OPTIONS.find((v) => v.id === voice)?.label;
   // Player-HCP-sköldar (§1.3 UI). Läser den intjänade per-kategori-bundlen ur
   // profil-spegeln (motorn skriver profile.hcpByCategory efter varje spel).
   // Saknas den → 99 för alla (ny spelare / aldrig spelat). Total-sköld + tre
@@ -1168,9 +1181,10 @@ export default function ProfileScreen() {
         spotifyAnswerName,
         spotifyAppConfirmed: spotifyConnected,
         parentControlEnabled,
+        voice,
       });
       savedSnapshotRef.current = JSON.stringify({
-        birthYear, assistance,
+        birthYear, assistance, voice,
         gameEraFrom: eraValues[0], gameEraTo: eraValues[1],
         gameMode, maxPlayers, roundsCount,
         answerResponseSeconds, youtubeEnabledCategories,
@@ -1187,7 +1201,7 @@ export default function ProfileScreen() {
   // Jämför aktuell state mot load-snapshot — true om något ändrats.
   const hasUnsavedChanges = (): boolean => {
     const current = JSON.stringify({
-      birthYear, assistance,
+      birthYear, assistance, voice,
       gameEraFrom: eraValues[0], gameEraTo: eraValues[1],
       gameMode, maxPlayers, roundsCount,
       answerResponseSeconds, youtubeEnabledCategories,
@@ -1589,6 +1603,35 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
 
+            {/* Countdown voice */}
+            <View style={styles.field}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={styles.fieldLabel}>Countdown voice</Text>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() => Alert.alert(
+                    'Countdown voice',
+                    'The voice that counts down 3-2-1 before each question. "Default (system voice)" uses your phone\'s built-in speech; the other options are recorded voice packs.\n\nTap the ▶ button in the list to hear a voice before choosing.',
+                  )}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              </View>
+              <Pressable
+                onPress={() => setVoicePickerOpen(true)}
+                style={({ pressed }) => [
+                  styles.selector,
+                  pressed && styles.selectorPressed,
+                ]}
+              >
+                <Text style={styles.selectorText}>
+                  {voiceLabel ?? 'Default (system voice)'}
+                </Text>
+                <Text style={styles.selectorChevron}>›</Text>
+              </Pressable>
+            </View>
+
             {/* MUSIC-ONLY LAUNCH: "HCP per category"-utfällningen (Music/Film/
                 Sport-subsköldar) borttagen — bara Total-skölden ovan visas. */}
 
@@ -1754,9 +1797,9 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Music Mixerboard */}
+          {/* Source Mixerboard */}
           <View style={styles.field}>
-            <Text style={styles.sectionLabel}>MUSIC MIXERBOARD</Text>
+            <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
             {/* Grå ram runt hela mixerboarden (Spotify + YouTube + Hints) —
                 samma setup som lobby-vyn. Spotify-blockets egen bg borttagen så
                 ramen blir en enda enhetlig box. */}
@@ -1895,29 +1938,40 @@ export default function ProfileScreen() {
             </View>
             {/* Grått streck mellan Spotify-delen och YouTube-delen (speglar lobby). */}
             <View style={styles.mixerboardDivider} />
-            {/* MUSIC-ONLY LAUNCH: bara två källtoggles (YouTube + Hints), styr
-                Music-kategorin. Ikon + rubrik linjerar med Spotify-raden ovan. */}
-            <View style={{ marginTop: Spacing.xs }}>
-              {/* YouTube-rad — samma vänster-geometri som Spotify-raden. */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingVertical: 8, paddingRight: 18, paddingLeft: Spacing.sm }}>
-                <View style={[styles.connectionIconWrap, { marginLeft: -2 }]}>
+            {/* Source × Category Matrix (Music + Film) — host-default.
+                Sport parkerat (catalog/deferred/) → ingen Sport-kolumn; lägg
+                tillbaka en tredje kolumn + Sport-handlers när Sport av-parkeras.
+                Kolumnbredd via smDataStack flex:1 (ingen onLayout-mätning). */}
+            <View style={styles.smGrid}>
+
+              {/* Etikett-stack (vänster) */}
+              <View style={styles.smLabelStack}>
+                <View style={[styles.smHeaderCell, styles.smDataShift]}>
+                  <Text style={styles.sourceMatrixAllText}>All</Text>
+                </View>
+                <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
+                  <Switch
+                    value={sourcesAllEnabled}
+                    onValueChange={handleToggleAllSources}
+                    trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={sourcesAllEnabled ? Colors.success : PROFILE_MATRIX_OFF}
+                    style={styles.profileSwitch}
+                  />
+                </View>
+                <View style={styles.smLabelSourceCell}>
                   <YouTubeBrandIcon size={20} />
+                  <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
+                  <Pressable
+                    onPress={() => Alert.alert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers')}
+                    hitSlop={8}
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
                 </View>
-                <Text style={[styles.sourceMatrixSourceText, { marginLeft: -8 }]}>YouTube</Text>
-                <Pressable
-                  onPress={() => Alert.alert('YouTube', 'Music videos and audio clips — guess the release year.')}
-                  hitSlop={8}
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-                <View style={{ marginLeft: 'auto', marginRight: -16 }}>
-                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
-                </View>
-              </View>
-              {/* Hints-rad — samma vänster-geometri som Spotify/YouTube. */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingVertical: 8, paddingRight: 18, paddingLeft: Spacing.sm }}>
-                <View style={[styles.connectionIconWrap, { marginLeft: -2 }]}>
+                <View style={styles.smAutoCell} />
+                <View style={styles.smLabelSourceCell}>
                   <View style={styles.imagesIconWrap}>
                     <Svg width={20} height={20} viewBox="24 22 32 32">
                       <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
@@ -1925,19 +1979,51 @@ export default function ProfileScreen() {
                     </Svg>
                     <Text style={styles.imagesQMark}>?</Text>
                   </View>
+                  <Text style={styles.sourceMatrixSourceText}>Hints</Text>
+                  <Pressable
+                    onPress={() => Alert.alert('Hints', 'Guess the artist, band or actor from a flag + progressive clues.')}
+                    hitSlop={8}
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
                 </View>
-                <Text style={[styles.sourceMatrixSourceText, { marginLeft: -8 }]}>Hints</Text>
-                <Pressable
-                  onPress={() => Alert.alert('Hints', 'Guess the artist or band from a flag + progressive clues.')}
-                  hitSlop={8}
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-                <View style={{ marginLeft: 'auto', marginRight: -16 }}>
+              </View>
+
+              {/* Music (Artists) kolumn */}
+              <View style={styles.smDataStack}>
+                <View style={styles.smHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Music</Text>
+                </View>
+                <View style={[styles.smAllToggleCell, styles.smSwitchNudge]}>
+                  <Switch value={artistsAllOn} onValueChange={handleToggleArtistsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={artistsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                </View>
+                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
+                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                </View>
+                <View style={styles.smAutoCell} />
+                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
                   <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
                 </View>
               </View>
+
+              {/* Film (Actors) kolumn */}
+              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
+                <View style={styles.smHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Film</Text>
+                </View>
+                <View style={[styles.smAllToggleCell, styles.smSwitchNudge, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
+                  <Switch value={actorsAllOn} onValueChange={handleToggleActorsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                </View>
+                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
+                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                </View>
+                <View style={styles.smAutoCell} />
+                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
+                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                </View>
+              </View>
+
             </View>
             </View>{/* ── slut grå mixerboard-ram ── */}
 
@@ -2929,6 +3015,75 @@ export default function ProfileScreen() {
                   <Text
                     style={[
                       styles.optionText,
+                      isSelected && styles.optionTextSelected,
+                    ]}
+                  >
+                    {opt.label}
+                  </Text>
+                  {isSelected && <Text style={styles.optionCheck}>✓</Text>}
+                </Pressable>
+              );
+            })}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* ── Countdown voice picker modal ─────────────────────────── */}
+      <Modal
+        visible={voicePickerOpen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setVoicePickerOpen(false)}
+      >
+        <Pressable
+          style={styles.pickerBackdrop}
+          onPress={() => setVoicePickerOpen(false)}
+        >
+          <Pressable style={styles.pickerCardShort} onPress={() => {}}>
+            <View style={styles.pickerHeader}>
+              <Text style={styles.pickerTitle}>Countdown voice</Text>
+              <Pressable
+                onPress={() => setVoicePickerOpen(false)}
+                style={({ pressed }) => [
+                  styles.modalClose,
+                  pressed && { opacity: 0.6 },
+                ]}
+                hitSlop={10}
+              >
+                <Text style={styles.modalCloseText}>✕</Text>
+              </Pressable>
+            </View>
+            {VOICE_OPTIONS.map((opt) => {
+              const isSelected = voice === opt.id;
+              return (
+                <Pressable
+                  key={opt.id}
+                  onPress={() => {
+                    setVoice(opt.id);
+                    setVoicePickerOpen(false);
+                  }}
+                  style={({ pressed }) => [
+                    styles.optionRow,
+                    isSelected && styles.optionRowSelected,
+                    pressed && styles.optionRowPressed,
+                  ]}
+                >
+                  {/* ▶ förhandslyssning — egen Pressable så tap på ikonen
+                      spelar rösten utan att välja + stänga pickern. */}
+                  <Pressable
+                    onPress={() => previewVoice(opt.id, 'who')}
+                    hitSlop={10}
+                    style={({ pressed }) => [
+                      styles.voicePreviewBtn,
+                      pressed && { opacity: 0.6 },
+                    ]}
+                  >
+                    <Text style={styles.voicePreviewIcon}>▶</Text>
+                  </Pressable>
+                  <Text
+                    style={[
+                      styles.optionText,
+                      styles.voiceOptionLabel,
                       isSelected && styles.optionTextSelected,
                     ]}
                   >
@@ -4298,6 +4453,12 @@ const styles = StyleSheet.create({
   smDataShift: {
     paddingLeft: 4,
   },
+  // Data-kolumnernas (Music/Film) switch-celler: nudgas höger så switchen
+  // hamnar centrerad UNDER sin kolumnrubrik (iOS-<Switch> har en fast vänster-
+  // bias inom sin center-cell). Speglar LobbyScreen:s smSwitchNudge. Tuna här.
+  smSwitchNudge: {
+    paddingLeft: 32,
+  },
   smAllToggleShift: {
     paddingLeft: 18,
   },
@@ -4776,6 +4937,26 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     color: Colors.primary,
     fontWeight: FontWeight.bold,
+  },
+  // Voice-pickerns ▶-preview: liten rund tap-yta till vänster om labeln.
+  voicePreviewBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    backgroundColor: Colors.cardElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  voicePreviewIcon: {
+    fontSize: 13,
+    color: Colors.primary,
+    marginLeft: 2, // optisk centrering av ▶-glyfen
+  },
+  voiceOptionLabel: {
+    flex: 1,
+    marginLeft: Spacing.md,
   },
 
   // Modal
