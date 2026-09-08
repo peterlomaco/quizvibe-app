@@ -1,31 +1,27 @@
 /**
- * Countdown voice packs.
+ * Countdown + lobby voice packs.
  *
- * Varje pack är en handfull förinspelade ljudklipp som ersätter den
- * syntetiska expo-speech-rösten i CountdownIntro (3-2-1 + "When"/"Who").
- * Spelarens röstval lagras per profil (`ProfileData.voice`, AsyncStorage-only)
- * och väljs i Profile → "Countdown voice".
+ * Två röster (Peter 2026-09-07): `hype` = "Female voice", `coach` = "Male voice".
+ * `hype` är DEFAULT — den används överallt appen talar (countdown 3-2-1 samt
+ * "QuizVibe"-välkomsten när host går in i lobbyn) tills spelaren väljer något
+ * annat i Profile → "Countdown voice".
  *
- * `DEFAULT_VOICE_ID` behåller den nuvarande system-TTS-rösten: ingen ljudfil,
- * alltid tillgänglig, och den fallback CountdownIntro faller tillbaka på om ett
- * pack inte kan laddas.
+ * Varje pack är en handfull förinspelade mp3-klipp. Tokens:
+ *  - '1'..'3' talas i nedräkningen (+ '4'/'5' som reserv om voiceFrom höjs)
+ *  - 'quizvibe' talas i lobbyn (ersätter den gamla expo-speech-välkomsten)
+ *  - 'when'/'who' är KVAR som klipp men talas inte längre (slut-ordet är borttaget
+ *    ur nedräkningen 2026-09-07) — behålls för enkel återaktivering.
  *
- * Talad vokabulär i countdown är ett litet FAST set — tokens '1','2','3' (de
- * enda siffror som talas idag, `voiceFrom` default 3) + finalWord 'when'/'who'.
- * '4'/'5' bundlas som reserv ifall `voiceFrom`/`startFrom` någonsin höjs.
- *
- * ⚠ Klippen är i dag PLATSHÅLLARE genererade lokalt (Windows TTS). Kör
- * `backend/scripts/generate-voice-packs.ts` med en cloud-TTS-nyckel för att
- * skriva över dem med riktiga röster — samma filnamn, inga kodändringar.
- *
- * Lägg till ett nytt pack: droppa `assets/voice-packs/<id>/{1,2,3,4,5,when,who}.mp3`
- * och lägg till en post i `VOICE_PACKS`. VOICE_OPTIONS + Profile-pickern följer med.
+ * ⚠ Klippen genereras via `backend/scripts/generate-voice-packs.ts` (OpenAI TTS,
+ * hype→shimmer/kvinnlig, coach→ash/manlig). Samma filnamn = inga kodändringar
+ * vid omgenerering. Lägg till ett pack: droppa `assets/voice-packs/<id>/*.mp3`
+ * + en post i `VOICE_PACKS`; Profile-pickern + VOICE_OPTIONS följer med.
  */
 
-export type VoiceToken = '1' | '2' | '3' | '4' | '5' | 'when' | 'who';
+export type VoiceToken = '1' | '2' | '3' | '4' | '5' | 'when' | 'who' | 'quizvibe';
 
-/** Alla token i kanonisk ordning — driver preload + placeholder-generering. */
-export const VOICE_TOKENS: readonly VoiceToken[] = ['1', '2', '3', '4', '5', 'when', 'who'];
+/** Alla token i kanonisk ordning — driver preload i CountdownIntro. */
+export const VOICE_TOKENS: readonly VoiceToken[] = ['1', '2', '3', '4', '5', 'when', 'who', 'quizvibe'];
 
 export interface VoicePack {
   id: string;
@@ -34,15 +30,13 @@ export interface VoicePack {
   clips: Record<VoiceToken, number>;
 }
 
-/** Sentinel: behåll den nuvarande expo-speech-rösten. Även global fallback. */
-export const DEFAULT_VOICE_ID = 'default';
+/** Standardröst: används när spelaren inte valt något (samt fallback). */
+export const DEFAULT_VOICE_ID = 'hype';
 
-// Energiska/positiva röster först (Peter 2026-09-07), Deep sist som den
-// dramatiska kontrasten. Lägg till nya pack här — pickern + VOICE_OPTIONS följer.
 export const VOICE_PACKS: VoicePack[] = [
   {
     id: 'hype',
-    label: 'Hype',
+    label: 'Female voice',
     clips: {
       '1': require('../../assets/voice-packs/hype/1.mp3'),
       '2': require('../../assets/voice-packs/hype/2.mp3'),
@@ -51,50 +45,12 @@ export const VOICE_PACKS: VoicePack[] = [
       '5': require('../../assets/voice-packs/hype/5.mp3'),
       when: require('../../assets/voice-packs/hype/when.mp3'),
       who: require('../../assets/voice-packs/hype/who.mp3'),
-    },
-  },
-  {
-    id: 'cheer',
-    label: 'Cheer',
-    clips: {
-      '1': require('../../assets/voice-packs/cheer/1.mp3'),
-      '2': require('../../assets/voice-packs/cheer/2.mp3'),
-      '3': require('../../assets/voice-packs/cheer/3.mp3'),
-      '4': require('../../assets/voice-packs/cheer/4.mp3'),
-      '5': require('../../assets/voice-packs/cheer/5.mp3'),
-      when: require('../../assets/voice-packs/cheer/when.mp3'),
-      who: require('../../assets/voice-packs/cheer/who.mp3'),
-    },
-  },
-  {
-    id: 'bright',
-    label: 'Bright',
-    clips: {
-      '1': require('../../assets/voice-packs/bright/1.mp3'),
-      '2': require('../../assets/voice-packs/bright/2.mp3'),
-      '3': require('../../assets/voice-packs/bright/3.mp3'),
-      '4': require('../../assets/voice-packs/bright/4.mp3'),
-      '5': require('../../assets/voice-packs/bright/5.mp3'),
-      when: require('../../assets/voice-packs/bright/when.mp3'),
-      who: require('../../assets/voice-packs/bright/who.mp3'),
-    },
-  },
-  {
-    id: 'announcer',
-    label: 'Announcer',
-    clips: {
-      '1': require('../../assets/voice-packs/announcer/1.mp3'),
-      '2': require('../../assets/voice-packs/announcer/2.mp3'),
-      '3': require('../../assets/voice-packs/announcer/3.mp3'),
-      '4': require('../../assets/voice-packs/announcer/4.mp3'),
-      '5': require('../../assets/voice-packs/announcer/5.mp3'),
-      when: require('../../assets/voice-packs/announcer/when.mp3'),
-      who: require('../../assets/voice-packs/announcer/who.mp3'),
+      quizvibe: require('../../assets/voice-packs/hype/quizvibe.mp3'),
     },
   },
   {
     id: 'coach',
-    label: 'Coach',
+    label: 'Male voice',
     clips: {
       '1': require('../../assets/voice-packs/coach/1.mp3'),
       '2': require('../../assets/voice-packs/coach/2.mp3'),
@@ -103,19 +59,7 @@ export const VOICE_PACKS: VoicePack[] = [
       '5': require('../../assets/voice-packs/coach/5.mp3'),
       when: require('../../assets/voice-packs/coach/when.mp3'),
       who: require('../../assets/voice-packs/coach/who.mp3'),
-    },
-  },
-  {
-    id: 'deep',
-    label: 'Deep',
-    clips: {
-      '1': require('../../assets/voice-packs/deep/1.mp3'),
-      '2': require('../../assets/voice-packs/deep/2.mp3'),
-      '3': require('../../assets/voice-packs/deep/3.mp3'),
-      '4': require('../../assets/voice-packs/deep/4.mp3'),
-      '5': require('../../assets/voice-packs/deep/5.mp3'),
-      when: require('../../assets/voice-packs/deep/when.mp3'),
-      who: require('../../assets/voice-packs/deep/who.mp3'),
+      quizvibe: require('../../assets/voice-packs/coach/quizvibe.mp3'),
     },
   },
 ];
@@ -125,14 +69,22 @@ export interface VoiceOption {
   label: string;
 }
 
-/** Val som visas i Profile-pickern: Default + alla pack. */
-export const VOICE_OPTIONS: VoiceOption[] = [
-  { id: DEFAULT_VOICE_ID, label: 'Default (system voice)' },
-  ...VOICE_PACKS.map((p) => ({ id: p.id, label: p.label })),
-];
+/** Val som visas i Profile-pickern: bara de två rösterna (ingen system-TTS). */
+export const VOICE_OPTIONS: VoiceOption[] = VOICE_PACKS.map((p) => ({ id: p.id, label: p.label }));
 
-/** Returnerar packet för ett id, eller null för Default / okänt id (→ fallback). */
+/** Returnerar packet för ett id, eller null om det inte finns. */
 export function getVoicePack(id: string | null | undefined): VoicePack | null {
-  if (!id || id === DEFAULT_VOICE_ID) return null;
+  if (!id) return null;
   return VOICE_PACKS.find((p) => p.id === id) ?? null;
+}
+
+/** Som getVoicePack men faller ALLTID tillbaka på default-rösten (hype) för
+ *  okända/stale id:n — så countdown + lobby alltid har en röst att spela. */
+export function resolveVoicePack(id: string | null | undefined): VoicePack {
+  return getVoicePack(id) ?? getVoicePack(DEFAULT_VOICE_ID)!;
+}
+
+/** True om id:t är en giltig, valbar röst (för coerce av stale profil-värden). */
+export function isValidVoiceId(id: string | null | undefined): boolean {
+  return !!getVoicePack(id);
 }

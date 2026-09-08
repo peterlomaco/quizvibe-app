@@ -94,8 +94,8 @@ import { clearGameStarted } from '../utils/mockStartedGames';
 import { generateRoomCode } from '../utils/roomCode';
 import { checkSpotifyInstalled } from '../utils/spotifyDJ';
 import { resolveDisplayHcp } from '../utils/hcpEngine';
-import { DEFAULT_VOICE_ID, VOICE_OPTIONS } from '../utils/voicePacks';
-import { previewVoice } from '../utils/voicePlayback';
+import { DEFAULT_VOICE_ID, isValidVoiceId, VOICE_OPTIONS } from '../utils/voicePacks';
+import { playVoiceClip } from '../utils/voicePlayback';
 import { refreshOwnHcpDecay } from '../utils/hcpProgress';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -840,7 +840,10 @@ export default function ProfileScreen() {
           ...data,
           birthYear: resolvedBirthYear,
           assistance: data.assistance ?? 'standard',
-          voice: data.voice ?? DEFAULT_VOICE_ID,
+          // Coerce stale/borttagna röst-id:n (t.ex. 'default'/'cheer' från
+          // tidigare lineup) till default-rösten (hype). wasIncomplete nedan
+          // triggar en defensiv write så storage konvergerar.
+          voice: isValidVoiceId(data.voice) ? data.voice! : DEFAULT_VOICE_ID,
           // V1: bara Sweden. Coerce sparad 'nordics'/'global' (från innan
           // v1-launch-scopet) till 'sweden' så UI:t och persisterad state
           // alltid stämmer. wasIncomplete-checken nedan upptäcker att fältet
@@ -889,7 +892,7 @@ export default function ProfileScreen() {
         const wasIncomplete = (
           data.birthYear == null ||
           data.assistance == null ||
-          data.voice == null ||
+          !isValidVoiceId(data.voice) ||
           // null ELLER non-sweden → coerce-write krävs (v1 Sweden-only)
           data.region !== 'sweden' ||
           data.gameEraFrom == null ||
@@ -1606,12 +1609,12 @@ export default function ProfileScreen() {
             {/* Countdown voice */}
             <View style={styles.field}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={styles.fieldLabel}>Countdown voice</Text>
+                <Text style={styles.fieldLabel}>Voice</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() => Alert.alert(
-                    'Countdown voice',
-                    'The voice that counts down 3-2-1 before each question. "Default (system voice)" uses your phone\'s built-in speech; the other options are recorded voice packs.\n\nTap the ▶ button in the list to hear a voice before choosing.',
+                    'Voice',
+                    'The voice used in the app — the 3-2-1 countdown before each question and the "QuizVibe" welcome in the lobby. Choose a female or male voice.\n\nTap the ▶ button in the list to hear a voice before choosing.',
                   )}
                   hitSlop={8}
                 >
@@ -1626,7 +1629,7 @@ export default function ProfileScreen() {
                 ]}
               >
                 <Text style={styles.selectorText}>
-                  {voiceLabel ?? 'Default (system voice)'}
+                  {voiceLabel ?? 'Female voice'}
                 </Text>
                 <Text style={styles.selectorChevron}>›</Text>
               </Pressable>
@@ -3041,7 +3044,7 @@ export default function ProfileScreen() {
         >
           <Pressable style={styles.pickerCardShort} onPress={() => {}}>
             <View style={styles.pickerHeader}>
-              <Text style={styles.pickerTitle}>Countdown voice</Text>
+              <Text style={styles.pickerTitle}>Voice</Text>
               <Pressable
                 onPress={() => setVoicePickerOpen(false)}
                 style={({ pressed }) => [
@@ -3071,7 +3074,7 @@ export default function ProfileScreen() {
                   {/* ▶ förhandslyssning — egen Pressable så tap på ikonen
                       spelar rösten utan att välja + stänga pickern. */}
                   <Pressable
-                    onPress={() => previewVoice(opt.id, 'who')}
+                    onPress={() => playVoiceClip(opt.id, 'quizvibe', 'QuizVibe')}
                     hitSlop={10}
                     style={({ pressed }) => [
                       styles.voicePreviewBtn,

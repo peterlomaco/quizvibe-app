@@ -34,6 +34,8 @@ const TOKENS: Record<string, string> = {
   '5': 'Five',
   when: 'When',
   who: 'Who',
+  // Sagt när host går in i lobbyn (ersätter expo-speech-välkomsten).
+  quizvibe: 'QuizVibe',
 };
 
 interface PackConfig {
@@ -48,42 +50,20 @@ interface PackConfig {
 // soft-spoken and calm — NOT loud, shouting, intense or theatrical. Each pack
 // keeps a distinct warm character. Say the word softly, relaxed, at a natural
 // conversational volume.
+// Bara två röster (Peter 2026-09-07): hype = "Female voice", coach = "Male
+// voice". Övriga fyra borttagna. Gentle/soft-spoken direktion behålls.
 const PACKS: PackConfig[] = [
   {
     id: 'hype',
-    voice: 'shimmer',
+    voice: 'shimmer', // kvinnlig
     instructions:
-      'Warm and gently upbeat, like a friendly host smiling. Positive and lively but soft-spoken and relaxed. Do NOT shout or raise your voice. One short word, said calmly.',
-  },
-  {
-    id: 'cheer',
-    voice: 'coral',
-    instructions:
-      'Gentle, warm and encouraging, like a kind friend quietly cheering you on. Soft, positive and relaxed. Never loud or shouting. One short word, said softly.',
-  },
-  {
-    id: 'bright',
-    voice: 'nova',
-    instructions:
-      'Light, friendly and pleasant. Clear and cheerful but calm and easy-going, at a soft conversational volume. Not energetic, not loud. One short word.',
-  },
-  {
-    id: 'announcer',
-    voice: 'fable',
-    instructions:
-      'Smooth, warm narrator. Calm and quietly confident, gently engaging. A soft, pleasant announcer — not theatrical, not loud. One short word, said softly.',
+      'Female voice. Warm and gently upbeat, like a friendly host smiling. Positive and lively but soft-spoken and relaxed. Do NOT shout or raise your voice. One short word, said calmly.',
   },
   {
     id: 'coach',
-    voice: 'ash',
+    voice: 'ash', // manlig
     instructions:
-      'Calm, reassuring and steady, like a supportive mentor speaking quietly. Confident but soft and gentle, never intense or shouting. One short word.',
-  },
-  {
-    id: 'deep',
-    voice: 'onyx',
-    instructions:
-      'Deep, calm and soothing. Slow, gentle and warm, at a soft, relaxed volume. One short word.',
+      'Male voice. Calm, reassuring and steady, like a supportive mentor speaking quietly. Confident but soft and gentle, never intense or shouting. One short word.',
   },
 ];
 

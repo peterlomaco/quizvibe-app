@@ -13,7 +13,7 @@ import {
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '../theme';
 import { type MainCategory } from '../utils/mainCategory';
-import { DEFAULT_VOICE_ID, getVoicePack, VOICE_TOKENS, type VoiceToken } from '../utils/voicePacks';
+import { DEFAULT_VOICE_ID, resolveVoicePack, VOICE_TOKENS, type VoiceToken } from '../utils/voicePacks';
 import { ensureVoiceAudioMode } from '../utils/voicePlayback';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
@@ -159,10 +159,10 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
   // Remote 1v1 delar IndDev:s headline ("Get Ready to QuizVibe") — varje
   // spelare sitter på egen enhet, ingen specifik spelare att namnge.
   const isIndDev = mode === 'individual-devices' || mode === 'remote-1v1';
-  // Valt röstpack (null = Default → system-TTS, samt fallback vid okänt id).
-  // Stabil objektreferens (samma VOICE_PACKS-post) så den kan ligga i
-  // effekt-deps utan att trigga omkörningar.
-  const pack = getVoicePack(voice);
+  // Valt röstpack — resolveVoicePack faller alltid tillbaka på default-rösten
+  // (hype) för okända/stale id:n, så countdown alltid har en röst. Stabil
+  // objektreferens (samma VOICE_PACKS-post) så den kan ligga i effekt-deps.
+  const pack = resolveVoicePack(voice);
   // Förinladdade expo-audio-players per token — ETT klipp per token så
   // uppspelningen har minimal latens under den tajta nedräkningen.
   const playersRef = useRef<Partial<Record<VoiceToken, AudioPlayer>>>({});
