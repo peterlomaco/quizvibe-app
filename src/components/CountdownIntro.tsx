@@ -472,10 +472,14 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
               centrerade siffra/?. Glyph-overlay:n flyttas INTE eftersom dess
               flex-centrering redan ankrar mot logoStack-mitten. */}
           <View
-            style={[
-              StyleSheet.absoluteFillObject,
-              { transform: [{ translateX: LOGO_SIZE * 0.0375 }] },
-            ]}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              transform: [{ translateX: LOGO_SIZE * 0.0375 }],
+            }}
             pointerEvents="none"
           >
             <CountdownQLogo size={LOGO_SIZE} />
@@ -697,8 +701,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // ⚠ Explicit position:absolute + top/left/right/bottom, INTE
+  // `...StyleSheet.absoluteFillObject`-spread. På nya arkitekturen (dev-build)
+  // applicerades spreaden inte som absolut → overlayn hamnade i normalt flöde
+  // som ett flex-barn UNDER Q-loggan, så siffran/? renderades utanför Q-et.
+  // Med explicit absolut overlay centrerar flex-layouten glyfen i Q-ringen igen.
   glyphOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

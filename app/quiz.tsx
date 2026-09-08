@@ -10567,10 +10567,11 @@ export default function QuizScreen() {
                     )}
                     {/* Facit-texten (år + låt/artist) hålls tillbaka tills
                         nedräkningen tagit slut. Under 'awaiting' renderas texten
-                        DOLD (opacity 0) så kortet reserverar exakt samma höjd som
-                        vid reveal, och en QuizVibe-logo läggs centrerad ovanpå så
-                        boxen inte ser tom/hopklämd ut medan spelaren väntar. Vid
-                        'reveal' fylls texten i och kortet ser ut precis som förut. */}
+                        DOLD (opacity 0) så kortet reserverar EXAKT samma höjd som
+                        vid reveal — ingen logo-overlay längre (den stack ut förbi
+                        kortet och fick awaiting-rutan att se större ut än reveal-
+                        rutan). Vid 'reveal' fylls texten i och kortet ser ut precis
+                        som förut. */}
                     <View style={rv.feedbackBody}>
                       <Text
                         style={[
@@ -10600,11 +10601,6 @@ export default function QuizScreen() {
                         >
                           {question.hint}
                         </Text>
-                      )}
-                      {phase !== 'reveal' && (
-                        <View style={rv.feedbackLogoOverlay} pointerEvents="none">
-                          <QuizVibeLogo size={52} />
-                        </View>
                       )}
                     </View>
                   </Animated.View>
@@ -12063,18 +12059,13 @@ const rv = StyleSheet.create({
   // krympt så hela kortet håller låg höjd oavsett assistance-nivå (kortet
   // ska bara vara så högt att badge + correct-year-raden får plats).
   // Wrapper runt facit-texten så awaiting-boxen kan reservera exakt reveal-höjd
-  // (dold text) medan QuizVibe-logon overlay:as centrerad ovanpå.
+  // (dold text) så awaiting-boxen reserverar exakt reveal-höjd.
   feedbackBody: {
     position: 'relative',
     gap: 2,
   },
   feedbackTextHidden: {
     opacity: 0,
-  },
-  feedbackLogoOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   feedbackCorrectYear: {
     fontSize: FontSize.md,

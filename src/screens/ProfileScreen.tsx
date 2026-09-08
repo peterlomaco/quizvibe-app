@@ -3572,7 +3572,7 @@ const styles = StyleSheet.create({
   //     för konsistent UX när man loggar ut från Profile-pillen) ───
   logoutOverlay: { flex: 1, justifyContent: 'flex-end' },
   logoutBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   logoutSheet: {
@@ -4454,10 +4454,10 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
   },
   // Data-kolumnernas (Music/Film) switch-celler: nudgas höger så switchen
-  // hamnar centrerad UNDER sin kolumnrubrik (iOS-<Switch> har en fast vänster-
-  // bias inom sin center-cell). Speglar LobbyScreen:s smSwitchNudge. Tuna här.
+  // hamnar centrerad UNDER sin kolumnrubrik (iOS-<Switch> renderar vänster-
+  // biasad; paddingLeft flyttar ~1:1). Speglar LobbyScreen:s smSwitchNudge. Tuna här.
   smSwitchNudge: {
-    paddingLeft: 32,
+    paddingLeft: 20,
   },
   smAllToggleShift: {
     paddingLeft: 18,
@@ -5242,7 +5242,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   spotifyGuideBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.6)',
   },
   spotifyGuideSheet: {
@@ -5304,7 +5304,7 @@ const styles = StyleSheet.create({
 
 const friendsModal = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)' },
   sheet: {
     backgroundColor: Colors.card,
     borderTopLeftRadius: 24,
