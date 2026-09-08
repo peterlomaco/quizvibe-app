@@ -35,7 +35,9 @@ const TOKENS: Record<string, string> = {
   when: 'When',
   who: 'Who',
   // Sagt när host går in i lobbyn (ersätter expo-speech-välkomsten).
-  quizvibe: 'QuizVibe',
+  // ETT ord, gemener 'v' — camelCase 'QuizVibe' fick TTS att pausa mellan
+  // "Quiz" och "Vibe" (Peter 2026-09-08).
+  quizvibe: 'Quizvibe',
 };
 
 interface PackConfig {
