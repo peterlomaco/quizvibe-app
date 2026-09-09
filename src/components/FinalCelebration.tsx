@@ -651,21 +651,38 @@ export default function FinalCelebration({
 }
 
 const styles = StyleSheet.create({
+  // ⚠ Explicit position:absolute + top/left/right/bottom, INTE
+  // `...StyleSheet.absoluteFillObject`-spread. På nya arkitekturen (dev-build)
+  // applicerades spreaden inte som absolut → overlayn hamnade i normalt flöde
+  // och tryckte ner Final Leaderboards footer/innehåll. Explicit form matchar
+  // de absoluta element som fungerar (halo m.fl.).
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     zIndex: 80,
     elevation: 80,
     alignItems: 'center',
     justifyContent: 'center',
   },
   veil: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: Colors.background,
     opacity: 0.97,
   },
   // Speglar bgFinalWrap i RoundLeaderboard.tsx.
   markWrap: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

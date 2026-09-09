@@ -1356,3 +1356,37 @@ items:
         startSec: 0
         endSec: 30
         notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1281)."
+  - id: jimi-hendrix-all-along-the-watchtower
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "All Along the Watchtower — Jimi Hendrix"
+    correctYear: 1968
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Jimi Hendrix All Along the Watchtower 1968"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2aoo2jlRnM3A0NyLQqMN2f"
+    notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1300)."
+  - id: bob-marley-could-you-be-loved
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Could You Be Loved — Bob Marley"
+    correctYear: 1980
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Bob Marley Could You Be Loved 1980"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    youtubeClips:
+      - videoId: "1ti2YCFgCoI"
+        startSec: 4
+        endSec: 34
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1344)."
+  - id: rod-stewart-da-ya-think-im-sexy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Da Ya Think I'm Sexy? — Rod Stewart"
+    correctYear: 1978
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Rod Stewart Da Ya Think Im Sexy 1978"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3wsPg2KrRYZFi0inIFa41x"
+    notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1363)."

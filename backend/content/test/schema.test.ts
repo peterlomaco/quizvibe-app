@@ -16,16 +16,17 @@ describe('content catalog', () => {
     expect(() => loadCatalog()).not.toThrow();
   });
 
-  it('default load is MUSIC-ONLY (Film/Sport parkerade i deferred/)', () => {
+  it('default load is MUSIC + FILM (Sport parkerat i deferred/)', () => {
     const { files } = loadCatalog();
     const categories = new Set(
       Array.from(files.values()).map((f) => f.category),
     );
-    // MUSIC-ONLY LAUNCH (2026-09): bara musik-kategorier laddas som default.
+    // MUSIC + FILM (2026-09): musik + film-kategorier laddas som default.
     expect(categories.has('artists')).toBe(true);
     expect(categories.has('songs')).toBe(true);
-    // Film (actors) + Sport (athletes/sport-events) flyttade till deferred/.
-    expect(categories.has('actors')).toBe(false);
+    // Film återinfört: actors (Hints) + movies (category:songs) flyttade UT ur deferred/.
+    expect(categories.has('actors')).toBe(true);
+    // Sport (athletes/sport-events) fortfarande parkerat i deferred/.
     expect(categories.has('sport')).toBe(false);
     // persons-* raderade vid politiker-purge:n (2026-05-21).
     expect(categories.has('persons')).toBe(false);

@@ -179,8 +179,15 @@ const Block = React.memo(function Block({ hidden }: { hidden: boolean }) {
 });
 
 const styles = StyleSheet.create({
+  // ⚠ Explicit position:absolute, INTE `...StyleSheet.absoluteFillObject`-spread
+  // — spreaden applicerades inte som absolut på nya arkitekturen (dev-build)
+  // och mosaik-gridet/logon täckte inte bilden/flaggan.
   grid: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
@@ -193,7 +200,11 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   logoCenter: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

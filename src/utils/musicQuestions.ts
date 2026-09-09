@@ -49,6 +49,34 @@ export interface MusicQuestion {
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = [
   {
+    "id": "steamboat-willie-1928",
+    "displayName": "Steamboat Willie",
+    "correctYear": 1928,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "I5pG1wbRKOg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Did You Catch This?",
+        "license": "standard",
+        "notes": "4K-remaster av Steamboat Willie (public domain sedan jan 2024). Ikononisk öppning med Mickey som visslar på ångbåten."
+      }
+    ]
+  },
+  {
     "id": "cab-calloway-minnie-the-moocher",
     "displayName": "Minnie the Moocher — Cab Calloway",
     "correctYear": 1931,
@@ -224,6 +252,110 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-wizard-of-oz-1939",
+    "displayName": "The Wizard of Oz",
+    "correctYear": 1939,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Judy Garland"
+    ],
+    "distractorNames": [
+      "Shirley Temple",
+      "Vivien Leigh",
+      "Katharine Hepburn",
+      "Ingrid Bergman"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FfpF8UUVTeM",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Warner On Demand",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiell WB-trailer, titeln avslöjar varken skådespelare eller år."
+      }
+    ]
+  },
+  {
+    "id": "citizen-kane-1941",
+    "displayName": "Citizen Kane",
+    "correctYear": 1941,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 74,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Orson Welles"
+    ],
+    "distractorNames": [
+      "Humphrey Bogart",
+      "James Stewart",
+      "Cary Grant",
+      "Gary Cooper"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "fXf2LGhW66M",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Mackenzie Parker",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. OBS: fan-gjord 'modern trailer' på privat kanal — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
+      }
+    ]
+  },
+  {
+    "id": "bambi-1942",
+    "displayName": "Bambi",
+    "correctYear": 1942,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YgNx5J0SROE",
+        "startSec": 5,
+        "endSec": 20,
+        "channelTitle": "Disney UK",
+        "license": "standard",
+        "notes": "Disney UK officiell Diamond Edition-trailer — Bambi i skogen, klassisk Disney-estetik."
+      }
+    ]
+  },
+  {
     "id": "bing-crosby-white-christmas",
     "displayName": "White Christmas — Bing Crosby",
     "correctYear": 1942,
@@ -252,6 +384,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bing Crosby - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Refrängområde."
+      }
+    ]
+  },
+  {
+    "id": "casablanca-1942",
+    "displayName": "Casablanca",
+    "correctYear": 1942,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Humphrey Bogart",
+      "Ingrid Bergman"
+    ],
+    "distractorNames": [
+      "Cary Grant",
+      "James Stewart",
+      "Katharine Hepburn",
+      "Greta Garbo"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "0V1eoBH0Zcw",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "thecoolidge",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Original-trailer i HD, titeln avslöjar varken skådespelare eller år."
       }
     ]
   },
@@ -472,6 +643,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "singin-in-the-rain-1952",
+    "displayName": "Singin' in the Rain",
+    "correctYear": 1952,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Gene Kelly",
+      "Debbie Reynolds"
+    ],
+    "distractorNames": [
+      "Fred Astaire",
+      "Frank Sinatra",
+      "Audrey Hepburn",
+      "Grace Kelly"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "D-NJHUasYVA",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Park Circus",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiell Park Circus-trailer (rättighetsdistributör), ren titel."
+      }
+    ]
+  },
+  {
     "id": "bill-haley-rock-around-the-clock",
     "displayName": "Rock Around the Clock — Bill Haley & His Comets",
     "correctYear": 1954,
@@ -496,6 +706,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "OLD TAPES",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
+    "id": "lady-and-the-tramp",
+    "displayName": "Lady and the Tramp",
+    "correctYear": 1955,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "SAoLpLXvGN0",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Disney UK",
+        "license": "standard",
+        "notes": "Disney UK officiell Blu-ray-trailer — spagetti-scen + hundar etablerade."
       }
     ]
   },
@@ -1354,6 +1592,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-good-the-bad-and-the-ugly-1966",
+    "displayName": "The Good, the Bad and the Ugly",
+    "correctYear": 1966,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Clint Eastwood"
+    ],
+    "distractorNames": [
+      "Charles Bronson",
+      "Steve McQueen",
+      "Lee Marvin",
+      "Yul Brynner"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "WCN5JJY_wiA",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Videotiteln lyder '... Official Trailer #1 - Clint Eastwood Movie (1966) HD'. Peter bedömde 2026-08-13 att slutet av titelraden inte hinner läsas i spelaren och BEHÖLL klippet medvetet — flagga inte om som spoiler. OBS att det som står där är rätt SKÅDESPELARE (frågan är actor-select, svaret = Clint Eastwood), inte bara årtalet. Vill man ta bort risken utan att byta klipp: sätt correctNames till Eli Wallach / Lee Van Cleef (också huvudroller, står inte i titeln)."
+      }
+    ]
+  },
+  {
     "id": "aretha-franklin-respect",
     "displayName": "Respect — Aretha Franklin",
     "correctYear": 1967,
@@ -1647,6 +1923,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
+  },
+  {
+    "id": "jimi-hendrix-all-along-the-watchtower",
+    "displayName": "All Along the Watchtower — Jimi Hendrix",
+    "correctYear": 1968,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "2aoo2jlRnM3A0NyLQqMN2f",
+    "youtubeClips": []
   },
   {
     "id": "simon-garfunkel-mrs-robinson",
@@ -2309,6 +2605,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-godfather",
+    "displayName": "The Godfather",
+    "correctYear": 1972,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 92,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Marlon Brando",
+      "Al Pacino"
+    ],
+    "distractorNames": [
+      "Jack Nicholson",
+      "Robert Redford",
+      "Dustin Hoffman",
+      "Steve McQueen"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "UaVTIH8mujA",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Paramount Pictures",
+        "license": "standard",
+        "notes": "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener."
+      }
+    ]
+  },
+  {
     "id": "vicky-leandros-apres-toi",
     "displayName": "Après toi — Vicky Leandros",
     "correctYear": 1972,
@@ -2785,6 +3120,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jaws",
+    "displayName": "Jaws",
+    "correctYear": 1975,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Roy Scheider",
+      "Richard Dreyfuss"
+    ],
+    "distractorNames": [
+      "Robert Redford",
+      "Dustin Hoffman",
+      "Jack Nicholson",
+      "Gene Hackman"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "qCzncv0ISaE",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Universal Pictures",
+        "license": "standard",
+        "notes": "Official Universal Pictures-klipp — 'Bigger Boat'-scenen i 4K HDR."
+      }
+    ]
+  },
+  {
     "id": "kc-sunshine-band-thats-the-way-i-like-it",
     "displayName": "That's the Way (I Like It) — KC and the Sunshine Band",
     "correctYear": 1975,
@@ -3026,6 +3400,47 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Fleetwood Mac",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (3)."
+      }
+    ]
+  },
+  {
+    "id": "rocky",
+    "displayName": "Rocky",
+    "correctYear": 1976,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 92,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Sylvester Stallone"
+    ],
+    "distractorNames": [
+      "Burt Reynolds",
+      "Steve McQueen",
+      "James Caan",
+      "Gene Hackman"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "-Hk-LYcavrw",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Amazon MGM Studios",
+        "license": "standard",
+        "notes": "MGM Official trailer — Bill Conti's Gonna Fly Now-tema + training-montage."
       }
     ]
   },
@@ -3273,6 +3688,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "star-wars-new-hope",
+    "displayName": "Star Wars: A New Hope",
+    "correctYear": 1977,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Mark Hamill",
+      "Harrison Ford"
+    ],
+    "distractorNames": [
+      "Donald Sutherland",
+      "Jack Nicholson",
+      "Robert Redford",
+      "Warren Beatty"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "vZ734NWnAHA",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Star Wars",
+        "license": "standard",
+        "notes": "Official Star Wars channel — A New Hope trailer. John Williams theme."
+      }
+    ]
+  },
+  {
     "id": "blondie-heart-of-glass",
     "displayName": "Heart of Glass — Blondie",
     "correctYear": 1978,
@@ -3392,6 +3846,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "grease-1978",
+    "displayName": "Grease",
+    "correctYear": 1978,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "John Travolta",
+      "Olivia Newton-John"
+    ],
+    "distractorNames": [
+      "Elvis Presley",
+      "Burt Reynolds",
+      "Farrah Fawcett",
+      "Brooke Shields"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ZW0DfsCzfq4",
+        "startSec": 0,
+        "endSec": 20,
+        "channelTitle": "Kurt Harmsworth",
+        "license": "standard",
+        "notes": "Summer Nights-scen med Travolta + Newton-John — ikonisk strandbild."
+      }
+    ]
+  },
+  {
     "id": "izhar-cohen-a-ba-ni-bi",
     "displayName": "A-Ba-Ni-Bi — Izhar Cohen & The Alphabeta",
     "correctYear": 1978,
@@ -3450,6 +3943,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }
     ]
+  },
+  {
+    "id": "rod-stewart-da-ya-think-im-sexy",
+    "displayName": "Da Ya Think I'm Sexy? — Rod Stewart",
+    "correctYear": 1978,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "3wsPg2KrRYZFi0inIFa41x",
+    "youtubeClips": []
   },
   {
     "id": "travolta-newton-john-youre-the-one-that-i-want",
@@ -3697,6 +4210,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bob-marley-could-you-be-loved",
+    "displayName": "Could You Be Loved — Bob Marley",
+    "correctYear": 1980,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "1ti2YCFgCoI",
+        "startSec": 4,
+        "endSec": 34,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1344)."
+      }
+    ]
+  },
+  {
     "id": "bruce-springsteen-the-river",
     "displayName": "The River — Bruce Springsteen",
     "correctYear": 1980,
@@ -3808,6 +4351,125 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Queen Official",
         "license": "standard",
         "notes": "Bytt 2026-08-10: gamla klippet (Y09uL2qbYCg, Queen - Topic) hade allow-list utan SE → 'Video unavailable' i Sverige. Officiell remaster från rättsinnehavarens kanal, HD, blockerad enbart i RU."
+      }
+    ]
+  },
+  {
+    "id": "raging-bull-1980",
+    "displayName": "Raging Bull",
+    "correctYear": 1980,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Robert De Niro"
+    ],
+    "distractorNames": [
+      "Sylvester Stallone",
+      "Jack Nicholson",
+      "Burt Reynolds",
+      "Jon Voight"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "F2UKuKxCJqc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Amazon MGM Studios",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+      }
+    ]
+  },
+  {
+    "id": "sallskapsresan",
+    "displayName": "Sällskapsresan",
+    "correctYear": 1980,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Lasse Åberg"
+    ],
+    "distractorNames": [
+      "Stig Grybe",
+      "Magnus Härenstam",
+      "Gösta Ekman",
+      "Björn Skifs",
+      "Per Oscarsson"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3WD7f7pvoSY",
+        "startSec": 10,
+        "endSec": 45,
+        "channelTitle": "HD Retro Trailers",
+        "license": "standard",
+        "notes": "HD originaltrailer. Uno Svenningsson + Lasse Åberg ikonisk öppning."
+      }
+    ]
+  },
+  {
+    "id": "star-wars-empire-strikes-back-1980",
+    "displayName": "Star Wars: The Empire Strikes Back",
+    "correctYear": 1980,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Mark Hamill",
+      "Harrison Ford"
+    ],
+    "distractorNames": [
+      "Kurt Russell",
+      "Christopher Reeve",
+      "Michael Douglas",
+      "Richard Dreyfuss"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "JNwNXF9Y6kY",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Star Wars",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiella Star Wars-kanalen, ren titel utan skådespelar- eller års-spoiler."
       }
     ]
   },
@@ -3941,6 +4603,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "gota-kanal",
+    "displayName": "Göta kanal — eller vem drog ur proppen?",
+    "correctYear": 1981,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Janne Carlsson"
+    ],
+    "distractorNames": [
+      "Lasse Åberg",
+      "Stig Grybe",
+      "Gösta Ekman",
+      "Allan Edwall"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "qx7zpGYSm0s",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "NjutafilmsStudioS",
+        "license": "standard",
+        "notes": "Officiell NjutaFilms-trailer. Karaktärerna + kanalscenerna väl representerade."
+      }
+    ]
+  },
+  {
     "id": "hasse-andersson-guld-och-groena-skogar",
     "displayName": "Guld och gröna skogar — Hasse Andersson",
     "correctYear": 1981,
@@ -4001,6 +4701,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "indiana-jones-raiders",
+    "displayName": "Indiana Jones: Raiders of the Lost Ark",
+    "correctYear": 1981,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 92,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Harrison Ford"
+    ],
+    "distractorNames": [
+      "Tom Selleck",
+      "Mel Gibson",
+      "Bruce Willis",
+      "Kurt Russell"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "0xQSIdSRlAk",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Paramount Movies",
+        "license": "standard",
+        "notes": "Official Paramount Movies trailer. Raiders March-theme + boulder-scen."
       }
     ]
   },
@@ -4171,6 +4909,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Zoinks Scoob",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-29. Ersatte d-ghe23_uwI. Titeln avslöjar inte årtalet."
+      }
+    ]
+  },
+  {
+    "id": "e-t-the-extra-terrestrial",
+    "displayName": "E.T. the Extra-Terrestrial",
+    "correctYear": 1982,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 92,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Henry Thomas",
+      "Drew Barrymore"
+    ],
+    "distractorNames": [
+      "Macaulay Culkin",
+      "River Phoenix",
+      "Elijah Wood",
+      "Jake Gyllenhaal"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "2tK7AMgLvv0",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "IMAX",
+        "license": "standard",
+        "notes": "IMAX official trailer — John Williams theme + iconic bicycle/moon-scen."
       }
     ]
   },
@@ -4520,6 +5297,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bob-marley-buffalo-soldier",
+    "displayName": "Buffalo Soldier — Bob Marley",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "uMUQMSXLlHM",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1343)."
+      }
+    ]
+  },
+  {
     "id": "bonnie-tyler-total-eclipse-of-the-heart",
     "displayName": "Total Eclipse of the Heart — Bonnie Tyler",
     "correctYear": 1983,
@@ -4603,6 +5410,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Cyndi Lauper - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag Q2ahfQoB9EY är en privat re-upload; Topic är rättsinnehavarens kanal."
+      }
+    ]
+  },
+  {
+    "id": "donna-summer-she-works-hard-for-the-money",
+    "displayName": "She Works Hard for the Money — Donna Summer",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "N8EkGUm9q_A",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1332)."
       }
     ]
   },
@@ -4747,6 +5581,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-08-14. Officiella musikvideon — ersatte Topic-audion (statisk albumkonst)."
       }
     ]
+  },
+  {
+    "id": "rod-stewart-baby-jane",
+    "displayName": "Baby Jane — Rod Stewart",
+    "correctYear": 1983,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "5F5SMUnFD058zo1K0DtjUq",
+    "youtubeClips": []
   },
   {
     "id": "rufus-chaka-khan-aint-nobody",
@@ -5040,6 +5894,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jonssonligan-far-guldfeber",
+    "displayName": "Jönssonligan får guldfeber",
+    "correctYear": 1984,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 83,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Gösta Ekman"
+    ],
+    "distractorNames": [
+      "Lasse Åberg",
+      "Stig Grybe",
+      "Magnus Härenstam",
+      "Per Oscarsson"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FD3jK0gWbPc",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "ZorbaMovies",
+        "license": "standard",
+        "notes": "Trailer. Jönssonligan-gänget tydliga."
+      }
+    ]
+  },
+  {
     "id": "laura-branigan-self-control",
     "displayName": "Self Control — Laura Branigan",
     "correctYear": 1984,
@@ -5316,6 +6208,72 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-karate-kid-1984",
+    "displayName": "The Karate Kid",
+    "correctYear": 1984,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bgBy0_y-Ktw",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Karate Kid: Crane Kick Final Fight Scene (Ralph Macchio, William Zabka)'."
+      }
+    ]
+  },
+  {
+    "id": "the-terminator-1984",
+    "displayName": "The Terminator",
+    "correctYear": 1984,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Arnold Schwarzenegger",
+      "Linda Hamilton"
+    ],
+    "distractorNames": [
+      "Mel Gibson",
+      "Tom Cruise",
+      "Bruce Willis",
+      "Kurt Russell"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nGrW-OR2uDk",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Amazon MGM Studios",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell 1984-trailer (MGM)."
+      }
+    ]
+  },
+  {
     "id": "tina-turner-whats-love",
     "displayName": "What's Love Got to Do with It — Tina Turner",
     "correctYear": 1984,
@@ -5469,6 +6427,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "a-ha",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Officiella rotoscope-musikvideon på bandets egen kanal — ersatte Topic-audion (statisk albumkonst)."
+      }
+    ]
+  },
+  {
+    "id": "back-to-the-future",
+    "displayName": "Back to the Future",
+    "correctYear": 1985,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Michael J. Fox"
+    ],
+    "distractorNames": [
+      "Rob Lowe",
+      "Tom Hanks",
+      "Emilio Estevez",
+      "Patrick Swayze"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "T_WSXXPQYeY",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Universal Pictures",
+        "license": "standard",
+        "notes": "Official Universal Pictures-klipp — Johnny B. Goode-scenen. BEHÅLLET 2026-08-12: Peters förslag 2LnShmQ_hLc är en privat re-upload av teaser-trailern; rättsinnehavarens klipp är stabilare."
       }
     ]
   },
@@ -6107,6 +7103,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1986 vinnare — Belgien."
+      }
+    ]
+  },
+  {
+    "id": "top-gun",
+    "displayName": "Top Gun",
+    "correctYear": 1986,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Tom Cruise",
+      "Val Kilmer"
+    ],
+    "distractorNames": [
+      "Kevin Bacon",
+      "Mel Gibson",
+      "Patrick Swayze",
+      "Matthew Modine"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xa_z57UatDY",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Official 1986-trailer — Danger Zone-tema + jet-action."
       }
     ]
   },
@@ -6966,6 +8001,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "field-of-dreams-1989",
+    "displayName": "Field of Dreams",
+    "correctYear": 1989,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Kevin Costner"
+    ],
+    "distractorNames": [
+      "Tom Hanks",
+      "Patrick Swayze",
+      "Tom Cruise",
+      "Mel Gibson"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Ut06d4dptWo",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Movieclips",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+      }
+    ]
+  },
+  {
     "id": "hakan-sodergren-nu-tar-vi-dom",
     "displayName": "Nu tar vi dom — Håkan Södergren & Ishockeylandslaget",
     "correctYear": 1989,
@@ -7318,6 +8391,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Dr. Alban",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Dr. Alban - No Coke (Official 4K Video)' — inget ar i titeln."
+      }
+    ]
+  },
+  {
+    "id": "home-alone",
+    "displayName": "Home Alone",
+    "correctYear": 1990,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 93,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Macaulay Culkin"
+    ],
+    "distractorNames": [
+      "Jake Lloyd",
+      "Haley Joel Osment",
+      "Elijah Wood",
+      "Freddie Highmore"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NOIgZYlYvyk",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "NOW PLAYING",
+        "license": "standard",
+        "notes": "Home Alone (1990) officiell trailer — Kevin McCallister + booby traps etableras."
       }
     ]
   },
@@ -8160,6 +9271,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "aladdin-1992",
+    "displayName": "Aladdin",
+    "correctYear": 1992,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "GacgWYqL-Bc",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "Marcus R",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-27. Ersatte XBrfbWtmvWs vars titel hade 1992 vid tecken 9 av 53 = spoiler. Svenskt tal."
+      }
+    ]
+  },
+  {
     "id": "bon-jovi-bed-of-roses",
     "displayName": "Bed of Roses — Bon Jovi",
     "correctYear": 1992,
@@ -8669,6 +9808,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-bodyguard-1992",
+    "displayName": "The Bodyguard",
+    "correctYear": 1992,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Kevin Costner",
+      "Whitney Houston"
+    ],
+    "distractorNames": [
+      "Tom Cruise",
+      "Mel Gibson",
+      "Julia Roberts",
+      "Demi Moore"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "v4qauDAr_hA",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Bodyguard - Theatrical Trailer' — avslojar varken skadespelare eller ar."
+      }
+    ]
+  },
+  {
     "id": "whitney-houston-i-have-nothing",
     "displayName": "I Have Nothing — Whitney Houston",
     "correctYear": 1992,
@@ -8883,6 +10060,47 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "cool-runnings-1993",
+    "displayName": "Cool Runnings",
+    "correctYear": 1993,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "John Candy"
+    ],
+    "distractorNames": [
+      "Robin Williams",
+      "Bill Murray",
+      "Eddie Murphy",
+      "Chris Farley"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3mS-l1F5Xvs",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "DVDizzydotcom",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — original 1993-trailer (1080p HD-upscale)."
+      }
+    ]
+  },
+  {
     "id": "cypress-hill-insane-in-the-brain",
     "displayName": "Insane in the Brain — Cypress Hill",
     "correctYear": 1993,
@@ -8973,6 +10191,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "JanetJacksonVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "jurassic-park",
+    "displayName": "Jurassic Park",
+    "correctYear": 1993,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Sam Neill",
+      "Jeff Goldblum"
+    ],
+    "distractorNames": [
+      "Kevin Costner",
+      "Mel Gibson",
+      "Kurt Russell",
+      "Bruce Willis"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "VzZN9AVBS1I",
+        "startSec": 60,
+        "endSec": 75,
+        "channelTitle": "Universal Pictures At Home",
+        "license": "standard",
+        "notes": "Official Universal Pictures-klipp 4K — iconic theme + dinosaur-reveal."
       }
     ]
   },
@@ -9097,6 +10354,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SnoopDoggVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "sunes-sommar",
+    "displayName": "Sunes sommar",
+    "correctYear": 1993,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Peter Haber"
+    ],
+    "distractorNames": [
+      "Mikael Persbrandt",
+      "Lasse Åberg",
+      "Gösta Ekman",
+      "Johan Ulveson"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "88B9JxorPcI",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "ZorbaMovies",
+        "license": "standard",
+        "notes": "Trailer. Familjefilm, stark igenkänning hos millennials som barn."
       }
     ]
   },
@@ -9410,6 +10705,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "forrest-gump",
+    "displayName": "Forrest Gump",
+    "correctYear": 1994,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 93,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Tom Hanks"
+    ],
+    "distractorNames": [
+      "Kevin Costner",
+      "Robin Williams",
+      "Mel Gibson",
+      "Jim Carrey"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bSMxl1V8FSg",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Movieclips",
+        "license": "standard",
+        "notes": "Movieclips 'Run, Forrest, Run!'-scenen — iconic moment + theme."
+      }
+    ]
+  },
+  {
     "id": "ges-graver-guld-usa",
     "displayName": "När vi gräver guld i USA — GES",
     "correctYear": 1994,
@@ -9534,6 +10867,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1994 vinnare — Irland."
+      }
+    ]
+  },
+  {
+    "id": "pulp-fiction",
+    "displayName": "Pulp Fiction",
+    "correctYear": 1994,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "John Travolta",
+      "Samuel L. Jackson"
+    ],
+    "distractorNames": [
+      "Kevin Costner",
+      "Tom Hanks",
+      "Nicolas Cage",
+      "Denzel Washington"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "s7EdQ4FqbhY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Movieclips",
+        "license": "standard",
+        "notes": "Official trailer (Movieclips) — iconic surf-rock soundtrack + ensemble-shots. BEHÅLLET 2026-08-12: Peters förslag tGpTpVyI_OQ (Miramax) har titeln 'John Travolta, Uma Thurman, Samuel L. Jackson' = direkt spoiler för actor-select."
       }
     ]
   },
@@ -9680,6 +11052,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Parlophone Sweden",
         "license": "standard",
         "notes": "Officiell Parlophone/WM Group. Album Byns enda blondin (1994)."
+      }
+    ]
+  },
+  {
+    "id": "the-lion-king-1994",
+    "displayName": "The Lion King",
+    "correctYear": 1994,
+    "contentSubject": "movie",
+    "questionText": "What is the name of the main character in this film?",
+    "itemHcp": 93,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": true,
+    "correctNames": [
+      "Simba"
+    ],
+    "distractorNames": [
+      "Mufasa",
+      "Scar",
+      "Nala",
+      "Timon"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "lfiprM5l_cE",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "Aarush Boi",
+        "license": "standard",
+        "notes": "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
       }
     ]
   },
@@ -10073,6 +11483,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1995 vinnare — Norge."
+      }
+    ]
+  },
+  {
+    "id": "b-real-hit-em-high",
+    "displayName": "Hit 'Em High — B-Real, Busta Rhymes, Coolio",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "spotifyTrackId": "12MIoieKIYC1jDgpKGy12F",
+    "youtubeClips": [
+      {
+        "videoId": "gdhcbkdQvXE",
+        "startSec": 26,
+        "endSec": 56,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1301)."
       }
     ]
   },
@@ -11237,6 +12680,82 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "titanic",
+    "displayName": "Titanic",
+    "correctYear": 1997,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 95,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Leonardo DiCaprio",
+      "Kate Winslet"
+    ],
+    "distractorNames": [
+      "Brad Pitt",
+      "Matt Damon",
+      "Julia Roberts",
+      "Sandra Bullock"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "I7c1etV7D7g",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "20th Century Studios",
+        "license": "standard",
+        "notes": "Official 25th Anniversary trailer — Celine Dion theme + iconic scenes."
+      }
+    ]
+  },
+  {
+    "id": "2pac-changes",
+    "displayName": "Changes — 2Pac",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "eXvBjCO19QY",
+        "startSec": 13,
+        "endSec": 43,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1299)."
+      },
+      {
+        "videoId": "gfF8jMN-2CM",
+        "startSec": 13,
+        "endSec": 43,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "ace-of-base-cruel-summer",
     "displayName": "Cruel Summer — Ace of Base",
     "correctYear": 1998,
@@ -11586,6 +13105,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-30 (ersatte 98ID_halfhs)."
+      }
+    ]
+  },
+  {
+    "id": "mulan-1998",
+    "displayName": "Mulan",
+    "correctYear": 1998,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "sRtZaSkBp58",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Allen Theatres Inc",
+        "license": "standard",
+        "notes": "Original 1998 teatral trailer — Mulan som krigare + Make a Man Out of You-känsla."
       }
     ]
   },
@@ -11978,6 +13525,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dmx-party-up",
+    "displayName": "Party Up — DMX",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "spotifyTrackId": "3Y4BqG5FGXgGFQaJzX1MQC",
+    "youtubeClips": [
+      {
+        "videoId": "cNYUnKMCa7Y",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1296)."
+      }
+    ]
+  },
+  {
     "id": "dr-dre-still-dre",
     "displayName": "Still D.R.E. — Dr. Dre feat. Snoop Dogg",
     "correctYear": 1999,
@@ -12137,6 +13717,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "enrique-iglesias-could-i-have-this-kiss-forever",
+    "displayName": "Could I Have This Kiss Forever — Enrique Iglesias & Whitney Houston",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "spotifyTrackId": "3XkLdXXnh4sviCzhO0bu23",
+    "youtubeClips": [
+      {
+        "videoId": "zsfj9j0kjoU",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1303)."
+      }
+    ]
+  },
+  {
     "id": "jennifer-lopez-if-you-had-my-love",
     "displayName": "If You Had My Love — Jennifer Lopez",
     "correctYear": 1999,
@@ -12281,6 +13892,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SmashMouthVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1999 = albumet Astro Lounge (MusicBrainz gav felaktigt 1997)."
+      }
+    ]
+  },
+  {
+    "id": "the-matrix",
+    "displayName": "The Matrix",
+    "correctYear": 1999,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 93,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Keanu Reeves",
+      "Laurence Fishburne"
+    ],
+    "distractorNames": [
+      "Brad Pitt",
+      "Nicolas Cage",
+      "Hugh Jackman",
+      "Will Smith"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "vKQi3bBA1y8",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Official 1999-trailer — bullet-time + Neo/Trinity-scener."
       }
     ]
   },
@@ -12453,6 +14103,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 273,
         "channelTitle": "Coldplay",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "gladiator-2000",
+    "displayName": "Gladiator",
+    "correctYear": 2000,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Russell Crowe"
+    ],
+    "distractorNames": [
+      "Mel Gibson",
+      "Tom Cruise",
+      "Kevin Costner",
+      "Brad Pitt"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "gDbltV8z7dQ",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Paramount Movies",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
       }
     ]
   },
@@ -12643,6 +14331,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "snatch-2000",
+    "displayName": "Snatch",
+    "correctYear": 2000,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Brad Pitt",
+      "Jason Statham"
+    ],
+    "distractorNames": [
+      "Vin Diesel",
+      "Dwayne Johnson",
+      "Gerard Butler",
+      "Mark Wahlberg"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9Jar2XkBboo",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "Movieclips Classic Trailers",
+        "license": "standard",
+        "notes": "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."
+      }
+    ]
+  },
+  {
     "id": "the-hives-hate-to-say",
     "displayName": "Hate to Say I Told You So — The Hives",
     "correctYear": 2000,
@@ -12691,6 +14421,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1283)."
+      }
+    ]
+  },
+  {
+    "id": "toni-braxton-he-wasnt-man-enough",
+    "displayName": "He Wasn't Man Enough — Toni Braxton",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "9_hKXk2qSuw",
+        "startSec": 25,
+        "endSec": 55,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1306)."
       }
     ]
   },
@@ -12819,6 +14580,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "harry-potter-philosophers-stone-2001",
+    "displayName": "Harry Potter and the Philosopher's Stone",
+    "correctYear": 2001,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 91,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Daniel Radcliffe",
+      "Emma Watson"
+    ],
+    "distractorNames": [
+      "Tobey Maguire",
+      "Elijah Wood",
+      "Macaulay Culkin",
+      "Jake Lloyd"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "iSItf2y7hgs",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "ClipZone: Heroes & Villains",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — scen ur 2001-filmen (ej 2026 HBO-reboot-teaser)."
+      }
+    ]
+  },
+  {
     "id": "kylie-minogue-cant-get-you-out-of-my-head",
     "displayName": "Can't Get You Out of My Head — Kylie Minogue",
     "correctYear": 2001,
@@ -12870,6 +14670,77 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MUSIC EVOLUTION",
         "license": "standard",
         "notes": "Official Video 4K 60fps remaster — HD-fix av tidigare SD-klipp 2026-05-22. Refrängområde."
+      }
+    ]
+  },
+  {
+    "id": "lotr-fellowship-2001",
+    "displayName": "The Lord of the Rings: The Fellowship of the Ring",
+    "correctYear": 2001,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 89,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Elijah Wood",
+      "Ian McKellen"
+    ],
+    "distractorNames": [
+      "Tobey Maguire",
+      "Daniel Radcliffe",
+      "Brendan Fraser",
+      "Ewan McGregor"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "_nZdmwHrcnw",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Warner Bros. Entertainment",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12 — ersatte Movieclips-trailern (V75dMMIW2B4) med rättsinnehavarens 4K Ultra HD-klipp."
+      }
+    ]
+  },
+  {
+    "id": "ludacris-area-codes",
+    "displayName": "Area Codes — Ludacris feat. Nate Dogg",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "DwGKDF9Y1r4",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1297)."
       }
     ]
   },
@@ -12990,6 +14861,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Planet Funk",
         "license": "standard",
         "notes": "Official video 2001."
+      }
+    ]
+  },
+  {
+    "id": "shrek-2001",
+    "displayName": "Shrek",
+    "correctYear": 2001,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "s9nVUOP3Oik",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Dreamworks",
+        "license": "standard",
+        "notes": "DreamWorks officiell trailer (1:48) — Shrek + Åsnon i träsket. Allsvars DreamWorks-kanal."
       }
     ]
   },
@@ -13142,6 +15041,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "eminem-lose-yourself",
+    "displayName": "Lose Yourself — Eminem",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "spotifyTrackId": "5Z01UMMf7V1o0MzF86s6WJ",
+    "youtubeClips": [
+      {
+        "videoId": "7YuAzR2XVAM",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1290)."
+      },
+      {
+        "videoId": "tR1ECf4sEpw",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "eminem-without-me",
     "displayName": "Without Me — Eminem",
     "correctYear": 2002,
@@ -13164,6 +15102,66 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 0,
         "endSec": 291,
         "channelTitle": "Solitude Songs",
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "justin-timberlake-like-i-love-you",
+    "displayName": "Like I Love You — Justin Timberlake",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Party mix"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "6W2Ef5Ph6ILTUAedoQ3QIv",
+    "youtubeClips": []
+  },
+  {
+    "id": "justin-timberlake-rock-your-body",
+    "displayName": "Rock Your Body — Justin Timberlake",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Party mix"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TSVHoHyErBQ",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1295)."
+      },
+      {
+        "videoId": "uQSLKlLjvKY",
+        "startSec": 0,
+        "endSec": 30,
         "license": "standard"
       }
     ]
@@ -13318,6 +15316,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "BritneySpearsVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "finding-nemo",
+    "displayName": "Finding Nemo",
+    "correctYear": 2003,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6fHR58bSwpg",
+        "startSec": 20,
+        "endSec": 35,
+        "channelTitle": "Saskia Rice",
+        "license": "standard",
+        "notes": "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
       }
     ]
   },
@@ -13587,6 +15613,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "eternal-sunshine-of-the-spotless-mind-2004",
+    "displayName": "Eternal Sunshine of the Spotless Mind",
+    "correctYear": 2004,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Jim Carrey",
+      "Kate Winslet"
+    ],
+    "distractorNames": [
+      "Adam Sandler",
+      "Ben Stiller",
+      "Cameron Diaz",
+      "Julia Roberts"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "86NjzbHhZOE",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Max Caulfield",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. OBS: privat kanal-uppladdning av trailern — ej rättsinnehavare. Takedown-risk, byt till officiellt klipp när sådant hittas."
+      }
+    ]
+  },
+  {
     "id": "gunther-ding-dong-song",
     "displayName": "Ding Dong Song — Günther",
     "correctYear": 2004,
@@ -13610,6 +15675,60 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 0,
         "endSec": 15,
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "gwen-stefani-hollaback-girl",
+    "displayName": "Hollaback Girl — Gwen Stefani",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Kgjkth6BRRY",
+        "startSec": 9,
+        "endSec": 39,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1335)."
+      }
+    ]
+  },
+  {
+    "id": "gwen-stefani-rich-girl",
+    "displayName": "Rich Girl — Gwen Stefani",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9rlNpWYQunY",
+        "startSec": 11,
+        "endSec": 41,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1336)."
       }
     ]
   },
@@ -13678,6 +15797,48 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "million-dollar-baby-2004",
+    "displayName": "Million Dollar Baby",
+    "correctYear": 2004,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Hilary Swank",
+      "Clint Eastwood"
+    ],
+    "distractorNames": [
+      "Sandra Bullock",
+      "Charlize Theron",
+      "Tom Hanks",
+      "Denzel Washington"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "5_RsHRmIRBY",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell 2004-trailer (Swank/Eastwood). Ej Ava Max-låten."
+      }
+    ]
+  },
+  {
     "id": "o-zone-dragostea-din-tei",
     "displayName": "Dragostea Din Tei — O-Zone",
     "correctYear": 2004,
@@ -13737,6 +15898,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sa-som-i-himmelen",
+    "displayName": "Så som i himmelen",
+    "correctYear": 2004,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Mikael Nyqvist"
+    ],
+    "distractorNames": [
+      "Rolf Lassgård",
+      "Björn Skifs",
+      "Mikael Persbrandt",
+      "Peter Haber"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FT5A0rYUSVE",
+        "startSec": 10,
+        "endSec": 45,
+        "channelTitle": "NuovoCinemaGiornico",
+        "license": "standard",
+        "notes": "Originaltrailer. Oscar-nominerad svensk film. Mikael Nyqvist."
+      }
+    ]
+  },
+  {
     "id": "usher-yeah",
     "displayName": "Yeah! — Usher",
     "correctYear": 2004,
@@ -13760,6 +15959,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 251,
         "channelTitle": "7clouds",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "black-eyed-peas-pump-it",
+    "displayName": "Pump It — Black Eyed Peas",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ZaI2IlHwmgQ",
+        "startSec": 17,
+        "endSec": 47,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1337)."
       }
     ]
   },
@@ -13940,6 +16166,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sean-paul-give-it-up-to-me",
+    "displayName": "Give It Up to Me — Sean Paul",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bMoNV9oWs2E",
+        "startSec": 13,
+        "endSec": 43,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1346)."
+      }
+    ]
+  },
+  {
     "id": "the-game-hate-it-or-love-it",
     "displayName": "Hate It or Love It — The Game feat. 50 Cent",
     "correctYear": 2005,
@@ -13968,6 +16221,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1282)."
+      }
+    ]
+  },
+  {
+    "id": "three-6-mafia-stay-fly",
+    "displayName": "Stay Fly — Three 6 Mafia",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "spotifyTrackId": "5MYFw4T2gy52pOGBN4EYHS",
+    "youtubeClips": [
+      {
+        "videoId": "vBjzAdpZzf0",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1298)."
+      },
+      {
+        "videoId": "a6kIx2AN61A",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard"
       }
     ]
   },
@@ -14151,6 +16443,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "gwen-stefani-the-sweet-escape",
+    "displayName": "The Sweet Escape — Gwen Stefani",
+    "correctYear": 2006,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "O0lf_fE3HwA",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1339)."
+      }
+    ]
+  },
+  {
     "id": "lordi-hard-rock-hallelujah",
     "displayName": "Hard Rock Hallelujah — Lordi",
     "correctYear": 2006,
@@ -14300,6 +16619,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "britney-spears-piece-of-me",
+    "displayName": "Piece of Me — Britney Spears",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "u4FF6MpcsRw",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1342)."
+      }
+    ]
+  },
+  {
     "id": "chris-brown-with-you",
     "displayName": "With You — Chris Brown",
     "correctYear": 2007,
@@ -14327,6 +16673,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ChrisBrownVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "enrique-iglesias-tired-of-being-sorry",
+    "displayName": "Tired of Being Sorry — Enrique Iglesias",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "spotifyTrackId": "1u0aKJj9kr930YeAa6KXcy",
+    "youtubeClips": [
+      {
+        "videoId": "X86S5oZzzh4",
+        "startSec": 10,
+        "endSec": 40,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1304)."
       }
     ]
   },
@@ -14781,6 +17158,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "katy-perry-hot-n-cold",
+    "displayName": "Hot n Cold — Katy Perry",
+    "correctYear": 2008,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "kTHNpusq654",
+        "startSec": 35,
+        "endSec": 65,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1340)."
+      }
+    ]
+  },
+  {
     "id": "katy-perry-i-kissed-a-girl",
     "displayName": "I Kissed a Girl — Katy Perry",
     "correctYear": 2008,
@@ -14837,6 +17241,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 6,
         "endSec": 21,
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "lady-gaga-paparazzi",
+    "displayName": "Paparazzi — Lady Gaga",
+    "correctYear": 2008,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "d2smz_1L2_0",
+        "startSec": 157,
+        "endSec": 187,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1341)."
       }
     ]
   },
@@ -14902,6 +17333,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-dark-knight-2008",
+    "displayName": "The Dark Knight",
+    "correctYear": 2008,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Christian Bale",
+      "Heath Ledger"
+    ],
+    "distractorNames": [
+      "Ben Affleck",
+      "Robert Downey Jr.",
+      "Hugh Jackman",
+      "Ryan Reynolds"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EXeTwQWrcwY",
+        "startSec": 15,
+        "endSec": 30,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Curerad 2026-05-29 — officiell 2008-trailer #1 (Nolan)."
+      }
+    ]
+  },
+  {
     "id": "alexander-rybak-fairytale",
     "displayName": "Fairytale — Alexander Rybak",
     "correctYear": 2009,
@@ -14926,6 +17396,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2009 vinnare — Norge."
+      }
+    ]
+  },
+  {
+    "id": "avatar",
+    "displayName": "Avatar",
+    "correctYear": 2009,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 93,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Sam Worthington",
+      "Zoe Saldana"
+    ],
+    "distractorNames": [
+      "Matt Damon",
+      "Chris Pratt",
+      "Mila Kunis",
+      "Scarlett Johansson"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "5PSNL1qE6VY",
+        "startSec": 60,
+        "endSec": 75,
+        "channelTitle": "20th Century Studios",
+        "license": "standard",
+        "notes": "20th Century Studios official 2009-trailer — Pandora-värld, Na'vi-action."
       }
     ]
   },
@@ -15172,6 +17681,75 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Mando Diao - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "timbaland-morning-after-dark",
+    "displayName": "Morning After Dark — Timbaland",
+    "correctYear": 2009,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Party mix"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "25LBTSUEU0A",
+        "startSec": 40,
+        "endSec": 70,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1294)."
+      },
+      {
+        "videoId": "6akixw3v7WE",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "timbaland-scream",
+    "displayName": "Scream — Timbaland",
+    "correctYear": 2009,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Party mix"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "5sp1KDCNEm1Eoeqxsep01L",
+    "youtubeClips": [
+      {
+        "videoId": "nXskfsgBihE",
+        "startSec": 3,
+        "endSec": 33,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1292)."
       }
     ]
   },
@@ -15474,6 +18052,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mohombi-bumpy-ride",
+    "displayName": "Bumpy Ride — Mohombi",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "G2RCCDSBEGk",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1347)."
+      }
+    ]
+  },
+  {
     "id": "rihanna-only-girl",
     "displayName": "Only Girl (In the World) — Rihanna",
     "correctYear": 2010,
@@ -15627,6 +18236,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MrWeiird",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "the-social-network-2010",
+    "displayName": "The Social Network",
+    "correctYear": 2010,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Jesse Eisenberg",
+      "Andrew Garfield"
+    ],
+    "distractorNames": [
+      "Michael Cera",
+      "Joseph Gordon-Levitt",
+      "Shia LaBeouf",
+      "Anton Yelchin"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "rBCNU0XT9GY",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Sony Pictures Releasing UK",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-08-12. Officiell Sony-trailer. Titeln innehåller '15 October 2010' men frågan är actor-select, så året är inte svaret — får INTE bytas till timeline utan nytt klipp."
       }
     ]
   },
@@ -15981,6 +18629,47 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "moneyball-2011",
+    "displayName": "Moneyball",
+    "correctYear": 2011,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Brad Pitt"
+    ],
+    "distractorNames": [
+      "Matt Damon",
+      "George Clooney",
+      "Ryan Gosling",
+      "Christian Bale"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "-4QPVo0UIzc",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "Rotten Tomatoes Trailers",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (10)."
+      }
+    ]
+  },
+  {
     "id": "rihanna-we-found-love",
     "displayName": "We Found Love — Rihanna feat. Calvin Harris",
     "correctYear": 2011,
@@ -16039,6 +18728,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SelenaGomezVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "swedish-house-mafia-save-the-world",
+    "displayName": "Save the World — Swedish House Mafia",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Club & Dance"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "0R42XHlMMu4hBgOvdICIsU",
+    "youtubeClips": [
+      {
+        "videoId": "-ea-R_90WQI",
+        "startSec": 6,
+        "endSec": 36,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1289)."
+      },
+      {
+        "videoId": "DTjTPceTdwo",
+        "startSec": 6,
+        "endSec": 36,
+        "license": "standard"
       }
     ]
   },
@@ -16542,6 +19269,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "hundraringen-klev-ut",
+    "displayName": "Hundraåringen som klev ut genom fönstret och försvann",
+    "correctYear": 2013,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Robert Gustafsson"
+    ],
+    "distractorNames": [
+      "Rolf Lassgård",
+      "Mikael Nyqvist",
+      "Peter Haber",
+      "Mikael Persbrandt"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pjiJ1cL3Uss",
+        "startSec": 10,
+        "endSec": 45,
+        "channelTitle": "Buena Vista Sverige",
+        "license": "standard",
+        "notes": "Officiell svensk trailer. Buena Vista Sverige. Robert Gustafsson."
+      }
+    ]
+  },
+  {
     "id": "john-newman-love-me-again",
     "displayName": "Love Me Again — John Newman",
     "correctYear": 2013,
@@ -16981,6 +19746,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "j-cole-no-role-modelz",
+    "displayName": "No Role Modelz — J. Cole",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "spotifyTrackId": "62vpWI1CHwFy7tMIcSStl8",
+    "youtubeClips": [
+      {
+        "videoId": "JatWTfTCxJ8",
+        "startSec": 10,
+        "endSec": 40,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1286)."
+      },
+      {
+        "videoId": "nSERqaFagJc",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "mark-ronson-uptown-funk",
     "displayName": "Uptown Funk — Mark Ronson ft. Bruno Mars",
     "correctYear": 2014,
@@ -17033,6 +19837,43 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MeghanTrainorVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "pitbull-fireball",
+    "displayName": "Fireball — Pitbull",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Party mix"
+    ],
+    "spotifyTrackId": "4Y7XAxTANhu3lmnLAzhWJW",
+    "youtubeClips": [
+      {
+        "videoId": "HMqgVXSvwGo",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1291)."
+      },
+      {
+        "videoId": "WJT5SGS6qkY",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard"
       }
     ]
   },
@@ -17230,6 +20071,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "EllieGouldingVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 20 angiven av Peter."
+      }
+    ]
+  },
+  {
+    "id": "en-man-som-heter-ove",
+    "displayName": "En man som heter Ove",
+    "correctYear": 2015,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Rolf Lassgård"
+    ],
+    "distractorNames": [
+      "Robert Gustafsson",
+      "Mikael Nyqvist",
+      "Mikael Persbrandt",
+      "Peter Haber"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "q84plEEyGZY",
+        "startSec": 12,
+        "endSec": 47,
+        "channelTitle": "MovieZine",
+        "license": "standard",
+        "notes": "Officiell svensk trailer. Rolf Lassgård. SF Studios-produktion."
       }
     ]
   },
@@ -17438,6 +20317,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ZaraLarssonMusicVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Ersatte Topic-klippet 8BmMB3i--FM med officiella musikvideon (samma langd 3:22, sa startSec 30 traffar samma parti)."
+      }
+    ]
+  },
+  {
+    "id": "angry-birds",
+    "displayName": "The Angry Birds Movie",
+    "correctYear": 2016,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "e4sdQBmqnuA",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Sony Pictures Releasing UK",
+        "license": "standard",
+        "notes": "Sony Pictures UK — officiell 2016-trailer. Red + Bomb + Chuck i fokus. Ej embed-blockerad."
       }
     ]
   },
@@ -17967,6 +20874,86 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ZaynVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "zootopia-2016",
+    "displayName": "Zootopia",
+    "correctYear": 2016,
+    "contentSubject": "movie",
+    "questionText": "What is the name of the main character in this film?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": true,
+    "correctNames": [
+      "Judy Hopps"
+    ],
+    "distractorNames": [
+      "Simba",
+      "Nemo",
+      "Shrek",
+      "Mulan"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "CzvH6_e2a-U",
+        "startSec": 10,
+        "endSec": 25,
+        "channelTitle": "Zero Media",
+        "license": "standard",
+        "notes": "Scen: Judy Hopps anländer till Zootopia — Try Everything (Shakira) i bakgrunden. HD trailer."
+      }
+    ]
+  },
+  {
+    "id": "borg-vs-mcenroe-2017",
+    "displayName": "Borg vs McEnroe",
+    "correctYear": 2017,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Sverrir Gudnason",
+      "Shia LaBeouf"
+    ],
+    "distractorNames": [
+      "Tom Hanks",
+      "Benedict Cumberbatch",
+      "Michael Fassbender",
+      "Joel Edgerton"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "yQgWMs0TBKU",
+        "startSec": 30,
+        "endSec": 45,
+        "channelTitle": "SF Studios",
+        "license": "standard",
+        "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
       }
     ]
   },
@@ -20093,6 +23080,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "0uHrMbMv3c78398pIANDqR",
+    "youtubeClips": []
+  },
+  {
+    "id": "kendrick-lamar-not-like-us",
+    "displayName": "Not Like Us — Kendrick Lamar",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "spotifyTrackId": "6ZWalyzfVcNCc1XwKnnyyn",
     "youtubeClips": []
   },
   {

@@ -329,8 +329,15 @@ const styles = StyleSheet.create({
   // playback ended. Bakgrunds-färg matchar mediakortets card-färg så
   // ingen YouTube-pixel "läcker" igenom. Centrerar QuizVibe-loggan +
   // "QuizVibe"-texten under den.
+  // ⚠ Explicit position:absolute, INTE `...StyleSheet.absoluteFillObject`-spread
+  // — spreaden applicerades inte som absolut på nya arkitekturen (dev-build)
+  // och overlayn hamnade i normalt flöde i stället för att täcka spelaren.
   endedOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'center',
@@ -372,7 +379,11 @@ const styles = StyleSheet.create({
   // Täcker hela spelaren vid YouTube-fel. Samma bg som card så ingen
   // iframe-pixel läcker igenom. Samma centrerings-layout som endedOverlay.
   errorOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'center',

@@ -1980,3 +1980,54 @@ items:
         startSec: 10
         endSec: 40
         notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1272)."
+  - id: j-cole-no-role-modelz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "No Role Modelz — J. Cole"
+    correctYear: 2014
+    probability: 86
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["J. Cole No Role Modelz 2014"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    parentControlled: true
+    spotifyTrackId: "62vpWI1CHwFy7tMIcSStl8"
+    youtubeClips:
+      - videoId: "JatWTfTCxJ8"
+        startSec: 10
+        endSec: 40
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1286)."
+      - videoId: "nSERqaFagJc"
+        startSec: 0
+        endSec: 30
+  - id: kendrick-lamar-not-like-us
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Not Like Us — Kendrick Lamar"
+    correctYear: 2024
+    probability: 88
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Kendrick Lamar Not Like Us 2024"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    parentControlled: true
+    spotifyTrackId: "6ZWalyzfVcNCc1XwKnnyyn"
+    notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1287)."
+  - id: pitbull-fireball
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Fireball — Pitbull"
+    correctYear: 2014
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Pitbull Fireball 2014"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party mix"]
+    spotifyTrackId: "4Y7XAxTANhu3lmnLAzhWJW"
+    youtubeClips:
+      - videoId: "HMqgVXSvwGo"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1291)."
+      - videoId: "WJT5SGS6qkY"
+        startSec: 0
+        endSec: 30

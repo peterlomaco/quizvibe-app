@@ -3165,3 +3165,57 @@ items:
         startSec: 0
         endSec: 30
         notes: "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1280)."
+  - id: b-real-hit-em-high
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hit 'Em High — B-Real, Busta Rhymes, Coolio"
+    correctYear: 1996
+    probability: 78
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Hit Em High Space Jam Monstars Anthem 1996"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    parentControlled: true
+    spotifyTrackId: "12MIoieKIYC1jDgpKGy12F"
+    youtubeClips:
+      - videoId: "gdhcbkdQvXE"
+        startSec: 26
+        endSec: 56
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1301)."
+  - id: donna-summer-she-works-hard-for-the-money
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "She Works Hard for the Money — Donna Summer"
+    correctYear: 1983
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Donna Summer She Works Hard for the Money 1983"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "N8EkGUm9q_A"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1332)."
+  - id: bob-marley-buffalo-soldier
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Buffalo Soldier — Bob Marley"
+    correctYear: 1983
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Bob Marley Buffalo Soldier 1983"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport"]
+    youtubeClips:
+      - videoId: "uMUQMSXLlHM"
+        startSec: 8
+        endSec: 38
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1343)."
+  - id: rod-stewart-baby-jane
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Baby Jane — Rod Stewart"
+    correctYear: 1983
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Rod Stewart Baby Jane 1983"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5F5SMUnFD058zo1K0DtjUq"
+    notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1364)."

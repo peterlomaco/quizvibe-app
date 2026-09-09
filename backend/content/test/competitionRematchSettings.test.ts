@@ -68,8 +68,8 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     expect(s.answerResponseSeconds).toBe(30);
     expect(s.selectedExtraPackages).toEqual([]);
     expect(s.spotifyEnabled).toBe(false);
-    // MUSIC-ONLY LAUNCH: default är bara Music (Film/Sport parkerade).
-    expect(s.youtubeEnabledCategories).toEqual(['Music']);
+    // MUSIC + FILM: default är Music + Film (Sport fortfarande parkerat).
+    expect(s.youtubeEnabledCategories).toEqual(['Music', 'Film']);
   });
 
   it('ignores an invalid answer-response value from the snapshot', () => {
@@ -78,7 +78,7 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     expect(s.answerResponseSeconds).toBe(30); // faller på profil-defaulten
   });
 
-  it('drops non-catalog categories and falls back to Music-only when empty', () => {
+  it('drops non-catalog categories and falls back to defaults when empty', () => {
     const weird = {
       ...SNAPSHOT,
       youtubeEnabledCategories: ['Music', 'Bogus'],
@@ -86,8 +86,9 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     };
     const s = buildRematchSettings({ ...PROFILE_DEFAULTS, settings: weird }, 4);
     expect(s.youtubeEnabledCategories).toEqual(['Music']);
-    // MUSIC-ONLY LAUNCH: alla ogiltiga → fallback till Music (ej alla tre).
-    expect(s.imagesEnabledCategories).toEqual(['Music']);
+    // MUSIC + FILM: alla ogiltiga → fallback till defaultEnabledMainCategories()
+    // = ['Music','Film'] (Sport fortfarande parkerat).
+    expect(s.imagesEnabledCategories).toEqual(['Music', 'Film']);
   });
 
   it('honors an explicitly-empty images array (Hints turned off last game)', () => {

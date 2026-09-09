@@ -4593,10 +4593,19 @@ const styles = StyleSheet.create({
   gameBtnJoinCodeText: {
     color: Colors.warning,
   },
-  // Absolut-fyllande wrapper som centrerar titeln i hela knappen (flex-
-  // centrering är plattformsoberoende, till skillnad från textAlignVertical).
+  // Absolut-fyllande wrapper som centrerar titeln i hela knappen.
+  // ⚠ Explicit position:absolute + top/left/right/bottom, INTE
+  // `...StyleSheet.absoluteFillObject`-spread. På nya arkitekturen (dev-build)
+  // applicerades spreaden inte som absolut → wrappern hamnade i normalt flöde
+  // som ett flex-barn i knappens `justifyContent: flex-end`-rad, så titeln
+  // packades åt HÖGER. Explicit absolut form fyller knappen och centrerar
+  // titeln via alignItems/justifyContent center.
   joinCodeTitleWrap: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: Spacing.md,
@@ -5136,7 +5145,7 @@ const modal = StyleSheet.create({
 
   // Year picker overlay (inuti samma Modal)
   yearPickerOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
@@ -5275,7 +5284,7 @@ const modal = StyleSheet.create({
 
 const profileMenu = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)' },
   // maxHeight: '90%' bounder sheet:en så toppen inte spiller ut när
   // PlayerName:s custom CodeKeyboard tar plats — samma fix som
   // modal.sheet (JoinModal). ScrollView:n inuti har flexShrink: 1.

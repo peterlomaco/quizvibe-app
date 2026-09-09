@@ -2715,3 +2715,340 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "2Sl83ewoJgUBQCb3dvSTma"
     genrePackages: ["100% in swedish"]
+  - id: swedish-house-mafia-save-the-world
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Save the World — Swedish House Mafia"
+    correctYear: 2011
+    probability: 84
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Swedish House Mafia Save the World 2011"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance"]
+    spotifyTrackId: "0R42XHlMMu4hBgOvdICIsU"
+    youtubeClips:
+      - videoId: "-ea-R_90WQI"
+        startSec: 6
+        endSec: 36
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1289)."
+      - videoId: "DTjTPceTdwo"
+        startSec: 6
+        endSec: 36
+  - id: eminem-lose-yourself
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Lose Yourself — Eminem"
+    correctYear: 2002
+    probability: 90
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Eminem Lose Yourself 8 Mile 2002"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    parentControlled: true
+    spotifyTrackId: "5Z01UMMf7V1o0MzF86s6WJ"
+    youtubeClips:
+      - videoId: "7YuAzR2XVAM"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1290)."
+      - videoId: "tR1ECf4sEpw"
+        startSec: 30
+        endSec: 60
+  - id: timbaland-scream
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Scream — Timbaland"
+    correctYear: 2009
+    probability: 78
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Timbaland Scream Keri Hilson 2009"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party mix"]
+    spotifyTrackId: "5sp1KDCNEm1Eoeqxsep01L"
+    youtubeClips:
+      - videoId: "nXskfsgBihE"
+        startSec: 3
+        endSec: 33
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1292)."
+  - id: justin-timberlake-like-i-love-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Like I Love You — Justin Timberlake"
+    correctYear: 2002
+    probability: 82
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Justin Timberlake Like I Love You 2002"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party mix"]
+    spotifyTrackId: "6W2Ef5Ph6ILTUAedoQ3QIv"
+    notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1293)."
+  - id: timbaland-morning-after-dark
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Morning After Dark — Timbaland"
+    correctYear: 2009
+    probability: 76
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Timbaland Morning After Dark 2009"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party mix"]
+    youtubeClips:
+      - videoId: "25LBTSUEU0A"
+        startSec: 40
+        endSec: 70
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1294)."
+      - videoId: "6akixw3v7WE"
+        startSec: 8
+        endSec: 38
+  - id: justin-timberlake-rock-your-body
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rock Your Body — Justin Timberlake"
+    correctYear: 2002
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Justin Timberlake Rock Your Body 2002"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party mix"]
+    youtubeClips:
+      - videoId: "TSVHoHyErBQ"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1295)."
+      - videoId: "uQSLKlLjvKY"
+        startSec: 0
+        endSec: 30
+  - id: dmx-party-up
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Party Up — DMX"
+    correctYear: 1999
+    probability: 84
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["DMX Party Up Up in Here 1999"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    parentControlled: true
+    spotifyTrackId: "3Y4BqG5FGXgGFQaJzX1MQC"
+    youtubeClips:
+      - videoId: "cNYUnKMCa7Y"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1296)."
+  - id: ludacris-area-codes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Area Codes — Ludacris feat. Nate Dogg"
+    correctYear: 2001
+    probability: 78
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Ludacris Area Codes Nate Dogg 2001"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    parentControlled: true
+    youtubeClips:
+      - videoId: "DwGKDF9Y1r4"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1297)."
+  - id: three-6-mafia-stay-fly
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Stay Fly — Three 6 Mafia"
+    correctYear: 2005
+    probability: 78
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Three 6 Mafia Stay Fly 2005"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    parentControlled: true
+    spotifyTrackId: "5MYFw4T2gy52pOGBN4EYHS"
+    youtubeClips:
+      - videoId: "vBjzAdpZzf0"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1298)."
+      - videoId: "a6kIx2AN61A"
+        startSec: 0
+        endSec: 30
+  - id: 2pac-changes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Changes — 2Pac"
+    correctYear: 1998
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["2Pac Changes 1998"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    parentControlled: true
+    youtubeClips:
+      - videoId: "eXvBjCO19QY"
+        startSec: 13
+        endSec: 43
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1299)."
+      - videoId: "gfF8jMN-2CM"
+        startSec: 13
+        endSec: 43
+  - id: enrique-iglesias-could-i-have-this-kiss-forever
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Could I Have This Kiss Forever — Enrique Iglesias & Whitney Houston"
+    correctYear: 1999
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Enrique Iglesias Whitney Houston Could I Have This Kiss Forever 1999"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    spotifyTrackId: "3XkLdXXnh4sviCzhO0bu23"
+    youtubeClips:
+      - videoId: "zsfj9j0kjoU"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1303)."
+  - id: enrique-iglesias-tired-of-being-sorry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Tired of Being Sorry — Enrique Iglesias"
+    correctYear: 2007
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Enrique Iglesias Tired of Being Sorry Insomniac 2007"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    spotifyTrackId: "1u0aKJj9kr930YeAa6KXcy"
+    youtubeClips:
+      - videoId: "X86S5oZzzh4"
+        startSec: 10
+        endSec: 40
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1304)."
+  - id: toni-braxton-he-wasnt-man-enough
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "He Wasn't Man Enough — Toni Braxton"
+    correctYear: 2000
+    probability: 78
+    region: ["global"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Toni Braxton He Wasnt Man Enough 2000"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    youtubeClips:
+      - videoId: "9_hKXk2qSuw"
+        startSec: 25
+        endSec: 55
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1306)."
+  - id: gwen-stefani-hollaback-girl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hollaback Girl — Gwen Stefani"
+    correctYear: 2004
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Gwen Stefani Hollaback Girl 2004"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Kgjkth6BRRY"
+        startSec: 9
+        endSec: 39
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1335)."
+  - id: gwen-stefani-rich-girl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rich Girl — Gwen Stefani"
+    correctYear: 2004
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Gwen Stefani Rich Girl 2004"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9rlNpWYQunY"
+        startSec: 11
+        endSec: 41
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1336)."
+  - id: black-eyed-peas-pump-it
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Pump It — Black Eyed Peas"
+    correctYear: 2005
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Black Eyed Peas Pump It 2005"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZaI2IlHwmgQ"
+        startSec: 17
+        endSec: 47
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1337)."
+  - id: gwen-stefani-the-sweet-escape
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Sweet Escape — Gwen Stefani"
+    correctYear: 2006
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Gwen Stefani The Sweet Escape 2006"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "O0lf_fE3HwA"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1339)."
+  - id: katy-perry-hot-n-cold
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hot n Cold — Katy Perry"
+    correctYear: 2008
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Katy Perry Hot n Cold 2008"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "kTHNpusq654"
+        startSec: 35
+        endSec: 65
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1340)."
+  - id: lady-gaga-paparazzi
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Paparazzi — Lady Gaga"
+    correctYear: 2008
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Lady Gaga Paparazzi The Fame 2008"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "d2smz_1L2_0"
+        startSec: 157
+        endSec: 187
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1341)."
+  - id: britney-spears-piece-of-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Piece of Me — Britney Spears"
+    correctYear: 2007
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Britney Spears Piece of Me Blackout 2007"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "u4FF6MpcsRw"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1342)."
+  - id: sean-paul-give-it-up-to-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Give It Up to Me — Sean Paul"
+    correctYear: 2005
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Sean Paul Give It Up to Me Trinity 2005"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "bMoNV9oWs2E"
+        startSec: 13
+        endSec: 43
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1346)."
+  - id: mohombi-bumpy-ride
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bumpy Ride — Mohombi"
+    correctYear: 2010
+    probability: 78
+    region: ["sweden"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Mohombi Bumpy Ride 2010"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    youtubeClips:
+      - videoId: "G2RCCDSBEGk"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1347)."

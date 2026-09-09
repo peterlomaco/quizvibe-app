@@ -397,8 +397,15 @@ const styles = StyleSheet.create({
   // Absolut-fyllande wrapper som centrerar titeln i hela knappen — flex-
   // centrering är plattformsoberoende (till skillnad från textAlignVertical
   // som ignoreras på iOS).
+  // ⚠ Explicit position:absolute, INTE `...StyleSheet.absoluteFillObject`-spread
+  // — spreaden applicerades inte som absolut på nya arkitekturen (dev-build) och
+  // titel-overlayn hamnade i normalt flöde (samma bugg som Join-knappens titel).
   titleOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

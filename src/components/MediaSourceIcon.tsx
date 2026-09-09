@@ -52,13 +52,14 @@ export function MediaSourceIcon({ source, size = 28 }: Props) {
     return (
       <View style={wrapStyle}>
         {/* Q-figuren från startskärmens logga (utan omgivande kvadrater).
-            Samma SVG-koordinater som Lobby:s Profiles & Places-ikon. */}
-        <Svg
-          width={size}
-          height={size}
-          viewBox="24 22 32 32"
-          style={StyleSheet.absoluteFillObject}
-        >
+            Svg:n renderas i normalt flöde och fyller size×size-wrappen. "?"-
+            glyfen läggs i en ABSOLUT overlay-VIEW från StyleSheet.create som
+            flex-centrerar Texten — exakt samma struktur som CountdownIntro:s
+            glyphOverlay, som fungerar på nya arkitekturen (dev-build). På den
+            här builden appliceras position:absolute BARA från en View i
+            StyleSheet.create; på själva <Svg>, på <Text> eller via inline-objekt
+            ignorerades det → "?" hamnade UNDER Q:t. */}
+        <Svg width={size} height={size} viewBox="24 22 32 32">
           <Circle
             cx="40"
             cy="38"
@@ -74,7 +75,9 @@ export function MediaSourceIcon({ source, size = 28 }: Props) {
             strokeLinecap="round"
           />
         </Svg>
-        <Text style={[styles.questionGlyph, { fontSize: size * 0.55 }]}>?</Text>
+        <View style={styles.qMarkOverlay} pointerEvents="none">
+          <Text style={[styles.questionGlyph, { fontSize: size * 0.55 }]}>?</Text>
+        </View>
       </View>
     );
   }
@@ -90,10 +93,22 @@ const styles = StyleSheet.create({
   glyph: {
     textAlign: 'center',
   },
-  // "?"-glyph centrerad inom Q-ringen (cx=40, cy=38 i viewBox). Upprät
-  // (ingen italic) — italic på ett ensamt "?" dubbel-lutar glyfen och
-  // läses inte cleant. translateY -1 finjusterar vertikal centrering så
-  // glyfens visuella mitt landar exakt på Q-ring-mitt.
+  // Absolut overlay-View som flex-centrerar "?"-glyfen ovanpå den in-flow
+  // Svg:n — exakt CountdownIntro:s glyphOverlay-mönster (fungerar på nya
+  // arkitekturen). Q-ringens center (viewBox 40,38) sitter i wrap-mitten, så
+  // flex-center landar glyfen i ringen.
+  qMarkOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // "?"-glyph — in-flow i qMarkOverlay, centreras av dess flex-layout. Upprät
+  // (ingen italic) — italic på ett ensamt "?" dubbel-lutar glyfen. translateY
+  // -1 finjusterar vertikal centrering mot Q-ringens visuella mitt.
   questionGlyph: {
     fontWeight: FontWeight.bold,
     color: Colors.primary,
