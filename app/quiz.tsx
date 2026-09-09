@@ -2033,21 +2033,63 @@ export default function QuizScreen() {
       if (fullSpotifyEligible && guestSpotifyCount === totalRounds) {
         return spotifyByFreshness.slice(0, totalRounds);
       }
-      // Viktad OBEROENDE dragning per fråga över 6 källa×kategori-celler.
-      // Hints-tungt (75 %) med YouTube-inslag (25 %) — maximerar upplevd
-      // variation i korta 2-4-frågors trial-spel. Vid partiellt Spotify-
-      // spel dras (guestTotal − 2) frågor här och Spotify-frågorna sprängs
-      // in efteråt.
+      // Källvariation i guest-spel (Peter 2026-09-09):
+      //   • ANTALET YouTube- vs Hints-frågor är GARANTERAT jämnt delat per
+      //     spel — 4 rundor utan Spotify → exakt 2 YT + 2 Hints.
+      //   • Music vs Film är en VIKTAD 75/25-sannolikhet INOM varje källa
+      //     (förväntad proportion över många spel; får skilja sig mellan
+      //     enskilda spel). Sport utgår i v1.
+      // Music-vikt 0.75 / Film-vikt 0.25 per källa.
       const byCat = (pool: QuizQuestion[], cat: MainCategory) =>
         pool.filter((q) => q.mainCategory === cat);
-      const cells = [
-        { pool: byCat(pureYoutubePool, 'Music'), weight: 0.15 },
-        { pool: byCat(pureYoutubePool, 'Film'), weight: 0.05 },
-        { pool: byCat(pureYoutubePool, 'Sport'), weight: 0.05 },
-        { pool: byCat(imagePool, 'Music'), weight: 0.25 },
-        { pool: byCat(imagePool, 'Film'), weight: 0.2 },
-        { pool: byCat(imagePool, 'Sport'), weight: 0.3 },
+      const ytCells = [
+        { pool: byCat(pureYoutubePool, 'Music'), weight: 0.75 },
+        { pool: byCat(pureYoutubePool, 'Film'), weight: 0.25 },
       ];
+      const hintsCells = [
+        { pool: byCat(imagePool, 'Music'), weight: 0.75 },
+        { pool: byCat(imagePool, 'Film'), weight: 0.25 },
+      ];
+      // Drar `count` frågor ur viktade kategori-celler: dedupe mot `picked`,
+      // viktrenormalisering över icke-tomma celler, färskhets-prioritering
+      // (osedd → sedd → senaste sessionen) via pickTiered. Fallback till
+      // källans egen samlade pool (within-source) om alla celler töms — så
+      // den garanterade YT/Hints-delningen inte läcker mellan källorna.
+      const drawFromCells = (
+        cellDefs: { pool: QuizQuestion[]; weight: number }[],
+        count: number,
+        fallbackPool: QuizQuestion[],
+        picked: Set<string>,
+      ): QuizQuestion[] => {
+        const out: QuizQuestion[] = [];
+        for (let i = 0; i < count; i++) {
+          const avail = cellDefs
+            .map((c) => ({ weight: c.weight, pool: c.pool.filter((q) => !picked.has(q.id)) }))
+            .filter((c) => c.pool.length > 0);
+          let pickPool: QuizQuestion[];
+          if (avail.length === 0) {
+            pickPool = fallbackPool.filter((q) => !picked.has(q.id));
+            if (pickPool.length === 0) break;
+          } else {
+            const totalW = avail.reduce((sum, c) => sum + c.weight, 0);
+            let r = Math.random() * totalW;
+            let chosen = avail[avail.length - 1];
+            for (const c of avail) {
+              r -= c.weight;
+              if (r <= 0) {
+                chosen = c;
+                break;
+              }
+            }
+            pickPool = chosen.pool;
+          }
+          const q = pickTiered(pickPool, combinedSeenIds, combinedLastIds, (x) => x.id);
+          if (!q) break;
+          picked.add(q.id);
+          out.push(q);
+        }
+        return out;
+      };
       // Totalt antal frågor = rundor × block-storlek (PtP: en fråga per
       // spelare och runda; IndDev/Single: en per runda) — speglar
       // questionsPerBlock-formeln i ordinarie flödet nedan.
@@ -2055,58 +2097,36 @@ export default function QuizScreen() {
         gameMode === 'individual-devices' || playerCount <= 1 ? 1 : playerCount;
       const guestTotal = totalRounds * guestQpb;
       // Partiellt Spotify-spel: reservera slots för Spotify-frågorna —
-      // viktade dragningen fyller bara resten.
+      // den jämna YT/Hints-delningen gäller bara de kvarvarande frågorna.
       const weightedTotal = guestTotal - guestSpotifyCount;
+      // Jämn YT/Hints-delning: jämnt weightedTotal (t.ex. 4 rundor utan
+      // Spotify) → exakt hälften var; udda → myntkast om vem som får
+      // extra-slotten, rättvist över många spel.
+      const ytCount =
+        Math.floor(weightedTotal / 2) +
+        (weightedTotal % 2 === 1 && Math.random() < 0.5 ? 1 : 0);
+      const hintsCount = weightedTotal - ytCount;
       const picked = new Set<string>();
-      const drawn: QuizQuestion[] = [];
-      for (let i = 0; i < weightedTotal; i++) {
-        // Dedupe + renormalisering: celler vars pool är uttömd utesluts och
-        // vikterna omfördelas proportionellt över resterande.
-        const avail = cells
-          .map((c) => ({ weight: c.weight, pool: c.pool.filter((q) => !picked.has(q.id)) }))
-          .filter((c) => c.pool.length > 0);
-        let pickPool: QuizQuestion[];
-        if (avail.length === 0) {
-          // Alla celler uttömda (mycket små pooler) → dra ur samlade
-          // poolen utan dedupe hellre än att korta spelet.
-          pickPool = [...pureYoutubePool, ...imagePool];
-          if (pickPool.length === 0) break;
-        } else {
-          const totalW = avail.reduce((sum, c) => sum + c.weight, 0);
-          let r = Math.random() * totalW;
-          let chosen = avail[avail.length - 1];
-          for (const c of avail) {
-            r -= c.weight;
-            if (r <= 0) {
-              chosen = c;
-              break;
-            }
-          }
-          pickPool = chosen.pool;
-        }
-        // Färskhets-prioriterat val inom cellen (osedd → sedd → senaste
-        // sessionen). Tidigare drogs det helt uniformt, så guest-hostade spel
-        // ignorerade 20-spelars-historiken helt — `picked` deduperade bara
-        // INOM samma spel, aldrig mellan två spel i rad.
-        const q = pickTiered(pickPool, combinedSeenIds, combinedLastIds, (x) => x.id);
-        if (!q) break;
-        picked.add(q.id);
-        drawn.push(q);
-      }
-      // Källordning: Spotify → YouTube → Hints, EXAKT samma sekvens som det
-      // ordinarie flödet (mixed = [...spotifySeq, ...ytSeq, ...imgSeq]). Den
-      // viktade dragningen ovan bestämmer bara HUR MÅNGA av varje källa som
-      // spelas — den blandar YouTube och Hints om vartannat, så utan denna
-      // omordning öppnade guest-spel nästan alltid på Hints (75 % vikt).
-      // Spotify-frågorna läggs först: DJ-round-robin scannar gameQuestions i
-      // ordning och tilldelar DJ per Spotify-fråga, så konsekutiva positioner
-      // ger fortfarande varje spelare en DJ-tur.
-      const pureYoutubeIds = new Set(pureYoutubePool.map((q) => q.id));
-      const guestYtDrawn = drawn.filter((q) => pureYoutubeIds.has(q.id));
-      const guestImgDrawn = drawn.filter((q) => !pureYoutubeIds.has(q.id));
+      const guestYtDrawn = drawFromCells(ytCells, ytCount, pureYoutubePool, picked);
+      const guestImgDrawn = drawFromCells(hintsCells, hintsCount, imagePool, picked);
+      // Fast presentationsordning: Spotify → YT-Music → YT-Film →
+      // Hints-Music → Hints-Film (Music alltid före Film inom varje källa).
+      // Ev. stray-items (null mainCategory, eller Sport via within-source-
+      // fallbacken) läggs sist inom sin källa så ingen dragen fråga tappas.
+      // Spotify läggs först + konsekutivt: DJ-round-robin scannar
+      // gameQuestions i ordning och ger varje spelare en DJ-tur.
+      const orderByCat = (items: QuizQuestion[]) => [
+        ...items.filter((q) => q.mainCategory === 'Music'),
+        ...items.filter((q) => q.mainCategory === 'Film'),
+        ...items.filter((q) => q.mainCategory !== 'Music' && q.mainCategory !== 'Film'),
+      ];
       const spotifyPicks =
         guestSpotifyCount > 0 ? spotifyByFreshness.slice(0, guestSpotifyCount) : [];
-      const guestOrdered = [...spotifyPicks, ...guestYtDrawn, ...guestImgDrawn];
+      const guestOrdered = [
+        ...spotifyPicks,
+        ...orderByCat(guestYtDrawn),
+        ...orderByCat(guestImgDrawn),
+      ];
       if (guestOrdered.length > 0) return guestOrdered;
       // Defensivt: inget kunde dras (borde inte hända — all-tomt-fallbacken
       // ovan har redan hanterat helt tomma pooler) → fall igenom till
