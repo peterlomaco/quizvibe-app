@@ -3024,6 +3024,20 @@ Ingen `eas build`, ingen App Store-granskning. Träffar installerade appar inom 
 
 **Första native-bygget måste ändå gå via App Store.** OTA fungerar bara för builds som redan har `expo-updates` inbyggt och pekar på rätt channel — det finns inget att uppdatera förrän en build med den här konfigurationen finns i TestFlight/App Store. Planera in den här releasen som en vanlig native-build, INTE som något som kan skippas.
 
+### Lokal dev-loop på telefon — dev-build vs preview-build (2026-09-09)
+
+Peter kör appen på en fysisk iPhone. Rätt binär för iteration är en **development build** (`eas.json` `development`-profilen: `developmentClient: true`, ingen channel) — den ansluter till Metro och live-reloadar. En **preview build** (`preview`-profilen, `channel: "preview"`, INGEN `developmentClient`) är en release-config-binär med inbäddad JS som ALDRIG pratar med Metro; den uppdateras bara via EAS Update-OTA.
+
+**Diagnos-tell (viktigast): "inget dev-menu + ingen bundling-bar + appen öppnas rakt in" = FEL/inaktuell binär, INTE ett nätverksproblem.** Jaga inte brandvägg/hotspot/tunnel i det läget. En äkta dev-build visar ALLTID launcher-skärmen + en bundling-bar när den når Metro. Öppnas appen direkt i QuizVibe kör den en inbäddad bundle → antingen är det en preview-build, eller en dev-build vars OTA/fingerprint inte matchar.
+
+**Arbetsflöde:**
+- **JS-only-ändring** (quiz.tsx, komponenter, `export-*-questions`-output, styles) → dev-builden ligger kvar installerad; kör bara `npx expo start --dev-client`, öppna appen, den live-reloadar. Ingen rebuild, ingen OTA, ingen EAS.
+- **Native-ändring** (nytt/ändrat paket med native kod — se native-listan ovan) → NY `eas build --profile development --platform ios`, installera via länken, sedan `expo start --dev-client`. Det var precis det som bet 2026-09-09: `expo-audio` (voice packs, PR #8) lades till efter den installerade preview-builden → fingerprint bytte, och OTA:n (`92c3c33…`) matchade inte den installerade builden (`885fa42…`), så "latest fixes" syntes aldrig. **OTA kan aldrig brygga en native-ändring.**
+
+**Nätverk:** LAN funkar ibland, blockeras ibland (klient-isolering på Peters WiFi). Prova vanlig WiFi först; timeoutar QR-target-IP:n → `--tunnel` (kan brytas av Norton TLS-scanning) eller telefonens mobila hotspot (`expo start --dev-client` utan tunnel). Se memory `feedback_dev_server_tunnel` + `project_norton_ssl_scanning`.
+
+**⚠ `eas update` exporterar `--platform=all` och web-bundlen failar** på `Unable to resolve module react-native-web-webview` (web-shimmen i `react-native-youtube-iframe`). iOS + Android bundlar klart, men web kraschar hela exporten. Fix: **`npx eas update --branch preview --platform ios --message "…"`** — vi är iOS-only, så skippa web. Installera INTE `react-native-web-webview` för att "laga" det (drar in web i dependency-ytan för en plattform vi inte shippar).
+
 ## Scripts
 
 `npm start` (Expo dev), `npm run ios` / `android` / `web`, `npm run lint` (`expo lint`). No tests, no CI.
