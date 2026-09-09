@@ -399,7 +399,7 @@ function RegionModal({ visible, value, onChange, onClose }: {
 
 const regionSheet = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)' },
   container: { backgroundColor: Colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: Spacing.xl, paddingTop: Spacing.lg, paddingBottom: 48, borderWidth: 1, borderColor: Colors.border },
   handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: Colors.borderStrong, alignSelf: 'center', marginBottom: Spacing.md },
   title: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
@@ -2774,10 +2774,14 @@ export default function LobbyScreen() {
   // AND-logik: Actors/All och Athletes/All är ON enbart om BÅDA YT och Guess Who är aktiva.
   const actorsAllOn =
     youtubeEnabledCategories.includes('Film') && imagesEnabledCategories.includes('Film');
+  // Sport är parkerat (ingen kolumn i mixerboarden) — athletesEnabled/athletesAllOn
+  // behålls som inert dead code (Sport-innehållet ligger i catalog/deferred/) och
+  // ingår MEDVETET inte i "All"-mastern eller kolumn-räkningen. Lägg tillbaka Sport
+  // i allEnabled/enabledColumnsCount när Sport-kolumnen återinförs.
   const athletesAllOn =
     youtubeEnabledCategories.includes('Sport') && imagesEnabledCategories.includes('Sport');
-  const allEnabled = artistsAllOn && actorsAllOn && athletesAllOn;
-  const enabledColumnsCount = [artistsEnabled, actorsEnabled, athletesEnabled].filter(Boolean).length;
+  const allEnabled = artistsAllOn && actorsAllOn;
+  const enabledColumnsCount = [artistsEnabled, actorsEnabled].filter(Boolean).length;
   // Uppmätt kolumnbredd via onLayout på smGrid — garanterar pixel-perfekt
   // centrering oavsett flex-beräkningsfel i Yoga/React Native.
   // MUSIC-ONLY LAUNCH: 3×3-matrisen borttagen → Spotify-radens switch-
@@ -2822,8 +2826,9 @@ export default function LobbyScreen() {
       Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
       return;
     }
-    setYoutubeEnabledCategories(value ? ['Music', 'Film', 'Sport'] : []);
-    setImagesEnabledCategories(value ? ['Music', 'Film', 'Sport'] : []);
+    // Music + Film (Sport parkerat) — lägg tillbaka 'Sport' när kolumnen återinförs.
+    setYoutubeEnabledCategories(value ? ['Music', 'Film'] : []);
+    setImagesEnabledCategories(value ? ['Music', 'Film'] : []);
     // Slå även på Spotify om host har kopplat konto + IndDev är aktivt.
     if (value && isSpotifyAvailable && spotifyConnected) {
       setSpotifyEnabled(true);
@@ -6826,6 +6831,10 @@ export default function LobbyScreen() {
           </Text>
         )}
 
+        {/* Room code-kortet döljs helt i single-player-lobbyn — ett solospel
+            har ingen kod att dela, inga andra spelare som kan ansluta och
+            koden behövs inte för sparade spel (Peter 2026-09-06). */}
+        {!isSingleLobby && (
         <Card style={styles.roomCard} padding={Spacing.xl}>
           {/* Loggan är absolut-positionerad i Card:ens övre vänstra hörn med
               en liten inset från kantlinjen. Card är default position:
@@ -6922,6 +6931,7 @@ export default function LobbyScreen() {
             </TouchableOpacity>
           )}
         </Card>
+        )}
 
         {/* ── Players in Lobby ─────────────────────────────────── */}
         <View style={styles.section}>
@@ -7556,7 +7566,7 @@ export default function LobbyScreen() {
             med färgade brand-badges (kompakt list-format). marginTop ger lite
             extra luft mellan Game Mode-beskrivningen och denna rubrik. */}
         <View style={[styles.section, { marginTop: Spacing.sm }]}>
-          <Text style={styles.sectionLabel}>MUSIC MIXERBOARD</Text>
+          <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
           <View style={styles.connectionsList}>
             {/* ── Spotify DJ-läge ─────────────────────────────────────────
                 Göms HELT (inkl. attest-raden) i två lobbytyper där Spotify
@@ -7796,45 +7806,47 @@ export default function LobbyScreen() {
               <View style={styles.mixerboardDivider} />
             )}
 
-            {/* ── Music-källrader — visas bara UTAN aktivt paket ──
-                MUSIC-ONLY LAUNCH: Music/Film/Sport-kolumnerna borttagna.
-                Mixerboarden är per definition musik-only, så bara två
-                källtoggles (YouTube + Hints) kvar; båda styr Music-kategorin.
-                Non-host: read-only (disabled). Guest host: samma opacity 0.45 +
-                handlers guest-låser internt (guestLockAlert). Switcharna delar
-                spotifySwitchMR med Spotify-raden ovan → höger-kanterna linjerar. */}
+            {/* ── Source × Category Matrix (Music + Film) — visas bara UTAN aktivt paket ──
+                Kolumn-matris: vänster etikett-stack (All / YouTube / Hints) +
+                en data-kolumn per aktiv kategori (Music, Film). SPORT är parkerat
+                (athletes- och sport-events-filerna ligger i catalog/deferred/) → ingen Sport-
+                kolumn. Lägg tillbaka en tredje kolumn + Sport-handlers när Sport
+                av-parkeras. Kolumnbredd = smDataStack flex:1 (Yoga ger lika bredd,
+                ingen onLayout-mätning behövs). Cell-switch-alignment mot Spotify-
+                raden ovan är en empirisk tuning-punkt (spotifySwitchMR). När ett
+                Host-paket är valt kollapsar mixerboarden till aggregat-toggles nedan. */}
             {!anyPackageActive && (
-            <View>
-              {/* YouTube-rad — samma vänster-geometri som Spotify-raden
-                  (paddingLeft sm + 28-px connectionIconWrap marginLeft -2 +
-                  label marginLeft -8) så ikon + rubrik linjerar med Spotify. */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingVertical: 8, paddingRight: 18, paddingLeft: Spacing.sm }}>
-                <View style={[styles.connectionIconWrap, { marginLeft: -2 }]}>
-                  <YouTubeBrandIcon size={22} />
+            <View style={styles.smGrid}>
+
+              {/* ── Etikett-stack (vänster) ── */}
+              <View style={styles.smLabelStack}>
+                <View style={[styles.smHeaderCell, styles.smDataShift]}>
+                  <Text style={styles.sourceMatrixAllText}>All</Text>
                 </View>
-                <Text style={[styles.sourceMatrixSourceText, { marginLeft: -8 }]}>YouTube</Text>
-                <Pressable
-                  onPress={() => Alert.alert('YouTube', 'Music videos and audio clips — guess the release year.')}
-                  hitSlop={8}
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-                <View style={{ marginLeft: 'auto', marginRight: spotifySwitchMR }}>
+                <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
                   <Switch
-                    value={youtubeEnabledCategories.includes('Music')}
-                    onValueChange={hostMode ? handleToggleArtistsYoutube : undefined}
-                    disabled={!hostMode}
+                    value={smAllValue}
+                    onValueChange={hostMode ? handleToggleAllSources : undefined}
+                    disabled={!hostMode || anyPackageActive}
                     trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
                     thumbColor="#FFF"
-                    ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
+                    ios_backgroundColor={smAllValue ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={[styles.sourceMatrixSwitch, (isGuestHost || (anyPackageActive && !pkgAllCovered)) && { opacity: 0.45 }]}
                   />
                 </View>
-              </View>
-              {/* Hints-rad — samma vänster-geometri som Spotify/YouTube. */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingVertical: 8, paddingRight: 18, paddingLeft: Spacing.sm }}>
-                <View style={[styles.connectionIconWrap, { marginLeft: -2 }]}>
+                <View style={styles.smLabelSourceCell}>
+                  <YouTubeBrandIcon size={22} />
+                  <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
+                  <Pressable
+                    onPress={() => Alert.alert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers')}
+                    hitSlop={8}
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
+                </View>
+                <View style={styles.smAutoCell} />
+                <View style={styles.smLabelSourceCell}>
                   <View style={styles.imagesIconWrap}>
                     <Svg width={22} height={22} viewBox="24 22 32 32">
                       <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
@@ -7842,27 +7854,59 @@ export default function LobbyScreen() {
                     </Svg>
                     <Text style={styles.imagesQMark}>?</Text>
                   </View>
-                </View>
-                <Text style={[styles.sourceMatrixSourceText, { marginLeft: -8 }]}>Hints</Text>
-                <Pressable
-                  onPress={() => Alert.alert('Hints', 'Guess the artist or band from a flag + progressive clues.')}
-                  hitSlop={8}
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-                <View style={{ marginLeft: 'auto', marginRight: spotifySwitchMR }}>
-                  <Switch
-                    value={imagesEnabledCategories.includes('Music')}
-                    onValueChange={hostMode ? handleToggleArtistsGuessWho : undefined}
-                    disabled={!hostMode}
-                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
-                  />
+                  <Text style={styles.sourceMatrixSourceText}>Hints</Text>
+                  <Pressable
+                    onPress={() => Alert.alert('Hints', 'Guess the artist, band or actor from a flag + progressive clues.')}
+                    hitSlop={8}
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
                 </View>
               </View>
+
+              {/* ── Music (Artists) kolumn-stack ── */}
+              <View style={styles.smDataStack}>
+                <View style={styles.smHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Music</Text>
+                </View>
+                <View style={[styles.smAllToggleCell, styles.smSwitchNudge]}>
+                  <Switch
+                    value={smColValue('Music', artistsAllOn)}
+                    onValueChange={hostMode ? handleToggleArtistsColumn : undefined}
+                    disabled={!hostMode || anyPackageActive}
+                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
+                    thumbColor="#FFF"
+                    ios_backgroundColor={smColValue('Music', artistsAllOn) ? Colors.success : MATRIX_SWITCH_OFF}
+                    style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Music')) && { opacity: 0.45 }]}
+                  />
+                </View>
+                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
+                  <Switch value={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'youtube')) && { opacity: 0.45 }]} />
+                </View>
+                <View style={styles.smAutoCell} />
+                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
+                  <Switch value={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'hints')) && { opacity: 0.45 }]} />
+                </View>
+              </View>
+
+              {/* ── Film (Actors) kolumn-stack ── */}
+              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
+                <View style={styles.smHeaderCell}>
+                  <Text style={styles.sourceMatrixHeaderText}>Film</Text>
+                </View>
+                <View style={[styles.smAllToggleCell, styles.smSwitchNudge, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
+                  <Switch value={smColValue('Film', actorsAllOn)} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smColValue('Film', actorsAllOn) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Film')) && { opacity: 0.45 }]} />
+                </View>
+                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
+                  <Switch value={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'youtube')) && { opacity: 0.45 }]} />
+                </View>
+                <View style={styles.smAutoCell} />
+                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
+                  <Switch value={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'hints')) && { opacity: 0.45 }]} />
+                </View>
+              </View>
+
             </View>
             )}
 
@@ -9942,7 +9986,7 @@ const styles = StyleSheet.create({
   //     istället för Colors.success eftersom guest INTE är inloggad.) ─
   guestLeaveOverlay: { flex: 1, justifyContent: 'flex-end' },
   guestLeaveBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   guestLeaveSheet: {
@@ -10908,7 +10952,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   spotifyGuideBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.6)',
   },
   spotifyGuideSheet: {
@@ -11302,6 +11346,14 @@ const styles = StyleSheet.create({
   },
   smDataShift: {
     paddingLeft: 3,
+  },
+  // Data-kolumnernas (Music/Film) switch-celler: nudgas höger så switchen
+  // hamnar centrerad UNDER sin kolumnrubrik. iOS-<Switch>:en renderar vänster-
+  // biasad i sin cell och paddingLeft flyttar den ~1:1 höger. Empiriskt centrerad
+  // vid 17 för Lobby (Profile centrerar vid 20 — annan switch-stil/cellgeometri).
+  // Gäller EJ label-stackens "All"-toggle (den ser redan centrerad ut). Tuna här.
+  smSwitchNudge: {
+    paddingLeft: 17,
   },
   smAllToggleShift: {
     paddingLeft: 18,
@@ -12092,7 +12144,7 @@ const styles = StyleSheet.create({
   // (startGlow 0.4 ↔ 0.85) ger pulserande glöd; pillen har egen mörk
   // bg + guld-border så den förblir läsbar ovanpå.
   startStickyBarGlow: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: Colors.warning,
   },
   startGameCompactWrap: {
@@ -12394,7 +12446,7 @@ const modal = StyleSheet.create({
 
   // Year picker som conditional overlay inuti samma Modal
   yearPickerOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
@@ -12430,7 +12482,7 @@ const modal = StyleSheet.create({
 
 const playerEditSheet = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)' },
   container: {
     backgroundColor: Colors.card,
     borderTopLeftRadius: 24,
@@ -12525,7 +12577,7 @@ const playerEditSheet = StyleSheet.create({
 
   // Year-picker overlay inom samma Modal (inga nested native-modals).
   yearPickerOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
@@ -12561,7 +12613,7 @@ const playerEditSheet = StyleSheet.create({
 
 const shareSheet = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)' },
   container: {
     backgroundColor: Colors.card,
     borderTopLeftRadius: 24,

@@ -63,16 +63,20 @@ export function isMainCategory(value: unknown): value is MainCategory {
 /**
  * Default-listan när enabledMainCategories saknas i sparad profil/lobby.
  *
- * ⚠ MUSIC-ONLY LAUNCH (2026-09): returnerar ENBART Music. Film/Sport är parkerade
- * (katalogfilerna ligger i catalog/deferred/, se registry.ts) och ska aldrig seedas
- * som aktiverade. Detta är den ärliga "music-only"-spaken + belt-and-suspenders mot
- * befintliga users vars sparade kategori-arrayer kan innehålla Film/Sport.
- * Återställ till `[...MAIN_CATEGORIES]` när Film/Sport återaktiveras.
+ * ⚠ MUSIC + FILM (2026-09): returnerar Music + Film. Film återaktiverades (movies-*
+ * + actors-* flyttades ut ur catalog/deferred/, se registry.ts). SPORT är fortfarande
+ * parkerat (athletes- och sport-events-filerna ligger kvar i deferred/) och seedas ALDRIG som
+ * aktiverat — lägg INTE till 'Sport' här förrän det innehållet av-parkeras. Använd
+ * alltså inte `[...MAIN_CATEGORIES]` (den drar in Sport).
+ *
+ * Belt-and-suspenders: befintliga users kan ha sparade arrayer med bara ['Music']
+ * (music-only-eran) — de behåller Music-only tills de togglar Film i mixerboarden;
+ * denna default gäller bara NYA profiler/färska lobbies utan sparat värde.
  *
  * Returnerar en frisk array varje anrop så call-sites kan muta den safely.
  */
 export function defaultEnabledMainCategories(): MainCategory[] {
-  return ['Music'];
+  return ['Music', 'Film'];
 }
 
 /**
