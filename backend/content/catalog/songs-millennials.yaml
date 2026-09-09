@@ -3546,3 +3546,33 @@ items:
         startSec: 20
         endSec: 50
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1332)."
+  # Tillagda 2026-09-09 ur Music.xlsx (rad 1351-1400).
+  - id: lena-philipsson-karleken-ar-evig
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kärleken är evig — Lena Philipsson"
+    correctYear: 1986
+    probability: 60
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    wikimediaSearchHints: ["Kärleken är evig - Lena Philipsson 1986"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Mp-P_DhFewE"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1384)."
+  - id: jan-johansen-se-pa-mig
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Se på mig — Jan Johansen"
+    correctYear: 1995
+    probability: 60
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Se på mig - Jan Johansen 1995"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "yiaPi7rvwQE"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1389)."

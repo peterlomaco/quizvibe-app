@@ -2031,3 +2031,244 @@ items:
       - videoId: "WJT5SGS6qkY"
         startSec: 0
         endSec: 30
+  # Tillagda 2026-09-09 ur Music.xlsx (rad 1351-1400).
+  - id: alcazar-blame-it-on-the-disco
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Blame It on the Disco — Alcazar"
+    correctYear: 2014
+    probability: 60
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Blame It on the Disco - Alcazar 2014"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "AoB8UyLpBLo"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1378)."
+  - id: jon-henrik-fjallgren-norrsken
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Norrsken — Jon Henrik Fjällgren"
+    correctYear: 2019
+    probability: 60
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Norrsken - Jon Henrik Fjällgren 2019"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XLHuwcfO4fU"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1379)."
+  - id: dolly-style-rollercoaster
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rollercoaster — Dolly Style"
+    correctYear: 2016
+    probability: 56
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Rollercoaster - Dolly Style 2016"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XlFypQLuWic"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1380)."
+  - id: linus-svenning-broder
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bröder — Linus Svenning"
+    correctYear: 2014
+    probability: 56
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Bröder - Linus Svenning 2014"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iBExcsRFNOA"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1381)."
+  - id: de-vet-du-road-trip
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Road Trip — De Vet Du"
+    correctYear: 2017
+    probability: 56
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Road Trip - De Vet Du 2017"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "gO8hkdxG11s"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1382)."
+  - id: foo-gotta-thing-about-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gotta Thing About You — FO&O"
+    correctYear: 2017
+    probability: 56
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Gotta Thing About You - FO&O 2017"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "5vZdiFnGHHA"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1383)."
+  - id: drangarna-piga-och-drang
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Piga & dräng — Drängarna"
+    correctYear: 2020
+    probability: 58
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Piga & dräng - Drängarna 2020"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FVjoNGIc1K8"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1386)."
+  - id: anna-bergendahl-ashes-to-ashes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ashes to Ashes — Anna Bergendahl"
+    correctYear: 2019
+    probability: 60
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Ashes to Ashes - Anna Bergendahl 2019"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "uXg7HDjedlY"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1390)."
+  - id: eric-saade-sting
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sting — Eric Saade"
+    correctYear: 2015
+    probability: 62
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Sting - Eric Saade 2015"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "wD4mwilTocw"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1391)."
+  - id: robin-bengtsson-constellation-prize
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Constellation Prize — Robin Bengtsson"
+    correctYear: 2016
+    probability: 60
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Constellation Prize - Robin Bengtsson 2016"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "U2HPDlVdSyk"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1392)."
+  - id: panetoz-efter-solsken
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Efter solsken — Panetoz"
+    correctYear: 2014
+    probability: 56
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Efter solsken - Panetoz 2014"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UarrvvhOYek"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1393)."
+  - id: klara-hammarstrom-on-and-on-and-on
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "On and On and On — Klara Hammarström"
+    correctYear: 2025
+    probability: 58
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["On and On and On - Klara Hammarström 2025"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ZuEiplgMHtU"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1394)."
+  - id: theoz-som-du-vill
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Som du vill — Theoz"
+    correctYear: 2022
+    probability: 56
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Som du vill - Theoz 2022"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "WAk--GrYtwg"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1396)."
+  - id: behrang-miri-jalla-dansa-sawa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jalla Dansa Sawa — Behrang Miri"
+    correctYear: 2013
+    probability: 56
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Jalla Dansa Sawa - Behrang Miri 2013"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "n4a1gJMy7wo"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1397)."
+  - id: froken-snusk-unga-och-fria
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Unga & fria — Fröken Snusk"
+    correctYear: 2024
+    probability: 56
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Unga & fria - Fröken Snusk 2024"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "0P6FA6qUqr8"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1399)."
+  - id: dolly-style-yihaa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Yihaa — Dolly Style"
+    correctYear: 2025
+    probability: 56
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Yihaa - Dolly Style 2025"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "mgIc0iHQTHA"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1400)."

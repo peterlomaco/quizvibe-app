@@ -1456,3 +1456,264 @@ items:
         startSec: 20
         endSec: 50
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1350)."
+  # Tillagda 2026-09-09 ur Music.xlsx (rad 1351-1400).
+  - id: supertramp-the-logical-song
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Logical Song — Supertramp"
+    correctYear: 1979
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["The Logical Song - Supertramp 1979"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "A-2H96uX_lI"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1351)."
+  - id: harry-chapin-cats-in-the-cradle
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Cat's in the Cradle — Harry Chapin"
+    correctYear: 1974
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Cat's in the Cradle - Harry Chapin 1974"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jmhoOp2fUzg"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1353)."
+  - id: chicago-if-you-leave-me-now
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "If You Leave Me Now — Chicago"
+    correctYear: 1976
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["If You Leave Me Now - Chicago 1976"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-9_d-sFhmRM"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1354)."
+  - id: al-green-lets-stay-together
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Let's Stay Together — Al Green"
+    correctYear: 1971
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Let's Stay Together - Al Green 1971"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "mYDLL6tOcUY"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1355)."
+  - id: sweet-the-ballroom-blitz
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Ballroom Blitz — Sweet"
+    correctYear: 1973
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["The Ballroom Blitz - Sweet 1973"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "7lTwA5xMeTM"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1356)."
+  - id: barry-white-youre-the-first-the-last-my-everything
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "You're the First, the Last, My Everything — Barry White"
+    correctYear: 1974
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["You're the First, the Last, My Everything - Barry White 1974"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "SRCzskCp5rE"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1357)."
+  - id: fleetwood-mac-dont-stop
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Don't Stop — Fleetwood Mac"
+    correctYear: 1977
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Don't Stop - Fleetwood Mac 1977"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "QV9JJmSCiI8"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1358)."
+  - id: free-all-right-now
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "All Right Now — Free"
+    correctYear: 1970
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["All Right Now - Free 1970"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "5wiF6b4rxno"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1360)."
+  - id: commodores-easy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Easy — Commodores"
+    correctYear: 1977
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Easy - Commodores 1977"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9nBSd1U18vM"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1363)."
+  - id: chic-good-times
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Good Times — Chic"
+    correctYear: 1979
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Good Times - Chic 1979"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "HeeDOVcVUQY"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1365)."
+  - id: bee-gees-night-fever
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Night Fever — Bee Gees"
+    correctYear: 1977
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Night Fever - Bee Gees 1977"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "-ihs-vT9T3Q"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1366)."
+  - id: jackson-5-ill-be-there
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I'll Be There — The Jackson 5"
+    correctYear: 1970
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["I'll Be There - The Jackson 5 1970"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "kBhSh7y_IkM"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1368)."
+  - id: four-seasons-december-1963
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "December, 1963 (Oh, What a Night) — The Four Seasons"
+    correctYear: 1975
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["December, 1963 (Oh, What a Night) - The Four Seasons 1975"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "mTUhnIY3oRM"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1369)."
+  - id: bto-you-aint-seen-nothing-yet
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "You Ain't Seen Nothing Yet — Bachman-Turner Overdrive"
+    correctYear: 1974
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["You Ain't Seen Nothing Yet - Bachman-Turner Overdrive 1974"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "4cia_v4vxfE"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1370)."
+  - id: t-rex-bang-a-gong
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bang a Gong (Get It On) — T. Rex"
+    correctYear: 1971
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Bang a Gong (Get It On) - T. Rex 1971"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FyzWDl0nz00"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1371)."
+  - id: pink-floyd-another-brick-in-the-wall
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Another Brick in the Wall (Part 2) — Pink Floyd"
+    correctYear: 1979
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Another Brick in the Wall (Part 2) - Pink Floyd 1979"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "HrxX9TBj2zY"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1373)."
+  - id: queen-dont-stop-me-now
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Don't Stop Me Now — Queen"
+    correctYear: 1978
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Don't Stop Me Now - Queen 1978"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "HgzGwKwLmgM"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1374)."
+  - id: 10cc-im-not-in-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I'm Not in Love — 10cc"
+    correctYear: 1975
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["I'm Not in Love - 10cc 1975"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "q9MQYdqbWD8"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1375)."
+  - id: the-who-baba-oriley
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Baba O'Riley — The Who"
+    correctYear: 1971
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Baba O'Riley - The Who 1971"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "_8_Pf144Qmg"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1376)."
+  - id: david-bowie-heroes
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Heroes — David Bowie"
+    correctYear: 1977
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Heroes - David Bowie 1977"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "lXgkuM2NhYI"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1377)."

@@ -3052,3 +3052,64 @@ items:
         startSec: 20
         endSec: 50
         notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1347)."
+  # Tillagda 2026-09-09 ur Music.xlsx (rad 1351-1400).
+  - id: kalle-moraeus-underbart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Underbart — Kalle Moraeus & Orsa Spelmän"
+    correctYear: 2010
+    probability: 58
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Underbart - Kalle Moraeus & Orsa Spelmän 2010"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "XD54TYtS2Bs"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1385)."
+  - id: david-lindgren-shout-it-out
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Shout It Out — David Lindgren"
+    correctYear: 2012
+    probability: 60
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Shout It Out - David Lindgren 2012"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "GkRXTG_d37s"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1387)."
+  - id: alcazar-stay-the-night
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Stay the Night — Alcazar"
+    correctYear: 2009
+    probability: 62
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Stay the Night - Alcazar 2009"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "22HjHuPxe8A"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1388)."
+  - id: swingfly-me-and-my-drum
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Me and My Drum — Swingfly"
+    correctYear: 2011
+    probability: 58
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    wikimediaSearchHints: ["Me and My Drum - Swingfly 2011"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UonzieycUp4"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1398)."

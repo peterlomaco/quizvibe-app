@@ -2256,6 +2256,60 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "free-all-right-now",
+    "displayName": "All Right Now — Free",
+    "correctYear": 1970,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "5wiF6b4rxno",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1360)."
+      }
+    ]
+  },
+  {
+    "id": "jackson-5-ill-be-there",
+    "displayName": "I'll Be There — The Jackson 5",
+    "correctYear": 1970,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "kBhSh7y_IkM",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1368)."
+      }
+    ]
+  },
+  {
     "id": "mungo-jerry-in-the-summertime",
     "displayName": "In the Summertime — Mungo Jerry",
     "correctYear": 1970,
@@ -2317,6 +2371,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Simon & Garfunkel - Topic",
         "license": "standard",
         "notes": "Officiell album-audio via YouTube Topic. Chorus area."
+      }
+    ]
+  },
+  {
+    "id": "al-green-lets-stay-together",
+    "displayName": "Let's Stay Together — Al Green",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "mYDLL6tOcUY",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1355)."
       }
     ]
   },
@@ -2513,6 +2594,60 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1971 vinnare — Monaco."
+      }
+    ]
+  },
+  {
+    "id": "t-rex-bang-a-gong",
+    "displayName": "Bang a Gong (Get It On) — T. Rex",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FyzWDl0nz00",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1371)."
+      }
+    ]
+  },
+  {
+    "id": "the-who-baba-oriley",
+    "displayName": "Baba O'Riley — The Who",
+    "correctYear": 1971,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "_8_Pf144Qmg",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1376)."
       }
     ]
   },
@@ -2967,6 +3102,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sweet-the-ballroom-blitz",
+    "displayName": "The Ballroom Blitz — Sweet",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "7lTwA5xMeTM",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1356)."
+      }
+    ]
+  },
+  {
     "id": "ted-gardestad-vilken-harlig-dag",
     "displayName": "Oh, vilken härlig dag — Ted Gärdestad",
     "correctYear": 1973,
@@ -3059,6 +3221,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "barry-white-youre-the-first-the-last-my-everything",
+    "displayName": "You're the First, the Last, My Everything — Barry White",
+    "correctYear": 1974,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "SRCzskCp5rE",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1357)."
+      }
+    ]
+  },
+  {
     "id": "bob-marley-no-woman-no-cry",
     "displayName": "No Woman, No Cry — Bob Marley & The Wailers",
     "correctYear": 1974,
@@ -3087,6 +3276,60 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bto-you-aint-seen-nothing-yet",
+    "displayName": "You Ain't Seen Nothing Yet — Bachman-Turner Overdrive",
+    "correctYear": 1974,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "4cia_v4vxfE",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1370)."
+      }
+    ]
+  },
+  {
+    "id": "harry-chapin-cats-in-the-cradle",
+    "displayName": "Cat's in the Cradle — Harry Chapin",
+    "correctYear": 1974,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "jmhoOp2fUzg",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1353)."
+      }
+    ]
+  },
+  {
     "id": "lynyrd-skynyrd-sweet-home-alabama",
     "displayName": "Sweet Home Alabama — Lynyrd Skynyrd",
     "correctYear": 1974,
@@ -3111,6 +3354,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Lynyrd Skynyrd - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "10cc-im-not-in-love",
+    "displayName": "I'm Not in Love — 10cc",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "q9MQYdqbWD8",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1375)."
       }
     ]
   },
@@ -3197,6 +3467,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bruce Springsteen - Topic",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell album-audio via YouTube Topic (1975 studio-version)."
+      }
+    ]
+  },
+  {
+    "id": "four-seasons-december-1963",
+    "displayName": "December, 1963 (Oh, What a Night) — The Four Seasons",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "mTUhnIY3oRM",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1369)."
       }
     ]
   },
@@ -3419,6 +3716,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "chicago-if-you-leave-me-now",
+    "displayName": "If You Leave Me Now — Chicago",
+    "correctYear": 1976,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "-9_d-sFhmRM",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1354)."
+      }
+    ]
+  },
+  {
     "id": "dancing-queen",
     "displayName": "Dancing Queen — ABBA",
     "correctYear": 1976,
@@ -3608,6 +3932,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bee-gees-night-fever",
+    "displayName": "Night Fever — Bee Gees",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "-ihs-vT9T3Q",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1366)."
+      }
+    ]
+  },
+  {
     "id": "bee-gees-stayin-alive",
     "displayName": "Stayin' Alive — Bee Gees",
     "correctYear": 1977,
@@ -3697,6 +4048,87 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 8,
         "endSec": 23,
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "commodores-easy",
+    "displayName": "Easy — Commodores",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9nBSd1U18vM",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1363)."
+      }
+    ]
+  },
+  {
+    "id": "david-bowie-heroes",
+    "displayName": "Heroes — David Bowie",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "lXgkuM2NhYI",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1377)."
+      }
+    ]
+  },
+  {
+    "id": "fleetwood-mac-dont-stop",
+    "displayName": "Don't Stop — Fleetwood Mac",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "QV9JJmSCiI8",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1358)."
       }
     ]
   },
@@ -4080,6 +4512,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "queen-dont-stop-me-now",
+    "displayName": "Don't Stop Me Now — Queen",
+    "correctYear": 1978,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HgzGwKwLmgM",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1374)."
+      }
+    ]
+  },
+  {
     "id": "rod-stewart-da-ya-think-im-sexy",
     "displayName": "Da Ya Think I'm Sexy? — Rod Stewart",
     "correctYear": 1978,
@@ -4247,6 +4706,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "chic-good-times",
+    "displayName": "Good Times — Chic",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HeeDOVcVUQY",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1365)."
+      }
+    ]
+  },
+  {
     "id": "milk-and-honey-hallelujah",
     "displayName": "Hallelujah — Milk & Honey",
     "correctYear": 1979,
@@ -4275,6 +4761,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1979 vinnare — Israel."
+      }
+    ]
+  },
+  {
+    "id": "pink-floyd-another-brick-in-the-wall",
+    "displayName": "Another Brick in the Wall (Part 2) — Pink Floyd",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "HrxX9TBj2zY",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1373)."
       }
     ]
   },
@@ -4312,6 +4825,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 35,
         "endSec": 50,
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "supertramp-the-logical-song",
+    "displayName": "The Logical Song — Supertramp",
+    "correctYear": 1979,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "A-2H96uX_lI",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1351)."
       }
     ]
   },
@@ -7014,6 +7554,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Miami Vice",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "lena-philipsson-karleken-ar-evig",
+    "displayName": "Kärleken är evig — Lena Philipsson",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 60,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Mp-P_DhFewE",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1384)."
       }
     ]
   },
@@ -12014,6 +12584,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Coolio - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "jan-johansen-se-pa-mig",
+    "displayName": "Se på mig — Jan Johansen",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 60,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "yiaPi7rvwQE",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1389)."
       }
     ]
   },
@@ -18145,6 +18746,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "alcazar-stay-the-night",
+    "displayName": "Stay the Night — Alcazar",
+    "correctYear": 2009,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 62,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "22HjHuPxe8A",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1388)."
+      }
+    ]
+  },
+  {
     "id": "alexander-rybak-fairytale",
     "displayName": "Fairytale — Alexander Rybak",
     "correctYear": 2009,
@@ -18697,6 +19329,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 264,
         "channelTitle": "Eminem - Topic",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "kalle-moraeus-underbart",
+    "displayName": "Underbart — Kalle Moraeus & Orsa Spelmän",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 58,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "XD54TYtS2Bs",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1385)."
       }
     ]
   },
@@ -19543,6 +20206,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "swingfly-me-and-my-drum",
+    "displayName": "Me and My Drum — Swingfly",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 58,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "UonzieycUp4",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1398)."
+      }
+    ]
+  },
+  {
     "id": "veronica-maggio-jag-kommer",
     "displayName": "Jag kommer — Veronica Maggio",
     "correctYear": 2011,
@@ -19596,6 +20290,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "CarlyRaeJepsenVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Ersatte reuploaden 47EG91_XHic (Unique Vibes) med officiella Vevo-klippet."
+      }
+    ]
+  },
+  {
+    "id": "david-lindgren-shout-it-out",
+    "displayName": "Shout It Out — David Lindgren",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 60,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "GkRXTG_d37s",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1387)."
       }
     ]
   },
@@ -19951,6 +20676,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Avicii - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "behrang-miri-jalla-dansa-sawa",
+    "displayName": "Jalla Dansa Sawa — Behrang Miri",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "n4a1gJMy7wo",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1397)."
       }
     ]
   },
@@ -20340,6 +21096,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "alcazar-blame-it-on-the-disco",
+    "displayName": "Blame It on the Disco — Alcazar",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 60,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "AoB8UyLpBLo",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1378)."
+      }
+    ]
+  },
+  {
     "id": "ariana-grande-break-free",
     "displayName": "Break Free — Ariana Grande feat. Zedd",
     "correctYear": 2014,
@@ -20558,6 +21345,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "linus-svenning-broder",
+    "displayName": "Bröder — Linus Svenning",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "iBExcsRFNOA",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1381)."
+      }
+    ]
+  },
+  {
     "id": "mark-ronson-uptown-funk",
     "displayName": "Uptown Funk — Mark Ronson ft. Bruno Mars",
     "correctYear": 2014,
@@ -20610,6 +21428,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MeghanTrainorVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "panetoz-efter-solsken",
+    "displayName": "Efter solsken — Panetoz",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "UarrvvhOYek",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1393)."
       }
     ]
   },
@@ -20882,6 +21731,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MovieZine",
         "license": "standard",
         "notes": "Officiell svensk trailer. Rolf Lassgård. SF Studios-produktion."
+      }
+    ]
+  },
+  {
+    "id": "eric-saade-sting",
+    "displayName": "Sting — Eric Saade",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 62,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "wD4mwilTocw",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1391)."
       }
     ]
   },
@@ -21301,6 +22181,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dolly-style-rollercoaster",
+    "displayName": "Rollercoaster — Dolly Style",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "XlFypQLuWic",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1380)."
+      }
+    ]
+  },
+  {
     "id": "drake-one-dance",
     "displayName": "One Dance — Drake",
     "correctYear": 2016,
@@ -21566,6 +22477,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "robin-bengtsson-constellation-prize",
+    "displayName": "Constellation Prize — Robin Bengtsson",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 60,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "U2HPDlVdSyk",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1392)."
+      }
+    ]
+  },
+  {
     "id": "sean-paul-no-lie",
     "displayName": "No Lie — Sean Paul feat. Dua Lipa",
     "correctYear": 2016,
@@ -21796,6 +22738,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "de-vet-du-road-trip",
+    "displayName": "Road Trip — De Vet Du",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "gO8hkdxG11s",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1382)."
+      }
+    ]
+  },
+  {
     "id": "dua-lipa-idgaf",
     "displayName": "IDGAF — Dua Lipa",
     "correctYear": 2017,
@@ -21881,6 +22854,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ed Sheeran",
         "license": "standard",
         "notes": "Officiell musikvideo (Ed Sheeran-kanalen)."
+      }
+    ]
+  },
+  {
+    "id": "foo-gotta-thing-about-you",
+    "displayName": "Gotta Thing About You — FO&O",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "5vZdiFnGHHA",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1383)."
       }
     ]
   },
@@ -22436,6 +23440,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "anna-bergendahl-ashes-to-ashes",
+    "displayName": "Ashes to Ashes — Anna Bergendahl",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 60,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "uXg7HDjedlY",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1390)."
+      }
+    ]
+  },
+  {
     "id": "arvingarna-i-do",
     "displayName": "I Do — Arvingarna",
     "correctYear": 2019,
@@ -22640,6 +23675,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2019 vinnare. ESC 2019 official video."
+      }
+    ]
+  },
+  {
+    "id": "jon-henrik-fjallgren-norrsken",
+    "displayName": "Norrsken — Jon Henrik Fjällgren",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 60,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "XLHuwcfO4fU",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1379)."
       }
     ]
   },
@@ -22937,6 +24003,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 0,
         "endSec": 15,
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "drangarna-piga-och-drang",
+    "displayName": "Piga & dräng — Drängarna",
+    "correctYear": 2020,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 58,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "FVjoNGIc1K8",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1386)."
       }
     ]
   },
@@ -23636,6 +24733,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "theoz-som-du-vill",
+    "displayName": "Som du vill — Theoz",
+    "correctYear": 2022,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "WAk--GrYtwg",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1396)."
+      }
+    ]
+  },
+  {
     "id": "doja-cat-paint-the-town-red",
     "displayName": "Paint the Town Red — Doja Cat",
     "correctYear": 2023,
@@ -23893,6 +25021,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "froken-snusk-unga-och-fria",
+    "displayName": "Unga & fria — Fröken Snusk",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "0P6FA6qUqr8",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1399)."
+      }
+    ]
+  },
+  {
     "id": "kendrick-lamar-not-like-us",
     "displayName": "Not Like Us — Kendrick Lamar",
     "correctYear": 2024,
@@ -24120,6 +25279,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dolly-style-yihaa",
+    "displayName": "Yihaa — Dolly Style",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "mgIc0iHQTHA",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1400)."
+      }
+    ]
+  },
+  {
     "id": "jj-wasted-love",
     "displayName": "Wasted Love — JJ",
     "correctYear": 2025,
@@ -24180,6 +25370,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2025 vinnare. ESC 2025 official music video."
+      }
+    ]
+  },
+  {
+    "id": "klara-hammarstrom-on-and-on-and-on",
+    "displayName": "On and On and On — Klara Hammarström",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 58,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "ZuEiplgMHtU",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1394)."
       }
     ]
   },
