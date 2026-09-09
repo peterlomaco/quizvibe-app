@@ -649,6 +649,10 @@ items:
         endSec: 45
         channelTitle: "FLEETWOOD MAC - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "Y3ywicffOj4"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1364) - alternativ officiell MV."
     region: ["global"]
   - id: queen-we-are-the-champions
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1390,6 +1394,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "3wsPg2KrRYZFi0inIFa41x"
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1363)."
+    youtubeClips:
+      - videoId: "Hphwfq1wLJs"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1361) - YouTube-kalla tillagd (var Spotify-only)."
   # 1969-1976 klassiker — tillagda 2026-09-09 ur Music.xlsx (rad 1346-1350).
   - id: bellamy-brothers-let-your-love-flow
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]

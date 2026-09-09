@@ -4157,6 +4157,13 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "FLEETWOOD MAC - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      },
+      {
+        "videoId": "Y3ywicffOj4",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1364) - alternativ officiell MV."
       }
     ]
   },
@@ -4556,7 +4563,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "3wsPg2KrRYZFi0inIFa41x",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "Hphwfq1wLJs",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1361) - YouTube-kalla tillagd (var Spotify-only)."
+      }
+    ]
   },
   {
     "id": "travolta-newton-john-youre-the-one-that-i-want",
