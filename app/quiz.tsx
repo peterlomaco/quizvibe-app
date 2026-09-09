@@ -11181,7 +11181,6 @@ export default function QuizScreen() {
                 style={[
                   rv.nextTab,
                   shouldLockForUnstable && { opacity: 0.4 },
-                  isNextCtaLocked && rv.nextTabCountingDown,
                 ]}
                 onPress={
                   isLastQuestion
@@ -12638,11 +12637,6 @@ const rv = StyleSheet.create({
   nextTabCountdownText: {
     position: 'absolute',
     fontVariant: ['tabular-nums'],
-  },
-  // Dämpad knapp medan låset räknar ned — signalerar "inte tryckbar än"
-  // utan att göra siffran svårläst (därav 0.55, inte unstable-lägets 0.4).
-  nextTabCountingDown: {
-    opacity: 0.55,
   },
   // Non-host:s "Waiting for host…"-pill i IndDev — sitter i samma position
   // som Next-tab skulle. Dämpad styling (textSecondary + borderStrong)
