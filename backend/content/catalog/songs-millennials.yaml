@@ -3219,3 +3219,134 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "5F5SMUnFD058zo1K0DtjUq"
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1364)."
+  # 1988-1989 internationella hitlatar — tillagda 2026-09-09 ur Music.xlsx (rad 1306-1316).
+  - id: soul-ii-soul-back-to-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Back to Life — Soul II Soul"
+    correctYear: 1989
+    probability: 76
+    region: ["global"]
+    wikimediaSearchHints: ["Soul II Soul Back to Life 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2F9_AwRs4Ao"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1306)."
+  - id: neneh-cherry-buffalo-stance
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Buffalo Stance — Neneh Cherry"
+    correctYear: 1988
+    probability: 74
+    region: ["global"]
+    wikimediaSearchHints: ["Neneh Cherry Buffalo Stance 1988"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "JWsRz3TJDEY"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1307)."
+  - id: madonna-cherish
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Cherish — Madonna"
+    correctYear: 1989
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Madonna Cherish 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "8q2WS6ahCnY"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1308)."
+  - id: gloria-estefan-dont-wanna-lose-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Don't Wanna Lose You — Gloria Estefan"
+    correctYear: 1989
+    probability: 74
+    region: ["global"]
+    wikimediaSearchHints: ["Gloria Estefan Don't Wanna Lose You 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "J1x1WGtePSE"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1309)."
+  - id: the-bangles-eternal-flame
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Eternal Flame — The Bangles"
+    correctYear: 1989
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["The Bangles Eternal Flame 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "PSoOFn3wQV4"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1311)."
+  - id: tom-petty-free-fallin
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Free Fallin' — Tom Petty"
+    correctYear: 1989
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Tom Petty Free Fallin 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "1lWJXDG2i0A"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1312)."
+  - id: fine-young-cannibals-good-thing
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Good Thing — Fine Young Cannibals"
+    correctYear: 1989
+    probability: 74
+    region: ["global"]
+    wikimediaSearchHints: ["Fine Young Cannibals Good Thing 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "We_9MthGzwk"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1313)."
+  - id: queen-i-want-it-all
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I Want It All — Queen"
+    correctYear: 1989
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Queen I Want It All 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "hFDcoX7s6rE"
+        startSec: 8
+        endSec: 38
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1314)."
+  - id: cher-if-i-could-turn-back-time
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "If I Could Turn Back Time — Cher"
+    correctYear: 1989
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Cher If I Could Turn Back Time 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9n3A_-HRFfc"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1315)."
+  - id: simply-red-if-you-dont-know-me-by-now
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "If You Don't Know Me by Now — Simply Red"
+    correctYear: 1989
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Simply Red If You Don't Know Me by Now 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "zTcu7MCtuTs"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1316)."

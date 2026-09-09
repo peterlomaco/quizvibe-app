@@ -7718,6 +7718,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "neneh-cherry-buffalo-stance",
+    "displayName": "Buffalo Stance — Neneh Cherry",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "JWsRz3TJDEY",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1307)."
+      }
+    ]
+  },
+  {
     "id": "paula-abdul-straight-up",
     "displayName": "Straight Up — Paula Abdul",
     "correctYear": 1988,
@@ -7964,6 +7991,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "cher-if-i-could-turn-back-time",
+    "displayName": "If I Could Turn Back Time — Cher",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9n3A_-HRFfc",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1315)."
+      }
+    ]
+  },
+  {
     "id": "field-of-dreams-1989",
     "displayName": "Field of Dreams",
     "correctYear": 1989,
@@ -7998,6 +8052,60 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Movieclips",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-27 via batch-pick-clips. Top-scored kandidat (13)."
+      }
+    ]
+  },
+  {
+    "id": "fine-young-cannibals-good-thing",
+    "displayName": "Good Thing — Fine Young Cannibals",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "We_9MthGzwk",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1313)."
+      }
+    ]
+  },
+  {
+    "id": "gloria-estefan-dont-wanna-lose-you",
+    "displayName": "Don't Wanna Lose You — Gloria Estefan",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "J1x1WGtePSE",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1309)."
       }
     ]
   },
@@ -8063,6 +8171,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Club Music 80",
         "license": "standard",
         "notes": "Officiell musikvideo-re-upload — stabil sedan 2014."
+      }
+    ]
+  },
+  {
+    "id": "madonna-cherish",
+    "displayName": "Cherish — Madonna",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "8q2WS6ahCnY",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1308)."
       }
     ]
   },
@@ -8174,6 +8309,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "queen-i-want-it-all",
+    "displayName": "I Want It All — Queen",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "hFDcoX7s6rE",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1314)."
+      }
+    ]
+  },
+  {
     "id": "riva-rock-me",
     "displayName": "Rock Me — Riva",
     "correctYear": 1989,
@@ -8238,6 +8400,87 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "simply-red-if-you-dont-know-me-by-now",
+    "displayName": "If You Don't Know Me by Now — Simply Red",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zTcu7MCtuTs",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1316)."
+      }
+    ]
+  },
+  {
+    "id": "soul-ii-soul-back-to-life",
+    "displayName": "Back to Life — Soul II Soul",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "2F9_AwRs4Ao",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1306)."
+      }
+    ]
+  },
+  {
+    "id": "the-bangles-eternal-flame",
+    "displayName": "Eternal Flame — The Bangles",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "PSoOFn3wQV4",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1311)."
+      }
+    ]
+  },
+  {
     "id": "tina-turner-the-best",
     "displayName": "The Best — Tina Turner",
     "correctYear": 1989,
@@ -8262,6 +8505,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "tom-petty-free-fallin",
+    "displayName": "Free Fallin' — Tom Petty",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "1lWJXDG2i0A",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1312)."
       }
     ]
   },
