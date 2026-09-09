@@ -3453,6 +3453,10 @@ export default function QuizScreen() {
   // svaret poppa in. Kopierad logik från den borttagna RevealScreen-komponenten.
   const revealScale = useRef(new Animated.Value(0.6)).current;
   const revealOpacity = useRef(new Animated.Value(0)).current;
+  // Pulserande QuizVibe-logo i reveal-boxen medan en spelare som bekräftat
+  // tidigt väntar på att sista spelaren ska svara (IndDev-multiplayer). Loopas
+  // bara under 'awaiting'; vid 'reveal' göms logon och facit-texten tonar in.
+  const revealWaitPulse = useRef(new Animated.Value(1)).current;
   // One-shot-guard så reveal-boxens spring-in bara körs EN gång per fråga.
   // Boxen blir synlig redan vid 'awaiting' (efter confirm) och ska inte
   // poppa om vid 'awaiting' → 'reveal'-övergången när facit-texten fylls i.
@@ -4616,6 +4620,26 @@ export default function QuizScreen() {
       glowLoop.stop();
     };
   }, [phase, timerRingPulse, timerRingGlow]);
+
+  // Vänte-logons puls i reveal-boxen. Körs bara medan en spelare som bekräftat
+  // väntar på övriga i IndDev-multiplayer ('awaiting'). Single/PtP och reveal-
+  // fasen står still (gameMode är aldrig 'individual-devices' i single/PtP).
+  useEffect(() => {
+    const isWaiting = phase === 'awaiting' && gameMode === 'individual-devices';
+    if (!isWaiting) {
+      revealWaitPulse.stopAnimation();
+      revealWaitPulse.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(revealWaitPulse, { toValue: 1.06, duration: 700, useNativeDriver: true }),
+        Animated.timing(revealWaitPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [phase, gameMode, revealWaitPulse]);
 
   // Next-tab:ens kontinuerliga scale-pulse (1 ↔ 1.03 over 900ms each way) —
   // speglar startskärmens primary-CTA-pulse exakt. Körs på mount och framåt
@@ -10862,13 +10886,24 @@ export default function QuizScreen() {
                       </Text>
                     )}
                     {/* Facit-texten (år + låt/artist) hålls tillbaka tills
-                        nedräkningen tagit slut. Under 'awaiting' renderas texten
+                        sista spelaren bekräftat. Under 'awaiting' renderas texten
                         DOLD (opacity 0) så kortet reserverar EXAKT samma höjd som
-                        vid reveal — ingen logo-overlay längre (den stack ut förbi
-                        kortet och fick awaiting-rutan att se större ut än reveal-
-                        rutan). Vid 'reveal' fylls texten i och kortet ser ut precis
-                        som förut. */}
+                        vid reveal. I IndDev-multiplayer överlagras då en pulserande
+                        QuizVibe-logo där facit-värdet snart hamnar — den är
+                        absolut-positionerad (explicit position:'absolute', INTE
+                        StyleSheet.absoluteFillObject-spread som föll ur flow på
+                        Fabric-dev-builden) så den centreras i den reserverade ytan
+                        utan att ändra layouten. Vid 'reveal' göms logon och facit-
+                        texten tonar in. */}
                     <View style={rv.feedbackBody}>
+                      {phase === 'awaiting' && gameMode === 'individual-devices' && (
+                        <Animated.View
+                          style={[rv.feedbackWaitLogo, { transform: [{ scale: revealWaitPulse }] }]}
+                          pointerEvents="none"
+                        >
+                          <QuizVibeLogo size={48} />
+                        </Animated.View>
+                      )}
                       <Text
                         style={[
                           rv.feedbackCorrectYear,
@@ -12424,6 +12459,19 @@ const rv = StyleSheet.create({
   },
   feedbackTextHidden: {
     opacity: 0,
+  },
+  // Vänte-logon centreras i den (dolt-text-)reserverade feedbackBody-ytan.
+  // Explicit position:'absolute' + top/left/right/bottom (ALDRIG spread av
+  // StyleSheet.absoluteFillObject — den föll ur flow på Fabric-dev-builden och
+  // fick logon att sticka ut förbi kortet). Absolut → påverkar inte layouten.
+  feedbackWaitLogo: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   feedbackCorrectYear: {
     fontSize: FontSize.md,
