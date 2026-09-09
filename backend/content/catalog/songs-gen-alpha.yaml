@@ -332,7 +332,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "iawgB2CDCrw"
-        startSec: 0
+        startSec: 7
         endSec: 198
         channelTitle: "7clouds"
     region: ["global"]

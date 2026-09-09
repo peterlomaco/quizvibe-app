@@ -321,7 +321,7 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "Ouf9-bOqJVk"
-        startSec: 0
+        startSec: 8
         endSec: 15
         channelTitle: "Sinéad O'Connor - Topic"
         notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."

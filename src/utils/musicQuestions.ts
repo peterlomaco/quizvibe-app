@@ -8634,7 +8634,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "Ouf9-bOqJVk",
-        "startSec": 0,
+        "startSec": 8,
         "endSec": 15,
         "channelTitle": "Sinéad O'Connor - Topic",
         "license": "standard",
@@ -22936,7 +22936,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "iawgB2CDCrw",
-        "startSec": 0,
+        "startSec": 7,
         "endSec": 198,
         "channelTitle": "7clouds",
         "license": "standard"
