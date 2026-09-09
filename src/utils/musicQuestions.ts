@@ -4641,43 +4641,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "hasse-andersson-guld-och-groena-skogar",
-    "displayName": "Guld och gröna skogar — Hasse Andersson",
-    "correctYear": 1981,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 88,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "Melodifestivalen",
-      "100% in swedish"
-    ],
-    "spotifyTrackId": "6EnNjWkk1YX3fsTXtwO773",
-    "youtubeClips": [
-      {
-        "videoId": "fDQRShw-Vdc",
-        "startSec": 0,
-        "endSec": 15,
-        "license": "standard"
-      },
-      {
-        "videoId": "1SudSj4156A",
-        "startSec": 0,
-        "endSec": 15,
-        "license": "standard"
-      }
-    ]
-  },
-  {
     "id": "human-league-dont-you-want-me",
     "displayName": "Don't You Want Me — The Human League",
     "correctYear": 1981,
@@ -20109,6 +20072,43 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MovieZine",
         "license": "standard",
         "notes": "Officiell svensk trailer. Rolf Lassgård. SF Studios-produktion."
+      }
+    ]
+  },
+  {
+    "id": "hasse-andersson-guld-och-groena-skogar",
+    "displayName": "Guld och gröna skogar — Hasse Andersson",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen",
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "6EnNjWkk1YX3fsTXtwO773",
+    "youtubeClips": [
+      {
+        "videoId": "fDQRShw-Vdc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      },
+      {
+        "videoId": "1SudSj4156A",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },

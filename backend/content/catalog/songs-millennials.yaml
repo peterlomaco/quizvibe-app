@@ -28,7 +28,7 @@ items:
   - id: hasse-andersson-guld-och-groena-skogar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Guld och gröna skogar — Hasse Andersson"
-    correctYear: 1981
+    correctYear: 2015
     probability: 88
     wikimediaSearchHints: ["Hasse Andersson Guld och gröna skogar dansband"]
     answerMethods: ["timeline"]
