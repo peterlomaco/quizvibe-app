@@ -3853,6 +3853,14 @@ export default function QuizScreen() {
     setPhase('reveal');
   }, [timerProgressAnim]);
 
+  // Latch: reveal_now broadcastas EN gång per fråga (maybeRevealEarly-effekten
+  // fyrar på varje playerConfirms-ändring). Nyckel = questionIndex → auto-reset
+  // per fråga utan explicit nollställning.
+  const revealNowBroadcastedForRef = useRef<number>(-1);
+  // Handler för inkommande reveal_now (auktoritativ "alla har svarat"-signal
+  // från en enhet som såg alla confirms). Assignas i subscription-effekten.
+  const revealNowHandlerRef = useRef<(qIndex: number) => void>(() => {});
+
   useEffect(() => {
     if (timeLeft !== 0) return;
     if (phase === 'awaiting') {
@@ -3946,6 +3954,21 @@ export default function QuizScreen() {
           (id) => !!id && !leftPlayerIds.has(id) && !(isSpotifyQuestion && id === effectiveDJId),
         );
       if (expected.length > 0 && expected.every((id) => playerConfirms[id] !== undefined)) {
+        // Auktoritativ aggregat-signal: berätta för enheter som missat
+        // enskilda player_answer_confirmed (Spotify-DJ:n som var i Spotify-
+        // appen — Realtime replayar inte missade broadcasts) att alla svarat,
+        // så de avslöjar direkt i stället för att rulla ut hela timern. En
+        // gång per fråga (latch på questionIndex). revealNow() nedan är
+        // idempotent (phase-guard) så en egen mottagen reveal_now skadar inte.
+        if (
+          syncChannelRef.current &&
+          revealNowBroadcastedForRef.current !== questionIndex
+        ) {
+          revealNowBroadcastedForRef.current = questionIndex;
+          syncChannelRef.current
+            .broadcastRevealNow({ question_index: questionIndex })
+            .catch(() => {});
+        }
         revealNow();
       }
     } else if (phase === 'awaiting') {
@@ -4045,6 +4068,11 @@ export default function QuizScreen() {
       //   på icke-DJ-enheter men DJ:ns phase är fortfarande 'question' →
       //   DJ ser timer börja om från början när de återvänder.
       if (spotifyDJOpenedAppRef.current && spotifyTimerStartAtRef.current > 0) {
+        // Redan avslöjad (t.ex. maybeRevealEarly/reveal_now fyrade medan DJ:n
+        // var i Spotify-appen) → ingen timer att synka. Utan denna guard
+        // startade else-grenen nedan om timern I reveal-fasen (setTimerActive
+        // + Animated.timing) så nedräkningen "rullade igen" efter DJ:ns retur.
+        if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
         const elapsedSec = (Date.now() - spotifyTimerStartAtRef.current) / 1000;
         if (elapsedSec >= responseSeconds) {
           // Timer har redan gått ut — sätt timeLeft=0 om vi fortfarande är i
@@ -5755,6 +5783,16 @@ export default function QuizScreen() {
         if (prev[playerId] !== undefined) return prev;
         return { ...prev, [playerId]: timeUsed };
       });
+    };
+    // Mottagare av reveal_now: en enhet som såg ALLA svarare bekräfta har bett
+    // oss avslöja. Vi kan ha missat enskilda confirms (t.ex. Spotify-DJ:n som
+    // var i Spotify-appen), så vi litar på aggregat-signalen — men bara för
+    // rätt fråga och bara medan vi fortfarande svarar (revealNow är annars en
+    // no-op via sin phase-guard).
+    revealNowHandlerRef.current = (qIndex: number) => {
+      if (qIndex !== questionIndexRef.current) return;
+      if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
+      revealNow();
     };
     // Mottagare av response_seconds_changed: host ändrade Answer response
     // time i GetReady mellan ronder. Non-host:s read-only-display + timer-
@@ -8474,6 +8512,7 @@ export default function QuizScreen() {
         playerLeftHandlerRef.current(payload.player_id, payload.player_name),
       onPlayerAnswerConfirmed: (payload) =>
         playerAnswerConfirmedHandlerRef.current(payload.player_id, payload.time_used),
+      onRevealNow: (payload) => revealNowHandlerRef.current(payload.question_index),
       onResponseSecondsChanged: (payload) =>
         responseSecondsChangedHandlerRef.current(payload.seconds),
       onPlayAgainInitiated: () => playAgainInitiatedHandlerRef.current(),
@@ -8583,6 +8622,15 @@ export default function QuizScreen() {
               }).catch(() => {});
             }, 500);
           }
+        }
+        // Host redan i reveal (alla svarade tidigt) + en peer/DJ just tillbaka
+        // → de kan ha missat den live reveal_now:en medan de var borta
+        // (Realtime replayar inte). Åter-sänd så de avslutar timern i stället
+        // för att rulla ut den.
+        if (isHost && syncChannelRef.current && phaseRef.current === 'reveal') {
+          syncChannelRef.current
+            .broadcastRevealNow({ question_index: questionIndexRef.current })
+            .catch(() => {});
         }
       },
       onHostRejoined: () => hostRejoinedHandlerRef.current(),

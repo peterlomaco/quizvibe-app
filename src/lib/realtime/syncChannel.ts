@@ -77,6 +77,23 @@ export interface PlayerAnswerConfirmedPayload {
   time_used: number;
 }
 
+/**
+ * Auktoritativ "avslöja nu"-signal: skickas av en enhet vars maybeRevealEarly
+ * har sett ALLA förväntade svarare bekräfta. Mottagare avslöjar direkt (om
+ * question_index matchar och de fortfarande är i question/awaiting), utan att
+ * själva behöva ha räknat ihop varje enskild `player_answer_confirmed`.
+ *
+ * Varför: Spotify-DJ:n måste lämna appen för att öppna Spotify, och Realtime
+ * replayar INTE broadcasts som missades medan enheten var bakgrundad. DJ:ns
+ * `playerConfirms` blir därför ofullständig → dess egen maybeRevealEarly kan
+ * aldrig fyra → timern rullar ut hela vägen medan alla andra redan avslöjat.
+ * Detta aggregat-event når DJ:n så snart den är i förgrunden igen.
+ */
+export interface RevealNowPayload {
+  /** Frågan avslöjandet gäller — mottagaren ignorerar stale signaler. */
+  question_index: number;
+}
+
 export interface ResponseSecondsChangedPayload {
   /** Host:s nya val. Speglar Lobby:s val-set (30/45/60). */
   seconds: 30 | 45 | 60;
@@ -408,6 +425,7 @@ export interface SyncChannelHandlers {
   onQuestionAdvance?: (payload: QuestionAdvancePayload) => void;
   onPlayerLeft?: (payload: PlayerLeftPayload) => void;
   onPlayerAnswerConfirmed?: (payload: PlayerAnswerConfirmedPayload) => void;
+  onRevealNow?: (payload: RevealNowPayload) => void;
   onResponseSecondsChanged?: (payload: ResponseSecondsChangedPayload) => void;
   /** Host tappade Play Again — non-host:s knapp ska aktiveras. */
   onPlayAgainInitiated?: (payload: PlayAgainInitiatedPayload) => void;
@@ -517,6 +535,7 @@ export interface SyncChannel {
   broadcastPlayerAnswerConfirmed: (
     payload: PlayerAnswerConfirmedPayload,
   ) => Promise<void>;
+  broadcastRevealNow: (payload: RevealNowPayload) => Promise<void>;
   broadcastResponseSecondsChanged: (
     payload: ResponseSecondsChangedPayload,
   ) => Promise<void>;
@@ -680,6 +699,10 @@ function vPlayerAnswerConfirmed(raw: unknown): PlayerAnswerConfirmedPayload | nu
   if (!isObj(raw) || !str(raw.player_id) || !num(raw.time_used)) return null;
   if (raw.time_used < 0 || raw.time_used > MAX_TIME_USED_SEC) return null;
   return { player_id: raw.player_id, time_used: raw.time_used };
+}
+function vRevealNow(raw: unknown): RevealNowPayload | null {
+  if (!isObj(raw) || !index(raw.question_index)) return null;
+  return { question_index: raw.question_index };
 }
 function vResponseSecondsChanged(raw: unknown): ResponseSecondsChangedPayload | null {
   if (!isObj(raw)) return null;
@@ -935,6 +958,7 @@ export function subscribeSyncChannel(
     onEvent('player_answer_confirmed', vPlayerAnswerConfirmed, (p) => {
       if (known(p.player_id, 'player_answer_confirmed')) handlers.onPlayerAnswerConfirmed!(p);
     });
+  if (handlers.onRevealNow) onEvent('reveal_now', vRevealNow, handlers.onRevealNow);
   if (handlers.onResponseSecondsChanged)
     onEvent('response_seconds_changed', vResponseSecondsChanged, handlers.onResponseSecondsChanged);
   if (handlers.onPlayAgainInitiated)
@@ -1094,6 +1118,9 @@ export function subscribeSyncChannel(
         event: 'player_answer_confirmed',
         payload,
       });
+    },
+    broadcastRevealNow: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'reveal_now', payload });
     },
     broadcastResponseSecondsChanged: async (payload) => {
       await channel.send({
