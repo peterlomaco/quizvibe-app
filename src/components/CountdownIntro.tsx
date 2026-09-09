@@ -21,7 +21,7 @@ import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
 interface Props {
   /** Anropas när nedräkningen passerat 1 → 0 OCH "?" har visats. */
   onComplete: () => void;
-  /** Sekunder att räkna ner från (default 5). */
+  /** Sekunder att räkna ner från (default 3). */
   startFrom?: number;
   /** Lägsta count-värde där rösten börjar prata (default 3).
    *  Visuellt visas siffror från startFrom ner, men rösten startar
@@ -155,7 +155,7 @@ function SideTag({
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, category = null, finalWord, silent = false, anchorT0, voice = DEFAULT_VOICE_ID }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, mediaSource, answerType = null, category = null, finalWord, silent = false, anchorT0, voice = DEFAULT_VOICE_ID }: Props) {
   // Remote 1v1 delar IndDev:s headline ("Get Ready to QuizVibe") — varje
   // spelare sitter på egen enhet, ingen specifik spelare att namnge.
   const isIndDev = mode === 'individual-devices' || mode === 'remote-1v1';
@@ -279,8 +279,8 @@ export function CountdownIntro({ onComplete, startFrom = 5, voiceFrom = 3, mode 
     // hörbar eftersläpning mot host. Med absolut ankare självkorrigerar varje
     // timer och ett sent steg påverkar inte nästa.
     //
-    // Det nominella schemat är OFÖRÄNDRAT (700 / 1880 / 2000 / … / 7200 /
-    // 8200 för startFrom=5) — bara driften försvinner. Blockeras tråden
+    // Det nominella schemat är OFÖRÄNDRAT (700 / 2000 / 3300 / 4600 / 5600
+    // för startFrom=3) — bara driften försvinner. Blockeras tråden
     // längre än en tick hinner flera steg fyra i samma frame och siffror
     // hoppar; det är korrekt för en deadline-ankrad nedräkning.
     // t0 = countdown-schemats nollpunkt. Normalt lokal mount-tid, men non-host

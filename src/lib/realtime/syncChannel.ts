@@ -40,13 +40,13 @@ export interface PlayCommandPayload {
   spotify_answer_year?: boolean;
   spotify_answer_name?: boolean;
   /** Wall-clock ms (Date.now()) för när host:s timer kommer att starta —
-   *  700ms initial paus + 5×1300ms tick + 1000ms ?-display + 2000ms timerActive-delay
-   *  = ~10200ms + 300ms marginal = ~10500ms efter broadcasten.
+   *  700ms initial paus + 3×1300ms tick + 1000ms ?-display + 2000ms timerActive-delay
+   *  = ~7600ms + 300ms marginal = ~7900ms efter broadcasten.
    *  Non-host använder detta för att återsynka sin timer korrekt om de vaknar
    *  upp från iOS-bakgrund under nedräknings- eller fråge-fasen. */
   timer_start_at?: number;
   /** DJ-spelarens player_id för denna Spotify-fråga. Skickas med play_command
-   *  (som ankommer vid countdown-start, ~10 s INNAN spelaren behöver trycka
+   *  (som ankommer vid countdown-start, ~8 s INNAN spelaren behöver trycka
    *  "Start track in Spotify") så non-host inte behöver vänta på det separata
    *  spotify_question_ready-broadcastet som ankommer senare. */
   dj_player_id?: string;

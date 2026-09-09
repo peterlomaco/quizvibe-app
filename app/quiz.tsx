@@ -3834,6 +3834,24 @@ export default function QuizScreen() {
     };
   }, [timerProgressAnim]);
 
+  // Avsluta svarstiden i FÖRTID: stoppar nedräkningen (interval + progress-bar)
+  // och går direkt till reveal. Anropas av maybeRevealEarly-effekten nedan när
+  // den sista förväntade svararen har bekräftat — i stället för att vänta ut
+  // timern. Guardad på phase så den aldrig rör en redan avslöjad/leaderboard-
+  // fas. Registrerar INGEN score: bekräftade spelare har redan poängsatts i sina
+  // confirm-handlers (latchat via hasRecordedScoreForCurrentQuestionRef) och
+  // Spotify-DJ:n poängsätts aldrig. Eftersom timer-intervallet rensas når
+  // timeLeft aldrig 0 → useEffect([timeLeft]) fyrar inte → ingen dubbelregistrering.
+  const revealNow = useCallback(() => {
+    if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    timerProgressAnim.stopAnimation();
+    setPhase('reveal');
+  }, [timerProgressAnim]);
+
   useEffect(() => {
     if (timeLeft !== 0) return;
     if (phase === 'awaiting') {
@@ -3900,6 +3918,42 @@ export default function QuizScreen() {
     // ändras aldrig mid-question (response_time gäller nästa fråga).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft]);
+
+  // Avslöja i FÖRTID när alla förväntade svarare har bekräftat — i stället för
+  // att vänta ut hela timern. Reveal-kortet, multiplayer-facitet ("All Players")
+  // och 5s-låset på Next/Final Leaderboard nycklar alla på phase, så att fyra
+  // 'reveal' tidigt drar fram allt automatiskt (revealNextCountdown-effekten
+  // startar på [phase, questionIndex]).
+  //
+  // IndDev: varje enhet tar emot alla peers `player_answer_confirmed` (egen
+  // confirm sätts lokalt i handleConfirm*), så detektionen körs oberoende per
+  // enhet. Missas en broadcast faller enheten tillbaka på timer-slut
+  // (useEffect([timeLeft])) — self-healing, host-authority bevaras (bara host
+  // kan advance:a). Single/PtP/remote-1v1: exakt en lokal svarare, och PtP
+  // broadcastar inte playerConfirms, så vi läser phase i stället — 'awaiting'
+  // betyder att den enda svararen bekräftat.
+  useEffect(() => {
+    if (phase !== 'question' && phase !== 'awaiting') return;
+    if (gameMode === 'individual-devices') {
+      // Förväntade svarare = turnOrder minus avhoppade minus DJ:n (som aldrig
+      // svarar på sin egen Spotify-fråga). Enumerera de förväntade id:na och slå
+      // upp dem i playerConfirms — räkna ALDRIG Object.keys(playerConfirms)
+      // (forge-skyddat, samma mönster som expectedPeerIds/start-gaten).
+      const expected = turnOrder
+        .map((p) => p.id)
+        .filter(
+          (id) => !!id && !leftPlayerIds.has(id) && !(isSpotifyQuestion && id === effectiveDJId),
+        );
+      if (expected.length > 0 && expected.every((id) => playerConfirms[id] !== undefined)) {
+        revealNow();
+      }
+    } else if (phase === 'awaiting') {
+      // Single player / Pass-the-Phone / remote-1v1: en svarare per fråga på
+      // denna enhet; 'awaiting' = den har bekräftat → avslöja direkt.
+      revealNow();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, playerConfirms, questionIndex, turnOrder, leftPlayerIds, isSpotifyQuestion, effectiveDJId, gameMode]);
 
   // Spegla Spotify DJ-state till refs så AppState-listener aldrig läser stale closures.
   useEffect(() => { spotifyDJOpenedAppRef.current = spotifyDJOpenedApp; }, [spotifyDJOpenedApp]);
@@ -5243,13 +5297,13 @@ export default function QuizScreen() {
   // Broadcast skickas efter samma fördröjning så host + non-host synkar.
   const handleHostStartFromGetReady = () => {
     // Beräkna exakt när non-host:s timer kommer att starta:
-    // countdown: 700 ms initial paus + 5 × 1300 ms tick (5→4→3→2→1→0) = 7200 ms
-    // när "?" VISAS, + 1000 ms "?"-display → onComplete vid **8200 ms**.
-    // Plus timerActive-delay 2000 ms = 10200 ms, +300 ms marginal → 10500 ms.
-    // ⚠ 7200 är när "?" dyker upp, INTE när nedräkningen är klar — den gamla
-    // kommentaren räknade 7200+2000=10200 och råkade landa rätt av fel skäl.
-    // Ändra inte 10500 utan att räkna om mot CountdownIntro:s offset-tabell.
-    const timerStartAt = Date.now() + 10500;
+    // countdown: 700 ms initial paus + 3 × 1300 ms tick (3→2→1→0) = 4600 ms
+    // när "?" VISAS, + 1000 ms "?"-display → onComplete vid **5600 ms**.
+    // Plus timerActive-delay 2000 ms = 7600 ms, +300 ms marginal → 7900 ms.
+    // ⚠ 4600 är när "?" dyker upp, INTE när nedräkningen är klar (5600 ms) —
+    // timern startar först efter "?"-hold + timerActive-delay.
+    // Ändra inte 7900 utan att räkna om mot CountdownIntro:s offset-tabell.
+    const timerStartAt = Date.now() + 7900;
     setPhase('countdown');
     if (gameMode === 'individual-devices' && syncChannelRef.current) {
       // Skicka IDENTISK payload tre gånger: direkt + 600 ms + 1800 ms.
@@ -9208,9 +9262,9 @@ export default function QuizScreen() {
         // MorseAmbientSound ovan för varför isHost inte hör hemma här.
         silent={isAudioMutedForSelf}
         // Non-host i IndDev ankrar nedräkningen mot host:s delade wall-clock
-        // (timer_start_at − 10500 = host:s egen CountdownIntro-t0 = dess Play-
+        // (timer_start_at − 7900 = host:s egen CountdownIntro-t0 = dess Play-
         // tap-ögonblick), så countdown/question/timer/media landar på samma
-        // moment som host oavsett broadcast-latens. 10500 är SAMMA konstant
+        // moment som host oavsett broadcast-latens. 7900 är SAMMA konstant
         // som host använder i handleHostStartFromGetReady (håll i synk).
         // hostTimerStartAtRef sätts synkront i play_command-handlern precis
         // före setPhase('countdown'), så den är redan populerad här. Host +
@@ -9219,7 +9273,7 @@ export default function QuizScreen() {
           !isHost &&
           gameMode === 'individual-devices' &&
           hostTimerStartAtRef.current > 0
-            ? hostTimerStartAtRef.current - 10500
+            ? hostTimerStartAtRef.current - 7900
             : undefined
         }
       />
