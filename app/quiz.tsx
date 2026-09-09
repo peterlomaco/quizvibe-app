@@ -2721,6 +2721,13 @@ export default function QuizScreen() {
   // Skiljs från hostTimerStartAtRef som även sätts av play_command —
   // detta är ENBART Spotify-timerns start-timestamp, aldrig play_command-tid.
   const spotifyTimerStartAtRef = useRef<number>(0);
+  // DJ:ns wall-clock-reveal: en one-shot setTimeout som avslöjar DJ:ns enhet
+  // vid Spotify-timerns exakta utgång UTAN en synlig rullande nedräkning. Se
+  // syncDjWallClockReveal. Nollställs per fråga + vid unmount.
+  const djRevealTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ref-brygga så subscription-handlern (registreras en gång) kan anropa den
+  // senaste render:ens syncDjWallClockReveal-closure.
+  const syncDjWallClockRevealRef = useRef<() => void>(() => {});
   // ── FUTURE VERSION 2 — Automated API Flow (archived refs) ────────────────────────
   // const wentToBackgroundRef = useRef(false);
   // const spotifyKeepAliveRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -3830,11 +3837,65 @@ export default function QuizScreen() {
     }, 1000);
   }, [questionIndex, timerProgressAnim, responseSeconds, isHost]);
 
+  // ── DJ:ns wall-clock-reveal (Peter 2026-09-09) ────────────────────────────
+  // Problemet: DJ:n måste lämna QuizVibe för att öppna/stoppa Spotify. Medan
+  // enheten är bakgrundad fryser iOS JS + Realtime-socketen kan dö, så
+  // reveal_now (som avslutar rundan när sista spelaren bekräftat) missas ofta.
+  // När DJ:n återvänder fyrar AppState/heartbeat och SÅG bara `phaseRef`, som
+  // fortfarande är 'question' i fönstret innan den missade reveal_now hunnit
+  // processas → den elapsed-kompenserade startTimer() rullade i gång
+  // nedräkningen IGEN, trots att alla redan svarat.
+  //
+  // Lösningen: DJ:n kör ALDRIG en synlig rullande nedräkning (startTimer-
+  // effekten skippar DJ:n). Timerns enda syfte på DJ:ns enhet är att avslöja
+  // vid utgång — det sköts av denna wall-clock-baserade one-shot i stället.
+  // Vid varje (åter)synk: har tiden gått ut → avslöja direkt (setTimeLeft(0)
+  // → useEffect([timeLeft])); annars frys baren på rätt återstående position
+  // och arma en timeout som avslöjar vid EXAKT utgång. Ingen rullande timer =
+  // den kan aldrig "rulla igen". Early-reveal (reveal_now) avslöjar som förr;
+  // timeout:en är bara self-heal-fallback för naturlig utgång.
+  // Styr ENBART reveal-TIMINGEN på DJ:ns enhet (fyllningens POSITION ägs av
+  // DJ-fill-effekten ovan, som speglar gissarnas confirms). DJ:n kör ingen
+  // rullande nedräkning; reveal kommer från reveal_now (early) eller denna
+  // wall-clock-timeout (naturlig utgång). Vid utgång → setTimeLeft(0) →
+  // useEffect([timeLeft]) → setPhase('reveal').
+  const syncDjWallClockReveal = useCallback(() => {
+    if (!(isSpotifyQuestion && isCurrentPlayerDJ)) return;
+    if (djRevealTimeoutRef.current) {
+      clearTimeout(djRevealTimeoutRef.current);
+      djRevealTimeoutRef.current = null;
+    }
+    // Redan avslöjad/vidare → inget att synka.
+    if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
+    if (spotifyTimerStartAtRef.current === 0) return;
+    // En eventuell (stale) rullande nedräkning nollas — DJ:n ska aldrig ha en.
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    const elapsedSec = (Date.now() - spotifyTimerStartAtRef.current) / 1000;
+    if (elapsedSec >= responseSeconds) {
+      setTimeLeft(0);
+      return;
+    }
+    const remaining = responseSeconds - elapsedSec;
+    setTimeLeft(Math.ceil(remaining));
+    djRevealTimeoutRef.current = setTimeout(() => {
+      djRevealTimeoutRef.current = null;
+      if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
+        setTimeLeft(0);
+      }
+    }, remaining * 1000);
+  }, [isSpotifyQuestion, isCurrentPlayerDJ, responseSeconds]);
+  // Håll ref-bryggan färsk så subscription-handlern (registreras en gång) alltid
+  // anropar den senaste closuren.
+  useEffect(() => {
+    syncDjWallClockRevealRef.current = syncDjWallClockReveal;
+  }, [syncDjWallClockReveal]);
+
   // Unmount-cleanup så timern inte läcker om component unmounts (t.ex.
   // Quit Game mid-question). Lever utanför phase-baserade effects.
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (djRevealTimeoutRef.current) clearTimeout(djRevealTimeoutRef.current);
       timerProgressAnim.stopAnimation();
     };
   }, [timerProgressAnim]);
@@ -3847,6 +3908,43 @@ export default function QuizScreen() {
   // confirm-handlers (latchat via hasRecordedScoreForCurrentQuestionRef) och
   // Spotify-DJ:n poängsätts aldrig. Eftersom timer-intervallet rensas når
   // timeLeft aldrig 0 → useEffect([timeLeft]) fyrar inte → ingen dubbelregistrering.
+  // Progress-position (0–1) för den SISTA bekräftande spelarens avatar — dvs.
+  // den vänstraste bekräftade markören på timer-baren (störst `used` = minst
+  // återstående). Används för att FRYSA fyllningen exakt där sista avataren
+  // sitter när rundan tar slut, i stället för vid animationens (överskjutande)
+  // ögonblicksposition. IndDev: max `used` bland bekräftade gissare (DJ:n
+  // exkluderad). PtP/single: den lokala confirm-markören. null = ingen har
+  // bekräftat än. (Peter 2026-09-09.)
+  const computeLastConfirmedProgress = useCallback((): number | null => {
+    if (gameMode !== 'individual-devices') {
+      if (confirmedTimeUsed !== null) {
+        return Math.max(0, Math.min(1, (responseSeconds - confirmedTimeUsed) / responseSeconds));
+      }
+      return null;
+    }
+    const usedTimes = turnOrder
+      .filter((p) => !leftPlayerIds.has(p.id) && !(isSpotifyQuestion && p.id === effectiveDJId))
+      .map((p) => playerConfirms[p.id])
+      .filter((u): u is number => typeof u === 'number');
+    if (usedTimes.length === 0) return null;
+    const maxUsed = Math.max(...usedTimes);
+    return Math.max(0, Math.min(1, (responseSeconds - maxUsed) / responseSeconds));
+  }, [
+    gameMode,
+    confirmedTimeUsed,
+    responseSeconds,
+    turnOrder,
+    leftPlayerIds,
+    isSpotifyQuestion,
+    effectiveDJId,
+    playerConfirms,
+  ]);
+  // Render-assignerad ref-spegel (samma mönster som phaseRef) så revealNow —
+  // som anropas synkront mitt i en state-cascade — alltid läser den FÄRSKA
+  // beräkningen, aldrig en fryst closure.
+  const computeLastConfirmedProgressRef = useRef(computeLastConfirmedProgress);
+  computeLastConfirmedProgressRef.current = computeLastConfirmedProgress;
+
   const revealNow = useCallback(() => {
     if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
     if (timerRef.current) {
@@ -3854,6 +3952,13 @@ export default function QuizScreen() {
       timerRef.current = null;
     }
     timerProgressAnim.stopAnimation();
+    // Frys fyllningen EXAKT vid sista bekräftade avataren i stället för vid
+    // animationens ögonblicksposition (som ligger några frames/latens förbi
+    // den → "fylld färg ovanför avataren"). Faller tillbaka på nuvarande
+    // position om ingen bekräftat (bör inte hända när reveal triggas av
+    // all-confirmed).
+    const freeze = computeLastConfirmedProgressRef.current();
+    if (freeze !== null) timerProgressAnim.setValue(freeze);
     setPhase('reveal');
   }, [timerProgressAnim]);
 
@@ -3983,6 +4088,28 @@ export default function QuizScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, playerConfirms, questionIndex, turnOrder, leftPlayerIds, isSpotifyQuestion, effectiveDJId, gameMode]);
 
+  // DJ:ns timer-fyllning speglar gissarnas confirms (Peter 2026-09-09).
+  // DJ:n kör ingen egen nedräkning (startTimer-effekten skippar DJ:n), så utan
+  // detta satt fyllningen kvar på FULL (frusen vid track-start) och "sköt över"
+  // förbi gissarnas avatarer. Här sätts fyllningen i stället till den
+  // vänstraste bekräftade avataren (störst `used`), eller full om ingen
+  // bekräftat än — så baren alltid stannar exakt vid sista spelarens avatar.
+  // Vid reveal returnerar effekten tidigt → fyllningen fryses där den står.
+  useEffect(() => {
+    if (!(isSpotifyQuestion && isCurrentPlayerDJ)) return;
+    if (phase !== 'question' && phase !== 'awaiting') return;
+    const p = computeLastConfirmedProgress();
+    timerProgressAnim.stopAnimation();
+    timerProgressAnim.setValue(p !== null ? p : 1);
+  }, [
+    isSpotifyQuestion,
+    isCurrentPlayerDJ,
+    phase,
+    playerConfirms,
+    computeLastConfirmedProgress,
+    timerProgressAnim,
+  ]);
+
   // Spegla Spotify DJ-state till refs så AppState-listener aldrig läser stale closures.
   useEffect(() => { spotifyDJOpenedAppRef.current = spotifyDJOpenedApp; }, [spotifyDJOpenedApp]);
   useEffect(() => { spotifyDJStartedRef.current = spotifyDJStarted; }, [spotifyDJStarted]);
@@ -4072,40 +4199,14 @@ export default function QuizScreen() {
       //   på icke-DJ-enheter men DJ:ns phase är fortfarande 'question' →
       //   DJ ser timer börja om från början när de återvänder.
       if (spotifyDJOpenedAppRef.current && spotifyTimerStartAtRef.current > 0) {
-        // Redan avslöjad (t.ex. maybeRevealEarly/reveal_now fyrade medan DJ:n
-        // var i Spotify-appen) → ingen timer att synka. Utan denna guard
-        // startade else-grenen nedan om timern I reveal-fasen (setTimerActive
-        // + Animated.timing) så nedräkningen "rullade igen" efter DJ:ns retur.
-        if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
-        const elapsedSec = (Date.now() - spotifyTimerStartAtRef.current) / 1000;
-        if (elapsedSec >= responseSeconds) {
-          // Timer har redan gått ut — sätt timeLeft=0 om vi fortfarande är i
-          // question/awaiting. timeLeft-useEffect:n sköter setPhase('reveal')
-          // inkl. score-registrering för timeout-fallet.
-          if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
-            if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-            timerProgressAnim.stopAnimation();
-            timerProgressAnim.setValue(0);
-            setTimeLeft(0);
-          }
-          // phase='reveal' eller senare → ingenting att göra.
-        } else {
-          // Timer tickar fortfarande — synka position.
-          const remaining: number = responseSeconds - elapsedSec;
-          timerProgressAnim.stopAnimation();
-          timerProgressAnim.setValue(remaining / responseSeconds);
-          Animated.timing(timerProgressAnim, {
-            toValue: 0,
-            duration: remaining * 1000,
-            easing: Easing.linear,
-            useNativeDriver: false,
-          }).start();
-          setTimeLeft(Math.ceil(remaining));
-          // setTimerActive(true) triggar startTimer()-useEffect:n som
-          // kompenserar elapsed via hostTimerStartAtRef → idempotent.
-          // Om timerActive redan är true blir det en React no-op.
-          setTimerActive(true);
-        }
+        // DJ:n återvänder från Spotify. Synka mot wall-clock UTAN att starta en
+        // rullande nedräkning (se syncDjWallClockReveal): tiden ute → avslöja,
+        // annars frys baren + arma reveal vid exakt utgång. Detta ersätter den
+        // tidigare else-grenen som startade om timern (setTimerActive +
+        // Animated.timing) och fick nedräkningen att "rulla igen" efter retur
+        // när sista spelaren redan bekräftat men reveal_now missats. (Peter
+        // 2026-09-09.)
+        syncDjWallClockRevealRef.current();
         return;
       }
 
@@ -4148,23 +4249,11 @@ export default function QuizScreen() {
   // — vilket garanterat sker EFTER spotifyTimerStartAtRef satts synkront i
   // broadcasthanteraren. Fungerar som fallback för första återkomsten;
   // andra och efterföljande återkomster hanteras av AppState-path:en ovan.
+  // Synkar mot wall-clock (frys/avslöja) — startar ALDRIG en rullande timer.
   useEffect(() => {
     if (!spotifyDJStarted || !spotifyDJOpenedApp) return;
-    if (spotifyTimerStartAtRef.current === 0) return;
-    if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
-    const elapsedSec = (Date.now() - spotifyTimerStartAtRef.current) / 1000;
-    if (elapsedSec >= responseSeconds) {
-      // Timer gick ut medan DJ var i Spotify-appen.
-      if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-      timerProgressAnim.stopAnimation();
-      timerProgressAnim.setValue(0);
-      setTimeLeft(0);
-    } else {
-      // Timer tickar fortfarande — setTimerActive(true) triggar startTimer()
-      // som kompenserar elapsed via hostTimerStartAtRef.
-      setTimerActive(true);
-    }
-  }, [spotifyDJStarted, spotifyDJOpenedApp, responseSeconds, timerProgressAnim]);
+    syncDjWallClockReveal();
+  }, [spotifyDJStarted, spotifyDJOpenedApp, syncDjWallClockReveal]);
 
   // Registrera score:n för en avslutad fråga. I Pass-the-Phone (eller när
   // turnOrder är satt) skapar vi en post för ENDAST den aktiva spelaren —
@@ -4287,6 +4376,12 @@ export default function QuizScreen() {
     // phase-byte; intervallet self-clearas när timeLeft hits 0 (eller via
     // unmount-cleanup ovan).
     if (!timerActive) return;
+    // Spotify-DJ:n kör ALDRIG en synlig rullande nedräkning — DJ:n svarar inte
+    // (canConfirm=false). Reveal på DJ:ns enhet sköts av syncDjWallClockReveal
+    // (reveal_now för early-reveal + wall-clock-timeout för naturlig utgång).
+    // Utan denna skip startade AppState/heartbeat om nedräkningen ("rullade
+    // igen") efter att sista spelaren bekräftat. (Peter 2026-09-09.)
+    if (isSpotifyQuestion && isCurrentPlayerDJ) return;
     // Normalt: startar bara i 'question'. Spotify-undantag: om non-host
     // confirmat (phase='awaiting') INNAN DJ aktiverat, startar timern när
     // timerActive sätts true av onSpotifyDJTrackStarted-handleren.
@@ -4298,7 +4393,7 @@ export default function QuizScreen() {
     // (non-host confirmat INNAN DJ aktiverat trackingen).
     if (phase === 'awaiting' && timerRef.current !== null) return;
     startTimer();
-  }, [questionIndex, phase, timerActive, isSpotifyQuestion]);
+  }, [questionIndex, phase, timerActive, isSpotifyQuestion, isCurrentPlayerDJ]);
 
   // ── Spotify DJ timeout ──────────────────────────────────────────────────
   // Ref till handleAdvanceToNextRound för att undvika stale closure i
@@ -4634,6 +4729,10 @@ export default function QuizScreen() {
       youtubeErrorTimerRef.current = null;
     }
     // Spotify: nollställ DJ-state + timeout per fråga.
+    if (djRevealTimeoutRef.current) {
+      clearTimeout(djRevealTimeoutRef.current);
+      djRevealTimeoutRef.current = null;
+    }
     setSpotifyDJOpenedApp(false);
     setSpotifyDJOpenedAppBroadcast(false);
     setSpotifyDJStarted(false);
@@ -5292,8 +5391,14 @@ export default function QuizScreen() {
       // Realtime replayar aldrig, så en enda tappad frame lämnade host
       // permanent frusen i reveal. Handovern är idempotent hos mottagaren.
       const djId = currentDJPlayer?.id ?? effectiveDJId ?? selfPlayerId ?? '';
+      // question_index så en sen re-broadcast av DENNA frågas handover inte
+      // sätter djHandedOver på NÄSTA fråga (frozen closure vid sändning — läs
+      // ref:en så alla tre sändningarna bär rätt index).
+      const qIdx = questionIndexRef.current;
       const send = () => {
-        syncChannelRef.current?.broadcastSpotifyDJHandover({ dj_player_id: djId }).catch(() => {});
+        syncChannelRef.current
+          ?.broadcastSpotifyDJHandover({ dj_player_id: djId, question_index: qIdx })
+          .catch(() => {});
       };
       send();
       djHandoverRetryTimersRef.current.forEach(clearTimeout);
@@ -8693,14 +8798,27 @@ export default function QuizScreen() {
           // för att skilja Spotify-timern från play_command-tidens stämpel.
           spotifyTimerStartAtRef.current = payload.timer_start_at;
         }
-        // Starta timer för non-host oavsett om de redan confirmat (awaiting)
-        // eller inte hunnit (question). Utan 'awaiting'-grenen fastnar non-host
-        // som confirmat INNAN DJ aktiverat för alltid i awaiting-fasen.
+        // DJ:ns EGEN enhet (spotifyDJOpenedAppRef=true): kör ALDRIG en rullande
+        // nedräkning — synka mot wall-clock (frys baren / avslöja vid utgång).
+        // Så kan heartbeat-re-broadcasten inte starta om timern efter att
+        // rundan är över. (Peter 2026-09-09.)
+        if (spotifyDJOpenedAppRef.current) {
+          syncDjWallClockRevealRef.current();
+          return;
+        }
+        // Gissarnas enheter: starta timern oavsett om de redan confirmat
+        // (awaiting) eller inte hunnit (question). Utan 'awaiting'-grenen
+        // fastnar non-host som confirmat INNAN DJ aktiverat för alltid i
+        // awaiting-fasen.
         if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
           setTimeout(() => setTimerActive(true), 2000);
         }
       },
-      onSpotifyDJHandover: () => {
+      onSpotifyDJHandover: (payload) => {
+        // Ignorera stale handover från en tidigare fråga (3× re-broadcast kan
+        // anlända efter frågebyte) — annars dyker Next-/End-DJ-knappen upp
+        // innan DJ:n bekräftat stoppet på den nya frågan.
+        if (payload.question_index !== questionIndexRef.current) return;
         setDjHandedOver(true);
       },
       onPlayerScoreRecorded: (payload) => playerScoreRecordedHandlerRef.current(payload),
@@ -10054,7 +10172,11 @@ export default function QuizScreen() {
                         <SpotifyBrandIcon size={28} variant="white" />
                         <Text style={styles.spotifyDJLabel}>You are the DJ</Text>
                       </View>
-                      <View style={styles.spotifyGuideSection}>
+                      <ScrollView
+                        style={styles.spotifyGuideScroll}
+                        contentContainerStyle={styles.spotifyGuideSection}
+                        showsVerticalScrollIndicator
+                      >
                         {SPOTIFY_DJ_STEPS.map((step, i) => {
                           const isDone = i < djStep;
                           const isActive = i === djStep;
@@ -10069,7 +10191,7 @@ export default function QuizScreen() {
                             </View>
                           );
                         })}
-                      </View>
+                      </ScrollView>
                     </View>
                   );
                 })()
@@ -10108,7 +10230,11 @@ export default function QuizScreen() {
                       : phase !== 'reveal' ? 2
                       : 3;
                     return (
-                      <View style={styles.spotifyGuideSection}>
+                      <ScrollView
+                        style={styles.spotifyGuideScrollCompact}
+                        contentContainerStyle={styles.spotifyGuideSection}
+                        showsVerticalScrollIndicator
+                      >
                         {SPOTIFY_NON_DJ_STEPS.map((step, i) => {
                           const isDone = i < activeStep;
                           const isActive = i === activeStep;
@@ -10123,7 +10249,7 @@ export default function QuizScreen() {
                             </View>
                           );
                         })}
-                      </View>
+                      </ScrollView>
                     );
                   })()}
                 </View>
@@ -11748,6 +11874,21 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   // ── Spotify steg-guide (DJ + gissare) ────────────────────────────────
+  // Steg-listan ligger i en ScrollView så det AKTIVA steget kan förstoras
+  // (spotifyGuideTextActive nedan) utan att de övriga stegen trycks utanför
+  // mediakortet — överflödet scrollar i stället. maxHeight håller kortet nära
+  // sin naturliga QUIZ_MEDIA_H: DJ-kortet reserverar bara ikon-raden, medan
+  // Q-logo-kortet (gissare + host) dessutom har QuizVibeLogo:n ovanför.
+  spotifyGuideScroll: {
+    alignSelf: 'stretch',
+    flexShrink: 1,
+    maxHeight: Math.max(140, QUIZ_MEDIA_H - 56),
+  },
+  spotifyGuideScrollCompact: {
+    alignSelf: 'stretch',
+    flexShrink: 1,
+    maxHeight: Math.max(100, QUIZ_MEDIA_H - 150),
+  },
   spotifyGuideSection: {
     width: '100%',
     paddingHorizontal: Spacing.lg,
@@ -11789,9 +11930,14 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.35)',
     flex: 1,
   },
+  // Det aktuella steget förstoras rejält (11 → 17) så DJ:n/spelaren snabbt
+  // kan läsa vad de ska göra just nu med en blick. De övriga stegen står
+  // kvar på FontSize.xs; överflödet scrollar (spotifyGuideScroll ovan).
   spotifyGuideTextActive: {
     color: '#FFFFFF',
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.bold,
+    fontSize: FontSize.lg,
+    lineHeight: 22,
   },
   spotifyGuideTextDone: {
     color: 'rgba(29,185,84,0.6)',

@@ -222,6 +222,13 @@ export interface SpotifyDJOpenedAppPayload {
 export interface SpotifyDJHandoverPayload {
   /** DJ:ns lobby_players.player_id. */
   dj_player_id: string;
+  /**
+   * Frågan handovern gäller. Handovern skickas 3× (retry mot tappade frames),
+   * så en sen re-broadcast från FÖRRA frågan kunde annars sätta djHandedOver på
+   * NÄSTA fråga → Next-/End-DJ-knappen dök upp innan DJ:n bekräftat stoppet.
+   * Mottagaren ignorerar stale signaler (samma mönster som reveal_now).
+   */
+  question_index: number;
 }
 
 /**
@@ -768,8 +775,8 @@ function vSpotifyDJTrackStarted(raw: unknown): SpotifyDJTrackStartedPayload | nu
   };
 }
 function vSpotifyDJHandover(raw: unknown): SpotifyDJHandoverPayload | null {
-  if (!isObj(raw) || !str(raw.dj_player_id)) return null;
-  return { dj_player_id: raw.dj_player_id };
+  if (!isObj(raw) || !str(raw.dj_player_id) || !index(raw.question_index)) return null;
+  return { dj_player_id: raw.dj_player_id, question_index: raw.question_index };
 }
 function vPlayerAudioStateChanged(raw: unknown): PlayerAudioStateChangedPayload | null {
   if (!isObj(raw) || !str(raw.player_id) || typeof raw.audio_on !== 'boolean') return null;
