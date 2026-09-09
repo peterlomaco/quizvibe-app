@@ -11,6 +11,7 @@ import { Colors } from '@/src/theme';
 import { refreshOfferConfig, refreshPromoGrants } from '@/src/utils/promoPremium';
 import { clearPremiumSubscription, refreshPremiumMirror, setPremiumActive } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
+import { ensureVoiceAudioMode } from '@/src/utils/voicePlayback';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -30,6 +31,13 @@ export default function RootLayout() {
   // tystnar Premium-features i appen utan att kräva manual refresh.
   useEffect(() => {
     let cancelled = false;
+
+    // Sätt iOS-audio-sessionen till mixWithOthers REDAN vid app-start, innan
+    // någon WebView/ljud laddats (ambient-ljudet startar så tidigt som i
+    // Lobbyn). Utan detta håller appen iOS default-sessionen (non-mixing), och
+    // när host-DJ:n växlar tillbaka från Spotify återaktiverar iOS vår session
+    // vid foreground → Spotify-spåret pausas. Fire-and-forget; no-op i Expo Go.
+    void ensureVoiceAudioMode(true);
 
     // Free Premium-kampanjens av/på-läge bor i Supabase (app_config) så den
     // kan stängas utan App Store-release. Fire-and-forget: misslyckas

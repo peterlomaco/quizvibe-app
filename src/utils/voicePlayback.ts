@@ -17,12 +17,21 @@ import { resolveVoicePack, type VoiceToken } from './voicePacks';
 let audioModeConfigured = false;
 
 /**
- * Sätter audio-mode EN gång: `playsInSilentMode` (paritet med expo-speech, som
- * hörs oavsett ringläge) + `interruptionMode: 'mixWithOthers'` så Morse-ambient
- * / YouTube-WebView-ljudet inte avbryts. Idempotent; retry:ar om det failar.
+ * Sätter app-ens iOS-audio-mode: `playsInSilentMode` (paritet med expo-speech,
+ * som hörs oavsett ringläge) + `interruptionMode: 'mixWithOthers'` så QuizVibes
+ * eget ljud (Morse-ambient- / countdown- / YouTube-WebView-ljud) MIXAR med annat
+ * ljud i stället för att avbryta det. Det är detta som håller en Spotify-DJ:s
+ * spår igång när host växlar Spotify → QuizVibe: utan mixWithOthers återaktiverar
+ * iOS vår non-mixing-session vid foreground och pausar Spotify.
+ *
+ * Anropas dels vid app-start (global default innan någon WebView/ljud laddats),
+ * dels lazy från voice-clip-uppspelning nedan. Guardad så den bara sätts en gång
+ * — men `force: true` kringgår guarden och åter-sätter läget (behövs precis före
+ * en Spotify-handoff, ifall WebKit/expo-speech hunnit flippa sessionen till en
+ * non-mixing-kategori efter första anropet). Idempotent; retry:ar om det failar.
  */
-export async function ensureVoiceAudioMode(): Promise<void> {
-  if (audioModeConfigured) return;
+export async function ensureVoiceAudioMode(force = false): Promise<void> {
+  if (audioModeConfigured && !force) return;
   audioModeConfigured = true;
   try {
     await setAudioModeAsync({

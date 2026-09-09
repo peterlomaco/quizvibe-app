@@ -102,6 +102,7 @@ import {
   type DJRotationPlan,
   type SpotifyDJPlayer,
 } from '@/src/utils/spotifyDJ';
+import { ensureVoiceAudioMode } from '@/src/utils/voicePlayback';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';
 import { getSpotifyArtistMeta, type SpotifyArtistMeta } from '@/src/utils/spotifyArtistMeta';
@@ -5134,6 +5135,12 @@ export default function QuizScreen() {
    */
   const handleStartSpotifyTrack = async () => {
     if (!currentSpotifyTrackId || spotifyDJOpenedApp) return;
+    // Åter-sätt iOS-audio-sessionen till mixWithOthers PRECIS innan vi lämnar
+    // över till Spotify. Intro/countdown-ljudet (MorseAmbient-WebView + TTS)
+    // kan ha lämnat sessionen i en non-mixing-kategori; utan detta pausar iOS
+    // Spotify-spåret när host växlar tillbaka hit (foreground återaktiverar vår
+    // session). force:true kringgår voicePlaybacks engångs-guard. Best-effort.
+    await ensureVoiceAudioMode(true);
     const ok = await openSpotifyTrack(currentSpotifyTrackId);
     if (ok) {
       setSpotifyDJOpenedApp(true);
