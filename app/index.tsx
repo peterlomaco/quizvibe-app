@@ -371,6 +371,28 @@ async function checkRematchLockedLobby(
   return true;
 }
 
+// Spelläge som visas på Waiting Invites-kortet (Peter 2026-09-09). Härleds ur
+// rums-metadatan i stället för att lagras på inviten: isRemote1v1 (H2H) ligger
+// atomiskt på rooms-raden (0031), medan single vs multiplayer läses ur den
+// levande toggeln lobby_settings.single_player_default. Fail till 'multiplayer'
+// när settings-raden ännu inte skrivits (host:s 300 ms-debounce) — samma
+// antagande som join-gatarna gör.
+type InviteGameMode = 'single' | 'multiplayer' | 'h2h';
+
+const INVITE_GAME_MODE_LABEL: Record<InviteGameMode, string> = {
+  single: 'Single Player',
+  multiplayer: 'Multiplayer',
+  h2h: 'H2H',
+};
+
+async function resolveInviteGameMode(code: string): Promise<InviteGameMode> {
+  const meta = await getRoomMeta(code);
+  if (meta?.isRemote1v1) return 'h2h';
+  const settings = await getLobbySettings(code);
+  if (settings?.singlePlayerDefault) return 'single';
+  return 'multiplayer';
+}
+
 function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'multiplayer', onRemoteAccountRequired, initialGuestDraft, hasNewInvite = false, onInvitesSeen }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   const [code, setCode] = useState('');
@@ -380,6 +402,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [playerNameStatus, setPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [invites, setInvites] = useState<WaitingInvite[]>([]);
+  // Härlett spelläge per rumkod (single/multiplayer/H2H) för badgen i övre
+  // högra hörnet på varje invite-kort. Resolvas asynkront ur rums-metadatan
+  // när listan laddas; saknad nyckel = ännu ej resolvad → ingen badge.
+  const [inviteGameModes, setInviteGameModes] = useState<Record<string, InviteGameMode>>({});
   // True medan ett accept-flöde pågår (removeInvite → navigera → stäng modal).
   // removeInvite triggar en realtime DELETE → reload, som annars skulle
   // setInvites([]) och blanka den fortfarande öppna modalen till "No invites
@@ -535,8 +561,33 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     if (visible) {
       acceptInFlightRef.current = false;
       loadInvites().then(setInvites);
+    } else {
+      // Töm spelläge-cachen vid stängning så nästa open resolvar färskt ur
+      // rums-metadatan (host kan ha växlat single↔multiplayer emellan).
+      setInviteGameModes({});
     }
   }, [visible]);
+
+  // Resolva spelläget per invite (single/multiplayer/H2H) för kort-badgen.
+  // Körs när invite-listan ändras; hoppar över koder som redan resolvats så
+  // en realtime-reload inte trigga:ar onödiga DB-queries. cancelled-flaggan
+  // skyddar mot setState efter unmount/reopen.
+  useEffect(() => {
+    if (!visible) return;
+    let cancelled = false;
+    const pending = invites.filter((inv) => inviteGameModes[inv.roomCode] === undefined);
+    if (pending.length === 0) return;
+    pending.forEach((inv) => {
+      resolveInviteGameMode(inv.roomCode).then((mode) => {
+        if (!cancelled) {
+          setInviteGameModes((prev) => ({ ...prev, [inv.roomCode]: mode }));
+        }
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [visible, invites, inviteGameModes]);
 
   // Släck "New update"-märket så snart användaren öppnar Waiting Invites-
   // listan (samma "sett vid visning"-semantik som Marathon/H2H). onInvitesSeen
@@ -1237,8 +1288,20 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   </Text>
                 </View>
               ) : (
-                invites.map((inv) => (
+                invites.map((inv) => {
+                  const gameMode = inviteGameModes[inv.roomCode];
+                  return (
                   <View key={inv.id} style={modal.inviteRow}>
+                    {/* Spelläge-badge i övre högra hörnet (Peter 2026-09-09):
+                        Single Player / Multiplayer / H2H. Renderas först när
+                        läget resolvats ur rums-metadatan. */}
+                    {gameMode !== undefined && (
+                      <View style={modal.inviteGameModeBadge}>
+                        <Text style={modal.inviteGameModeText}>
+                          {INVITE_GAME_MODE_LABEL[gameMode]}
+                        </Text>
+                      </View>
+                    )}
                     {/* Emoji + info på övre raden; Deny/Accept flyttade till egen
                         rad längst ned (Peter 2026-09-02) så hela bredden är fri
                         för PlayerName-raderna. */}
@@ -1287,7 +1350,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       </TouchableOpacity>
                     </View>
                   </View>
-                ))
+                  );
+                })
               )}
             </>
           )}
@@ -5225,11 +5289,34 @@ const modal = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
   },
-  // Övre raden i invite-kortet: avatar-emoji + info-kolumn.
+  // Övre raden i invite-kortet: avatar-emoji + info-kolumn. paddingRight
+  // reserverar plats åt spelläge-badgen i övre högra hörnet så namn-/kod-
+  // raderna aldrig löper in under den.
   inviteMain: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
+    paddingRight: 88,
+  },
+  // Spelläge-badge (Single Player / Multiplayer / H2H) i kortets övre högra
+  // hörn. Info-pill-vokabulär: primaryMuted bg + primary-kant + primary text.
+  inviteGameModeBadge: {
+    position: 'absolute',
+    top: Spacing.md,
+    right: Spacing.lg,
+    zIndex: 1,
+    backgroundColor: Colors.primaryMuted,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+    borderRadius: Radius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  inviteGameModeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.primary,
+    letterSpacing: 0.3,
   },
   // Tidsstämpel ovanför PlayerName — när inbjudan skickades.
   inviteTimestamp: {
