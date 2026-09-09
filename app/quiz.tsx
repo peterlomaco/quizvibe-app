@@ -2703,6 +2703,10 @@ export default function QuizScreen() {
   const [djForceQuitCountdown, setDjForceQuitCountdown] = useState(0);
   // DJ har tryckt × på overlay → aktiverar steg 5 i guiden (utan att låsa upp host:s Next ännu).
   const [djDismissedOverlay, setDjDismissedOverlay] = useState(false);
+  // Reveal-fasens DJ-stopp-flöde (Peter): 'idle' = enda knappen "Track has been
+  // stopped in Spotify"; tap → Yes/No-Alert. Yes → dismiss (Next/handover). No →
+  // 'openSpotify' = visa "Open Spotify" + Cancel; Cancel → tillbaka till 'idle'.
+  const [djStopConfirmStep, setDjStopConfirmStep] = useState<'idle' | 'openSpotify'>('idle');
   // ── FUTURE VERSION 2 — Automated API Flow (archived states) ─────────────────────
   // const [showNowPlayingOverlay, setShowNowPlayingOverlay] = useState(false);
   // const [nowPlayingTrackInfo, setNowPlayingTrackInfo] = useState<SpotifyTrackInfo | null>(null);
@@ -4636,6 +4640,7 @@ export default function QuizScreen() {
     setDjHandedOver(false);
     setDjHandoverStuck(false);
     setDjDismissedOverlay(false);
+    setDjStopConfirmStep('idle');
     setSpotifyWaitPhase(null);
     setSpotifyTimeoutSeconds(60);
     // Nollställ broadcastDJPlayerId så föregående frågas DJ-tilldelning
@@ -5274,11 +5279,19 @@ export default function QuizScreen() {
   // DJ:n överlämnar till host i reveal-fasen — låser upp host:s Next-knapp.
   const handleDJHandover = () => {
     setDjHandedOver(true);
-    if (gameMode === 'individual-devices' && syncChannelRef.current && currentDJPlayer) {
+    // ⚠ Broadcasta ALLTID — gate:a INTE på currentDJPlayer. På en non-host-DJ är
+    // det lokala djRotationPlan baserat på fel shuffle, så getDJForQuestionIndex
+    // returnerar null för host:s frågeindex → currentDJPlayer=null. Med den gamla
+    // `&& currentDJPlayer`-gaten satte handovern bara den LOKALA djHandedOver-
+    // flaggan och skickade INGET → host fastnade i "Waiting for DJ to end" och
+    // non-host i "Waiting for host" (deadlock). Host:s onSpotifyDJHandover
+    // ignorerar dj_player_id, så ett fallback-id (effectiveDJId = broadcast-DJ:n
+    // på non-host, selfPlayerId som sista utväg) räcker gott.
+    if (gameMode === 'individual-devices' && syncChannelRef.current) {
       // A1-fix: skicka handovern 3× (direkt / +600 / +1800 ms). Supabase
       // Realtime replayar aldrig, så en enda tappad frame lämnade host
       // permanent frusen i reveal. Handovern är idempotent hos mottagaren.
-      const djId = currentDJPlayer.id;
+      const djId = currentDJPlayer?.id ?? effectiveDJId ?? selfPlayerId ?? '';
       const send = () => {
         syncChannelRef.current?.broadcastSpotifyDJHandover({ dj_player_id: djId }).catch(() => {});
       };
@@ -10441,33 +10454,61 @@ export default function QuizScreen() {
             {question.type === 'timeline' && isCurrentPlayerDJ && (phase === 'question' || phase === 'awaiting' || (phase === 'reveal' && !djDismissedOverlay)) && (
               <View style={[styles.spotifyDJScrollZone, phase === 'reveal' && { paddingTop: Spacing.xl }]}>
                 {phase === 'reveal' ? (
-                  // Reveal-fas för DJ: Open Spotify (fortsätt uppspelning) + OR + bekräfta stopp
-                  <>
-                    <Animated.View style={nextTabPulseStyle}>
-                      <Pressable
-                        style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
-                        onPress={() => openSpotifyApp()}
-                      >
-                        <SpotifyBrandIcon size={20} variant="white" />
-                        <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
-                      </Pressable>
-                    </Animated.View>
-                    <Text style={styles.djOrSeparatorText}>OR</Text>
-                    <Animated.View style={nextTabPulseStyle}>
+                  // Reveal-fas för DJ (Peter 2026-09-09): ETT steg i taget.
+                  //  'idle' → enda knappen "Track has been stopped in Spotify".
+                  //     Tap → Yes/No-Alert. Yes → dismiss:a overlay:n (host får
+                  //     Next direkt via handleDJHandover, non-host får "End DJ —
+                  //     handover to Host" via revealNextAbsolute). No → 'openSpotify'.
+                  //  'openSpotify' → "Open Spotify" (fortsätt uppspelning) + Cancel
+                  //     under. Cancel → tillbaka till 'idle'.
+                  djStopConfirmStep === 'openSpotify' ? (
+                    <>
+                      <Animated.View style={nextTabPulseStyle}>
+                        <Pressable
+                          style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
+                          onPress={() => openSpotifyApp()}
+                        >
+                          <SpotifyBrandIcon size={20} variant="white" />
+                          <Text style={styles.spotifyDJActionBtnText}>Open Spotify</Text>
+                        </Pressable>
+                      </Animated.View>
                       <TouchableOpacity
-                        style={styles.djStopConfirmInlineBtn}
-                        onPress={() => {
-                          setDjDismissedOverlay(true);
-                          // Host behöver inte trycka "End DJ" separat — handover sker direkt.
-                          // Non-host DJ får "End DJ"-knappen via revealNextAbsolute istället.
-                          if (isHost) handleDJHandover();
-                        }}
-                        activeOpacity={0.85}
+                        style={styles.djStopCancelBtn}
+                        onPress={() => setDjStopConfirmStep('idle')}
+                        activeOpacity={0.7}
                       >
-                        <Text style={styles.djStopConfirmInlineBtnText}>Track has been stopped in Spotify</Text>
+                        <Text style={styles.djStopCancelBtnText}>Cancel</Text>
                       </TouchableOpacity>
-                    </Animated.View>
-                  </>
+                    </>
+                  ) : (
+                    // Gold rubrik + Yes/No (speglar Final Leaderboards
+                    // "Re-match with Marathon table?"-fråga). Yes → dismiss:a
+                    // overlay:n (host får Next direkt via handleDJHandover,
+                    // non-host får "End DJ — handover to Host" via
+                    // revealNextAbsolute). No → 'openSpotify'.
+                    <View style={styles.djStopConfirmBlock}>
+                      <Text style={styles.djStopConfirmHeader}>Track has been stopped in Spotify?</Text>
+                      <View style={styles.djStopConfirmActions}>
+                        <Animated.View style={[{ flex: 1 }, nextTabPulseStyle]}>
+                          <Pressable
+                            style={({ pressed }) => [styles.djStopYesBtn, pressed && { opacity: 0.85 }]}
+                            onPress={() => {
+                              setDjDismissedOverlay(true);
+                              if (isHost) handleDJHandover();
+                            }}
+                          >
+                            <Text style={styles.djStopYesBtnText}>Yes</Text>
+                          </Pressable>
+                        </Animated.View>
+                        <Pressable
+                          style={({ pressed }) => [styles.djStopNoBtn, pressed && { opacity: 0.7 }]}
+                          onPress={() => setDjStopConfirmStep('openSpotify')}
+                        >
+                          <Text style={styles.djStopNoBtnText}>No</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  )
                 ) : !spotifyDJOpenedApp ? (
                   // djStep=0: primär CTA — öppna Spotify och starta spåret.
                   // Låttitel + artist direkt under knappen. Ingen spoiler-risk —
@@ -10949,14 +10990,18 @@ export default function QuizScreen() {
         <View style={rv.revealNextAbsolute} pointerEvents="box-none">
           {/* Spotify DJ-handover-steg: väntar på att DJ trycker "End DJ" innan host kan gå vidare */}
           {isSpotifyQuestion && !djHandedOver ? (
-            isCurrentPlayerDJ ? (
-              djDismissedOverlay ? (
-                <Animated.View style={nextTabPulseStyle}>
-                  <TouchableOpacity style={rv.djHandoverBtn} onPress={handleDJHandover} activeOpacity={0.85}>
-                    <Text style={rv.djHandoverBtnText}>End DJ — handover to Host</Text>
-                  </TouchableOpacity>
-                </Animated.View>
-              ) : null /* knappar ligger i scroll-zonen ovan */
+            // djDismissedOverlay sätts ENBART på DJ:ns egen enhet (via
+            // stopp-bekräftelsen), så det är en pålitligare "jag är DJ:n som
+            // bekräftat stopp"-signal än isCurrentPlayerDJ (som kan race:a på
+            // broadcastDJPlayerId). Visa handover-knappen direkt när den är satt.
+            djDismissedOverlay ? (
+              <Animated.View style={nextTabPulseStyle}>
+                <TouchableOpacity style={rv.djHandoverBtn} onPress={handleDJHandover} activeOpacity={0.85}>
+                  <Text style={rv.djHandoverBtnText}>End DJ — handover to Host</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            ) : isCurrentPlayerDJ ? (
+              null /* knappar ligger i scroll-zonen ovan */
             ) : isHost && djHandoverStuck ? (
               // A1-fix: DJ:ns handover kom aldrig → ge host en manuell "Force DJ
               // to end"-väg vidare så spelet inte fastnar permanent i reveal.
@@ -11575,26 +11620,65 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
     gap: Spacing.sm,
   },
-  djStopConfirmInlineBtn: {
-    height: 56,
-    paddingHorizontal: Spacing.xl,
+  // Reveal-fasens DJ-stopp-bekräftelse — gold rubrik + Yes/No, speglar
+  // RoundLeaderboards replayTitle/replayYesBtn/replayNoBtn 1:1.
+  djStopConfirmBlock: {
+    width: '100%',
+    paddingHorizontal: Spacing.md,
+  },
+  djStopConfirmHeader: {
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    color: Colors.warning,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+  },
+  djStopConfirmActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  djStopYesBtn: {
+    height: 52,
     borderRadius: Radius.md,
-    backgroundColor: '#1DB954',
+    backgroundColor: Colors.warning,
+    borderWidth: 1,
+    borderColor: Colors.warning,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  djStopConfirmInlineBtnText: {
-    fontSize: 15,
+  djStopYesBtnText: {
+    fontSize: 17,
     fontWeight: '700',
-    color: '#000',
-    letterSpacing: 0.2,
+    color: '#000000',
   },
-  djOrSeparatorText: {
-    fontSize: FontSize.sm,
-    fontWeight: '500',
+  djStopNoBtn: {
+    flex: 1,
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  djStopNoBtnText: {
+    fontSize: 17,
+    fontWeight: '600',
     color: Colors.textSecondary,
-    textAlign: 'center',
-    letterSpacing: 0.5,
+  },
+  djStopCancelBtn: {
+    height: 44,
+    paddingHorizontal: Spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  djStopCancelBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
   },
   // ── DJ-handlingsknappar i stickyConfirmBar ───────────────────────────
   spotifyDJActions: {
