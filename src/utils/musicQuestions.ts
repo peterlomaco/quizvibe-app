@@ -2113,6 +2113,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "simon-garfunkel-the-boxer",
+    "displayName": "The Boxer — Simon & Garfunkel",
+    "correctYear": 1969,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "l3LFML_pxlY",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1349)."
+      }
+    ]
+  },
+  {
     "id": "beatles-let-it-be",
     "displayName": "Let It Be — The Beatles",
     "correctYear": 1970,
@@ -2737,6 +2764,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "billy-joel-piano-man",
+    "displayName": "Piano Man — Billy Joel",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "gxEPV4kolz0",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1347)."
+      }
+    ]
+  },
+  {
     "id": "dolly-parton-jolene",
     "displayName": "Jolene — Dolly Parton",
     "correctYear": 1973,
@@ -2941,6 +2995,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ted Gärdestad - Topic",
         "license": "standard",
         "notes": "Studio-audio från officiell Topic-kanal."
+      }
+    ]
+  },
+  {
+    "id": "wings-band-on-the-run",
+    "displayName": "Band on the Run — Wings",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "__t8wKdMmIw",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1348)."
       }
     ]
   },
@@ -3279,6 +3360,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bellamy-brothers-let-your-love-flow",
+    "displayName": "Let Your Love Flow — Bellamy Brothers",
+    "correctYear": 1976,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FQQj2rQBFvA",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1346)."
+      }
+    ]
+  },
+  {
     "id": "brotherhood-of-man-save-your-kisses",
     "displayName": "Save Your Kisses for Me — Brotherhood of Man",
     "correctYear": 1976,
@@ -3441,6 +3549,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Amazon MGM Studios",
         "license": "standard",
         "notes": "MGM Official trailer — Bill Conti's Gonna Fly Now-tema + training-montage."
+      }
+    ]
+  },
+  {
+    "id": "wild-cherry-play-that-funky-music",
+    "displayName": "Play That Funky Music — Wild Cherry",
+    "correctYear": 1976,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "BHcYFxU4fMo",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1350)."
       }
     ]
   },
@@ -7281,6 +7416,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "guns-n-roses-paradise-city",
+    "displayName": "Paradise City — Guns N' Roses",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "inoqFF-2t8I",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1321)."
+      }
+    ]
+  },
+  {
     "id": "guns-n-roses-sweet-child-o-mine",
     "displayName": "Sweet Child o' Mine — Guns N' Roses",
     "correctYear": 1987,
@@ -7545,6 +7707,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "white-lion-when-the-children-cry",
+    "displayName": "When the Children Cry — White Lion",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6tatKFXlYiY",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1331)."
+      }
+    ]
+  },
+  {
     "id": "whitesnake-here-i-go-again",
     "displayName": "Here I Go Again — Whitesnake",
     "correctYear": 1987,
@@ -7659,6 +7848,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1988 vinnare — Schweiz."
+      }
+    ]
+  },
+  {
+    "id": "fine-young-cannibals-she-drives-me-crazy",
+    "displayName": "She Drives Me Crazy — Fine Young Cannibals",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "UtvmTu4zAMg",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1327)."
       }
     ]
   },
@@ -7964,6 +8180,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "alice-cooper-poison",
+    "displayName": "Poison — Alice Cooper",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Qq4j1LtCdww",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1323)."
+      }
+    ]
+  },
+  {
     "id": "b52s-love-shack",
     "displayName": "Love Shack — The B-52's",
     "correctYear": 1989,
@@ -7991,6 +8234,60 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "belinda-carlisle-leave-a-light-on",
+    "displayName": "Leave a Light On — Belinda Carlisle",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pmZYE8j2ZNs",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1317)."
+      }
+    ]
+  },
+  {
+    "id": "black-box-ride-on-time",
+    "displayName": "Ride on Time — Black Box",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "M0quXl_od3g",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1325)."
+      }
+    ]
+  },
+  {
     "id": "cher-if-i-could-turn-back-time",
     "displayName": "If I Could Turn Back Time — Cher",
     "correctYear": 1989,
@@ -8014,6 +8311,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1315)."
+      }
+    ]
+  },
+  {
+    "id": "depeche-mode-personal-jesus",
+    "displayName": "Personal Jesus — Depeche Mode",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "u1xrNaTO1bI",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1322)."
       }
     ]
   },
@@ -8079,6 +8403,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1313)."
+      }
+    ]
+  },
+  {
+    "id": "gladys-knight-licence-to-kill",
+    "displayName": "Licence to Kill — Gladys Knight",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "v6Mzz9mLcsg",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1318)."
       }
     ]
   },
@@ -8257,6 +8608,87 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "marc-almond-somethings-gotten-hold-of-my-heart",
+    "displayName": "Something's Gotten Hold of My Heart — Marc Almond & Gene Pitney",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "LZ8Yn9QJi_o",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1328)."
+      }
+    ]
+  },
+  {
+    "id": "natalie-cole-miss-you-like-crazy",
+    "displayName": "Miss You Like Crazy — Natalie Cole",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "SSGCaaYuGoA",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1320)."
+      }
+    ]
+  },
+  {
+    "id": "neneh-cherry-manchild",
+    "displayName": "Manchild — Neneh Cherry",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "OJ9VBMBS3qE",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1319)."
+      }
+    ]
+  },
+  {
     "id": "orup-da-star-pojkarna-pa-rad",
     "displayName": "Då står pojkarna på rad — Orup",
     "correctYear": 1989,
@@ -8336,6 +8768,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "richard-marx-right-here-waiting",
+    "displayName": "Right Here Waiting — Richard Marx",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "S_E2EHVxNAE",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1326)."
+      }
+    ]
+  },
+  {
     "id": "riva-rock-me",
     "displayName": "Rock Me — Riva",
     "correctYear": 1989,
@@ -8400,6 +8859,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "roy-orbison-you-got-it",
+    "displayName": "You Got It — Roy Orbison",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "uWGCMUcJNfw",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1332)."
+      }
+    ]
+  },
+  {
     "id": "simply-red-if-you-dont-know-me-by-now",
     "displayName": "If You Don't Know Me by Now — Simply Red",
     "correctYear": 1989,
@@ -8450,6 +8936,60 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1306)."
+      }
+    ]
+  },
+  {
+    "id": "tears-for-fears-sowing-the-seeds-of-love",
+    "displayName": "Sowing the Seeds of Love — Tears for Fears",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "VAtGOESO7W8",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1329)."
+      }
+    ]
+  },
+  {
+    "id": "technotronic-pump-up-the-jam",
+    "displayName": "Pump Up the Jam — Technotronic",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9EcjWd-O4jI",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1324)."
       }
     ]
   },

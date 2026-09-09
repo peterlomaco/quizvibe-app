@@ -1390,3 +1390,69 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "3wsPg2KrRYZFi0inIFa41x"
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1363)."
+  # 1969-1976 klassiker — tillagda 2026-09-09 ur Music.xlsx (rad 1346-1350).
+  - id: bellamy-brothers-let-your-love-flow
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Let Your Love Flow — Bellamy Brothers"
+    correctYear: 1976
+    probability: 72
+    region: ["global"]
+    wikimediaSearchHints: ["Bellamy Brothers Let Your Love Flow 1976"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FQQj2rQBFvA"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1346)."
+  - id: billy-joel-piano-man
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Piano Man — Billy Joel"
+    correctYear: 1973
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["Billy Joel Piano Man 1973"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "gxEPV4kolz0"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1347)."
+  - id: wings-band-on-the-run
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Band on the Run — Wings"
+    correctYear: 1973
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Paul McCartney Wings Band on the Run 1973"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "__t8wKdMmIw"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1348)."
+  - id: simon-garfunkel-the-boxer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Boxer — Simon & Garfunkel"
+    correctYear: 1969
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Simon and Garfunkel The Boxer 1969"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "l3LFML_pxlY"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1349)."
+  - id: wild-cherry-play-that-funky-music
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Play That Funky Music — Wild Cherry"
+    correctYear: 1976
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Wild Cherry Play That Funky Music 1976"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "BHcYFxU4fMo"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1350)."

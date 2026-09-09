@@ -3350,3 +3350,199 @@ items:
         startSec: 20
         endSec: 50
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1316)."
+  # 1987-1989 internationella hitlatar (forts.) — tillagda 2026-09-09 ur Music.xlsx (rad 1317-1332).
+  - id: belinda-carlisle-leave-a-light-on
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Leave a Light On — Belinda Carlisle"
+    correctYear: 1989
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Belinda Carlisle Leave a Light On 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "pmZYE8j2ZNs"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1317)."
+  - id: gladys-knight-licence-to-kill
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Licence to Kill — Gladys Knight"
+    correctYear: 1989
+    probability: 68
+    region: ["global"]
+    wikimediaSearchHints: ["Gladys Knight Licence to Kill 1989 James Bond"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "v6Mzz9mLcsg"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1318)."
+  - id: neneh-cherry-manchild
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Manchild — Neneh Cherry"
+    correctYear: 1989
+    probability: 70
+    region: ["global"]
+    wikimediaSearchHints: ["Neneh Cherry Manchild 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "OJ9VBMBS3qE"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1319)."
+  - id: natalie-cole-miss-you-like-crazy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Miss You Like Crazy — Natalie Cole"
+    correctYear: 1989
+    probability: 70
+    region: ["global"]
+    wikimediaSearchHints: ["Natalie Cole Miss You Like Crazy 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "SSGCaaYuGoA"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1320)."
+  - id: guns-n-roses-paradise-city
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Paradise City — Guns N' Roses"
+    correctYear: 1987
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Guns N Roses Paradise City 1987"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "inoqFF-2t8I"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1321)."
+  - id: depeche-mode-personal-jesus
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Personal Jesus — Depeche Mode"
+    correctYear: 1989
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Depeche Mode Personal Jesus 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "u1xrNaTO1bI"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1322)."
+  - id: alice-cooper-poison
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Poison — Alice Cooper"
+    correctYear: 1989
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Alice Cooper Poison 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Qq4j1LtCdww"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1323)."
+  - id: technotronic-pump-up-the-jam
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Pump Up the Jam — Technotronic"
+    correctYear: 1989
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Technotronic Pump Up the Jam 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9EcjWd-O4jI"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1324)."
+  - id: black-box-ride-on-time
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ride on Time — Black Box"
+    correctYear: 1989
+    probability: 72
+    region: ["global"]
+    wikimediaSearchHints: ["Black Box Ride on Time 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "M0quXl_od3g"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1325)."
+  - id: richard-marx-right-here-waiting
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Right Here Waiting — Richard Marx"
+    correctYear: 1989
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Richard Marx Right Here Waiting 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "S_E2EHVxNAE"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1326)."
+  - id: fine-young-cannibals-she-drives-me-crazy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "She Drives Me Crazy — Fine Young Cannibals"
+    correctYear: 1988
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Fine Young Cannibals She Drives Me Crazy 1988"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UtvmTu4zAMg"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1327)."
+  - id: marc-almond-somethings-gotten-hold-of-my-heart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Something's Gotten Hold of My Heart — Marc Almond & Gene Pitney"
+    correctYear: 1989
+    probability: 68
+    region: ["global"]
+    wikimediaSearchHints: ["Marc Almond Gene Pitney Something's Gotten Hold of My Heart 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "LZ8Yn9QJi_o"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1328)."
+  - id: tears-for-fears-sowing-the-seeds-of-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sowing the Seeds of Love — Tears for Fears"
+    correctYear: 1989
+    probability: 76
+    region: ["global"]
+    wikimediaSearchHints: ["Tears for Fears Sowing the Seeds of Love 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "VAtGOESO7W8"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1329)."
+  - id: white-lion-when-the-children-cry
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "When the Children Cry — White Lion"
+    correctYear: 1987
+    probability: 70
+    region: ["global"]
+    wikimediaSearchHints: ["White Lion When the Children Cry Pride 1987"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6tatKFXlYiY"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1331)."
+  - id: roy-orbison-you-got-it
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "You Got It — Roy Orbison"
+    correctYear: 1989
+    probability: 74
+    region: ["global"]
+    wikimediaSearchHints: ["Roy Orbison You Got It Mystery Girl 1989"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "uWGCMUcJNfw"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1332)."
