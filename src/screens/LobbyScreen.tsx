@@ -6818,7 +6818,7 @@ export default function LobbyScreen() {
               utrymmet är fritt). Host visar den ovanför room code-kortet. */}
           {!hostMode && (
             <Text style={styles.headerTagline} numberOfLines={1}>
-              Music. Party & Hits.
+              Music. Film. Play.
             </Text>
           )}
         </View>
@@ -6827,7 +6827,7 @@ export default function LobbyScreen() {
             room code-kortet; non-host visar den i headern (se ovan). */}
         {hostMode && (
           <Text style={styles.roomTagline}>
-            Music. Party & Hits. And Guess.
+            Music. Film. Play.
           </Text>
         )}
 
