@@ -4813,6 +4813,40 @@ export default function LobbyScreen() {
     clearLobbySettings(newCode);
     clearEjected(newCode);
     clearGameStarted(newCode);
+    // Carry-over: den nya single-lobbyn ÄRVER den nuvarande multiplayer-lobbyns
+    // Source Mixerboard, Game Era, Extra Packages och Answer response time
+    // (samma Play Again-mönster som goToNewLobby). Utan detta re-seedas allt
+    // från profilen. Number of Rounds ÄRVS INTE — den sätts från profilen
+    // klampad till single-lobbyns 2/4-intervall (seeden re-klampar också).
+    // Parental Control går via nav-param nedan (seeden läser aldrig stored för
+    // den). spotifyEnabled/maxPlayers/gameMode/singlePlayerDefault forceras till
+    // single-lägets värden. Skriv EFTER clear-bunten. In-memory-mocken sätts
+    // synkront så den nya mountens seed (efter ~1.6s overlay) hinner läsa den.
+    setLobbySettings(newCode, {
+      gameMode: 'pass-the-phone',
+      singlePlayerDefault: true,
+      maxPlayers: 4,
+      region,
+      answerResponseSeconds,
+      eraFrom: effectiveEraValues[0],
+      eraTo: effectiveEraValues[1],
+      roundsCount: Math.max(
+        ROUNDS_MIN,
+        Math.min(ROUNDS_MAX_PASS, cachedProfile?.roundsDefault ?? ROUNDS_DEFAULT),
+      ),
+      selectedExtraPackages,
+      packageYoutubeEnabled,
+      packageHintsEnabled,
+      youtubeEnabledCategories,
+      imagesEnabledCategories,
+      sketchEnabled,
+      spotifyEnabled: false,
+      spotifyAnswerYear,
+      spotifyAnswerName,
+      parentControlEnabled,
+      remoteAssistance,
+      mutualAssistanceEnabled,
+    }).catch(() => { /* loggas i mockLobbySettings */ });
     // Riv den nuvarande multiplayer-lobbyn + navigera in i den nya single-
     // lobbyn. performLobbyDelete deaktiverar roomCode, städar mock-stores
     // + waiting_invites och visar loading-overlay ~1.6s innan onDone.
@@ -4823,6 +4857,9 @@ export default function LobbyScreen() {
           code: newCode,
           isHost: 'true',
           lobbyType: 'single',
+          // Parental Control persisteras aldrig i lobby_settings — seeden läser
+          // den via denna nav-param (?? profile ?? false). Krävs för carry-over.
+          parentControl: parentControlEnabled ? 'true' : 'false',
           // Bevara guest-host-identiteten om lobbyn skapades via "Start Game
           // as Guest" — annars faller den nya lobbyn tillbaka till profilen.
           ...(isGuestHost
