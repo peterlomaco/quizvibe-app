@@ -7776,12 +7776,27 @@ export default function QuizScreen() {
   const showLobbyDeletedAlert = useCallback(() => {
     setAwaitingNewLobby(false);
     Alert.alert(
-      'Host has deleted this lobby',
-      '',
+      'Game ended',
+      'Game has been deleted by Host.',
       [{ text: 'OK', onPress: () => router.replace('/') }],
       { cancelable: false },
     );
   }, []);
+  // Gemensam funnel för BÅDA "host avslutade spelet"-signalerna: dels
+  // lobby_deleted-broadcasten, dels rooms-radens postgres_changes DELETE.
+  // Delad guard (lobbyDeletedAlertedRef) → bara EN popup ("Game ended")
+  // oavsett vilken signal som når non-host först. Respekterar dessutom
+  // prisutdelnings-sekvensen (köas via pendingLobbyDeletedRef) så DB-DELETE-
+  // vägen inte längre avbryter celebration mitt i.
+  const triggerGameEndedAlert = useCallback(() => {
+    if (lobbyDeletedAlertedRef.current) return;
+    lobbyDeletedAlertedRef.current = true;
+    if (celebrationVisibleRef.current) {
+      pendingLobbyDeletedRef.current = true;
+      return;
+    }
+    showLobbyDeletedAlert();
+  }, [showLobbyDeletedAlert]);
   useEffect(() => {
     playAgainInitiatedHandlerRef.current = () => {
       if (isHost) return;
@@ -7855,23 +7870,13 @@ export default function QuizScreen() {
       setPlayerAudioOverridesState((prev) => ({ ...prev, [playerId]: audioOn }));
     };
     lobbyDeletedHandlerRef.current = () => {
-      // Host har tappat Home från Final Leaderboard — lobby:n är stängd.
-      // Bara non-host:s sida bryr sig (host själv broadcastar och navigerar
-      // omedelbart). Visar info-Alert + auto-nav till startskärmen. Guard
-      // mot dubbelfyrning via lobbyDeletedAlertedRef. Resetar
-      // awaitingNewLobby så ev. "Please Wait..."-overlay släpps innan
-      // popupen visas (Alert renderas över overlay:n, men cleanup gör
-      // state-tree:t konsistent vid nav).
+      // Host har tappat Home från Final Leaderboard (eller Quit Game) — lobby:n
+      // är stängd. Bara non-host:s sida bryr sig (host själv broadcastar och
+      // navigerar omedelbart). Går genom den delade funneln som guardar mot
+      // dubbelfyrning OCH mot att DB-DELETE-vägen (rooms postgres_changes)
+      // poppar en andra "Game ended"-Alert.
       if (isHost) return;
-      if (lobbyDeletedAlertedRef.current) return;
-      lobbyDeletedAlertedRef.current = true;
-      // Bläddrar spelaren fortfarande i prisutdelnings-sekvensen? Avbryt den
-      // INTE — köa popupen tills de själva lämnar via "Go to Final leaderboard".
-      if (celebrationVisibleRef.current) {
-        pendingLobbyDeletedRef.current = true;
-        return;
-      }
-      showLobbyDeletedAlert();
+      triggerGameEndedAlert();
     };
     hostActivePingHandlerRef.current = (
       hostQuestionIndex: number,
@@ -8408,13 +8413,11 @@ export default function QuizScreen() {
 
   useEffect(() => {
     if (!hostDeletedDetected) return;
-    Alert.alert(
-      'Game ended',
-      'Game has been deleted by Host.',
-      [{ text: 'OK', onPress: () => router.replace('/') }],
-      { cancelable: false },
-    );
-  }, [hostDeletedDetected]);
+    // DB-DELETE är backstop för lobby_deleted-broadcasten. Går genom samma
+    // delade funnel så bara EN "Game ended"-popup visas oavsett vilken signal
+    // som når non-host först (delad lobbyDeletedAlertedRef-guard).
+    triggerGameEndedAlert();
+  }, [hostDeletedDetected, triggerGameEndedAlert]);
 
   // ── Individual Devices sync ──────────────────────────────────────────────
   // Host:s Play- och Next-tap broadcast:as till alla approved enheter via
