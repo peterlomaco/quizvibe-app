@@ -8,6 +8,7 @@ import {
   Dimensions,
   Easing,
   Image,
+  InteractionManager,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -51,6 +52,7 @@ import {
 } from '../components/RoundsRuler';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { MorseAmbientSound } from '../components/MorseAmbientSound';
+import { hideGlobalOverlay, showGlobalOverlay } from '../utils/globalOverlay';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
@@ -1008,14 +1010,6 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
   );
 }
 
-// ─── WaveDots ─────────────────────────────────────────────────────────────────
-
-/**
- * Tre prickar som hoppar i sekvens (våg-effekt) — används som loading-
- * indikator i deleting-lobby-overlay:n. Varje prick har en 900ms cykel
- * (300ms upp+ner + 600ms vila) men startas med 150ms-offset så de ser
- * ut att rulla som en våg från vänster till höger.
- */
 // Cross-player seen-historik: publicera enhetens lokala 20-sessions fråge-
 // historik till egen lobby_players-rad (migration 0026) så host kan
 // exkludera frågor som NÅGON deltagare sett i sina senaste 20 spel — även i
@@ -1087,6 +1081,11 @@ function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
     .catch(() => {});
 }
 
+// Kort settle efter navigation innan den globala delete-covern tonas bort —
+// ger destinationsskärmen (Home) + BottomBanner tid att måla BAKOM covern så
+// inget flimrar fram innan reveal. Tunbar (bumpa om en flash smiter förbi).
+const OVERLAY_SETTLE_MS = 150;
+
 /**
  * Alert.alert som en await-bar Promise<boolean>. Används för guards inuti
  * redan-async flöden (t.ex. handleStartGame) där vi vill avbryta på Cancel
@@ -1112,62 +1111,6 @@ function confirmAsync(
     );
   });
 }
-
-function WaveDots() {
-  const dot1 = useRef(new Animated.Value(0)).current;
-  const dot2 = useRef(new Animated.Value(0)).current;
-  const dot3 = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const cycleMs = 900;
-    const upMs = 150;
-    const downMs = 150;
-    const makeDot = (val: Animated.Value, offsetMs: number) =>
-      Animated.loop(
-        Animated.sequence([
-          Animated.delay(offsetMs),
-          Animated.timing(val, { toValue: -6, duration: upMs, useNativeDriver: true }),
-          Animated.timing(val, { toValue: 0, duration: downMs, useNativeDriver: true }),
-          Animated.delay(cycleMs - offsetMs - upMs - downMs),
-        ]),
-      );
-    const a1 = makeDot(dot1, 0);
-    const a2 = makeDot(dot2, 150);
-    const a3 = makeDot(dot3, 300);
-    a1.start();
-    a2.start();
-    a3.start();
-    return () => {
-      a1.stop();
-      a2.stop();
-      a3.stop();
-    };
-  }, [dot1, dot2, dot3]);
-
-  return (
-    <View style={waveDotsStyles.row}>
-      <Animated.Text style={[waveDotsStyles.dot, { transform: [{ translateY: dot1 }] }]}>.</Animated.Text>
-      <Animated.Text style={[waveDotsStyles.dot, { transform: [{ translateY: dot2 }] }]}>.</Animated.Text>
-      <Animated.Text style={[waveDotsStyles.dot, { transform: [{ translateY: dot3 }] }]}>.</Animated.Text>
-    </View>
-  );
-}
-
-const waveDotsStyles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    marginLeft: 4,
-  },
-  dot: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.bold,
-    color: Colors.textPrimary,
-    marginHorizontal: 1,
-    // lineHeight säkrar att translateY rörelsen inte klipps av container:s
-    // tighta vertikala mått runt textens baseline.
-    lineHeight: 20,
-  },
-});
 
 // SequentialDots flyttat till src/components/SequentialDots.tsx för delning
 // med GetReadyIntro (icke-host:s "Waiting for Host to start quiz"-ruta).
@@ -2399,15 +2342,17 @@ export default function LobbyScreen() {
   // One-shot-guard: host publicerar sitt Guest alias en gång per lobby
   // (players-sync-effekten körs vid varje ändring).
   const hostAliasPublishedRef = useRef(false);
-  // True under den korta processing-fasen mellan host:s Yes-konfirmation
-  // och navigation till Home. Visar en loading-overlay med "Please Wait —
-  // Deleting this Lobby..." + animerade våg-prickar så host:en känner att
-  // appen jobbar (undviker upplevelsen av instant-cut till Home).
-  const [deletingLobby, setDeletingLobby] = useState(false);
-
   // True enbart när LobbyScreen är aktiv — stänger av MorseAmbientSound
   // (WebView-baserat ljud) när Stack-navigatorn trycker Quiz ovanpå.
   const [screenFocused, setScreenFocused] = useState(true);
+
+  // Sätts true FÖRST i performLobbyDelete så MorseAmbientSound tonar ut till
+  // tystnad (300ms FADE_OUT) INNAN router.replace unmountar LobbyScreen +
+  // WebView:n. Att riva en WebView mitt i en ringande ton ger annars ett
+  // hörbart klick/beep (Peter 2026 — samma hazard som Start Game hade). Den
+  // 1.6s delete-covern är gott om tid för uttoningen. Element:et förblir
+  // MONTERAT (hostMode && showAmbient orört) — bara `active` går false.
+  const [ambientSilenced, setAmbientSilenced] = useState(false);
 
   // Ambient-ljud startar 2.5 s efter att host-välkomst-rösten sagt "QuizVibe".
   const [showAmbient, setShowAmbient] = useState(false);
@@ -4789,6 +4734,10 @@ export default function LobbyScreen() {
   // Speglar EXAKT tidigare handleDeleteLobby-beteende (clearLeftPlayers
   // ingår medvetet INTE — anropades inte tidigare heller).
   const performLobbyDelete = async (onDone: () => void) => {
+    // Tona ut ambient-ljudet FÖRST så WebView:n är tyst (~0 gain efter 300ms
+    // FADE_OUT) innan router.replace unmountar den — annars ett hörbart klick.
+    // Element:et förblir monterat via `active`-flaggan; se ambientSilenced.
+    setAmbientSilenced(true);
     // Deaktivera rummet direkt så non-hosts polling-detection
     // upptäcker det inom ~2s (även medan host:s loading-overlay
     // visas — det är realistiskt async-beteende).
@@ -4807,17 +4756,19 @@ export default function LobbyScreen() {
     clearLobbySettings(roomCode);
     clearEjected(roomCode);
     clearGameStarted(roomCode);
-    // Visa loading-overlay i ~1.6s innan navigation. Ger host:en
-    // visuell feedback att appen processar och matchar real-
-    // backend-känsla där en DELETE-request tar några hundra ms.
-    // VIKTIGT: stäng overlay:n EXPLICIT innan navigation. Stack-
-    // navigatorn kan bevara Modal-state över route-replace —
-    // utan dismiss skulle Modal:en stå kvar synlig ovanpå Home-
-    // skärmen efter navigationen.
-    setDeletingLobby(true);
+    // Visa GLOBAL cover i ~1.6s (visuell "processar"-feedback), navigera
+    // sedan MEDAN covern fortfarande är uppe. Covern bor i app/_layout.tsx
+    // (utanför Stack) så den överlever router.replace — Home + BottomBanner
+    // monteras och målas BAKOM covern, som tonas bort först efter en kort
+    // settle. Resultat: inget banner-flimmer före Home. hideGlobalOverlay +
+    // settle-callbacken anropar bara module-funktioner (ingen setState på
+    // denna skärm) så de kör tryggt efter att LobbyScreen unmountat.
+    showGlobalOverlay('Please Wait — Deleting this Lobby');
     setTimeout(() => {
-      setDeletingLobby(false);
       onDone();
+      InteractionManager.runAfterInteractions(() => {
+        setTimeout(hideGlobalOverlay, OVERLAY_SETTLE_MS);
+      });
     }, 1600);
   };
 
@@ -6733,7 +6684,9 @@ export default function LobbyScreen() {
           tonar ut ljudet i stället. Att riva WebView:n mitt i en ringande ton
           gav ett hörbart klick när host tryckte Start Game (Peter 2026-08-26);
           se ⚠-noten i MorseAmbientSound.tsx. */}
-      {hostMode && showAmbient && <MorseAmbientSound active={screenFocused} />}
+      {hostMode && showAmbient && (
+        <MorseAmbientSound active={screenFocused && !ambientSilenced} />
+      )}
       {/* Top board (login status) — sticky utanför ScrollView så den följer
           med när användaren scrollar i lobbyn. Tap-beteendet är roll-
           beroende:
@@ -9864,24 +9817,9 @@ export default function LobbyScreen() {
         </View>
       </Modal>
 
-      {/* ── Deleting-lobby loading-overlay ────────────────────────────
-          Visar processing-feedback under tiden mellan host:s Yes-
-          konfirmation och navigation till Home. cancelable:false så
-          host:en inte kan tap:a runt om — vänta tills den färdig. */}
-      <Modal
-        visible={deletingLobby}
-        transparent
-        animationType="fade"
-      >
-        <View style={styles.deletingOverlay}>
-          <View style={styles.deletingCard}>
-            <View style={styles.deletingTextRow}>
-              <Text style={styles.deletingText}>Please Wait — Deleting this Lobby</Text>
-              <WaveDots />
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* Deleting-lobby-covern renderas numera GLOBALT i app/_layout.tsx
+          (GlobalOverlay) så den överlever router.replace och täcker banner +
+          transition — se performLobbyDelete + src/utils/globalOverlay.ts. */}
 
       {/* ── Spotify DJ guide modal ──────────────────────────────────────
           Visas när användaren tappar "Guide How it works" i Spotify-raden.
@@ -10186,33 +10124,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.error,
-  },
-
-  // Deleting-lobby loading-overlay — täcker hela skärmen med dimmad
-  // backdrop, centrerar ett card med "Please Wait — Deleting this Lobby"
-  // + tre animerade våg-prickar.
-  deletingOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.65)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  deletingCard: {
-    backgroundColor: Colors.card,
-    paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.lg,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  deletingTextRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  deletingText: {
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.medium,
-    color: Colors.textPrimary,
   },
 
   safe: { flex: 1, backgroundColor: Colors.background },

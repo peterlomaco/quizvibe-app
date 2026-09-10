@@ -7,6 +7,7 @@ import {
   logOutPurchases,
 } from '@/src/lib/iap';
 import { BottomBanner } from '@/src/components/BottomBanner';
+import { GlobalOverlay } from '@/src/components/GlobalOverlay';
 import { Colors } from '@/src/theme';
 import { refreshOfferConfig, refreshPromoGrants } from '@/src/utils/promoPremium';
 import { clearPremiumSubscription, refreshPremiumMirror, setPremiumActive } from '@/src/utils/subscriptionStorage';
@@ -131,6 +132,10 @@ export default function RootLayout() {
         <Stack.Screen name="competitions" />
       </Stack>
       <BottomBanner />
+      {/* Global cover (lobby-delete m.fl.) — renderas EFTER BottomBanner och
+          utanför Stack:en så den överlever router.replace och täcker banner +
+          transition. Se src/utils/globalOverlay.ts. */}
+      <GlobalOverlay />
     </GestureHandlerRootView>
   );
 }
