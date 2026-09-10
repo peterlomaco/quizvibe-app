@@ -12,7 +12,7 @@
  */
 import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import * as Speech from 'expo-speech';
-import { resolveVoicePack, type VoiceToken } from './voicePacks';
+import { resolveVoicePack, SILENT_VOICE_ID, type VoiceToken } from './voicePacks';
 
 let audioModeConfigured = false;
 
@@ -55,6 +55,9 @@ export function playVoiceClip(
   token: VoiceToken,
   fallbackText?: string,
 ): void {
+  // "No voice" — helt tyst: inget klipp och ingen TTS-fallback (gäller både
+  // Profile-förhandslyssningen och lobby-välkomsten).
+  if (voiceId === SILENT_VOICE_ID) return;
   const pack = resolveVoicePack(voiceId);
   void ensureVoiceAudioMode();
   try {

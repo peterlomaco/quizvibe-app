@@ -94,7 +94,7 @@ import { clearGameStarted } from '../utils/mockStartedGames';
 import { generateRoomCode } from '../utils/roomCode';
 import { checkSpotifyInstalled } from '../utils/spotifyDJ';
 import { resolveDisplayHcp } from '../utils/hcpEngine';
-import { DEFAULT_VOICE_ID, isValidVoiceId, VOICE_OPTIONS } from '../utils/voicePacks';
+import { DEFAULT_VOICE_ID, isValidVoiceId, SILENT_VOICE_ID, VOICE_OPTIONS } from '../utils/voicePacks';
 import { playVoiceClip } from '../utils/voicePlayback';
 import { refreshOwnHcpDecay } from '../utils/hcpProgress';
 
@@ -1616,7 +1616,7 @@ export default function ProfileScreen() {
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() => Alert.alert(
                     'Voice',
-                    'The voice used in the app — the 3-2-1 countdown before each question and the "QuizVibe" welcome in the lobby. Choose a female or male voice.\n\nTap the ▶ button in the list to hear a voice before choosing.',
+                    'The voice used in the app — the 3-2-1 countdown before each question and the "QuizVibe" welcome in the lobby. Choose a female or male voice, or "No voice" for a silent countdown.\n\nTap the ▶ button in the list to hear a voice before choosing.',
                   )}
                   hitSlop={8}
                 >
@@ -3096,17 +3096,20 @@ export default function ProfileScreen() {
                   ]}
                 >
                   {/* ▶ förhandslyssning — egen Pressable så tap på ikonen
-                      spelar rösten utan att välja + stänga pickern. */}
-                  <Pressable
-                    onPress={() => playVoiceClip(opt.id, 'quizvibe', 'QuizVibe')}
-                    hitSlop={10}
-                    style={({ pressed }) => [
-                      styles.voicePreviewBtn,
-                      pressed && { opacity: 0.6 },
-                    ]}
-                  >
-                    <Text style={styles.voicePreviewIcon}>▶</Text>
-                  </Pressable>
+                      spelar rösten utan att välja + stänga pickern. "No voice"
+                      har inget att förhandslyssna → knappen döljs. */}
+                  {opt.id !== SILENT_VOICE_ID && (
+                    <Pressable
+                      onPress={() => playVoiceClip(opt.id, 'quizvibe', 'QuizVibe')}
+                      hitSlop={10}
+                      style={({ pressed }) => [
+                        styles.voicePreviewBtn,
+                        pressed && { opacity: 0.6 },
+                      ]}
+                    >
+                      <Text style={styles.voicePreviewIcon}>▶</Text>
+                    </Pressable>
+                  )}
                   <Text
                     style={[
                       styles.optionText,

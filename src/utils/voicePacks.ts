@@ -33,6 +33,12 @@ export interface VoicePack {
 /** Standardröst: används när spelaren inte valt något (samt fallback). */
 export const DEFAULT_VOICE_ID = 'hype';
 
+/** "No voice" — tyst nedräkning: inget klipp, ingen system-TTS-fallback, och
+ *  lobby-välkomsten tystas. Ett giltigt, valbart id men INTE ett pack (så
+ *  getVoicePack returnerar null). Konsumenterna (CountdownIntro / playVoiceClip)
+ *  kollar id:t explicit — resolveVoicePack faller fortfarande tillbaka på hype. */
+export const SILENT_VOICE_ID = 'none';
+
 export const VOICE_PACKS: VoicePack[] = [
   {
     id: 'hype',
@@ -69,8 +75,11 @@ export interface VoiceOption {
   label: string;
 }
 
-/** Val som visas i Profile-pickern: bara de två rösterna (ingen system-TTS). */
-export const VOICE_OPTIONS: VoiceOption[] = VOICE_PACKS.map((p) => ({ id: p.id, label: p.label }));
+/** Val som visas i Profile-pickern: de två rösterna + "No voice" (tyst). */
+export const VOICE_OPTIONS: VoiceOption[] = [
+  ...VOICE_PACKS.map((p) => ({ id: p.id, label: p.label })),
+  { id: SILENT_VOICE_ID, label: 'No voice' },
+];
 
 /** Returnerar packet för ett id, eller null om det inte finns. */
 export function getVoicePack(id: string | null | undefined): VoicePack | null {
@@ -84,7 +93,8 @@ export function resolveVoicePack(id: string | null | undefined): VoicePack {
   return getVoicePack(id) ?? getVoicePack(DEFAULT_VOICE_ID)!;
 }
 
-/** True om id:t är en giltig, valbar röst (för coerce av stale profil-värden). */
+/** True om id:t är en giltig, valbar röst (för coerce av stale profil-värden).
+ *  Inkluderar SILENT_VOICE_ID så "No voice" inte skrivs tillbaka till hype. */
 export function isValidVoiceId(id: string | null | undefined): boolean {
-  return !!getVoicePack(id);
+  return id === SILENT_VOICE_ID || !!getVoicePack(id);
 }

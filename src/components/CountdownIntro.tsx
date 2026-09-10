@@ -13,7 +13,7 @@ import {
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '../theme';
 import { type MainCategory } from '../utils/mainCategory';
-import { DEFAULT_VOICE_ID, resolveVoicePack, VOICE_TOKENS, type VoiceToken } from '../utils/voicePacks';
+import { DEFAULT_VOICE_ID, resolveVoicePack, SILENT_VOICE_ID, VOICE_TOKENS, type VoiceToken } from '../utils/voicePacks';
 import { ensureVoiceAudioMode } from '../utils/voicePlayback';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
@@ -159,10 +159,16 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
   // Remote 1v1 delar IndDev:s headline ("Get Ready to QuizVibe") — varje
   // spelare sitter på egen enhet, ingen specifik spelare att namnge.
   const isIndDev = mode === 'individual-devices' || mode === 'remote-1v1';
+  // "No voice" (SILENT_VOICE_ID) = tyst nedräkning: inget klipp OCH ingen
+  // TTS-fallback. Behandlas som audioSilent nedan; `silent` (non-host) ger
+  // samma tystnad av andra skäl. audioSilent = OR av de två.
+  const isSilentVoice = voice === SILENT_VOICE_ID;
+  const audioSilent = silent || isSilentVoice;
   // Valt röstpack — resolveVoicePack faller alltid tillbaka på default-rösten
   // (hype) för okända/stale id:n, så countdown alltid har en röst. Stabil
   // objektreferens (samma VOICE_PACKS-post) så den kan ligga i effekt-deps.
-  const pack = resolveVoicePack(voice);
+  // För "No voice" är pack null → inga klipp preloadas/spelas.
+  const pack = isSilentVoice ? null : resolveVoicePack(voice);
   // Förinladdade expo-audio-players per token — ETT klipp per token så
   // uppspelningen har minimal latens under den tajta nedräkningen.
   const playersRef = useRef<Partial<Record<VoiceToken, AudioPlayer>>>({});
@@ -223,10 +229,10 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
   // Pre-warm TTS-motorn -- bara host (silent=false) OCH bara med Default-rösten
   // (ett röstpack talar inga TTS-ord; preload-effekten nedan värmer klippen).
   useEffect(() => {
-    if (silent || pack) return;
+    if (audioSilent || pack) return;
     try { Speech.speak(' ', { language: 'en-US', pitch: 0.01, rate: 2.0 }); } catch (_) {}
     return () => { try { Speech.stop(); } catch (_) {} };
-  }, [silent, pack]);
+  }, [audioSilent, pack]);
 
   // Förinladda röstpackets klipp (motsvarigheten till TTS-pre-warm för audio):
   // en player per token skapas vid mount så första klippet spelar utan
@@ -235,7 +241,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
   // (spelas i tyst läge + mixar med WebView-ljuden). Players tas bort vid
   // unmount / röstbyte.
   useEffect(() => {
-    if (silent || !pack) return;
+    if (audioSilent || !pack) return;
     void ensureVoiceAudioMode();
     const players: Partial<Record<VoiceToken, AudioPlayer>> = {};
     for (const token of VOICE_TOKENS) {
@@ -252,7 +258,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
         try { players[token]?.remove(); } catch (_) {}
       }
     };
-  }, [pack, silent]);
+  }, [pack, audioSilent]);
 
   // Huvud-countdown-logik med VOICE_LEAD_MS försprång för rösten:
   // Rösten schemaläggs VOICE_LEAD_MS ms INNAN setCount så den kompenserar
@@ -317,7 +323,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
         // CountdownIntro:s nedräknings-ord i talet var borttaget; propen behålls
         // (påverkar inte annat) men läses inte längre här.
         // Röstpack → spela klippet; Default/okänt pack → expo-speech.
-        if (!silent && next > 0 && next <= voiceFrom) {
+        if (!audioSilent && next > 0 && next <= voiceFrom) {
           const token = String(next) as VoiceToken;
           const player = pack ? playersRef.current[token] : undefined;
           if (player) {
@@ -343,7 +349,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
 
     // Starta: om startFrom självt ska talas, tala det 120 ms tidigt (580 ms
     // in i initial-pausen) och visa det visuellt som vanligt vid 700 ms.
-    if (!silent && startFrom <= voiceFrom) {
+    if (!audioSilent && startFrom <= voiceFrom) {
       addTimerAt(() => {
         const token = String(startFrom) as VoiceToken;
         const player = pack ? playersRef.current[token] : undefined;
@@ -365,7 +371,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
       tickTimers.current.forEach(clearTimeout);
       tickTimers.current = [];
     };
-  }, [startFrom, finalWord, voiceFrom, silent, anchorT0, pack]);
+  }, [startFrom, finalWord, voiceFrom, audioSilent, anchorT0, pack]);
 
   // Pop-in per siffer-byte (3, 2, 1) + kontinuerlig zoom-puls (1 ↔ 1.18).
   useEffect(() => {
