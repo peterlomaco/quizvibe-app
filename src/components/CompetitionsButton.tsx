@@ -17,7 +17,7 @@
 
 import { router, useFocusEffect, usePathname } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, AppState, type AppStateStatus, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from '@/src/components/haptic';
 
 import { Colors, FontSize, Radius, Spacing } from '../theme';
@@ -75,6 +75,20 @@ export function CompetitionsButton({
       void reload();
     });
     return unsub;
+  }, [reload]);
+
+  // Appen återvänder till förgrunden: useFocusEffect fyrar INTE här (Home var
+  // redan fokuserad), och subscribeToRematchRequests-Realtime replayar aldrig
+  // events som missades medan socketen låg nere i bakgrunden. Utan detta får en
+  // re-match-förfrågan som anlände MEDAN appen var bakgrundad ingen "Accept
+  // re-match"-signal när spelaren öppnar appen igen. reload() hämtar färskt
+  // serverstate oavsett missade live-events. Samma mönster som
+  // useWaitingInviteSignal.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (next: AppStateStatus) => {
+      if (next === 'active') void reload();
+    });
+    return () => sub.remove();
   }, [reload]);
 
   const hasUpdate = pendingIds.length > 0;

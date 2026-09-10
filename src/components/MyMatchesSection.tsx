@@ -27,7 +27,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect, usePathname } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, AppState, type AppStateStatus, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from '@/src/components/haptic';
 
 import { Colors, FontSize, Radius, Spacing } from '../theme';
@@ -162,6 +162,20 @@ export function MyMatchesSection({
   useEffect(() => {
     const unsubscribe = subscribeToMyMatches(() => { void reload(); });
     return unsubscribe;
+  }, [reload]);
+
+  // Appen återvänder till förgrunden: useFocusEffect fyrar INTE här (Home var
+  // redan fokuserad), och subscribeToMyMatches-Realtime replayar aldrig events
+  // som missades medan socketen låg nere i bakgrunden. Utan detta får en match
+  // som ändrat tillstånd MEDAN appen var bakgrundad ingen "New update"-signal
+  // när spelaren öppnar appen igen. reload() gör ett färskt getMyMatches()-hämt
+  // som plockar upp allt oavsett missade live-events. Samma mönster som
+  // useWaitingInviteSignal.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (next: AppStateStatus) => {
+      if (next === 'active') void reload();
+    });
+    return () => sub.remove();
   }, [reload]);
 
   // Ren guest (anon-session, inget QuizVibe-konto) ser INGEN 1vs1-ingång

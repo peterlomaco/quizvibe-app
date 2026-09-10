@@ -12,6 +12,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 
 import { supabase } from '../utils/supabase';
 import { loadInvites, type WaitingInvite } from '../utils/waitingInvites';
@@ -76,6 +77,20 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
       void reload();
     }, [reload]),
   );
+
+  // Appen återvänder till förgrunden: useFocusEffect fyrar INTE här (Home var
+  // redan den fokuserade route:n — den fyrar bara vid navigations-byte), och
+  // Supabase Realtime replayar ALDRIG en INSERT som missades medan socketen
+  // låg nere i bakgrunden. Utan detta får en spelare som fick en invite MEDAN
+  // appen var bakgrundad ingen "New update"-signal när de öppnar appen igen.
+  // reload() gör ett färskt loadInvites()-SELECT som plockar upp allt oavsett
+  // missade live-events. Samma AppState-mönster som quiz.tsx timer-resume.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (next: AppStateStatus) => {
+      if (next === 'active') void reload();
+    });
+    return () => sub.remove();
+  }, [reload]);
 
   // Live: en ny invite (INSERT) tänder märket, en borttagen (DELETE — host
   // raderade lobby:n eller startade spelet) släcker det. Defensiv channel-
