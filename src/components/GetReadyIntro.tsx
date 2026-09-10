@@ -1444,7 +1444,7 @@ export function GetReadyIntro({
                   ]}
                   pointerEvents="none"
                 >
-                  <Text style={styles.startLockedText}>Connecting players</Text>
+                  <Text style={styles.startLockedText}>Connecting</Text>
                   {startLocked && <SequentialDots color={Colors.textSecondary} />}
                 </View>
               </Animated.View>

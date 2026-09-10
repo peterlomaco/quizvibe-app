@@ -8644,10 +8644,18 @@ export default function QuizScreen() {
   // startGateTimedOut är avsiktligt KLIBBIG: när escapen väl fyrat kan D-iii:s
   // setPlayerConnectionStatus({})-wipe vid lokal unstable→ok-återhämtning inte
   // låsa knappen igen.
+  // Play-knappen låses av (a) peer-readiness-grinden (IndDev-host väntar på att
+  // alla peers rapporterat player_ready) ELLER (b) att host:s LOKALA frågesekvens
+  // ännu inte settlat (getReadySequencePending). (b) gäller single player + PtP-
+  // /IndDev-host (isHost && !isRemote) och håller knappen grå tills nästa-frågans
+  // box (Source/Category/Answer-type-badges) är definierad — annars vore knappen
+  // guld/tappbar innan frågedatan finns. De tre loaded-flaggorna resolvar alltid
+  // via .finally, så (b) släpper garanterat inom den vanliga async-load-fönstret.
   const startLocked =
-    startGateApplies &&
-    !startGateTimedOut &&
-    (!startGateMinGreyDone || unconfirmedPeerCount > 0);
+    (startGateApplies &&
+      !startGateTimedOut &&
+      (!startGateMinGreyDone || unconfirmedPeerCount > 0)) ||
+    getReadySequencePending;
 
   useEffect(() => {
     // syncActive = IndDev ELLER Pass-the-Phone med fler än en spelare. I PtP
