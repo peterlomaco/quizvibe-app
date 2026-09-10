@@ -18,6 +18,8 @@ import {
 interface Item {
   id: string;
   host?: string;
+  hostId?: string;
+  name?: string;
   date?: string;
   gameMode?: string;
   single?: boolean;
@@ -25,6 +27,8 @@ interface Item {
 
 const acc: GroupAccessors<Item> = {
   getHostName: (i) => i.host,
+  getHostUserId: (i) => i.hostId,
+  getName: (i) => i.name,
   getDateISO: (i) => i.date,
   getGameForm: (i) => resolveGameForm(i.gameMode, i.single),
 };
@@ -85,6 +89,55 @@ describe('groupHistory — host mode', () => {
       'individual-devices',
     ]);
     expect(anna.forms[0].items.map((i) => i.id)).toEqual(['4']);
+  });
+});
+
+describe('groupHistory — host mode, self first', () => {
+  it('pinnar egen host (selfUserId) överst, resten alfabetiskt, Unknown sist', () => {
+    const items: Item[] = [
+      { id: '1', host: 'Anna', hostId: 'u-anna', gameMode: 'pass-the-phone' },
+      { id: '2', host: 'Zoe', hostId: 'u-zoe', gameMode: 'pass-the-phone' },
+      { id: '3', gameMode: 'pass-the-phone' }, // ingen host
+      { id: '4', host: 'Mia', hostId: 'u-mia', gameMode: 'pass-the-phone' },
+    ];
+    // Jag = Zoe (alfabetiskt sist bland namnen) → ska ändå hamna först.
+    const groups = groupHistory(items, 'host', acc, 'u-zoe');
+    expect(groups.map((g) => g.l1Label)).toEqual([
+      'Zoe',
+      'Anna',
+      'Mia',
+      'Unknown host',
+    ]);
+  });
+
+  it('utan selfUserId-match → ren alfabetisk (bakåtkompatibelt)', () => {
+    const items: Item[] = [
+      { id: '1', host: 'Zoe', hostId: 'u-zoe', gameMode: 'pass-the-phone' },
+      { id: '2', host: 'Anna', hostId: 'u-anna', gameMode: 'pass-the-phone' },
+    ];
+    expect(groupHistory(items, 'host', acc).map((g) => g.l1Label)).toEqual([
+      'Anna',
+      'Zoe',
+    ]);
+    expect(
+      groupHistory(items, 'host', acc, 'u-nobody').map((g) => g.l1Label),
+    ).toEqual(['Anna', 'Zoe']);
+  });
+});
+
+describe('groupHistory — name mode', () => {
+  it('grupperar per tabellnamn, alfabetiskt, Unnamed sist', () => {
+    const items: Item[] = [
+      { id: '1', name: 'Zeta Cup', gameMode: 'pass-the-phone' },
+      { id: '2', name: 'Alpha League', gameMode: 'individual-devices' },
+      { id: '3', gameMode: 'pass-the-phone' }, // saknar namn
+    ];
+    const groups = groupHistory(items, 'name', acc);
+    expect(groups.map((g) => g.l1Label)).toEqual([
+      'Alpha League',
+      'Zeta Cup',
+      'Unnamed',
+    ]);
   });
 });
 

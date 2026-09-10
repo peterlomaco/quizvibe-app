@@ -50,7 +50,7 @@ export function resolveGameForm(
   return { key: 'unknown', label: 'Unknown mode' };
 }
 
-export type SortMode = 'host' | 'date';
+export type SortMode = 'host' | 'date' | 'name';
 
 // ── Månads-helpers ────────────────────────────────────────────────────────
 // Flyttade hit från PlayerHistorySection så samma månads-logik driver både
@@ -77,7 +77,11 @@ export function monthLabelForKey(key: string): string {
 
 export interface GroupAccessors<T> {
   getHostName: (item: T) => string | undefined;
+  /** Host-uid — bara för att flagga "det här är JAG" (self-first-sort i host-läge). */
+  getHostUserId?: (item: T) => string | undefined;
   getDateISO: (item: T) => string | undefined;
+  /** Marathon-tabellens eget namn — level-1-nyckel i 'name'-läge. */
+  getName?: (item: T) => string | undefined;
   getGameForm: (item: T) => GameForm;
 }
 
@@ -95,24 +99,30 @@ export interface L1Group<T> {
 
 const UNKNOWN_HOST_KEY = '__unknown_host__';
 const UNKNOWN_DATE_KEY = 'unknown';
+const UNKNOWN_NAME_KEY = '__unnamed__';
 
 /**
- * Grupperar `items` i två nivåer: level 1 = host name ELLER månad (styrt av
- * `sortMode`), level 2 = spelform (fast ordning via GAME_FORM_ORDER).
+ * Grupperar `items` i två nivåer: level 1 = host name / månad / tabellnamn
+ * (styrt av `sortMode`), level 2 = spelform (fast ordning via GAME_FORM_ORDER).
  *
- * - Level-1-sort: host = alfabetiskt ("Unknown host" sist); date = månads-
- *   nyckel nyast först ("Unknown date" sist).
+ * - Level-1-sort: host = alfabetiskt (JAG först om `selfUserId` matchar,
+ *   "Unknown host" sist); date = månads-nyckel nyast först ("Unknown date" sist);
+ *   name = alfabetiskt ("Unnamed" sist).
  * - Level 2: tomma spelform-hinkar slängs.
  * - Level 3 (items): inkommande ordning bevaras — anropare skickar dem redan
  *   sorterade nyast först, så leaf-ordningen förblir nyast först.
+ *
+ * `selfUserId` (host-läge) flaggar hinken vars host-uid är den inloggade
+ * användaren så den sorteras överst — "din egen som Host först".
  */
 export function groupHistory<T>(
   items: T[],
   sortMode: SortMode,
   acc: GroupAccessors<T>,
+  selfUserId?: string | null,
 ): L1Group<T>[] {
   // 1) Bucketa på level-1-nyckel (bevara insättningsordning inom hinken).
-  const l1Map = new Map<string, { label: string; items: T[] }>();
+  const l1Map = new Map<string, { label: string; items: T[]; isSelf: boolean }>();
   for (const item of items) {
     let key: string;
     let label: string;
@@ -124,6 +134,15 @@ export function groupHistory<T>(
       } else {
         key = UNKNOWN_HOST_KEY;
         label = 'Unknown host';
+      }
+    } else if (sortMode === 'name') {
+      const name = acc.getName?.(item)?.trim();
+      if (name) {
+        key = name;
+        label = name;
+      } else {
+        key = UNKNOWN_NAME_KEY;
+        label = 'Unnamed';
       }
     } else {
       const iso = acc.getDateISO(item);
@@ -138,8 +157,15 @@ export function groupHistory<T>(
     }
     let bucket = l1Map.get(key);
     if (!bucket) {
-      bucket = { label, items: [] };
+      bucket = { label, items: [], isSelf: false };
       l1Map.set(key, bucket);
+    }
+    if (
+      sortMode === 'host' &&
+      selfUserId &&
+      acc.getHostUserId?.(item) === selfUserId
+    ) {
+      bucket.isSelf = true;
     }
     bucket.items.push(item);
   }
@@ -151,6 +177,13 @@ export function groupHistory<T>(
       const aUnknown = ka === UNKNOWN_HOST_KEY;
       const bUnknown = kb === UNKNOWN_HOST_KEY;
       if (aUnknown !== bUnknown) return aUnknown ? 1 : -1; // Unknown sist
+      if (ba.isSelf !== bb.isSelf) return ba.isSelf ? -1 : 1; // JAG först
+      return ba.label.localeCompare(bb.label);
+    }
+    if (sortMode === 'name') {
+      const aUnknown = ka === UNKNOWN_NAME_KEY;
+      const bUnknown = kb === UNKNOWN_NAME_KEY;
+      if (aUnknown !== bUnknown) return aUnknown ? 1 : -1; // Unnamed sist
       return ba.label.localeCompare(bb.label);
     }
     // date: nyast först (YYYY-MM desc), Unknown sist

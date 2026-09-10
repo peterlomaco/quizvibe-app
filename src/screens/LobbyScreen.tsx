@@ -235,9 +235,6 @@ function mergeProfileIntoHost(existing: LobbyPlayer, profile: ProfileData): Lobb
   };
 }
 
-// Competition re-match (från Home): begäran lever i 5 minuter — hinner inte
-// alla inbjudna joina rivs lobbyn och inbjudningarna cascade:as bort.
-const COMPETITION_REMATCH_TTL_MS = 5 * 60 * 1000;
 
 const SEED_PLAYERS: LobbyPlayer[] = [
   { id: '1', name: 'Alex K.',   emoji: '🦊', isReady: true,  type: 'registered', hcpComplete: true,  age: 32, assistance: 'standard', isHost: true, approved: true  },
@@ -4599,36 +4596,11 @@ export default function LobbyScreen() {
     };
   }, [isRematchLobby, roomCode]);
 
-  // Competition re-match: 5-minuters livslängd. Ref-spegel av "alla på plats"
-  // så expiry-timeouten (satt en gång på mount) läser aktuellt läge vid fire.
-  const allRematchPresentRef = useRef(false);
-  useEffect(() => {
-    allRematchPresentRef.current =
-      !isCompetitionRematch ||
-      findMissingRematchPlayers(rematchExpectedIds, players).length === 0;
-  }, [isCompetitionRematch, rematchExpectedIds, players]);
-
-  useEffect(() => {
-    if (!hostMode || !isCompetitionRematch) return;
-    const timer = setTimeout(() => {
-      // Alla joinade i tid → låt lobbyn leva (host startar när de vill).
-      if (allRematchPresentRef.current) return;
-      // Riv rummet — deactivateRoom raderar rums-raden så waiting_invites
-      // cascade:as bort automatiskt (recipients JoinModal-sub tar bort dem).
-      void deactivateRoom(roomCode);
-      clearLobbyPlayers(roomCode);
-      clearLobbySettings(roomCode);
-      clearEjected(roomCode);
-      clearGameStarted(roomCode);
-      Alert.alert(
-        'Re-match request expired',
-        'Not everyone joined within 5 minutes, so the re-match was cancelled.',
-        [{ text: 'OK', onPress: () => router.replace('/') }],
-        { cancelable: false },
-      );
-    }, COMPETITION_REMATCH_TTL_MS);
-    return () => clearTimeout(timer);
-  }, [hostMode, isCompetitionRematch, roomCode]);
+  // (Ingen 5-minuters self-destruct för competition re-match: i två-fas-flödet
+  // accepterar alla inbjudna innan lobbyn ens skapas, så en timeout fyrar aldrig
+  // meningsfullt. Lineup-lock-guarden i handleStartGame är den faktiska
+  // spärren — Start blockeras tills hela uppsättningen är på plats — och host
+  // har "Delete this Game Lobby" som manuell utväg.)
 
   const isRemoteLobby = gameMode === 'remote-1v1' && !singlePlayerDefault;
   // Gemensam hjälpnivå gäller bara när BÅDE lobbyn är remote OCH host slagit
@@ -8816,21 +8788,6 @@ export default function LobbyScreen() {
 
         <View style={styles.bottomPad} />
       </ScrollView>
-
-      {/* Competition re-match: banner som visar vilka inbjudna vi väntar på.
-          Försvinner när alla joinat (då är Start Re-match upplåst). */}
-      {hostMode && isCompetitionRematch && (() => {
-        const missing = findMissingRematchPlayers(rematchExpectedIds, players);
-        if (missing.length === 0) return null;
-        return (
-          <View style={styles.compRematchWaitBanner}>
-            <Text style={styles.compRematchWaitText}>
-              Waiting for {describeMissingPlayers(missing)} to join — the re-match
-              is cancelled if everyone hasn&apos;t joined within 5 minutes.
-            </Text>
-          </View>
-        );
-      })()}
 
       {/* ── Start Game — sticky bottom-bar ──────────────────────────
           Ligger utanför ScrollView:n så den alltid är synlig oavsett

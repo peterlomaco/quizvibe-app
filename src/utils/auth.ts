@@ -132,6 +132,22 @@ export async function isAnonymousSession(): Promise<boolean> {
 }
 
 /**
+ * Inloggade användarens auth-uid, eller null (utloggad/fel).
+ *
+ * Används där klienten behöver jämföra mot ett server-lagrat uid (t.ex.
+ * `created_by` på en Marathon-tabell för att avgöra "min egen som Host").
+ */
+export async function getCurrentUserId(): Promise<string | null> {
+  try {
+    const { data } = await supabase.auth.getUser();
+    return data.user?.id ?? null;
+  } catch (err) {
+    console.warn('[auth] getCurrentUserId threw:', err);
+    return null;
+  }
+}
+
+/**
  * Login-via-PlayerName utan att exponera email:en klient-side.
  *
  * Anropar Edge Function 'login-by-name' som slår upp email:en server-side,

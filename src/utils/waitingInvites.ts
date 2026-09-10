@@ -49,6 +49,11 @@ export interface WaitingInvite {
   // skickades. Styr om recipient-klienten visar consent-popupen
   // ("...adds you to his/her QuizVibe friend list") innan Accept.
   alreadyFriend: boolean;
+  // Marathon-tabellens namn när inviten kommer från en Competition re-match
+  // ("Continue with new Game", migration 0051). Satt → invite-kortet visar
+  // "Marathon table: <namn>" i stället för den härledda lobbytypen. Bärs på
+  // inbjudan eftersom room→serie-kopplingen bara finns på hostens enhet.
+  competitionName?: string;
 }
 
 // DB row-shape (snake_case). Mappar till WaitingInvite via rowToInvite.
@@ -61,6 +66,8 @@ interface WaitingInviteRow {
   from_avatar_id: string | null;
   sent_at: string; // ISO-timestamp från Supabase
   already_friend: boolean;
+  // Optional — saknas på rader från FÖRE migration 0051 (undefined → null).
+  competition_name?: string | null;
 }
 
 function rowToInvite(row: WaitingInviteRow): WaitingInvite {
@@ -71,6 +78,7 @@ function rowToInvite(row: WaitingInviteRow): WaitingInvite {
     fromAvatarId: row.from_avatar_id ?? undefined,
     sentAt: new Date(row.sent_at).getTime(),
     alreadyFriend: row.already_friend,
+    competitionName: row.competition_name ?? undefined,
   };
 }
 
@@ -97,6 +105,7 @@ function parseInvites(json: string): WaitingInvite[] {
     roomCode: i.roomCode ?? '',
     fromPlayerName: i.fromPlayerName ?? i.fromNickname ?? '',
     fromAvatarId: i.fromAvatarId,
+    competitionName: i.competitionName,
     sentAt: i.sentAt ?? Date.now(),
     // Legacy cached invites (pre-migration) don't have this field — default
     // to true (assume already-friend / no popup) since we genuinely don't
@@ -246,13 +255,20 @@ export async function addInvite(
   //    duplicate-invite från samma host till samma rum failas med error
   //    code 23505. Det är ok — vi loggar inte det som ett fel.
   try {
-    const { error } = await supabase.from('waiting_invites').insert({
+    // `competition_name` läggs till ENBART när den finns (marathon-invite) så
+    // vanliga invites är byte-identiska med förr — en icke-applicerad 0051
+    // bryter då aldrig det ordinarie Share invite-flödet (okänd kolumn i en
+    // INSERT failar HELA raden). Marathon-invites kräver 0051 applicerad för
+    // cross-device-leverans; utan den faller de tyst till AsyncStorage-vägen.
+    const payload: Record<string, unknown> = {
       to_player_name: normalizedTo,
       room_code: invite.roomCode,
       from_player_name: invite.fromPlayerName,
       from_avatar_id: invite.fromAvatarId ?? null,
       already_friend: invite.alreadyFriend,
-    });
+    };
+    if (invite.competitionName) payload.competition_name = invite.competitionName;
+    const { error } = await supabase.from('waiting_invites').insert(payload);
     if (error && error.code !== '23505') {
       console.warn('[waitingInvites] Supabase insert failed:', error.message);
     }

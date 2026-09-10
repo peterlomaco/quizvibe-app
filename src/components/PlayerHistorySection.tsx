@@ -115,8 +115,11 @@ export function PlayerHistorySection() {
       {expanded && (
         <>
           {/* Sparade Aggregate Leaderboards/Scores (0037). Självgatande —
-              inget sparat eller anonym session → renderar null. */}
-          <SavedAggregatesCard />
+              inget sparat eller anonym session → renderar null.
+              showRematch → detalj-modalen kör den två-fas re-match-flödet
+              (CompetitionRematchActions: "Send Re-match invitation" → vänta på
+              accept → "Yes – start re-match"), samma som /competitions. */}
+          <SavedAggregatesCard showRematch />
           <View style={styles.card}>
             <Text style={styles.cardTitle}>
               Games played: {history.length}

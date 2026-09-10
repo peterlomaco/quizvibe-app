@@ -158,6 +158,8 @@ export async function startCompetitionRematch(
         fromPlayerName: hostPlayerName,
         fromAvatarId: hostAvatarId,
         alreadyFriend: true,
+        // Namnet visas på mottagarens invite-kort ("Marathon table: <namn>").
+        competitionName: saved.name,
       });
     }
   }

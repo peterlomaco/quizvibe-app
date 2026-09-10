@@ -284,7 +284,14 @@ export function CompetitionRematchActions({
       {busy ? (
         <ActivityIndicator color="#000000" />
       ) : (
-        <Text style={styles.goldBtnText}>{label}</Text>
+        <Text
+          style={styles.goldBtnText}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
+          {label}
+        </Text>
       )}
     </Pressable>
   );
@@ -300,7 +307,7 @@ export function CompetitionRematchActions({
 
   if (isHost) {
     if (isSolo) return goldButton('Replay', handleReplaySolo);
-    if (!activeRequest) return goldButton('Re-match', handleInitiate);
+    if (!activeRequest) return goldButton('Send Re-match invitation', handleInitiate);
     if (!allAccepted) {
       return (
         <View style={styles.stack}>
@@ -334,6 +341,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.warning,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
   },
   goldBtnText: {
     fontSize: FontSize.md,

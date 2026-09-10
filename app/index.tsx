@@ -1290,18 +1290,27 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
               ) : (
                 invites.map((inv) => {
                   const gameMode = inviteGameModes[inv.roomCode];
+                  // Marathon re-match-invite ("Continue with new Game") bär
+                  // tabellnamnet → badgen säger "Marathon table" i stället för
+                  // den härledda lobbytypen, och namnet visas under Room Code.
+                  const isMarathon = !!inv.competitionName;
                   return (
                   <View key={inv.id} style={modal.inviteRow}>
                     {/* Spelläge-badge i övre högra hörnet (Peter 2026-09-09):
-                        Single Player / Multiplayer / H2H. Renderas först när
-                        läget resolvats ur rums-metadatan. */}
-                    {gameMode !== undefined && (
+                        Single Player / Multiplayer / H2H — eller "Marathon
+                        table" för en marathon-invite. Renderas först när läget
+                        resolvats ur rums-metadatan (marathon-badgen direkt). */}
+                    {isMarathon ? (
+                      <View style={modal.inviteGameModeBadge}>
+                        <Text style={modal.inviteGameModeText}>Marathon table</Text>
+                      </View>
+                    ) : gameMode !== undefined ? (
                       <View style={modal.inviteGameModeBadge}>
                         <Text style={modal.inviteGameModeText}>
                           {INVITE_GAME_MODE_LABEL[gameMode]}
                         </Text>
                       </View>
-                    )}
+                    ) : null}
                     {/* Emoji + info på övre raden; Deny/Accept flyttade till egen
                         rad längst ned (Peter 2026-09-02) så hela bredden är fri
                         för PlayerName-raderna. */}
@@ -1331,6 +1340,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                           {inv.fromPlayerName}
                         </Text>
                         <Text style={modal.inviteCode}>Room {formatRoomCode(inv.roomCode)}</Text>
+                        {isMarathon && (
+                          <Text style={modal.inviteMarathonName} numberOfLines={1}>
+                            {inv.competitionName}
+                          </Text>
+                        )}
                       </View>
                     </View>
                     <View style={modal.inviteActions}>
@@ -5334,6 +5348,13 @@ const modal = StyleSheet.create({
     color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
     letterSpacing: 1,
+    marginTop: 2,
+  },
+  // Marathon-tabellens namn under Room Code för en marathon-invite.
+  inviteMarathonName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.primary,
     marginTop: 2,
   },
   // Deny/Accept-knapparna (Peter 2026-08-27, ersatte hela-radens implicita
