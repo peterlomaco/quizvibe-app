@@ -11,6 +11,10 @@ interface HCPShieldProps {
   // dynamiskt härlett HCP internt (getGuestHcpFromClosestAge), det visas
   // bara inte som ett tal. `hcp`-propen ignoreras när detta är true.
   notDefined?: boolean;
+  // Solid (icke-transparent) fyllning i stället för tier-tinten (rgba …0.22).
+  // Används av lobby-spelarkortets avatar-badge så avataren inte lyser igenom
+  // skölden. Kantlinje + glöd + text behåller sin tier-färg.
+  opaque?: boolean;
 }
 
 // Neutral tier för Guest-sköld ("Not Defined") — grå, ingen elit-glöd.
@@ -90,22 +94,30 @@ export function regionFlagEmoji(region: string | undefined | null): string {
   }
 }
 
-export function HCPShield({ hcp, size = 100, notDefined = false }: HCPShieldProps) {
+export function HCPShield({ hcp, size = 100, notDefined = false, opaque = false }: HCPShieldProps) {
   const tier = notDefined ? NOT_DEFINED_TIER : getTier(hcp);
-  const w = size;
+  // Solid mörk navy-fyllning (opaque) eller den genomskinliga tier-tinten.
+  const fillColor = opaque ? Colors.cardElevated : tier.fill;
+  // Bredden är något smalare än `size` (höjden oförändrad) → smäckrare sköld.
+  const w = size * 0.9;
   const h = size * 1.15;
-  const r = 6; // radius för rundade topp-hörn
 
-  // Klassisk sköld: rundade topp-hörn, raka sidor, spetsig bottenkurva
+  // Sköld med spetsig ("sharp") topp: rundade axlar (topp-hörn) + raka linjer
+  // upp till en spets i mitten, sedan raka sidor och en spetsig bottenkurva.
+  // Offset-värdena skalar med size så toppen ser proportionellt likadan ut i
+  // alla storlekar (badge 30 → Profile/leaderboard 40–64).
+  const cr = w * 0.24;              // topp-hörn-radie
+  const shoulderY = size * 0.1667;  // var de rundade topp-hörnen sitter
+  const peakY = size * 0.05;        // spetsen nära toppen
   const d = `
-    M ${r} 2
-    L ${w - r} 2
-    Q ${w - 2} 2 ${w - 2} ${r + 2}
+    M 2 ${cr + shoulderY}
+    Q 2 ${shoulderY} ${cr} ${shoulderY}
+    L ${w / 2} ${peakY}
+    L ${w - cr} ${shoulderY}
+    Q ${w - 2} ${shoulderY} ${w - 2} ${cr + shoulderY}
     L ${w - 2} ${h * 0.55}
     Q ${w - 2} ${h * 0.82} ${w / 2} ${h - 2}
     Q 2 ${h * 0.82} 2 ${h * 0.55}
-    L 2 ${r + 2}
-    Q 2 2 ${r} 2
     Z
   `.trim();
 
@@ -123,7 +135,7 @@ export function HCPShield({ hcp, size = 100, notDefined = false }: HCPShieldProp
       ]}
     >
       <Svg width={w} height={h}>
-        <Path d={d} stroke={tier.stroke} strokeWidth={2.5} fill={tier.fill} />
+        <Path d={d} stroke={tier.stroke} strokeWidth={2.5} fill={fillColor} />
       </Svg>
 
       {/* Textöverlagring – "HCP" över, siffra (eller "Not Defined") under */}
@@ -159,6 +171,10 @@ interface HCPShieldCardProps {
   // övre HÖGRA hörnet: 0 (grå) / -x (grön = bättre) / +y (röd = sämre). Flaggan
   // flyttas då till övre VÄNSTRA hörnet så de inte krockar.
   deltaBadge?: number;
+  // Döljer box-kantlinjen runt skölden (behåller sköld + etikett). Används av
+  // lobby-spelarkortet för Total-skölden bredvid avataren när kortet är
+  // hopfällt — då ska ingen ruta rita runt skölden.
+  hideBox?: boolean;
 }
 
 export function HCPShieldCard({
@@ -170,6 +186,7 @@ export function HCPShieldCard({
   badgeColor,
   badgeTextColor,
   deltaBadge,
+  hideBox = false,
 }: HCPShieldCardProps) {
   const color = getShieldTierColor(hcp, notDefined);
   const labelBg = badgeColor ?? color;
@@ -183,7 +200,7 @@ export function HCPShieldCard({
         : Colors.error;
   const deltaText = deltaBadge === undefined ? '' : deltaBadge > 0 ? `+${deltaBadge}` : `${deltaBadge}`;
   return (
-    <View style={[cardStyles.box, { borderColor: color }]}>
+    <View style={[cardStyles.box, { borderColor: color }, hideBox && cardStyles.boxBorderless]}>
       {regionFlag ? (
         // Flaggan ligger till höger som standard; med delta-badge → vänster.
         <View style={hasDelta ? cardStyles.flagBadgeLeft : cardStyles.flagBadge}>
@@ -261,6 +278,11 @@ const cardStyles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 6,
     paddingHorizontal: 10,
+  },
+  // hideBox: ta bort kantlinjen (behåll sköld + etikett + samma padding så
+  // etikett-badgens position är oförändrad).
+  boxBorderless: {
+    borderWidth: 0,
   },
   // HCP-förändrings-badge i övre HÖGRA hörnet (0 / -x / +y).
   deltaBadge: {

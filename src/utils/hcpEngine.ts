@@ -188,20 +188,21 @@ export function applyInactivityDecay(progress: HcpProgress, now: Date): HcpProgr
 }
 
 /**
- * Total-HCP (flyttal).
+ * Total-HCP (flyttal) = snittet av de AKTIVA spelade kategorierna Music + Film.
  *
- * ⚠ MUSIC-ONLY LAUNCH (2026-09): Total = Music-kategorins HCP, INTE snittet av de
- * tre. Film/Sport spelas aldrig (katalogen är parkerad) och ligger kvar på
- * HCP_START = 99 — ett snitt `(Music + 99 + 99) / 3` skulle späda ut en musik-
- * spelares Total mot 99, vilket motsäger "HCP baserat enbart på musikfrågornas
- * rätt-svarsfrekvens". Denna enda funktion föder profile.hcp, lobby_players.hcp,
- * player_hcp_changed-Total och varje Total-sköld (via bundleOf +
- * resolveDisplayTotalHcp). Återställ snittet när Film/Sport återaktiveras:
+ * ⚠ Sport ingår INTE (2026-09): dess katalog är fortfarande parkerad, så
+ * Sport.hcp ligger kvar på HCP_START = 99 och ett snitt som räknade in den
+ * skulle späda ut en spelares Total mot 99. Music + Film är de två kategorier
+ * som faktiskt spelas i dag. Denna enda funktion föder profile.hcp,
+ * lobby_players.hcp, player_hcp_changed-Total och varje Total-sköld (via
+ * bundleOf + resolveDisplayTotalHcp). Lägg tillbaka Sport i snittet när dess
+ * katalog återaktiveras:
  *   const { Music, Film, Sport } = progress.categories;
  *   return (Music.hcp + Film.hcp + Sport.hcp) / 3;
  */
 export function totalHcp(progress: HcpProgress): number {
-  return progress.categories.Music.hcp;
+  const { Music, Film } = progress.categories;
+  return (Music.hcp + Film.hcp) / 2;
 }
 
 /**

@@ -67,17 +67,21 @@ describe('emptyHcpProgress (§1.1/§1.3 — alla kategorier startar på 99)', ()
   });
 });
 
-describe('totalHcp / resolveDisplayTotalHcp (MUSIC-ONLY: Total = Music)', () => {
-  it('total = Music-kategorins float-HCP (Film/Sport ignoreras)', () => {
-    // MUSIC-ONLY LAUNCH: Total speglar Music, INTE snittet — annars skulle
-    // parkerade Film/Sport (99) späda ut en musik-spelares Total.
-    const p = progress(cat(40), cat(99), cat(99));
-    expect(totalHcp(p)).toBeCloseTo(40, 5);
-    expect(resolveDisplayTotalHcp(p)).toBe(40);
+describe('totalHcp / resolveDisplayTotalHcp (Total = snittet Music + Film)', () => {
+  it('total = snittet av Music + Film (Sport ignoreras)', () => {
+    // Total speglar snittet av de aktiva spelade kategorierna Music + Film.
+    // Parkerade Sport (99) ingår INTE i snittet.
+    const p = progress(cat(40), cat(60), cat(99));
+    expect(totalHcp(p)).toBeCloseTo(50, 5);
+    expect(resolveDisplayTotalHcp(p)).toBe(50);
   });
   it('avrundar total uppåt', () => {
-    const p = progress(cat(40.2), cat(99), cat(99)); // Music 40.2 → ceil 41
-    expect(resolveDisplayTotalHcp(p)).toBe(41);
+    const p = progress(cat(40), cat(61), cat(99)); // snitt 50.5 → ceil 51
+    expect(resolveDisplayTotalHcp(p)).toBe(51);
+  });
+  it('orört Film (99) späder Total mot 99', () => {
+    const p = progress(cat(40)); // Music 40, Film 99 → snitt 69.5 → ceil 70
+    expect(resolveDisplayTotalHcp(p)).toBe(70);
   });
   it('null progress → 99', () => {
     expect(resolveDisplayTotalHcp(null)).toBe(99);

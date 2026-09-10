@@ -473,6 +473,8 @@ export default function ProfileScreen() {
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
   const [voicePickerOpen, setVoicePickerOpen]   = useState(false);
+  // "+"-utfällning av per-kategori-HCP-sköldarna (Music/Film). Default av.
+  const [hcpCategoriesExpanded, setHcpCategoriesExpanded] = useState(false);
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
   const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -1521,11 +1523,11 @@ export default function ProfileScreen() {
               {playerName}
             </Text>
 
-            {/* HCP-sköld under avatar + namn. MUSIC-ONLY LAUNCH: en enda sköld
-                (Total = musik-HCP), ingen kategori-badge (`label` utelämnad) och
-                inga Music/Film/Sport-subsköldar. */}
+            {/* Total-HCP-sköld under avatar + namn (§1.3, Total = snittet
+                Music + Film). Music/Film fälls ut via "HCP per category"-raden
+                i höger-kolumnen. */}
             <View style={styles.hcpShieldWrap}>
-              <HCPShieldCard hcp={hcpShieldBundle.total} size={64} />
+              <HCPShieldCard hcp={hcpShieldBundle.total} size={64} label="Total" />
             </View>
           </View>
 
@@ -1635,8 +1637,30 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
 
-            {/* MUSIC-ONLY LAUNCH: "HCP per category"-utfällningen (Music/Film/
-                Sport-subsköldar) borttagen — bara Total-skölden ovan visas. */}
+            {/* "HCP per category"-rad — under Voice-dropdownen i höger-
+                kolumnen. "+"/"−"-toggle fäller ut Music/Film-sköldarna.
+                Rubriken i samma font som fält-labels ("Assistance level"). */}
+            <Pressable
+              onPress={() => setHcpCategoriesExpanded((v) => !v)}
+              hitSlop={8}
+              style={({ pressed }) => [styles.hcpCatHeaderRow, pressed && { opacity: 0.7 }]}
+            >
+              <View style={styles.hcpCatToggleBox}>
+                <Text style={styles.gameConnectionsChevron}>
+                  {hcpCategoriesExpanded ? '−' : '+'}
+                </Text>
+              </View>
+              <Text style={styles.fieldLabel}>HCP per category</Text>
+            </Pressable>
+            {/* Per-kategori-HCP (§1.3) — full-bredds-rad, utfälld via raden ovan.
+                Bara Music + Film (Sport parkerad). Badge-färgen matchar
+                GetReady/countdown-vyns kategori-badge (guld + svart). */}
+            {hcpCategoriesExpanded && (
+              <View style={styles.hcpSubRow}>
+                <HCPShieldCard hcp={hcpShieldBundle.music} size={56} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" />
+                <HCPShieldCard hcp={hcpShieldBundle.film} size={56} label="Film" badgeColor={Colors.warning} badgeTextColor="#000" />
+              </View>
+            )}
 
           </View>
           </View>

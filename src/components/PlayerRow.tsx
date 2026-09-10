@@ -10,7 +10,7 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
 import { Avatar } from './Avatar';
-import { HCPShieldCard } from './HCPShield';
+import { HCPShield, HCPShieldCard } from './HCPShield';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { WifiFanIcon } from './WifiFanIcon';
 
@@ -196,20 +196,20 @@ export function PlayerRow({
             uri={player.avatarUri}
             emoji={player.emoji}
             name={player.name}
-            size={34}
+            size={54}
             useBrandFallback={!isGuest}
           />
+          {/* HCP-sköld fäst i avatarens nedre högra hörn — Total (= snittet
+              Music + Film). Bara när kortet är HOPFÄLLT; vid "Details" flyttas
+              Total ned till kategori-raden (Total + Music + Film). Ingen
+              "Total"-etikett/ruta här — bara den lilla skölden mot avataren.
+              Döljs för left-spelare; gäst → "Not Defined"-sköld. */}
+          {!hasLeft && !detailsExpanded && (hcpNotDefined || hcp !== undefined) && (
+            <View style={styles.hcpShieldBadge}>
+              <HCPShield hcp={hcp ?? 99} size={30} notDefined={hcpNotDefined} opaque />
+            </View>
+          )}
         </View>
-
-        {/* HCP-sköld bredvid avataren. MUSIC-ONLY LAUNCH: en enda sköld
-            (Total = musik-HCP), ingen kategori-badge (`label` utelämnad), inga
-            Music/Film/Sport-subsköldar. Döljs för left-spelare; gäst →
-            "Not Defined"-vattenstämpel. */}
-        {!hasLeft && (hcpNotDefined || hcp !== undefined) && (
-          <View style={styles.hcpShieldWrap}>
-            <HCPShieldCard hcp={hcp ?? 99} size={40} notDefined={hcpNotDefined} />
-          </View>
-        )}
 
         <View style={styles.info}>
           <View style={styles.nameRow}>
@@ -425,9 +425,18 @@ export function PlayerRow({
         </View>
       )}
 
-      {/* MUSIC-ONLY LAUNCH: per-kategori-HCP-raden (Music/Film/Sport-subsköldar)
-          borttagen — bara Total-skölden bredvid avataren visas. "Details"-
-          toggeln styr fortsatt Assistance/Age-pillerna. */}
+      {/* ── Per-kategori-HCP: full-bredds-rad under meta-raden ─────────
+          Fälls ut med "Details" (samma toggle som Assistance/Age). Total (=
+          snittet Music + Film) flyttas hit från avatar-raden när kortet fälls
+          ut; sedan Music + Film (Sport parkerad). Egen rad så de breda
+          sköldarna inte klämmer PlayerName-kolumnen. */}
+      {!hasLeft && !hcpNotDefined && hcp !== undefined && detailsExpanded && (
+        <View style={styles.hcpCatRow}>
+          <HCPShieldCard hcp={hcp ?? 99} size={40} label="Total" />
+          <HCPShieldCard hcp={hcpMusic ?? 99} size={40} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" />
+          <HCPShieldCard hcp={hcpFilm ?? 99} size={40} label="Film" badgeColor={Colors.warning} badgeTextColor="#000" />
+        </View>
+      )}
 
       </View>
 
@@ -528,12 +537,14 @@ const styles = StyleSheet.create({
   avatarWrap: {
     position: 'relative',
   },
-  // HCP-sköld bredvid avataren — vertikalt centrerad i övre raden.
-  hcpShieldWrap: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: -Spacing.lg,
-    marginRight: Spacing.xs,
+  // HCP-sköld fäst som liten badge i avatarens ÖVRE HÖGRA hörn (hopfällt kort) —
+  // sticker ut något upp/åt höger så den överlappar avatar-kanten (som mockupen).
+  hcpShieldBadge: {
+    position: 'absolute',
+    right: -10,
+    top: -4,
+    zIndex: 10,
+    elevation: 6,
   },
   // Full-bredds-rad med Music/Film/Sport-sköldarna under meta-raden.
   // marginBottom ger plats åt de kant-skärande etikett-badgarna (bottom: -9)
