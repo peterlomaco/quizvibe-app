@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Animated, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { buildAggregateStandings } from '../utils/aggregateLeaderboard';
@@ -115,6 +115,33 @@ export function SavedAggregatesCard({
   const appliedFocusRef = useRef<string | null>(null);
   // Radera-knappen i detalj-modalen — busy-guard mot dubbeltapp.
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Flash-guide: den utpekade raden markeras numera med en BLINKANDE guldkant
+  // (ingen kant-skärande pill längre). En delad loop så alla flashade rader
+  // blinkar i synk — samma 600ms/0.3↔1-kurva som NewUpdateBadge. useNativeDriver
+  // måste vara false eftersom värdet driver en interpolerad borderColor.
+  const [borderBlink] = useState(() => new Animated.Value(1));
+  useEffect(() => {
+    if (flashIds.size === 0) {
+      borderBlink.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(borderBlink, { toValue: 0.3, duration: 600, useNativeDriver: false }),
+        Animated.timing(borderBlink, { toValue: 1, duration: 600, useNativeDriver: false }),
+      ]),
+    );
+    loop.start();
+    return () => {
+      loop.stop();
+      borderBlink.setValue(1);
+    };
+  }, [flashIds, borderBlink]);
+  const flashBorderColor = borderBlink.interpolate({
+    inputRange: [0.3, 1],
+    outputRange: ['rgba(245,166,35,0.3)', Colors.warning], // bleknad guld ↔ full guld (#F5A623)
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -320,11 +347,15 @@ export function SavedAggregatesCard({
         onPress={() => setOpenId(item.id)}
         style={({ pressed }) => [
           styles.row,
-          isFlash && styles.rowFlash,
           pressed && { opacity: 0.8 },
         ]}
       >
-        {isFlash && <NewUpdateBadge pill active style={styles.rowFlashBadge} />}
+        {isFlash && (
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.flashBorderOverlay, { borderColor: flashBorderColor }]}
+          />
+        )}
         <View style={styles.rowText}>
           <Text style={styles.rowName} numberOfLines={1}>
             {item.name}
@@ -557,7 +588,7 @@ export function SavedAggregatesCard({
             {/* Flash-guidens sista steg: blinka "New update" över accept-
                 åtgärden när modalen öppnats för en utpekad Marathon table. */}
             {showRematch && open && flashIds.has(open.id) && (
-              <NewUpdateBadge pill active style={styles.modalFlashBadge} />
+              <NewUpdateBadge active style={styles.modalFlashBadge} />
             )}
             {showRematch && open && (
               <CompetitionRematchActions
@@ -632,15 +663,12 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
   rowText: { flex: 1 },
-  // Flash-guide: den utpekade raden får guld-kant + kant-skärande "New update".
-  rowFlash: {
-    borderColor: Colors.warning,
-  },
-  rowFlashBadge: {
-    position: 'absolute',
-    top: -8,
-    right: Spacing.md,
-    zIndex: 2,
+  // Flash-guide: den utpekade raden får en BLINKANDE guldkant via ett
+  // icke-interaktivt overlay som täcker radens kant (ingen pill längre).
+  flashBorderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 1,
+    borderRadius: Radius.md,
   },
   modalFlashBadge: {
     alignSelf: 'center',

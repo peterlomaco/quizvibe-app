@@ -41,6 +41,7 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
+  Animated,
   type LayoutChangeEvent,
   Modal,
   SafeAreaView,
@@ -176,6 +177,32 @@ export default function MyMatchesScreen() {
   // seedade EN gång från focusMatchIds-paramet. Lever i lokalt state så
   // blinket kvarstår som ledtråd även efter att paramet konsumerats.
   const [flashIds, setFlashIds] = useState<Set<string>>(new Set());
+  // Flash-guide: den utpekade raden markeras med en BLINKANDE guldkant (ingen
+  // kant-skärande pill längre). En delad loop så alla flashade rader blinkar i
+  // synk — samma 600ms/0.3↔1-kurva som NewUpdateBadge. useNativeDriver måste
+  // vara false eftersom värdet driver en interpolerad borderColor.
+  const [borderBlink] = useState(() => new Animated.Value(1));
+  useEffect(() => {
+    if (flashIds.size === 0) {
+      borderBlink.setValue(1);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(borderBlink, { toValue: 0.3, duration: 600, useNativeDriver: false }),
+        Animated.timing(borderBlink, { toValue: 1, duration: 600, useNativeDriver: false }),
+      ]),
+    );
+    loop.start();
+    return () => {
+      loop.stop();
+      borderBlink.setValue(1);
+    };
+  }, [flashIds, borderBlink]);
+  const flashBorderColor = borderBlink.interpolate({
+    inputRange: [0.3, 1],
+    outputRange: ['rgba(245,166,35,0.3)', Colors.warning], // bleknad guld ↔ full guld (#F5A623)
+  });
   // Auto-scroll till rätt sektion via onLayout-kedja (measureLayout är trasig
   // på Fabric). sectionsY = "sections"-containerns y i scroll-innehållet;
   // sectionY = varje sektions y relativt containern. maybeScroll fyrar när
@@ -411,7 +438,7 @@ export default function MyMatchesScreen() {
     return (
       <TouchableOpacity
         key={match.id}
-        style={[styles.row, myTurn && styles.rowYourTurn, isFlash && styles.rowFlash]}
+        style={[styles.row, myTurn && styles.rowYourTurn]}
         activeOpacity={0.7}
         onPress={() => {
           // Sluta blinka raden när spelaren agerat på den (guiden är klar).
@@ -426,7 +453,12 @@ export default function MyMatchesScreen() {
           else setResultMatchId(match.id);
         }}
       >
-        {isFlash && <NewUpdateBadge pill active style={styles.rowFlashBadge} />}
+        {isFlash && (
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.flashBorderOverlay, { borderColor: flashBorderColor }]}
+          />
+        )}
         <View style={styles.rowText}>
           <Text style={styles.opponentName} numberOfLines={1}>
             {/* I historiken står motståndaren redan i underrubriken —
@@ -845,16 +877,12 @@ const styles = StyleSheet.create({
   rowYourTurn: {
     borderColor: Colors.warning,
   },
-  // Flash-guide: den utpekade "New update"-raden får guld-kant (samma som
-  // "din tur") + en kant-skärande pill uppe till höger.
-  rowFlash: {
-    borderColor: Colors.warning,
-  },
-  rowFlashBadge: {
-    position: 'absolute',
-    top: -8,
-    right: Spacing.md,
-    zIndex: 2,
+  // Flash-guide: den utpekade "New update"-raden markeras med en BLINKANDE
+  // guldkant via ett icke-interaktivt overlay (ingen pill längre).
+  flashBorderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 1,
+    borderRadius: Radius.md,
   },
   // "New update"-signal intill en sektions-/motståndar-rubrik (inline guldtext).
   headerFlashBadge: {
