@@ -84,7 +84,10 @@ interface PlayerRowProps {
   // Utelämnade → kategori-sköld faller till 99.
   hcpMusic?: number;
   hcpFilm?: number;
-  hcpSport?: number;
+  // När true döljs "Details"-toggeln OCH Assistance/Age-pillarna helt.
+  // Används för guest-host-kortet (en låst trial-upplevelse — gästen har
+  // alltid Full assistance och ingen HCP, så detaljerna är brus).
+  hideDetails?: boolean;
 }
 
 export function PlayerRow({
@@ -114,7 +117,7 @@ export function PlayerRow({
   hcpNotDefined,
   hcpMusic,
   hcpFilm,
-  hcpSport,
+  hideDetails,
 }: PlayerRowProps) {
   // "Details +/-"-toggle per spelarkort — gömmer Assistance + Age-pillarna
   // tills man fäller ut. Default hopfällt (Details +).
@@ -288,8 +291,9 @@ export function PlayerRow({
               </Text>
             </View>
           ) : null}
-          {/* "Details +/-"-toggle — fäller ut/in Assistance + Age-pillarna nedan. */}
-          {hasDetails && (
+          {/* "Details +/-"-toggle — fäller ut/in Assistance + Age-pillarna nedan.
+              Döljs helt för guest-host-kortet (hideDetails). */}
+          {!hideDetails && hasDetails && (
             <Pressable
               onPress={() => setDetailsExpanded((v) => !v)}
               hitSlop={6}
@@ -351,7 +355,7 @@ export function PlayerRow({
               parent). När onEditPlayer saknas (non-host-vy) renderas
               pillarna utan Pressable så de bara visar info. */}
           <View style={[styles.hcpRowLeft, metaIndent > 0 && { marginLeft: metaIndent }]}>
-            {detailsExpanded && (onEditPlayer ? (
+            {!hideDetails && detailsExpanded && (onEditPlayer ? (
               <Pressable
                 onPress={onEditPlayer}
                 hitSlop={6}
@@ -428,8 +432,8 @@ export function PlayerRow({
       {/* ── Per-kategori-HCP: full-bredds-rad under meta-raden ─────────
           Fälls ut med "Details" (samma toggle som Assistance/Age). Total (=
           snittet Music + Film) flyttas hit från avatar-raden när kortet fälls
-          ut; sedan Music + Film (Sport parkerad). Egen rad så de breda
-          sköldarna inte klämmer PlayerName-kolumnen. */}
+          ut; sedan Music + Film. Egen rad så de breda sköldarna inte klämmer
+          PlayerName-kolumnen. */}
       {!hasLeft && !hcpNotDefined && hcp !== undefined && detailsExpanded && (
         <View style={styles.hcpCatRow}>
           <HCPShieldCard hcp={hcp ?? 99} size={40} label="Total" />
@@ -546,9 +550,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 6,
   },
-  // Full-bredds-rad med Music/Film/Sport-sköldarna under meta-raden.
+  // Full-bredds-rad med Total/Music/Film-sköldarna under meta-raden.
   // marginBottom ger plats åt de kant-skärande etikett-badgarna (bottom: -9)
-  // så kortets nederkant inte klipper "Music/Film/Sport".
+  // så kortets nederkant inte klipper "Music/Film".
   hcpCatRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',

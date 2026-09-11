@@ -210,7 +210,7 @@ function settingsToRow(code: string, s: LobbySettings): LobbySettingsRow {
     // Gamla source-kolumner skrivs fortsatt för bakåt-kompatibilitet tills
     // migration 0014 körts. Härleds från nya category-arrays.
     youtube_enabled: s.youtubeEnabledCategories.length > 0,
-    images_enabled: true, // Images alltid aktiv (Film+Sport mandatory)
+    images_enabled: true, // Images alltid aktiv (legacy DB-flagga)
     enabled_main_categories: defaultEnabledMainCategories(), // legacy — ej längre använt av klienten
     // OBS: sketch_enabled skrivs INTE ännu — kolumnen finns inte förrän
     // migration 0013_sketch_enabled.sql körts, och en upsert mot en okänd

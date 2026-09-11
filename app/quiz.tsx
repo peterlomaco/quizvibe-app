@@ -89,7 +89,7 @@ import {
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
-import { isMainCategory, subjectToMainCategory, itemInEnabledCategories, displayCategoryForItem, MAIN_CATEGORIES, type MainCategory } from '@/src/utils/mainCategory';
+import { isMainCategory, subjectToMainCategory, itemInEnabledCategories, displayCategoryForItem, defaultEnabledMainCategories, MAIN_CATEGORIES, YT_CATEGORY_WEIGHTS, type MainCategory } from '@/src/utils/mainCategory';
 import { buildMatchHighlights } from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
@@ -140,8 +140,9 @@ import { WebViewWarmer } from '@/src/components/WebViewWarmer';
 import { generateRoomCode } from '@/src/utils/roomCode';
 import { addSeenQuestionIds, addSessionRecord, addSessionRecordForNames, loadSeenQuestionIds, loadLastSessionIds } from '@/src/utils/hostQuestionHistory';
 import { consumePendingPeerSeenIds } from '@/src/utils/pendingSeenQuestions';
-import { allocateCategoryBlocks, buildEpochPhase, emptyEpochDebt, getActiveEpochs, pickTiered, planEpochSequence, sequenceToQuotas, type CategoryCapacity, type EpochDebt, type EpochId, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
+import { allocateCategoryBlocks, buildActiveCategories, buildEpochPhase, emptyCategoryDebt, emptyEpochDebt, getActiveEpochs, pickTiered, planCategorySequence, planEpochSequence, sequenceToCategoryQuotas, sequenceToQuotas, type CategoryCapacity, type CategoryDebt, type EpochDebt, type EpochId, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
 import { loadEpochLedger, saveEpochLedger } from '@/src/utils/epochLedger';
+import { loadCategoryLedger, saveCategoryLedger } from '@/src/utils/categoryLedger';
 import { getGenerationKeyFromBirthYear } from '@/src/utils/mockPurchasedPackages';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
@@ -394,15 +395,14 @@ const ALL_QUESTIONS_MAP = new Map<string, QuizQuestion>(
 // §1.3 — bygg per-kategori-HCP-förändring (nytt värde + delta) ur before/after-
 // bundlarna (display-heltal) för leaderboardens "+"-utfällning.
 function buildHcpCategoryChange(
-  before: { total: number; music: number; film: number; sport: number },
-  after: { total: number; music: number; film: number; sport: number },
+  before: { total: number; music: number; film: number },
+  after: { total: number; music: number; film: number },
 ): HcpCategoryChange {
   const mk = (b: number, a: number) => ({ after: a, delta: a - b });
   return {
     total: mk(before.total, after.total),
     music: mk(before.music, after.music),
     film: mk(before.film, after.film),
-    sport: mk(before.sport, after.sport),
   };
 }
 
@@ -411,7 +411,7 @@ function filterPoolByCategoryHcp<T extends { itemHcp?: number; mainCategory: Mai
   regionHcp: Record<MainCategory, number> | null,
   minCount: number,
 ): T[] {
-  const byCat: Record<MainCategory, T[]> = { Music: [], Film: [], Sport: [] };
+  const byCat: Record<MainCategory, T[]> = { Music: [], Film: [] };
   const passthrough: T[] = [];
   pool.forEach((q) => {
     if (q.mainCategory) byCat[q.mainCategory].push(q);
@@ -664,10 +664,21 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
    *  om LRM från noll — det är just den omräkningen som gjorde att låga
    *  rundantal alltid landade i samma epok. */
   epochSequence?: EpochId[];
+  /** Målblock per kategori (från kategori-skuldboken). Styr Music/Film-andelen
+   *  viktat (t.ex. 90/10) i stället för lika vikt. Utelämnas för Hints-fasen
+   *  → lika vikt som förut. */
+  categoryQuotas?: Record<string, number>;
+  /** YouTube-fasen: fast kategori-ordning Music → Film → Sport → _other så ALLA
+   *  YT/Music-block spelas FÖRE alla YT/Film-block (Peter 2026-09-12). Blocken
+   *  shufflas då INOM varje kategori (epok-variation bevaras) och anroparen ska
+   *  INTE köra shuffleBlocks ovanpå. Utelämnas (Hints-fasen) → kategori-ordningen
+   *  shufflas som förr och anroparen blandar över kategori-gränserna. */
+  orderedCategories?: boolean;
 }): T[] {
   const {
     pool, totalBlocks, questionsPerBlock, activeEpochs,
-    recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear, epochSequence,
+    recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear, epochSequence, categoryQuotas,
+    orderedCategories,
   } = opts;
   const totalQuestions = totalBlocks * questionsPerBlock;
   if (totalQuestions === 0 || pool.length === 0) return [];
@@ -680,19 +691,28 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
     catMap.get(key)!.push(q);
   }
 
-  // Shufflas — annars är kategori-ordningen deterministisk (Map insertion
-  // order = pool-ordning): Music-blocken hamnade alltid först OCH remainder-
-  // blocken gick alltid till första kategorin (stable sort på lika decimaler
-  // i LRM:en nedan). Shuffle randomiserar både vilken kategori som får extra
-  // block och i vilken ordning kategori-blocken spelas.
-  const cats = shuffleArray([...catMap.keys()]);
+  // orderedCategories (YouTube): fast ordning Music → Film → Sport → _other.
+  // Annars shufflas kategori-ordningen — annars vore den deterministisk (Map
+  // insertion order = pool-ordning): Music-blocken hamnade alltid först OCH
+  // remainder-blocken gick alltid till första kategorin (stable sort på lika
+  // decimaler i LRM:en nedan). Shuffle randomiserar både vilken kategori som
+  // får extra block och i vilken ordning kategori-blocken spelas.
+  const CATEGORY_SEQUENCE_RANK: Record<string, number> = { Music: 0, Film: 1, Sport: 2 };
+  const cats = orderedCategories
+    ? [...catMap.keys()].sort(
+        (a, b) => (CATEGORY_SEQUENCE_RANK[a] ?? 99) - (CATEGORY_SEQUENCE_RANK[b] ?? 99),
+      )
+    : shuffleArray([...catMap.keys()]);
 
   // Enstaka kategori eller inget att fördela — delegera direkt utan overhead.
   if (cats.length <= 1) {
-    return buildEpochPhase<T>({
+    const single = buildEpochPhase<T>({
       pool, totalQuestions, activeEpochs, recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear,
       quotas: epochSequence ? sequenceToQuotas(epochSequence.slice(0, totalQuestions)) : undefined,
     });
+    // I orderedCategories-läget kör anroparen ingen shuffleBlocks → shuffla här
+    // så en enkategori-fas inte alltid öppnar på samma epok (E1→E5-ordning).
+    return orderedCategories ? shuffleBlocks(single, questionsPerBlock) : single;
   }
 
   // Lika vikt per kategori — men aldrig fler block än kategorin kan fylla.
@@ -715,7 +735,7 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
       total: Math.floor(catPool.length / questionsPerBlock),
     };
   }
-  const blocksByCat = allocateCategoryBlocks(totalBlocks, cats, capacity);
+  const blocksByCat = allocateCategoryBlocks(totalBlocks, cats, capacity, categoryQuotas);
 
   // Bygg sekvens per kategori och konkatenera.
   // Trim till närmaste multipel av questionsPerBlock: om buildEpochPhase returnerar
@@ -743,7 +763,10 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
       quotas: catSlice && catSlice.length > 0 ? sequenceToQuotas(catSlice) : undefined,
     });
     const aligned = catSeq.slice(0, Math.floor(catSeq.length / questionsPerBlock) * questionsPerBlock);
-    result.push(...aligned);
+    // orderedCategories: shuffla blocken INOM kategorin (epok-variation) men
+    // behåll kategori-segmenten i ordning. Annars lämnas ordningen till
+    // anroparens shuffleBlocks (som blandar över kategori-gränserna).
+    result.push(...(orderedCategories ? shuffleBlocks(aligned, questionsPerBlock) : aligned));
   }
   return result;
 }
@@ -1508,29 +1531,28 @@ export default function QuizScreen() {
   // (t.ex. direkt-nav till /quiz utan Lobby).
   const eraFrom = parseInt(String(params.eraFrom ?? '1900'), 10);
   const eraTo = parseInt(String(params.eraTo ?? new Date().getFullYear()), 10);
-  // Per-source profession-category-filter. YouTube: min 1, alla tre valbara.
-  // Images: Actors/Athletes är mandatory (alltid inkluderade), Music valbar.
+  // Per-source profession-category-filter. Music/Film valbara, min 1 (Sport borttaget 2026-09).
   const youtubeEnabledCategories = useMemo<MainCategory[]>(() => {
-    if (!params.youtubeEnabledCategories) return ['Music', 'Film', 'Sport'];
+    if (!params.youtubeEnabledCategories) return defaultEnabledMainCategories();
     try {
       const parsed = JSON.parse(params.youtubeEnabledCategories);
       // Tom array [] är ett giltigt explicit val (= YouTube helt av).
       // Fallback till default BARA om parse misslyckas eller inte är array.
-      if (!Array.isArray(parsed)) return ['Music', 'Film', 'Sport'];
+      if (!Array.isArray(parsed)) return defaultEnabledMainCategories();
       return parsed.filter(isMainCategory);
     } catch {
-      return ['Music', 'Film', 'Sport'];
+      return defaultEnabledMainCategories();
     }
   }, [params.youtubeEnabledCategories]);
   const imagesEnabledCategories = useMemo<MainCategory[]>(() => {
-    if (!params.imagesEnabledCategories) return ['Music', 'Film', 'Sport'];
+    if (!params.imagesEnabledCategories) return defaultEnabledMainCategories();
     try {
       const parsed = JSON.parse(params.imagesEnabledCategories);
       // Tom array [] är ett giltigt explicit val (= Images helt av).
-      if (!Array.isArray(parsed)) return ['Music', 'Film', 'Sport'];
+      if (!Array.isArray(parsed)) return defaultEnabledMainCategories();
       return parsed.filter(isMainCategory);
     } catch {
-      return ['Music', 'Film', 'Sport'];
+      return defaultEnabledMainCategories();
     }
   }, [params.imagesEnabledCategories]);
   // Deriverade source-flags: en källa är aktiv när minst en kategori valts.
@@ -1717,6 +1739,18 @@ export default function QuizScreen() {
     if (!debt) return;
     plannedEpochDebtRef.current = null;
     saveEpochLedger(debt).catch(() => {});
+  }, []);
+  // Host:ens kategori-skuldbok (Music/Film-andel av YT-klippen "över tid").
+  // Speglar epok-skuldboken ovan: laddas asynkront, tom skuld ger samma
+  // fördelning som förut tills den hunnit in.
+  const [categoryDebtLoaded, setCategoryDebtLoaded] = useState(false);
+  const [categoryDebt, setCategoryDebt] = useState<CategoryDebt>(() => emptyCategoryDebt());
+  const plannedCategoryDebtRef = useRef<CategoryDebt | null>(null);
+  const persistCategoryLedger = useCallback(() => {
+    const debt = plannedCategoryDebtRef.current;
+    if (!debt) return;
+    plannedCategoryDebtRef.current = null;
+    saveCategoryLedger(debt).catch(() => {});
   }, []);
   const savedSeenRef = useRef(false);
 
@@ -1908,13 +1942,13 @@ export default function QuizScreen() {
     //   Personbilder (artist/band/actor/athlete — non-null mainCategory) är
     //   juridiskt parkerade och aldrig inkluderade oavsett toggles.
     const isAllYoutubeCats =
-      effectiveYoutubeCategories.length === 3 &&
+      effectiveYoutubeCategories.length === MAIN_CATEGORIES.length &&
       effectiveYoutubeCategories.includes('Music') &&
-      effectiveYoutubeCategories.includes('Film') &&
-      effectiveYoutubeCategories.includes('Sport');
+      effectiveYoutubeCategories.includes('Film');
     // ── §4.1 HCP-frågefilter ────────────────────────────────────────────
-    // Spelaren får items vars Item-HCP (= probability) >= sitt HCP, relaxat
-    // nedåt om poolen blir för tunn (se filterByItemHcp). Gäller BARA Single
+    // Spelaren får items vars Item-HCP (= probability) ligger i bandet
+    // [max(1,HCP−20), min(100,HCP+80)]; nedre kanten vidgas nedåt om poolen
+    // blir för tunn (variety-floor, se filterByItemHcp). Gäller BARA Single
     // Player + Pass-the-Phone (individanpassat per §4.1). IndDev delar host:s
     // identiska sekvens (ej individanpassad); remote (server-sekvens) + guest-
     // hostade spel (anonyma, grundar inget HCP) filtreras inte. Filtret läser
@@ -1942,10 +1976,9 @@ export default function QuizScreen() {
     // ledtrådar). Items med data i HINTS_LIBRARY får faktiska hints; övriga visar
     // placeholders tills backend-script populerar HINTS_LIBRARY med Wikidata-data.
     const isAllImageCats =
-      imagesEnabledCategories.length === 3 &&
+      imagesEnabledCategories.length === MAIN_CATEGORIES.length &&
       imagesEnabledCategories.includes('Music') &&
-      imagesEnabledCategories.includes('Film') &&
-      imagesEnabledCategories.includes('Sport');
+      imagesEnabledCategories.includes('Film');
     const imagePool: QuizQuestion[] = applyItemHcp(isAllImageCats
       ? imagePoolPreCategory
       : imagePoolPreCategory.filter((q) =>
@@ -2042,9 +2075,12 @@ export default function QuizScreen() {
       // Music-vikt 0.75 / Film-vikt 0.25 per källa.
       const byCat = (pool: QuizQuestion[], cat: MainCategory) =>
         pool.filter((q) => q.mainCategory === cat);
+      // YouTube: 90% Music / 10% Film (YT_CATEGORY_WEIGHTS) — samma målandel som
+      // normala spel, fast som sannolikhetsvikt (gäster har ingen persistent
+      // skuldbok). Hints lämnas OFÖRÄNDRAT på 0.75/0.25 (Peter: bara YT-klippen).
       const ytCells = [
-        { pool: byCat(pureYoutubePool, 'Music'), weight: 0.75 },
-        { pool: byCat(pureYoutubePool, 'Film'), weight: 0.25 },
+        { pool: byCat(pureYoutubePool, 'Music'), weight: YT_CATEGORY_WEIGHTS.Music },
+        { pool: byCat(pureYoutubePool, 'Film'), weight: YT_CATEGORY_WEIGHTS.Film },
       ];
       const hintsCells = [
         { pool: byCat(imagePool, 'Music'), weight: 0.75 },
@@ -2272,28 +2308,53 @@ export default function QuizScreen() {
     // för frågor spelaren aldrig såg.
     plannedEpochDebtRef.current = nextDebt;
 
+    // Kategori-plan för YouTube-fasen: 90% Music / 10% Film "över tid" via
+    // kategori-skuldboken. Gäller ENBART YouTube — Hints-fasen nedan behåller
+    // lika vikt (skickar ingen categoryQuotas). Parkeras (och persisteras vid
+    // samma punkter som epok-skuldboken) bara när en YouTube-fas faktiskt byggs,
+    // så ett spel utan YT-block inte bokför kategori-skuld.
+    let ytCategoryQuotas: Record<string, number> | undefined;
+    if (hasPureYoutube && ytBlockCount > 0) {
+      const ytPresentCats = [
+        ...new Set(
+          pureYoutubePool
+            .map((q) => q.mainCategory)
+            .filter((c): c is MainCategory => c !== null),
+        ),
+      ];
+      const activeYtCats = buildActiveCategories(ytPresentCats, YT_CATEGORY_WEIGHTS);
+      const { sequence: plannedCats, nextDebt: nextCategoryDebt } = planCategorySequence(
+        ytBlockCount,
+        activeYtCats,
+        categoryDebt,
+      );
+      plannedCategoryDebtRef.current = nextCategoryDebt;
+      ytCategoryQuotas = sequenceToCategoryQuotas(plannedCats);
+    }
+
     // Fas 2: YouTube — kategori-alignerade block (PtP: alla spelare i ett
     // block får samma mainCategory, t.ex. alla YouTube/Music i samma runda).
-    // shuffleBlocks bryter den kronologiska epok-ordningen från
-    // buildEpochPhase; per fas så källordningen nedan bevaras.
+    // orderedCategories: ALLA YT/Music-block spelas FÖRE alla YT/Film-block
+    // (Peter 2026-09-12). buildCategoryAlignedPhase shufflar blocken inom varje
+    // kategori (epok-variation) och behåller kategori-ordningen — därför INGEN
+    // shuffleBlocks ovanpå (den skulle blanda tillbaka Music och Film).
     const ytSeq: QuizQuestion[] =
       hasPureYoutube && ytBlockCount > 0
-        ? shuffleBlocks(
-            buildCategoryAlignedPhase<QuizQuestion>({
-              pool: pureYoutubePool,
-              totalBlocks: ytBlockCount,
-              questionsPerBlock,
-              activeEpochs,
-              recentIds: combinedSeenIds,
-              lastSessionIds: combinedLastIds,
-              isPtP,
-              players: epochPlayers,
-              turnOrderIds,
-              getEpochYear: youtubeEpochYear,
-              epochSequence: plannedEpochs.slice(0, ytTotal),
-            }),
+        ? buildCategoryAlignedPhase<QuizQuestion>({
+            pool: pureYoutubePool,
+            totalBlocks: ytBlockCount,
             questionsPerBlock,
-          )
+            activeEpochs,
+            recentIds: combinedSeenIds,
+            lastSessionIds: combinedLastIds,
+            isPtP,
+            players: epochPlayers,
+            turnOrderIds,
+            getEpochYear: youtubeEpochYear,
+            epochSequence: plannedEpochs.slice(0, ytTotal),
+            categoryQuotas: ytCategoryQuotas,
+            orderedCategories: true,
+          })
         : [];
 
     // Fas 3: Image/Hints — kategori-alignerade block.
@@ -2335,7 +2396,7 @@ export default function QuizScreen() {
       return shuffleArray(SEED_QUESTIONS);
     }
     return mixed;
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt, parentControlEnabled, selectedExtraPackages, regionHcp, packageYoutubeEnabled, packageHintsEnabled]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt, categoryDebt, parentControlEnabled, selectedExtraPackages, regionHcp, packageYoutubeEnabled, packageHintsEnabled]);
 
   // ── Sekvens-frys ─────────────────────────────────────────────────────
   // gameQuestionsRaw är en LIVE useMemo vars shuffleBlocks/freshness-ordning
@@ -2356,7 +2417,7 @@ export default function QuizScreen() {
   // Remote hoppas över (pinnar via question_ids inuti memon); PtP-spectatorn
   // hoppas över (spelar aldrig ur sin lokala pool — läser host:s broadcast).
   const localSequenceSettledForLock =
-    seenDataLoaded && epochLedgerLoaded && regionHcpLoaded;
+    seenDataLoaded && epochLedgerLoaded && categoryDebtLoaded && regionHcpLoaded;
   const lockedSequenceRef = useRef<QuizQuestion[] | null>(null);
   if (
     !lockedSequenceRef.current &&
@@ -3207,6 +3268,10 @@ export default function QuizScreen() {
       // den här läsningen", inte "den lyckades". Annars kan ett AsyncStorage-
       // fel låsa host bakom escape-timeouten i onödan.
       .finally(() => setEpochLedgerLoaded(true));
+    loadCategoryLedger()
+      .then(setCategoryDebt)
+      .catch(() => {})
+      .finally(() => setCategoryDebtLoaded(true));
     Promise.all([loadSeenQuestionIds(), loadLastSessionIds()])
       .then(([seen, last]) => {
       setSeenQuestionIds(seen);
@@ -4905,6 +4970,7 @@ export default function QuizScreen() {
       setLastSessionIds(new Set(playedIds));
     });
     persistEpochLedger();
+    persistCategoryLedger();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
@@ -6229,7 +6295,7 @@ export default function QuizScreen() {
           return out;
         };
         const hasAnswers = (m: CategoryAnswers): boolean =>
-          (m.Music?.length ?? 0) + (m.Film?.length ?? 0) + (m.Sport?.length ?? 0) > 0;
+          (m.Music?.length ?? 0) + (m.Film?.length ?? 0) > 0;
 
         if (gameMode === 'pass-the-phone') {
           void (async () => {
@@ -8082,6 +8148,7 @@ export default function QuizScreen() {
                 }
               }
               persistEpochLedger();
+              persistCategoryLedger();
             }
             const code = params.roomCode;
             // Non-hosts sitter kvar i /quiz (IndDev-spelare, PtP-spectators)
@@ -8137,6 +8204,7 @@ export default function QuizScreen() {
               const shownIds = [...new Set(sourceIds.slice(0, questionIndex))];
               addSessionRecord(shownIds).catch(() => {});
               persistEpochLedger();
+              persistCategoryLedger();
             }
             // syncActive (inte bara IndDev): i PtP är detta den enda
             // signalen som tar bort åskådaren ur host:s approver-set, så en
@@ -8330,6 +8398,7 @@ export default function QuizScreen() {
     ];
     await addSessionRecord(shownIds).catch(() => {});
     persistEpochLedger();
+    persistCategoryLedger();
   };
 
   // Quit match: ge upp. forfeit_remote_match sätter status 'forfeited' +
@@ -8555,7 +8624,7 @@ export default function QuizScreen() {
   // (remote_matches.question_ids) och rörs inte av dessa loads. Tills settlat
   // visar GetReady "Waiting for question data…" hellre än fel badge.
   const localSequenceSettled =
-    seenDataLoaded && epochLedgerLoaded && regionHcpLoaded;
+    seenDataLoaded && epochLedgerLoaded && categoryDebtLoaded && regionHcpLoaded;
   const getReadySequencePending = isHost && !isRemote && !localSequenceSettled;
 
   // Skicka `player_ready` när villkoret först uppfylls. Tre sändningar av

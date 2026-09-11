@@ -476,7 +476,7 @@ Five top-level collapsible sections — all use the same tappable-header pattern
 
    ⚠ **`effectiveMediaSourceByQuestion` läses ur render-closuren** i `saveFinalGame` — den är MEDVETET ingen `useCallback`. Seen-ids-effekten sätter `seenQuestionIds` i samma commit, vilket re-memoar `gameQuestions` med en NY shuffle; closure-värdet är sekvensen som faktiskt spelades. Gör inte om det till en ref-läsning.
 
-   **Källvokabulären bor i [mediaSource.ts](src/utils/mediaSource.ts)** (`PlayedMediaSource`, `PLAYED_MEDIA_SOURCE_ORDER`, `PLAYED_MEDIA_SOURCE_LABEL`, `collectPlayedSources`) — en ren modul utan React/RN/AsyncStorage, så den är vitest-nåbar ([backend/content/test/playedSources.test.ts](backend/content/test/playedSources.test.ts), 12 tester). `QuestionMediaType` i GetReadyIntro är numera `PlayedMediaSource | 'none'`, så det finns EN union. Lägg inte källtypen i `gameResults.ts` och importera den inte från `GetReadyIntro` — en storage-modul ska inte bero på en skärmkomponent. **`'image'` etiketteras `Hints`**, aldrig "Images" (personbilderna är parkerade; det som spelas är flagga + ledtrådar) — samma etiketter som `SOURCE_CARDS` och `mediaSourceLabel`.
+   **Källvokabulären bor i [mediaSource.ts](src/utils/mediaSource.ts)** (`PlayedMediaSource`, `PLAYED_MEDIA_SOURCE_ORDER`, `PLAYED_MEDIA_SOURCE_LABEL`, `collectPlayedSources`) — en ren modul utan React/RN/AsyncStorage, så den är vitest-nåbar ([backend/content/test/playedSources.test.ts](backend/content/test/playedSources.test.ts), 12 tester). `QuestionMediaType` i GetReadyIntro är numera `PlayedMediaSource | 'none'`, så det finns EN union. Lägg inte källtypen i `gameResults.ts` och importera den inte från `GetReadyIntro` — en storage-modul ska inte bero på en skärmkomponent. **`'image'` etiketteras `Hints`**, aldrig "Images" (personbilderna är parkerade; det som spelas är flagga + ledtrådar) — samma etikett som prisutdelnings-sekvensens Hints-kort och `mediaSourceLabel`.
 
 **Tre oberoende Save-knappar** (en per editable sektion: Profile defaults, Host defaults, Customized packages — `'defaults' | 'host' | 'packages'`). Driver av `savedSection`-state — när en knapp trycks visar bara den knappen "✓ Saved" i 2 s, övriga står kvar i sin label. Underliggande `handleSave(section)` persisterar hela profilen i ett svep oavsett knapp (en blob i AsyncStorage); det är bara den visuella bekräftelsen som är knapp-lokal.
 
@@ -2277,33 +2277,41 @@ Mellan sista frågans reveal och slutskärmen spelas en kort prisutdelning: guld
 
 **Gating**: `isLastQuestion && !summaryDone`. `phase` kan bli `'leaderboard'` även MELLAN ronder via footerns `Next Round →`-gren — där ska ingen prisutdelning fyra.
 
-**Däcket (omarbetat 2026-08-25, Peter)** — fem kort i FAST ordning. Ordningen är explicit begärd; ändra den inte utan nytt beslut (notera att **Spotify ligger före YouTube** trots att YouTube är den vanligaste källan):
+**Däcket (omarbetat 2026-09-11, Peter — kategori-hinkar ersätter källkorten)** — upp till sex kort i FAST ordning. Ordningen är explicit begärd; ändra den inte utan nytt beslut (notera att **Music ligger före Film**, och att Hints splittas på kategori):
 
 | # | Kort | Innehåll | Villkor |
 |---|---|---|---|
 | 1 | Correct answers | **PLACERINGSLISTA över alla spelare** efter antal rätt | ≥2 spelare |
-| 2 | Best on Spotify | **enbart förstaplatsen** (flest rätt i källan), samma radlayout | källan spelad + någon fick ≥1 rätt |
-| 3 | Best on YouTube | ↑ | ↑ |
-| 4 | Best on Hints | ↑ | ↑ |
-| 5 | Fastest fingers | **PLACERINGSLISTA över alla spelare** efter snittsvarstid | ≥2 spelare med tidsunderlag |
+| 2 | Best on Music | **enbart förstaplatsen** (flest rätt i hinken), samma radlayout | hinken spelad + någon fick ≥1 rätt |
+| 3 | Best on Film | ↑ | ↑ |
+| 4 | Best on Hints - Music | ↑ | ↑ |
+| 5 | Best on Hints - Film | ↑ | ↑ |
+| 6 | Fastest fingers | **PLACERINGSLISTA över alla spelare** efter snittsvarstid | ≥2 spelare med tidsunderlag |
 
-**ALLA kort som namnger spelare använder SAMMA radlayout** (Peter 2026-08-25): `1. 🦊 Anna` till vänster, talet högerställt. Skillnaden är bara hur många rader som visas — listkorten (1 och 5) tar med alla spelare, källkorten (2-4) bara förstaplatsen. Det finns alltså inget "stort namn + stort tal"-kort kvar; `HighlightCard.rows` är enda vägen till ett spelarnamn, och `value` används bara när det inte finns någon att placera sig mot.
+**Hinkarna byggs ur (källa × kategori) per fråga**, inte ur källan ensam. `mediaSourceByQuestion` och `categoryByQuestion` (f.d. dormant, nu LIVE) är index-alignade mot samma frågesekvens, så en frågas hink avgörs av båda tillsammans:
+- **Music** (kort 2) = alla Spotify-frågor (räknas ALLTID som Music — DJ:n serverar bara låtar) **+** YouTube-frågor med kategori Music, sammanslaget till EN hink.
+- **Film** (kort 3) = bara YouTube-frågor med kategori Film.
+- **Hints - Music / Hints - Film** (kort 4-5) = image/Hints-frågor splittade på kategori.
 
-**Talet i högerkolumnen** är `antal rätt/antal frågor` på kort 1-4 och snittiden på kort 5. ⚠ På källkorten är **nämnaren hinkens storlek**, inte spelarens antal svar — alla delade vinnare har samma `correct`, men `answered` kan skilja om någon tappade uppkopplingen. Kort 1 använder däremot spelarens eget `answered`.
+**ALLA kort som namnger spelare använder SAMMA radlayout** (Peter 2026-08-25): `1. 🦊 Anna` till vänster, talet högerställt. Skillnaden är bara hur många rader som visas — listkorten (1 och 6) tar med alla spelare, hink-korten (2-5) bara förstaplatsen. Det finns alltså inget "stort namn + stort tal"-kort kvar; `HighlightCard.rows` är enda vägen till ett spelarnamn, och `value` används bara när det inte finns någon att placera sig mot.
 
-**Delad placering är hela poängen med listkorten.** Standard competition ranking (**1, 1, 3** — inte 1, 1, 2): spelare med samma antal rätt delar plats. Det skiljer sig MEDVETET från Final Leaderboard, som bryter poänglika på snittsvarstid och därför alltid ger en unik ordning — korten firar prestationen, tabellen kör tävlingen. Källkorten (2-4) visar bara förstaplatsen, men **flera spelare kan dela den och listas då båda på plats 1** (`detail`: "N players share first place").
+**Ikon-treatment**: kategorikorten (Music/Film) bär en gold kant-skärande kategoribadge + en genre-emoji (🎵/🎬); Hints-korten bär Hints-källikonen (`source: 'image'`, Q+"?") PLUS en Music/Film-kategoribadge. Renderingen i FinalCelebration är oförändrad — den ritar redan badge + källikon/emoji per fältuppsättning.
+
+**Talet i högerkolumnen** är `antal rätt/antal frågor` på kort 1-5 och snittiden på kort 6. ⚠ På hink-korten är **nämnaren hinkens storlek**, inte spelarens antal svar — alla delade vinnare har samma `correct`, men `answered` kan skilja om någon tappade uppkopplingen. Kort 1 använder däremot spelarens eget `answered`.
+
+**Delad placering är hela poängen med listkorten.** Standard competition ranking (**1, 1, 3** — inte 1, 1, 2): spelare med samma antal rätt delar plats. Det skiljer sig MEDVETET från Final Leaderboard, som bryter poänglika på snittsvarstid och därför alltid ger en unik ordning — korten firar prestationen, tabellen kör tävlingen. Hink-korten (2-5) visar bara förstaplatsen, men **flera spelare kan dela den och listas då båda på plats 1** (`detail`: "N players share first place").
 - Kort 1 delar plats på **antal rätt**, inte på träffprocent — "3/4" och "3/3" hamnar på samma plats.
-- Kort 5 delar plats på det **VISADE** talet (2 decimaler). Annars kan två rader som båda står på "8.42s" hamna på plats 1 och 2, vilket läses som en bugg.
-- Spelare som aldrig svarade är MED i kort 1 (sist, "0/0") men UTE ur kort 5 — de har inget tidsunderlag att placera.
+- Kort 6 delar plats på det **VISADE** talet (2 decimaler). Annars kan två rader som båda står på "8.42s" hamna på plats 1 och 2, vilket läses som en bugg.
+- Spelare som aldrig svarade är MED i kort 1 (sist, "0/0") men UTE ur kort 6 — de har inget tidsunderlag att placera.
 
-**Kort 5 mäter snittiden att låsa ett svar oavsett rätt/fel** — samma tal som tabellens `AVG`-kolumn och samma som redan avgör vid poänglika i sorteringen. Sekvensen förstärker alltså poängmodellen spelarna redan spelar efter. **Timeouts räknas MED** (registreras med full svarstid — man låste aldrig ett svar), **`connectionError` räknas BORT** (nätverkets fel; tabellen särredovisar dem redan). Ändra inte det utan att också ändra `AVG`, annars motsäger kortet tabellen under.
+**Kort 6 mäter snittiden att låsa ett svar oavsett rätt/fel** — samma tal som tabellens `AVG`-kolumn och samma som redan avgör vid poänglika i sorteringen. Sekvensen förstärker alltså poängmodellen spelarna redan spelar efter. **Timeouts räknas MED** (registreras med full svarstid — man låste aldrig ett svar), **`connectionError` räknas BORT** (nätverkets fel; tabellen särredovisar dem redan). Ändra inte det utan att också ändra `AVG`, annars motsäger kortet tabellen under.
 
-⚠ **`MIN_QUESTIONS_PER_BUCKET = 1`** (sänkt från 2 den 2026-08-25). Regeln är "visa inte kort för källor som inte spelats" — en källa som spelats EN gång HAR spelats. Tröskeln 2 var dessutom oförenlig med däcket: standardspelet är 4 rundor och Hints-kvoten är `floor(N/4) = 1` fråga, så Hints-kortet hade aldrig kunnat visas. Källor utan data hoppas fortfarande över automatiskt, liksom källor där **ingen** fick något rätt (sekvensen ska vara firande — "Best on Spotify — 0 of 3" är den inte).
+⚠ **`MIN_QUESTIONS_PER_BUCKET = 1`** (sänkt från 2 den 2026-08-25). Regeln är "visa inte kort för hinkar som inte spelats" — en hink som spelats EN gång HAR spelats. Tröskeln 2 var dessutom oförenlig med däcket: standardspelet är 4 rundor och Hints-kvoten är `floor(N/4) = 1` fråga, så Hints-korten hade aldrig kunnat visas. Hinkar utan data hoppas fortfarande över automatiskt, liksom hinkar där **ingen** fick något rätt (sekvensen ska vara firande — "Best on Music — 0 of 3" är den inte). ⚠ En YouTube-fråga UTAN kategori-data hamnar i varken Music eller Film → inget kort; kategori-arrayen måste vara populerad (den kommer från `effectiveCategoryByQuestion` i quiz.tsx).
 
-**`mode`**: `competitive` ger källkorten sina rader; `personal` utelämnar dem och låter talet bära kortet ("Spotify — 3 of 4"). Personal används vid **enspelarläge och remote 1v1**.
-- ⚠ **Listkorten gatas på ANTALET SPELARE, inte på `mode`.** Remote 1v1 kör personal-läge (källjämförelser saknar underlag) men har två spelare med fullgott underlag för båda listkorten — de ska placeras mot varandra. Ett SOLOSPEL får value-layouten i stället, eftersom en lista med en enda rad inte är en placering.
+**`mode`**: `competitive` ger hink-korten sina rader; `personal` utelämnar dem och låter talet bära kortet ("Music — 3 of 4", "Hints · Music — 2 of 2"). Personal används vid **enspelarläge och remote 1v1**.
+- ⚠ **Listkorten gatas på ANTALET SPELARE, inte på `mode`.** Remote 1v1 kör personal-läge (kategorijämförelser saknar underlag) men har två spelare med fullgott underlag för båda listkorten — de ska placeras mot varandra. Ett SOLOSPEL får value-layouten i stället, eftersom en lista med en enda rad inte är en placering.
 
-⚠ **Dormant sedan 2026-08-25: kategorikorten (Musik/Film/Sport) och "snabbaste enskilda rätta svar".** De föll bort när däcket ovan spikades. `HighlightCard.category`, kind:arna `'category'`/`'fastest-single'`, `CATEGORY_CARDS` och badge-renderingen i FinalCelebration lämnas kvar så de kan återinföras med en loop — men **inget emitterar dem i dag**, och `BuildMatchHighlightsInput.categoryByQuestion` är därför optional och oanvänd (quiz.tsx skickar den fortfarande). Radera dem inte som "död kod".
+⚠ **`MAX_HIGHLIGHT_CARDS = 8`** (höjt från 6 när däcket blev sex kort) — taket binder inte i dag men står kvar som skyddsnät. `HighlightKind` är numera `most-correct | fastest-average | best-music | best-film | best-hints-music | best-hints-film`; de gamla `'source'`/`'category'`/`'fastest-single'`-kind:arna + `SOURCE_CARDS` är borttagna. `CATEGORY_CARDS = ['Music','Film']` behålls som dokumentation av de levande V1-kategorierna (Sport är borttaget som live-kategori).
 
 ⚠ **"Bild"-frågor och "Hints" är SAMMA hink.** Personbilderna är juridiskt parkerade — det som spelas är flagga + ledtrådar. Kortet heter `Hints` (appens eget namn i Source Mixerboard). Lägg inte till ett separat bildkort.
 
@@ -2336,7 +2344,7 @@ Mellan sista frågans reveal och slutskärmen spelas en kort prisutdelning: guld
 
 **Delning till sociala medier är INTE byggd** (steg 2). Kräver `react-native-view-shot` + `expo-sharing` + `expo-file-system` som direkt dep → nytt dev-/TestFlight-bygge. Se planen för delningskortets spec.
 
-Tester: [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts) (28 st) låser kortordningen (inkl. Spotify före YouTube), radlayouten på källkorten (plats 1 + rätt/frågor, nämnare = hinkens storlek), delad placering i båda listkorten (1, 1, 3 + delning på visat tal), delad förstaplats på källkorten, 1-frågas-källor, autoskippade källor, solo/personal-fallbacken, remote-gaten på spelarantal och snittidens timeout-/connectionError-semantik.
+Tester: [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts) (35 st) låser kortordningen (Music → Film → Hints-Music → Hints-Film), hink-logiken (Music = Spotify + YT-Music sammanslaget, Film = bara YT-Film, Hints splittad på kategori), radlayouten på hink-korten (plats 1 + rätt/frågor, nämnare = hinkens storlek), delad placering i båda listkorten (1, 1, 3 + delning på visat tal), delad förstaplats på hink-korten, ikon-treatment (Music/Film = kategori + emoji, Hints = source + kategori), 1-frågas-hinkar, hinkar utan kategori-data, autoskippade hinkar, solo/personal-fallbacken, remote-gaten på spelarantal och snittidens timeout-/connectionError-semantik.
 
 ## Final Leaderboard: "Re-match with Aggregate Leaderboard?" → "Start New Game" — 2026-08-08, omarbetad 2026-08-24 (rev 3)
 
@@ -2499,7 +2507,7 @@ Lämnar man MITT i spelet är delresultatet ingen giltig slutställning — man 
 
 ⚠ **Prisutdelnings-sekvensen följer samma regel men VISAR dem ändå** (Peter 2026-08-26). `buildMatchHighlights` delar `input.players` i `players` (aktiva) och `departed`:
 - **Listkorten** (*Correct answers*, *Fastest fingers*) namnger ALLA spelare, så avhopparna hängs på sist via `appendDepartedRows` — `place: null` (ingen siffra) och `value: 'Left'` i grått (`rankValueLeft`). `HighlightRankRow.place` är därför `number | null`.
-- **Källkorten** (*Best on Spotify* osv.) visar bara förstaplatsen — där ska en avhoppare inte kunna vinna, så de är borta ur `aggs` helt.
+- **Hink-korten** (*Best on Music* osv.) visar bara förstaplatsen — där ska en avhoppare inte kunna vinna, så de är borta ur `aggs` helt.
 - **`ranked`-gaten räknar bara aktiva.** Är bara EN kvar finns ingen lista att stå i, och korten faller tillbaka på value-layouten precis som i ett solospel — då syns avhopparen inte alls.
 
 Låst av fyra tester i [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts).

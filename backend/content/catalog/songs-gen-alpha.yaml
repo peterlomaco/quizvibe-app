@@ -2013,6 +2013,11 @@ items:
     parentControlled: true
     spotifyTrackId: "6ZWalyzfVcNCc1XwKnnyyn"
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1287)."
+    youtubeClips:
+      - videoId: "nSERqaFagJc"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1286)."
   - id: pitbull-fireball
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fireball — Pitbull"
@@ -2272,3 +2277,30 @@ items:
         startSec: 20
         endSec: 50
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1400)."
+  # Tillagda 2026-09-11 ur Music.xlsx.
+  - id: marcus-martinus-elektrisk
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Elektrisk — Marcus & Martinus"
+    correctYear: 2015
+    probability: 58
+    region: ["nordic"]
+    wikimediaSearchHints: ["Elektrisk - Marcus & Martinus 2015"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ri5_fzndMBg"
+        startSec: 13
+        endSec: 43
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1404)."
+  - id: bolaget-ikvall-igen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ikväll igen — Bolaget"
+    correctYear: 2023
+    probability: 56
+    region: ["sweden"]
+    wikimediaSearchHints: ["Ikväll igen - Bolaget 2023"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ASzgTmKlTRA"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1405)."

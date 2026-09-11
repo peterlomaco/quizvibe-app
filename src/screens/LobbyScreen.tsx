@@ -161,7 +161,6 @@ export interface LobbyPlayer extends Player {
   // ningen på spelarkortet. undefined → kategori-sköld faller till 99.
   hcpMusic?: number;
   hcpFilm?: number;
-  hcpSport?: number;
 }
 
 type GameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
@@ -492,6 +491,28 @@ function resolveMaxPlayers(
   if (singlePlayer) return 4;
   return gameMode === 'individual-devices' && premium ? 12 : 4;
 }
+
+// YT-Film är innehållsfattigt (få filmklipp) → får ALDRIG vara enda aktiva
+// källan. Returnerar true när det FÖRESLAGNA tillståndet lämnar ENBART
+// YouTube-Film aktivt.
+//
+// Kategori-modellen är Music/Film (Sport borttaget 2026-09), så inga fantom-
+// källor kan smyga in här längre.
+const isOnlyYtFilm = (
+  youtube: MainCategory[],
+  images: MainCategory[],
+  spotify: boolean,
+): boolean => {
+  if (spotify) return false;
+  if (images.length > 0) return false;
+  return youtube.length === 1 && youtube[0] === 'Film';
+};
+
+const ytFilmAloneAlert = () =>
+  Alert.alert(
+    "YouTube Film can't be alone",
+    "YouTube Film content is limited and can't be played on its own. Keep or add another source to play.",
+  );
 
 // ─── Add Player Modal ─────────────────────────────────────────────────────────
 
@@ -1072,7 +1093,6 @@ function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
         total: displayHcp(total),
         music: cat?.music ?? HCP_START,
         film: cat?.film ?? HCP_START,
-        sport: cat?.sport ?? HCP_START,
       });
     })
     .catch(() => {});
@@ -1466,13 +1486,10 @@ export default function LobbyScreen() {
               age: guestBirthYear
                 ? CURRENT_YEAR - parseInt(guestBirthYear, 10)
                 : undefined,
-              // Nivån väljs på Home:s guest-host-form (och kan sedan ändras
-              // i player-edit-sheeten) — var hårdkodad 'full' t.o.m.
-              // 2026-08-08. Fallback 'full' för äldre payloads utan param.
-              assistance:
-                guestAssistance === 'standard' || guestAssistance === 'minimal'
-                  ? guestAssistance
-                  : 'full',
+              // Guest host spelar ALLTID på Full assistance (2026-09-11) —
+              // en låst trial-upplevelse. guestAssistance-paramet ignoreras
+              // och assistance-väljaren är borttagen ur guest-host-formen.
+              assistance: 'full',
               hcpComplete: true,
               isHost: true,
               approved: true,
@@ -1572,10 +1589,10 @@ export default function LobbyScreen() {
         // Single: alltid av (Spotify-kortet göms — DJ kräver en motspelare).
         setSpotifyEnabled(seedSinglePlayer ? false : stored?.spotifyEnabled ?? false);
         setEnabledHostPackages([]);
-        // Parent Control — carry-over-param (guest host kan också toggla den).
-        // Persisteras aldrig i DB, så param är enda carry-över-källan. Utan
-        // param (fresh guest-lobby) → av.
-        setParentControlEnabled(parentControl === 'true');
+        // Parent Control — ALLTID på och icke-editerbar för guest host (single
+        // OCH multiplayer, Peter 2026-09-11): en guest/trial-lobby är alltid
+        // barnvänlig. Switchen renderas disabled nedan. Persisteras aldrig i DB.
+        setParentControlEnabled(true);
         setYoutubeEnabledCategories(defaultEnabledMainCategories());
         setImagesEnabledCategories(defaultEnabledMainCategories());
         // Släpp debounce-skrivningen till lobby_settings så non-hosts ser
@@ -2484,6 +2501,12 @@ export default function LobbyScreen() {
    *  Deklareras direkt efter state:n så även effekter ovanför render
    *  (dep-arrayer evalueras under render) kan läsa den utan TDZ. */
   const isSingleLobby = resolveSeedSinglePlayer(lobbyType, singlePlayerDefault);
+  // Guest host i SINGLE PLAYER — den låsta trial-vyn (grön sektionsram +
+  // hänglås-badge, inga Customized Host packages, Parent Control forcerad på,
+  // dolda kort-detaljer). Multiplayer guest host behåller den vanliga lobbyn
+  // (Peter 2026-09-11). OBS: Game Sequence-döljning och "alltid Full"-assistance
+  // gäller BÅDA lägena och gatas därför fortsatt på isGuestHost, inte denna.
+  const isGuestHostSingle = isGuestHost && isSingleLobby;
 
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   // Lobby-local state; speglar Profile:s host-default-toggle.
@@ -2711,17 +2734,9 @@ export default function LobbyScreen() {
   // Actors/Athletes: kolumn aktiv (OR) om minst en källa är på — används för min-1-guards.
   const actorsEnabled =
     youtubeEnabledCategories.includes('Film') || imagesEnabledCategories.includes('Film');
-  const athletesEnabled =
-    youtubeEnabledCategories.includes('Sport') || imagesEnabledCategories.includes('Sport');
-  // AND-logik: Actors/All och Athletes/All är ON enbart om BÅDA YT och Guess Who är aktiva.
+  // AND-logik: Artists/All och Actors/All är ON enbart om BÅDA YT och Guess Who är aktiva.
   const actorsAllOn =
     youtubeEnabledCategories.includes('Film') && imagesEnabledCategories.includes('Film');
-  // Sport är parkerat (ingen kolumn i mixerboarden) — athletesEnabled/athletesAllOn
-  // behålls som inert dead code (Sport-innehållet ligger i catalog/deferred/) och
-  // ingår MEDVETET inte i "All"-mastern eller kolumn-räkningen. Lägg tillbaka Sport
-  // i allEnabled/enabledColumnsCount när Sport-kolumnen återinförs.
-  const athletesAllOn =
-    youtubeEnabledCategories.includes('Sport') && imagesEnabledCategories.includes('Sport');
   const allEnabled = artistsAllOn && actorsAllOn;
   const enabledColumnsCount = [artistsEnabled, actorsEnabled].filter(Boolean).length;
   // Uppmätt kolumnbredd via onLayout på smGrid — garanterar pixel-perfekt
@@ -2768,7 +2783,7 @@ export default function LobbyScreen() {
       Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
       return;
     }
-    // Music + Film (Sport parkerat) — lägg tillbaka 'Sport' när kolumnen återinförs.
+    // Music + Film (de enda live kategorierna sedan Sport togs bort 2026-09).
     setYoutubeEnabledCategories(value ? ['Music', 'Film'] : []);
     setImagesEnabledCategories(value ? ['Music', 'Film'] : []);
     // Slå även på Spotify om host har kopplat konto + IndDev är aktivt.
@@ -2780,15 +2795,18 @@ export default function LobbyScreen() {
   const handleToggleArtistsColumn = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
+      // YT-Film får inte bli enda källan när hela Music-kolumnen stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories.filter((c) => c !== 'Music'), imagesEnabledCategories.filter((c) => c !== 'Music'), false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       // Column-toggle stänger av BÅDA källorna → Artists alltid inaktiv efteråt.
-      const remainingActorsAthletes = [
+      const remainingActors = [
         youtubeEnabledCategories.includes('Film'),
-        youtubeEnabledCategories.includes('Sport'),
         imagesEnabledCategories.includes('Film'),
-        imagesEnabledCategories.includes('Sport'),
       ].filter(Boolean).length;
-      if (remainingActorsAthletes < 2) {
-        Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+      if (remainingActors < 2) {
+        Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
         return;
       }
     }
@@ -2805,11 +2823,9 @@ export default function LobbyScreen() {
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Sport'), imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
-        if (remaining < 2) {
-          Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.');
-          return;
-        }
+        // Utan Music-källa (Artists) finns inget kvar när Actors stängs av.
+        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.');
+        return;
       }
       if (enabledColumnsCount <= 1) {
         Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
@@ -2821,30 +2837,6 @@ export default function LobbyScreen() {
     );
     setImagesEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
-    );
-  };
-
-  const handleToggleAthletesColumn = (value: boolean) => {
-    if (isGuestHost) { guestLockAlert(); return; }
-    if (!value && !spotifyEnabled) {
-      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
-      if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film')].filter(Boolean).length;
-        if (remaining < 2) {
-          Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.');
-          return;
-        }
-      }
-      if (enabledColumnsCount <= 1) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
-        return;
-      }
-    }
-    setYoutubeEnabledCategories((prev) =>
-      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
-    );
-    setImagesEnabledCategories((prev) =>
-      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
     );
   };
 
@@ -2855,17 +2847,20 @@ export default function LobbyScreen() {
   const handleToggleArtistsYoutube = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
+      // YT-Film får inte bli enda källan när Music-YT stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories.filter((c) => c !== 'Music'), imagesEnabledCategories, false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       // Artists inaktiv efteråt bara om Hints Music OCKSÅ är av.
       const artistsWouldStillBeActive = imagesEnabledCategories.includes('Music');
       if (!artistsWouldStillBeActive) {
-        const remainingActorsAthletes = [
+        const remainingActors = [
           youtubeEnabledCategories.includes('Film'),
-          youtubeEnabledCategories.includes('Sport'),
           imagesEnabledCategories.includes('Film'),
-          imagesEnabledCategories.includes('Sport'),
         ].filter(Boolean).length;
-        if (remainingActorsAthletes < 2) {
-          Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+        if (remainingActors < 2) {
+          Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
           return;
         }
       }
@@ -2883,17 +2878,20 @@ export default function LobbyScreen() {
   const handleToggleArtistsGuessWho = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
+      // YT-Film får inte bli enda källan när Music-Hints stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories.filter((c) => c !== 'Music'), false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       // Artists inaktiv efteråt bara om YouTube Music OCKSÅ är av.
       const artistsWouldStillBeActive = youtubeEnabledCategories.includes('Music');
       if (!artistsWouldStillBeActive) {
-        const remainingActorsAthletes = [
+        const remainingActors = [
           youtubeEnabledCategories.includes('Film'),
-          youtubeEnabledCategories.includes('Sport'),
           imagesEnabledCategories.includes('Film'),
-          imagesEnabledCategories.includes('Sport'),
         ].filter(Boolean).length;
-        if (remainingActorsAthletes < 2) {
-          Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+        if (remainingActors < 2) {
+          Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
           return;
         }
       }
@@ -2912,8 +2910,8 @@ export default function LobbyScreen() {
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
-        const remaining = [false, youtubeEnabledCategories.includes('Sport'), imagesEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+        // Utan Music-källa (Artists) finns inget kvar när Actors-YT stängs av.
+        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
       if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
@@ -2925,45 +2923,20 @@ export default function LobbyScreen() {
   const handleToggleActorsGuessWho = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
+      // YT-Film får inte bli enda källan när Film-Hints stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories.filter((c) => c !== 'Film'), false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Film'), youtubeEnabledCategories.includes('Sport'), false, imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+        // Utan Music-källa (Artists) finns inget kvar när Actors-Hints stängs av.
+        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
       if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setImagesEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
-    );
-  };
-
-  const handleToggleAthletesYoutube = (value: boolean) => {
-    if (isGuestHost) { guestLockAlert(); return; }
-    if (!value && !spotifyEnabled) {
-      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
-      if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film'), false, imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
-      }
-      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Sport')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
-    }
-    setYoutubeEnabledCategories((prev) =>
-      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
-    );
-  };
-
-  const handleToggleAthletesGuessWho = (value: boolean) => {
-    if (isGuestHost) { guestLockAlert(); return; }
-    if (!value && !spotifyEnabled) {
-      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
-      if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film'), youtubeEnabledCategories.includes('Sport'), false].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
-      }
-      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Sport')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
-    }
-    setImagesEnabledCategories((prev) =>
-      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
     );
   };
   // ── Spotify DJ-handlers ───────────────────────────────────────────────
@@ -3141,16 +3114,19 @@ export default function LobbyScreen() {
       }
     }
     if (!val) {
+      // YT-Film får inte bli enda källan när Spotify stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories, false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       // Samma regel som i handleStartGame: Artists ensamt räcker (som Spotify).
       // För Actors/Athletes krävs ≥ 2 aktiva kombinationer om varken Spotify
       // eller Artists är aktiv.
       const activeNonSpotifyCount = [
         youtubeEnabledCategories.includes('Music'),
         youtubeEnabledCategories.includes('Film'),
-        youtubeEnabledCategories.includes('Sport'),
         imagesEnabledCategories.includes('Music'),
         imagesEnabledCategories.includes('Film'),
-        imagesEnabledCategories.includes('Sport'),
       ].filter(Boolean).length;
       const artistsActiveForSpotify =
         youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
@@ -3266,6 +3242,23 @@ export default function LobbyScreen() {
     () => hasActivePackage(selectedExtraPackages),
     [selectedExtraPackages],
   );
+
+  // HÅRT skyddsnät: YT-Film får ALDRIG bli enda aktiva källan (innehållsfattigt).
+  // Per-toggle-guardsen blockerar de normala vägarna, men detta fångar VARJE väg
+  // (async-race, auto-disable-effekten, eller carry-over/legacy-settings) och
+  // återställer direkt i mixerboarden + visar popupen. Lägger tillbaka Film-Hints
+  // som sällskap (samma kolumn, alltid innehåll) så host får ett giltigt
+  // "Film-only"-spel i stället för ett låst tillstånd.
+  useEffect(() => {
+    if (!hostMode || anyPackageActive) return;
+    if (isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled)) {
+      setImagesEnabledCategories((prev) =>
+        prev.includes('Film') ? prev : ([...prev, 'Film'] as MainCategory[]),
+      );
+      ytFilmAloneAlert();
+    }
+  }, [youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, hostMode, anyPackageActive]);
+
   const packageCoverage = useMemo(
     () => computePackageCoverage(selectedExtraPackages),
     [selectedExtraPackages],
@@ -3284,21 +3277,20 @@ export default function LobbyScreen() {
   const pkgGraySpotify =
     anyPackageActive &&
     !packageCoverage.Music.spotify &&
-    !packageCoverage.Film.spotify &&
-    !packageCoverage.Sport.spotify;
+    !packageCoverage.Film.spotify;
   // "All"-master gråas bara när HELA matrisen saknar material (alla kolumner grå).
   const pkgGrayAllSources =
-    pkgGrayColumn('Music') && pkgGrayColumn('Film') && pkgGrayColumn('Sport');
+    pkgGrayColumn('Music') && pkgGrayColumn('Film');
   // ── Paket-läge: aggregat-täckning per källa (driver de två toggle-raderna) ──
-  // Paket-läget kollapsar 3×3-matrisen till EN YT- + EN Hints-toggle (+ Spotify).
+  // Paket-läget kollapsar matrisen till EN YT- + EN Hints-toggle (+ Spotify).
   // En toggle är AKTIVERBAR bara om paketet har material för källan; annars
   // disabled/grå. "Aktiv" = host:s toggle på OCH täckning finns.
   const pkgHasYoutube =
     anyPackageActive &&
-    (packageCoverage.Music.youtube || packageCoverage.Film.youtube || packageCoverage.Sport.youtube);
+    (packageCoverage.Music.youtube || packageCoverage.Film.youtube);
   const pkgHasHints =
     anyPackageActive &&
-    (packageCoverage.Music.hints || packageCoverage.Film.hints || packageCoverage.Sport.hints);
+    (packageCoverage.Music.hints || packageCoverage.Film.hints);
   const pkgHasSpotify = anyPackageActive && !pkgGraySpotify;
   const pkgYtActive = pkgHasYoutube && packageYoutubeEnabled;
   const pkgHintsActive = pkgHasHints && packageHintsEnabled;
@@ -3322,8 +3314,7 @@ export default function LobbyScreen() {
   const pkgAllCovered =
     anyPackageActive &&
     !pkgGrayColumn('Music') &&
-    !pkgGrayColumn('Film') &&
-    !pkgGrayColumn('Sport');
+    !pkgGrayColumn('Film');
   const smAllValue = anyPackageActive ? pkgAllCovered : allEnabled;
   // Effektivt Game Era-spann: paketets innehålls-span när låst, annars host:s
   // slider-val. Används för display, lobby_settings-write, quiz-params + preview
@@ -3616,6 +3607,10 @@ export default function LobbyScreen() {
   // redan oberoende så ingen risk att hasLeft hamnar i turn-order.
   const isPlayerApproved = (p: LobbyPlayer) => !!p.approved || !!p.isHost;
   const approvedPlayers = players.filter((p) => isPlayerApproved(p) && !p.hasLeft);
+  // Någon motståndare (approved ELLER väntande) redan i lobbyn — H2H:s enda
+  // slot är då fylld, så Share invite ska förbli dold även när invite-raden
+  // raderats av ett accept. Driver Share invite-grinden i room-kortet.
+  const remoteOpponentPresent = players.some((p) => !p.isHost && !p.hasLeft);
   // Bokstäver som redan används som identifierar-suffix på Guest-spelare i
   // lobbyn. hasLeft-spelare exkluderas — deras letter frigörs. Skickas till
   // AddPlayerModal:s auto-gen så två guests inte får samma bokstav.
@@ -4399,6 +4394,61 @@ export default function LobbyScreen() {
       if (channel) supabase.removeChannel(channel);
     };
   }, [shareModalOpen, roomCode, resyncPendingFromInvites]);
+
+  // H2H (remote-1v1): en-slot-lås på Share invite (Peter 2026-09-11). En 1v1-
+  // lobby har exakt EN motståndarplats, så host får bara ha EN utestående
+  // invite för DETTA rum. `hasOutstandingRemoteInvite` driver både send-
+  // guarden (handleInviteFriend) och att Share invite-knappen i room-kortet
+  // döljs medan en invite väntar på svar. Till skillnad från modal-
+  // subscriptionen ovan är denna LOBBY-scopad (inte gated på shareModalOpen),
+  // så en deny som anländer medan modalen är stängd ändå flippar tillbaka
+  // knappen. Deny OCH accept raderar båda raden (ingen status-kolumn) → vi
+  // re-räknar rum-scopat till 0 i båda fallen; accept-fallet hålls knappen
+  // dold ändå via `remoteOpponentPresent`-grinden i renderingen.
+  const [hasOutstandingRemoteInvite, setHasOutstandingRemoteInvite] = useState(false);
+  useEffect(() => {
+    if (!hostMode || gameMode !== 'remote-1v1' || singlePlayerDefault || !roomCode) return;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    const recount = async () => {
+      const hostUserId = await getOwnUserId();
+      if (!hostUserId || cancelled) return;
+      const { count, error } = await supabase
+        .from('waiting_invites')
+        .select('id', { count: 'exact', head: true })
+        .eq('from_user_id', hostUserId)
+        .eq('room_code', roomCode);
+      if (!cancelled && !error) setHasOutstandingRemoteInvite((count ?? 0) > 0);
+    };
+    (async () => {
+      const hostUserId = await getOwnUserId();
+      if (!hostUserId || cancelled) return;
+      await recount();
+      // Distinkt topic från `share-invites:<roomCode>` — samma topic → befintlig
+      // subscribed channel, .on() efteråt kraschar (dokumenterad gotcha).
+      const topic = `realtime:remote-invite-status:${roomCode}`;
+      supabase.getChannels()
+        .filter((c) => c.topic === topic)
+        .forEach((c) => supabase.removeChannel(c));
+      channel = supabase
+        .channel(`remote-invite-status:${roomCode}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'waiting_invites', filter: `from_user_id=eq.${hostUserId}` },
+          () => { void recount(); },
+        )
+        .on(
+          'postgres_changes',
+          { event: 'DELETE', schema: 'public', table: 'waiting_invites', filter: `from_user_id=eq.${hostUserId}` },
+          () => { void recount(); },
+        )
+        .subscribe();
+    })();
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [hostMode, gameMode, singlePlayerDefault, roomCode]);
 
   // Lägg till en QuizVibe friend direkt från Share invite-modalen.
   // `playerNameExists` (samma RPC som Register/Add Player-uniqueness-
@@ -5255,7 +5305,6 @@ export default function LobbyScreen() {
           const nextHcp = updated.hcp;
           const nextHcpMusic = updated.hcpMusic;
           const nextHcpFilm = updated.hcpFilm;
-          const nextHcpSport = updated.hcpSport;
           if (
             !!p.hasLeft === nextHasLeft &&
             !!p.approved === nextApproved &&
@@ -5263,8 +5312,7 @@ export default function LobbyScreen() {
             p.accountPlayerName === nextAccountName &&
             p.hcp === nextHcp &&
             p.hcpMusic === nextHcpMusic &&
-            p.hcpFilm === nextHcpFilm &&
-            p.hcpSport === nextHcpSport
+            p.hcpFilm === nextHcpFilm
           )
             return p;
           changed = true;
@@ -5277,7 +5325,6 @@ export default function LobbyScreen() {
             hcp: nextHcp,
             hcpMusic: nextHcpMusic,
             hcpFilm: nextHcpFilm,
-            hcpSport: nextHcpSport,
           };
         });
         return changed ? next : prev;
@@ -5848,6 +5895,25 @@ export default function LobbyScreen() {
           );
           return;
         }
+        // En-slot-lås: en H2H-lobby har EN motståndarplats, så host får inte
+        // skicka en andra invite för DETTA rum (till samma ELLER annan spelare)
+        // medan en redan är obesvarad. Rum-scopad DB-räkning = auktoritativ,
+        // kan inte kringgås av stale state. Täcker alla call-sites av
+        // handleInviteFriend. Deny/accept raderar raden → count 0 → låset lyfts.
+        if (userId) {
+          const { count: roomCount, error: roomErr } = await supabase
+            .from('waiting_invites')
+            .select('id', { count: 'exact', head: true })
+            .eq('from_user_id', userId)
+            .eq('room_code', roomCode);
+          if (!roomErr && (roomCount ?? 0) > 0) {
+            Alert.alert(
+              'Invitation already sent',
+              'You already have a pending H2H invitation for this lobby. Wait for a response, or for it to be denied, before inviting someone else.',
+            );
+            return;
+          }
+        }
       }
     }
     const profile = await loadProfile();
@@ -5863,6 +5929,11 @@ export default function LobbyScreen() {
       next.add(friend.id);
       return next;
     });
+    // Optimistiskt lås för H2H — döljer Share invite-knappen direkt utan att
+    // vänta på realtime-round-trip. Realtime-DELETE (deny/accept) lyfter det.
+    if (gameMode === 'remote-1v1' && !singlePlayerDefault) {
+      setHasOutstandingRemoteInvite(true);
+    }
     // "Pending"-perioden startar HÄR (inviten är nu en levande waiting_invites-
     // rad) — inte redan vid Add. Driver badgen på nästa modal-open.
     if (friend.id.startsWith('pending-')) {
@@ -5909,15 +5980,20 @@ export default function LobbyScreen() {
       return;
     }
 
+    // YT-Film får inte vara enda källan (backstop — toggle-guardsen gör detta
+    // tillstånd onåbart i vila, men carry-over/legacy-settings kan seeda det).
+    if (!anyPackageActive && isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled)) {
+      ytFilmAloneAlert();
+      return;
+    }
+
     // Min-2-regel: minst 2 aktiva val i Source Dashboard (YouTube × profession
     // eller Hints × profession). Spotify kan spelas ensamt och räknas separat.
     const activeNonSpotifyCount = [
       youtubeEnabledCategories.includes('Music'),
       youtubeEnabledCategories.includes('Film'),
-      youtubeEnabledCategories.includes('Sport'),
       imagesEnabledCategories.includes('Music'),
       imagesEnabledCategories.includes('Film'),
-      imagesEnabledCategories.includes('Sport'),
     ].filter(Boolean).length;
     // Undantag från min-2: Spotify eller Artists (Music) ensamt räcker.
     // Min-2 gäller bara om varken Spotify eller Artists är aktiv.
@@ -6624,13 +6700,12 @@ export default function LobbyScreen() {
     }
 
     // Fas 2: YouTube-slots med jämn rotation per aktiverad kategori.
-    // Inom varje block gäller en kategori (Music → Film → Sport → Music …).
+    // Inom varje block gäller en kategori (Music → Film → Music …).
     if (ytCount > 0) {
       type YtCatEntry = { cat: MainCategory; items: typeof pureYtPool };
       const subjectForCat: Record<MainCategory, string[]> = {
         Music: ['song'],
         Film: ['movie'],
-        Sport: ['sport-event'],
       };
       const ytCatEntries: YtCatEntry[] = effYtCats
         .map((cat) => ({
@@ -6651,12 +6726,11 @@ export default function LobbyScreen() {
       }
     }
 
-    // Fas 3: Hints/Image-slots — alla block per kategori samlade (Music → Film → Sport).
+    // Fas 3: Hints/Image-slots — alla block per kategori samlade (Music → Film).
     if (imageCount > 0 && imagePool.length > 0) {
       const imgSubjectForCat: Record<MainCategory, string[]> = {
         Music: ['artist', 'band'],
         Film: ['actor', 'character'],
-        Sport: ['athlete'],
       };
       const imgCatEntries = (imagesEnabledCategories as MainCategory[])
         .map((cat) => ({
@@ -6886,8 +6960,11 @@ export default function LobbyScreen() {
               Re-match/Replay: dold — uppsättningen är låst till förra spelets
               spelare, så nya spelare kan inte bjudas in (Peter 2026-08-28).
               Single-lobby: dold — ett solospel har inga andra spelare att
-              bjuda in (Peter 2026-08-29). */}
-          {hostMode && !isGuestHost && !isRematchLobby && !isSingleLobby && (
+              bjuda in (Peter 2026-08-29).
+              Remote-1v1: dold medan en invite väntar på svar (en-slot-lås) OCH
+              när en motståndare redan joinat (slot fylld) — Peter 2026-09-11. */}
+          {hostMode && !isGuestHost && !isRematchLobby && !isSingleLobby &&
+            (gameMode !== 'remote-1v1' || (!hasOutstandingRemoteInvite && !remoteOpponentPresent)) && (
             <TouchableOpacity onPress={handleOpenShareModal} style={styles.shareBtn}>
               <Text style={styles.shareBtnText}>↑ Share invite to friends</Text>
             </TouchableOpacity>
@@ -7049,8 +7126,8 @@ export default function LobbyScreen() {
                 hcp={player.type === 'guest' ? undefined : resolveDisplayHcp(player.id === ownPlayerIdRef.current ? (selfHcp ?? player.hcpOverride) : (player.hcp ?? player.hcpOverride))}
                 hcpMusic={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.music : player.hcpMusic)}
                 hcpFilm={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.film : player.hcpFilm)}
-                hcpSport={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.sport : player.hcpSport)}
                 hcpNotDefined={player.type === 'guest'}
+                hideDetails={isGuestHost}
                 accountPlayerName={player.accountPlayerName}
                 turnNumber={
                   // Turnummer bara i PtP-MULTIPLAYER. Single kör PtP under
@@ -7116,8 +7193,8 @@ export default function LobbyScreen() {
                     hcp={player.type === 'guest' ? undefined : resolveDisplayHcp(player.id === ownPlayerIdRef.current ? (selfHcp ?? player.hcpOverride) : (player.hcp ?? player.hcpOverride))}
                     hcpMusic={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.music : player.hcpMusic)}
                     hcpFilm={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.film : player.hcpFilm)}
-                    hcpSport={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.sport : player.hcpSport)}
                     hcpNotDefined={player.type === 'guest'}
+                    hideDetails={isGuestHost}
                     accountPlayerName={player.accountPlayerName}
                     showApproveToggle={hostMode && !isRematchLobby && !player.hasLeft}
                     approved={false}
@@ -7197,10 +7274,21 @@ export default function LobbyScreen() {
             container. Ger semantiskt en "vad spelet ska spelas som"-sektion
             som visuellt skiljer sig från Players in Lobby nedanför. */}
         {gameSettingsExpanded && (
-        <View style={styles.gameSettingsBorder}>
+        <View style={[styles.gameSettingsBorder, isGuestHostSingle && styles.gameSettingsBorderGuest]}>
+        {/* Guest host SINGLE PLAYER: HELA Game Settings-sektionen får den gröna
+            låsta ramen (i stället för per-sektion grön box på mixerboarden), och
+            "DEFINED BY HOST"-badgen ersätts av hänglås-badgen — samma stil som
+            single-player-rutans lockBadge (Peter 2026-09-11). Multiplayer guest
+            host behåller den vanliga "DEFINED BY HOST"-vyn. */}
+        {isGuestHostSingle ? (
+        <View style={styles.guestLockBadge} pointerEvents="none">
+          <Text style={styles.guestLockBadgeText}>🔒</Text>
+        </View>
+        ) : (
         <View style={styles.definedByHostBadge} pointerEvents="none">
           <Text style={styles.definedByHostBadgeText}>DEFINED BY HOST</Text>
         </View>
+        )}
         {/* ── Game Mode ─────────────────────────────────────────── */}
         {/* Visas för alla i lobbyn, men kan bara *ändras* av host. För icke-host
             döljs FREE/PREMIUM-badges (de är host-relevanta paketdetaljer) och
@@ -7382,10 +7470,14 @@ export default function LobbyScreen() {
               >
                 {/* Stängt hänglås — läget är LÅST för lobbyns livstid (single
                     väljs på Home / vid replay och kan inte bytas här). Samma
-                    signal som re-match-rutan (Peter 2026-08-28). */}
+                    signal som re-match-rutan (Peter 2026-08-28). Döljs för guest
+                    host — låst-signalen bärs där av den gröna sektionsramen +
+                    dess hänglås-badge (Peter 2026-09-11). */}
+                {!isGuestHost && (
                 <View style={styles.lockBadge} pointerEvents="none">
                   <Text style={styles.lockBadgeText}>🔒</Text>
                 </View>
+                )}
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
                   Single player — 1 player
                 </Text>
@@ -7545,7 +7637,10 @@ export default function LobbyScreen() {
                 YouTube → Hints), se mockup. Öppnas här, stängs efter paket-
                 boarden. Spotify-blockets egen bg är borttagen så ramen blir en
                 enda enhetlig box i stället för en nästlad ruta. */}
-            <View style={styles.mixerboardBox}>
+            {/* Guest host SINGLE PLAYER: yttre grå boxen blir borderless — den
+                gröna låsta ramen sitter runt HELA Game Settings-sektionen. I
+                multiplayer guest host (och för alla andra) behålls den grå ramen. */}
+            <View style={[styles.mixerboardBox, isGuestHostSingle && styles.mixerboardBoxGuest]}>
             {gameMode !== 'remote-1v1' && !isSingleLobby && (
             <View style={{ marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
             {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
@@ -7947,19 +8042,22 @@ export default function LobbyScreen() {
               </View>
               <Switch
                 value={parentControlEnabled}
-                onValueChange={hostMode ? setParentControlEnabled : undefined}
-                disabled={!hostMode}
+                onValueChange={hostMode && !isGuestHost ? setParentControlEnabled : undefined}
+                disabled={!hostMode || isGuestHost}
                 trackColor={{ false: '#3C3C3C', true: Colors.success }}
                 thumbColor="#FFF"
                 ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
-                style={[styles.connectionSwitch, { marginLeft: 0 }, !hostMode && { opacity: 0.6 }]}
+                style={[styles.connectionSwitch, { marginLeft: 0 }, (!hostMode || isGuestHost) && { opacity: 0.6 }]}
               />
             </View>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
                 Basic-utbudet är alltid implicit aktivt (ingen synlig chip);
                 hosten kan välja till köpta Extra packages ovanpå. För
-                icke-host visas allt read-only (disabled på TouchableOpacity). */}
+                icke-host visas allt read-only (disabled på TouchableOpacity).
+                Döljs HELT för guest host (2026-09-11) — en guest kan aldrig
+                aktivera paket, så hela blocket är brus (single + multiplayer). */}
+            {!isGuestHost && (
             <View style={styles.usePackagesBlock}>
               {/* Rubrik-rad: section label vänster + info-ikon höger som
                   förklarar Generic vs Extra Host Packages. Info-ikonen
@@ -8286,6 +8384,7 @@ export default function LobbyScreen() {
               </View>
               )}
             </View>
+            )}
           </View>
         </View>
         </View>
@@ -8654,7 +8753,10 @@ export default function LobbyScreen() {
 
             {/* Game Sequence — ruta per rund med medie-källa och kategori.
                 Speglar quiz.tsx:s 3-pool-logik baserat på aktuella inställningar.
-                Synlig för alla (host + non-host) som read-only feedback. */}
+                Synlig för alla (host + non-host) som read-only feedback. Döljs
+                HELT för guest host — både single player och multiplayer (Peter
+                2026-09-11). */}
+            {!isGuestHost && (
             <View>
               <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Game Sequence</Text>
@@ -8726,6 +8828,7 @@ export default function LobbyScreen() {
               </View>
               )}
             </View>
+            )}
 
             {/* Answer response time */}
             <View>
@@ -10467,6 +10570,32 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     gap: Spacing.lg,
   },
+  // Guest host: grön låst ram runt hela Game Settings-sektionen (ersätter
+  // per-sektion-grön på mixerboarden). Hänglås-badgen sitter i top-right där
+  // "DEFINED BY HOST" annars sitter.
+  gameSettingsBorderGuest: {
+    borderColor: Colors.success,
+    borderWidth: 2,
+  },
+  // Kant-skärande hänglås-badge i Game Settings-sektionens övre högra hörn —
+  // IDENTISK stil med single-player-rutans lockBadge (opak cardElevated-
+  // fyllning + blå Colors.primary-kant), positionerad som definedByHostBadge.
+  guestLockBadge: {
+    position: 'absolute',
+    top: -10,
+    right: Spacing.md,
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    zIndex: 10,
+    elevation: 4,
+  },
+  guestLockBadgeText: {
+    fontSize: 11,
+  },
 
   // Quiz Settings — speglar gameSettingsBorder. Game Era + Number of
   // Rounds samlas i en gemensam ram så de visuellt läses som en grupp
@@ -11192,6 +11321,11 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.xs,
     marginBottom: Spacing.sm,
+  },
+  // Guest host: yttre mixerboard-boxen blir borderless — den gröna låsta ramen
+  // sitter i stället runt HELA Game Settings-sektionen (gameSettingsBorderGuest).
+  mixerboardBoxGuest: {
+    borderWidth: 0,
   },
   // Grått streck inuti mixerboarden mellan Spotify-delen och YouTube-delen.
   mixerboardDivider: {

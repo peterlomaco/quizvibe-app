@@ -9,7 +9,7 @@ import { Avatar } from './Avatar';
 import { HCPShieldCard } from './HCPShield';
 import { WifiOffIcon } from './WifiOffIcon';
 
-// Höjd på den utfällda per-kategori-sköld-raden (Total/Music/Film/Sport med
+// Höjd på den utfällda per-kategori-sköld-raden (Total/Music/Film med
 // förändrings-badge). Samma värde i ALLA tre kolumnerna (spacer) så rader
 // ligger i linje.
 // Rad-höjd för spelar-raderna. Något högre än rubrikraden så långa PlayerNames
@@ -26,7 +26,6 @@ export interface HcpCategoryChange {
   total: HcpDelta;
   music: HcpDelta;
   film: HcpDelta;
-  sport: HcpDelta;
 }
 
 /**
@@ -129,7 +128,7 @@ export function LeaderboardTable({
   hcpChanges?: Record<string, { before: number; after: number }>;
   // §1.3 — per-kategori-HCP-förändring. Spelare som finns här får en "+" i
   // Player-kolumnen som fäller ut en text-uppställning av förändringen
-  // (Total/Music/Film/Sport, 0 / -x / +y). Bara spelare vars per-kategori-
+  // (Total/Music/Film, 0 / -x / +y). Bara spelare vars per-kategori-
   // delta denna enhet räknat (self + PtP-deltagare); IndDev-peers saknar den.
   hcpCategoryChanges?: Record<string, HcpCategoryChange>;
 }) {
@@ -482,7 +481,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     lineHeight: 15,
   },
-  // Popup med den utfällda spelarens kategori-sköldar (Total/Music/Film/Sport).
+  // Popup med den utfällda spelarens kategori-sköldar (Total/Music/Film).
   lbHcpModalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',

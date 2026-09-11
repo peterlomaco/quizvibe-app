@@ -533,11 +533,10 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "6P40lE9SODIcT21NpmRd2I"
     youtubeClips:
-      - videoId: "YT45RF2SGRw"
+      - videoId: "BrYFFIESx3c"
         startSec: 0
         endSec: 30
-        channelTitle: "Universal Music Group"
-        notes: "Officiell UMG-uppladdning. Studio 1963. Svensk version av It's My Party."
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1336)."
   - id: lill-babs-letkis-jenka
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Letkis-Jenka — Lill-Babs"

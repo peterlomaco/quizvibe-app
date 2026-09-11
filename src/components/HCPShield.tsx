@@ -135,18 +135,23 @@ export function HCPShield({ hcp, size = 100, notDefined = false, opaque = false 
       ]}
     >
       <Svg width={w} height={h}>
+        {/* Skenande kantlinje: en bredare, halvgenomskinlig stroke bakom den
+            skarpa kanten bildar en mjuk gloria längs kanten. */}
+        <Path d={d} stroke={tier.stroke} strokeWidth={7} fill="none" opacity={0.35} />
+        <Path d={d} stroke={tier.stroke} strokeWidth={4.5} fill="none" opacity={0.55} />
         <Path d={d} stroke={tier.stroke} strokeWidth={2.5} fill={fillColor} />
       </Svg>
 
-      {/* Textöverlagring – "HCP" över, siffra (eller "Not Defined") under */}
-      <View style={[styles.textLayer, { paddingBottom: h * 0.1 }]} pointerEvents="none">
-        <Text style={[styles.labelText, { fontSize: size * 0.14 }]}>HCP</Text>
+      {/* Textöverlagring – Guest: bara "Guest" centrerat. Annars "HCP" över +
+          siffra under. */}
+      <View style={[styles.textLayer, notDefined ? null : { paddingBottom: h * 0.1 }]} pointerEvents="none">
         {notDefined ? (
-          <Text style={[styles.notDefinedText, { fontSize: size * 0.14 }]}>
-            Not{'\n'}Defined
-          </Text>
+          <Text style={[styles.guestText, { fontSize: size * 0.18 }]}>Guest</Text>
         ) : (
-          <Text style={[styles.valueText, { fontSize: size * 0.34 }]}>{hcp}</Text>
+          <>
+            <Text style={[styles.labelText, { fontSize: size * 0.14 }]}>HCP</Text>
+            <Text style={[styles.valueText, { fontSize: size * 0.34 }]}>{hcp}</Text>
+          </>
         )}
       </View>
     </View>
@@ -154,7 +159,7 @@ export function HCPShield({ hcp, size = 100, notDefined = false, opaque = false 
 }
 
 // ── Sköld-KORT: sköld i en ruta vars kant matchar sköldens färg, med en
-// etikett-badge under (Total/Music/Film/Sport) och en region-flagg-badge
+// etikett-badge under (Total/Music/Film) och en region-flagg-badge
 // ovan-höger (§1.3 UI-krav). notDefined → gäst-vattenstämpel + neutral grå kant.
 interface HCPShieldCardProps {
   hcp: number;
@@ -163,7 +168,7 @@ interface HCPShieldCardProps {
   regionFlag?: string;
   notDefined?: boolean;
   // Etikett-badgens färger. Default = sköldens tier-färg + vit text. Kategori-
-  // korten (Music/Film/Sport) skickar guld + svart för att matcha GetReady/
+  // korten (Music/Film) skickar guld + svart för att matcha GetReady/
   // countdown-vyns kategori-badge.
   badgeColor?: string;
   badgeTextColor?: string;
@@ -231,7 +236,6 @@ export interface HcpShieldBundle {
   total: number;
   music: number;
   film: number;
-  sport: number;
 }
 interface HCPShieldClusterProps {
   bundle: HcpShieldBundle;
@@ -261,7 +265,6 @@ export function HCPShieldCluster({
         <View style={cardStyles.clusterRow}>
           <HCPShieldCard hcp={bundle.music} size={subSize} label="Music" notDefined={notDefined} badgeColor={Colors.warning} badgeTextColor="#000" />
           <HCPShieldCard hcp={bundle.film} size={subSize} label="Film" notDefined={notDefined} badgeColor={Colors.warning} badgeTextColor="#000" />
-          <HCPShieldCard hcp={bundle.sport} size={subSize} label="Sport" notDefined={notDefined} badgeColor={Colors.warning} badgeTextColor="#000" />
         </View>
       ) : null}
     </View>
@@ -378,6 +381,11 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: '#fff',
     letterSpacing: 1.8,
+    // letterSpacing lägger till efterföljande mellanrum efter sista bokstaven
+    // ("P") vilket skjuter den synliga texten vänster om mitten i den centrerade
+    // rutan. Kompensera med en matchande vänsterindrag så "HCP" ser centrerat ut.
+    paddingLeft: 1.8,
+    textAlign: 'center',
   },
   valueText: {
     fontWeight: FontWeight.bold,
@@ -385,11 +393,9 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     marginTop: 2,
   },
-  notDefinedText: {
+  guestText: {
     fontWeight: FontWeight.bold,
     color: '#fff',
-    marginTop: 2,
     textAlign: 'center',
-    opacity: 0.85,
   },
 });

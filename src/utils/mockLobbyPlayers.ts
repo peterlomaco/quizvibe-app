@@ -68,7 +68,8 @@ interface LobbyPlayerRow {
   // (PlayerRow/leaderboard) läser dessa; NULL → kategori-sköld faller till 99.
   hcp_music?: number | null;
   hcp_film?: number | null;
-  hcp_sport?: number | null;
+  // hcp_sport-kolumnen (migration 0050) finns kvar i DB men läses inte längre
+  // (Sport borttaget ur modellen 2026-09).
   // OBS: kolumnen `seen_question_ids` (migration 0026) ingår MEDVETET INTE
   // i denna row-shape eller i playerToRow — den skrivs enbart via
   // updateOwnSeenQuestionIds (targeted UPDATE) så host:s bulk-UPSERT aldrig
@@ -96,7 +97,6 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     hcp: row.hcp ?? undefined,
     hcpMusic: row.hcp_music ?? undefined,
     hcpFilm: row.hcp_film ?? undefined,
-    hcpSport: row.hcp_sport ?? undefined,
     // Host-added guests har user_id=null i DB eftersom host saknar deras
     // auth-session vid upsert (setLobbyPlayers strippar dessutom user_id ur
     // non-host-payload:en). Self-joined guests sätter user_id=auth.uid() via
@@ -531,15 +531,16 @@ export async function publishOwnAccountName(
  * UPDATE scoped på room_code + player_id + user_id (samma mönster som
  * publishOwnAccountName) — ingår ALDRIG i host:s bulk-UPSERT.
  *
- * Tolerans för icke-applicerad 0050: försök skriva alla 4 kolumnerna; failar
- * det (kategori-kolumnerna saknas) → console.warn + RETRY med bara `hcp` så
- * Total ändå publiceras på det gamla schemat (kategori-sköldar faller till 99).
+ * Tolerans för icke-applicerad 0050: försök skriva Total + kategori-kolumnerna;
+ * failar det (kategori-kolumnerna saknas) → console.warn + RETRY med bara `hcp`
+ * så Total ändå publiceras på det gamla schemat (kategori-sköldar faller till 99).
  * No-op om Total inte är ett tal (gäst / ännu ej progressad spelare → 99).
+ * (hcp_sport-kolumnen finns kvar i DB men skrivs inte längre — Sport borttaget 2026-09.)
  */
 export async function publishOwnHcp(
   code: string,
   playerId: string,
-  bundle: { total: number; music: number; film: number; sport: number },
+  bundle: { total: number; music: number; film: number },
 ): Promise<void> {
   if (!code || !playerId || typeof bundle?.total !== 'number') return;
   const normalized = normalizeCode(code);
@@ -553,7 +554,6 @@ export async function publishOwnHcp(
       hcp: bundle.total,
       hcp_music: bundle.music,
       hcp_film: bundle.film,
-      hcp_sport: bundle.sport,
     })
     .eq('room_code', normalized)
     .eq('player_id', playerId)

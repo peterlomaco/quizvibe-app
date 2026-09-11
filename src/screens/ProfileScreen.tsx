@@ -535,12 +535,6 @@ export default function ProfileScreen() {
     youtubeEnabledCategories.includes('Film') || imagesEnabledCategories.includes('Film');
   const actorsAllOn =
     youtubeEnabledCategories.includes('Film') && imagesEnabledCategories.includes('Film');
-  const athletesEnabled =
-    youtubeEnabledCategories.includes('Sport') || imagesEnabledCategories.includes('Sport');
-  const athletesAllOn =
-    youtubeEnabledCategories.includes('Sport') && imagesEnabledCategories.includes('Sport');
-  // Sport parkerat (ingen kolumn i mixerboarden) — athletesEnabled/athletesAllOn
-  // behålls som inert dead code och ingår ej i All-mastern/kolumn-räkningen.
   const sourcesAllEnabled = artistsAllOn && actorsAllOn;
   const enabledSourceColumnsCount = [artistsEnabled, actorsEnabled].filter(Boolean).length;
   // Alias som matchar Lobby-namngivningen (används i porterade handlers).
@@ -573,7 +567,7 @@ export default function ProfileScreen() {
       Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
       return;
     }
-    // Music + Film (Sport parkerat) — lägg tillbaka 'Sport' när kolumnen återinförs.
+    // Music + Film (de enda live kategorierna sedan Sport togs bort 2026-09).
     setYoutubeEnabledCategories(value ? ['Music', 'Film'] : []);
     setImagesEnabledCategories(value ? ['Music', 'Film'] : []);
     if (value && spotifyConnected) setSpotifyEnabled(true);
@@ -581,14 +575,12 @@ export default function ProfileScreen() {
 
   const handleToggleArtistsColumn = (value: boolean) => {
     if (!value && !spotifyEnabled) {
-      const remainingActorsAthletes = [
+      const remainingActors = [
         youtubeEnabledCategories.includes('Film'),
-        youtubeEnabledCategories.includes('Sport'),
         imagesEnabledCategories.includes('Film'),
-        imagesEnabledCategories.includes('Sport'),
       ].filter(Boolean).length;
-      if (remainingActorsAthletes < 2) {
-        Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+      if (remainingActors < 2) {
+        Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
         return;
       }
     }
@@ -604,8 +596,8 @@ export default function ProfileScreen() {
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Sport'), imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+        // Utan Music-källa (Artists) finns inget kvar när Actors stängs av.
+        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
       if (enabledColumnsCount <= 1) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
@@ -614,23 +606,6 @@ export default function ProfileScreen() {
     );
     setImagesEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
-    );
-  };
-
-  const handleToggleAthletesColumn = (value: boolean) => {
-    if (!value && !spotifyEnabled) {
-      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
-      if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film')].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
-      }
-      if (enabledColumnsCount <= 1) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
-    }
-    setYoutubeEnabledCategories((prev) =>
-      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
-    );
-    setImagesEnabledCategories((prev) =>
-      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
     );
   };
 
@@ -638,14 +613,12 @@ export default function ProfileScreen() {
     if (!value && !spotifyEnabled) {
       const artistsWouldStillBeActive = imagesEnabledCategories.includes('Music');
       if (!artistsWouldStillBeActive) {
-        const remainingActorsAthletes = [
+        const remainingActors = [
           youtubeEnabledCategories.includes('Film'),
-          youtubeEnabledCategories.includes('Sport'),
           imagesEnabledCategories.includes('Film'),
-          imagesEnabledCategories.includes('Sport'),
         ].filter(Boolean).length;
-        if (remainingActorsAthletes < 2) {
-          Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+        if (remainingActors < 2) {
+          Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
           return;
         }
       }
@@ -663,14 +636,12 @@ export default function ProfileScreen() {
     if (!value && !spotifyEnabled) {
       const artistsWouldStillBeActive = youtubeEnabledCategories.includes('Music');
       if (!artistsWouldStillBeActive) {
-        const remainingActorsAthletes = [
+        const remainingActors = [
           youtubeEnabledCategories.includes('Film'),
-          youtubeEnabledCategories.includes('Sport'),
           imagesEnabledCategories.includes('Film'),
-          imagesEnabledCategories.includes('Sport'),
         ].filter(Boolean).length;
-        if (remainingActorsAthletes < 2) {
-          Alert.alert('Not applicable', 'Enable at least 2 Actors/Athletes combinations before turning off Artists, or keep Spotify active.');
+        if (remainingActors < 2) {
+          Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
           return;
         }
       }
@@ -688,8 +659,8 @@ export default function ProfileScreen() {
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
-        const remaining = [false, youtubeEnabledCategories.includes('Sport'), imagesEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+        // Utan Music-källa (Artists) finns inget kvar när Actors-YT stängs av.
+        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
       if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
@@ -702,41 +673,13 @@ export default function ProfileScreen() {
     if (!value && !spotifyEnabled) {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Film'), youtubeEnabledCategories.includes('Sport'), false, imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
+        // Utan Music-källa (Artists) finns inget kvar när Actors-Hints stängs av.
+        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
       if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setImagesEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
-    );
-  };
-
-  const handleToggleAthletesYoutube = (value: boolean) => {
-    if (!value && !spotifyEnabled) {
-      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
-      if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film'), false, imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
-      }
-      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Sport')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
-    }
-    setYoutubeEnabledCategories((prev) =>
-      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
-    );
-  };
-
-  const handleToggleAthletesGuessWho = (value: boolean) => {
-    if (!value && !spotifyEnabled) {
-      const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
-      if (!artistsActive) {
-        const remaining = [youtubeEnabledCategories.includes('Film'), imagesEnabledCategories.includes('Film'), youtubeEnabledCategories.includes('Sport'), false].filter(Boolean).length;
-        if (remaining < 2) { Alert.alert('Not applicable', 'At least 2 Actors/Athletes source combinations must remain active — or enable Artists or Spotify.'); return; }
-      }
-      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Sport')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
-    }
-    setImagesEnabledCategories((prev) =>
-      value ? ([...new Set([...prev, 'Sport'])] as MainCategory[]) : prev.filter((c) => c !== 'Sport'),
     );
   };
 
@@ -1131,14 +1074,13 @@ export default function ProfileScreen() {
   const voiceLabel       = VOICE_OPTIONS.find((v) => v.id === voice)?.label;
   // Player-HCP-sköldar (§1.3 UI). Läser den intjänade per-kategori-bundlen ur
   // profil-spegeln (motorn skriver profile.hcpByCategory efter varje spel).
-  // Saknas den → 99 för alla (ny spelare / aldrig spelat). Total-sköld + tre
-  // sub-sköldar (Music/Film/Sport) visas alltid i Profile.
+  // Saknas den → 99 för alla (ny spelare / aldrig spelat). Total-sköld + två
+  // sub-sköldar (Music/Film) visas alltid i Profile.
   const hcpBundle = getCachedProfile()?.hcpByCategory;
   const hcpShieldBundle = {
     total: resolveDisplayHcp(hcpBundle?.total ?? getCachedProfile()?.hcp),
     music: resolveDisplayHcp(hcpBundle?.music),
     film: resolveDisplayHcp(hcpBundle?.film),
-    sport: resolveDisplayHcp(hcpBundle?.sport),
   };
   const regionLabel = REGION_OPTIONS.find((r) => r.id === region)?.label;
   const answerResponseLabel = ANSWER_RESPONSE_OPTIONS.find(

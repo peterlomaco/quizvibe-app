@@ -379,12 +379,12 @@ export interface PlayerHcpChangedPayload {
   after: number;
   /** §1.3 — per-kategori nytt värde + förändring, så alla enheter kan visa
    *  varandras kategori-sköldar + delta i leaderboarden. Optional (äldre
-   *  klienter/Total-only-fall utelämnar). */
+   *  klienter/Total-only-fall utelämnar). Sport borttaget 2026-09; en äldre
+   *  klient kan fortfarande skicka `sport` — validatorn ignorerar det. */
   categories?: {
     total: HcpCatDelta;
     music: HcpCatDelta;
     film: HcpCatDelta;
-    sport: HcpCatDelta;
   };
 }
 
@@ -867,8 +867,9 @@ function vPlayerHcpChanged(raw: unknown): PlayerHcpChangedPayload | null {
     const total = vHcpCatDelta(c.total);
     const music = vHcpCatDelta(c.music);
     const film = vHcpCatDelta(c.film);
-    const sport = vHcpCatDelta(c.sport);
-    if (total && music && film && sport) out.categories = { total, music, film, sport };
+    // Tolerant mot äldre klienter: ett kvarvarande c.sport ignoreras, och dess
+    // frånvaro får inte fälla payloaden.
+    if (total && music && film) out.categories = { total, music, film };
   }
   return out;
 }

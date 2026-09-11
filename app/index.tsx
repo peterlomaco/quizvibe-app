@@ -1603,7 +1603,11 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     nivån här, svarstiden och Game era (default [födelseår,
                     idag], editerbar) i lobbyn.
                     Guest-HOST har inga rumkods-celler — koden genereras vid
-                    submit i handleStartGameAsGuestHost. */}
+                    submit i handleStartGameAsGuestHost.
+                    Guest-HOST döljer assistance-väljaren helt (2026-09-11) —
+                    guest host spelar alltid på Full. Bara guest-JOIN visar den. */}
+                {step === 'guest' && (
+                <>
                 <Text
                   style={[
                     modal.statusHint,
@@ -1647,6 +1651,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     })}
                   </View>
                 </View>
+                </>
+                )}
 
                 {step === 'guest' && (
                 <>

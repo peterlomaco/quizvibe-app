@@ -8,13 +8,20 @@
 
 import { describe, it, expect } from 'vitest';
 import {
+  allocateCategoryBlocks,
+  buildActiveCategories,
+  emptyCategoryDebt,
   emptyEpochDebt,
   getActiveEpochs,
+  planCategorySequence,
   planEpochSequence,
+  sequenceToCategoryQuotas,
   sequenceToQuotas,
+  type CategoryDebt,
   type EpochDebt,
   type EpochId,
 } from '../../../src/utils/epochAllocation';
+import { YT_CATEGORY_WEIGHTS } from '../../../src/utils/mainCategory';
 
 // Spegel av shuffleBlocks i app/quiz.tsx. Kopieras hit eftersom quiz.tsx är en
 // React-skärm som inte går att importera i node-miljön; håll dem i synk.
@@ -286,5 +293,136 @@ describe('shuffleBlocks', () => {
     for (let run = 0; run < 25; run++) {
       expect(shuffleBlocks(seq, 3)[6]).toBe('tail');
     }
+  });
+});
+
+// ── Kategori-skuldbok: 90% Music / 10% Film av YT-klippen "över tid" ──────────
+// Speglar epok-testerna: bär EN skuldbok mellan spelen och verifierar att den
+// lilla Film-andelen realiseras trots att den avrundas bort i varje kort spel.
+
+function catShare(seq: string[], id: string): number {
+  return seq.filter((x) => x === id).length / seq.length;
+}
+
+// Kör `games` spel à `ytBlocks` YouTube-block med EN kategori-skuldbok som bärs
+// mellan spelen. Music+Film närvarande (Sport parkerat), 90/10-vikt.
+function runCategoryGames(
+  games: number,
+  ytBlocks: number,
+  startDebt: CategoryDebt = emptyCategoryDebt(),
+): { all: string[]; perGame: string[][]; debt: CategoryDebt } {
+  const active = buildActiveCategories(['Music', 'Film'], YT_CATEGORY_WEIGHTS);
+  let debt = startDebt;
+  const perGame: string[][] = [];
+  for (let g = 0; g < games; g++) {
+    const { sequence, nextDebt } = planCategorySequence(ytBlocks, active, debt);
+    perGame.push(sequence);
+    debt = nextDebt;
+  }
+  return { all: perGame.flat(), perGame, debt };
+}
+
+describe('buildActiveCategories', () => {
+  it('renormalizes present categories to sum to 1', () => {
+    const active = buildActiveCategories(['Music', 'Film'], YT_CATEGORY_WEIGHTS);
+    expect(active.map((c) => c.id).sort()).toEqual(['Film', 'Music']);
+    expect(active.reduce((s, c) => s + c.normWeight, 0)).toBeCloseTo(1, 10);
+    const film = active.find((c) => c.id === 'Film')!;
+    expect(film.normWeight).toBeCloseTo(0.1, 10);
+  });
+
+  it('gives a lone present category the full weight', () => {
+    const active = buildActiveCategories(['Music'], YT_CATEGORY_WEIGHTS);
+    expect(active).toEqual([{ id: 'Music', normWeight: 1 }]);
+  });
+
+  it('drops categories with no weight (e.g. parked Sport)', () => {
+    const active = buildActiveCategories(['Music', 'Sport'], YT_CATEGORY_WEIGHTS);
+    expect(active.map((c) => c.id)).toEqual(['Music']);
+  });
+});
+
+describe('planCategorySequence', () => {
+  const active = buildActiveCategories(['Music', 'Film'], YT_CATEGORY_WEIGHTS);
+
+  it('returns exactly nBlocks slots, all from active categories', () => {
+    const { sequence } = planCategorySequence(9, active, emptyCategoryDebt());
+    expect(sequence).toHaveLength(9);
+    for (const id of sequence) expect(['Music', 'Film']).toContain(id);
+  });
+
+  it('returns nothing for nBlocks <= 0 or no active categories', () => {
+    expect(planCategorySequence(0, active, emptyCategoryDebt()).sequence).toEqual([]);
+    expect(planCategorySequence(3, [], emptyCategoryDebt()).sequence).toEqual([]);
+  });
+
+  it('does not mutate the debt passed in', () => {
+    const debt = emptyCategoryDebt();
+    planCategorySequence(30, active, debt);
+    expect(debt).toEqual(emptyCategoryDebt());
+  });
+
+  it('reaches Film across games even though 3 YT blocks can never contain 10%', () => {
+    // Kärnan: 3 × 10% = 0,3 block. Utan skuldbok avrundas det bort varje spel
+    // och Film visas ALDRIG. Med skuldboken ackumuleras resten över spel.
+    const { all } = runCategoryGames(40, 3);
+    expect(all.filter((x) => x === 'Film').length).toBeGreaterThan(0);
+  });
+
+  it('converges on 90/10 over many games', () => {
+    const { all } = runCategoryGames(200, 3);
+    expect(Math.abs(catShare(all, 'Music') - 0.9)).toBeLessThan(0.02);
+    expect(Math.abs(catShare(all, 'Film') - 0.1)).toBeLessThan(0.02);
+  });
+
+  it('freezes an absent category (no debt accrual, never scheduled)', () => {
+    const musicOnly = buildActiveCategories(['Music'], YT_CATEGORY_WEIGHTS);
+    const start: CategoryDebt = { Music: 0, Film: 0.4, Sport: 0 };
+    const { sequence, nextDebt } = planCategorySequence(6, musicOnly, start);
+    expect(sequence.every((x) => x === 'Music')).toBe(true);
+    expect(nextDebt.Film).toBe(0.4); // orörd — Film frös
+  });
+});
+
+describe('sequenceToCategoryQuotas', () => {
+  it('counts blocks per category and returns {} for empty input', () => {
+    expect(sequenceToCategoryQuotas(['Music', 'Music', 'Film'])).toEqual({ Music: 2, Film: 1 });
+    expect(sequenceToCategoryQuotas([])).toEqual({});
+  });
+});
+
+describe('allocateCategoryBlocks with targetBlocks', () => {
+  const cap = (fresh: number, total = fresh) => ({ fresh, total });
+
+  it('honours the ledger target when capacity allows, summing to totalBlocks', () => {
+    const out = allocateCategoryBlocks(
+      10,
+      ['Music', 'Film'],
+      { Music: cap(20), Film: cap(20) },
+      { Music: 9, Film: 1 },
+    );
+    expect(out).toEqual({ Music: 9, Film: 1 });
+  });
+
+  it('water-fills a scarce Film target onto Music, still summing to totalBlocks', () => {
+    // Film-målet är 1 men Film har 0 färska block → överskottet går till Music.
+    const out = allocateCategoryBlocks(
+      10,
+      ['Music', 'Film'],
+      { Music: cap(20), Film: cap(0, 0) },
+      { Music: 9, Film: 1 },
+    );
+    expect(out.Film).toBe(0);
+    expect(out.Music).toBe(10);
+  });
+
+  it('falls back to equal weight when no target is given (Hints path)', () => {
+    const out = allocateCategoryBlocks(
+      4,
+      ['Music', 'Film'],
+      { Music: cap(20), Film: cap(20) },
+    );
+    expect(out.Music).toBe(2);
+    expect(out.Film).toBe(2);
   });
 });

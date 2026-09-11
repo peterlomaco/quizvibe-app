@@ -5,15 +5,21 @@
  * Ren funktion utan React så regeln kan enhetstestas
  * (backend/content/test/matchHighlights.test.ts).
  *
- * ── Däcket (Peter 2026-08-25) ───────────────────────────────────────────
- *   1. Correct answers  — PLACERINGSLISTA över ALLA spelare
- *   2. Best on Spotify  — enbart förstaplatsen
- *   3. Best on YouTube  — enbart förstaplatsen
- *   4. Best on Hints    — enbart förstaplatsen
- *   5. Fastest fingers  — PLACERINGSLISTA över ALLA spelare
+ * ── Däcket (Peter 2026-09-11 — kategori-hinkar ersätter källkorten) ──────
+ *   1. Correct answers        — PLACERINGSLISTA över ALLA spelare
+ *   2. Best on Music          — Spotify + YouTube-Music sammanslaget
+ *   3. Best on Film           — enbart YouTube-Film
+ *   4. Best on Hints - Music  — Hints-frågor med kategori Music
+ *   5. Best on Hints - Film   — Hints-frågor med kategori Film
+ *   6. Fastest fingers        — PLACERINGSLISTA över ALLA spelare
  *
- * Ordningen är explicit begärd; ändra den inte utan nytt beslut. Spotify
- * ligger FÖRE YouTube trots att YouTube är den vanligaste källan.
+ * Ordningen är explicit begärd; ändra den inte utan nytt beslut. Music
+ * ligger FÖRE Film, och Hints splittas på kategori (var tidigare ETT kort).
+ * Spotify räknas ALLTID som Music (Spotify DJ serverar bara låtar).
+ *
+ * Korten byggs ur (källa × kategori) per fråga: `mediaSourceByQuestion` och
+ * `categoryByQuestion` är index-alignade mot samma frågesekvens, så en
+ * frågas hink avgörs av båda arrayerna tillsammans.
  *
  * ── Delad placering ─────────────────────────────────────────────────────
  * Listkorten använder standard competition ranking (1, 1, 3): spelare med
@@ -21,9 +27,9 @@
  * Leaderboard, som bryter poänglika på snittsvarstid och därför alltid ger
  * en unik ordning. Korten firar prestationen, tabellen kör tävlingen.
  *
- * Källkorten (2-4) visar BARA förstaplatsen — men flera spelare kan dela
+ * Hink-korten (2-5) visar BARA förstaplatsen — men flera spelare kan dela
  * den, och då namnges alla. De använder SAMMA radlayout som listkorten
- * ("1. 🦊 Anna … 2/2", antal rätt / antal frågor i källan), så alla kort i
+ * ("1. 🦊 Anna … 2/2", antal rätt / antal frågor i hinken), så alla kort i
  * sekvensen läses likadant.
  *
  * ── Snittiden (kort 5, "Fastest fingers") ───────────────────────────────
@@ -39,12 +45,11 @@
  * rader som båda står på "8.42s" hamna på plats 1 och 2, vilket läses som
  * en bugg.
  *
- * ── Dormant: kategorikort (Musik/Film/Sport) + snabbaste enskilda svar ──
- * Fanns t.o.m. 2026-08-25 och föll bort när däcket ovan spikades. Typfältet
- * `category`, kind:arna 'category'/'fastest-single' och badge-renderingen i
- * FinalCelebration lämnas kvar så de kan återinföras med en loop över
- * CATEGORY_CARDS — men inget emitterar dem i dag, och `categoryByQuestion`
- * är därför oanvänd (den skickas fortfarande från quiz.tsx).
+ * ── Ikon-treatment per hink ─────────────────────────────────────────────
+ * Kategorikorten (Music/Film) bär en gold kant-skärande kategoribadge +
+ * en genre-emoji (🎵 / 🎬). Hints-korten bär appens Hints-källikon (Q+"?")
+ * via `source: 'image'` PLUS en Music/Film-badge, så det syns både att det
+ * är Hints och vilken kategori. Se FinalCelebration för renderingen.
  */
 
 import type { MainCategory } from './mainCategory';
@@ -52,10 +57,10 @@ import type { QuestionMediaType } from '../components/GetReadyIntro';
 import type { LeaderboardPlayer, RoundScore } from '../components/RoundLeaderboard';
 
 /**
- * Max antal kort i sekvensen. Däcket ovan ger som mest 5, så taket binder
+ * Max antal kort i sekvensen. Däcket ovan ger som mest 6, så taket binder
  * inte i dag — det står kvar som skyddsnät om fler korttyper återinförs.
  */
-export const MAX_HIGHLIGHT_CARDS = 6;
+export const MAX_HIGHLIGHT_CARDS = 8;
 
 /**
  * Minsta antal frågor i en källhink för att den ska förtjäna ett eget kort.
@@ -70,11 +75,10 @@ export const MIN_QUESTIONS_PER_BUCKET = 1;
 export type HighlightKind =
   | 'most-correct'
   | 'fastest-average'
-  /** Dormant — se filhuvudet. */
-  | 'fastest-single'
-  | 'source'
-  /** Dormant — se filhuvudet. */
-  | 'category';
+  | 'best-music'
+  | 'best-film'
+  | 'best-hints-music'
+  | 'best-hints-film';
 
 /** En namngiven spelare på ett kort (källkortens förstaplats). */
 export interface HighlightPlayerRef {
@@ -105,8 +109,8 @@ export interface HighlightCard {
   title: string;
   /**
    * Placeringslista. ENDA sättet ett kort namnger spelare — alla korttyper
-   * använder samma radlayout ("1. 🦊 Anna … 2/2"). Listkorten (1 och 5) tar
-   * med ALLA spelare; källkorten (2-4) bara förstaplatsen, som kan delas av
+   * använder samma radlayout ("1. 🦊 Anna … 2/2"). Listkorten (1 och 6) tar
+   * med ALLA spelare; hink-korten (2-5) bara förstaplatsen, som kan delas av
    * flera. Sätts inte i solospel/personal-läge — där bär `value` kortet.
    */
   rows?: HighlightRankRow[];
@@ -118,19 +122,21 @@ export interface HighlightCard {
   /** Valfri underrad, t.ex. "3 questions". */
   detail?: string;
   /**
-   * Källkort renderas med appens OFFICIELLA källikon via `MediaSourceIcon`
-   * (YouTubes röda play-knapp, Spotify vit monokrom, Q+"?" för Hints) —
-   * aldrig emoji. Samma komponent som GetReadyIntro:s kö och CountdownIntro.
+   * Renderar appens OFFICIELLA källikon via `MediaSourceIcon` (Q+"?" för
+   * Hints) — aldrig emoji. Sätts på Hints-korten (2:5), som också bär en
+   * kategoribadge. Samma komponent som GetReadyIntro:s kö och CountdownIntro.
    */
   source?: QuestionMediaType;
   /**
-   * DORMANT (se filhuvudet). Kategorikort renderades med appens gold
-   * kant-skärande kategoribadge; inget emitterar dem i dag.
+   * Gold kant-skärande kategoribadge (MUSIC/FILM). Sätts på alla fyra
+   * hink-korten (2-5): kategorikorten (Music/Film) bär den ensam med en
+   * genre-emoji, Hints-korten bär den ovanpå Hints-källikonen.
    */
   category?: MainCategory;
   /**
-   * Dekorativ emoji — BARA för de generella korten (placeringslistorna).
-   * Källor har en app-standard-ikon och ska därför aldrig sätta detta fält.
+   * Dekorativ central emoji. Bärs av listkorten (🎯/⚡) OCH av
+   * kategorikorten Music/Film (🎵/🎬). Hints-korten sätter det INTE — de
+   * har källikonen som central ikon.
    */
   icon?: string;
 }
@@ -141,27 +147,19 @@ export interface BuildMatchHighlightsInput {
   /** allRoundScoresHistory, platt eller nästlad — vi flattar själva. */
   scores: RoundScore[][];
   players: LeaderboardPlayer[];
-  /** DORMANT — kategorikorten är borttagna, se filhuvudet. */
+  /**
+   * V1-huvudkategori (Music/Film/null) per fråga, index-alignad mot
+   * `mediaSourceByQuestion`. Driver Music/Film-hinkarna och Hints-splitten.
+   * Tom/utelämnad → inga kategori-hinkar kan byggas.
+   */
   categoryByQuestion?: (MainCategory | null)[];
   /** Indexerad mot host:s auktoritativa frågesekvens. */
   mediaSourceByQuestion: QuestionMediaType[];
   mode: HighlightMode;
 }
 
-/**
- * Källor som får ett eget kort, i VISNINGSORDNING: Spotify → YouTube →
- * Hints (kort 2, 3 och 4). Ordningen är explicit begärd.
- */
-const SOURCE_CARDS: { source: QuestionMediaType; label: string }[] = [
-  { source: 'spotify', label: 'Spotify' },
-  { source: 'youtube', label: 'YouTube' },
-  // 'image' heter Hints i appen — personbilderna är juridiskt parkerade och
-  // det som faktiskt spelas är flagga + ledtrådar (samma frågepool).
-  { source: 'image', label: 'Hints' },
-];
-
-/** DORMANT — se filhuvudet. Behålls så kategorikorten kan återinföras. */
-export const CATEGORY_CARDS: MainCategory[] = ['Music', 'Film', 'Sport'];
+/** De levande V1-kategorierna, i visningsordning (Sport borttaget). */
+export const CATEGORY_CARDS: MainCategory[] = ['Music', 'Film'];
 
 /** Sekunder med två decimaler, som leaderboardens AVG/LAST-kolumner. */
 function formatSeconds(value: number): string {
@@ -257,7 +255,7 @@ function buildRankRows(entries: RankEntry[], higherIsBetter: boolean): Highlight
  * placeringssiffra, med "Left" i stället för sitt tal. Deras delsumma är
  * ingen giltig placering: de slutade svara.
  *
- * ⚠ Gäller BARA listkorten. Källkorten ("Best on Spotify" osv.) visar bara
+ * ⚠ Gäller BARA listkorten. Hink-korten ("Best on Music" osv.) visar bara
  * förstaplatsen — där ska en avhoppare inte kunna vinna, så de filtreras
  * bort ur `aggs` innan korten byggs.
  */
@@ -279,13 +277,16 @@ function appendDepartedRows(
 
 /**
  * Bygger korten för en avslutad match. Returnerar max MAX_HIGHLIGHT_CARDS
- * kort; källor utan underlag hoppas över helt (spelades ingen Spotify finns
- * inget Spotify-kort — ingen extra flagga behövs).
+ * kort; hinkar utan underlag hoppas över helt (spelades ingen Film finns
+ * inget Film-kort — ingen extra flagga behövs).
  */
 export function buildMatchHighlights(
   input: BuildMatchHighlightsInput,
 ): HighlightCard[] {
   const { scores, mediaSourceByQuestion, mode } = input;
+  // Index-alignad mot mediaSourceByQuestion; tom när ingen kategori-data
+  // finns (då kan inga Music/Film-hinkar byggas).
+  const categoryByQuestion = input.categoryByQuestion ?? [];
   // ⚠ Den som lämnade MITT i matchen RANKAS inte (Peter 2026-08-26) — de
   // slutade svara, så deras delsumma är ingen giltig placering. Utan det
   // kunde någon som gick efter två rätta svar toppa "Correct answers"
@@ -340,7 +341,7 @@ export function buildMatchHighlights(
         ),
         departed,
       ),
-      detail: 'Same number of correct answers shares a place',
+      detail: 'If tied on correct answers, fastest fingers decides',
       icon: '🎯',
     });
   } else {
@@ -357,21 +358,21 @@ export function buildMatchHighlights(
   }
 
   /**
-   * Källkorten (2-4). Kortet skapas bara om källan spelats
+   * Ett kategori-/Hints-hinkkort (kort 2-5). Skapas bara om hinken spelats
    * (MIN_QUESTIONS_PER_BUCKET frågor) OCH någon svarat rätt på minst en —
-   * sekvensen ska vara firande, och "Best on Spotify — 0 of 3" är inte det.
+   * sekvensen ska vara firande, och "Best on Music — 0 of 3" är inte det.
    *
    * Flera spelare kan DELA förstaplatsen; då namnges alla. Placeringar
-   * under första visas aldrig här.
+   * under första visas aldrig här. `visual` fäster kortets ikon-treatment.
    */
-  const sourceCard = (
-    id: string,
+  const bucketCard = (
+    id: HighlightKind,
     title: string,
-    source: QuestionMediaType,
     questionIndices: Set<number>,
+    visual: { source?: QuestionMediaType; category?: MainCategory; icon?: string },
   ): HighlightCard | null => {
     if (questionIndices.size < MIN_QUESTIONS_PER_BUCKET) return null;
-    // Poster utan questionIndex (äldre data) kan inte hänföras till en källa.
+    // Poster utan questionIndex (äldre data) kan inte hänföras till en hink.
     const inBucket = flat.filter(
       (s) => s.questionIndex !== undefined && questionIndices.has(s.questionIndex),
     );
@@ -396,12 +397,12 @@ export function buildMatchHighlights(
 
     return {
       id,
-      kind: 'source',
+      kind: id,
       title,
       // Samma radlayout som listkorten ("1. 🦊 Anna … 2/2"), men BARA
       // förstaplatsen. Alla vinnare har per definition samma `correct`;
       // `answered` kan skilja om någon tappade uppkopplingen, så nämnaren
-      // är hinkens storlek — antal rätt / antal frågor i källan.
+      // är hinkens storlek — antal rätt / antal frågor i hinken.
       rows: personal
         ? undefined
         : winners.map((w) => ({
@@ -416,29 +417,57 @@ export function buildMatchHighlights(
         winners.length > 1 && !personal
           ? `${winners.length} players share first place`
           : undefined,
-      source,
+      ...visual,
     };
   };
 
-  const indicesWhere = <T,>(arr: T[], match: (v: T) => boolean): Set<number> => {
+  const srcOf = (i: number): QuestionMediaType | undefined => mediaSourceByQuestion[i];
+  const catOf = (i: number): MainCategory | null | undefined => categoryByQuestion[i];
+  const indicesWhere = (match: (i: number) => boolean): Set<number> => {
     const out = new Set<number>();
-    arr.forEach((v, i) => {
-      if (match(v)) out.add(i);
-    });
+    const len = Math.max(mediaSourceByQuestion.length, categoryByQuestion.length);
+    for (let i = 0; i < len; i++) if (match(i)) out.add(i);
     return out;
   };
 
-  // ── 2-4. Källor: Spotify → YouTube → Hints ─────────────────────────────
-  // Rubriken behåller källans NAMN eftersom Hints-ikonen (Q + "?") inte är
-  // självförklarande på egen hand — brand-ikonen och namnet förstärker
-  // varandra, precis som i Lobby:s Game Connections-rader.
-  for (const { source, label } of SOURCE_CARDS) {
-    const card = sourceCard(
-      `source-${source}`,
-      personal ? label : `Best on ${label}`,
-      source,
-      indicesWhere(mediaSourceByQuestion, (s) => s === source),
-    );
+  // ── 2-5. Kategori-hinkar: Music → Film → Hints-Music → Hints-Film ──────
+  // Music slår ihop Spotify (alltid låtar) + YouTube-Music. Film är bara
+  // YouTube-Film. Hints splittas på kategori. Hint-korten bär Hints-ikonen
+  // (source: 'image') OCH en kategoribadge; kategorikorten bär badge + emoji.
+  const buckets: {
+    id: HighlightKind;
+    title: string;
+    match: (i: number) => boolean;
+    visual: { source?: QuestionMediaType; category?: MainCategory; icon?: string };
+  }[] = [
+    {
+      id: 'best-music',
+      title: personal ? 'Music' : 'Best on Music',
+      match: (i) => srcOf(i) === 'spotify' || (srcOf(i) === 'youtube' && catOf(i) === 'Music'),
+      visual: { category: 'Music', icon: '🎵' },
+    },
+    {
+      id: 'best-film',
+      title: personal ? 'Film' : 'Best on Film',
+      match: (i) => srcOf(i) === 'youtube' && catOf(i) === 'Film',
+      visual: { category: 'Film', icon: '🎬' },
+    },
+    {
+      id: 'best-hints-music',
+      title: personal ? 'Hints · Music' : 'Best on Hints - Music',
+      match: (i) => srcOf(i) === 'image' && catOf(i) === 'Music',
+      visual: { source: 'image', category: 'Music' },
+    },
+    {
+      id: 'best-hints-film',
+      title: personal ? 'Hints · Film' : 'Best on Hints - Film',
+      match: (i) => srcOf(i) === 'image' && catOf(i) === 'Film',
+      visual: { source: 'image', category: 'Film' },
+    },
+  ];
+
+  for (const b of buckets) {
+    const card = bucketCard(b.id, b.title, indicesWhere(b.match), b.visual);
     if (card) cards.push(card);
   }
 

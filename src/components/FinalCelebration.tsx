@@ -538,7 +538,13 @@ export default function FinalCelebration({
               style={styles.pager}
               contentContainerStyle={styles.pagerContent}
             >
-              {highlights.map((card) => (
+              {highlights.map((card) => {
+                // Music/Film-korten visar bara EN vinnare, så "1." blir bara
+                // brus — dölj radnumret helt och ge titeln mer luft ner till
+                // spelarnamnet. Listkorten + Hints-korten behåller sitt nummer.
+                const isCategoryCard =
+                  card.id === 'best-music' || card.id === 'best-film';
+                return (
                 <View key={card.id} style={styles.page}>
                   <View style={styles.card}>
                     {/* Kategori → appens kant-skärande guld-badge (samma
@@ -570,29 +576,38 @@ export default function FinalCelebration({
                          Motsatt scroll-riktning gör att paging fortfarande
                          fungerar. */
                       <ScrollView
-                        style={styles.rankList}
+                        style={[styles.rankList, isCategoryCard && styles.rankListSpaced]}
                         contentContainerStyle={styles.rankListContent}
                         nestedScrollEnabled
                         showsVerticalScrollIndicator={false}
                       >
                         {card.rows.map((row) => (
-                          <View key={row.playerId} style={styles.rankRow}>
+                          <View
+                            key={row.playerId}
+                            style={[styles.rankRow, isCategoryCard && styles.rankRowCentered]}
+                          >
                             {/* place === null: spelaren lämnade mitt i
                                 matchen och rankas inte. Texten renderas ändå
                                 (tom) så `rankPlace`:ens fasta bredd håller
-                                namnkolumnen i linje. */}
-                            <Text
-                              style={[
-                                styles.rankPlace,
-                                row.place === 1 && styles.rankPlaceTop,
-                              ]}
-                            >
-                              {row.place === null ? '' : `${row.place}.`}
-                            </Text>
+                                namnkolumnen i linje. På Music/Film-korten
+                                (en enda vinnare) döljs numret helt. */}
+                            {!isCategoryCard && (
+                              <Text
+                                style={[
+                                  styles.rankPlace,
+                                  row.place === 1 && styles.rankPlaceTop,
+                                ]}
+                              >
+                                {row.place === null ? '' : `${row.place}.`}
+                              </Text>
+                            )}
                             {row.emoji ? (
                               <Text style={styles.rankEmoji}>{row.emoji}</Text>
                             ) : null}
-                            <Text style={styles.rankName} numberOfLines={1}>
+                            <Text
+                              style={isCategoryCard ? styles.rankNameCentered : styles.rankName}
+                              numberOfLines={1}
+                            >
                               {row.name}
                             </Text>
                             <Text
@@ -616,7 +631,8 @@ export default function FinalCelebration({
                     ) : null}
                   </View>
                 </View>
-              ))}
+                );
+              })}
             </ScrollView>
           )}
 
@@ -812,6 +828,11 @@ const styles = StyleSheet.create({
     // sträcka ut kortet när det är få spelare.
     flexGrow: 0,
   },
+  // Music/Film-korten (en vinnarrad, inget radnummer) — mer luft mellan
+  // titeln och spelarnamnet.
+  rankListSpaced: {
+    marginTop: Spacing.lg,
+  },
   rankListContent: {
     gap: COMPACT ? 4 : 6,
   },
@@ -819,6 +840,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
+  },
+  // Music/Film-korten: en enda vinnarrad centreras som grupp (avatar + namn
+  // + poäng) i stället för namn vänster / poäng långt till höger.
+  rankRowCentered: {
+    justifyContent: 'center',
   },
   rankPlace: {
     width: 22,
@@ -839,6 +865,16 @@ const styles = StyleSheet.create({
   },
   rankName: {
     flex: 1,
+    fontSize: COMPACT ? FontSize.sm : FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  // Centrerad rad: självständig stil UTAN `flex` (att override:a flex-shorthanden
+  // med flexBasis är opålitligt i RN — namnet kollapsade till 0 bredd). Namnet
+  // tar sitt innehålls bredd så poängen sitter tätt intill, och flexShrink 1
+  // låter mycket långa namn trunkeras.
+  rankNameCentered: {
+    flexShrink: 1,
     fontSize: COMPACT ? FontSize.sm : FontSize.md,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,

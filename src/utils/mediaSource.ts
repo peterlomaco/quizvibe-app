@@ -94,9 +94,8 @@ export function pickMediaSource(
 export type PlayedMediaSource = 'spotify' | 'youtube' | 'image';
 
 /**
- * Kanonisk VISNINGSORDNING: Spotify → YouTube → Hints. Samma ordning som
- * källkorten i prisutdelnings-sekvensen (matchHighlights.ts SOURCE_CARDS).
- * Ändra inte utan nytt beslut.
+ * Kanonisk VISNINGSORDNING: Spotify → YouTube → Hints. Driver bl.a. Player
+ * history-radens källetiketter. Ändra inte utan nytt beslut.
  */
 export const PLAYED_MEDIA_SOURCE_ORDER: PlayedMediaSource[] = ['spotify', 'youtube', 'image'];
 

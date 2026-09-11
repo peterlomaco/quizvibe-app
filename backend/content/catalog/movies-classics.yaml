@@ -141,7 +141,7 @@ items:
         startSec: 30
         endSec: 45
         channelTitle: "Paramount Pictures"
-        notes: "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener."
+        notes: "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener. OBS: parat med 'the-godfather-1972' (Year/global, annat klipp) som lades till 2026-09-11 — detta ar Name/sweden."
   - id: rocky
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rocky"
@@ -631,3 +631,297 @@ items:
         startSec: 0
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Bodyguard - Theatrical Trailer' — avslojar varken skadespelare eller ar."
+
+  # === Tillägg 2026-09-11 (Peters Film.xlsx) ===
+  # actor-select (Name) — de fem klipp vars YouTube-titel innehaller filmens
+  # ARSTAL kordes medvetet som Name i stallet for Year, sa att det synliga aret
+  # inte langre ar svaret (samma spoiler-logik som the-karate-kid, fast omvant).
+
+  - id: ghostbusters-1984
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ghostbusters"
+    correctYear: 1984
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Ghostbusters 1984 film Bill Murray Dan Aykroyd"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Bill Murray", "Dan Aykroyd"]
+    distractorNames: ["Eddie Murphy", "Chevy Chase", "Steve Martin", "John Candy"]
+    youtubeClips:
+      - videoId: "710w9M1n2KM"
+        startSec: 25
+        endSec: 55
+        channelTitle: "Cine Trailer"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Titeln 'Ghostbusters 1984 Trailer 4K' innehaller aret men INTE nagon skadespelare — fr33gan ar Name (svaret = Bill Murray/Dan Aykroyd), sa aret spoilar inte. Aggregator-kanal, takedown-risk."
+
+  - id: spider-man-2002
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Spider-Man"
+    correctYear: 2002
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Spider-Man 2002 film Tobey Maguire Sam Raimi"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Tobey Maguire"]
+    distractorNames: ["Andrew Garfield", "Tom Holland", "Elijah Wood", "Heath Ledger"]
+    youtubeClips:
+      - videoId: "t06RUxPbp_c"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Sony Pictures Entertainment"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Officiell Sony-trailer 'SPIDER-MAN [2002] Official Trailer' — titeln avslojar ar men INTE skadespelare (svaret = Tobey Maguire). Distraktorerna Garfield/Holland ar andra Spider-Man-skadespelare = klurigt."
+
+  - id: monty-python-holy-grail-1975
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Monty Python and the Holy Grail"
+    correctYear: 1975
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Monty Python and the Holy Grail 1975 John Cleese Graham Chapman"]
+    answerMethods: ["actor-select"]
+    correctNames: ["John Cleese", "Graham Chapman"]
+    distractorNames: ["Rowan Atkinson", "Hugh Grant", "Michael Caine", "Gene Hackman"]
+    youtubeClips:
+      - videoId: "67yCrKqAPQk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "HD Retro Trailers"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Titeln 'Monty Python and the Holy Grail (1975) Original Trailer' innehaller aret; kord som Name sa aret inte ar svaret (svar = John Cleese/Graham Chapman, ingen skadespelare i titeln). Fan/aggregator-kanal, takedown-risk."
+
+  - id: the-naked-gun-1988
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Naked Gun"
+    correctYear: 1988
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["The Naked Gun 1988 film Leslie Nielsen"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Leslie Nielsen"]
+    distractorNames: ["Chevy Chase", "Steve Martin", "John Cleese", "Bill Murray"]
+    youtubeClips:
+      - videoId: "ocxp2kns6jw"
+        startSec: 4
+        endSec: 34
+        channelTitle: "TrailerHome"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1988 star i titeln). OBS: titeln namner ocksa 'Leslie Nielsen' (= svaret) men vid ~tecken 55, forbi spelarens titel-trunkering (samma grund som the-good-the-bad-and-the-ugly). VERIFIERA i spelaren att namnet inte syns; byt annars klipp eller satt correctNames till en huvudroll som inte star i titeln."
+
+  - id: the-naked-gun-2-5-1991
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Naked Gun 2½: The Smell of Fear"
+    correctYear: 1991
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["The Naked Gun 2 1/2 The Smell of Fear 1991 Leslie Nielsen"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Leslie Nielsen"]
+    distractorNames: ["Chevy Chase", "Steve Martin", "John Cleese", "Bill Murray"]
+    youtubeClips:
+      - videoId: "EW66cjw-3xI"
+        startSec: 4
+        endSec: 34
+        channelTitle: "Trailer World"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1991 star i titeln). OBS: titeln namner 'Leslie Nielsen' (= svaret) vid ~tecken 55, forbi trunkeringen. VERIFIERA i spelaren; byt annars klipp/correctNames."
+
+  - id: the-grand-budapest-hotel-2014
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Grand Budapest Hotel"
+    correctYear: 2014
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["The Grand Budapest Hotel 2014 film Ralph Fiennes Wes Anderson"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Ralph Fiennes"]
+    distractorNames: ["Colin Firth", "Hugh Grant", "Ewan McGregor", "Edward Norton"]
+    youtubeClips:
+      - videoId: "zru-1DbbcsA"
+        startSec: 6
+        endSec: 36
+        channelTitle: "FilmIsNow Movies"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 2014 star i titeln, ingen skadespelare). OBS: detta ar en RED BAND-trailer (moget innehall) — Peter markerade INTE parentControlled i Film.xlsx, men overvag det. Ralph Fiennes = huvudroll, ej i titeln."
+
+  - id: fargo-1996
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Fargo"
+    correctYear: 1996
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Fargo 1996 film Frances McDormand Coen brothers"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Frances McDormand"]
+    distractorNames: ["Holly Hunter", "Laura Dern", "Susan Sarandon", "Sharon Stone"]
+    youtubeClips:
+      - videoId: "h2tY82z3xXU"
+        startSec: 10
+        endSec: 40
+        channelTitle: "Rotten Tomatoes Classic Trailers"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1996 star i titeln). Titeln namner 'Steve Buscemi' men svaret ar Frances McDormand (huvudrollen, ej i titeln) — sa ingen spoiler. Fargo ar en R-vald valdsfilm; overvag parentControlled (ej markt av Peter)."
+
+  # === Tillägg 2026-09-11 (Peters Film.xlsx) — timeline (Year) ===
+
+  - id: lost-in-translation-2003
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Lost in Translation"
+    correctYear: 2003
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Lost in Translation 2003 film Bill Murray Scarlett Johansson"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "g_maEh38ZTw"
+        startSec: 8
+        endSec: 38
+        channelTitle: "Ondreia Pedraza"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'Lost In Translation - Official Trailer HD' — inget ar. Privat kanal, takedown-risk."
+
+  - id: king-kong-1933
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "King Kong"
+    correctYear: 1933
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["King Kong 1933 film original"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "o-7BF7f5lZA"
+        startSec: 90
+        endSec: 120
+        channelTitle: "Slim Shady"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'King Kong original trailer' — inget ar. Privat kanal, takedown-risk."
+
+  - id: goldfinger-1964
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Goldfinger"
+    correctYear: 1964
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Goldfinger 1964 James Bond Sean Connery"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "KdQoSK9wibU"
+        startSec: 30
+        endSec: 60
+        channelTitle: "acool3k2010"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'Goldfinger Trailer' — inget ar. Privat kanal, takedown-risk."
+
+  - id: crouching-tiger-hidden-dragon-2000
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Crouching Tiger, Hidden Dragon"
+    correctYear: 2000
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Crouching Tiger Hidden Dragon 2000 film Ang Lee"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "q-HrIQLdaNE"
+        startSec: 46
+        endSec: 76
+        channelTitle: "Sony Pictures Classics"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Officiell Sony Pictures Classics-trailer, ingen ar-spoiler i titeln."
+
+  - id: the-sound-of-music-1965
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Sound of Music"
+    correctYear: 1965
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["The Sound of Music 1965 film Julie Andrews"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "ygyK0HStjwg"
+        startSec: 2
+        endSec: 32
+        channelTitle: "Park Circus"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Park Circus (rattighetsdistributor) 4K-restaurering, ingen ar-spoiler."
+
+  - id: west-side-story-1961
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "West Side Story"
+    correctYear: 1961
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["West Side Story 1961 film musical"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "IakulTGwc0U"
+        startSec: 13
+        endSec: 43
+        channelTitle: "wormontheweb"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'West Side Story HD Trailer' — inget ar. ANTAGET 1961 (klassikern). Om klippet ar 2021 (Spielberg): andra correctYear till 2021. Privat kanal, takedown-risk."
+
+  - id: the-avengers-2012
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Avengers"
+    correctYear: 2012
+    probability: 84
+    region: ["global"]
+    parentControlled: true
+    wikimediaSearchHints: ["The Avengers 2012 Marvel film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "eOrNdBpGMv8"
+        startSec: 7
+        endSec: 37
+        channelTitle: "Marvel Entertainment"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Officiell Marvel-trailer, ingen ar-spoiler. parentControlled=true per Film.xlsx."
+
+  - id: blade-runner-1982
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Blade Runner"
+    correctYear: 1982
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Blade Runner 1982 film Harrison Ford Ridley Scott"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "kTaewJomjAo"
+        startSec: 60
+        endSec: 90
+        channelTitle: "GameSpot Universe Trailers"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Klippet ar 'The Final Cut' (2007 restaurering) men correctYear=1982 = originalfilmen per ar-policy. Titeln namner skadespelare men inte aret (Year-fraga)."
+
+  - id: when-harry-met-sally-1989
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "When Harry Met Sally…"
+    correctYear: 1989
+    probability: 80
+    region: ["global"]
+    parentControlled: true
+    wikimediaSearchHints: ["When Harry Met Sally 1989 film Meg Ryan Billy Crystal"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "LO0Oe-sdG4g"
+        startSec: 7
+        endSec: 37
+        channelTitle: "Billy Barnell"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). VARNING: titeln 'When Harry Met Sally... | New Trailer 2020' visar '2020' (aterutgivningsar) men RATT SVAR ar 1989 — en spelare som laser titeln kan svara fel. VERIFIERA i spelaren; byt klipp om '2020' syns. parentControlled=true per Film.xlsx. Privat kanal, takedown-risk."
+
+  - id: taxi-driver-1976
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Taxi Driver"
+    correctYear: 1976
+    probability: 78
+    region: ["global"]
+    wikimediaSearchHints: ["Taxi Driver 1976 film Robert De Niro Scorsese"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oTbYR-ETFBQ"
+        startSec: 38
+        endSec: 68
+        channelTitle: "Wiziwiz"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'TAXI DRIVER in 4K Trailer - Robert De Niro' — inget ar (namner skadespelare, ok for Year-fraga). Taxi Driver ar en R-vald valdsfilm; overvag parentControlled (ej markt av Peter). Privat kanal, takedown-risk."
+
+  - id: the-godfather-1972
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Godfather"
+    correctYear: 1972
+    probability: 82
+    region: ["global"]
+    parentControlled: true
+    wikimediaSearchHints: ["The Godfather 1972 film Al Pacino Marlon Brando"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UJU7IoXmZ9s"
+        startSec: 15
+        endSec: 45
+        channelTitle: "Christian J Romero"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Andra Godfather-item: detta ar Year/global, samexisterar med det befintliga 'the-godfather' (Name/sweden). Titel 'The Godfather | Modern Trailer | 4k' — inget ar. OBS: fan-gjord 'Modern Trailer' pa privat kanal (ej rattsinnehavare), takedown-risk — samma klass som citizen-kane-1941. parentControlled=true per Film.xlsx."

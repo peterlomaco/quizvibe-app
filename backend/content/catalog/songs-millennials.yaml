@@ -203,11 +203,10 @@ items:
     wikimediaSearchHints: ["Europe The Final Countdown"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "4hj8M8XZpis"
+      - videoId: "9jK-NcRmVcw"
         startSec: 0
-        endSec: 15
-        channelTitle: "EUROPE - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1101)."
     region: ["global"]
   - id: bon-jovi-livin-on-a-prayer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -305,11 +304,10 @@ items:
     wikimediaSearchHints: ["Phil Collins Another Day in Paradise"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "At9FypGZ44M"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Phil Collins"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (3)."
+      - videoId: "Qt2mbGP6vFI"
+        startSec: 12
+        endSec: 42
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1305)."
   # 1990
     region: ["global"]
   - id: sinead-oconnor-nothing-compares-2-u
@@ -3219,6 +3217,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "5F5SMUnFD058zo1K0DtjUq"
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1364)."
+    youtubeClips:
+      - videoId: "TVWNiw6AoNE"
+        startSec: 16
+        endSec: 46
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1362)."
   # 1988-1989 internationella hitlatar — tillagda 2026-09-09 ur Music.xlsx (rad 1306-1316).
   - id: soul-ii-soul-back-to-life
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
