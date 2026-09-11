@@ -62,7 +62,6 @@ function emptyCoverage(): PackageCoverage {
   return {
     Music: { youtube: false, spotify: false, hints: false },
     Film: { youtube: false, spotify: false, hints: false },
-    Sport: { youtube: false, spotify: false, hints: false },
   };
 }
 

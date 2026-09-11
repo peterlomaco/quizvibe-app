@@ -259,11 +259,11 @@ export function sequenceToQuotas(
 /** Bråkdels-skuld per kategori. Positiv = kategorin har fått för få block. */
 export type CategoryDebt = Record<string, number>;
 
-/** Kategorier skuldboken spårar. Sport är parkerat men hålls i formen. */
-export const CATEGORY_DEBT_IDS: string[] = ['Music', 'Film', 'Sport'];
+/** Kategorier skuldboken spårar (Sport borttaget 2026-09 — parkerat innehåll). */
+export const CATEGORY_DEBT_IDS: string[] = ['Music', 'Film'];
 
 export function emptyCategoryDebt(): CategoryDebt {
-  return { Music: 0, Film: 0, Sport: 0 };
+  return { Music: 0, Film: 0 };
 }
 
 /** Kopierar och saniterar en kategori-skuldbok — ogiltiga/saknade tal blir 0. */

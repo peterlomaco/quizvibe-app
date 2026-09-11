@@ -18,7 +18,7 @@ const CURRENT_YEAR = new Date().getFullYear();
 type MainCat = LobbySettings['youtubeEnabledCategories'][number];
 
 function isMainCat(v: string): v is MainCat {
-  return v === 'Music' || v === 'Film' || v === 'Sport';
+  return v === 'Music' || v === 'Film';
 }
 
 /** Strukturell validering av en snapshot ur DB (jsonb kan vara vad som helst). */

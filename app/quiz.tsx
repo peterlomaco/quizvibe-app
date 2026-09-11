@@ -89,7 +89,7 @@ import {
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
-import { isMainCategory, subjectToMainCategory, itemInEnabledCategories, displayCategoryForItem, MAIN_CATEGORIES, YT_CATEGORY_WEIGHTS, type MainCategory } from '@/src/utils/mainCategory';
+import { isMainCategory, subjectToMainCategory, itemInEnabledCategories, displayCategoryForItem, defaultEnabledMainCategories, MAIN_CATEGORIES, YT_CATEGORY_WEIGHTS, type MainCategory } from '@/src/utils/mainCategory';
 import { buildMatchHighlights } from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
@@ -395,15 +395,14 @@ const ALL_QUESTIONS_MAP = new Map<string, QuizQuestion>(
 // §1.3 — bygg per-kategori-HCP-förändring (nytt värde + delta) ur before/after-
 // bundlarna (display-heltal) för leaderboardens "+"-utfällning.
 function buildHcpCategoryChange(
-  before: { total: number; music: number; film: number; sport: number },
-  after: { total: number; music: number; film: number; sport: number },
+  before: { total: number; music: number; film: number },
+  after: { total: number; music: number; film: number },
 ): HcpCategoryChange {
   const mk = (b: number, a: number) => ({ after: a, delta: a - b });
   return {
     total: mk(before.total, after.total),
     music: mk(before.music, after.music),
     film: mk(before.film, after.film),
-    sport: mk(before.sport, after.sport),
   };
 }
 
@@ -412,7 +411,7 @@ function filterPoolByCategoryHcp<T extends { itemHcp?: number; mainCategory: Mai
   regionHcp: Record<MainCategory, number> | null,
   minCount: number,
 ): T[] {
-  const byCat: Record<MainCategory, T[]> = { Music: [], Film: [], Sport: [] };
+  const byCat: Record<MainCategory, T[]> = { Music: [], Film: [] };
   const passthrough: T[] = [];
   pool.forEach((q) => {
     if (q.mainCategory) byCat[q.mainCategory].push(q);
@@ -1513,29 +1512,28 @@ export default function QuizScreen() {
   // (t.ex. direkt-nav till /quiz utan Lobby).
   const eraFrom = parseInt(String(params.eraFrom ?? '1900'), 10);
   const eraTo = parseInt(String(params.eraTo ?? new Date().getFullYear()), 10);
-  // Per-source profession-category-filter. YouTube: min 1, alla tre valbara.
-  // Images: Actors/Athletes är mandatory (alltid inkluderade), Music valbar.
+  // Per-source profession-category-filter. Music/Film valbara, min 1 (Sport borttaget 2026-09).
   const youtubeEnabledCategories = useMemo<MainCategory[]>(() => {
-    if (!params.youtubeEnabledCategories) return ['Music', 'Film', 'Sport'];
+    if (!params.youtubeEnabledCategories) return defaultEnabledMainCategories();
     try {
       const parsed = JSON.parse(params.youtubeEnabledCategories);
       // Tom array [] är ett giltigt explicit val (= YouTube helt av).
       // Fallback till default BARA om parse misslyckas eller inte är array.
-      if (!Array.isArray(parsed)) return ['Music', 'Film', 'Sport'];
+      if (!Array.isArray(parsed)) return defaultEnabledMainCategories();
       return parsed.filter(isMainCategory);
     } catch {
-      return ['Music', 'Film', 'Sport'];
+      return defaultEnabledMainCategories();
     }
   }, [params.youtubeEnabledCategories]);
   const imagesEnabledCategories = useMemo<MainCategory[]>(() => {
-    if (!params.imagesEnabledCategories) return ['Music', 'Film', 'Sport'];
+    if (!params.imagesEnabledCategories) return defaultEnabledMainCategories();
     try {
       const parsed = JSON.parse(params.imagesEnabledCategories);
       // Tom array [] är ett giltigt explicit val (= Images helt av).
-      if (!Array.isArray(parsed)) return ['Music', 'Film', 'Sport'];
+      if (!Array.isArray(parsed)) return defaultEnabledMainCategories();
       return parsed.filter(isMainCategory);
     } catch {
-      return ['Music', 'Film', 'Sport'];
+      return defaultEnabledMainCategories();
     }
   }, [params.imagesEnabledCategories]);
   // Deriverade source-flags: en källa är aktiv när minst en kategori valts.
@@ -1925,13 +1923,13 @@ export default function QuizScreen() {
     //   Personbilder (artist/band/actor/athlete — non-null mainCategory) är
     //   juridiskt parkerade och aldrig inkluderade oavsett toggles.
     const isAllYoutubeCats =
-      effectiveYoutubeCategories.length === 3 &&
+      effectiveYoutubeCategories.length === MAIN_CATEGORIES.length &&
       effectiveYoutubeCategories.includes('Music') &&
-      effectiveYoutubeCategories.includes('Film') &&
-      effectiveYoutubeCategories.includes('Sport');
+      effectiveYoutubeCategories.includes('Film');
     // ── §4.1 HCP-frågefilter ────────────────────────────────────────────
-    // Spelaren får items vars Item-HCP (= probability) >= sitt HCP, relaxat
-    // nedåt om poolen blir för tunn (se filterByItemHcp). Gäller BARA Single
+    // Spelaren får items vars Item-HCP (= probability) ligger i bandet
+    // [max(1,HCP−20), min(100,HCP+80)]; nedre kanten vidgas nedåt om poolen
+    // blir för tunn (variety-floor, se filterByItemHcp). Gäller BARA Single
     // Player + Pass-the-Phone (individanpassat per §4.1). IndDev delar host:s
     // identiska sekvens (ej individanpassad); remote (server-sekvens) + guest-
     // hostade spel (anonyma, grundar inget HCP) filtreras inte. Filtret läser
@@ -1959,10 +1957,9 @@ export default function QuizScreen() {
     // ledtrådar). Items med data i HINTS_LIBRARY får faktiska hints; övriga visar
     // placeholders tills backend-script populerar HINTS_LIBRARY med Wikidata-data.
     const isAllImageCats =
-      imagesEnabledCategories.length === 3 &&
+      imagesEnabledCategories.length === MAIN_CATEGORIES.length &&
       imagesEnabledCategories.includes('Music') &&
-      imagesEnabledCategories.includes('Film') &&
-      imagesEnabledCategories.includes('Sport');
+      imagesEnabledCategories.includes('Film');
     const imagePool: QuizQuestion[] = applyItemHcp(isAllImageCats
       ? imagePoolPreCategory
       : imagePoolPreCategory.filter((q) =>
@@ -6279,7 +6276,7 @@ export default function QuizScreen() {
           return out;
         };
         const hasAnswers = (m: CategoryAnswers): boolean =>
-          (m.Music?.length ?? 0) + (m.Film?.length ?? 0) + (m.Sport?.length ?? 0) > 0;
+          (m.Music?.length ?? 0) + (m.Film?.length ?? 0) > 0;
 
         if (gameMode === 'pass-the-phone') {
           void (async () => {

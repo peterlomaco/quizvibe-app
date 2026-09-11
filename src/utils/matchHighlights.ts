@@ -161,7 +161,7 @@ const SOURCE_CARDS: { source: QuestionMediaType; label: string }[] = [
 ];
 
 /** DORMANT — se filhuvudet. Behålls så kategorikorten kan återinföras. */
-export const CATEGORY_CARDS: MainCategory[] = ['Music', 'Film', 'Sport'];
+export const CATEGORY_CARDS: MainCategory[] = ['Music', 'Film'];
 
 /** Sekunder med två decimaler, som leaderboardens AVG/LAST-kolumner. */
 function formatSeconds(value: number): string {

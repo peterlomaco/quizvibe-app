@@ -83,8 +83,7 @@ export interface ProfileData {
   // PURCHASED_PACKAGES-id:n (allt aktiverat) i UI.
   enabledHostPackages?: string[];
   // Per-source profession-category-defaults (ersätter enabledMainCategories).
-  // YouTube: alla tre valbara, min 1 krävs. Default = alla 3.
-  // Images: Film+Sport är mandatory (alltid i arrayen), Music valbar. Default = alla 3.
+  // YouTube: Music/Film valbara, min 1 krävs. Default = båda (Sport borttaget 2026-09).
   youtubeEnabledCategories?: MainCategory[];
   imagesEnabledCategories?: MainCategory[];
   // Om Spotify DJ-läget är aktiverat som standard-val i Host defaults.
@@ -120,16 +119,17 @@ export interface ProfileData {
   // Per-kategori-HCP för den region scope spelaren senast spelade i (§1.3).
   // AsyncStorage-only, samma rationale som `hcp`. `hcp` ovan = `total` här (den
   // enda skalär lobby-kolumnen + legacy-läsare läser fortfarande `hcp`). Detta
-  // fält låter sköldarna läsa alla 4 värden synkront via getCachedProfile().
+  // fält låter sköldarna läsa alla värden synkront via getCachedProfile().
   // Bara EN region lagras här (den senast spelade) — sköldarna är per-session;
   // en per-region-map skulle blåsa upp profil-bloben i onödan. Speglas av
   // hcpProgress.ts mirrorToProfile. Display-heltal (avrundade uppåt).
+  // (Sport är borttaget ur modellen 2026-09; en äldre profil-spegel kan bära en
+  // kvarvarande `sport`-nyckel — den ignoreras.)
   hcpByCategory?: {
     region: string;
     total: number;
     music: number;
     film: number;
-    sport: number;
   };
   // Vald countdown-röst (röstpack-id, eller DEFAULT_VOICE_ID = system-TTS).
   // Styr vilken röst som talar 3-2-1 + "When"/"Who" i CountdownIntro. Läses

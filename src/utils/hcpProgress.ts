@@ -31,12 +31,11 @@ import { loadProfile, saveProfile } from './profileStorage';
 // Total går inte att splittra i tre kategori-fönster, så vi startar friskt på 99.
 const HCP_KEY_PREFIX = '@quizvibe/hcpProgress/v2/';
 
-// Bundle av display-heltal (avrundade uppåt) för de fyra sköldarna.
+// Bundle av display-heltal (avrundade uppåt) för sköldarna (Total + Music + Film).
 export interface HcpBundle {
   total: number;
   music: number;
   film: number;
-  sport: number;
 }
 
 // Svar bucketade per kategori (från quiz-slutet). Kategorier utan svar utelämnas.
@@ -60,7 +59,7 @@ async function resolveOwnKey(region: string): Promise<string | null> {
   }
 }
 
-// Defensiv parse — säkerställ 3-kategori-strukturen även om lagrad data är gammal.
+// Defensiv parse — säkerställ kategori-strukturen även om lagrad data är gammal.
 function coerceCategory(raw: unknown) {
   const p = (raw ?? {}) as Partial<ReturnType<typeof emptyCategoryProgress>>;
   const w = (p.windows ?? {}) as Partial<HcpProgress['categories']['Music']['windows']>;
@@ -78,11 +77,12 @@ function coerceCategory(raw: unknown) {
 function coerce(raw: unknown): HcpProgress {
   const p = (raw ?? {}) as Partial<HcpProgress>;
   const c = (p.categories ?? {}) as Partial<HcpProgress['categories']>;
+  // En äldre v2-blob kan bära en kvarvarande `Sport`-nyckel i c — den läses
+  // helt enkelt inte (ingen key-bump/migration behövs).
   return {
     categories: {
       Music: coerceCategory(c.Music),
       Film: coerceCategory(c.Film),
-      Sport: coerceCategory(c.Sport),
     },
   };
 }
@@ -117,7 +117,6 @@ function bundleOf(progress: HcpProgress): HcpBundle {
     total: displayHcp(totalHcp(progress)),
     music: displayHcp(progress.categories.Music.hcp),
     film: displayHcp(progress.categories.Film.hcp),
-    sport: displayHcp(progress.categories.Sport.hcp),
   };
 }
 
@@ -174,8 +173,7 @@ export async function refreshOwnHcpDecay(region: string, now: Date = new Date())
       profile?.hcpByCategory?.region === region &&
       profile.hcpByCategory.total === HCP_START &&
       profile.hcpByCategory.music === HCP_START &&
-      profile.hcpByCategory.film === HCP_START &&
-      profile.hcpByCategory.sport === HCP_START;
+      profile.hcpByCategory.film === HCP_START;
     if (!already) await mirrorToProfile(region, bundleOf(emptyHcpProgress()));
     return;
   }
@@ -184,7 +182,7 @@ export async function refreshOwnHcpDecay(region: string, now: Date = new Date())
   // Skriv/spegla bara när decay:n faktiskt ändrade något (undviker onödiga
   // Supabase-upserts vid varje Profile-open).
   const changed =
-    (['Music', 'Film', 'Sport'] as const).some(
+    (['Music', 'Film'] as const).some(
       (c) =>
         decayed.categories[c].hcp !== current.categories[c].hcp ||
         decayed.categories[c].lastPlayedISO !== current.categories[c].lastPlayedISO,
@@ -250,7 +248,6 @@ export async function loadOwnCategoryHcp(
   return {
     Music: decayed.categories.Music.hcp,
     Film: decayed.categories.Film.hcp,
-    Sport: decayed.categories.Sport.hcp,
   };
 }
 

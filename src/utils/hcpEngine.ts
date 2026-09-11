@@ -10,10 +10,11 @@
  * MODELL (Peters beslut 2026-08-28, kategori-uppdelning 2026-08-31):
  *  • §1.1  Skala 1–99, 1 = elit, 99 = nybörjare. ALLA nya spelare startar
  *          på HCP 99 (assistance/ålder-baserat start är avfärdat).
- *  • §1.3  En spelare har FYRA HCP: Music, Film, Sport (var sin egen
- *          progress + fönster) samt Total = SNITTET av de tre kategorierna
- *          (härlett, aldrig lagrat). Varje HCP är dessutom kopplat till EN
- *          region scope — se hcpProgress.ts (nyckel per region).
+ *  • §1.3  En spelare har TRE HCP: Music, Film (var sin egen progress + fönster)
+ *          samt Total = SNITTET av de två kategorierna (härlett, aldrig lagrat).
+ *          Varje HCP är dessutom kopplat till EN region scope — se
+ *          hcpProgress.ts (nyckel per region). (Sport är borttaget ur den live
+ *          modellen 2026-09 — allt sport-innehåll är parkerat i deferred/.)
  *  • §2.1  Ett glidande fönster per assistance-nivå (senaste 20 svaren) PER
  *          kategori. När fönstret är fullt: viktad summa S ≥ upper → HCP −1,
  *          S ≤ lower → HCP +1, annars 0. Max ±1 per spel och kategori.
@@ -38,7 +39,7 @@ export const HCP_CATEGORIES = MAIN_CATEGORIES;
 // `true` = rätt, `false` = fel. Äldst först; trimmas till HCP_WINDOW_SIZE.
 export type HcpWindow = boolean[];
 
-// Progress för EN kategori (Music/Film/Sport): float-HCP, fönster per nivå och
+// Progress för EN kategori (Music/Film): float-HCP, fönster per nivå och
 // en egen decay-klocka. `hcp` lagras som flyttal (decay ger 0,25-steg);
 // visningen avrundas uppåt (displayHcp).
 export interface CategoryProgress {
@@ -49,7 +50,9 @@ export interface CategoryProgress {
 
 // Hela HCP-progressen för EN registrerad spelare i EN region scope. Persisteras
 // device-lokalt per (region, playerName) i hcpProgress.ts — INTE i profiles-
-// raden. Total härleds som snittet av de tre kategorierna (totalHcp), lagras ej.
+// raden. Total härleds som snittet av de två kategorierna (totalHcp), lagras ej.
+// (Ett äldre v2-blob kan bära en kvarvarande `Sport`-nyckel — den ignoreras vid
+// läsning, ingen key-bump/migration behövs.)
 export interface HcpProgress {
   categories: Record<MainCategory, CategoryProgress>;
 }
@@ -96,13 +99,12 @@ export function emptyCategoryProgress(): CategoryProgress {
   };
 }
 
-/** Tomt progress-objekt: tre kategorier var för sig seedade på HCP_START. */
+/** Tomt progress-objekt: två kategorier var för sig seedade på HCP_START. */
 export function emptyHcpProgress(): HcpProgress {
   return {
     categories: {
       Music: emptyCategoryProgress(),
       Film: emptyCategoryProgress(),
-      Sport: emptyCategoryProgress(),
     },
   };
 }
@@ -182,23 +184,16 @@ export function applyInactivityDecay(progress: HcpProgress, now: Date): HcpProgr
     categories: {
       Music: decayCategory(progress.categories.Music, now),
       Film: decayCategory(progress.categories.Film, now),
-      Sport: decayCategory(progress.categories.Sport, now),
     },
   };
 }
 
 /**
- * Total-HCP (flyttal) = snittet av de AKTIVA spelade kategorierna Music + Film.
- *
- * ⚠ Sport ingår INTE (2026-09): dess katalog är fortfarande parkerad, så
- * Sport.hcp ligger kvar på HCP_START = 99 och ett snitt som räknade in den
- * skulle späda ut en spelares Total mot 99. Music + Film är de två kategorier
- * som faktiskt spelas i dag. Denna enda funktion föder profile.hcp,
- * lobby_players.hcp, player_hcp_changed-Total och varje Total-sköld (via
- * bundleOf + resolveDisplayTotalHcp). Lägg tillbaka Sport i snittet när dess
- * katalog återaktiveras:
- *   const { Music, Film, Sport } = progress.categories;
- *   return (Music.hcp + Film.hcp + Sport.hcp) / 3;
+ * Total-HCP (flyttal) = snittet av kategorierna Music + Film — de enda live
+ * kategorierna (Sport togs bort ur modellen 2026-09; dess katalog är parkerad).
+ * Denna enda funktion föder profile.hcp, lobby_players.hcp,
+ * player_hcp_changed-Total och varje Total-sköld (via bundleOf +
+ * resolveDisplayTotalHcp).
  */
 export function totalHcp(progress: HcpProgress): number {
   const { Music, Film } = progress.categories;
@@ -223,33 +218,56 @@ export function resolveDisplayTotalHcp(progress: HcpProgress | null | undefined)
   return progress ? displayHcp(totalHcp(progress)) : HCP_START;
 }
 
-// §4.1 — hur långt ned golvet relaxas per steg när poolen blir för tunn.
+// §4.1 — hur långt ned golvet (lower bound) vidgas per steg när bandet blir för tunt.
 export const HCP_FILTER_STEP = 10;
 
+// Item-HCP-skalan är 0–100 (bootstrappad från katalogens `probability`), medan
+// spelarens HCP är 1–99. Övre bandkanten klampas mot 100 — INTE HCP_MAX (99),
+// annars utesluts itemHcp-100-items för en HCP-20-spelare.
+export const HCP_MAX_ITEM = 100;
+
+// Bandets bredd nedåt/uppåt från spelarens HCP (Peter 2026-09):
+//   lower = max(1, HCP − BAND_BELOW),  upper = min(100, HCP + BAND_ABOVE)
+export const HCP_BAND_BELOW = 20;
+export const HCP_BAND_ABOVE = 80;
+
 /**
- * §4.1 — HCP-frågefilter med progressiv relaxering.
+ * §4.1 — HCP-frågefilter: ett TVÅSIDIGT band per kategori (Peter 2026-09).
  *
- * En spelare ska få items vars Item-HCP >= sitt HCP (Peter 2026-08-28: "items
- * från X och uppåt"). Item-HCP bootstrappas från katalogens `probability`
- * (0–100), som toppar runt 80–90 — en ny spelare (HCP 99) skulle därför svälta
- * (nästan inga items har probability >= 99). Vi relaxar därför golvet nedåt i
- * steg om HCP_FILTER_STEP tills poolen har minst `minCount` items, annars
- * faller vi tillbaka på hela poolen. Returnerar den HÖGSTA (mest restriktiva)
- * golv-nivån som ger tillräckligt. Nettoeffekt: de svåraste (lägst Item-HCP)
- * items utesluts tills spelaren tjänat ner sitt HCP → gradvis upplåsning.
+ * En spelare på HCP `X` får items vars Item-HCP ligger i bandet
+ *   [max(1, X − 20),  min(100, X + 80)]
+ * Item-HCP bootstrappas från katalogens `probability` (0–100).
+ *   • HCP 99 → 79–100, HCP 98 → 78–100, … HCP 20 → 1–100 (nedre bottnar på 1)
+ *   • sedan HCP 19 → 1–99, 18 → 1–98, … HCP 1 → 1–81 (övre sjunker när nedre är pinnad)
+ * Nettoeffekt: nybörjare (högt HCP) ser bara de lättaste/mest igenkända items;
+ * när HCP tjänas ner vidgas bandet nedåt och släpper in svårare items; riktiga
+ * experter (HCP < 20) slutar serveras de allra trivialaste items.
+ *
+ * Variety-floor: hedra bandet, men om kategorins bandade pool har färre än
+ * `minCount` items vidgas NEDRE kanten nedåt i steg om HCP_FILTER_STEP tills
+ * tillräckligt många kvalar (övre kanten står fast). Ultimat skyddsnät: om ens
+ * ett golv på 1 ger tomt → hela poolen.
  *
  * Ren + generisk (enhetstestbar): items behöver bara ett `itemHcp`-fält
- * (saknas → behandlas som 100 = lättast = alltid med).
+ * (saknas → behandlas som 100 = lättast).
  */
 export function filterByItemHcp<T extends { itemHcp?: number }>(
   pool: T[],
   playerHcp: number,
   minCount: number,
 ): T[] {
-  if (pool.length <= minCount) return pool; // inget att vinna på att filtrera
-  for (let floor = playerHcp; floor > HCP_MIN; floor -= HCP_FILTER_STEP) {
-    const kept = pool.filter((q) => (q.itemHcp ?? 100) >= floor);
-    if (kept.length >= minCount) return kept;
+  if (pool.length <= minCount) return pool; // liten katalog → filtrera inte
+  const upper = Math.min(HCP_MAX_ITEM, playerHcp + HCP_BAND_ABOVE);
+  let lower = Math.max(1, playerHcp - HCP_BAND_BELOW);
+  const withinBand = (item: T) => {
+    const v = item.itemHcp ?? 100;
+    return v >= lower && v <= upper;
+  };
+  let kept = pool.filter(withinBand);
+  // variety-floor: vidga nedre kanten nedåt tills tillräckligt många (övre fast).
+  while (kept.length < minCount && lower > 1) {
+    lower = Math.max(1, lower - HCP_FILTER_STEP);
+    kept = pool.filter(withinBand);
   }
-  return pool; // ens ett lågt golv gav för få → använd hela poolen
+  return kept.length > 0 ? kept : pool; // tomt band → hela poolen
 }

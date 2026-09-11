@@ -1,7 +1,13 @@
 // Huvudkategori-modell — den högsta nivån av content-grouping i klienten.
 // Härleds från backend-katalogens `contentSubject` via `subjectToMainCategory`.
 //
-// V1: tre kategorier (Music/Film/Sport) — används uteslutande av YouTube-källan.
+// V1: två kategorier (Music/Film) — används uteslutande av YouTube-källan.
+// Sport är BORTTAGET ur den live modellen (2026-09): allt athlete-/sport-event-
+// innehåll ligger parkerat i backend/content/catalog/deferred/ och laddas aldrig,
+// så ingen runtime-logik ska längre grena på Sport. Katalog-YAML:en, backend-
+// `schema.ts`s `category: 'sport'`, `genrePackages: ['sport']`-taggar på
+// musik/film-items och DB-kolumnen `lobby_players.hcp_sport` lämnas orörda som
+// ofarlig död data. Lägg INTE tillbaka 'Sport' här förrän det innehållet av-parkeras.
 //
 // Guess-källan (ersätter Images) är uppdelad i:
 //   "Who?"   — personbilder (artist/band/actor/athlete) — juridiskt parkerade, visas EJ
@@ -15,35 +21,34 @@
 //   - ProfileScreen + LobbyScreen (YouTube-toggle per profession-typ)
 //   - quiz.tsx:s gameQuestions-filter
 
-export type MainCategory = 'Music' | 'Film' | 'Sport';
+export type MainCategory = 'Music' | 'Film';
 
-export const MAIN_CATEGORIES: readonly MainCategory[] = ['Music', 'Film', 'Sport'] as const;
+export const MAIN_CATEGORIES: readonly MainCategory[] = ['Music', 'Film'] as const;
 
 // Målandel av YOUTUBE-klippen per kategori "över tid" (Peter 2026-09-12).
 // YT-Film är innehållsfattigt → hålls till 10% av YT-klippen; resten Music.
 // Realiseras via kategori-skuldboken (planCategorySequence) i normala spel och
-// som sannolikhetsvikt i gäst-spel. Sport parkerat → utelämnat (vikt 0).
+// som sannolikhetsvikt i gäst-spel.
 // Gäller ENBART YouTube-fasen; Hints-fasens kategorimix är oförändrad.
 export const YT_CATEGORY_WEIGHTS: Record<string, number> = { Music: 0.9, Film: 0.1 };
 
 // Legacy — användes av Images-källan (ersatt av Guess-sektionen).
 // Bevaras för bakåtkompatibilitet med mockLobbySettings.ts DB-adapter.
-export const IMAGES_MANDATORY_CATEGORIES: readonly MainCategory[] = ['Film', 'Sport'] as const;
+export const IMAGES_MANDATORY_CATEGORIES: readonly MainCategory[] = ['Film'] as const;
 
 /**
  * Användar-vänliga etiketter för lobby/profile-filtret. Filtret är PERSON-
  * centrerat (vem) medan det interna MainCategory-värdet + fråge-badgen är
  * MEDIUM-centrerat (vad). Samma mappning, bara annan etikett:
- *   Music → "Artist"  ·  Film → "Actors"  ·  Sport → "Athlete"
- * Rationale (Peter 2026-05-31): man filtrerar inte på "sport" utan på en
- * sport-ATLET — som även kan ha gjort musiklåtar eller medverkat i film
- * (genrePackages-crossover). Internt värde, filterlogik, persistens och
- * fråge-badge är OFÖRÄNDRADE — detta är enbart en display-etikett.
+ *   Music → "Artist"  ·  Film → "Actors"
+ * Rationale (Peter 2026-05-31): man filtrerar inte på "musik" utan på en
+ * ARTIST — som även kan ha medverkat i film (genrePackages-crossover).
+ * Internt värde, filterlogik, persistens och fråge-badge är OFÖRÄNDRADE —
+ * detta är enbart en display-etikett.
  */
 export const MAIN_CATEGORY_LABELS: Record<MainCategory, string> = {
   Music: 'Artists',
   Film: 'Actors',
-  Sport: 'Athletes',
 };
 
 /**
@@ -55,7 +60,7 @@ export function subjectToMainCategory(subject: string | undefined): MainCategory
   if (!subject) return null;
   if (subject === 'song' || subject === 'artist' || subject === 'band') return 'Music';
   if (subject === 'movie' || subject === 'actor' || subject === 'character') return 'Film';
-  if (subject === 'sport-event' || subject === 'athlete') return 'Sport';
+  // 'sport-event'/'athlete' är parkerade subjects (deferred/) → null (ingen live-kategori).
   return null;
 }
 
@@ -64,17 +69,16 @@ export function subjectToMainCategory(subject: string | undefined): MainCategory
  * DB-rader) → MainCategory. Filtrerar bort typos/legacy-värden tyst.
  */
 export function isMainCategory(value: unknown): value is MainCategory {
-  return value === 'Music' || value === 'Film' || value === 'Sport';
+  return value === 'Music' || value === 'Film';
 }
 
 /**
  * Default-listan när enabledMainCategories saknas i sparad profil/lobby.
  *
- * ⚠ MUSIC + FILM (2026-09): returnerar Music + Film. Film återaktiverades (movies-*
- * + actors-* flyttades ut ur catalog/deferred/, se registry.ts). SPORT är fortfarande
- * parkerat (athletes- och sport-events-filerna ligger kvar i deferred/) och seedas ALDRIG som
- * aktiverat — lägg INTE till 'Sport' här förrän det innehållet av-parkeras. Använd
- * alltså inte `[...MAIN_CATEGORIES]` (den drar in Sport).
+ * ⚠ MUSIC + FILM (2026-09): returnerar Music + Film — numera identiskt med
+ * `[...MAIN_CATEGORIES]` sedan Sport togs bort ur den live modellen. (Sport-
+ * innehållet ligger kvar parkerat i deferred/; av-parkeras det måste 'Sport'
+ * återinföras i MainCategory-unionen först.)
  *
  * Belt-and-suspenders: befintliga users kan ha sparade arrayer med bara ['Music']
  * (music-only-eran) — de behåller Music-only tills de togglar Film i mixerboarden;
@@ -153,7 +157,6 @@ export function displayCategoryForItem(
   // Bas-kategorin vinner när den faktiskt är påslagen.
   if (mainCategory !== null && enabled.includes(mainCategory)) return mainCategory;
   // Annars surfades itemet via en crossover-tagg → visa den matchade kategorin.
-  if (genrePackages?.includes('sport') && enabled.includes('Sport')) return 'Sport';
   if (genrePackages?.includes('film') && enabled.includes('Film')) return 'Film';
   if (genrePackages?.includes('music') && enabled.includes('Music')) return 'Music';
   // Ingen match (t.ex. Spotify-låt som kringgår kategori-filtret, eller null

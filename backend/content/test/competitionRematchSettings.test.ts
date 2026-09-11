@@ -23,7 +23,7 @@ const SNAPSHOT: AggregateGameSettings = {
   roundsCount: 12,
   answerResponseSeconds: 45,
   youtubeEnabledCategories: ['Music', 'Film'],
-  imagesEnabledCategories: ['Sport'],
+  imagesEnabledCategories: ['Film'],
   selectedExtraPackages: ['pkg-hiphop'],
   parentControlEnabled: true,
   spotifyEnabled: true,
@@ -46,7 +46,7 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     expect(s.answerResponseSeconds).toBe(45);
     expect(s.selectedExtraPackages).toEqual(['pkg-hiphop']);
     expect(s.youtubeEnabledCategories).toEqual(['Music', 'Film']);
-    expect(s.imagesEnabledCategories).toEqual(['Sport']);
+    expect(s.imagesEnabledCategories).toEqual(['Film']);
     expect(s.spotifyEnabled).toBe(true);
   });
 
@@ -105,7 +105,7 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     const s = buildRematchSettings({ ...PROFILE_DEFAULTS, settings: ytOff }, 4);
     expect(s.youtubeEnabledCategories).toEqual([]);
     // Hints-kolumnen orörd.
-    expect(s.imagesEnabledCategories).toEqual(['Sport']);
+    expect(s.imagesEnabledCategories).toEqual(['Film']);
   });
 });
 

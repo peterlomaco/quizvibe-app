@@ -159,7 +159,7 @@ export function HCPShield({ hcp, size = 100, notDefined = false, opaque = false 
 }
 
 // ── Sköld-KORT: sköld i en ruta vars kant matchar sköldens färg, med en
-// etikett-badge under (Total/Music/Film/Sport) och en region-flagg-badge
+// etikett-badge under (Total/Music/Film) och en region-flagg-badge
 // ovan-höger (§1.3 UI-krav). notDefined → gäst-vattenstämpel + neutral grå kant.
 interface HCPShieldCardProps {
   hcp: number;
@@ -168,7 +168,7 @@ interface HCPShieldCardProps {
   regionFlag?: string;
   notDefined?: boolean;
   // Etikett-badgens färger. Default = sköldens tier-färg + vit text. Kategori-
-  // korten (Music/Film/Sport) skickar guld + svart för att matcha GetReady/
+  // korten (Music/Film) skickar guld + svart för att matcha GetReady/
   // countdown-vyns kategori-badge.
   badgeColor?: string;
   badgeTextColor?: string;
@@ -236,7 +236,6 @@ export interface HcpShieldBundle {
   total: number;
   music: number;
   film: number;
-  sport: number;
 }
 interface HCPShieldClusterProps {
   bundle: HcpShieldBundle;
@@ -266,7 +265,6 @@ export function HCPShieldCluster({
         <View style={cardStyles.clusterRow}>
           <HCPShieldCard hcp={bundle.music} size={subSize} label="Music" notDefined={notDefined} badgeColor={Colors.warning} badgeTextColor="#000" />
           <HCPShieldCard hcp={bundle.film} size={subSize} label="Film" notDefined={notDefined} badgeColor={Colors.warning} badgeTextColor="#000" />
-          <HCPShieldCard hcp={bundle.sport} size={subSize} label="Sport" notDefined={notDefined} badgeColor={Colors.warning} badgeTextColor="#000" />
         </View>
       ) : null}
     </View>
