@@ -3301,6 +3301,35 @@ export default function QuizScreen() {
     return totals;
   }, [allRoundScoresHistory]);
 
+  // ALLA spelares rader för DETTA spel, i AggregateGamePlayer-form. Delas av
+  // marathon-bokföringen (recordGameInSeries/recordAggregateGame) OCH av
+  // saveFinalGame:s HistoryEntry.players — så varje spel blir ett tappbart
+  // final-leaderboard-kort i Player history. Håll de två call-sites byte-
+  // identiska genom att alltid bygga rader här.
+  const buildGamePlayerStats = useCallback(
+    (): AggregateGamePlayer[] =>
+      gamePlayers.map((p) => {
+        const scores = allRoundScoresHistory.flatMap((round) =>
+          round.filter((sc) => sc.playerId === p.id),
+        );
+        return {
+          playerId: p.id,
+          name: p.name,
+          emoji: p.emoji,
+          assistance: p.assistance,
+          age: p.age,
+          points: gameTotals[p.id] ?? 0,
+          playedRounds: scores.length,
+          correctAnswers: scores.filter((sc) => sc.correct).length,
+          totalResponseSeconds: scores.reduce((sum, sc) => sum + sc.timeUsed, 0),
+          results: scores.map((sc) => sc.correct),
+          lastResponseSeconds:
+            scores.length > 0 ? scores[scores.length - 1].timeUsed : null,
+        };
+      }),
+    [gamePlayers, allRoundScoresHistory, gameTotals],
+  );
+
   const allPlayers: LeaderboardPlayer[] = gamePlayers;
 
   // Host:s id (= "your" perspektiv från denna enhet). Pass-the-phone:
@@ -6153,6 +6182,9 @@ export default function QuizScreen() {
         gameMode,
         singlePlayerDefault: isLocalSoloGame,
         hostName: turnOrder[0]?.name,
+        // ALLA spelares rader → gör spelet till ett tappbart final-leaderboard-
+        // kort i Player history (samma stats-form som en marathon-games snapshot).
+        players: buildGamePlayerStats(),
       };
       try {
         await appendGameHistoryEntry(entry);
@@ -6396,25 +6428,7 @@ export default function QuizScreen() {
     // re-match skriver över den via `markSeriesContinues`.
     if (gamePlayers.some((p) => p.hasLeft)) return;
     const roomCode = params.roomCode as string;
-    const contribution: AggregateGamePlayer[] = gamePlayers.map((p) => {
-      const scores = allRoundScoresHistory.flatMap((round) =>
-        round.filter((sc) => sc.playerId === p.id),
-      );
-      return {
-        playerId: p.id,
-        name: p.name,
-        emoji: p.emoji,
-        assistance: p.assistance,
-        age: p.age,
-        points: gameTotals[p.id] ?? 0,
-        playedRounds: scores.length,
-        correctAnswers: scores.filter((sc) => sc.correct).length,
-        totalResponseSeconds: scores.reduce((sum, sc) => sum + sc.timeUsed, 0),
-        results: scores.map((sc) => sc.correct),
-        lastResponseSeconds:
-          scores.length > 0 ? scores[scores.length - 1].timeUsed : null,
-      };
-    });
+    const contribution: AggregateGamePlayer[] = buildGamePlayerStats();
     let cancelled = false;
     // Skrivningen är idempotent per rumkod (ERSÄTTER spelets snapshot), så
     // sena peer-scores i Individual Devices uppdaterar serien i stället för

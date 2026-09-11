@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { AggregateGamePlayer } from './aggregateLeaderboard';
 import { loadProfile, type GameMode } from './profileStorage';
 import type { PlayedMediaSource } from './mediaSource';
 
@@ -174,6 +175,15 @@ export interface HistoryEntry {
   /** Host:ens namn vid speltillfället (turnOrder[0].name). För egna hostade
    *  spel = eget playerName; i PtP-spectator-läget = host:ens namn. */
   hostName?: string;
+  /** ALLA spelares rader för spelet — samma AggregateGamePlayer-form som en
+   *  marathon-games `stats`, byggd ur gamePlayers + allRoundScoresHistory vid
+   *  game-completion (2026-09-11). Gör varje spel till ett tappbart final-
+   *  leaderboard-kort (via buildAggregateStandings → finalizeRows →
+   *  LeaderboardTable, exakt samma väg som SavedAggregatesCard). Antal spelare
+   *  = players.length. OPTIONAL med flit: poster skrivna FÖRE detta fält
+   *  saknar det → Player history filtrerar bort dem (de kan inte visa en
+   *  leaderboard). Additivt — ingen HISTORY_Vx_RESET. */
+  players?: AggregateGamePlayer[];
 }
 
 /**
@@ -268,6 +278,24 @@ export async function appendGameHistoryEntry(entry: HistoryEntry): Promise<void>
     await AsyncStorage.setItem(key, JSON.stringify(next));
   } catch (err) {
     console.warn('[gameResults] Failed to append history entry:', err);
+  }
+}
+
+/**
+ * Raderar EN spel-post ur den inloggade spelarens lokala history (tap på
+ * Delete i ett spels final-leaderboard). Per-device/per-user — historiken är
+ * redan namespacead per playerName, så motståndarnas egna devices behåller
+ * spelet. Om spelet ingick i en marathon är den serien (server) oberörd.
+ */
+export async function deleteGameHistoryEntry(id: string): Promise<void> {
+  try {
+    const key = await resolveHistoryKey();
+    if (!key) return;
+    const existing = await loadGameHistory();
+    const next = existing.filter((e) => e.id !== id);
+    await AsyncStorage.setItem(key, JSON.stringify(next));
+  } catch (err) {
+    console.warn('[gameResults] Failed to delete history entry:', err);
   }
 }
 
