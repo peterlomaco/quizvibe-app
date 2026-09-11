@@ -493,6 +493,34 @@ function resolveMaxPlayers(
   return gameMode === 'individual-devices' && premium ? 12 : 4;
 }
 
+// YT-Film är innehållsfattigt (få filmklipp) → får ALDRIG vara enda aktiva
+// källan. Returnerar true när det FÖRESLAGNA tillståndet lämnar ENBART
+// YouTube-Film aktivt.
+//
+// ⚠ Sport är PARKERAT (ingen UI-kolumn, inget spelbart innehåll) och får
+// ALDRIG räknas som en riktig källa här. Profilens default seedar 'Sport' i
+// BÅDA arrayerna (['Music','Film','Sport']), så en host som stänger av alla
+// SYNLIGA källor utom YT-Film sitter kvar med fantom-Sport i state — vilket
+// annars gör images non-empty / youtube.length > 1 och döljer att YT-Film är
+// ensam. Filtrera därför bort Sport innan invariansen prövas.
+const isOnlyYtFilm = (
+  youtube: MainCategory[],
+  images: MainCategory[],
+  spotify: boolean,
+): boolean => {
+  if (spotify) return false;
+  const ytReal = youtube.filter((c) => c !== 'Sport');
+  const imgReal = images.filter((c) => c !== 'Sport');
+  if (imgReal.length > 0) return false;
+  return ytReal.length === 1 && ytReal[0] === 'Film';
+};
+
+const ytFilmAloneAlert = () =>
+  Alert.alert(
+    "YouTube Film can't be alone",
+    "YouTube Film content is limited and can't be played on its own. Keep or add another source to play.",
+  );
+
 // ─── Add Player Modal ─────────────────────────────────────────────────────────
 
 type AddPlayerAssistance = 'minimal' | 'standard' | 'full';
@@ -2783,6 +2811,11 @@ export default function LobbyScreen() {
   const handleToggleArtistsColumn = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
+      // YT-Film får inte bli enda källan när hela Music-kolumnen stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories.filter((c) => c !== 'Music'), imagesEnabledCategories.filter((c) => c !== 'Music'), false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       // Column-toggle stänger av BÅDA källorna → Artists alltid inaktiv efteråt.
       const remainingActorsAthletes = [
         youtubeEnabledCategories.includes('Film'),
@@ -2858,6 +2891,11 @@ export default function LobbyScreen() {
   const handleToggleArtistsYoutube = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
+      // YT-Film får inte bli enda källan när Music-YT stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories.filter((c) => c !== 'Music'), imagesEnabledCategories, false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       // Artists inaktiv efteråt bara om Hints Music OCKSÅ är av.
       const artistsWouldStillBeActive = imagesEnabledCategories.includes('Music');
       if (!artistsWouldStillBeActive) {
@@ -2886,6 +2924,11 @@ export default function LobbyScreen() {
   const handleToggleArtistsGuessWho = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
+      // YT-Film får inte bli enda källan när Music-Hints stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories.filter((c) => c !== 'Music'), false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       // Artists inaktiv efteråt bara om YouTube Music OCKSÅ är av.
       const artistsWouldStillBeActive = youtubeEnabledCategories.includes('Music');
       if (!artistsWouldStillBeActive) {
@@ -2928,6 +2971,11 @@ export default function LobbyScreen() {
   const handleToggleActorsGuessWho = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
+      // YT-Film får inte bli enda källan när Film-Hints stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories.filter((c) => c !== 'Film'), false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
         const remaining = [youtubeEnabledCategories.includes('Film'), youtubeEnabledCategories.includes('Sport'), false, imagesEnabledCategories.includes('Sport')].filter(Boolean).length;
@@ -3144,6 +3192,11 @@ export default function LobbyScreen() {
       }
     }
     if (!val) {
+      // YT-Film får inte bli enda källan när Spotify stängs av.
+      if (isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories, false)) {
+        ytFilmAloneAlert();
+        return;
+      }
       // Samma regel som i handleStartGame: Artists ensamt räcker (som Spotify).
       // För Actors/Athletes krävs ≥ 2 aktiva kombinationer om varken Spotify
       // eller Artists är aktiv.
@@ -3269,6 +3322,23 @@ export default function LobbyScreen() {
     () => hasActivePackage(selectedExtraPackages),
     [selectedExtraPackages],
   );
+
+  // HÅRT skyddsnät: YT-Film får ALDRIG bli enda aktiva källan (innehållsfattigt).
+  // Per-toggle-guardsen blockerar de normala vägarna, men detta fångar VARJE väg
+  // (async-race, auto-disable-effekten, eller carry-over/legacy-settings) och
+  // återställer direkt i mixerboarden + visar popupen. Lägger tillbaka Film-Hints
+  // som sällskap (samma kolumn, alltid innehåll) så host får ett giltigt
+  // "Film-only"-spel i stället för ett låst tillstånd.
+  useEffect(() => {
+    if (!hostMode || anyPackageActive) return;
+    if (isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled)) {
+      setImagesEnabledCategories((prev) =>
+        prev.includes('Film') ? prev : ([...prev, 'Film'] as MainCategory[]),
+      );
+      ytFilmAloneAlert();
+    }
+  }, [youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, hostMode, anyPackageActive]);
+
   const packageCoverage = useMemo(
     () => computePackageCoverage(selectedExtraPackages),
     [selectedExtraPackages],
@@ -5992,6 +6062,13 @@ export default function LobbyScreen() {
         'At least one source required',
         'Turn on YouTube or Hints for this package. Spotify can only be the sole source for music packages.',
       );
+      return;
+    }
+
+    // YT-Film får inte vara enda källan (backstop — toggle-guardsen gör detta
+    // tillstånd onåbart i vila, men carry-over/legacy-settings kan seeda det).
+    if (!anyPackageActive && isOnlyYtFilm(youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled)) {
+      ytFilmAloneAlert();
       return;
     }
 
