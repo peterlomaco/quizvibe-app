@@ -67,7 +67,10 @@ export interface SavedAggregate {
   /** Skaparen = competitionens host (0037). Bara created_by kan initiera en
    *  re-match från Home (0041). */
   createdBy: string;
-  participants: { userId: string; playerName: string }[];
+  /** `dismissed` = denna deltagare har raderat serien ur sin egen historik
+   *  (migration 0052). Härledd "locked" = NÅGON deltagare dismissed → serien
+   *  är permanent olåsbar för re-match. Optional tills 0052 körts. */
+  participants: { userId: string; playerName: string; dismissed?: boolean }[];
   games: AggregateSeriesGame[];
   /** Inställningarna från det SENAST spelade spelet i serien (0043). Undefined
    *  = ingen snapshot (äldre spel, gäst-blandat, eller migration ej körd) →
@@ -87,7 +90,12 @@ interface LeaderboardRow {
   // Redan returnerade av select('*') — mappas nu (0037-kolumner).
   updated_at?: string;
   created_at?: string;
-  aggregate_leaderboard_players?: { user_id: string; player_name: string }[];
+  aggregate_leaderboard_players?: {
+    user_id: string;
+    player_name: string;
+    // Optional tills migration 0052 körts (tolerant read).
+    dismissed?: boolean;
+  }[];
   aggregate_leaderboard_games?: {
     room_code: string;
     stats: AggregateGamePlayer[];
@@ -108,6 +116,7 @@ function rowToSaved(row: LeaderboardRow): SavedAggregate {
     participants: (row.aggregate_leaderboard_players ?? []).map((p) => ({
       userId: p.user_id,
       playerName: p.player_name,
+      dismissed: p.dismissed ?? false,
     })),
     // Mappas till EXAKT den form buildAggregateStandings redan tar, så lokal
     // och sparad vy räknas av samma funktion och inte kan glida isär.
@@ -206,6 +215,26 @@ export async function saveAggregateGameSettings(
   if (error) {
     console.warn('[aggregateLeaderboards] saveGameSettings failed:', error.message);
   }
+}
+
+/**
+ * Raderar serien ur den INLOGGADE spelarens historik (migration 0052). Bara
+ * callerns egen `dismissed`-flagga sätts — övriga deltagare behåller serien.
+ * Sidoeffekt: serien blir permanent olåsbar för re-match (härlett locked).
+ * Returnerar false vid fel (t.ex. migration ej körd) så call-siten kan
+ * avstå från att optimistiskt ta bort raden.
+ */
+export async function dismissAggregateLeaderboard(
+  leaderboardId: string,
+): Promise<boolean> {
+  const { error } = await supabase.rpc('dismiss_aggregate_leaderboard', {
+    p_leaderboard_id: leaderboardId,
+  });
+  if (error) {
+    console.warn('[aggregateLeaderboards] dismiss failed:', error.message);
+    return false;
+  }
+  return true;
 }
 
 export async function renameAggregateLeaderboard(

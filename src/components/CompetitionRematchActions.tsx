@@ -305,6 +305,23 @@ export function CompetitionRematchActions({
     </View>
   );
 
+  const lockedBox = (label: string) => (
+    <View style={styles.lockedBox}>
+      <Text style={styles.lockedText} numberOfLines={2}>
+        {label}
+      </Text>
+    </View>
+  );
+
+  // Har NÅGON deltagare raderat serien ur sin historik (0052) är den
+  // permanent olåsbar för re-match. Host ser en grå "All players not
+  // available"-ruta i stället för re-match-knappen; en deltagare ser
+  // ingenting actionable (modalen visar ändå standings + Delete + Close).
+  const locked = saved.participants.some((p) => p.dismissed);
+  if (locked) {
+    return isHost ? lockedBox('All players not available') : null;
+  }
+
   if (isHost) {
     if (isSolo) return goldButton('Replay', handleReplaySolo);
     if (!activeRequest) return goldButton('Send Re-match invitation', handleInitiate);
@@ -363,6 +380,24 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
+    textAlign: 'center',
+  },
+  // Grå "All players not available" — serien är raderad av någon deltagare
+  // och kan aldrig spelas igen.
+  lockedBox: {
+    height: 52,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.cardElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
+  },
+  lockedText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
   cancelLink: {

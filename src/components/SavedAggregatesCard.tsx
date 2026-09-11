@@ -6,11 +6,12 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { buildAggregateStandings } from '../utils/aggregateLeaderboard';
 import {
+  dismissAggregateLeaderboard,
   listMyAggregateLeaderboards,
   type SavedAggregate,
 } from '../utils/aggregateLeaderboards';
@@ -102,6 +103,8 @@ export function SavedAggregatesCard({
   // Flash-guide: id:n som blinkar (seedade en gång per focusIds-värde).
   const [flashIds, setFlashIds] = useState<Set<string>>(new Set());
   const appliedFocusRef = useRef<string | null>(null);
+  // Radera-knappen i detalj-modalen — busy-guard mot dubbeltapp.
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -119,7 +122,14 @@ export function SavedAggregatesCard({
           loadFriends(),
         ]);
         if (!cancelled) {
-          setItems(saved);
+          // Dölj serier JAG raderat ur min historik (0052) — övriga deltagare
+          // behåller dem. Matchas på min egen deltagar-rads `dismissed`.
+          setItems(
+            saved.filter(
+              (a) =>
+                !a.participants.find((p) => p.userId === uid)?.dismissed,
+            ),
+          );
           setSelfHostId(uid);
           setFriends(fr);
         }
@@ -229,6 +239,38 @@ export function SavedAggregatesCard({
     }
   }, [focusIds, groups]);
 
+  // Radera en Marathon-tabell ur MIN historik (0052). Per-user: övriga
+  // deltagare behåller den, men serien blir permanent olåsbar för re-match.
+  const handleDeleteMarathon = useCallback(() => {
+    if (!open) return;
+    const id = open.id;
+    const solo = open.participants.length <= 1;
+    Alert.alert(
+      'Delete from your history?',
+      solo
+        ? 'This marathon will be removed from your history and can no longer be replayed.'
+        : 'This marathon will be removed from your history and can no longer be re-played by anyone. The other players keep it in their own history.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            setDeletingId(id);
+            const ok = await dismissAggregateLeaderboard(id);
+            setDeletingId(null);
+            if (!ok) {
+              Alert.alert('Could not delete', 'Please try again.');
+              return;
+            }
+            setItems((prev) => prev.filter((a) => a.id !== id));
+            setOpenId(null);
+          },
+        },
+      ],
+    );
+  }, [open]);
+
   if (items.length === 0) return null;
 
   const renderRow = (item: SavedAggregate) => {
@@ -258,7 +300,9 @@ export function SavedAggregatesCard({
         </View>
         <View style={styles.rowRight}>
           {lastPlayed ? (
-            <Text style={styles.rowDate}>{lastPlayed}</Text>
+            <Text style={styles.rowDate} numberOfLines={1}>
+              Last update: {lastPlayed}
+            </Text>
           ) : null}
           <Text style={styles.chevron}>›</Text>
         </View>
@@ -362,9 +406,26 @@ export function SavedAggregatesCard({
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle} numberOfLines={1}>
-              {open?.name}
-            </Text>
+            {/* Rubrik-rad: namn till vänster, röd Delete uppe till höger.
+                Delete raderar serien ur MIN historik (per-user, 0052). */}
+            <View style={styles.modalHeaderRow}>
+              <Text style={styles.modalTitle} numberOfLines={1}>
+                {open?.name}
+              </Text>
+              <Pressable
+                onPress={handleDeleteMarathon}
+                disabled={!!deletingId}
+                hitSlop={8}
+                style={({ pressed }) => [
+                  styles.modalDeleteBtn,
+                  (pressed || !!deletingId) && { opacity: 0.6 },
+                ]}
+              >
+                <Text style={styles.modalDeleteText}>
+                  {deletingId ? 'Deleting…' : 'Delete'}
+                </Text>
+              </Pressable>
+            </View>
             <ScrollView style={{ maxHeight: 360 }}>
               <LeaderboardTable entries={openRows} />
             </ScrollView>
@@ -745,10 +806,30 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     gap: Spacing.md,
   },
+  modalHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+  },
   modalTitle: {
+    flex: 1,
     fontSize: 20,
     fontWeight: '700',
     color: Colors.textPrimary,
+  },
+  // Röd Delete uppe till höger i modalen (radera ur egen historik).
+  modalDeleteBtn: {
+    borderWidth: 1,
+    borderColor: Colors.error,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+  },
+  modalDeleteText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.error,
   },
   modalCloseBtn: {
     height: 48,
