@@ -119,11 +119,10 @@ items:
     wikimediaSearchHints: ["Bill Withers Lean on Me"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "fOZ-MySzAac"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Bill Withers - Topic"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "Nx_D0VTHBag"
+        startSec: 25
+        endSec: 55
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1359)."
     region: ["global"]
   - id: roberta-flack-killing-me-softly
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -133,11 +132,10 @@ items:
     wikimediaSearchHints: ["Roberta Flack Killing Me Softly"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "DEbi_YjpA-Y"
-        startSec: 15
-        endSec: 45
-        channelTitle: "RHINO"
-        notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (3)."
+      - videoId: "3r3R0lmH7OE"
+        startSec: 45
+        endSec: 75
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1352)."
     region: ["global"]
   - id: abba-waterloo
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -545,11 +543,10 @@ items:
     wikimediaSearchHints: ["Gloria Gaynor I Will Survive 1978"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "FHhZPp08s74"
-        startSec: 30
-        endSec: 45
-        channelTitle: "Gloria Gaynor - Topic"
-        notes: "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+      - videoId: "TPpfSp40qy0"
+        startSec: 6
+        endSec: 36
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1403)."
     region: ["global"]
   - id: beatles-yesterday
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -630,10 +627,10 @@ items:
     wikimediaSearchHints: ["Bob Marley No Woman No Cry Natty Dread 1974"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "TfNymCvydHc"
-        startSec: 5
-        endSec: 50
-        channelTitle: "Bob Marley"
+      - videoId: "Pv00rRagnqA"
+        startSec: 50
+        endSec: 80
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1343)."
     spotifyTrackId: "3PQLYVskjUeRmRIfECsL0X"
     region: ["global"]
   - id: fleetwood-mac-dreams
@@ -1370,6 +1367,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "2aoo2jlRnM3A0NyLQqMN2f"
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1300)."
+    youtubeClips:
+      - videoId: "vBjzAdpZzf0"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1298)."
   - id: bob-marley-could-you-be-loved
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Could You Be Loved — Bob Marley"
@@ -1475,10 +1477,10 @@ items:
     wikimediaSearchHints: ["The Logical Song - Supertramp 1979"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "A-2H96uX_lI"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1351)."
+      - videoId: "kln_bIndDJg"
+        startSec: 5
+        endSec: 35
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1351)."
   - id: harry-chapin-cats-in-the-cradle
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cat's in the Cradle — Harry Chapin"
@@ -1501,10 +1503,10 @@ items:
     wikimediaSearchHints: ["If You Leave Me Now - Chicago 1976"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "-9_d-sFhmRM"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1354)."
+      - videoId: "1602T9ZVPjg"
+        startSec: 9
+        endSec: 39
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1354)."
   - id: al-green-lets-stay-together
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Let's Stay Together — Al Green"
@@ -1514,10 +1516,10 @@ items:
     wikimediaSearchHints: ["Let's Stay Together - Al Green 1971"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "mYDLL6tOcUY"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1355)."
+      - videoId: "fNWqSez_6VA"
+        startSec: 9
+        endSec: 39
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1355)."
   - id: sweet-the-ballroom-blitz
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Ballroom Blitz — Sweet"
@@ -1579,10 +1581,10 @@ items:
     wikimediaSearchHints: ["Easy - Commodores 1977"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "9nBSd1U18vM"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1363)."
+      - videoId: "3woUYuyLsaI"
+        startSec: 14
+        endSec: 44
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1363)."
   - id: chic-good-times
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Good Times — Chic"
@@ -1592,10 +1594,10 @@ items:
     wikimediaSearchHints: ["Good Times - Chic 1979"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "HeeDOVcVUQY"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1365)."
+      - videoId: "8lCNzQ6sYxo"
+        startSec: 6
+        endSec: 36
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1365)."
   - id: bee-gees-night-fever
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Night Fever — Bee Gees"
@@ -1618,10 +1620,10 @@ items:
     wikimediaSearchHints: ["I'll Be There - The Jackson 5 1970"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "kBhSh7y_IkM"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1368)."
+      - videoId: "Xg2vMrDzoXM"
+        startSec: 10
+        endSec: 40
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1368)."
   - id: four-seasons-december-1963
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "December, 1963 (Oh, What a Night) — The Four Seasons"
@@ -1657,10 +1659,10 @@ items:
     wikimediaSearchHints: ["Bang a Gong (Get It On) - T. Rex 1971"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "FyzWDl0nz00"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1371)."
+      - videoId: "Sc-OJ9DeeSc"
+        startSec: 40
+        endSec: 70
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1371)."
   - id: pink-floyd-another-brick-in-the-wall
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Another Brick in the Wall (Part 2) — Pink Floyd"
@@ -1696,10 +1698,10 @@ items:
     wikimediaSearchHints: ["I'm Not in Love - 10cc 1975"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "q9MQYdqbWD8"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1375)."
+      - videoId: "STugQ0X1NoI"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1375)."
   - id: the-who-baba-oriley
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Baba O'Riley — The Who"
@@ -1709,10 +1711,10 @@ items:
     wikimediaSearchHints: ["Baba O'Riley - The Who 1971"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "_8_Pf144Qmg"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1376)."
+      - videoId: "Gu9HhYv0C7E"
+        startSec: 40
+        endSec: 70
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1376)."
   - id: david-bowie-heroes
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Heroes — David Bowie"
@@ -1726,3 +1728,17 @@ items:
         startSec: 20
         endSec: 50
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1377)."
+  # Tillagda 2026-09-11 ur Music.xlsx.
+  - id: diana-ross-upside-down
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Upside Down — Diana Ross"
+    correctYear: 1980
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Upside Down - Diana Ross 1980"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Po0BbGMSX4g"
+        startSec: 19
+        endSec: 49
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1402)."

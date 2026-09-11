@@ -884,11 +884,10 @@ items:
     wikimediaSearchHints: ["Lena Philipsson Det gör ont Eurovision 2004"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "na2qDYmm7LM"
-        startSec: 5
-        endSec: 20
-        channelTitle: "Eurovision Song Contest"
-        notes: "Melodifestivalen 2004 vinnare. ESC-version It Hurts."
+      - videoId: "5JDFnN-WYGA"
+        startSec: 3
+        endSec: 33
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1395)."
     genrePackages: ["Melodifestivalen"]
   - id: martin-stenmarck-las-vegas
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2776,6 +2775,11 @@ items:
     genrePackages: ["Party mix"]
     spotifyTrackId: "6W2Ef5Ph6ILTUAedoQ3QIv"
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1293)."
+    youtubeClips:
+      - videoId: "HMqgVXSvwGo"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1291)."
   - id: timbaland-morning-after-dark
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Morning After Dark — Timbaland"
@@ -3107,3 +3111,18 @@ items:
         startSec: 20
         endSec: 50
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1398)."
+  # Tillagda 2026-09-11 ur Music.xlsx.
+  - id: martin-du-ar-sa-yeah-yeah-wow-wow
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Du är så yeah yeah wow wow — Martin"
+    correctYear: 1999
+    probability: 58
+    region: ["sweden"]
+    genrePackages: ["Melodifestivalen"]
+    wikimediaSearchHints: ["Du är så yeah yeah wow wow - Martin 1999"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "InHUeiPNBDk"
+        startSec: 6
+        endSec: 36
+        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1401)."

@@ -1184,12 +1184,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "6P40lE9SODIcT21NpmRd2I",
     "youtubeClips": [
       {
-        "videoId": "YT45RF2SGRw",
+        "videoId": "BrYFFIESx3c",
         "startSec": 0,
         "endSec": 30,
-        "channelTitle": "Universal Music Group",
         "license": "standard",
-        "notes": "Officiell UMG-uppladdning. Studio 1963. Svensk version av It's My Party."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1336)."
       }
     ]
   },
@@ -1942,7 +1941,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "2aoo2jlRnM3A0NyLQqMN2f",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "vBjzAdpZzf0",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1298)."
+      }
+    ]
   },
   {
     "id": "simon-garfunkel-mrs-robinson",
@@ -2301,11 +2308,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "kBhSh7y_IkM",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "Xg2vMrDzoXM",
+        "startSec": 10,
+        "endSec": 40,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1368)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1368)."
       }
     ]
   },
@@ -2393,11 +2400,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "mYDLL6tOcUY",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "fNWqSez_6VA",
+        "startSec": 9,
+        "endSec": 39,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1355)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1355)."
       }
     ]
   },
@@ -2616,11 +2623,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "FyzWDl0nz00",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "Sc-OJ9DeeSc",
+        "startSec": 40,
+        "endSec": 70,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1371)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1371)."
       }
     ]
   },
@@ -2643,11 +2650,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "_8_Pf144Qmg",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "Gu9HhYv0C7E",
+        "startSec": 40,
+        "endSec": 70,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1376)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1376)."
       }
     ]
   },
@@ -2701,12 +2708,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "fOZ-MySzAac",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Bill Withers - Topic",
+        "videoId": "Nx_D0VTHBag",
+        "startSec": 25,
+        "endSec": 55,
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1359)."
       }
     ]
   },
@@ -3032,12 +3038,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "DEbi_YjpA-Y",
-        "startSec": 15,
-        "endSec": 45,
-        "channelTitle": "RHINO",
+        "videoId": "3r3R0lmH7OE",
+        "startSec": 45,
+        "endSec": 75,
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (3)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1352)."
       }
     ]
   },
@@ -3267,11 +3272,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "3PQLYVskjUeRmRIfECsL0X",
     "youtubeClips": [
       {
-        "videoId": "TfNymCvydHc",
-        "startSec": 5,
-        "endSec": 50,
-        "channelTitle": "Bob Marley",
-        "license": "standard"
+        "videoId": "Pv00rRagnqA",
+        "startSec": 50,
+        "endSec": 80,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1343)."
       }
     ]
   },
@@ -3376,11 +3381,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "q9MQYdqbWD8",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "STugQ0X1NoI",
+        "startSec": 15,
+        "endSec": 45,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1375)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1375)."
       }
     ]
   },
@@ -3734,11 +3739,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "-9_d-sFhmRM",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "1602T9ZVPjg",
+        "startSec": 9,
+        "endSec": 39,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1354)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1354)."
       }
     ]
   },
@@ -4070,11 +4075,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "9nBSd1U18vM",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "3woUYuyLsaI",
+        "startSec": 14,
+        "endSec": 44,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1363)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1363)."
       }
     ]
   },
@@ -4410,12 +4415,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "FHhZPp08s74",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Gloria Gaynor - Topic",
+        "videoId": "TPpfSp40qy0",
+        "startSec": 6,
+        "endSec": 36,
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1403)."
       }
     ]
   },
@@ -4739,11 +4743,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "HeeDOVcVUQY",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "8lCNzQ6sYxo",
+        "startSec": 6,
+        "endSec": 36,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1365)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1365)."
       }
     ]
   },
@@ -4862,11 +4866,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "A-2H96uX_lI",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "kln_bIndDJg",
+        "startSec": 5,
+        "endSec": 35,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1351)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1351)."
       }
     ]
   },
@@ -4953,6 +4957,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 15,
         "endSec": 30,
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "diana-ross-upside-down",
+    "displayName": "Upside Down — Diana Ross",
+    "correctYear": 1980,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Po0BbGMSX4g",
+        "startSec": 19,
+        "endSec": 49,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1402)."
       }
     ]
   },
@@ -6253,7 +6284,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "5F5SMUnFD058zo1K0DtjUq",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "TVWNiw6AoNE",
+        "startSec": 16,
+        "endSec": 46,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1362)."
+      }
+    ]
   },
   {
     "id": "rufus-chaka-khan-aint-nobody",
@@ -7531,12 +7570,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "4hj8M8XZpis",
+        "videoId": "9jK-NcRmVcw",
         "startSec": 0,
-        "endSec": 15,
-        "channelTitle": "EUROPE - Topic",
+        "endSec": 30,
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (100)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1101)."
       }
     ]
   },
@@ -9316,12 +9354,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "At9FypGZ44M",
-        "startSec": 30,
-        "endSec": 45,
-        "channelTitle": "Phil Collins",
+        "videoId": "Qt2mbGP6vFI",
+        "startSec": 12,
+        "endSec": 42,
         "license": "standard",
-        "notes": "Auto-curerad 2026-05-29 via batch-pick-clips. Top-scored kandidat (3)."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1305)."
       }
     ]
   },
@@ -15225,6 +15262,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "martin-du-ar-sa-yeah-yeah-wow-wow",
+    "displayName": "Du är så yeah yeah wow wow — Martin",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 58,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "InHUeiPNBDk",
+        "startSec": 6,
+        "endSec": 36,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1401)."
+      }
+    ]
+  },
+  {
     "id": "ricky-martin-livin-la-vida-loca",
     "displayName": "Livin' la Vida Loca — Ricky Martin",
     "correctYear": 1999,
@@ -16517,7 +16584,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "6W2Ef5Ph6ILTUAedoQ3QIv",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "HMqgVXSvwGo",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1291)."
+      }
+    ]
   },
   {
     "id": "justin-timberlake-rock-your-body",
@@ -17143,12 +17218,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "na2qDYmm7LM",
-        "startSec": 5,
-        "endSec": 20,
-        "channelTitle": "Eurovision Song Contest",
+        "videoId": "5JDFnN-WYGA",
+        "startSec": 3,
+        "endSec": 33,
         "license": "standard",
-        "notes": "Melodifestivalen 2004 vinnare. ESC-version It Hurts."
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1395)."
       }
     ]
   },
@@ -21869,6 +21943,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "marcus-martinus-elektrisk",
+    "displayName": "Elektrisk — Marcus & Martinus",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 58,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ri5_fzndMBg",
+        "startSec": 13,
+        "endSec": 43,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1404)."
+      }
+    ]
+  },
+  {
     "id": "shawn-mendes-i-know-what-you-did-last-summer",
     "displayName": "I Know What You Did Last Summer — Shawn Mendes & Camila Cabello",
     "correctYear": 2015,
@@ -24770,6 +24871,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bolaget-ikvall-igen",
+    "displayName": "Ikväll igen — Bolaget",
+    "correctYear": 2023,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 56,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ASzgTmKlTRA",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1405)."
+      }
+    ]
+  },
+  {
     "id": "doja-cat-paint-the-town-red",
     "displayName": "Paint the Town Red — Doja Cat",
     "correctYear": 2023,
@@ -25080,7 +25208,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "inBaseCatalog": false,
     "parentControlled": true,
     "spotifyTrackId": "6ZWalyzfVcNCc1XwKnnyyn",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "nSERqaFagJc",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1286)."
+      }
+    ]
   },
   {
     "id": "lady-gaga-bruno-mars-die-with-a-smile",
