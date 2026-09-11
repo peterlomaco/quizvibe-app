@@ -81,14 +81,23 @@ function formatLastPlayed(iso?: string): string | null {
 export function SavedAggregatesCard({
   showRematch = false,
   focusIds,
+  collapsible = false,
 }: {
   showRematch?: boolean;
   /** Flash-guide: leaderboard-id:n (= SavedAggregate.id) som ska blinka "New
    *  update" och vars grupp/spelform auto-fälls ut. Sätts från /competitions
    *  när Home:s "Accept re-match" tappas. */
   focusIds?: string[];
+  /** När true blir kort-rubriken tappbar (+/−) och HELA innehållet (sort,
+   *  filter, listan) göms när kortet är hopfällt — bara rubriken syns. Default
+   *  hopfällt. Sätts av Profile → Player history; /competitions utelämnar den
+   *  (kortet ÄR skärmen där, inget att fälla ihop). */
+  collapsible?: boolean;
 } = {}) {
   const [items, setItems] = useState<SavedAggregate[]>([]);
+  // Kort-kollaps (bara i collapsible-läge). Default hopfällt, som Profiles
+  // övriga sektioner.
+  const [cardOpen, setCardOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('date');
   const [expandedL1, setExpandedL1] = useState<Set<string>>(new Set());
@@ -337,9 +346,29 @@ export function SavedAggregatesCard({
     );
   };
 
+  const contentHidden = collapsible && !cardOpen;
+  // Antal sparade Marathon tables (efter dismiss-filtret) — speglar
+  // "Games played: N"-rubriken.
+  const titleText = `Marathon tables: ${items.length}`;
+
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>Marathon tables</Text>
+      {collapsible ? (
+        <Pressable
+          onPress={() => setCardOpen((o) => !o)}
+          style={({ pressed }) => [styles.cardHeaderRow, pressed && { opacity: 0.7 }]}
+          hitSlop={8}
+        >
+          <Text style={styles.cardTitle}>{titleText}</Text>
+          <View style={styles.toggleBox}>
+            <Text style={styles.toggleText}>{cardOpen ? '−' : '+'}</Text>
+          </View>
+        </Pressable>
+      ) : (
+        <Text style={styles.cardTitle}>{titleText}</Text>
+      )}
+      {!contentHidden && (
+        <>
       <SegmentedControl
         options={SORT_OPTIONS}
         value={sortMode}
@@ -487,6 +516,8 @@ export function SavedAggregatesCard({
               );
             })}
       </View>
+        </>
+      )}
 
       <Modal
         visible={open !== null}
@@ -564,6 +595,27 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
+  },
+  // Tappbar rubrik-rad (collapsible-läge): titel + +/−-ruta i höger kant.
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  toggleBox: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toggleText: {
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Colors.textSecondary,
+    lineHeight: 20,
   },
   groups: { gap: Spacing.sm },
   rowList: { gap: Spacing.sm },

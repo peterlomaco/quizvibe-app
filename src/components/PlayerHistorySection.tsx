@@ -82,6 +82,8 @@ export function PlayerHistorySection() {
   // Kollapsbart block — speglar Game connections-mönstret.
   // Default hopfälld — alla Profile-sektioner är ihopfällda vid besök (2026-06-01).
   const [expanded, setExpanded] = useState(false);
+  // Kort-kollaps för "Games played" — default hopfällt (bara rubriken syns).
+  const [gamesOpen, setGamesOpen] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [sortMode, setSortMode] = useState<SortMode>('date');
   const [expandedL1, setExpandedL1] = useState<Set<string>>(new Set());
@@ -254,10 +256,19 @@ export function PlayerHistorySection() {
               showRematch → detalj-modalen kör den två-fas re-match-flödet
               (CompetitionRematchActions: "Send Re-match invitation" → vänta på
               accept → "Yes – start re-match"), samma som /competitions. */}
-          <SavedAggregatesCard showRematch />
+          <SavedAggregatesCard showRematch collapsible />
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Games played: {games.length}</Text>
-            {games.length === 0 ? (
+            <Pressable
+              onPress={() => setGamesOpen((o) => !o)}
+              style={({ pressed }) => [styles.cardHeaderRow, pressed && { opacity: 0.7 }]}
+              hitSlop={8}
+            >
+              <Text style={styles.cardTitle}>Games played: {games.length}</Text>
+              <View style={styles.toggleBox}>
+                <Text style={styles.toggleText}>{gamesOpen ? '−' : '+'}</Text>
+              </View>
+            </Pressable>
+            {!gamesOpen ? null : games.length === 0 ? (
               <Text style={styles.emptyText}>
                 No games played yet. Play your first game from Home to start
                 building history.
@@ -560,6 +571,12 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
+  },
+  // Tappbar rubrik-rad för "Games played" — titel + +/−-ruta i höger kant.
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   emptyText: {
     fontSize: FontSize.sm,
