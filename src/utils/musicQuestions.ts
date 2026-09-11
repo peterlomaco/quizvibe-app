@@ -6113,8 +6113,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "fK6tf6opIg0",
-        "startSec": 60,
-        "endSec": 75,
+        "startSec": 125,
+        "endSec": 140,
         "channelTitle": "prod. ovr",
         "license": "standard",
         "notes": "Official Shortened 4K Video — rörlig MV (zombiedans). Mid-song."
