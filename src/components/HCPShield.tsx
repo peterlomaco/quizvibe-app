@@ -138,15 +138,16 @@ export function HCPShield({ hcp, size = 100, notDefined = false, opaque = false 
         <Path d={d} stroke={tier.stroke} strokeWidth={2.5} fill={fillColor} />
       </Svg>
 
-      {/* Textöverlagring – "HCP" över, siffra (eller "Not Defined") under */}
-      <View style={[styles.textLayer, { paddingBottom: h * 0.1 }]} pointerEvents="none">
-        <Text style={[styles.labelText, { fontSize: size * 0.14 }]}>HCP</Text>
+      {/* Textöverlagring – Guest: bara "Guest" centrerat. Annars "HCP" över +
+          siffra under. */}
+      <View style={[styles.textLayer, notDefined ? null : { paddingBottom: h * 0.1 }]} pointerEvents="none">
         {notDefined ? (
-          <Text style={[styles.notDefinedText, { fontSize: size * 0.14 }]}>
-            Not{'\n'}Defined
-          </Text>
+          <Text style={[styles.guestText, { fontSize: size * 0.18 }]}>Guest</Text>
         ) : (
-          <Text style={[styles.valueText, { fontSize: size * 0.34 }]}>{hcp}</Text>
+          <>
+            <Text style={[styles.labelText, { fontSize: size * 0.14 }]}>HCP</Text>
+            <Text style={[styles.valueText, { fontSize: size * 0.34 }]}>{hcp}</Text>
+          </>
         )}
       </View>
     </View>
@@ -378,6 +379,11 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: '#fff',
     letterSpacing: 1.8,
+    // letterSpacing lägger till efterföljande mellanrum efter sista bokstaven
+    // ("P") vilket skjuter den synliga texten vänster om mitten i den centrerade
+    // rutan. Kompensera med en matchande vänsterindrag så "HCP" ser centrerat ut.
+    paddingLeft: 1.8,
+    textAlign: 'center',
   },
   valueText: {
     fontWeight: FontWeight.bold,
@@ -385,11 +391,9 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     marginTop: 2,
   },
-  notDefinedText: {
+  guestText: {
     fontWeight: FontWeight.bold,
     color: '#fff',
-    marginTop: 2,
     textAlign: 'center',
-    opacity: 0.85,
   },
 });
