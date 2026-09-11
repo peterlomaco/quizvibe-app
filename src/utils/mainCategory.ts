@@ -19,6 +19,13 @@ export type MainCategory = 'Music' | 'Film' | 'Sport';
 
 export const MAIN_CATEGORIES: readonly MainCategory[] = ['Music', 'Film', 'Sport'] as const;
 
+// Målandel av YOUTUBE-klippen per kategori "över tid" (Peter 2026-09-12).
+// YT-Film är innehållsfattigt → hålls till 10% av YT-klippen; resten Music.
+// Realiseras via kategori-skuldboken (planCategorySequence) i normala spel och
+// som sannolikhetsvikt i gäst-spel. Sport parkerat → utelämnat (vikt 0).
+// Gäller ENBART YouTube-fasen; Hints-fasens kategorimix är oförändrad.
+export const YT_CATEGORY_WEIGHTS: Record<string, number> = { Music: 0.9, Film: 0.1 };
+
 // Legacy — användes av Images-källan (ersatt av Guess-sektionen).
 // Bevaras för bakåtkompatibilitet med mockLobbySettings.ts DB-adapter.
 export const IMAGES_MANDATORY_CATEGORIES: readonly MainCategory[] = ['Film', 'Sport'] as const;

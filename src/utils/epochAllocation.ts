@@ -248,6 +248,100 @@ export function sequenceToQuotas(
     .map(([epochId, quota]) => ({ epochId, quota }));
 }
 
+// ── Kategori-skuldbok (Music/Film-andel av YouTube-klippen "över tid") ────────
+// Speglar epok-skuldboken ovan men på KATEGORI-axeln (block, inte frågor).
+// Varför en skuldbok: målandelen (t.ex. 10% Film) går inte att uppfylla inom ETT
+// kort spel — 4 rundor ger ~3 YT-block, och 10% = 0,3 block avrundas alltid till
+// 0. Genom att spara resten mellan spel ackumuleras 0,3 tills den passerar 1 och
+// Film får ett block (~vart 3:e 4-rundorsspel). Endast YouTube-fasen använder
+// detta; Hints-fasen behåller lika vikt.
+
+/** Bråkdels-skuld per kategori. Positiv = kategorin har fått för få block. */
+export type CategoryDebt = Record<string, number>;
+
+/** Kategorier skuldboken spårar. Sport är parkerat men hålls i formen. */
+export const CATEGORY_DEBT_IDS: string[] = ['Music', 'Film', 'Sport'];
+
+export function emptyCategoryDebt(): CategoryDebt {
+  return { Music: 0, Film: 0, Sport: 0 };
+}
+
+/** Kopierar och saniterar en kategori-skuldbok — ogiltiga/saknade tal blir 0. */
+export function clampCategoryDebt(raw: unknown): CategoryDebt {
+  const out = emptyCategoryDebt();
+  if (!raw || typeof raw !== 'object') return out;
+  const rec = raw as Record<string, unknown>;
+  for (const id of CATEGORY_DEBT_IDS) {
+    const v = rec[id];
+    if (typeof v === 'number' && Number.isFinite(v)) {
+      out[id] = Math.max(-DEBT_CLAMP, Math.min(DEBT_CLAMP, v));
+    }
+  }
+  return out;
+}
+
+/** En kategori som är NÄRVARANDE i poolen, med normaliserad målvikt. */
+export interface ActiveCategory {
+  id: string;
+  normWeight: number;
+}
+
+/**
+ * Bygger listan av aktiva kategorier ur de som faktiskt finns i poolen +
+ * har en målvikt > 0. Vikterna renormaliseras så de summerar till 1 över de
+ * närvarande kategorierna. En kategori som saknar innehåll blir inte aktiv och
+ * ackumulerar därför ingen skuld (fryses — samma semantik som epok-frysning).
+ */
+export function buildActiveCategories(
+  presentCats: string[],
+  weights: Record<string, number>,
+): ActiveCategory[] {
+  const present = presentCats.filter((c) => (weights[c] ?? 0) > 0);
+  const sum = present.reduce((acc, c) => acc + (weights[c] ?? 0), 0);
+  if (sum <= 0) return [];
+  return present.map((c) => ({ id: c, normWeight: (weights[c] ?? 0) / sum }));
+}
+
+/**
+ * Planerar vilken kategori varje BLOCK ska hämtas ur och returnerar den
+ * uppdaterade skuldboken. Ren funktion — `debt` muteras inte. Bokför ALLOKERAT,
+ * inte serverat (som epok-skuldboken) — ett Film-block som inte kan fyllas pga
+ * innehållsbrist räknas ändå, så Film aldrig överserveras.
+ */
+export function planCategorySequence(
+  nBlocks: number,
+  activeCats: ActiveCategory[],
+  debt: CategoryDebt,
+): { sequence: string[]; nextDebt: CategoryDebt } {
+  const nextDebt = clampCategoryDebt(debt);
+  const sequence: string[] = [];
+  if (nBlocks <= 0 || activeCats.length === 0) return { sequence, nextDebt };
+
+  for (let i = 0; i < nBlocks; i++) {
+    // Endast AKTIVA kategorier ackumulerar — övriga fryses vid sitt värde.
+    for (const c of activeCats) nextDebt[c.id] = (nextDebt[c.id] ?? 0) + c.normWeight;
+
+    let best = activeCats[0];
+    for (const c of activeCats) {
+      if ((nextDebt[c.id] ?? 0) > (nextDebt[best.id] ?? 0)) best = c;
+    }
+    nextDebt[best.id] = (nextDebt[best.id] ?? 0) - 1;
+    sequence.push(best.id);
+  }
+
+  for (const id of CATEGORY_DEBT_IDS) {
+    nextDebt[id] = Math.max(-DEBT_CLAMP, Math.min(DEBT_CLAMP, nextDebt[id] ?? 0));
+  }
+  return { sequence, nextDebt };
+}
+
+/** Vänder en planerad kategori-sekvens till block-antal per kategori. */
+export function sequenceToCategoryQuotas(sequence: string[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const id of sequence) out[id] = (out[id] ?? 0) + 1;
+  return out;
+}
+
 /**
  * Distribute N questions evenly across players using Largest Remainder Method.
  * Max |quota_i − quota_j| ≤ 1. Input order is preserved.
@@ -536,6 +630,7 @@ export function allocateCategoryBlocks(
   totalBlocks: number,
   cats: string[],
   capacity: Record<string, CategoryCapacity>,
+  targetBlocks?: Record<string, number>,
 ): Record<string, number> {
   const out: Record<string, number> = {};
   for (const c of cats) out[c] = 0;
@@ -543,12 +638,15 @@ export function allocateCategoryBlocks(
 
   const capOf = (c: string): CategoryCapacity => capacity[c] ?? { fresh: 0, total: 0 };
 
-  // Pass 1: lika vikt (LRM), kapat mot FRESH-kapacitet.
+  // Pass 1: önskad andel per kategori, kapat mot FRESH-kapacitet.
+  // Med `targetBlocks` (från kategori-skuldboken) styrs andelen viktat
+  // (t.ex. 90% Music / 10% Film över tid); utan den används lika vikt (LRM)
+  // som förut — så Hints-fasen och enstaka-kategori-fallet är oförändrade.
   const base = Math.floor(totalBlocks / cats.length);
   const remainder = totalBlocks - base * cats.length;
   let placed = 0;
   cats.forEach((c, i) => {
-    const want = base + (i < remainder ? 1 : 0);
+    const want = targetBlocks ? targetBlocks[c] ?? 0 : base + (i < remainder ? 1 : 0);
     const give = Math.min(want, capOf(c).fresh);
     out[c] = give;
     placed += give;
