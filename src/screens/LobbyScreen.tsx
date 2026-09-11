@@ -3616,6 +3616,10 @@ export default function LobbyScreen() {
   // redan oberoende så ingen risk att hasLeft hamnar i turn-order.
   const isPlayerApproved = (p: LobbyPlayer) => !!p.approved || !!p.isHost;
   const approvedPlayers = players.filter((p) => isPlayerApproved(p) && !p.hasLeft);
+  // Någon motståndare (approved ELLER väntande) redan i lobbyn — H2H:s enda
+  // slot är då fylld, så Share invite ska förbli dold även när invite-raden
+  // raderats av ett accept. Driver Share invite-grinden i room-kortet.
+  const remoteOpponentPresent = players.some((p) => !p.isHost && !p.hasLeft);
   // Bokstäver som redan används som identifierar-suffix på Guest-spelare i
   // lobbyn. hasLeft-spelare exkluderas — deras letter frigörs. Skickas till
   // AddPlayerModal:s auto-gen så två guests inte får samma bokstav.
@@ -4399,6 +4403,61 @@ export default function LobbyScreen() {
       if (channel) supabase.removeChannel(channel);
     };
   }, [shareModalOpen, roomCode, resyncPendingFromInvites]);
+
+  // H2H (remote-1v1): en-slot-lås på Share invite (Peter 2026-09-11). En 1v1-
+  // lobby har exakt EN motståndarplats, så host får bara ha EN utestående
+  // invite för DETTA rum. `hasOutstandingRemoteInvite` driver både send-
+  // guarden (handleInviteFriend) och att Share invite-knappen i room-kortet
+  // döljs medan en invite väntar på svar. Till skillnad från modal-
+  // subscriptionen ovan är denna LOBBY-scopad (inte gated på shareModalOpen),
+  // så en deny som anländer medan modalen är stängd ändå flippar tillbaka
+  // knappen. Deny OCH accept raderar båda raden (ingen status-kolumn) → vi
+  // re-räknar rum-scopat till 0 i båda fallen; accept-fallet hålls knappen
+  // dold ändå via `remoteOpponentPresent`-grinden i renderingen.
+  const [hasOutstandingRemoteInvite, setHasOutstandingRemoteInvite] = useState(false);
+  useEffect(() => {
+    if (!hostMode || gameMode !== 'remote-1v1' || singlePlayerDefault || !roomCode) return;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    const recount = async () => {
+      const hostUserId = await getOwnUserId();
+      if (!hostUserId || cancelled) return;
+      const { count, error } = await supabase
+        .from('waiting_invites')
+        .select('id', { count: 'exact', head: true })
+        .eq('from_user_id', hostUserId)
+        .eq('room_code', roomCode);
+      if (!cancelled && !error) setHasOutstandingRemoteInvite((count ?? 0) > 0);
+    };
+    (async () => {
+      const hostUserId = await getOwnUserId();
+      if (!hostUserId || cancelled) return;
+      await recount();
+      // Distinkt topic från `share-invites:<roomCode>` — samma topic → befintlig
+      // subscribed channel, .on() efteråt kraschar (dokumenterad gotcha).
+      const topic = `realtime:remote-invite-status:${roomCode}`;
+      supabase.getChannels()
+        .filter((c) => c.topic === topic)
+        .forEach((c) => supabase.removeChannel(c));
+      channel = supabase
+        .channel(`remote-invite-status:${roomCode}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'waiting_invites', filter: `from_user_id=eq.${hostUserId}` },
+          () => { void recount(); },
+        )
+        .on(
+          'postgres_changes',
+          { event: 'DELETE', schema: 'public', table: 'waiting_invites', filter: `from_user_id=eq.${hostUserId}` },
+          () => { void recount(); },
+        )
+        .subscribe();
+    })();
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [hostMode, gameMode, singlePlayerDefault, roomCode]);
 
   // Lägg till en QuizVibe friend direkt från Share invite-modalen.
   // `playerNameExists` (samma RPC som Register/Add Player-uniqueness-
@@ -5848,6 +5907,25 @@ export default function LobbyScreen() {
           );
           return;
         }
+        // En-slot-lås: en H2H-lobby har EN motståndarplats, så host får inte
+        // skicka en andra invite för DETTA rum (till samma ELLER annan spelare)
+        // medan en redan är obesvarad. Rum-scopad DB-räkning = auktoritativ,
+        // kan inte kringgås av stale state. Täcker alla call-sites av
+        // handleInviteFriend. Deny/accept raderar raden → count 0 → låset lyfts.
+        if (userId) {
+          const { count: roomCount, error: roomErr } = await supabase
+            .from('waiting_invites')
+            .select('id', { count: 'exact', head: true })
+            .eq('from_user_id', userId)
+            .eq('room_code', roomCode);
+          if (!roomErr && (roomCount ?? 0) > 0) {
+            Alert.alert(
+              'Invitation already sent',
+              'You already have a pending H2H invitation for this lobby. Wait for a response, or for it to be denied, before inviting someone else.',
+            );
+            return;
+          }
+        }
       }
     }
     const profile = await loadProfile();
@@ -5863,6 +5941,11 @@ export default function LobbyScreen() {
       next.add(friend.id);
       return next;
     });
+    // Optimistiskt lås för H2H — döljer Share invite-knappen direkt utan att
+    // vänta på realtime-round-trip. Realtime-DELETE (deny/accept) lyfter det.
+    if (gameMode === 'remote-1v1' && !singlePlayerDefault) {
+      setHasOutstandingRemoteInvite(true);
+    }
     // "Pending"-perioden startar HÄR (inviten är nu en levande waiting_invites-
     // rad) — inte redan vid Add. Driver badgen på nästa modal-open.
     if (friend.id.startsWith('pending-')) {
@@ -6886,8 +6969,11 @@ export default function LobbyScreen() {
               Re-match/Replay: dold — uppsättningen är låst till förra spelets
               spelare, så nya spelare kan inte bjudas in (Peter 2026-08-28).
               Single-lobby: dold — ett solospel har inga andra spelare att
-              bjuda in (Peter 2026-08-29). */}
-          {hostMode && !isGuestHost && !isRematchLobby && !isSingleLobby && (
+              bjuda in (Peter 2026-08-29).
+              Remote-1v1: dold medan en invite väntar på svar (en-slot-lås) OCH
+              när en motståndare redan joinat (slot fylld) — Peter 2026-09-11. */}
+          {hostMode && !isGuestHost && !isRematchLobby && !isSingleLobby &&
+            (gameMode !== 'remote-1v1' || (!hasOutstandingRemoteInvite && !remoteOpponentPresent)) && (
             <TouchableOpacity onPress={handleOpenShareModal} style={styles.shareBtn}>
               <Text style={styles.shareBtnText}>↑ Share invite to friends</Text>
             </TouchableOpacity>
