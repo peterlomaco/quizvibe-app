@@ -1216,12 +1216,6 @@ items:
     wikimediaSearchHints: ["Kapten Röd AKI När solen går ner 2012 Swedish hip-hop reggae"]
     answerMethods: ["timeline"]
     spotifyTrackId: "68GdZAAowWDac3SkdNWOwo"
-    youtubeClips:
-      - videoId: "W-BkWPk9Hqo"
-        startSec: 0
-        endSec: 30
-        channelTitle: "Kapten Röd"
-        notes: "Officiell video. AKI feat. Kapten Röd (hip-hop/reggae)."
 
   - id: markoolio-sommar-och-sol
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]

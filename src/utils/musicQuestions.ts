@@ -20454,16 +20454,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "68GdZAAowWDac3SkdNWOwo",
-    "youtubeClips": [
-      {
-        "videoId": "W-BkWPk9Hqo",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Kapten Röd",
-        "license": "standard",
-        "notes": "Officiell video. AKI feat. Kapten Röd (hip-hop/reggae)."
-      }
-    ]
+    "youtubeClips": []
   },
   {
     "id": "loreen-euphoria",
