@@ -668,10 +668,17 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
    *  viktat (t.ex. 90/10) i stället för lika vikt. Utelämnas för Hints-fasen
    *  → lika vikt som förut. */
   categoryQuotas?: Record<string, number>;
+  /** YouTube-fasen: fast kategori-ordning Music → Film → Sport → _other så ALLA
+   *  YT/Music-block spelas FÖRE alla YT/Film-block (Peter 2026-09-12). Blocken
+   *  shufflas då INOM varje kategori (epok-variation bevaras) och anroparen ska
+   *  INTE köra shuffleBlocks ovanpå. Utelämnas (Hints-fasen) → kategori-ordningen
+   *  shufflas som förr och anroparen blandar över kategori-gränserna. */
+  orderedCategories?: boolean;
 }): T[] {
   const {
     pool, totalBlocks, questionsPerBlock, activeEpochs,
     recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear, epochSequence, categoryQuotas,
+    orderedCategories,
   } = opts;
   const totalQuestions = totalBlocks * questionsPerBlock;
   if (totalQuestions === 0 || pool.length === 0) return [];
@@ -684,19 +691,28 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
     catMap.get(key)!.push(q);
   }
 
-  // Shufflas — annars är kategori-ordningen deterministisk (Map insertion
-  // order = pool-ordning): Music-blocken hamnade alltid först OCH remainder-
-  // blocken gick alltid till första kategorin (stable sort på lika decimaler
-  // i LRM:en nedan). Shuffle randomiserar både vilken kategori som får extra
-  // block och i vilken ordning kategori-blocken spelas.
-  const cats = shuffleArray([...catMap.keys()]);
+  // orderedCategories (YouTube): fast ordning Music → Film → Sport → _other.
+  // Annars shufflas kategori-ordningen — annars vore den deterministisk (Map
+  // insertion order = pool-ordning): Music-blocken hamnade alltid först OCH
+  // remainder-blocken gick alltid till första kategorin (stable sort på lika
+  // decimaler i LRM:en nedan). Shuffle randomiserar både vilken kategori som
+  // får extra block och i vilken ordning kategori-blocken spelas.
+  const CATEGORY_SEQUENCE_RANK: Record<string, number> = { Music: 0, Film: 1, Sport: 2 };
+  const cats = orderedCategories
+    ? [...catMap.keys()].sort(
+        (a, b) => (CATEGORY_SEQUENCE_RANK[a] ?? 99) - (CATEGORY_SEQUENCE_RANK[b] ?? 99),
+      )
+    : shuffleArray([...catMap.keys()]);
 
   // Enstaka kategori eller inget att fördela — delegera direkt utan overhead.
   if (cats.length <= 1) {
-    return buildEpochPhase<T>({
+    const single = buildEpochPhase<T>({
       pool, totalQuestions, activeEpochs, recentIds, lastSessionIds, isPtP, players, turnOrderIds, getEpochYear,
       quotas: epochSequence ? sequenceToQuotas(epochSequence.slice(0, totalQuestions)) : undefined,
     });
+    // I orderedCategories-läget kör anroparen ingen shuffleBlocks → shuffla här
+    // så en enkategori-fas inte alltid öppnar på samma epok (E1→E5-ordning).
+    return orderedCategories ? shuffleBlocks(single, questionsPerBlock) : single;
   }
 
   // Lika vikt per kategori — men aldrig fler block än kategorin kan fylla.
@@ -747,7 +763,10 @@ function buildCategoryAlignedPhase<T extends QuizQuestion>(opts: {
       quotas: catSlice && catSlice.length > 0 ? sequenceToQuotas(catSlice) : undefined,
     });
     const aligned = catSeq.slice(0, Math.floor(catSeq.length / questionsPerBlock) * questionsPerBlock);
-    result.push(...aligned);
+    // orderedCategories: shuffla blocken INOM kategorin (epok-variation) men
+    // behåll kategori-segmenten i ordning. Annars lämnas ordningen till
+    // anroparens shuffleBlocks (som blandar över kategori-gränserna).
+    result.push(...(orderedCategories ? shuffleBlocks(aligned, questionsPerBlock) : aligned));
   }
   return result;
 }
@@ -2315,27 +2334,27 @@ export default function QuizScreen() {
 
     // Fas 2: YouTube — kategori-alignerade block (PtP: alla spelare i ett
     // block får samma mainCategory, t.ex. alla YouTube/Music i samma runda).
-    // shuffleBlocks bryter den kronologiska epok-ordningen från
-    // buildEpochPhase; per fas så källordningen nedan bevaras.
+    // orderedCategories: ALLA YT/Music-block spelas FÖRE alla YT/Film-block
+    // (Peter 2026-09-12). buildCategoryAlignedPhase shufflar blocken inom varje
+    // kategori (epok-variation) och behåller kategori-ordningen — därför INGEN
+    // shuffleBlocks ovanpå (den skulle blanda tillbaka Music och Film).
     const ytSeq: QuizQuestion[] =
       hasPureYoutube && ytBlockCount > 0
-        ? shuffleBlocks(
-            buildCategoryAlignedPhase<QuizQuestion>({
-              pool: pureYoutubePool,
-              totalBlocks: ytBlockCount,
-              questionsPerBlock,
-              activeEpochs,
-              recentIds: combinedSeenIds,
-              lastSessionIds: combinedLastIds,
-              isPtP,
-              players: epochPlayers,
-              turnOrderIds,
-              getEpochYear: youtubeEpochYear,
-              epochSequence: plannedEpochs.slice(0, ytTotal),
-              categoryQuotas: ytCategoryQuotas,
-            }),
+        ? buildCategoryAlignedPhase<QuizQuestion>({
+            pool: pureYoutubePool,
+            totalBlocks: ytBlockCount,
             questionsPerBlock,
-          )
+            activeEpochs,
+            recentIds: combinedSeenIds,
+            lastSessionIds: combinedLastIds,
+            isPtP,
+            players: epochPlayers,
+            turnOrderIds,
+            getEpochYear: youtubeEpochYear,
+            epochSequence: plannedEpochs.slice(0, ytTotal),
+            categoryQuotas: ytCategoryQuotas,
+            orderedCategories: true,
+          })
         : [];
 
     // Fas 3: Image/Hints — kategori-alignerade block.
