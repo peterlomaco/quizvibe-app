@@ -1466,13 +1466,10 @@ export default function LobbyScreen() {
               age: guestBirthYear
                 ? CURRENT_YEAR - parseInt(guestBirthYear, 10)
                 : undefined,
-              // Nivån väljs på Home:s guest-host-form (och kan sedan ändras
-              // i player-edit-sheeten) — var hårdkodad 'full' t.o.m.
-              // 2026-08-08. Fallback 'full' för äldre payloads utan param.
-              assistance:
-                guestAssistance === 'standard' || guestAssistance === 'minimal'
-                  ? guestAssistance
-                  : 'full',
+              // Guest host spelar ALLTID på Full assistance (2026-09-11) —
+              // en låst trial-upplevelse. guestAssistance-paramet ignoreras
+              // och assistance-väljaren är borttagen ur guest-host-formen.
+              assistance: 'full',
               hcpComplete: true,
               isHost: true,
               approved: true,
@@ -1572,10 +1569,10 @@ export default function LobbyScreen() {
         // Single: alltid av (Spotify-kortet göms — DJ kräver en motspelare).
         setSpotifyEnabled(seedSinglePlayer ? false : stored?.spotifyEnabled ?? false);
         setEnabledHostPackages([]);
-        // Parent Control — carry-over-param (guest host kan också toggla den).
-        // Persisteras aldrig i DB, så param är enda carry-över-källan. Utan
-        // param (fresh guest-lobby) → av.
-        setParentControlEnabled(parentControl === 'true');
+        // Parent Control — ALLTID på och icke-editerbar för guest host (single
+        // OCH multiplayer, Peter 2026-09-11): en guest/trial-lobby är alltid
+        // barnvänlig. Switchen renderas disabled nedan. Persisteras aldrig i DB.
+        setParentControlEnabled(true);
         setYoutubeEnabledCategories(defaultEnabledMainCategories());
         setImagesEnabledCategories(defaultEnabledMainCategories());
         // Släpp debounce-skrivningen till lobby_settings så non-hosts ser
@@ -2484,6 +2481,12 @@ export default function LobbyScreen() {
    *  Deklareras direkt efter state:n så även effekter ovanför render
    *  (dep-arrayer evalueras under render) kan läsa den utan TDZ. */
   const isSingleLobby = resolveSeedSinglePlayer(lobbyType, singlePlayerDefault);
+  // Guest host i SINGLE PLAYER — den låsta trial-vyn (grön sektionsram +
+  // hänglås-badge, inga Customized Host packages, Parent Control forcerad på,
+  // dolda kort-detaljer). Multiplayer guest host behåller den vanliga lobbyn
+  // (Peter 2026-09-11). OBS: Game Sequence-döljning och "alltid Full"-assistance
+  // gäller BÅDA lägena och gatas därför fortsatt på isGuestHost, inte denna.
+  const isGuestHostSingle = isGuestHost && isSingleLobby;
 
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   // Lobby-local state; speglar Profile:s host-default-toggle.
@@ -7137,6 +7140,7 @@ export default function LobbyScreen() {
                 hcpFilm={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.film : player.hcpFilm)}
                 hcpSport={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.sport : player.hcpSport)}
                 hcpNotDefined={player.type === 'guest'}
+                hideDetails={isGuestHost}
                 accountPlayerName={player.accountPlayerName}
                 turnNumber={
                   // Turnummer bara i PtP-MULTIPLAYER. Single kör PtP under
@@ -7204,6 +7208,7 @@ export default function LobbyScreen() {
                     hcpFilm={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.film : player.hcpFilm)}
                     hcpSport={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.sport : player.hcpSport)}
                     hcpNotDefined={player.type === 'guest'}
+                    hideDetails={isGuestHost}
                     accountPlayerName={player.accountPlayerName}
                     showApproveToggle={hostMode && !isRematchLobby && !player.hasLeft}
                     approved={false}
@@ -7283,10 +7288,21 @@ export default function LobbyScreen() {
             container. Ger semantiskt en "vad spelet ska spelas som"-sektion
             som visuellt skiljer sig från Players in Lobby nedanför. */}
         {gameSettingsExpanded && (
-        <View style={styles.gameSettingsBorder}>
+        <View style={[styles.gameSettingsBorder, isGuestHostSingle && styles.gameSettingsBorderGuest]}>
+        {/* Guest host SINGLE PLAYER: HELA Game Settings-sektionen får den gröna
+            låsta ramen (i stället för per-sektion grön box på mixerboarden), och
+            "DEFINED BY HOST"-badgen ersätts av hänglås-badgen — samma stil som
+            single-player-rutans lockBadge (Peter 2026-09-11). Multiplayer guest
+            host behåller den vanliga "DEFINED BY HOST"-vyn. */}
+        {isGuestHostSingle ? (
+        <View style={styles.guestLockBadge} pointerEvents="none">
+          <Text style={styles.guestLockBadgeText}>🔒</Text>
+        </View>
+        ) : (
         <View style={styles.definedByHostBadge} pointerEvents="none">
           <Text style={styles.definedByHostBadgeText}>DEFINED BY HOST</Text>
         </View>
+        )}
         {/* ── Game Mode ─────────────────────────────────────────── */}
         {/* Visas för alla i lobbyn, men kan bara *ändras* av host. För icke-host
             döljs FREE/PREMIUM-badges (de är host-relevanta paketdetaljer) och
@@ -7468,10 +7484,14 @@ export default function LobbyScreen() {
               >
                 {/* Stängt hänglås — läget är LÅST för lobbyns livstid (single
                     väljs på Home / vid replay och kan inte bytas här). Samma
-                    signal som re-match-rutan (Peter 2026-08-28). */}
+                    signal som re-match-rutan (Peter 2026-08-28). Döljs för guest
+                    host — låst-signalen bärs där av den gröna sektionsramen +
+                    dess hänglås-badge (Peter 2026-09-11). */}
+                {!isGuestHost && (
                 <View style={styles.lockBadge} pointerEvents="none">
                   <Text style={styles.lockBadgeText}>🔒</Text>
                 </View>
+                )}
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
                   Single player — 1 player
                 </Text>
@@ -7631,7 +7651,10 @@ export default function LobbyScreen() {
                 YouTube → Hints), se mockup. Öppnas här, stängs efter paket-
                 boarden. Spotify-blockets egen bg är borttagen så ramen blir en
                 enda enhetlig box i stället för en nästlad ruta. */}
-            <View style={styles.mixerboardBox}>
+            {/* Guest host SINGLE PLAYER: yttre grå boxen blir borderless — den
+                gröna låsta ramen sitter runt HELA Game Settings-sektionen. I
+                multiplayer guest host (och för alla andra) behålls den grå ramen. */}
+            <View style={[styles.mixerboardBox, isGuestHostSingle && styles.mixerboardBoxGuest]}>
             {gameMode !== 'remote-1v1' && !isSingleLobby && (
             <View style={{ marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
             {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
@@ -8033,19 +8056,22 @@ export default function LobbyScreen() {
               </View>
               <Switch
                 value={parentControlEnabled}
-                onValueChange={hostMode ? setParentControlEnabled : undefined}
-                disabled={!hostMode}
+                onValueChange={hostMode && !isGuestHost ? setParentControlEnabled : undefined}
+                disabled={!hostMode || isGuestHost}
                 trackColor={{ false: '#3C3C3C', true: Colors.success }}
                 thumbColor="#FFF"
                 ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
-                style={[styles.connectionSwitch, { marginLeft: 0 }, !hostMode && { opacity: 0.6 }]}
+                style={[styles.connectionSwitch, { marginLeft: 0 }, (!hostMode || isGuestHost) && { opacity: 0.6 }]}
               />
             </View>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
                 Basic-utbudet är alltid implicit aktivt (ingen synlig chip);
                 hosten kan välja till köpta Extra packages ovanpå. För
-                icke-host visas allt read-only (disabled på TouchableOpacity). */}
+                icke-host visas allt read-only (disabled på TouchableOpacity).
+                Döljs HELT för guest host (2026-09-11) — en guest kan aldrig
+                aktivera paket, så hela blocket är brus (single + multiplayer). */}
+            {!isGuestHost && (
             <View style={styles.usePackagesBlock}>
               {/* Rubrik-rad: section label vänster + info-ikon höger som
                   förklarar Generic vs Extra Host Packages. Info-ikonen
@@ -8372,6 +8398,7 @@ export default function LobbyScreen() {
               </View>
               )}
             </View>
+            )}
           </View>
         </View>
         </View>
@@ -8740,7 +8767,10 @@ export default function LobbyScreen() {
 
             {/* Game Sequence — ruta per rund med medie-källa och kategori.
                 Speglar quiz.tsx:s 3-pool-logik baserat på aktuella inställningar.
-                Synlig för alla (host + non-host) som read-only feedback. */}
+                Synlig för alla (host + non-host) som read-only feedback. Döljs
+                HELT för guest host — både single player och multiplayer (Peter
+                2026-09-11). */}
+            {!isGuestHost && (
             <View>
               <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Game Sequence</Text>
@@ -8812,6 +8842,7 @@ export default function LobbyScreen() {
               </View>
               )}
             </View>
+            )}
 
             {/* Answer response time */}
             <View>
@@ -10553,6 +10584,32 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     gap: Spacing.lg,
   },
+  // Guest host: grön låst ram runt hela Game Settings-sektionen (ersätter
+  // per-sektion-grön på mixerboarden). Hänglås-badgen sitter i top-right där
+  // "DEFINED BY HOST" annars sitter.
+  gameSettingsBorderGuest: {
+    borderColor: Colors.success,
+    borderWidth: 2,
+  },
+  // Kant-skärande hänglås-badge i Game Settings-sektionens övre högra hörn —
+  // IDENTISK stil med single-player-rutans lockBadge (opak cardElevated-
+  // fyllning + blå Colors.primary-kant), positionerad som definedByHostBadge.
+  guestLockBadge: {
+    position: 'absolute',
+    top: -10,
+    right: Spacing.md,
+    backgroundColor: Colors.cardElevated,
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    zIndex: 10,
+    elevation: 4,
+  },
+  guestLockBadgeText: {
+    fontSize: 11,
+  },
 
   // Quiz Settings — speglar gameSettingsBorder. Game Era + Number of
   // Rounds samlas i en gemensam ram så de visuellt läses som en grupp
@@ -11278,6 +11335,11 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.xs,
     marginBottom: Spacing.sm,
+  },
+  // Guest host: yttre mixerboard-boxen blir borderless — den gröna låsta ramen
+  // sitter i stället runt HELA Game Settings-sektionen (gameSettingsBorderGuest).
+  mixerboardBoxGuest: {
+    borderWidth: 0,
   },
   // Grått streck inuti mixerboarden mellan Spotify-delen och YouTube-delen.
   mixerboardDivider: {

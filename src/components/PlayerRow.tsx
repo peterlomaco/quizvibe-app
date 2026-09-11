@@ -85,6 +85,10 @@ interface PlayerRowProps {
   hcpMusic?: number;
   hcpFilm?: number;
   hcpSport?: number;
+  // När true döljs "Details"-toggeln OCH Assistance/Age-pillarna helt.
+  // Används för guest-host-kortet (en låst trial-upplevelse — gästen har
+  // alltid Full assistance och ingen HCP, så detaljerna är brus).
+  hideDetails?: boolean;
 }
 
 export function PlayerRow({
@@ -115,6 +119,7 @@ export function PlayerRow({
   hcpMusic,
   hcpFilm,
   hcpSport,
+  hideDetails,
 }: PlayerRowProps) {
   // "Details +/-"-toggle per spelarkort — gömmer Assistance + Age-pillarna
   // tills man fäller ut. Default hopfällt (Details +).
@@ -288,8 +293,9 @@ export function PlayerRow({
               </Text>
             </View>
           ) : null}
-          {/* "Details +/-"-toggle — fäller ut/in Assistance + Age-pillarna nedan. */}
-          {hasDetails && (
+          {/* "Details +/-"-toggle — fäller ut/in Assistance + Age-pillarna nedan.
+              Döljs helt för guest-host-kortet (hideDetails). */}
+          {!hideDetails && hasDetails && (
             <Pressable
               onPress={() => setDetailsExpanded((v) => !v)}
               hitSlop={6}
@@ -351,7 +357,7 @@ export function PlayerRow({
               parent). När onEditPlayer saknas (non-host-vy) renderas
               pillarna utan Pressable så de bara visar info. */}
           <View style={[styles.hcpRowLeft, metaIndent > 0 && { marginLeft: metaIndent }]}>
-            {detailsExpanded && (onEditPlayer ? (
+            {!hideDetails && detailsExpanded && (onEditPlayer ? (
               <Pressable
                 onPress={onEditPlayer}
                 hitSlop={6}
