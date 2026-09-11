@@ -166,6 +166,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "king-kong-1933",
+    "displayName": "King Kong",
+    "correctYear": 1933,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "o-7BF7f5lZA",
+        "startSec": 90,
+        "endSec": 120,
+        "channelTitle": "Slim Shady",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'King Kong original trailer' — inget ar. Privat kanal, takedown-risk."
+      }
+    ]
+  },
+  {
     "id": "cole-porter-anything-goes",
     "displayName": "Anything Goes — Cole Porter",
     "correctYear": 1934,
@@ -190,6 +218,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Cole Porter - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
+      }
+    ]
+  },
+  {
+    "id": "snow-white-1937",
+    "displayName": "Snow White and the Seven Dwarfs",
+    "correctYear": 1937,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nSgngZ9CpTM",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Ika1rutan",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Svensk scen 'The Silly Song (Swedish)'. Ingen ar-spoiler i titeln. Privat kanal — hog takedown-/embed-block-risk, kontrollera nightly-validate."
       }
     ]
   },
@@ -1080,6 +1136,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "west-side-story-1961",
+    "displayName": "West Side Story",
+    "correctYear": 1961,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "IakulTGwc0U",
+        "startSec": 13,
+        "endSec": 43,
+        "channelTitle": "wormontheweb",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'West Side Story HD Trailer' — inget ar. ANTAGET 1961 (klassikern). Om klippet ar 2021 (Spielberg): andra correctYear till 2021. Privat kanal, takedown-risk."
+      }
+    ]
+  },
+  {
     "id": "beach-boys-surfin-safari",
     "displayName": "Surfin' Safari — The Beach Boys",
     "correctYear": 1962,
@@ -1245,6 +1329,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Frank Sinatra - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "goldfinger-1964",
+    "displayName": "Goldfinger",
+    "correctYear": 1964,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "KdQoSK9wibU",
+        "startSec": 30,
+        "endSec": 60,
+        "channelTitle": "acool3k2010",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'Goldfinger Trailer' — inget ar. Privat kanal, takedown-risk."
       }
     ]
   },
@@ -1470,6 +1582,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Simon & Garfunkel - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "the-sound-of-music-1965",
+    "displayName": "The Sound of Music",
+    "correctYear": 1965,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ygyK0HStjwg",
+        "startSec": 2,
+        "endSec": 32,
+        "channelTitle": "Park Circus",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Park Circus (rattighetsdistributor) 4K-restaurering, ingen ar-spoiler."
       }
     ]
   },
@@ -2807,7 +2947,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 45,
         "channelTitle": "Paramount Pictures",
         "license": "standard",
-        "notes": "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener."
+        "notes": "Paramount Pictures 50th Anniversary trailer — Nino Rota theme + iconic scener. OBS: parat med 'the-godfather-1972' (Year/global, annat klipp) som lades till 2026-09-11 — detta ar Name/sweden."
+      }
+    ]
+  },
+  {
+    "id": "the-godfather-1972",
+    "displayName": "The Godfather",
+    "correctYear": 1972,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "UJU7IoXmZ9s",
+        "startSec": 15,
+        "endSec": 45,
+        "channelTitle": "Christian J Romero",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Andra Godfather-item: detta ar Year/global, samexisterar med det befintliga 'the-godfather' (Name/sweden). Titel 'The Godfather | Modern Trailer | 4k' — inget ar. OBS: fan-gjord 'Modern Trailer' pa privat kanal (ej rattsinnehavare), takedown-risk — samma klass som citizen-kane-1941. parentControlled=true per Film.xlsx."
       }
     ]
   },
@@ -3630,6 +3799,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "monty-python-holy-grail-1975",
+    "displayName": "Monty Python and the Holy Grail",
+    "correctYear": 1975,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "John Cleese",
+      "Graham Chapman"
+    ],
+    "distractorNames": [
+      "Rowan Atkinson",
+      "Hugh Grant",
+      "Michael Caine",
+      "Gene Hackman"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "67yCrKqAPQk",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "HD Retro Trailers",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Titeln 'Monty Python and the Holy Grail (1975) Original Trailer' innehaller aret; kord som Name sa aret inte ar svaret (svar = John Cleese/Graham Chapman, ingen skadespelare i titeln). Fan/aggregator-kanal, takedown-risk."
+      }
+    ]
+  },
+  {
     "id": "teach-in-ding-a-dong",
     "displayName": "Ding-a-dong — Teach-In",
     "correctYear": 1975,
@@ -3878,6 +4086,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Amazon MGM Studios",
         "license": "standard",
         "notes": "MGM Official trailer — Bill Conti's Gonna Fly Now-tema + training-montage."
+      }
+    ]
+  },
+  {
+    "id": "taxi-driver-1976",
+    "displayName": "Taxi Driver",
+    "correctYear": 1976,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "oTbYR-ETFBQ",
+        "startSec": 38,
+        "endSec": 68,
+        "channelTitle": "Wiziwiz",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'TAXI DRIVER in 4K Trailer - Robert De Niro' — inget ar (namner skadespelare, ok for Year-fraga). Taxi Driver ar en R-vald valdsfilm; overvag parentControlled (ej markt av Peter). Privat kanal, takedown-risk."
       }
     ]
   },
@@ -5569,6 +5805,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "blade-runner-1982",
+    "displayName": "Blade Runner",
+    "correctYear": 1982,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "kTaewJomjAo",
+        "startSec": 60,
+        "endSec": 90,
+        "channelTitle": "GameSpot Universe Trailers",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Klippet ar 'The Final Cut' (2007 restaurering) men correctYear=1982 = originalfilmen per ar-policy. Titeln namner skadespelare men inte aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "chips-dag-efter-dag",
     "displayName": "Dag efter dag — Chips",
     "correctYear": 1982,
@@ -6520,6 +6784,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "George Michael - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "ghostbusters-1984",
+    "displayName": "Ghostbusters",
+    "correctYear": 1984,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Bill Murray",
+      "Dan Aykroyd"
+    ],
+    "distractorNames": [
+      "Eddie Murphy",
+      "Chevy Chase",
+      "Steve Martin",
+      "John Candy"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "710w9M1n2KM",
+        "startSec": 25,
+        "endSec": 55,
+        "channelTitle": "Cine Trailer",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Titeln 'Ghostbusters 1984 Trailer 4K' innehaller aret men INTE nagon skadespelare — fr33gan ar Name (svaret = Bill Murray/Dan Aykroyd), sa aret spoilar inte. Aggregator-kanal, takedown-risk."
       }
     ]
   },
@@ -8670,6 +8973,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-naked-gun-1988",
+    "displayName": "The Naked Gun",
+    "correctYear": 1988,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Leslie Nielsen"
+    ],
+    "distractorNames": [
+      "Chevy Chase",
+      "Steve Martin",
+      "John Cleese",
+      "Bill Murray"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ocxp2kns6jw",
+        "startSec": 4,
+        "endSec": 34,
+        "channelTitle": "TrailerHome",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1988 star i titeln). OBS: titeln namner ocksa 'Leslie Nielsen' (= svaret) men vid ~tecken 55, forbi spelarens titel-trunkering (samma grund som the-good-the-bad-and-the-ugly). VERIFIERA i spelaren att namnet inte syns; byt annars klipp eller satt correctNames till en huvudroll som inte star i titeln."
+      }
+    ]
+  },
+  {
     "id": "thomas-di-leva-vi-har-bara-varandra",
     "displayName": "Vi har bara varandra — Thomas Di Leva",
     "correctYear": 1988,
@@ -9729,6 +10070,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "when-harry-met-sally-1989",
+    "displayName": "When Harry Met Sally…",
+    "correctYear": 1989,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "LO0Oe-sdG4g",
+        "startSec": 7,
+        "endSec": 37,
+        "channelTitle": "Billy Barnell",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). VARNING: titeln 'When Harry Met Sally... | New Trailer 2020' visar '2020' (aterutgivningsar) men RATT SVAR ar 1989 — en spelare som laser titeln kan svara fel. VERIFIERA i spelaren; byt klipp om '2020' syns. parentControlled=true per Film.xlsx. Privat kanal, takedown-risk."
+      }
+    ]
+  },
+  {
     "id": "acdc-thunderstruck",
     "displayName": "Thunderstruck — AC/DC",
     "correctYear": 1990,
@@ -10094,6 +10464,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1990 vinnare — Italien."
+      }
+    ]
+  },
+  {
+    "id": "beauty-and-the-beast-1991",
+    "displayName": "Skönheten och odjuret",
+    "correctYear": 1991,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "gz4iE2kzgyg",
+        "startSec": 21,
+        "endSec": 51,
+        "channelTitle": "Bella Y Bestia Son",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). VARNING: titeln 'Skönheten och odjuret: Trailer (2010)' visar '2010' (svensk aterutgivning) men RATT SVAR ar 1991 (originalfilmen, animerad) per ar-policy — en spelare som laser titeln kan svara fel. VERIFIERA i spelaren; byt klipp om '2010' syns."
       }
     ]
   },
@@ -10573,6 +10971,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SpinDoctorsVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "the-naked-gun-2-5-1991",
+    "displayName": "The Naked Gun 2½: The Smell of Fear",
+    "correctYear": 1991,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Leslie Nielsen"
+    ],
+    "distractorNames": [
+      "Chevy Chase",
+      "Steve Martin",
+      "John Cleese",
+      "Bill Murray"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EW66cjw-3xI",
+        "startSec": 4,
+        "endSec": 34,
+        "channelTitle": "Trailer World",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1991 star i titeln). OBS: titeln namner 'Leslie Nielsen' (= svaret) vid ~tecken 55, forbi trunkeringen. VERIFIERA i spelaren; byt annars klipp/correctNames."
       }
     ]
   },
@@ -12913,6 +13349,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "toy-story-1995",
+    "displayName": "Toy Story",
+    "correctYear": 1995,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "CxwTLktovTU",
+        "startSec": 20,
+        "endSec": 50,
+        "channelTitle": "Disney Plus",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Officiell Disney+ 'Toy Story | Original Trailer' — ingen ar-spoiler."
+      }
+    ]
+  },
+  {
     "id": "b-real-hit-em-high",
     "displayName": "Hit 'Em High — B-Real, Busta Rhymes, Coolio",
     "correctYear": 1996,
@@ -13098,6 +13562,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ErosRamazzottiVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "fargo-1996",
+    "displayName": "Fargo",
+    "correctYear": 1996,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Frances McDormand"
+    ],
+    "distractorNames": [
+      "Holly Hunter",
+      "Laura Dern",
+      "Susan Sarandon",
+      "Sharon Stone"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "h2tY82z3xXU",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "Rotten Tomatoes Classic Trailers",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1996 star i titeln). Titeln namner 'Steve Buscemi' men svaret ar Frances McDormand (huvudrollen, ej i titeln) — sa ingen spoiler. Fargo ar en R-vald valdsfilm; overvag parentControlled (ej markt av Peter)."
       }
     ]
   },
@@ -15563,6 +16065,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "crouching-tiger-hidden-dragon-2000",
+    "displayName": "Crouching Tiger, Hidden Dragon",
+    "correctYear": 2000,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "q-HrIQLdaNE",
+        "startSec": 46,
+        "endSec": 76,
+        "channelTitle": "Sony Pictures Classics",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Officiell Sony Pictures Classics-trailer, ingen ar-spoiler i titeln."
+      }
+    ]
+  },
+  {
     "id": "gladiator-2000",
     "displayName": "Gladiator",
     "correctYear": 2000,
@@ -16693,6 +17223,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "spider-man-2002",
+    "displayName": "Spider-Man",
+    "correctYear": 2002,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Tobey Maguire"
+    ],
+    "distractorNames": [
+      "Andrew Garfield",
+      "Tom Holland",
+      "Elijah Wood",
+      "Heath Ledger"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "t06RUxPbp_c",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Sony Pictures Entertainment",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Officiell Sony-trailer 'SPIDER-MAN [2002] Official Trailer' — titeln avslojar ar men INTE skadespelare (svaret = Tobey Maguire). Distraktorerna Garfield/Holland ar andra Spider-Man-skadespelare = klurigt."
+      }
+    ]
+  },
+  {
     "id": "50-cent-in-da-club",
     "displayName": "In da Club — 50 Cent",
     "correctYear": 2003,
@@ -16808,6 +17376,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Saskia Rice",
         "license": "standard",
         "notes": "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
+      }
+    ]
+  },
+  {
+    "id": "lost-in-translation-2003",
+    "displayName": "Lost in Translation",
+    "correctYear": 2003,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "g_maEh38ZTw",
+        "startSec": 8,
+        "endSec": 38,
+        "channelTitle": "Ondreia Pedraza",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'Lost In Translation - Official Trailer HD' — inget ar. Privat kanal, takedown-risk."
       }
     ]
   },
@@ -20702,6 +21298,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-avengers-2012",
+    "displayName": "The Avengers",
+    "correctYear": 2012,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "eOrNdBpGMv8",
+        "startSec": 7,
+        "endSec": 37,
+        "channelTitle": "Marvel Entertainment",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Officiell Marvel-trailer, ingen ar-spoiler. parentControlled=true per Film.xlsx."
+      }
+    ]
+  },
+  {
     "id": "avicii-hey-brother",
     "displayName": "Hey Brother — Avicii",
     "correctYear": 2013,
@@ -21662,6 +22287,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 242,
         "channelTitle": "Taylor Swift",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "the-grand-budapest-hotel-2014",
+    "displayName": "The Grand Budapest Hotel",
+    "correctYear": 2014,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Ralph Fiennes"
+    ],
+    "distractorNames": [
+      "Colin Firth",
+      "Hugh Grant",
+      "Ewan McGregor",
+      "Edward Norton"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zru-1DbbcsA",
+        "startSec": 6,
+        "endSec": 36,
+        "channelTitle": "FilmIsNow Movies",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 2014 star i titeln, ingen skadespelare). OBS: detta ar en RED BAND-trailer (moget innehall) — Peter markerade INTE parentControlled i Film.xlsx, men overvag det. Ralph Fiennes = huvudroll, ej i titeln."
       }
     ]
   },

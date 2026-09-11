@@ -169,3 +169,48 @@ items:
         endSec: 25
         channelTitle: "Zero Media"
         notes: "Scen: Judy Hopps anländer till Zootopia — Try Everything (Shakira) i bakgrunden. HD trailer."
+
+  # === Tillägg 2026-09-11 (Peters Film.xlsx) ===
+
+  - id: snow-white-1937
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Snow White and the Seven Dwarfs"
+    correctYear: 1937
+    probability: 84
+    wikimediaSearchHints: ["Snow White and the Seven Dwarfs 1937 Disney animated"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nSgngZ9CpTM"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Ika1rutan"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Svensk scen 'The Silly Song (Swedish)'. Ingen ar-spoiler i titeln. Privat kanal — hog takedown-/embed-block-risk, kontrollera nightly-validate."
+
+  - id: toy-story-1995
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Toy Story"
+    correctYear: 1995
+    probability: 90
+    region: ["global"]
+    wikimediaSearchHints: ["Toy Story 1995 Pixar animated Woody Buzz Lightyear"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "CxwTLktovTU"
+        startSec: 20
+        endSec: 50
+        channelTitle: "Disney Plus"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Officiell Disney+ 'Toy Story | Original Trailer' — ingen ar-spoiler."
+
+  - id: beauty-and-the-beast-1991
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Skönheten och odjuret"
+    correctYear: 1991
+    probability: 84
+    wikimediaSearchHints: ["Beauty and the Beast 1991 Disney animated"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "gz4iE2kzgyg"
+        startSec: 21
+        endSec: 51
+        channelTitle: "Bella Y Bestia Son"
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). VARNING: titeln 'Skönheten och odjuret: Trailer (2010)' visar '2010' (svensk aterutgivning) men RATT SVAR ar 1991 (originalfilmen, animerad) per ar-policy — en spelare som laser titeln kan svara fel. VERIFIERA i spelaren; byt klipp om '2010' syns."
