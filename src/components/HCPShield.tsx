@@ -135,6 +135,10 @@ export function HCPShield({ hcp, size = 100, notDefined = false, opaque = false 
       ]}
     >
       <Svg width={w} height={h}>
+        {/* Skenande kantlinje: en bredare, halvgenomskinlig stroke bakom den
+            skarpa kanten bildar en mjuk gloria längs kanten. */}
+        <Path d={d} stroke={tier.stroke} strokeWidth={7} fill="none" opacity={0.35} />
+        <Path d={d} stroke={tier.stroke} strokeWidth={4.5} fill="none" opacity={0.55} />
         <Path d={d} stroke={tier.stroke} strokeWidth={2.5} fill={fillColor} />
       </Svg>
 
