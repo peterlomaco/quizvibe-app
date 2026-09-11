@@ -73,6 +73,27 @@ export function monthLabelForKey(key: string): string {
   return d.toLocaleString('en', { month: 'long', year: 'numeric' });
 }
 
+export function dateKeyForDate(iso: string): string {
+  // YYYY-MM-DD ur ISO. Samma format-skydd som monthKeyForDate.
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 'unknown';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+    d.getDate(),
+  ).padStart(2, '0')}`;
+}
+
+export function dateLabelForKey(key: string): string {
+  // 'YYYY-MM-DD' → '11 Sep 2026'. Date(year, month-1, day) → lokal formatterare.
+  const [y, m, dd] = key.split('-').map(Number);
+  if (!y || !m || !dd) return key;
+  const d = new Date(y, m - 1, dd);
+  return d.toLocaleDateString('en', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 // ── Två-nivå-gruppering ────────────────────────────────────────────────────
 
 export interface GroupAccessors<T> {
@@ -95,6 +116,19 @@ export interface L1Group<T> {
   l1Key: string;
   l1Label: string;
   forms: FormGroup<T>[];
+}
+
+// Tre-nivå (bara Date-läget i Marathon-listan): månad → datum → spelform.
+export interface DateGroup<T> {
+  dateKey: string; // YYYY-MM-DD
+  dateLabel: string; // "11 Sep 2026"
+  forms: FormGroup<T>[];
+}
+
+export interface MonthDateGroup<T> {
+  monthKey: string; // YYYY-MM
+  monthLabel: string; // "September 2026"
+  dates: DateGroup<T>[];
 }
 
 const UNKNOWN_HOST_KEY = '__unknown_host__';
@@ -214,4 +248,85 @@ export function groupHistory<T>(
     }
     return { l1Key, l1Label: bucket.label, forms };
   });
+}
+
+/** Bucketa items på spelform i fast GAME_FORM_ORDER; tomma hinkar slängs. */
+function bucketByForm<T>(items: T[], acc: GroupAccessors<T>): FormGroup<T>[] {
+  const formMap = new Map<GameFormKey, { label: string; items: T[] }>();
+  for (const item of items) {
+    const form = acc.getGameForm(item);
+    let fb = formMap.get(form.key);
+    if (!fb) {
+      fb = { label: form.label, items: [] };
+      formMap.set(form.key, fb);
+    }
+    fb.items.push(item);
+  }
+  const forms: FormGroup<T>[] = [];
+  for (const fk of GAME_FORM_ORDER) {
+    const fb = formMap.get(fk);
+    if (fb && fb.items.length > 0) {
+      forms.push({ formKey: fk, formLabel: fb.label, items: fb.items });
+    }
+  }
+  return forms;
+}
+
+/**
+ * Tre-nivå-gruppering för Marathon-listans Date-läge: månad → datum → spelform.
+ * Månader OCH datum nyast först ("Unknown date" sist på båda nivåerna),
+ * spelform i fast GAME_FORM_ORDER. Leaf-ordningen bevaras (anropare skickar
+ * redan nyast först). Bara SavedAggregatesCard använder den — `groupHistory`
+ * (två-nivå) är orörd för host/name-lägena och PlayerHistorySection.
+ */
+export function groupHistoryByMonthDateForm<T>(
+  items: T[],
+  acc: GroupAccessors<T>,
+): MonthDateGroup<T>[] {
+  const monthMap = new Map<
+    string,
+    { label: string; dates: Map<string, { label: string; items: T[] }> }
+  >();
+  for (const item of items) {
+    const iso = acc.getDateISO(item);
+    const mk = iso ? monthKeyForDate(iso) : UNKNOWN_DATE_KEY;
+    const dk = iso ? dateKeyForDate(iso) : UNKNOWN_DATE_KEY;
+    let month = monthMap.get(mk);
+    if (!month) {
+      month = {
+        label: mk !== UNKNOWN_DATE_KEY ? monthLabelForKey(mk) : 'Unknown date',
+        dates: new Map(),
+      };
+      monthMap.set(mk, month);
+    }
+    let date = month.dates.get(dk);
+    if (!date) {
+      date = {
+        label: dk !== UNKNOWN_DATE_KEY ? dateLabelForKey(dk) : 'Unknown date',
+        items: [],
+      };
+      month.dates.set(dk, date);
+    }
+    date.items.push(item);
+  }
+
+  const byKeyDesc = (
+    [ka]: [string, unknown],
+    [kb]: [string, unknown],
+  ): number => {
+    const au = ka === UNKNOWN_DATE_KEY;
+    const bu = kb === UNKNOWN_DATE_KEY;
+    if (au !== bu) return au ? 1 : -1; // Unknown sist
+    return kb.localeCompare(ka); // nyast först
+  };
+
+  return [...monthMap.entries()].sort(byKeyDesc).map(([monthKey, month]) => ({
+    monthKey,
+    monthLabel: month.label,
+    dates: [...month.dates.entries()].sort(byKeyDesc).map(([dateKey, date]) => ({
+      dateKey,
+      dateLabel: date.label,
+      forms: bucketByForm(date.items, acc),
+    })),
+  }));
 }

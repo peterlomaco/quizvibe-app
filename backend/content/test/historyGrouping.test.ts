@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import {
   GAME_FORM_ORDER,
   groupHistory,
+  groupHistoryByMonthDateForm,
   monthKeyForDate,
   monthLabelForKey,
   resolveGameForm,
@@ -179,5 +180,39 @@ describe('groupHistory — date mode', () => {
   it('tom input → tom output', () => {
     expect(groupHistory([], 'date', acc)).toEqual([]);
     expect(groupHistory([], 'host', acc)).toEqual([]);
+  });
+});
+
+describe('groupHistoryByMonthDateForm — tre-nivå (månad → datum → spelform)', () => {
+  it('grupperar per månad → datum → spelform, nyast först, Unknown sist', () => {
+    const items: Item[] = [
+      { id: 'a', date: '2026-05-18T10:00:00Z', gameMode: 'pass-the-phone' },
+      { id: 'b', date: '2026-05-18T14:00:00Z', single: true },
+      { id: 'c', date: '2026-05-02T10:00:00Z', gameMode: 'individual-devices' },
+      { id: 'd', date: '2026-06-01T10:00:00Z', gameMode: 'pass-the-phone' },
+      { id: 'e', date: 'garbage', gameMode: 'pass-the-phone' },
+    ];
+    const months = groupHistoryByMonthDateForm(items, acc);
+    // Månader nyast först, Unknown date sist.
+    expect(months.map((m) => m.monthLabel)).toEqual([
+      'June 2026',
+      'May 2026',
+      'Unknown date',
+    ]);
+    // Maj: två datum, nyast (18) före äldre (2). Label-formatet följer
+    // värdmiljöns toLocaleDateString; ordningen är det vi låser här.
+    const may = months[1];
+    expect(may.dates.map((d) => d.dateKey)).toEqual(['2026-05-18', '2026-05-02']);
+    // 18 maj har två spelformer i fast ordning (single-player före pass-the-phone).
+    const may18 = may.dates[0];
+    expect(may18.forms.map((f) => f.formKey)).toEqual([
+      'single-player',
+      'pass-the-phone',
+    ]);
+    expect(may18.forms[1].items.map((i) => i.id)).toEqual(['a']);
+  });
+
+  it('tom input → tom output', () => {
+    expect(groupHistoryByMonthDateForm([], acc)).toEqual([]);
   });
 });

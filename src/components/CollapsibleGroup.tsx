@@ -21,7 +21,9 @@ export function CollapsibleGroup({
 }: {
   label: string;
   summary?: string;
-  level: 1 | 2;
+  /** 1 = host/månad (bold, 26-box), 2 = spelform (uppercase, indrag),
+   *  3 = datum-mellannivå i Date-läget (läsbar, indrag). */
+  level: 1 | 2 | 3;
   open: boolean;
   onToggle: () => void;
   children: React.ReactNode;
@@ -30,14 +32,18 @@ export function CollapsibleGroup({
   badge?: React.ReactNode;
 }) {
   const isL1 = level === 1;
+  const groupStyle =
+    level === 1 ? styles.groupL1 : level === 3 ? styles.groupL3 : styles.groupL2;
+  const labelStyle =
+    level === 1 ? styles.labelL1 : level === 3 ? styles.labelL3 : styles.labelL2;
   return (
-    <View style={isL1 ? styles.groupL1 : styles.groupL2}>
+    <View style={groupStyle}>
       <Pressable
         onPress={onToggle}
         style={({ pressed }) => [styles.header, pressed && { opacity: 0.7 }]}
         hitSlop={6}
       >
-        <Text style={isL1 ? styles.labelL1 : styles.labelL2} numberOfLines={1}>
+        <Text style={labelStyle} numberOfLines={1}>
           {label}
         </Text>
         {summary ? (
@@ -63,6 +69,14 @@ const styles = StyleSheet.create({
   groupL1: { gap: Spacing.xs },
   // Level 2 (spelform) dras in något så nästlingen läses visuellt.
   groupL2: { gap: Spacing.xs, paddingLeft: Spacing.md },
+  // Level 3 (datum-mellannivå i Date-läget) — samma indrag som L2; nästlas
+  // inuti månaden, och spelform-L2:orna inuti får sitt eget indrag ovanpå.
+  groupL3: { gap: Spacing.xs, paddingLeft: Spacing.md },
+  labelL3: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

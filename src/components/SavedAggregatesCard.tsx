@@ -20,7 +20,9 @@ import { getAvatarEmojiById } from '../utils/avatars';
 import { loadFriends, type Friend } from '../utils/friendsStorage';
 import {
   groupHistory,
+  groupHistoryByMonthDateForm,
   resolveGameForm,
+  type GroupAccessors,
   type SortMode,
 } from '../utils/historyGrouping';
 import { CollapsibleGroup } from './CollapsibleGroup';
@@ -90,6 +92,8 @@ export function SavedAggregatesCard({
   const [openId, setOpenId] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('date');
   const [expandedL1, setExpandedL1] = useState<Set<string>>(new Set());
+  // Date-lägets mellannivå (månad::datum). Oanvänd i host/name-lägena.
+  const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
   const [expandedForms, setExpandedForms] = useState<Set<string>>(new Set());
   // Inloggade user:s uid — för "min egen som Host först" i host-sorten.
   const [selfHostId, setSelfHostId] = useState<string | null>(null);
@@ -189,26 +193,33 @@ export function SavedAggregatesCard({
     });
   }, [items, selectedFriends]);
 
+  const accessors = useMemo<GroupAccessors<SavedAggregate>>(
+    () => ({
+      getHostName: (it) =>
+        it.participants.find((p) => p.userId === it.createdBy)?.playerName,
+      getHostUserId: (it) => it.createdBy,
+      getDateISO: (it) => it.updatedAt ?? it.createdAt,
+      getName: (it) => it.name,
+      getGameForm: (it) =>
+        resolveGameForm(
+          it.latestSettings?.gameMode,
+          it.latestSettings?.singlePlayerDefault,
+        ),
+    }),
+    [],
+  );
+
+  const isDateSort = sortMode === 'date';
+
+  // Host/Name: två-nivå (l1 → spelform). Date: tre-nivå (månad → datum →
+  // spelform) via egen funktion — se render-grenen nedan.
   const groups = useMemo(
-    () =>
-      groupHistory(
-        visibleItems,
-        sortMode,
-        {
-          getHostName: (it) =>
-            it.participants.find((p) => p.userId === it.createdBy)?.playerName,
-          getHostUserId: (it) => it.createdBy,
-          getDateISO: (it) => it.updatedAt ?? it.createdAt,
-          getName: (it) => it.name,
-          getGameForm: (it) =>
-            resolveGameForm(
-              it.latestSettings?.gameMode,
-              it.latestSettings?.singlePlayerDefault,
-            ),
-        },
-        selfHostId,
-      ),
-    [visibleItems, sortMode, selfHostId],
+    () => (isDateSort ? [] : groupHistory(visibleItems, sortMode, accessors, selfHostId)),
+    [isDateSort, visibleItems, sortMode, accessors, selfHostId],
+  );
+  const dateGroups = useMemo(
+    () => (isDateSort ? groupHistoryByMonthDateForm(visibleItems, accessors) : []),
+    [isDateSort, visibleItems, accessors],
   );
 
   // Flash-guide: fäll ut gruppen + spelformen som håller de utpekade raderna
@@ -217,27 +228,46 @@ export function SavedAggregatesCard({
   // expand-effekten ovan så den mergar in målgrupperna i stället för att bli
   // överskriven.
   useEffect(() => {
-    if (!focusIds || focusIds.length === 0 || groups.length === 0) return;
+    if (!focusIds || focusIds.length === 0) return;
+    // Vänta tills den aktiva strukturen faktiskt laddats.
+    if (isDateSort ? dateGroups.length === 0 : groups.length === 0) return;
     const sig = focusIds.join(',');
     if (appliedFocusRef.current === sig) return;
     appliedFocusRef.current = sig;
     const ids = new Set(focusIds);
     setFlashIds(ids);
     const l1ToOpen = new Set<string>();
+    const datesToOpen = new Set<string>();
     const formsToOpen = new Set<string>();
-    for (const g of groups) {
-      for (const f of g.forms) {
-        if (f.items.some((it) => ids.has(it.id))) {
-          l1ToOpen.add(g.l1Key);
-          formsToOpen.add(`${g.l1Key}::${f.formKey}`);
+    if (isDateSort) {
+      // månad → datum → spelform
+      for (const m of dateGroups) {
+        for (const d of m.dates) {
+          for (const f of d.forms) {
+            if (f.items.some((it) => ids.has(it.id))) {
+              l1ToOpen.add(m.monthKey);
+              datesToOpen.add(`${m.monthKey}::${d.dateKey}`);
+              formsToOpen.add(`${m.monthKey}::${d.dateKey}::${f.formKey}`);
+            }
+          }
+        }
+      }
+    } else {
+      for (const g of groups) {
+        for (const f of g.forms) {
+          if (f.items.some((it) => ids.has(it.id))) {
+            l1ToOpen.add(g.l1Key);
+            formsToOpen.add(`${g.l1Key}::${f.formKey}`);
+          }
         }
       }
     }
     if (l1ToOpen.size > 0) {
       setExpandedL1((prev) => new Set([...prev, ...l1ToOpen]));
+      setExpandedDates((prev) => new Set([...prev, ...datesToOpen]));
       setExpandedForms((prev) => new Set([...prev, ...formsToOpen]));
     }
-  }, [focusIds, groups]);
+  }, [focusIds, groups, dateGroups, isDateSort]);
 
   // Radera en Marathon-tabell ur MIN historik (0052). Per-user: övriga
   // deltagare behåller den, men serien blir permanent olåsbar för re-match.
@@ -351,51 +381,139 @@ export function SavedAggregatesCard({
           </View>
         )}
       </View>
-      {selectedFriends.length > 0 && groups.length === 0 && (
-        <Text style={styles.emptyNote}>
-          No marathons where all selected players took part.
-        </Text>
-      )}
+      {selectedFriends.length > 0 &&
+        (isDateSort ? dateGroups.length === 0 : groups.length === 0) && (
+          <Text style={styles.emptyNote}>
+            No marathons where all selected players took part.
+          </Text>
+        )}
       <View style={styles.groups}>
-        {groups.map((g) => {
-          const total = g.forms.reduce((sum, f) => sum + f.items.length, 0);
-          const l1Flash = g.forms.some((f) =>
-            f.items.some((it) => flashIds.has(it.id)),
-          );
-          return (
-            <CollapsibleGroup
-              key={g.l1Key}
-              level={1}
-              label={g.l1Label}
-              summary={`${total} ${total === 1 ? 'marathon' : 'marathons'}`}
-              open={expandedL1.has(g.l1Key)}
-              onToggle={() => setExpandedL1((prev) => toggleSetKey(prev, g.l1Key))}
-              badge={l1Flash ? <NewUpdateBadge active /> : undefined}
-            >
-              {g.forms.map((f) => {
-                const formKey = `${g.l1Key}::${f.formKey}`;
-                const formFlash = f.items.some((it) => flashIds.has(it.id));
-                return (
-                  <CollapsibleGroup
-                    key={formKey}
-                    level={2}
-                    label={f.formLabel}
-                    summary={`${f.items.length} ${
-                      f.items.length === 1 ? 'marathon' : 'marathons'
-                    }`}
-                    open={expandedForms.has(formKey)}
-                    onToggle={() =>
-                      setExpandedForms((prev) => toggleSetKey(prev, formKey))
-                    }
-                    badge={formFlash ? <NewUpdateBadge active /> : undefined}
-                  >
-                    <View style={styles.rowList}>{f.items.map(renderRow)}</View>
-                  </CollapsibleGroup>
-                );
-              })}
-            </CollapsibleGroup>
-          );
-        })}
+        {isDateSort
+          ? // Tre-nivå: månad (level 1) → datum (level 3) → spelform (level 2).
+            dateGroups.map((m) => {
+              const monthTotal = m.dates.reduce(
+                (sum, d) =>
+                  sum + d.forms.reduce((s, f) => s + f.items.length, 0),
+                0,
+              );
+              const monthFlash = m.dates.some((d) =>
+                d.forms.some((f) => f.items.some((it) => flashIds.has(it.id))),
+              );
+              return (
+                <CollapsibleGroup
+                  key={m.monthKey}
+                  level={1}
+                  label={m.monthLabel}
+                  summary={`${monthTotal} ${
+                    monthTotal === 1 ? 'marathon' : 'marathons'
+                  }`}
+                  open={expandedL1.has(m.monthKey)}
+                  onToggle={() =>
+                    setExpandedL1((prev) => toggleSetKey(prev, m.monthKey))
+                  }
+                  badge={monthFlash ? <NewUpdateBadge active /> : undefined}
+                >
+                  {m.dates.map((d) => {
+                    const dateKey = `${m.monthKey}::${d.dateKey}`;
+                    const dateTotal = d.forms.reduce(
+                      (s, f) => s + f.items.length,
+                      0,
+                    );
+                    const dateFlash = d.forms.some((f) =>
+                      f.items.some((it) => flashIds.has(it.id)),
+                    );
+                    return (
+                      <CollapsibleGroup
+                        key={dateKey}
+                        level={3}
+                        label={d.dateLabel}
+                        summary={`${dateTotal} ${
+                          dateTotal === 1 ? 'marathon' : 'marathons'
+                        }`}
+                        open={expandedDates.has(dateKey)}
+                        onToggle={() =>
+                          setExpandedDates((prev) => toggleSetKey(prev, dateKey))
+                        }
+                        badge={dateFlash ? <NewUpdateBadge active /> : undefined}
+                      >
+                        {d.forms.map((f) => {
+                          const formKey = `${dateKey}::${f.formKey}`;
+                          const formFlash = f.items.some((it) =>
+                            flashIds.has(it.id),
+                          );
+                          return (
+                            <CollapsibleGroup
+                              key={formKey}
+                              level={2}
+                              label={f.formLabel}
+                              summary={`${f.items.length} ${
+                                f.items.length === 1 ? 'marathon' : 'marathons'
+                              }`}
+                              open={expandedForms.has(formKey)}
+                              onToggle={() =>
+                                setExpandedForms((prev) =>
+                                  toggleSetKey(prev, formKey),
+                                )
+                              }
+                              badge={
+                                formFlash ? <NewUpdateBadge active /> : undefined
+                              }
+                            >
+                              <View style={styles.rowList}>
+                                {f.items.map(renderRow)}
+                              </View>
+                            </CollapsibleGroup>
+                          );
+                        })}
+                      </CollapsibleGroup>
+                    );
+                  })}
+                </CollapsibleGroup>
+              );
+            })
+          : groups.map((g) => {
+              const total = g.forms.reduce((sum, f) => sum + f.items.length, 0);
+              const l1Flash = g.forms.some((f) =>
+                f.items.some((it) => flashIds.has(it.id)),
+              );
+              return (
+                <CollapsibleGroup
+                  key={g.l1Key}
+                  level={1}
+                  label={g.l1Label}
+                  summary={`${total} ${total === 1 ? 'marathon' : 'marathons'}`}
+                  open={expandedL1.has(g.l1Key)}
+                  onToggle={() =>
+                    setExpandedL1((prev) => toggleSetKey(prev, g.l1Key))
+                  }
+                  badge={l1Flash ? <NewUpdateBadge active /> : undefined}
+                >
+                  {g.forms.map((f) => {
+                    const formKey = `${g.l1Key}::${f.formKey}`;
+                    const formFlash = f.items.some((it) => flashIds.has(it.id));
+                    return (
+                      <CollapsibleGroup
+                        key={formKey}
+                        level={2}
+                        label={f.formLabel}
+                        summary={`${f.items.length} ${
+                          f.items.length === 1 ? 'marathon' : 'marathons'
+                        }`}
+                        open={expandedForms.has(formKey)}
+                        onToggle={() =>
+                          setExpandedForms((prev) => toggleSetKey(prev, formKey))
+                        }
+                        badge={formFlash ? <NewUpdateBadge active /> : undefined}
+                      >
+                        <View style={styles.rowList}>
+                          {f.items.map(renderRow)}
+                        </View>
+                      </CollapsibleGroup>
+                    );
+                  })}
+                </CollapsibleGroup>
+              );
+            })}
       </View>
 
       <Modal
