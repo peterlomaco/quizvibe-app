@@ -40,6 +40,7 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Alert,
   type LayoutChangeEvent,
   Modal,
   SafeAreaView,
@@ -52,8 +53,14 @@ import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 
 import { TopUserBanner } from '../components/TopUserBanner';
 import { BOTTOM_BANNER_HEIGHT } from '../components/BottomBanner';
+import {
+  finalizeRows,
+  LeaderboardTable,
+  type LeaderboardRow,
+} from '../components/LeaderboardTable';
 import { NewUpdateBadge } from '../components/NewUpdateBadge';
 import { RemoteMatchResultPanel } from '../components/RemoteMatchResultPanel';
+import type { AssistanceLevel } from '../components/RoundLeaderboard';
 import { VersusIcon } from '../components/VersusIcon';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
@@ -61,9 +68,11 @@ import { getLobbyPlayers } from '../utils/mockLobbyPlayers';
 import { getRoomMeta } from '../utils/mockActiveRooms';
 import {
   buildRemoteQuizParams,
+  dismissRemoteMatchesWithOpponent,
   formatPlayerLabel,
   getMyAnsweredMatchIds,
   getMyMatches,
+  type RemoteMatch,
   subscribeToMyMatches,
   type MyRemoteMatch,
 } from '../utils/remoteMatches';
@@ -80,6 +89,36 @@ function formatDate(iso: string): string {
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
   return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+/**
+ * Två-rads final-leaderboard för en H2H-match ur BÅDA spelarnas
+ * aggregatsummor (readable via remote_match_players). Motståndarens per-
+ * fråga-facit är RLS-blockat, så `lastFiveResults`/`lastResponseSeconds`
+ * lämnas tomma och `playedRounds` approximeras med roundsCount (samma
+ * approximation som quiz-slutskärmens motståndar-rad). Sorteras av den
+ * delade `finalizeRows` (trackConnectionErrors=false — blandat läge).
+ */
+function buildRemoteLeaderboardRows(match: RemoteMatch): LeaderboardRow[] {
+  const rounds = match.settings.roundsCount;
+  return finalizeRows(
+    match.players.map((p) => ({
+      playerId: p.userId,
+      name: formatPlayerLabel(p),
+      emoji: '👤',
+      age: p.age ?? undefined,
+      assistance: (p.assistance as AssistanceLevel | null) ?? undefined,
+      points: p.totalPoints,
+      playedRounds: rounds,
+      correctAnswers: p.correctAnswers,
+      incorrectAnswers: Math.max(0, rounds - p.correctAnswers),
+      avgResponseSeconds: p.avgResponseSeconds ?? 0,
+      lastResponseSeconds: null,
+      lastFiveResults: [],
+      hasLeft: false,
+    })),
+    false,
+  );
 }
 
 /**
@@ -130,6 +169,8 @@ export default function MyMatchesScreen() {
   // Historikens motståndar-grupper (nyckel = PlayerName) — alla startar
   // ihopfällda; state lever bara medan skärmen är monterad.
   const [expandedOpponents, setExpandedOpponents] = useState<Record<string, boolean>>({});
+  // Busy-guard för "Delete all" per motståndar-grupp (blockerar dubbeltapp).
+  const [deletingOpp, setDeletingOpp] = useState<string | null>(null);
 
   // Flash-guide: match-id:n som ska blinka "New update" (sektionsrubrik + rad),
   // seedade EN gång från focusMatchIds-paramet. Lever i lokalt state så
@@ -212,6 +253,37 @@ export default function MyMatchesScreen() {
     setAnsweredIds(answered);
     setLoaded(true);
   }, []);
+
+  // "Delete all" i en motståndar-grupp: radera HELA min H2H-historik mot
+  // den motståndaren (per-user, server-side — motståndaren behåller sin).
+  // oppKey ÄR motståndarens user-id (gruppnyckeln). Confirm-popup först.
+  const handleDeleteOpponent = useCallback(
+    (oppKey: string) => {
+      if (oppKey === 'unknown-opponent') return;
+      Alert.alert(
+        'Delete H2H history?',
+        'Are you sure you want to delete all of the H2H games against this player?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              setDeletingOpp(oppKey);
+              const ok = await dismissRemoteMatchesWithOpponent(oppKey);
+              setDeletingOpp(null);
+              if (!ok) {
+                Alert.alert('Could not delete', 'Please try again.');
+                return;
+              }
+              await reload();
+            },
+          },
+        ],
+      );
+    },
+    [reload],
+  );
 
   // Refetch vid varje focus (spelaren kan komma tillbaka från quiz).
   useFocusEffect(
@@ -440,6 +512,15 @@ export default function MyMatchesScreen() {
   const renderOpponentGroup = (oppKey: string, oppName: string, rows: MyRemoteMatch[]) => {
     const isOpen = expandedOpponents[oppKey] ?? false;
     const groupFlash = rows.some((m) => flashIds.has(m.match.id));
+    // Head-to-head-facit: avgjorda matcher (winnerUserId satt) räknas som
+    // win/loss; oavgjorda (draw/void → winnerUserId null) exkluderas.
+    const wins = rows.filter((m) => m.match.winnerUserId === m.me.userId).length;
+    const losses = rows.filter(
+      (m) => m.match.winnerUserId != null && m.match.winnerUserId !== m.me.userId,
+    ).length;
+    const net = wins - losses;
+    const netColor =
+      net > 0 ? Colors.success : net < 0 ? Colors.error : Colors.textSecondary;
     return (
       <View key={oppKey} style={styles.opponentGroup}>
         <Pressable
@@ -457,7 +538,48 @@ export default function MyMatchesScreen() {
           <Text style={styles.sectionCount}>{rows.length}</Text>
         </Pressable>
         {!isOpen && <View style={styles.sectionDivider} />}
-        {isOpen && <View style={styles.list}>{rows.map((m) => renderRow(m, 'history'))}</View>}
+        {isOpen && (
+          <View style={styles.list}>
+            {/* Facit + "Delete all" överst i den utfällda gruppen. */}
+            <View style={styles.recordRow}>
+              <View style={styles.recordText}>
+                <Text style={styles.recordLine} numberOfLines={2}>
+                  <Text style={styles.recordLabel}>You: </Text>
+                  <Text style={styles.recordWins}>
+                    {wins} {wins === 1 ? 'win' : 'wins'}
+                  </Text>
+                  <Text style={styles.recordLabel}>{'   ·   '}</Text>
+                  <Text style={styles.recordLabel}>{oppName}: </Text>
+                  <Text style={styles.recordWins}>
+                    {losses} {losses === 1 ? 'win' : 'wins'}
+                  </Text>
+                </Text>
+                <Text style={styles.recordNetLine}>
+                  <Text style={styles.recordLabel}>Record: </Text>
+                  <Text style={[styles.recordNet, { color: netColor }]}>
+                    {net >= 0 ? '+' : ''}
+                    {net}
+                  </Text>
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => handleDeleteOpponent(oppKey)}
+                disabled={deletingOpp === oppKey}
+                activeOpacity={0.7}
+                hitSlop={8}
+                style={[
+                  styles.deleteAllBtn,
+                  deletingOpp === oppKey && { opacity: 0.6 },
+                ]}
+              >
+                <Text style={styles.deleteAllText}>
+                  {deletingOpp === oppKey ? 'Deleting…' : 'Delete all'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {rows.map((m) => renderRow(m, 'history'))}
+          </View>
+        )}
       </View>
     );
   };
@@ -564,6 +686,17 @@ export default function MyMatchesScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
+            {/* Final-leaderboard (2 rader) ovanför W/L/D-bannern. Byggs ur
+                match-snapshotten i state; motståndarens Last-5 blank. */}
+            {(() => {
+              const rm = matches.find((m) => m.match.id === resultMatchId);
+              if (!rm) return null;
+              return (
+                <ScrollView style={styles.modalTableScroll}>
+                  <LeaderboardTable entries={buildRemoteLeaderboardRows(rm.match)} />
+                </ScrollView>
+              );
+            })()}
             {resultMatchId && <RemoteMatchResultPanel matchId={resultMatchId} />}
             <TouchableOpacity
               style={styles.modalCloseBtn}
@@ -749,6 +882,57 @@ const styles = StyleSheet.create({
   chevron: {
     fontSize: FontSize.lg,
     color: Colors.textSecondary,
+  },
+  // Facit + "Delete all" överst i en utfälld motståndar-grupp.
+  recordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  recordText: {
+    flex: 1,
+    gap: 2,
+  },
+  recordLine: {
+    fontSize: FontSize.sm,
+  },
+  recordNetLine: {
+    fontSize: FontSize.sm,
+  },
+  recordLabel: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  recordWins: {
+    fontSize: FontSize.sm,
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.bold,
+    fontVariant: ['tabular-nums'],
+  },
+  recordNet: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    fontVariant: ['tabular-nums'],
+  },
+  // Röd outline-knapp — speglar modalDeleteBtn-vokabuläret i Profile.
+  deleteAllBtn: {
+    borderWidth: 1,
+    borderColor: Colors.error,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+  },
+  deleteAllText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.error,
+  },
+  modalTableScroll: {
+    maxHeight: 300,
+    marginHorizontal: Spacing.lg,
   },
   modalOverlay: {
     flex: 1,

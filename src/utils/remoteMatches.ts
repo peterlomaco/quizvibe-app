@@ -64,6 +64,13 @@ export interface RemoteMatchPlayer {
   totalPoints: number;
   correctAnswers: number;
   avgResponseSeconds: number | null;
+  /**
+   * True när DENNA deltagare raderat matchen ur sin egen H2H-historik
+   * (migration 0053). Bara den egna radens flagga påverkar den egna vyn —
+   * `getMyMatches` filtrerar på `me.dismissed`. Tolerant `?? false` i
+   * row-adaptern så pre-0053-databaser resolvar false.
+   */
+  dismissed: boolean;
 }
 
 export interface RemoteMatch {
@@ -143,6 +150,8 @@ interface RemoteMatchPlayerRow {
   total_points: number;
   correct_answers: number;
   avg_response_seconds: number | null;
+  /** Optional: kolumnen kom i migration 0053 — äldre rader saknar den. */
+  dismissed?: boolean;
 }
 
 interface RemoteMatchRow {
@@ -178,6 +187,7 @@ function rowToPlayer(r: RemoteMatchPlayerRow): RemoteMatchPlayer {
     totalPoints: r.total_points,
     correctAnswers: r.correct_answers,
     avgResponseSeconds: r.avg_response_seconds == null ? null : Number(r.avg_response_seconds),
+    dismissed: r.dismissed ?? false,
   };
 }
 
@@ -387,6 +397,26 @@ export async function forfeitRemoteMatch(matchId: string): Promise<void> {
 }
 
 /**
+ * Raderar HELA min H2H-historik mot EN motståndare ("Delete all" på
+ * H2H History-skärmens motståndar-grupp). PER ANVÄNDARE: RPC:n sätter
+ * `dismissed=true` på MINA deltagarrader för alla TERMINALA matcher jag
+ * delat med `opponentUserId` — motståndaren behåller sin historik, och en
+ * pågående duell mot samma motståndare rörs inte. Idempotent.
+ * Returnerar false + console.warn vid fel så call-site kan Alert:a.
+ * Kräver migration 0053_remote_match_dismissal.sql.
+ */
+export async function dismissRemoteMatchesWithOpponent(opponentUserId: string): Promise<boolean> {
+  const { error } = await supabase.rpc('dismiss_remote_matches_with_opponent', {
+    p_opponent_user_id: opponentUserId,
+  });
+  if (error) {
+    console.warn('[remoteMatches] dismissRemoteMatchesWithOpponent failed:', error.message);
+    return false;
+  }
+  return true;
+}
+
+/**
  * Finaliserar EGEN spelarrad. Sista finishern triggar atomisk vinnar-
  * beräkning server-side (radlås i RPC:n — ingen klient-race).
  */
@@ -463,7 +493,11 @@ export async function getMyMatches(limit = 30): Promise<MyRemoteMatch[]> {
   }
   return ((data as RemoteMatchRow[]) ?? [])
     .map((r) => splitMatchForUser(rowToMatch(r), userId))
-    .filter((m): m is MyRemoteMatch => m !== null);
+    .filter((m): m is MyRemoteMatch => m !== null)
+    // Matcher jag raderat ur min egen historik (migration 0053) döljs helt.
+    // Bara MIN egen rads flagga räknas — motståndarens dismissal påverkar
+    // aldrig min vy.
+    .filter((m) => !m.me.dismissed);
 }
 
 /** Egna svar för en match, sorterade på question_index (driver resume). */
