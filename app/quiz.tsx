@@ -1946,18 +1946,18 @@ export default function QuizScreen() {
       effectiveYoutubeCategories.includes('Music') &&
       effectiveYoutubeCategories.includes('Film');
     // ── §4.1 HCP-frågefilter ────────────────────────────────────────────
-    // Spelaren får items vars Item-HCP (= probability) ligger i bandet
-    // [max(1,HCP−20), min(100,HCP+80)]; nedre kanten vidgas nedåt om poolen
-    // blir för tunn (variety-floor, se filterByItemHcp). Gäller BARA Single
+    // Spelaren får items vars Item-HCP (= probability) ligger på/över ett golv
+    // som sänks stegvis med spelarens HCP (se hcpRecognitionLowerBound):
+    // HCP ≥ 80 → itemHcp ≥ 10, 60–79 → ≥ 8, 40–59 → ≥ 6, 20–39 → ≥ 4,
+    // < 20 → ≥ 0. Övre kanten är alltid 100 (inget tak). Gäller BARA Single
     // Player + Pass-the-Phone (individanpassat per §4.1). IndDev delar host:s
     // identiska sekvens (ej individanpassad); remote (server-sekvens) + guest-
     // hostade spel (anonyma, grundar inget HCP) filtreras inte. Filtret läser
     // DENNA enhets spelar-HCP ur profil-spegeln.
     const applyHcp =
       gameMode !== 'individual-devices' && !isRemote && !isGuestHostGame;
-    // Tuning-knopp: hur många items en pool minst måste behålla innan HCP-
-    // golvet relaxas. Högre = mildare filter + mer variation över spel; lägre
-    // = hårdare svårighetsstyrning men tunnare pool (fler reprisrisk).
+    // Liten-katalog-tröskel: om en (per-kategori) pool är ≤ detta filtreras den
+    // inte alls. Golvet i sig är så milt (≤ 10) att svält i praktiken inte sker.
     const HCP_FILTER_MIN_POOL = 30;
     // §1.3 — filtret använder spelarens PER-KATEGORI-HCP för denna region (en
     // Music-fråga mot Music-HCP osv.). regionHcp laddas async vid mount; innan

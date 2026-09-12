@@ -218,38 +218,50 @@ export function resolveDisplayTotalHcp(progress: HcpProgress | null | undefined)
   return progress ? displayHcp(totalHcp(progress)) : HCP_START;
 }
 
-// §4.1 — hur långt ned golvet (lower bound) vidgas per steg när bandet blir för tunt.
-export const HCP_FILTER_STEP = 10;
-
-// Item-HCP-skalan är 0–100 (bootstrappad från katalogens `probability`), medan
-// spelarens HCP är 1–99. Övre bandkanten klampas mot 100 — INTE HCP_MAX (99),
-// annars utesluts itemHcp-100-items för en HCP-20-spelare.
-export const HCP_MAX_ITEM = 100;
-
-// Bandets bredd nedåt/uppåt från spelarens HCP (Peter 2026-09):
-//   lower = max(1, HCP − BAND_BELOW),  upper = min(100, HCP + BAND_ABOVE)
-export const HCP_BAND_BELOW = 20;
-export const HCP_BAND_ABOVE = 80;
+// §4.1 — Item-HCP-golv per spelar-HCP-nivå (Peter 2026-09-12).
+// [minPlayerHcp, itemLowerBound] — nedåtsorterad; första nivån vars minPlayerHcp <= HCP vinner.
+// Övre bandkanten är alltid 100 (ingen tak) — bara golvet varierar.
+//   HCP ≥ 80 → itemHcp ≥ 10   (bara de mest igenkända items)
+//   HCP 60–79 → ≥ 8
+//   HCP 40–59 → ≥ 6
+//   HCP 20–39 → ≥ 4
+//   HCP < 20  → ≥ 0           (alla items, inkl. de mest obskyra)
+export const HCP_RECOGNITION_TIERS: readonly (readonly [number, number])[] = [
+  [80, 10],
+  [60, 8],
+  [40, 6],
+  [20, 4],
+  [0, 0],
+];
 
 /**
- * §4.1 — HCP-frågefilter: ett TVÅSIDIGT band per kategori (Peter 2026-09).
+ * Item-HCP-golvet (lägsta `itemHcp` en spelare på `playerHcp` får serveras).
+ * Ren + testbar; se HCP_RECOGNITION_TIERS för tabellen.
+ */
+export function hcpRecognitionLowerBound(playerHcp: number): number {
+  for (const [minHcp, lower] of HCP_RECOGNITION_TIERS) {
+    if (playerHcp >= minHcp) return lower;
+  }
+  return 0;
+}
+
+/**
+ * §4.1 — HCP-frågefilter: ett ENSIDIGT golv per kategori (Peter 2026-09-12).
  *
- * En spelare på HCP `X` får items vars Item-HCP ligger i bandet
- *   [max(1, X − 20),  min(100, X + 80)]
- * Item-HCP bootstrappas från katalogens `probability` (0–100).
- *   • HCP 99 → 79–100, HCP 98 → 78–100, … HCP 20 → 1–100 (nedre bottnar på 1)
- *   • sedan HCP 19 → 1–99, 18 → 1–98, … HCP 1 → 1–81 (övre sjunker när nedre är pinnad)
- * Nettoeffekt: nybörjare (högt HCP) ser bara de lättaste/mest igenkända items;
- * när HCP tjänas ner vidgas bandet nedåt och släpper in svårare items; riktiga
- * experter (HCP < 20) slutar serveras de allra trivialaste items.
+ * En spelare på HCP `X` får items vars Item-HCP ≥ hcpRecognitionLowerBound(X);
+ * övre kanten är alltid 100 (inget tak). Item-HCP bootstrappas från katalogens
+ * `probability` (0–100). Nettoeffekt: golvet sänks stegvis när HCP tjänas ner,
+ * så de mest obskyra items (låg probability) låses gradvis upp. Nybörjare
+ * (HCP ≥ 80) utesluts bara från de allra obskyraste (probability < 10);
+ * experter (HCP < 20) når hela poolen.
  *
- * Variety-floor: hedra bandet, men om kategorins bandade pool har färre än
- * `minCount` items vidgas NEDRE kanten nedåt i steg om HCP_FILTER_STEP tills
- * tillräckligt många kvalar (övre kanten står fast). Ultimat skyddsnät: om ens
- * ett golv på 1 ger tomt → hela poolen.
+ * Skyddsnät: om ett tomt band skulle uppstå (kategorins items alla under golvet
+ * — osannolikt eftersom probability toppar ~80–90 och högsta golvet är 10)
+ * returneras hela poolen. `minCount` bevaras i signaturen (call-sites orörda)
+ * och används som liten-katalog-tröskel.
  *
  * Ren + generisk (enhetstestbar): items behöver bara ett `itemHcp`-fält
- * (saknas → behandlas som 100 = lättast).
+ * (saknas → behandlas som 100 = lättast → alltid inom bandet).
  */
 export function filterByItemHcp<T extends { itemHcp?: number }>(
   pool: T[],
@@ -257,17 +269,7 @@ export function filterByItemHcp<T extends { itemHcp?: number }>(
   minCount: number,
 ): T[] {
   if (pool.length <= minCount) return pool; // liten katalog → filtrera inte
-  const upper = Math.min(HCP_MAX_ITEM, playerHcp + HCP_BAND_ABOVE);
-  let lower = Math.max(1, playerHcp - HCP_BAND_BELOW);
-  const withinBand = (item: T) => {
-    const v = item.itemHcp ?? 100;
-    return v >= lower && v <= upper;
-  };
-  let kept = pool.filter(withinBand);
-  // variety-floor: vidga nedre kanten nedåt tills tillräckligt många (övre fast).
-  while (kept.length < minCount && lower > 1) {
-    lower = Math.max(1, lower - HCP_FILTER_STEP);
-    kept = pool.filter(withinBand);
-  }
+  const lower = hcpRecognitionLowerBound(playerHcp);
+  const kept = pool.filter((item) => (item.itemHcp ?? 100) >= lower);
   return kept.length > 0 ? kept : pool; // tomt band → hela poolen
 }

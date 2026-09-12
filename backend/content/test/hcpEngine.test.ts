@@ -8,6 +8,7 @@ import {
   emptyHcpProgress,
   evaluateWindow,
   filterByItemHcp,
+  hcpRecognitionLowerBound,
   HCP_START,
   HCP_WINDOW_SIZE,
   resolveDisplayHcp,
@@ -223,10 +224,37 @@ describe('resolveDisplayHcp (§1.1 — fallback 99, avrundat uppåt)', () => {
   });
 });
 
-describe('filterByItemHcp (§4.1 — tvåsidigt band [max(1,HCP−20), min(100,HCP+80)] + variety-floor)', () => {
+describe('hcpRecognitionLowerBound (§4.1 — item-golv per spelar-HCP-nivå)', () => {
+  it('HCP ≥ 80 → golv 10 (övre gränsen 80 inklusive)', () => {
+    expect(hcpRecognitionLowerBound(99)).toBe(10);
+    expect(hcpRecognitionLowerBound(80)).toBe(10);
+  });
+  it('HCP 60–79 → golv 8', () => {
+    expect(hcpRecognitionLowerBound(79)).toBe(8);
+    expect(hcpRecognitionLowerBound(60)).toBe(8);
+  });
+  it('HCP 40–59 → golv 6', () => {
+    expect(hcpRecognitionLowerBound(59)).toBe(6);
+    expect(hcpRecognitionLowerBound(40)).toBe(6);
+  });
+  it('HCP 20–39 → golv 4', () => {
+    expect(hcpRecognitionLowerBound(39)).toBe(4);
+    expect(hcpRecognitionLowerBound(20)).toBe(4);
+  });
+  it('HCP < 20 → golv 0 (alla items)', () => {
+    expect(hcpRecognitionLowerBound(19)).toBe(0);
+    expect(hcpRecognitionLowerBound(1)).toBe(0);
+  });
+  it('nivågränserna är >= (80 → 10, 79 → 8)', () => {
+    expect(hcpRecognitionLowerBound(80)).toBe(10);
+    expect(hcpRecognitionLowerBound(79)).toBe(8);
+  });
+});
+
+describe('filterByItemHcp (§4.1 — ensidigt golv itemHcp ≥ lowerBound(HCP), övre alltid 100)', () => {
   const mk = (itemHcp: number) => ({ itemHcp });
   const many = (itemHcp: number, n: number) => Array.from({ length: n }, () => mk(itemHcp));
-  // En item per Item-HCP 1..100 (100 st) — låter oss läsa bandets exakta gränser.
+  // En item per Item-HCP 1..100 (100 st) — låter oss läsa golvet exakt.
   const spread = () => Array.from({ length: 100 }, (_, i) => mk(i + 1));
   const bounds = (out: { itemHcp: number }[]) => {
     const vs = out.map((q) => q.itemHcp);
@@ -238,50 +266,63 @@ describe('filterByItemHcp (§4.1 — tvåsidigt band [max(1,HCP−20), min(100,H
     expect(filterByItemHcp(pool, 99, 5)).toBe(pool);
   });
 
-  // Bandmappningen (minCount lågt så variety-floor inte vidgar): övre = min(100,HCP+80).
-  it('HCP 99 → itemHcp 79–100', () => {
-    expect(bounds(filterByItemHcp(spread(), 99, 1))).toEqual([79, 100]);
+  // Golvmappningen (minCount lågt så liten-katalog-tröskeln inte slår in). spread saknar
+  // itemHcp 0, så golv 0 → övre observerade = 100, nedre = 1 (lägsta item i spread).
+  it('HCP 99 → itemHcp 10–100', () => {
+    expect(bounds(filterByItemHcp(spread(), 99, 1))).toEqual([10, 100]);
   });
-  it('HCP 98 → itemHcp 78–100', () => {
-    expect(bounds(filterByItemHcp(spread(), 98, 1))).toEqual([78, 100]);
+  it('HCP 80 → itemHcp 10–100', () => {
+    expect(bounds(filterByItemHcp(spread(), 80, 1))).toEqual([10, 100]);
   });
-  it('HCP 20 → itemHcp 1–100 (nedre bottnar på 1)', () => {
-    expect(bounds(filterByItemHcp(spread(), 20, 1))).toEqual([1, 100]);
+  it('HCP 79 → itemHcp 8–100', () => {
+    expect(bounds(filterByItemHcp(spread(), 79, 1))).toEqual([8, 100]);
   });
-  it('HCP 19 → itemHcp 1–99 (övre börjar sjunka)', () => {
-    expect(bounds(filterByItemHcp(spread(), 19, 1))).toEqual([1, 99]);
+  it('HCP 60 → itemHcp 8–100', () => {
+    expect(bounds(filterByItemHcp(spread(), 60, 1))).toEqual([8, 100]);
   });
-  it('HCP 1 → itemHcp 1–81', () => {
-    expect(bounds(filterByItemHcp(spread(), 1, 1))).toEqual([1, 81]);
+  it('HCP 59 → itemHcp 6–100', () => {
+    expect(bounds(filterByItemHcp(spread(), 59, 1))).toEqual([6, 100]);
+  });
+  it('HCP 40 → itemHcp 6–100', () => {
+    expect(bounds(filterByItemHcp(spread(), 40, 1))).toEqual([6, 100]);
+  });
+  it('HCP 39 → itemHcp 4–100', () => {
+    expect(bounds(filterByItemHcp(spread(), 39, 1))).toEqual([4, 100]);
+  });
+  it('HCP 20 → itemHcp 4–100', () => {
+    expect(bounds(filterByItemHcp(spread(), 20, 1))).toEqual([4, 100]);
+  });
+  it('HCP 19 → itemHcp 1–100 (golv 0 släpper in allt i spread)', () => {
+    expect(bounds(filterByItemHcp(spread(), 19, 1))).toEqual([1, 100]);
+  });
+  it('HCP 1 → itemHcp 1–100', () => {
+    expect(bounds(filterByItemHcp(spread(), 1, 1))).toEqual([1, 100]);
   });
 
-  it('nybörjare (HCP 99) utesluter de svåraste (lägst itemHcp) items', () => {
-    const pool = [...many(90, 10), ...many(40, 10)];
+  it('de mest obskyra items (itemHcp 0) släpps bara in under HCP 20', () => {
+    const pool = [mk(0), ...many(50, 20)];
+    // HCP 99 (golv 10) → itemHcp-0 exkluderas
+    expect(filterByItemHcp(pool, 99, 1).some((q) => q.itemHcp === 0)).toBe(false);
+    // HCP 19 (golv 0) → itemHcp-0 ingår
+    expect(filterByItemHcp(pool, 19, 1).some((q) => q.itemHcp === 0)).toBe(true);
+  });
+
+  it('nybörjare (HCP 99, golv 10) utesluter de svåraste (lägst itemHcp) items', () => {
+    const pool = [...many(90, 10), ...many(5, 10)];
     const out = filterByItemHcp(pool, 99, 5);
-    expect(out.every((q) => q.itemHcp >= 79)).toBe(true);
+    expect(out.every((q) => q.itemHcp >= 10)).toBe(true);
     expect(out.length).toBe(10);
   });
 
-  it('variety-floor: vidgar NEDRE kanten nedåt när bandet är för tunt (övre fast)', () => {
-    // HCP 99 → band 79–100. Bara 4 items i bandet, resten på 60. minCount 10 →
-    // nedre vidgas 79 → 69 → 59 tills ≥10 kvalar; övre står kvar på 100.
-    const pool = [...many(90, 4), ...many(60, 20)];
-    const out = filterByItemHcp(pool, 99, 10);
-    expect(out.length).toBe(24); // 4 (90) + 20 (60), alla ≤ 100
-    expect(bounds(out)[1]).toBe(90); // övre kanten (100) aldrig överskriden
-  });
-
-  it('saknat itemHcp behandlas som 100 (inom bandet för HCP ≥ 20)', () => {
+  it('saknat itemHcp behandlas som 100 (alltid inom bandet)', () => {
     const pool: { itemHcp?: number }[] = Array.from({ length: 20 }, () => ({}));
     expect(filterByItemHcp(pool, 99, 5).length).toBe(20);
   });
 
-  it('faller tillbaka på hela poolen om ens ett golv på 1 ger tomt band', () => {
-    // Alla items itemHcp 5, HCP 99 → band 79–100 tomt; vidga nedre till 1 → fortf.
-    // tomt (5 < 79-övre? nej: 5 <= upper 100 men 5 >= lower? lower bottnar på 1 → 5>=1 OK).
-    // Använd items ÖVER övre kanten i stället (HCP 1 → övre 81; items 90 utanför).
-    const pool = many(90, 20);
-    const out = filterByItemHcp(pool, 1, 15); // band 1–81, inga 90:or → tomt → hela poolen
+  it('faller tillbaka på hela poolen om golvet ger tomt band', () => {
+    // Alla items itemHcp 5, HCP 99 → golv 10 → inget kvalar → hela poolen.
+    const pool = many(5, 20);
+    const out = filterByItemHcp(pool, 99, 5);
     expect(out).toBe(pool);
   });
 });

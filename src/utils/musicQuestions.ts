@@ -23,7 +23,8 @@ export interface MusicQuestion {
   contentSubject: YoutubeContentSubject;
   questionText: string;
   /** Item-HCP (§4.1) = katalogens probability (0–100). Klientens HCP-filter
-   *  väljer item om itemHcp >= spelarens HCP (relaxas om poolen blir för tunn). */
+   *  väljer item om itemHcp >= ett golv som sänks stegvis med spelarens HCP
+   *  (HCP ≥ 80 → ≥ 10 … HCP < 20 → ≥ 0; övre kanten alltid 100). */
   itemHcp: number;
   audiences: MusicQuestionAudience[];
   genrePackages?: string[];
