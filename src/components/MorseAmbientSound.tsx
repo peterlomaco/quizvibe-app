@@ -101,6 +101,12 @@ const HTML = `<!DOCTYPE html>
     [349.23, 440.00, 523.25,  698.46], // F  : F4 A4 C5 F5
   ];
 
+  // Vilka ackord som faktiskt loopas. Sätts av applyIntensity: normal
+  // (lobbyn) kör hela C→G→Am→F; 'high' (Hints) droppar öppningsackordet C
+  // och loopar bara G→Am→F (Peter 2026-09-12). Bara Hints-slingan ändras —
+  // lobbyn är orörd eftersom valet sitter på intensitet, inte på CHORDS.
+  var chordSet = CHORDS;
+
   // Två klangvarv. Samma toner och samma takt — bara register och filter
   // skiljer. 'gain' kompenserar att mörkare klang uppfattas svagare i
   // mobilhögtalare; 'decay' är längre i den mörka så frasen får ringa ut.
@@ -114,12 +120,31 @@ const HTML = `<!DOCTYPE html>
     { octave: 0.25, lpf:  750, shine: 0.20, decay: 1.90, gain: 1.60 }, // mörk
   ];
 
+  // 'high' = intensivt läge (Hints-frågor): samma melodi och samma två
+  // klangvarv, men snabbare takt, kortare tystnad, högre volym och ljusare
+  // filter så slingan driver framåt i stället för att bara pyra. Detta är den
+  // ENDA platsen en hörbar stegring är önskad (svarstidspress, jämför
+  // hjärtslaget den ersätter) — jämför ramp-varningen överst, som gäller det
+  // normala lobby-läget. REST > 0 även här: fraseringen ska höras.
   var STEP      = 0.55;                    // sekunder mellan plingarna — FAST
   var REST      = 2.0;                     // tystnad mellan fraserna
+  var LPF_MUL   = 1.0;                     // filter-ljushet (>1 = ljusare)
+  var SHINE_ADD = 0.0;                     // extra oktav-glans i intensivt läge
   var LOOKAHEAD = 0.40;                    // schemalägg så här långt fram
   var MASTER    = 0.30;                    // full volym
   var FADE_OUT  = 0.30;                    // uttoning vid active=false
   var FADE_IN   = 0.15;                    // intoning vid active=true
+
+  function applyIntensity(mode) {
+    if (mode === 'high') {
+      STEP = 0.48; REST = 0.72; MASTER = 0.44; LPF_MUL = 1.6; SHINE_ADD = 0.10;
+      chordSet = [CHORDS[1], CHORDS[2], CHORDS[3]]; // G → Am → F (utan C)
+    } else {
+      STEP = 0.55; REST = 2.0;  MASTER = 0.30; LPF_MUL = 1.0; SHINE_ADD = 0.0;
+      chordSet = CHORDS;
+    }
+  }
+  applyIntensity(window.__qvIntensity);
   // Längsta decay (1.9 s) + delay-svans, med marginal: först när allt tystnat
   // suspendas contexten. Suspend tidigare fryser toner mitt i utklingningen
   // och de skulle då återuppstå vid nästa resume.
@@ -147,7 +172,7 @@ const HTML = `<!DOCTYPE html>
 
     var lpf = ctx.createBiquadFilter();
     lpf.type = 'lowpass';
-    lpf.frequency.value = voice.lpf;
+    lpf.frequency.value = voice.lpf * LPF_MUL;
     lpf.Q.value = 0.7;
 
     var g = ctx.createGain();
@@ -161,7 +186,7 @@ const HTML = `<!DOCTYPE html>
     body.connect(lpf);
 
     var shine = ctx.createGain();
-    shine.gain.value = voice.shine;
+    shine.gain.value = voice.shine + SHINE_ADD;
     var upper = ctx.createOscillator();
     upper.type = 'sine';
     upper.frequency.value = f * 2;
@@ -178,7 +203,7 @@ const HTML = `<!DOCTYPE html>
   }
 
   function schedulePhrase(idx, startTime, voice) {
-    var notes = CHORDS[idx % CHORDS.length];
+    var notes = chordSet[idx % chordSet.length];
     // Volymkontur: andra tonen lyfts lite så frasen får en puls framåt,
     // sista tonen dör bort så tystnaden efteråt känns avsiktlig.
     var VOLS = [0.10, 0.13, 0.11, 0.08];
@@ -191,7 +216,7 @@ const HTML = `<!DOCTYPE html>
     if (!ctx || !active) return;
     while (nextChordTime < ctx.currentTime + LOOKAHEAD) {
       schedulePhrase(chordIndex, nextChordTime, VOICES[voiceIndex]);
-      chordIndex = (chordIndex + 1) % CHORDS.length;
+      chordIndex = (chordIndex + 1) % chordSet.length;
       voiceIndex = (voiceIndex + 1) % VOICES.length;
       nextChordTime += STEP * 4 + REST;   // fras + tystnad
     }
@@ -247,7 +272,7 @@ const HTML = `<!DOCTYPE html>
     }, TAIL_MS);
   }
 
-  window.qvAmbient = { setActive: setActive };
+  window.qvAmbient = { setActive: setActive, setIntensity: applyIntensity };
 
   // !started-guarden: onLoadEnd-flushen kan hinna före den här timern och
   // har då redan startat. Utan guarden skulle start() → resumeAudio() rulla
@@ -265,6 +290,9 @@ const HTML = `<!DOCTYPE html>
 const setActiveJS = (on: boolean) =>
   `window.qvAmbient && window.qvAmbient.setActive(${on ? 'true' : 'false'}); true;`;
 
+const setIntensityJS = (mode: 'normal' | 'high') =>
+  `window.qvAmbient && window.qvAmbient.setIntensity(${JSON.stringify(mode)}); true;`;
+
 /**
  * Osynlig WebView som spelar en ljus, gles närvaro-slinga via Web Audio API.
  * C→G→Am→F som music-box-plingar i fraser om fyra toner med tystnad emellan.
@@ -276,19 +304,36 @@ const setActiveJS = (on: boolean) =>
  * `active` styr uppspelningen — se ⚠-noten överst i filen. Låt komponenten
  * vara monterad och flippa proppen; att avmontera den medan den låter ger ett
  * hörbart klick när WebView:n (och därmed AudioContext:en) rivs synkront.
+ *
+ * `intensity` väljer klangläge: 'normal' (lobbyns lugna närvaro-slinga) eller
+ * 'high' (Hints-frågor — samma melodi, snabbare/ljusare/högre). Se
+ * applyIntensity i HTML:en.
  */
-export function MorseAmbientSound({ active = true }: { active?: boolean }) {
+export function MorseAmbientSound({
+  active = true,
+  intensity = 'normal',
+}: {
+  active?: boolean;
+  intensity?: 'normal' | 'high';
+}) {
   const webRef = useRef<WebView>(null);
   // Sidan är inte laddad direkt vid mount; injectJavaScript före onLoadEnd
   // tappas tyst. Vi speglar därför önskat läge och flushar det vid load.
   const loadedRef = useRef(false);
   const activeRef = useRef(active);
   activeRef.current = active;
+  const intensityRef = useRef(intensity);
+  intensityRef.current = intensity;
 
   useEffect(() => {
     if (!loadedRef.current) return;
     webRef.current?.injectJavaScript(setActiveJS(active));
   }, [active]);
+
+  useEffect(() => {
+    if (!loadedRef.current) return;
+    webRef.current?.injectJavaScript(setIntensityJS(intensity));
+  }, [intensity]);
 
   return (
     <View
@@ -307,9 +352,10 @@ export function MorseAmbientSound({ active = true }: { active?: boolean }) {
         source={{ html: HTML }}
         // Startläget måste finnas INNAN sidans script kör, annars hinner en
         // enhet som monteras inaktiv skapa en AudioContext i onödan.
-        injectedJavaScriptBeforeContentLoaded={`window.__qvActive = ${active ? 'true' : 'false'}; true;`}
+        injectedJavaScriptBeforeContentLoaded={`window.__qvActive = ${active ? 'true' : 'false'}; window.__qvIntensity = ${JSON.stringify(intensity)}; true;`}
         onLoadEnd={() => {
           loadedRef.current = true;
+          webRef.current?.injectJavaScript(setIntensityJS(intensityRef.current));
           webRef.current?.injectJavaScript(setActiveJS(activeRef.current));
         }}
         allowsInlineMediaPlayback

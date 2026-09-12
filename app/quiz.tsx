@@ -131,7 +131,6 @@ import { meetsHintsThreshold } from '@/src/utils/hintsText';
 import { buildHintsDistractorPool } from '@/src/utils/hintsDistractorPool';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
-import { HeartbeatSound } from '@/src/components/HeartbeatSound';
 import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
 import { WebViewWarmer } from '@/src/components/WebViewWarmer';
 // Person-bilderna är juridiskt parkerade sedan 2026-06-04 — en "image"-fråga
@@ -10271,11 +10270,18 @@ export default function QuizScreen() {
           Layout nu: [fixed-top: media+timer+question] + [ScrollView: bara
           answer-block + reveal-feedback] + [sticky-bottom: Confirm-bar]. */}
       <View style={styles.fixedTopZone}>
-        {/* Hjärtslag enbart för Hints-frågor under aktiv svarstid.
-            YT- och Spotify-frågor är tysta i quiz-vyn. Grindas ENBART på
-            isAudioMutedForSelf — se MorseAmbientSound i intro-vyn. */}
-        {!isAudioMutedForSelf && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
-          <HeartbeatSound bpm={80} />
+        {/* Lobbyns närvaro-slinga i intensivt läge (samma melodi, snabbare/
+            ljusare/högre) enbart för Hints-frågor under aktiv svarstid —
+            ersatte hjärtslaget 2026-09-12 (Peter). YT- och Spotify-frågor är
+            tysta i quiz-vyn. Grindas ENBART på isAudioMutedForSelf — se
+            MorseAmbientSound i intro-vyn. Monteras för HELA image-frågan så
+            den fadar ut vid reveal (active=false) i stället för att rivas
+            mitt i en ringande pluck (= klick, se MorseAmbientSound-noten). */}
+        {!isAudioMutedForSelf && isImageQuestion && (
+          <MorseAmbientSound
+            active={phase === 'question' || phase === 'awaiting'}
+            intensity="high"
+          />
         )}
           {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
             (leaderboard fångas av early-return ovan), så ingen extra
