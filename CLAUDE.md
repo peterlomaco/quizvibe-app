@@ -879,6 +879,22 @@ Snapshot-baserad jämförelse (`savedSnapshotRef` = JSON vid load/save). `hasUns
 
 **Pressable-event-fälla**: `onPress={handleStartGame}` på Start Game-knappen passar Pressable:s syntetiska event som första argument. För funktioner med default-värden (`handleStartGame = async (ptpConfirmed = false)`) blir då `ptpConfirmed = event` (truthy) → PtP-guarden hoppas över. Lösning: alltid wrappa i arrow `onPress={() => handleStartGame()}` när handler har default-argument. Samma mönster gäller övriga RN Pressable/TouchableOpacity-call-sites.
 
+## Email verification + resend (registration confirmation)
+
+New registrations require email confirmation before login. **LIVE + verified end-to-end on STAGING (`tottbiuikbdarsjlpxwn`); PROD (`pyndqehlebtxochwpwex`) still pending — a launch-cutover blocker (see `project_pre_launch_checklist` + `project_email_verification` memories).**
+
+**Client flow**: `handleRegisterSubmit` ([app/index.tsx](app/index.tsx)) `signUp`s (no auto-login, no local profile seeded), shows a "Check your email" popup, and switches to the login step. `handleLogin` detects `email_not_confirmed` in BOTH modes and offers a **"Resend link"** button: Email mode via `supabase.auth.resend({ type: 'signup' })` (client-side), PlayerName mode via `resendActivationByName()` ([src/utils/auth.ts](src/utils/auth.ts)) → Edge Function `resend-by-name`. PlayerName login runs through Edge Function `login-by-name` (returns `{ error: 'email_not_confirmed' }` at **HTTP 200** so `functions.invoke` surfaces it via `data.error` instead of swallowing a 4xx body).
+
+**Backend** (edge functions + migrations in `supabase/`): migration **0048** (`handle_new_user` — creates the `profiles` row server-side at signup so PlayerName login works *before* confirmation), **0049** (`on_email_confirmed` → `pg_net` → `send-welcome-email` welcome mail; silently no-ops if the Vault secrets are missing, never blocks confirmation). Edge functions `login-by-name` / `resend-by-name` / `send-welcome-email` are **all Verify JWT OFF** — they're called pre-session or by the DB trigger, and the `sb_publishable_*` key is not a legacy-signed JWT (JWT-on → gateway `401 UNAUTHORIZED_INVALID_JWT_FORMAT`). SMTP = **Resend** (`smtp.resend.com`, sender `QuizVibe <noreply@quizvibe.se>`, domain `quizvibe.se` verified). Two **Vault** secrets drive 0049: `welcome_email_url` (the function URL) + `welcome_email_secret` (must equal the function's `WELCOME_HOOK_SECRET`).
+
+**Email templates**: `supabase/email-templates/confirm-signup.html` is the SOURCE of the confirmation mail — ⚠ **the LIVE mail is rendered from the Supabase dashboard template** (Auth → Emails → Templates → "Confirm signup"), so editing the repo file does NOT change real emails; the dashboard body must be **re-pasted** (editable because custom SMTP is on). `send-welcome-email` builds its HTML inline, so changing it needs a function **redeploy**. Both are branded (QuizVibe logo + `Music. Film.` tagline — **Sport dropped for phase 1**). `docs/email-confirmed.html` (on master → published at `quizvibe.se`) is the post-confirm landing page (`emailRedirectTo`); it works without a Redirect-URL allowlist entry (Supabase allows same-origin paths of the Site URL).
+
+⚠ **Desktop email link-scanners (Norton, Outlook SafeLinks) pre-fetch and CONSUME the one-time confirmation token** → the account stays unconfirmed even though the page renders. **Test confirmations on a phone** (Apple Mail, no desktop scanner). Known Supabase issue; may warrant PKCE/click-through mitigation before launch.
+
+⚠ Resent confirmation links land on the Site URL homepage, not `email-confirmed.html`, because neither resend call passes `emailRedirectTo`. Cosmetic only (the account still confirms).
+
+Guest/anon flow, existing users, and the password-reset OTP flow are unaffected.
+
 ## Store screen
 
 Four sections in `src/screens/StoreScreen.tsx` under header **"Add QuizVibe Premium"** (subtitle: "Extra Host Game credits, or unlimited Host games with QuizVibe membership plans"):
