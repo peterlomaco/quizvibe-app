@@ -610,6 +610,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["The Karate Kid 1984 film Ralph Macchio Pat Morita"]
     answerMethods: ["timeline"]
+    genrePackages: ["sport"]
     youtubeClips:
       - videoId: "bgBy0_y-Ktw"
         startSec: 0

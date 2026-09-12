@@ -7219,6 +7219,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "sport"
+    ],
     "youtubeClips": [
       {
         "videoId": "bgBy0_y-Ktw",
