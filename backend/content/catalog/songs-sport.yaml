@@ -49,7 +49,7 @@ items:
         endSec: 45
         channelTitle: "Tre Kronor - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport", "sport-anthems"]
+    genrePackages: ["sport"]
   - id: markoolio-mera-mal
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mera mål — Markoolio"
@@ -80,7 +80,7 @@ items:
         endSec: 45
         channelTitle: "Markoolio - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport", "sport-anthems"]
+    genrePackages: ["sport"]
   - id: tomas-ledin-vi-ar-pa-gang
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vi är på gång — Tomas Ledin"
@@ -94,7 +94,7 @@ items:
         startSec: 5
         endSec: 50
         channelTitle: "uutiiset"
-    genrePackages: ["sport", "sport-anthems"]
+    genrePackages: ["sport", "football"]
   - id: svenne-rubins-langa-bollar-pa-bengt
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Långa Bollar På Bengt — Svenne Rubins"
@@ -222,7 +222,7 @@ items:
         endSec: 45
         channelTitle: "Håkan Södergren - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport", "sport-anthems"]
+    genrePackages: ["sport"]
   - id: poodles-en-for-alla-for-en
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "En för alla, för en — Tre Kronor & The Poodles"
@@ -231,7 +231,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["The Poodles En för alla för en hockey-VM 2013"]
     answerMethods: ["timeline"]
-    genrePackages: ["sport", "sport-anthems"]
+    genrePackages: ["sport"]
     youtubeClips:
       - videoId: "MxUhHQKZRGs"
         startSec: 14
@@ -253,7 +253,7 @@ items:
         endSec: 45
         channelTitle: "Baddiel - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport", "sport-anthems"]
+    genrePackages: ["sport", "football"]
   - id: new-order-world-in-motion
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "World in Motion — New Order"
@@ -268,7 +268,7 @@ items:
         endSec: 45
         channelTitle: "New Order - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport", "sport-anthems"]
+    genrePackages: ["sport"]
     region: ["europe"]
   - id: knaan-wavin-flag
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -300,7 +300,7 @@ items:
         endSec: 45
         channelTitle: "Whitney Houston - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport", "sport-anthems"]
+    genrePackages: ["sport"]
     region: ["global"]
   - id: guetta-this-ones-for-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -317,7 +317,7 @@ items:
         endSec: 30
         channelTitle: "David Guetta"
         notes: "Officiell MV från David Guettas kanal. UEFA EURO 2016 Official Song. Ersätter Topic-versionen."
-    genrePackages: ["sport", "sport-anthems"]
+    genrePackages: ["sport", "football"]
     region: ["global"]
   - id: bono-we-are-the-people
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -358,7 +358,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Zombie Nation Kernkraft 400 1999 techno dance"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance", "Sport"]
+    genrePackages: ["Club & Dance", "sport"]
     youtubeClips:
       - videoId: "SxhwbXYe1XE"
         startSec: 0

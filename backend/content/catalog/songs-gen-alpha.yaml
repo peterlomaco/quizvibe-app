@@ -94,6 +94,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Adele Hello 25"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "YQHsXMglC9A"
         startSec: 70
@@ -370,6 +371,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Billie Eilish Birds of a Feather Hit Me Hard and Soft"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "cz_lZAPlEAE"
         startSec: 30
@@ -658,6 +660,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Håkan Hellström Det kommer aldrig va över för mig 2013"]
     answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "z0hiC9rCG1c"
         startSec: 30
@@ -1022,6 +1025,8 @@ items:
     probability: 72
     wikimediaSearchHints: ["Albin Lee Meldau Per Gessle Nyper mig i armen Swedish"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
+    genrePackages: ["100% in swedish"]
     spotifyTrackId: "2ZyaNqLNxfJcCacEb9jVoT"
     youtubeClips:
       - videoId: "vKRY_npZdNg"
@@ -1036,6 +1041,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Arvingarna I Do 2019 Swedish dansband schlager"]
     answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish", "Melodifestivalen"]
     spotifyTrackId: "0pGX4KgirIW7JAHh93rzPU"
     youtubeClips:
       - videoId: "XcXNVsNgdwg"
@@ -1050,6 +1056,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Lucianoz Det är ju dej jag går och väntar på 2022 Swedish"]
     answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
     spotifyTrackId: "2sbjPQE3sS9H6i8BOmtZbr"
     youtubeClips:
       - videoId: "hGaWJ5IMf0k"
@@ -1492,6 +1499,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Coldplay Hymn for the Weekend A Head Full of Dreams"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "YykjpeuMNEk"
         startSec: 34
@@ -1815,7 +1823,6 @@ items:
         endSec: 40
         channelTitle: "Dua Lipa"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: dua-lipa-houdini
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Houdini — Dua Lipa"
@@ -1830,7 +1837,6 @@ items:
         endSec: 50
         channelTitle: "Dua Lipa"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: dua-lipa-illusion
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Illusion — Dua Lipa"
@@ -1845,7 +1851,6 @@ items:
         endSec: 33
         channelTitle: "Dua Lipa"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: mabel-dont-call-me-up
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don’t Call Me Up — Mabel"
@@ -1860,7 +1865,6 @@ items:
         endSec: 38
         channelTitle: "MabelVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: zara-larsson-aint-my-fault
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ain’t My Fault — Zara Larsson"
@@ -1875,7 +1879,6 @@ items:
         endSec: 32
         channelTitle: "ZaraLarssonMusicVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: ariana-grande-one-last-time
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "One Last Time — Ariana Grande"
@@ -1890,7 +1893,6 @@ items:
         endSec: 76
         channelTitle: "ArianaGrandeVevo"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: clean-bandit-rockabye
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rockabye — Clean Bandit feat. Sean Paul & Anne-Marie"
@@ -1905,7 +1907,6 @@ items:
         endSec: 30
         channelTitle: "Clean Bandit"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: sean-paul-no-lie
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "No Lie — Sean Paul feat. Dua Lipa"
@@ -1920,7 +1921,6 @@ items:
         endSec: 30
         channelTitle: "SeanPaulVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: shawn-mendes-if-i-cant-have-you
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "If I Can’t Have You — Shawn Mendes"
@@ -1935,7 +1935,6 @@ items:
         endSec: 33
         channelTitle: "ShawnMendesVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 2019 verifierat mot Wikipedia (MusicBrainz gav 2006 = annan artist)."
-    genrePackages: ["Hits"]
   - id: zayn-pillowtalk
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pillowtalk — ZAYN"
@@ -1966,7 +1965,6 @@ items:
         endSec: 38
         channelTitle: "Taylor Swift"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: hoffmaestro-highway-man
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Highway Man — Hoffmaestro"
@@ -2026,7 +2024,6 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Pitbull Fireball 2014"]
     answerMethods: ["timeline"]
-    genrePackages: ["Party mix"]
     spotifyTrackId: "4Y7XAxTANhu3lmnLAzhWJW"
     youtubeClips:
       - videoId: "HMqgVXSvwGo"
@@ -2088,7 +2085,7 @@ items:
     correctYear: 2014
     probability: 56
     region: ["sweden"]
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
     inBaseCatalog: false
     wikimediaSearchHints: ["Bröder - Linus Svenning 2014"]
     answerMethods: ["timeline"]
@@ -2103,7 +2100,7 @@ items:
     correctYear: 2017
     probability: 56
     region: ["sweden"]
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
     inBaseCatalog: false
     wikimediaSearchHints: ["Road Trip - De Vet Du 2017"]
     answerMethods: ["timeline"]
@@ -2133,7 +2130,7 @@ items:
     correctYear: 2020
     probability: 58
     region: ["sweden"]
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
     inBaseCatalog: false
     wikimediaSearchHints: ["Piga & dräng - Drängarna 2020"]
     answerMethods: ["timeline"]
@@ -2223,7 +2220,7 @@ items:
     correctYear: 2022
     probability: 56
     region: ["sweden"]
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
     inBaseCatalog: false
     wikimediaSearchHints: ["Som du vill - Theoz 2022"]
     answerMethods: ["timeline"]
@@ -2253,7 +2250,7 @@ items:
     correctYear: 2024
     probability: 56
     region: ["sweden"]
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
     inBaseCatalog: false
     wikimediaSearchHints: ["Unga & fria - Fröken Snusk 2024"]
     answerMethods: ["timeline"]
@@ -2299,6 +2296,8 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Ikväll igen - Bolaget 2023"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
+    genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "ASzgTmKlTRA"
         startSec: 15

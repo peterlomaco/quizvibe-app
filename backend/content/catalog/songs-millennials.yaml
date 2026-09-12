@@ -124,7 +124,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Van Halen Jump 1984 album"]
     answerMethods: ["timeline"]
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "SwYN7mTi6HM"
         startSec: 15
@@ -141,7 +141,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Billy Idol Rebel Yell 1983 album"]
     answerMethods: ["timeline"]
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "zkTqiuNj6xI"
         startSec: 15
@@ -260,6 +260,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bobby McFerrin Don't Worry Be Happy"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "qTuntvl6oLQ"
         startSec: 0
@@ -303,6 +304,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Phil Collins Another Day in Paradise"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Qt2mbGP6vFI"
         startSec: 12
@@ -364,6 +366,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bryan Adams Everything I Do I Do It for You Robin Hood"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Y0pdQU87dc8"
         startSec: 30
@@ -420,6 +423,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Boyz II Men End of the Road"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "CmeriHkAF5c"
         startSec: 30
@@ -495,6 +499,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Coolio Gangsta's Paradise Dangerous Minds"]
     answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
     youtubeClips:
       - videoId: "7DXlY8LhWnI"
         startSec: 30
@@ -641,6 +646,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Metallica Enter Sandman 1991"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "XZuM4zFg-60"
         startSec: 30
@@ -748,7 +754,7 @@ items:
     wikimediaSearchHints: ["AC/DC Thunderstruck 1990"]
     answerMethods: ["timeline"]
     spotifyTrackId: "57bgtoPSgt236HzfBOd8kj"
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     region: ["global"]
     youtubeClips:
       - videoId: "v2AC41dglnM"
@@ -949,6 +955,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Stevie Wonder I Just Called to Say I Love You 1984"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     spotifyTrackId: "2W8J9Gfw5q8tSvsuWSnMBl"
     youtubeClips:
       - videoId: "58RgLQ_0Ars"
@@ -1027,7 +1034,7 @@ items:
         endSec: 45
         channelTitle: "SchlagerArchive"
         notes: "Melodifestivalen 1981 vinnare."
-    genrePackages: ["Eurovision", "Melodifestivalen"]
+    genrePackages: ["100% in swedish", "Melodifestivalen"]
   - id: chips-dag-efter-dag
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Dag efter dag — Chips"
@@ -1054,7 +1061,7 @@ items:
         endSec: 40
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1984 vinnare, ESC-vinnare 1984."
-    genrePackages: ["Eurovision", "Melodifestivalen"]
+    genrePackages: ["Eurovision", "Melodifestivalen", "100% in swedish"]
     region: ["nordic"]
   - id: kikki-danielsson-bra-vibrationer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1070,7 +1077,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1985 vinnare. ESC 1985 performance."
-    genrePackages: ["Eurovision", "Melodifestivalen"]
+    genrePackages: ["Melodifestivalen"]
   - id: lotta-engberg-fyra-bugg
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fyra bugg och en Coca Cola — Lotta Engberg"
@@ -1084,7 +1091,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1987 vinnare."
-    genrePackages: ["Eurovision", "Melodifestivalen"]
+    genrePackages: ["Eurovision", "Melodifestivalen", "100% in swedish"]
   - id: tommy-korberg-stad-i-ljus
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Stad i ljus — Tommy Körberg"
@@ -1119,7 +1126,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1991 vinnare, ESC-vinnare 1991."
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
   - id: arvingarna-eloise
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Eloise — Arvingarna"
@@ -1133,7 +1140,7 @@ items:
         endSec: 20
         channelTitle: "Eurovision Song Contest"
         notes: "Melodifestivalen 1993 vinnare. ESC 1993 performance."
-    genrePackages: ["Dansband", "Melodifestivalen"]
+    genrePackages: ["Dansband", "Melodifestivalen", "100% in swedish"]
     region: ["nordic"]
   # ===== Eurovision Song Contest vinnare =====
   - id: bucks-fizz-making-your-mind-up
@@ -1451,7 +1458,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Ronny Ragge De e sommar 1989 Swedish summer"]
     answerMethods: ["timeline"]
-    genrePackages: ["Summer"]
+    genrePackages: ["Summer", "100% in swedish"]
     spotifyTrackId: "0EWaUpAQtTWET3E14ye6ZV"
     youtubeClips:
       - videoId: "K9KiSm1fyMk"
@@ -1540,7 +1547,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Def Leppard Pour Some Sugar on Me Hysteria"]
     answerMethods: ["timeline"]
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "0UIB9Y4OFPs"
         startSec: 30
@@ -1557,7 +1564,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Guns N Roses Sweet Child o Mine Appetite for Destruction"]
     answerMethods: ["timeline"]
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "qoflJn7zkFM"
         startSec: 0
@@ -1714,7 +1721,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["ZZ Top Gimme All Your Lovin 1983 Eliminator"]
     answerMethods: ["timeline"]
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "Ae829mFAGGE"
         startSec: 0
@@ -1742,6 +1749,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Foreigner I Want to Know What Love Is 1984 Agent Provocateur"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "r3Pr1_v7hsw"
         startSec: 0
@@ -2036,7 +2044,7 @@ items:
         endSec: 25
     notes: "SAKNAR MEDIA — Peter angav ingen lank (bara 'startsec60'). Behover kurerat YT-klipp innan den kan exporteras; satt startSec: 60 nar klippet laggs in. correctYear = 1987 ars ominspelning, den som blev hit och den vi spelar; bandets egen original fran albumet Saints & Sinners (1982) ar betydligt mindre kand — samma undantagsresonemang som a-ha Take on Me."
   # --- 1988 ---
-    genrePackages: ["Rock & Punk", "Soft & Love"]
+    genrePackages: ["Rock", "Soft & Love"]
     region: ["global"]
   - id: kylie-minogue-the-loco-motion
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2415,6 +2423,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Lenny Kravitz Are You Gonna Go My Way"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "i5PZQMwL7iE"
         startSec: 0
@@ -2811,7 +2820,6 @@ items:
         endSec: 30
         channelTitle: "2 Unlimited Official"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: janet-jackson-thats-the-way-love-goes
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "That’s the Way Love Goes — Janet Jackson"
@@ -2886,7 +2894,7 @@ items:
         endSec: 46
         channelTitle: "Green Day"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
   - id: michael-jackson-you-are-not-alone
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "You Are Not Alone — Michael Jackson"
@@ -2931,7 +2939,7 @@ items:
         endSec: 30
         channelTitle: "Radiohead"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1992 = singeln (21 sep 1992); albumet Pablo Honey kom 1993."
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     inBaseCatalog: false
   - id: all-4-one-i-swear
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2963,7 +2971,6 @@ items:
         endSec: 45
         channelTitle: "Alanis Morissette"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1995 = albumet Jagged Little Pill; singeln kom feb 1996."
-    genrePackages: ["Hits"]
   - id: red-hot-chili-peppers-under-the-bridge
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Under the Bridge — Red Hot Chili Peppers"
@@ -2978,7 +2985,7 @@ items:
         endSec: 30
         channelTitle: "Red Hot Chili Peppers"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Rock & Punk", "Mega Hits"]
+    genrePackages: ["Rock"]
   - id: sir-mix-a-lot-baby-got-back
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Baby Got Back — Sir Mix-a-Lot"
@@ -3026,7 +3033,7 @@ items:
         endSec: 66
         channelTitle: "TheFugeesVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits", "Soft & Love"]
+    genrePackages: ["Soft & Love"]
   - id: corona-the-rhythm-of-the-night
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Rhythm of the Night — Corona"
@@ -3156,6 +3163,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["2Pac Dr. Dre California Love 1995"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
     spotifyTrackId: "3ia3dJETSOllPsv3LJkE35"
     genrePackages: ["Hip Hop"]
     youtubeClips:
@@ -3172,7 +3180,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Hit Em High Space Jam Monstars Anthem 1996"]
     answerMethods: ["timeline"]
-    genrePackages: ["Hip Hop"]
+    genrePackages: ["Hip Hop", "Film edition"]
     parentControlled: true
     spotifyTrackId: "12MIoieKIYC1jDgpKGy12F"
     youtubeClips:
@@ -3270,6 +3278,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Gloria Estefan Don't Wanna Lose You 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "J1x1WGtePSE"
         startSec: 20
@@ -3296,6 +3305,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Tom Petty Free Fallin 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "1lWJXDG2i0A"
         startSec: 20
@@ -3322,6 +3332,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Queen I Want It All 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "hFDcoX7s6rE"
         startSec: 8
@@ -3335,6 +3346,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Cher If I Could Turn Back Time 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "9n3A_-HRFfc"
         startSec: 20
@@ -3348,6 +3360,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Simply Red If You Don't Know Me by Now 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "zTcu7MCtuTs"
         startSec: 20
@@ -3362,6 +3375,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Belinda Carlisle Leave a Light On 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "pmZYE8j2ZNs"
         startSec: 20
@@ -3375,6 +3389,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Gladys Knight Licence to Kill 1989 James Bond"]
     answerMethods: ["timeline"]
+    genrePackages: ["Film edition"]
     youtubeClips:
       - videoId: "v6Mzz9mLcsg"
         startSec: 20
@@ -3388,6 +3403,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Neneh Cherry Manchild 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "OJ9VBMBS3qE"
         startSec: 20
@@ -3401,6 +3417,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Natalie Cole Miss You Like Crazy 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "SSGCaaYuGoA"
         startSec: 20
@@ -3414,6 +3431,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Guns N Roses Paradise City 1987"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "inoqFF-2t8I"
         startSec: 20
@@ -3440,6 +3458,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Alice Cooper Poison 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "Qq4j1LtCdww"
         startSec: 20
@@ -3479,6 +3498,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Richard Marx Right Here Waiting 1989"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "S_E2EHVxNAE"
         startSec: 20
@@ -3531,6 +3551,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["White Lion When the Children Cry Pride 1987"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "6tatKFXlYiY"
         startSec: 20
@@ -3556,7 +3577,7 @@ items:
     correctYear: 1986
     probability: 60
     region: ["sweden"]
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
     wikimediaSearchHints: ["Kärleken är evig - Lena Philipsson 1986"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -3570,7 +3591,7 @@ items:
     correctYear: 1995
     probability: 60
     region: ["sweden"]
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
     inBaseCatalog: false
     wikimediaSearchHints: ["Se på mig - Jan Johansen 1995"]
     answerMethods: ["timeline"]

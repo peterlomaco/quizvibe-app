@@ -17,6 +17,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Rolling Stones Satisfaction"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "MSSxnv1_J2g"
         startSec: 0
@@ -97,6 +98,15 @@ items:
         channelTitle: "Simon & Garfunkel - Topic"
         notes: "Officiell album-audio via YouTube Topic. Chorus area."
     region: ["global"]
+  - id: creedence-wholl-stop-the-rain
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Who'll Stop the Rain — Creedence Clearwater Revival"
+    correctYear: 1970
+    probability: 82
+    wikimediaSearchHints: ["Creedence Clearwater Revival Who'll Stop the Rain 1970"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2aoo2jlRnM3A0NyLQqMN2f"
+    region: ["global"]
   - id: john-lennon-imagine
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Imagine — John Lennon"
@@ -118,6 +128,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Bill Withers Lean on Me"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Nx_D0VTHBag"
         startSec: 25
@@ -131,6 +142,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Roberta Flack Killing Me Softly"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "3r3R0lmH7OE"
         startSec: 45
@@ -229,7 +241,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Rolling Stones Paint It Black 1966"]
     answerMethods: ["timeline"]
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     spotifyTrackId: "63T7DJ1AFDD6Bn8VzG6JE8"
     youtubeClips:
       - videoId: "170sceOWWXc"
@@ -626,6 +638,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Bob Marley No Woman No Cry Natty Dread 1974"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Pv00rRagnqA"
         startSec: 50
@@ -718,7 +731,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["AC/DC Highway to Hell 1979"]
     answerMethods: ["timeline"]
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     spotifyTrackId: "2zYzyRzz6pRmhPzyfMEC8s"
     youtubeClips:
       - videoId: "ikFFVfObwss"
@@ -789,6 +802,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["The Rolling Stones Angie 1973"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "t1CvS7aOMa4"
         startSec: 30
@@ -837,6 +851,7 @@ items:
     probability: 68
     wikimediaSearchHints: ["Tomas Ledin Hon gör allt för att göra mig lycklig"]
     answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
     spotifyTrackId: "2eG2VJ3CiHs43XYBRIRQ45"
     youtubeClips:
       - videoId: "epuLWrb6AUA"
@@ -1009,6 +1024,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Lill Lindfors En sån karl 1967 Swedish schlager"]
     answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
     spotifyTrackId: "0S1nTYJUNSKpuJkkG4gucV"
     youtubeClips:
       - videoId: "cJ1-WZQvBSM"
@@ -1030,7 +1046,7 @@ items:
         endSec: 30
         channelTitle: "Sven Ingvars - Topic"
         notes: "Officiell Topic-kanal. Studio 1967. Ersatte fan-uppladdning (z0CDj6vwQ5s)."
-    genrePackages: ["Dansband"]
+    genrePackages: ["Dansband", "100% in swedish"]
   - id: abba-ring-ring
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ring Ring — ABBA"
@@ -1060,7 +1076,7 @@ items:
         endSec: 36
         channelTitle: "Lasse Berghagen - Topic"
         notes: "Peter-kurerad 2026-08-27. startSec 6 angiven av Peter. Ersatte uhYOEoQyqT4 vars titel 'Lasse Berghagen - Ding Dong (1973)' ar 34 tecken med aret vid 29 = spoiler."
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
   - id: streaplers-vad-har-du-under-blusen-rut
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Vad har du under blusen Rut — Streaplers"
@@ -1068,7 +1084,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Streaplers Vad har du under blusen Rut 1973 Swedish dansband"]
     answerMethods: ["timeline"]
-    genrePackages: ["Dansband"]
+    genrePackages: ["Dansband", "100% in swedish"]
     spotifyTrackId: "7915ILGV5otD6Oq3rOcKBR"
     youtubeClips:
       - videoId: "LdZuxKYJW3I"
@@ -1142,7 +1158,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Lasse Berghagen En kväll i juni 1975 Swedish schlager"]
     answerMethods: ["timeline"]
-    genrePackages: ["Summer"]
+    genrePackages: ["Summer", "100% in swedish"]
     spotifyTrackId: "6xYeTISkTw4S9K9hJgr1KJ"
     youtubeClips:
       - videoId: "RS1P0GhjmnQ"
@@ -1176,6 +1192,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Marvin Gaye Tammi Terrell Ain't No Mountain High Enough 1967"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     spotifyTrackId: "7tqhbajSfrz2F7E1Z75ASX"
     youtubeClips:
       - videoId: "IC5PL0XImjw"
@@ -1193,7 +1210,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["The Who Behind Blue Eyes 1971 Whos Next"]
     answerMethods: ["timeline"]
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     spotifyTrackId: "0cKk8BKEi7zXbdrYdyqBP5"
     youtubeClips:
       - videoId: "uA2zODu1nJw"
@@ -1502,6 +1519,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["If You Leave Me Now - Chicago 1976"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "1602T9ZVPjg"
         startSec: 9
@@ -1528,6 +1546,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["The Ballroom Blitz - Sweet 1973"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "7lTwA5xMeTM"
         startSec: 20
@@ -1541,6 +1560,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["You're the First, the Last, My Everything - Barry White 1974"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "SRCzskCp5rE"
         startSec: 20
@@ -1567,6 +1587,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["All Right Now - Free 1970"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "5wiF6b4rxno"
         startSec: 20
@@ -1580,6 +1601,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Easy - Commodores 1977"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "3woUYuyLsaI"
         startSec: 14
@@ -1619,6 +1641,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["I'll Be There - The Jackson 5 1970"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Xg2vMrDzoXM"
         startSec: 10
@@ -1671,6 +1694,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Another Brick in the Wall (Part 2) - Pink Floyd 1979"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "HrxX9TBj2zY"
         startSec: 20
@@ -1684,6 +1708,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Don't Stop Me Now - Queen 1978"]
     answerMethods: ["timeline"]
+    genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "HgzGwKwLmgM"
         startSec: 20
@@ -1697,6 +1722,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["I'm Not in Love - 10cc 1975"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "STugQ0X1NoI"
         startSec: 15
