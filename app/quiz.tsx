@@ -131,7 +131,6 @@ import { meetsHintsThreshold } from '@/src/utils/hintsText';
 import { buildHintsDistractorPool } from '@/src/utils/hintsDistractorPool';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
-import { HeartbeatSound } from '@/src/components/HeartbeatSound';
 import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
 import { WebViewWarmer } from '@/src/components/WebViewWarmer';
 // Person-bilderna är juridiskt parkerade sedan 2026-06-04 — en "image"-fråga
@@ -1946,24 +1945,27 @@ export default function QuizScreen() {
       effectiveYoutubeCategories.includes('Music') &&
       effectiveYoutubeCategories.includes('Film');
     // ── §4.1 HCP-frågefilter ────────────────────────────────────────────
-    // Spelaren får items vars Item-HCP (= probability) ligger i bandet
-    // [max(1,HCP−20), min(100,HCP+80)]; nedre kanten vidgas nedåt om poolen
-    // blir för tunn (variety-floor, se filterByItemHcp). Gäller BARA Single
+    // Spelaren får items vars Item-HCP (= probability) ligger på/över ett golv
+    // som sänks stegvis med spelarens HCP (se hcpRecognitionLowerBound):
+    // HCP ≥ 80 → itemHcp ≥ 10, 60–79 → ≥ 8, 40–59 → ≥ 6, 20–39 → ≥ 4,
+    // < 20 → ≥ 0. Övre kanten är alltid 100 (inget tak). Gäller BARA Single
     // Player + Pass-the-Phone (individanpassat per §4.1). IndDev delar host:s
-    // identiska sekvens (ej individanpassad); remote (server-sekvens) + guest-
-    // hostade spel (anonyma, grundar inget HCP) filtreras inte. Filtret läser
-    // DENNA enhets spelar-HCP ur profil-spegeln.
-    const applyHcp =
-      gameMode !== 'individual-devices' && !isRemote && !isGuestHostGame;
-    // Tuning-knopp: hur många items en pool minst måste behålla innan HCP-
-    // golvet relaxas. Högre = mildare filter + mer variation över spel; lägre
-    // = hårdare svårighetsstyrning men tunnare pool (fler reprisrisk).
+    // identiska sekvens (ej individanpassad) och remote (server-sekvens)
+    // filtreras inte. GUEST-hostade Single/PtP-spel filtreras NU (2026-09-12)
+    // men alltid som HCP 99 (ny-spelar-beteende) — se hcpSource nedan.
+    const applyHcp = gameMode !== 'individual-devices' && !isRemote;
+    // Liten-katalog-tröskel: om en (per-kategori) pool är ≤ detta filtreras den
+    // inte alls. Golvet i sig är så milt (≤ 10) att svält i praktiken inte sker.
     const HCP_FILTER_MIN_POOL = 30;
     // §1.3 — filtret använder spelarens PER-KATEGORI-HCP för denna region (en
     // Music-fråga mot Music-HCP osv.). regionHcp laddas async vid mount; innan
-    // dess (null) → HCP_START för alla (ny-spelar-beteende).
+    // dess (null) → HCP_START för alla (ny-spelar-beteende). Guest-hostade spel
+    // tvingar null → HCP 99 för ALLA kategorier: gästen har inget eget HCP, och
+    // en inloggad user som hostar som gäst ska INTE få sitt riktiga HCP använt
+    // (låst trial). Shielden visar ändå "Guest" och inget HCP sparas efteråt.
+    const hcpSource = isGuestHostGame ? null : regionHcp;
     const applyItemHcp = (pool: QuizQuestion[]): QuizQuestion[] =>
-      applyHcp ? filterPoolByCategoryHcp(pool, regionHcp, HCP_FILTER_MIN_POOL) : pool;
+      applyHcp ? filterPoolByCategoryHcp(pool, hcpSource, HCP_FILTER_MIN_POOL) : pool;
     const youtubePool = isAllYoutubeCats
       ? youtubePoolPreCategory
       : youtubePoolPreCategory.filter((q) =>
@@ -10268,11 +10270,18 @@ export default function QuizScreen() {
           Layout nu: [fixed-top: media+timer+question] + [ScrollView: bara
           answer-block + reveal-feedback] + [sticky-bottom: Confirm-bar]. */}
       <View style={styles.fixedTopZone}>
-        {/* Hjärtslag enbart för Hints-frågor under aktiv svarstid.
-            YT- och Spotify-frågor är tysta i quiz-vyn. Grindas ENBART på
-            isAudioMutedForSelf — se MorseAmbientSound i intro-vyn. */}
-        {!isAudioMutedForSelf && isImageQuestion && (phase === 'question' || phase === 'awaiting') && (
-          <HeartbeatSound bpm={80} />
+        {/* Lobbyns närvaro-slinga i intensivt läge (samma melodi, snabbare/
+            ljusare/högre) enbart för Hints-frågor under aktiv svarstid —
+            ersatte hjärtslaget 2026-09-12 (Peter). YT- och Spotify-frågor är
+            tysta i quiz-vyn. Grindas ENBART på isAudioMutedForSelf — se
+            MorseAmbientSound i intro-vyn. Monteras för HELA image-frågan så
+            den fadar ut vid reveal (active=false) i stället för att rivas
+            mitt i en ringande pluck (= klick, se MorseAmbientSound-noten). */}
+        {!isAudioMutedForSelf && isImageQuestion && (
+          <MorseAmbientSound
+            active={phase === 'question' || phase === 'awaiting'}
+            intensity="high"
+          />
         )}
           {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
             (leaderboard fångas av early-return ovan), så ingen extra
