@@ -6604,8 +6604,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport",
-      "sport-anthems"
+      "sport"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -9129,8 +9128,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "sport",
-      "sport-anthems"
+      "sport"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -9443,8 +9441,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport",
-      "sport-anthems"
+      "sport"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -10308,8 +10305,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "sport",
-      "sport-anthems"
+      "sport"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -13158,8 +13154,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport",
-      "sport-anthems"
+      "sport"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -13716,8 +13711,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "sport",
-      "sport-anthems"
+      "sport"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -17843,8 +17837,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport",
-      "sport-anthems"
+      "sport"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -21702,8 +21695,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "sport",
-      "sport-anthems"
+      "sport"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -23057,8 +23049,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "sport",
-      "sport-anthems"
+      "sport"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "46NBoIAHrmR7qcUGCIFEjR",
