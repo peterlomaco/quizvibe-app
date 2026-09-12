@@ -16,8 +16,13 @@
  *          hcpProgress.ts (nyckel per region). (Sport är borttaget ur den live
  *          modellen 2026-09 — allt sport-innehåll är parkerat i deferred/.)
  *  • §2.1  Ett glidande fönster per assistance-nivå (senaste 20 svaren) PER
- *          kategori. När fönstret är fullt: viktad summa S ≥ upper → HCP −1,
- *          S ≤ lower → HCP +1, annars 0. Max ±1 per spel och kategori.
+ *          kategori. När fönstret är fullt beräknas råa STEG från fönstersumman
+ *          S: ett steg per rätt svar förbi upper (S≥upper → −steg) och ett steg
+ *          per fel förbi lower (S≤lower → +steg), annars 0 — OKAPAT antal steg.
+ *          Stegen skalas sedan av en HCP-TIER-faktor tagen ur kategorins värde
+ *          FÖRE spelet (>60 → ×0.75, 30–60 → ×0.5, 1–29 → ×0.25), i BÅDA
+ *          riktningar. Den UPPÅTGÅENDE (sämre) deltan cappas dessutom per
+ *          nivå × tier (WORST_DELTA_CAP); den nedåtgående (bättre) cappas ej.
  *          Kontinuerligt glidande (INGEN reset).
  *  • §2.4  Inaktivitets-decay: +0.25 per hel 7-dagarsperiod utan spel,
  *          per kategori (var kategori har sin egen lastPlayedISO-klocka).
@@ -75,6 +80,27 @@ const WINDOW_THRESHOLDS: Record<AssistanceLevel, { lower: number; upper: number 
   minimal:  { lower:  8, upper: 14 },
 };
 
+// §2.1 — HCP-tier (bestäms av kategorins värde FÖRE spelet). Styr både
+// steg-faktorn (TIER_FACTOR) och den uppåtgående cappen (WORST_DELTA_CAP).
+export type HcpTier = 'high' | 'mid' | 'low';
+
+/** Vilken tier ett HCP-värde ligger i. 60.0 och 30.0 hamnar i 'mid'. */
+export function hcpTier(hcp: number): HcpTier {
+  return hcp > 60 ? 'high' : hcp >= 30 ? 'mid' : 'low';
+}
+
+// Steg-faktor per tier — hur mycket varje råstEg påverkar HCP (båda riktningar).
+const TIER_FACTOR: Record<HcpTier, number> = { high: 0.75, mid: 0.5, low: 0.25 };
+
+// Tak på den UPPÅTGÅENDE (sämre → högre HCP) deltan per assistance-nivå × tier.
+// Den nedåtgående (bättre) deltan cappas ALDRIG. Ett katastrofspel kan alltså
+// bara studsa tillbaka skölden ett begränsat antal poäng.
+const WORST_DELTA_CAP: Record<AssistanceLevel, Record<HcpTier, number>> = {
+  full:     { high: 5,   mid: 3.5, low: 1.75 },
+  standard: { high: 4,   mid: 2.5, low: 1.25 },
+  minimal:  { high: 3,   mid: 2.0, low: 1    },
+};
+
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 /** Klampar ett HCP-värde till [1, 99]. */
@@ -118,25 +144,37 @@ function appendToWindow(win: HcpWindow, answers: boolean[]): HcpWindow {
 }
 
 /**
- * §2.1 — utvärdera nivåns fönster → delta (−1 / 0 / +1).
+ * §2.1 — utvärdera nivåns fönster → RÅTT signerat stegantal (okapat).
+ * Ett steg per rätt svar förbi upper (negativt = bättre) och ett steg per fel
+ * förbi lower (positivt = sämre); däremellan 0. Ex FULL (12/18): 18/20 → −1,
+ * 20/20 → −3, 12/20 → +1, 0/20 → +13. Tier-faktor + capp appliceras i
+ * applyGameResult, INTE här.
+ *
  * Kräver ett FULLT fönster (20 svar) innan något steg sker — annars skulle
  * "≤ lower" fyra direkt för en ny spelare (0 rätt ≤ lower). Ny spelares HCP
  * är därför stabilt tills nivån har 20 svar (~5 spel).
  */
-export function evaluateWindow(win: HcpWindow, level: AssistanceLevel): -1 | 0 | 1 {
+export function evaluateWindow(win: HcpWindow, level: AssistanceLevel): number {
   if (win.length < HCP_WINDOW_SIZE) return 0;
   const sum = win.reduce((n, correct) => n + (correct ? 1 : 0), 0);
   const { lower, upper } = WINDOW_THRESHOLDS[level];
-  if (sum >= upper) return -1;
-  if (sum <= lower) return 1;
+  if (sum >= upper) return -(sum - upper + 1); // −1 vid upper, −N längre över
+  if (sum <= lower) return lower - sum + 1;    // +1 vid lower, +N längre under
   return 0;
+}
+
+/** Steg-faktorn för ett HCP-värde (>60 → 0.75, 30–60 → 0.5, 1–29 → 0.25). */
+export function hcpTierFactor(hcp: number): number {
+  return TIER_FACTOR[hcpTier(hcp)];
 }
 
 /**
  * §2.1 — kör en avslutad spelomgång för EN spelare på EN kategori + EN
- * assistance-nivå: lägg in svaren i den kategorins nivå-fönster, utvärdera,
- * applicera max ±1, klampa [1,99], stämpla kategorins lastPlayedISO. Rör bara
- * den spelade kategorins (och nivåns) fönster — övriga kategorier orörda.
+ * assistance-nivå: lägg in svaren i den kategorins nivå-fönster, utvärdera råa
+ * steg, skala med tier-faktorn (ur HCP:t FÖRE spelet), cappa den UPPÅTGÅENDE
+ * deltan per nivå × tier (nedåt cappas ej), klampa [1,99], stämpla kategorins
+ * lastPlayedISO. Rör bara den spelade kategorins (och nivåns) fönster — övriga
+ * kategorier orörda.
  */
 export function applyGameResult(
   progress: HcpProgress,
@@ -147,7 +185,9 @@ export function applyGameResult(
 ): HcpProgress {
   const cat = progress.categories[category];
   const win = appendToWindow(cat.windows[level], answers);
-  const delta = evaluateWindow(win, level);
+  const tier = hcpTier(cat.hcp);
+  let delta = evaluateWindow(win, level) * TIER_FACTOR[tier];
+  if (delta > 0) delta = Math.min(delta, WORST_DELTA_CAP[level][tier]);
   const nextCat: CategoryProgress = {
     hcp: clampHcp(cat.hcp + delta),
     windows: { ...cat.windows, [level]: win },
