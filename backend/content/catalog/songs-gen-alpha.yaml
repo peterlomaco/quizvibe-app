@@ -1199,11 +1199,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "2lOgTEwxmRPBtjp60opyRN"
     youtubeClips:
-      - videoId: "YOgIEc8y7-Y"
+      - videoId: "pcRKNslSS5g"
         startSec: 28
         endSec: 58
-        channelTitle: "Krystian GARY B"
-        notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+        channelTitle: "Ariana Grande Official"
+        notes: "Ersatte dött klipp (deleted/private) 2026-09-12 — official audio."
   - id: kygo-for-life
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "For Life — Kygo, Zak Abel & Nile Rodgers"
@@ -2213,10 +2213,11 @@ items:
     wikimediaSearchHints: ["On and On and On - Klara Hammarström 2025"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "ZuEiplgMHtU"
+      - videoId: "9dySigA-CqM"
         startSec: 20
         endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1394)."
+        channelTitle: "Klara Hammarström - Topic"
+        notes: "Ersatte dött klipp (deleted/private) 2026-09-12 — official Topic audio."
   - id: theoz-som-du-vill
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Som du vill — Theoz"
