@@ -2,10 +2,11 @@
 # låtar, idrottare som gjort musik). Crossover-kategori: contentForm=youtube
 # ("YouTube"), contentSubject=song ("musik", svaret är årtal).
 #
-# ⚠ MUSIC-ONLY LAUNCH (2026-09): items som Peter märkt "Music" i Musik sport.xlsx
-# ingår i "Sport Anthems"-temapaketet (pkg-sport-anthems) — de bär
-# genrePackages: [..., "sport-anthems"] + inBaseCatalog: false (paket-exklusiva,
-# surfar bara när paketet är aktivt). Items märkta "Sport" (Brandsta, Anis Don
+# ⚠ "Sport Anthems"-temapaketet (pkg-sport-anthems) är BORTTAGET 2026-09-12 och
+# "sport-anthems"-taggen strippad. De f.d. anthems-items bär nu bara
+# genrePackages: ["sport"] + inBaseCatalog: false → PARKERADE (surfar aldrig,
+# inget paket bär taggen), exakt som de "football"-taggade items nedan. Items
+# märkta "Sport" (Brandsta, Anis Don
 # Demina, Wavin' Flag, Mera mål, Långa Bollar, Gul och blå, Det ligger nåt i
 # luften) lämnas OTAGGADE + inBaseCatalog: false → parkerade (surfar aldrig utan
 # ett football/sport-paket som inte shippar). Se Workstream G i pivot-planen.

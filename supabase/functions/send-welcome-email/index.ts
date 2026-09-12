@@ -66,10 +66,60 @@ Deno.serve(async (req) => {
 
   const greeting = playerName ? `Hi ${playerName},` : 'Hi,';
   const subject = 'Your QuizVibe account is activated';
-  const text = `${greeting}\n\nYour QuizVibe account has been activated. Enjoy QuizVibe - Music`;
-  const html =
-    `<p>${greeting}</p>` +
-    `<p>Your QuizVibe account has been activated. Enjoy QuizVibe - Music</p>`;
+  const text =
+    `${greeting}\n\n` +
+    `Your QuizVibe account is activated. Jump in and put your ` +
+    `Music & Film knowledge to the test.\n\n` +
+    `QuizVibe is operated by LoMaCo AB, Sweden.`;
+  const html = `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+       style="background:#F4F7FB;margin:0;padding:0;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+             style="max-width:480px;background:#FFFFFF;border:1px solid #E6ECF3;
+                    border-radius:16px;overflow:hidden;
+                    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',
+                    Roboto,Helvetica,Arial,sans-serif;">
+        <tr>
+          <td align="center" style="padding:36px 32px 8px;">
+            <img src="https://quizvibe.se/quizvibe-logo.png" width="72" height="72"
+                 alt="QuizVibe" style="display:block;margin:0 auto;border:0;" />
+            <div style="font-size:12px;font-weight:700;letter-spacing:2px;
+                        text-transform:uppercase;color:#8A97AB;
+                        margin-top:12px;">Music. Film.</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 32px 0;">
+            <div style="height:1px;background:#EDF1F6;margin:20px 0 4px;"></div>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:20px 32px 0;">
+            <h1 style="font-size:22px;font-weight:700;color:#1A2233;
+                       margin:0 0 12px;">Your account is activated 🎉</h1>
+            <p style="font-size:15px;line-height:1.55;color:#4A5568;margin:0 0 10px;">
+              ${greeting}
+            </p>
+            <p style="font-size:15px;line-height:1.55;color:#4A5568;margin:0 0 8px;">
+              Your QuizVibe account is ready. Jump in and put your
+              Music &amp; Film knowledge to the test.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 32px 32px;">
+            <div style="height:1px;background:#EDF1F6;margin:16px 0 16px;"></div>
+            <p style="font-size:12px;line-height:1.5;color:#9AA6B8;margin:0;">
+              QuizVibe is operated by LoMaCo AB, Sweden.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`;
 
   try {
     const resp = await fetch('https://api.resend.com/emails', {

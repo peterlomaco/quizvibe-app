@@ -23,7 +23,8 @@ export interface MusicQuestion {
   contentSubject: YoutubeContentSubject;
   questionText: string;
   /** Item-HCP (§4.1) = katalogens probability (0–100). Klientens HCP-filter
-   *  väljer item om itemHcp >= spelarens HCP (relaxas om poolen blir för tunn). */
+   *  väljer item om itemHcp >= ett golv som sänks stegvis med spelarens HCP
+   *  (HCP ≥ 80 → ≥ 10 … HCP < 20 → ≥ 0; övre kanten alltid 100). */
   itemHcp: number;
   audiences: MusicQuestionAudience[];
   genrePackages?: string[];
@@ -9737,11 +9738,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "SSGCaaYuGoA",
+        "videoId": "OD1jb7Hgwk8",
         "startSec": 20,
         "endSec": 50,
+        "channelTitle": "NatalieColeMusic",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1320)."
+        "notes": "Ersatte dött klipp (deleted/private) 2026-09-12 — official audio."
       }
     ]
   },
@@ -10030,11 +10032,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "2F9_AwRs4Ao",
+        "videoId": "LC3Zu4puC1w",
         "startSec": 20,
         "endSec": 50,
+        "channelTitle": "Soul II Soul - Topic",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1306)."
+        "notes": "Ersatte dött klipp (deleted/private) 2026-09-12 — official Topic audio."
       }
     ]
   },
@@ -21981,12 +21984,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "2lOgTEwxmRPBtjp60opyRN",
     "youtubeClips": [
       {
-        "videoId": "YOgIEc8y7-Y",
+        "videoId": "pcRKNslSS5g",
         "startSec": 28,
         "endSec": 58,
-        "channelTitle": "Krystian GARY B",
+        "channelTitle": "Ariana Grande Official",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+        "notes": "Ersatte dött klipp (deleted/private) 2026-09-12 — official audio."
       }
     ]
   },
@@ -26330,11 +26333,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "inBaseCatalog": false,
     "youtubeClips": [
       {
-        "videoId": "ZuEiplgMHtU",
+        "videoId": "9dySigA-CqM",
         "startSec": 20,
         "endSec": 50,
+        "channelTitle": "Klara Hammarström - Topic",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1394)."
+        "notes": "Ersatte dött klipp (deleted/private) 2026-09-12 — official Topic audio."
       }
     ]
   },
