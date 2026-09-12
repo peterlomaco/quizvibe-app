@@ -1951,19 +1951,22 @@ export default function QuizScreen() {
     // HCP ≥ 80 → itemHcp ≥ 10, 60–79 → ≥ 8, 40–59 → ≥ 6, 20–39 → ≥ 4,
     // < 20 → ≥ 0. Övre kanten är alltid 100 (inget tak). Gäller BARA Single
     // Player + Pass-the-Phone (individanpassat per §4.1). IndDev delar host:s
-    // identiska sekvens (ej individanpassad); remote (server-sekvens) + guest-
-    // hostade spel (anonyma, grundar inget HCP) filtreras inte. Filtret läser
-    // DENNA enhets spelar-HCP ur profil-spegeln.
-    const applyHcp =
-      gameMode !== 'individual-devices' && !isRemote && !isGuestHostGame;
+    // identiska sekvens (ej individanpassad) och remote (server-sekvens)
+    // filtreras inte. GUEST-hostade Single/PtP-spel filtreras NU (2026-09-12)
+    // men alltid som HCP 99 (ny-spelar-beteende) — se hcpSource nedan.
+    const applyHcp = gameMode !== 'individual-devices' && !isRemote;
     // Liten-katalog-tröskel: om en (per-kategori) pool är ≤ detta filtreras den
     // inte alls. Golvet i sig är så milt (≤ 10) att svält i praktiken inte sker.
     const HCP_FILTER_MIN_POOL = 30;
     // §1.3 — filtret använder spelarens PER-KATEGORI-HCP för denna region (en
     // Music-fråga mot Music-HCP osv.). regionHcp laddas async vid mount; innan
-    // dess (null) → HCP_START för alla (ny-spelar-beteende).
+    // dess (null) → HCP_START för alla (ny-spelar-beteende). Guest-hostade spel
+    // tvingar null → HCP 99 för ALLA kategorier: gästen har inget eget HCP, och
+    // en inloggad user som hostar som gäst ska INTE få sitt riktiga HCP använt
+    // (låst trial). Shielden visar ändå "Guest" och inget HCP sparas efteråt.
+    const hcpSource = isGuestHostGame ? null : regionHcp;
     const applyItemHcp = (pool: QuizQuestion[]): QuizQuestion[] =>
-      applyHcp ? filterPoolByCategoryHcp(pool, regionHcp, HCP_FILTER_MIN_POOL) : pool;
+      applyHcp ? filterPoolByCategoryHcp(pool, hcpSource, HCP_FILTER_MIN_POOL) : pool;
     const youtubePool = isAllYoutubeCats
       ? youtubePoolPreCategory
       : youtubePoolPreCategory.filter((q) =>

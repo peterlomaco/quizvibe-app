@@ -517,16 +517,13 @@ const ytFilmAloneAlert = () =>
 // ─── Add Player Modal ─────────────────────────────────────────────────────────
 
 type AddPlayerAssistance = 'minimal' | 'standard' | 'full';
-const ADD_PLAYER_ASSISTANCE_OPTIONS: { id: AddPlayerAssistance; label: string }[] = [
-  { id: 'full',     label: 'Full' },
-  { id: 'standard', label: 'Standard' },
-  { id: 'minimal',  label: 'Minimal' },
-];
+// Host-tillagda gäster är låsta till Full (2026-09-12) — ingen väljare i
+// AddPlayerModal längre, så en options-lista behövs inte. Typen behålls för
+// onAdd/handleAddPlayer-signaturerna.
 
 // Remote 1v1: gemensam hjälpnivå för båda spelarna (host väljer i lobbyn).
-// Etiketterna speglar MEDVETET resten av appen (Profile, Add Player,
-// player-edit, leaderboard-metaraden) — samma nivå ska heta samma sak
-// överallt. Håll listan i synk med ADD_PLAYER_ASSISTANCE_OPTIONS ovan.
+// Etiketterna speglar MEDVETET resten av appen (Profile, player-edit,
+// leaderboard-metaraden) — samma nivå ska heta samma sak överallt.
 const REMOTE_ASSISTANCE_OPTIONS: { id: LobbyRemoteAssistance; label: string }[] = [
   { id: 'full',     label: 'Full' },
   { id: 'standard', label: 'Standard' },
@@ -634,7 +631,6 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
   // Sekventiella låsnings-gates — speglar Join-as-Guest-formen exakt
   // (utan code-steget).
   const yearUnlocked = playerNameStatus === 'available';
-  const assistanceUnlocked = yearUnlocked && birthYear !== null;
   const isFormValid = playerNameStatus === 'available' && birthYear !== null;
 
   const handleCheckPlayerName = async () => {
@@ -923,42 +919,20 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
               </TouchableOpacity>
             </View>
 
-            {/* Assistance level (låst tills year valt). Default 'standard'
-                är förvalt så användaren kan submit:a direkt efter year-pick. */}
-            <Text
-              style={[
-                modal.statusHint,
-                !assistanceUnlocked && modal.fieldGroupLocked,
-              ]}
-            >
-              Use default or select prefered setup
-            </Text>
-            <View
-              style={[modal.fieldGroup, !assistanceUnlocked && modal.fieldGroupLocked]}
-              pointerEvents={assistanceUnlocked ? 'auto' : 'none'}
-            >
+            {/* Assistance level: host-tillagda gäster är LÅSTA till Full —
+                samma guest-setup som guest host (2026-09-12). Ingen väljare,
+                bara en statisk Full-chip + not. handleAddPlayer forcerar
+                dessutom 'full' oavsett så värdet aldrig kan bli något annat. */}
+            <View style={modal.fieldGroup}>
               <Text style={modal.fieldLabel}>Assistance Level</Text>
               <View style={modal.skillRow}>
-                {ADD_PLAYER_ASSISTANCE_OPTIONS.map((opt) => {
-                  const isSelected = assistance === opt.id;
-                  return (
-                    <TouchableOpacity
-                      key={opt.id}
-                      style={[modal.skillBtn, isSelected && modal.skillBtnActive]}
-                      onPress={() => setAssistance(opt.id)}
-                    >
-                      <Text
-                        style={[
-                          modal.skillBtnText,
-                          isSelected && modal.skillBtnTextActive,
-                        ]}
-                      >
-                        {opt.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
+                <View style={[modal.skillBtn, modal.skillBtnActive]}>
+                  <Text style={[modal.skillBtnText, modal.skillBtnTextActive]}>
+                    Full
+                  </Text>
+                </View>
               </View>
+              <Text style={modal.statusHint}>Guests play on Full assistance.</Text>
             </View>
           </ScrollView>
 
@@ -3945,7 +3919,11 @@ export default function LobbyScreen() {
     setAddModalVisible(true);
   };
 
-  const handleAddPlayer = (name: string, age: number, assistance: AddPlayerAssistance) => {
+  // Host-tillagda gäster LÅSES till Full (2026-09-12) — samma guest-setup som
+  // guest host. AddPlayerModal visar bara en statisk Full-chip, men vi forcerar
+  // 'full' här också så värdet aldrig kan bli något annat även om en väljare
+  // återinförs i modalen. onAdd:s tredje arg (assistance) tas därför inte emot.
+  const handleAddPlayer = (name: string, age: number) => {
     if (isLobbyAtCapacity()) {
       Alert.alert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
       return;
@@ -3960,7 +3938,7 @@ export default function LobbyScreen() {
         approved: true,
         type: 'guest',
         age,
-        assistance,
+        assistance: 'full',
         hcpComplete: true,
         addedByHost: true,
       },
@@ -4154,6 +4132,12 @@ export default function LobbyScreen() {
     ? players.find((p) => p.id === playerEditTargetId) ?? null
     : null;
   const playerEditIsGuest = playerEditTarget?.type === 'guest';
+  // Assistance låst till Full för (a) guest host:s EGET kort och (b) host-
+  // tillagda gäster (2026-09-12) — samma guest-setup. Självanslutna gäster
+  // som JOINAT en multiplayer-lobby är INTE låsta (de valde nivå på join-
+  // formen; ingen addedByHost-flagga) och host kan fortsatt editera dem.
+  const editAssistanceLocked =
+    (isGuestHost && !!playerEditTarget?.isHost) || !!playerEditTarget?.addedByHost;
 
   const openPlayerEdit = (id: string) => {
     const target = players.find((p) => p.id === id);
@@ -4248,7 +4232,7 @@ export default function LobbyScreen() {
           ? {
               ...p,
               age: nextAge,
-              assistance: editAssistance,
+              assistance: editAssistanceLocked ? 'full' : editAssistance,
               // Guest:ens hcpOverride lämnas alltid undefined — getGuestHcp
               // sköter beräkningen från registrerade spelare i lobbyn.
               hcpOverride: playerEditIsGuest ? undefined : nextHcpOverride,
@@ -9094,26 +9078,32 @@ export default function LobbyScreen() {
                   tidigare låst till Full med statisk chip + not). */}
               <View style={playerEditSheet.fieldGroup}>
                 <Text style={playerEditSheet.fieldLabel}>Assistance Level</Text>
-                {mutualAssistanceActive ? (
-                  /* Remote 1v1 med Mutual assistance PÅ: nivån är gemensam och
-                     sätts i Game Mode-sektionen — per-spelare-val här skulle
-                     bara skrivas över av match-snapshotten vid Start Game. Visa
-                     den gällande nivån statiskt + peka på rätt kontroll.
-                     Är switchen AV faller vi igenom till den vanliga
-                     per-spelare-raden nedan. */
+                {mutualAssistanceActive || editAssistanceLocked ? (
+                  /* Låst nivå — statisk chip + not, ingen väljare. Två fall:
+                     (a) Remote 1v1 med Mutual assistance PÅ: nivån är gemensam
+                         och sätts i Game Mode-sektionen (per-spelare-val här
+                         skulle bara skrivas över av match-snapshotten).
+                     (b) Guest host:s eget kort ELLER host-tillagd gäst
+                         (2026-09-12): alltid Full — samma guest-setup.
+                     Är ingendera aktiv faller vi igenom till den vanliga
+                     per-spelare-raden nedan (t.ex. självanslutna gäster). */
                   <>
                     <View style={playerEditSheet.skillRow}>
                       <View style={[playerEditSheet.skillBtn, playerEditSheet.skillBtnActive]}>
                         <Text style={[playerEditSheet.skillBtnText, playerEditSheet.skillBtnTextActive]}>
-                          {REMOTE_ASSISTANCE_OPTIONS.find((o) => o.id === remoteAssistance)?.label
-                            ?? 'Full'}
+                          {mutualAssistanceActive
+                            ? (REMOTE_ASSISTANCE_OPTIONS.find((o) => o.id === remoteAssistance)?.label
+                              ?? 'Full')
+                            : 'Full'}
                         </Text>
                       </View>
                     </View>
                     <Text style={styles.guestHostNote}>
-                      {hostMode
-                        ? 'Shared by both players — change it under Game Mode.'
-                        : 'Shared by both players — selected by the Host.'}
+                      {mutualAssistanceActive
+                        ? (hostMode
+                          ? 'Shared by both players — change it under Game Mode.'
+                          : 'Shared by both players — selected by the Host.')
+                        : 'Guests play on Full assistance.'}
                     </Text>
                   </>
                 ) : (
