@@ -475,6 +475,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Etta James At Last 1960"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "cZag0E32is0"
         startSec: 30
@@ -489,6 +490,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ray Charles Georgia on My Mind 1960"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "JJoRBtz1fHg"
         startSec: 30
@@ -531,6 +533,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Lill-Babs Leva livet 1963 Swedish schlager"]
     answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
     spotifyTrackId: "6P40lE9SODIcT21NpmRd2I"
     youtubeClips:
       - videoId: "BrYFFIESx3c"

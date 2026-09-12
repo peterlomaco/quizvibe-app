@@ -29,7 +29,6 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Aqua Barbie Girl 1997"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "twW5slEK8wY"
         startSec: 0
@@ -338,6 +337,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Timbaland OneRepublic Apologize"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "xTjwTbnX_EA"
         startSec: 15
@@ -412,6 +412,8 @@ items:
     probability: 92
     wikimediaSearchHints: ["Shakira Waka Waka FIFA World Cup 2010"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
+    genrePackages: ["sport"]
     youtubeClips:
       - videoId: "Ntn1-SocNiY"
         startSec: 5
@@ -516,6 +518,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["OutKast Hey Ya 2003"]
     answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
     youtubeClips:
       - videoId: "_pYHJWd_yto"
         startSec: 30
@@ -615,6 +618,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Swedish House Mafia Don't You Worry Child 2012"]
     answerMethods: ["timeline"]
+    genrePackages: ["Club & Dance"]
     spotifyTrackId: "3zu2CuVTJwaZn2m4rBzaUO"
     youtubeClips:
       - videoId: "02Qa5PH0tZY"
@@ -680,7 +684,7 @@ items:
         endSec: 35
         channelTitle: "GlyphoricVibes"
         notes: "Peter-kurerad 2026-08-27. Lyrics. startSec 5 angiven av Peter."
-    genrePackages: ["Hits", "Soft & Love"]
+    genrePackages: ["Soft & Love"]
     region: ["global"]
   - id: bruno-mars-just-the-way-you-are
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -832,7 +836,6 @@ items:
         channelTitle: "GIRLS FOR MUSIC"
         notes: "Peter-kurerad 2026-08-27. Lyrics. startSec 0 angiven av Peter. Ersatte JKko13wVxE8 (min ersattning for Peters MZm-vC9CBe4 som inte gick att badda in)."
     region: ["global"]
-    genrePackages: ["Hits"]
   - id: jill-johnson-karleken-ar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kärleken är — Jill Johnson"
@@ -888,7 +891,7 @@ items:
         startSec: 3
         endSec: 33
         notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1395)."
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
   - id: martin-stenmarck-las-vegas
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Las Vegas — Martin Stenmarck"
@@ -916,7 +919,7 @@ items:
         endSec: 45
         channelTitle: "Melodifestivalen"
         notes: "Melodifestivalen 2006 vinnare."
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
   - id: the-ark-the-worrying-kind
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Worrying Kind — The Ark"
@@ -968,6 +971,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Anna Bergendahl This Is My Life Eurovision 2010"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
     youtubeClips:
       - videoId: "OTRcAg6VxU4"
         startSec: 30
@@ -975,7 +979,6 @@ items:
         channelTitle: "Anakina_Skywalker"
         notes: "Melodifestivalen 2010 vinnare."
     genrePackages: ["Eurovision", "Melodifestivalen"]
-    region: ["nordic"]
   - id: eric-saade-popular
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Popular — Eric Saade"
@@ -1154,6 +1157,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Alexander Rybak Fairytale Eurovision 2009 Norway"]
     answerMethods: ["timeline"]
+    genrePackages: ["Eurovision"]
     youtubeClips:
       - videoId: "WXwgZL4zx9o"
         startSec: 5
@@ -1214,6 +1218,8 @@ items:
     probability: 70
     wikimediaSearchHints: ["Kapten Röd AKI När solen går ner 2012 Swedish hip-hop reggae"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
+    genrePackages: ["Hip Hop"]
     spotifyTrackId: "68GdZAAowWDac3SkdNWOwo"
 
   - id: markoolio-sommar-och-sol
@@ -1224,7 +1230,6 @@ items:
     wikimediaSearchHints: ["Markoolio Swedish rapper singer Sommar och sol"]
     answerMethods: ["timeline"]
     genrePackages: ["Summer"]
-    inBaseCatalog: true
     region: ["sweden"]
     spotifyTrackId: "4bpqcGVSveDZ5E3rgr9v2y"
     youtubeClips:
@@ -1395,6 +1400,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Günther Ding Dong Song 2004 Swedish eurodance"]
     answerMethods: ["timeline"]
+    parentControlled: true
     spotifyTrackId: "2LELFaNglE9B5xlcmd4qtQ"
     # youtubeClips borttagna 2026-08-10: uUYplyWPKGk (Günther) är raderad/privat →
     # "Video unavailable" i spelaren. Lever vidare som Spotify-only DJ-runda.
@@ -1636,6 +1642,8 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Benny Benassi Satisfaction Hypnotica"]
     answerMethods: ["timeline"]
+    parentControlled: true
+    inBaseCatalog: false
     genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "y4gm5MdWg3M"
@@ -1651,7 +1659,6 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Vengaboys Boom Boom Boom Boom"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "llyiQ4I-mcQ"
         startSec: 0
@@ -1753,7 +1760,6 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Kate Ryan Desenchantee"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance"]
     youtubeClips:
       - videoId: "f_vyYpNDXkI"
         startSec: 0
@@ -1898,6 +1904,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Backstreet Boys I Want It That Way Millennium"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "4fndeDfaWCg"
         startSec: 0
@@ -2088,7 +2095,6 @@ items:
         endSec: 41
         channelTitle: "RihannaVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Club & Dance"]
   - id: jessie-j-price-tag
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Price Tag — Jessie J feat. B.o.B"
@@ -2312,7 +2318,6 @@ items:
         endSec: 45
         channelTitle: "BritneySpearsVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: destinys-child-bootylicious
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Bootylicious — Destiny’s Child"
@@ -2327,7 +2332,6 @@ items:
         endSec: 30
         channelTitle: "DestinysChildVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: pussycat-dolls-dont-cha
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Don’t Cha — The Pussycat Dolls feat. Busta Rhymes"
@@ -2342,7 +2346,6 @@ items:
         endSec: 33
         channelTitle: "ThePussycatDollsVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: destinys-child-say-my-name
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Say My Name — Destiny’s Child"
@@ -2357,7 +2360,6 @@ items:
         endSec: 30
         channelTitle: "DestinysChildVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1999 = albumet The Writing's on the Wall (MusicBrainz gav felaktigt 1998)."
-    genrePackages: ["Hits"]
   - id: brandy-monica-the-boy-is-mine
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "The Boy Is Mine — Brandy & Monica"
@@ -2387,7 +2389,6 @@ items:
         endSec: 30
         channelTitle: "blink182VEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: offspring-pretty-fly
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pretty Fly (For a White Guy) — The Offspring"
@@ -2402,7 +2403,7 @@ items:
         endSec: 33
         channelTitle: "OffspringVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
   - id: jennifer-lopez-love-dont-cost-a-thing
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Love Don’t Cost a Thing — Jennifer Lopez"
@@ -2448,7 +2449,6 @@ items:
         endSec: 30
         channelTitle: "Goo Goo Dolls"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
-    genrePackages: ["Hits"]
   - id: savage-garden-truly-madly-deeply
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Truly Madly Deeply — Savage Garden"
@@ -2511,7 +2511,7 @@ items:
         endSec: 67
         channelTitle: "SmashMouthVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1999 = albumet Astro Lounge (MusicBrainz gav felaktigt 1997)."
-    genrePackages: ["Rock & Punk"]
+    genrePackages: ["Rock"]
     inBaseCatalog: false
   - id: hanson-mmmbop
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -2527,7 +2527,6 @@ items:
         endSec: 30
         channelTitle: "HansonVEVO"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1997 = Mercury-singeln/Middle of Nowhere. RATTA INTE till 1996: bandet sjalvslappte en ANNAN inspelning pa indie-albumet MMMBop 1996 - itemet ar 1997-inspelningen."
-    genrePackages: ["Hits"]
   - id: timbuktu-alla-vill-till-himmelen
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Alla vill till himmelen men ingen vill dö — Timbuktu"
@@ -2652,6 +2651,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Manu Chao Me Gustas Tu 2001"]
     answerMethods: ["timeline"]
+    inBaseCatalog: false
     spotifyTrackId: "6b37xrsNCWYIUphFBazqD6"
     genrePackages: ["Soft & Love"]
     youtubeClips:
@@ -2753,10 +2753,8 @@ items:
     correctYear: 2009
     probability: 78
     region: ["global"]
-    inBaseCatalog: false
     wikimediaSearchHints: ["Timbaland Scream Keri Hilson 2009"]
     answerMethods: ["timeline"]
-    genrePackages: ["Party mix"]
     spotifyTrackId: "5sp1KDCNEm1Eoeqxsep01L"
     youtubeClips:
       - videoId: "nXskfsgBihE"
@@ -2769,10 +2767,8 @@ items:
     correctYear: 2002
     probability: 82
     region: ["global"]
-    inBaseCatalog: false
     wikimediaSearchHints: ["Justin Timberlake Like I Love You 2002"]
     answerMethods: ["timeline"]
-    genrePackages: ["Party mix"]
     spotifyTrackId: "6W2Ef5Ph6ILTUAedoQ3QIv"
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1293)."
     youtubeClips:
@@ -2786,10 +2782,8 @@ items:
     correctYear: 2009
     probability: 76
     region: ["global"]
-    inBaseCatalog: false
     wikimediaSearchHints: ["Timbaland Morning After Dark 2009"]
     answerMethods: ["timeline"]
-    genrePackages: ["Party mix"]
     youtubeClips:
       - videoId: "25LBTSUEU0A"
         startSec: 40
@@ -2806,7 +2800,6 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Justin Timberlake Rock Your Body 2002"]
     answerMethods: ["timeline"]
-    genrePackages: ["Party mix"]
     youtubeClips:
       - videoId: "TSVHoHyErBQ"
         startSec: 0
@@ -3057,7 +3050,7 @@ items:
     correctYear: 2010
     probability: 58
     region: ["sweden"]
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
     inBaseCatalog: false
     wikimediaSearchHints: ["Underbart - Kalle Moraeus & Orsa Spelmän 2010"]
     answerMethods: ["timeline"]
@@ -3118,7 +3111,7 @@ items:
     correctYear: 1999
     probability: 58
     region: ["sweden"]
-    genrePackages: ["Melodifestivalen"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
     wikimediaSearchHints: ["Du är så yeah yeah wow wow - Martin 1999"]
     answerMethods: ["timeline"]
     youtubeClips:

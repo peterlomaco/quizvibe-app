@@ -95,7 +95,7 @@ items:
         startSec: 5
         endSec: 50
         channelTitle: "uutiiset"
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "football"]
   - id: svenne-rubins-langa-bollar-pa-bengt
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Långa Bollar På Bengt — Svenne Rubins"
@@ -254,7 +254,7 @@ items:
         endSec: 45
         channelTitle: "Baddiel - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "football"]
   - id: new-order-world-in-motion
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "World in Motion — New Order"
@@ -318,7 +318,7 @@ items:
         endSec: 30
         channelTitle: "David Guetta"
         notes: "Officiell MV från David Guettas kanal. UEFA EURO 2016 Official Song. Ersätter Topic-versionen."
-    genrePackages: ["sport"]
+    genrePackages: ["sport", "football"]
     region: ["global"]
   - id: bono-we-are-the-people
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -359,7 +359,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Zombie Nation Kernkraft 400 1999 techno dance"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance", "Sport"]
+    genrePackages: ["Club & Dance", "sport"]
     youtubeClips:
       - videoId: "SxhwbXYe1XE"
         startSec: 0
