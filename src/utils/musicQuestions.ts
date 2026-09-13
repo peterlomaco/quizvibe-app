@@ -26005,11 +26005,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "6ZWalyzfVcNCc1XwKnnyyn",
     "youtubeClips": [
       {
-        "videoId": "nSERqaFagJc",
-        "startSec": 0,
-        "endSec": 30,
+        "videoId": "H58vbez_m4E",
+        "startSec": 43,
+        "endSec": 73,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1286)."
+        "notes": "Peter-kurerad 2026-09-13 (ersatte nSERqaFagJc)."
       }
     ]
   },
