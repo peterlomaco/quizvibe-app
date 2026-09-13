@@ -2599,6 +2599,29 @@ export default function LobbyScreen() {
       return next;
     });
   }, [stepperMax, roundsCount, singlePlayerDefault, gameMode]);
+  // Tap på rounds-PREMIUM-badgen (RoundsRuler-badgen OCH stepper-badgen).
+  // En premium-host får ALDRIG skickas till Store — de äger redan feature:n,
+  // och Store ger inget mer (PtP är hårt cappad på 4 oavsett premium; IndDev
+  // ger redan 20). Bara free-host får upsell-alerten. Se CLAUDE.md
+  // "Subscription-styling (host-vyn)".
+  const handleRoundsPremiumPress = useCallback(() => {
+    if (hasPremium) {
+      if (gameMode === 'individual-devices' && !singlePlayerDefault) {
+        Alert.alert('Premium active', 'You have QuizVibe Premium — up to 20 rounds are unlocked in Individual device mode.');
+      } else {
+        Alert.alert('Individual device required', 'Switch to Individual device mode to host up to 20 rounds. Premium is already active on your account.');
+      }
+      return;
+    }
+    Alert.alert(
+      'Premium feature',
+      'Host more than 4 rounds require QuizVibe Premium. Get in Store?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+      ],
+    );
+  }, [hasPremium, gameMode, singlePlayerDefault, roomCode]);
   // Per-source profession-category-filter (ersätter youtubeEnabled/imagesEnabled/enabledMainCategories).
   // YouTube: alla tre valbara, min 1 krävs. Images: Film+Sport mandatory, Music valbar.
   const [youtubeEnabledCategories, setYoutubeEnabledCategories] = useState<MainCategory[]>(
@@ -8660,14 +8683,7 @@ export default function LobbyScreen() {
                         missvisande). */}
                     {roundsCount >= stepperMax && gameMode !== 'remote-1v1' && (
                       <TouchableOpacity
-                        onPress={() => Alert.alert(
-                          'Premium feature',
-                          'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
-                          [
-                            { text: 'Cancel', style: 'cancel' },
-                            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
-                          ],
-                        )}
+                        onPress={handleRoundsPremiumPress}
                         activeOpacity={0.7}
                         style={{ backgroundColor: hasPremium ? '#F5A623' : '#6B7280', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 4 }}
                       >
@@ -8683,16 +8699,7 @@ export default function LobbyScreen() {
                       // 1v1: ingen premium-klammer/badge (onPremiumPress
                       // utelämnad → RoundsRuler döljer dem) — remote är
                       // alltid max 4 rundor, ingen Premium-väg förbi.
-                      onPremiumPress={gameMode === 'remote-1v1' ? undefined : () => {
-                        Alert.alert(
-                          'Premium feature',
-                          'Host more than 4 rounds require QuizVibe Premium. Get in Store?',
-                          [
-                            { text: 'Cancel', style: 'cancel' },
-                            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
-                          ],
-                        );
-                      }}
+                      onPremiumPress={gameMode === 'remote-1v1' ? undefined : handleRoundsPremiumPress}
                       hasSubscription={hasPremium}
                       indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
                     />
