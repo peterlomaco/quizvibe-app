@@ -2012,10 +2012,10 @@ items:
     spotifyTrackId: "6ZWalyzfVcNCc1XwKnnyyn"
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1287)."
     youtubeClips:
-      - videoId: "nSERqaFagJc"
-        startSec: 0
-        endSec: 30
-        notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1286)."
+      - videoId: "H58vbez_m4E"
+        startSec: 43
+        endSec: 73
+        notes: "Peter-kurerad 2026-09-13 (ersatte nSERqaFagJc)."
   - id: pitbull-fireball
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Fireball — Pitbull"
