@@ -5,7 +5,7 @@ description: How QuizVibe collects, uses, and protects your information.
 
 # Privacy Policy
 
-**Last updated:** 2026-08-07
+**Last updated:** 2026-09-14
 **Effective date:** Upon app launch on the Apple App Store
 
 This Privacy Policy explains how **QuizVibe** ("we", "us", "the app") collects, uses, and protects your information when you use our mobile application. We've tried to write it in plain English with the legal anchor points clearly marked.
@@ -106,14 +106,15 @@ We use **Supabase** (https://supabase.com) to store account data, game history, 
 
 Supabase has its own privacy policy: https://supabase.com/privacy
 
-### 4.2 YouTube IFrame Player (video playback)
+### 4.2 YouTube API Services (video playback)
 
-Quiz questions include embedded YouTube music clips. When a video plays, your device communicates directly with YouTube's servers to stream the content. This means **Google receives information about your device** (IP address, browser-like info, the video being watched) per their own data collection practices.
+QuizVibe uses **YouTube API Services** — specifically the YouTube IFrame Player — to play embedded video clips inside the app. By using the parts of QuizVibe that play these clips, you are also agreeing to the **YouTube Terms of Service** (https://www.youtube.com/t/terms), and the way Google handles your data is described in the **Google Privacy Policy** (https://policies.google.com/privacy).
 
-We do **not** send YouTube any of your QuizVibe account information. The YouTube player runs in a sandboxed view inside the app.
+When a video plays, your device communicates directly with YouTube's/Google's servers to stream the content. This means **Google receives information about your device** (such as IP address, browser-like device info, and the video being watched) per Google's own data collection practices. The embedded player runs in a sandboxed web view inside the app.
 
-Google's Privacy Policy applies to YouTube embeds: https://policies.google.com/privacy
-YouTube Terms of Service: https://www.youtube.com/t/terms
+**What QuizVibe collects, stores, and uses via YouTube API Services:** nothing. We do **not** send YouTube any of your QuizVibe account information, and we do **not** receive, store, or log any YouTube user data, viewing history, or Google account data. All such data is collected by Google directly, not by us.
+
+**Revoking access:** you can review and revoke any access that Google-connected apps and services (including YouTube) have to your Google account at Google's security settings page: **https://myaccount.google.com/permissions**.
 
 ### 4.3 Apple StoreKit (in-app purchases)
 
@@ -127,18 +128,28 @@ Our app's source code and this Privacy Policy document are hosted on **GitHub** 
 
 GitHub's Privacy Policy: https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement
 
+### 4.5 Spotify (optional track playback)
+
+Some questions can be played from Spotify. When you choose to play a track, QuizVibe simply **opens the Spotify app on your device via a standard link** (a deep link).
+
+QuizVibe **does not connect to, sign in to, authenticate with, or exchange any data with Spotify.** There is no Spotify account linking, no login, and we do not receive or store any Spotify tokens, listening history, or account information. QuizVibe never learns anything about your Spotify account.
+
+Once the Spotify app opens, any personal data is handled by Spotify under **Spotify's own Privacy Policy**: https://www.spotify.com/legal/privacy-policy/
+
 ---
 
 ## 5. How long we keep your data
 
 | Data type | Retention period |
 |---|---|
-| Registered user account (profile, history) | Until you delete it. Delete in-app via Profile → tap your name → Delete Account. Email info@quizvibe.se if you need help. |
+| Registered user account (profile, game history, **and your email address** — which is personal data) | Until you delete it. Delete in-app via Profile → tap your name → Delete Account. Email info@quizvibe.se if you need help. |
 | Guest anonymous session | Until you leave the game (immediate) or 30 days of inactivity. |
 | Lobby state (room codes, player list) | Auto-deleted 24 hours after the lobby was created. |
 | Analytics events (anonymized) | 90 days, then aggregated and de-identified for long-term retention. |
 | IP addresses (rate-limit tracking) | 1 hour, then automatically purged. |
 | In-app purchase records | 7 years (Swedish accounting law requirement — Bokföringslagen). |
+| Backup copies of the above (personal data in backups) | Backups are rotated and any personal data in them is deleted within 30 days, so deletions propagate to backups within that window. |
+| YouTube API data | We do not cache or store YouTube API data. To the extent any YouTube API data were ever stored, it would be deleted within **30 days**, as required by the YouTube API Services Terms of Service. |
 
 ---
 
@@ -205,6 +216,8 @@ The app does **not** use cookies (it's a mobile app, not a website). We do not u
 - Cross-site tracking pixels.
 
 We use **AsyncStorage** on your device to persist your preferences (login session, profile, game history). This is local-only and is not transmitted to us unless required for app functionality (e.g., syncing scores).
+
+**One exception is outside our control:** the embedded YouTube player runs in a web view, and Google may set its own cookies or similar technologies while a clip plays. Those cookies are controlled by Google (not by QuizVibe), are governed by the Google Privacy Policy, and are described in Section 4.2. QuizVibe itself sets no cookies.
 
 ---
 

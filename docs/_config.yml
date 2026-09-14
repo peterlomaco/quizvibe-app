@@ -2,7 +2,7 @@
 # Aktiveras via repo Settings → Pages → Source: master branch, /docs folder.
 
 title: QuizVibe
-description: A mobile app for social music quizzes. Operated by LoMaCo AB, Sweden.
+description: A mobile app for social music and film quizzes. Operated by LoMaCo AB, Sweden.
 theme: jekyll-theme-minimal
 
 # Använd "pretty" URL:er (/legal/privacy/ istället för /legal/privacy.html).
@@ -13,6 +13,7 @@ permalink: pretty
 exclude:
   # Interna specar och app review-underlag
   - APP_REVIEW_RESPONSES.md
+  - APP_STORE_LISTING.md
   - individual-devices-spec.md
   # Interna innehålls- och licensrevisioner (arbetsdokument, ej för publik visning)
   - commons-categories-candidates.md

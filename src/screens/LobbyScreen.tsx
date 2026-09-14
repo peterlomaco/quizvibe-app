@@ -6856,7 +6856,7 @@ export default function LobbyScreen() {
               </View>
             </Pressable>
           )}
-          {/* Non-host: "Music. Film. Sport."-tagline på samma rad som "Game
+          {/* Non-host: "Music. Film. Play."-tagline på samma rad som "Game
               Lobby", uppe i högra hörnet (host saknar credits-pill där så
               utrymmet är fritt). Host visar den ovanför room code-kortet. */}
           {!hostMode && (
@@ -10237,7 +10237,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     rowGap: Spacing.sm,
   },
-  // Non-host: "Music. Film. Sport." på samma rad som Game Lobby (höger).
+  // Non-host: "Music. Film. Play." på samma rad som Game Lobby (höger).
   headerTagline: {
     flexShrink: 1,
     fontSize: 19,
