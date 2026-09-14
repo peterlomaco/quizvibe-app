@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import { TopUserBanner } from '../components/TopUserBanner';
+import { SUBSCRIPTION_FEATURES } from './StoreScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 
 // ─── Data ───────────────────────────────────────────────────────────────────
@@ -20,6 +21,11 @@ import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../th
 interface FaqItem {
   q: string;
   a: string;
+  // När true renderas Premium-vs-Basic-jämförelsekortet under svarstexten —
+  // samma kort (och samma SUBSCRIPTION_FEATURES-data) som Store:ns "QuizVibe
+  // membership"-sektion. Renderas i komponenten, inte här, eftersom `styles`
+  // deklareras efter denna array (TDZ vid inline-JSX på modulnivå).
+  membershipCard?: boolean;
 }
 
 interface FaqCategory {
@@ -37,7 +43,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What is QuizVibe?',
-        a: 'A social quiz game where you guess years on music clips and names on images. Play with friends in the same room (Pass-the-Phone) or on separate phones (Individual Devices — free for everyone).',
+        a: 'A social quiz game about music and film. Guess the release year on song and movie clips, or the name behind an artist or band from a set of progressive hints. Play with friends in the same room (Pass-the-Phone) or on separate phones (Individual Devices — free for everyone).',
       },
       {
         q: 'Do I need an account to play?',
@@ -45,11 +51,11 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What is the age minimum?',
-        a: '15 years. The content in QuizVibe includes material rated for ages 15 and above. You provide a year of birth at registration which we use to match the generation category that fits your recognition — we do not store your actual age, only the generation category you play as.',
+        a: '15 years. The content in QuizVibe includes material rated for ages 15 and above. You provide a year of birth at registration, which is used to set sensible default game settings (such as the era range for your games) and your competition age.',
       },
       {
         q: 'How do I get started fastest?',
-        a: '(1) Tap Create Game on the Home screen, (2) share the Room Code with friends or invite them from the Lobby, (3) approve players who join, (4) tap Start Game. You get 2 Free Host Game Credits per day.',
+        a: '(1) Tap Create Game on the Home screen, (2) share the Room Code with friends or invite them from the Lobby, (3) approve players who join, (4) tap Start Game. You get 4 Free Host Game Credits per day.',
       },
       {
         q: 'Does QuizVibe work on Android?',
@@ -72,11 +78,11 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What is Single Player mode?',
-        a: 'A checkbox above the Game Mode toggle. Tick it to play alone — the multiplayer options dim and you only need to approve your own card before Start Game.',
+        a: 'A way to play on your own. Tap Start New Game on the Home screen and choose Single Game — the Lobby then opens locked to a single player, so you can start right away without approving anyone.',
       },
       {
         q: 'What is the difference between Host and Guest?',
-        a: 'Host is the player who created the room and controls all settings: Game Mode, Era, Number of Rounds, which packages are used, which media source the questions are drawn from (YouTube clips and/or images), and the maximum answer response time. Guest joins via Room Code and sees the Host\'s settings read-only.',
+        a: 'Host is the player who created the room and controls all settings: Game Mode, Era, Number of Rounds, which packages are used, which media sources the questions are drawn from (YouTube/Spotify clips and/or Hints), and the maximum answer response time. Guest joins via Room Code and sees the Host\'s settings read-only.',
       },
       {
         q: 'How many players can be in one room?',
@@ -114,23 +120,23 @@ const FAQ_CATEGORIES: FaqCategory[] = [
   {
     id: 'generations',
     emoji: '🎵',
-    title: 'Generations & content',
+    title: 'Content & questions',
     items: [
       {
-        q: 'How is my generation determined?',
-        a: 'Based on the year you provided at registration: Elder (1925-1964), Gen X (1965-1980), Millennials (1981-1996), Gen Z (1997-2012), Gen Alpha (2013-). You automatically get a free "Play as <Your Generation>" package. If you later update your birth year and cross into a different generation, your free Play-as package is automatically swapped to match the new generation.',
-      },
-      {
-        q: 'Why do I sometimes get questions I don\'t recognize from my generation?',
-        a: 'Recognition depends on two things: (a) the generations of the players in the lobby — we prioritize items tagged for those generations, and (b) Game Era — the Host picks a year range that acts as a hard limit. If the Host picks an era outside your generation (e.g. 1950-1970 when you were born in 2011), the selection will be items from that era regardless of your generation, because Era is always respected. You can also enable a different "Play as X" package (e.g. "Play as Elder" or "Play as Millennials") to override the generic generation-based pool — that tells the app to specifically include items recognized by that generation, useful when the Game Era falls outside your own lifespan and you still want a recognizable mix.',
-      },
-      {
-        q: 'What is a "Theme Package"?',
-        a: 'Theme Packages are purchasable extra packages you can select to make a game round specifically focused on a certain theme. Theme packages will be available continously — they are parked for the V1 launch and arrive in v1.1+. Right now everyone gets the free generation package that matches the year they chose at registration.',
-      },
-      {
         q: 'Why do some questions play a clip and others show hints?',
-        a: 'QuizVibe is a music quiz with two question types: YouTube / Spotify song clips (answer = the release year) and artist/band Hints — a flag plus progressive clues (answer = the name). The Host tunes which sources are used in the Lobby\'s Music Mixerboard, but at least one source must be active.',
+        a: 'QuizVibe has two question types: song and movie clips from YouTube/Spotify (answer = the release year, or for films one of the main actors) and Hints — a country flag plus progressive clues about an artist or band (answer = the name). The Host tunes which sources are used in the Lobby\'s Source Mixerboard, but at least one source must always be active.',
+      },
+      {
+        q: 'Can questions be based on Spotify?',
+        a: 'Yes. In Individual Devices games the Host can turn on Spotify DJ in the Source Mixerboard. For a Spotify question one player becomes the DJ and opens the track in the Spotify app on their own phone; everyone else listens and guesses the release year or the artist name. You don\'t need Spotify Premium, but the Spotify app should be installed on the DJ\'s phone.',
+      },
+      {
+        q: 'Why do I sometimes get questions from before my time?',
+        a: 'The Host sets the Game Era — a year range that acts as a hard limit on which clips can appear. If the Host picks an era outside your own lifespan (e.g. 1950-1970), you\'ll get questions from that era. Hint questions about people are not limited by era. Tip: agree on an era everyone recognizes before you start.',
+      },
+      {
+        q: 'What are Extra packages?',
+        a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. More themes are added over time.',
       },
     ],
   },
@@ -141,7 +147,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What are Host Game Credits?',
-        a: 'Each game you start as Host consumes 1 credit. You get 2 free credits per day — they refresh automatically every midnight CET. With a Premium subscription you have unlimited host games and no credits are consumed. Joining and playing in games hosted by others is always unlimited and free.',
+        a: 'Each game you start as Host consumes 1 credit. You get 4 free credits per day — they refresh automatically every midnight CET. With a Premium subscription you have unlimited host games and no credits are consumed. Joining and playing in games hosted by others is always unlimited and free.',
       },
       {
         q: 'When do I get my daily free credits?',
@@ -164,7 +170,8 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What is included in Premium?',
-        a: 'Unlimited Host Games (no daily cap), up to 12 players per Lobby, and longer quiz games (up to 20 rounds instead of 4). Individual Devices is free for all users.',
+        a: 'Premium vs the free Basic plan — the same comparison shown under "QuizVibe membership" in the Store:',
+        membershipCard: true,
       },
       {
         q: 'How do I restore purchases on a new phone?',
@@ -179,8 +186,8 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         a: 'Apple handles all refunds. You can request a refund via reportaproblem.apple.com or via iPhone Settings → Wallet → your subscription. QuizVibe doesn\'t have access to payment decisions.',
       },
       {
-        q: 'What subscription lengths are available?',
-        a: '1 month (79 kr), 3 months (199 kr), 6 months (279 kr), or 12 months (399 kr ≈ 33 kr/mo — saves 58% vs monthly). All auto-renew until you cancel.',
+        q: 'How does the subscription work?',
+        a: 'QuizVibe Premium is a single monthly plan that auto-renews until you cancel. During the launch period Premium is offered for free — activate it from the Store. The monthly subscription price applies once the launch offer ends.',
       },
     ],
   },
@@ -203,7 +210,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What data is saved about me?',
-        a: 'Player Name, email, the generation category you play as (Elder / Gen X / Millennials / Gen Z / Gen Alpha — this determines which content you receive and does not need to reflect your actual age), selected settings (assistance level, host defaults), friends you have added, and game history (points + response times). Your actual age or date of birth is never stored. No location data, no contacts, no social media links. Full list in the Privacy Policy.',
+        a: 'Player Name, email, your year of birth (used to set default game settings and competition age), selected settings (assistance level, host defaults), friends you have added, and game history (correct answers + response times). No location data, no contacts, no social media links. Full list in the Privacy Policy.',
       },
       {
         q: 'How do I stop friends from seeing me?',
@@ -330,7 +337,24 @@ export default function FAQScreen() {
                           <Text style={styles.questionText}>{item.q}</Text>
                           <Text style={styles.questionChevron}>{isOpen ? '−' : '+'}</Text>
                         </Pressable>
-                        {isOpen && <Text style={styles.answerText}>{item.a}</Text>}
+                        {isOpen && (
+                          <View>
+                            <Text style={styles.answerText}>{item.a}</Text>
+                            {item.membershipCard && (
+                              <View style={styles.featureList}>
+                                {SUBSCRIPTION_FEATURES.map((feature) => (
+                                  <View key={feature.premium} style={styles.featureRow}>
+                                    <Text style={styles.featureCheck}>✓</Text>
+                                    <View style={styles.featureTextWrap}>
+                                      <Text style={styles.featurePremium}>{feature.premium}</Text>
+                                      <Text style={styles.featureBasic}>Basic: {feature.basic}</Text>
+                                    </View>
+                                  </View>
+                                ))}
+                              </View>
+                            )}
+                          </View>
+                        )}
                         {idx < category.items.length - 1 && (
                           <View style={styles.questionDivider} />
                         )}
@@ -464,6 +488,47 @@ const styles = StyleSheet.create({
   questionDivider: {
     height: 1,
     backgroundColor: Colors.border,
+  },
+
+  // Premium-vs-Basic-jämförelsekort — speglar StoreScreen:s featureList 1:1
+  // (samma SUBSCRIPTION_FEATURES-data importeras). Renderas under svaret på
+  // "What is included in Premium?".
+  featureList: {
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+  },
+  featureCheck: {
+    fontSize: FontSize.md,
+    color: Colors.success,
+    fontWeight: FontWeight.bold,
+    width: 16,
+    marginTop: 1,
+  },
+  featureTextWrap: {
+    flex: 1,
+    gap: 2,
+  },
+  featurePremium: {
+    fontSize: FontSize.sm,
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.medium,
+    lineHeight: 20,
+  },
+  featureBasic: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    lineHeight: 16,
   },
 
   footnote: {
