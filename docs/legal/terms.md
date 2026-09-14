@@ -5,7 +5,7 @@ description: The rules for using QuizVibe.
 
 # Terms of Service
 
-**Last updated:** 2026-08-17
+**Last updated:** 2026-09-14
 **Effective date:** Upon app launch on the Apple App Store
 
 These Terms of Service ("Terms") govern your use of the **QuizVibe** mobile application ("the app", "we", "us"). By downloading, installing, or using the app, you agree to these Terms. If you don't agree, please don't use the app.
@@ -116,6 +116,15 @@ When using QuizVibe, you agree **not to**:
 - **Interfere with the service** — DDoS attacks, attempts to overload the backend, probing for security vulnerabilities without authorization.
 - **Resell or commercialize** access to the app, host games for money, or otherwise monetize the service in ways we haven't authorized.
 
+### 6.1 Additional rules for game hosts
+
+QuizVibe lets you **host** games and invite other players (using room codes, invitations, player naming, and game history). If you host a game, you additionally agree that you:
+
+- Are **responsible for the games you run** and for your own conduct toward the players you invite or admit.
+- Will **not** use host features to harass, bully, spam invitations to, impersonate, deceive, or publicly expose other players.
+- Will **not** rename, misattribute, or present other players in a way that is offensive, misleading, or that impersonates a real person.
+- Understand that hosting a game gives you **no ownership of, and no rights over, the personal data of other players** — you may not collect, store, publish, or reuse another player's information outside the normal in-app gameplay.
+
 Violation of these rules may result in account suspension or termination (Section 12).
 
 ---
@@ -126,7 +135,8 @@ Violation of these rules may result in account suspension or termination (Sectio
 
 QuizVibe presents quiz questions that include:
 
-- **YouTube video clips** — these are streamed directly from YouTube via their official IFrame Player. **The clips themselves are owned by their respective rights holders** (artists, labels, studios, sports leagues). We do not own this content; we link to it under YouTube's terms.
+- **YouTube video clips** — these are streamed directly from YouTube via their official IFrame Player. **The clips themselves are owned by their respective rights holders** (artists, labels, studios, and other rights holders). We do not own this content; we link to it under YouTube's terms.
+- **Spotify tracks** — some questions can open a track in the Spotify app on your device via a standard link. That content is owned by its respective rights holders and is subject to Spotify's own terms; QuizVibe does not own it and does not connect to your Spotify account.
 - **Text hints** — short factual clues (for example profession, era, notable works, or career milestones) compiled from open knowledge sources such as Wikidata and Wikipedia, which publish under open licenses (typically CC0 or Creative Commons), and edited by us.
 - **Question text and gameplay structure** — written and designed by us. These are our intellectual property.
 
@@ -154,11 +164,12 @@ We will respond within a reasonable time and remove infringing content if the cl
 
 ### 8.1 What you can buy
 
-QuizVibe offers the following one-time and recurring purchases via Apple StoreKit:
+QuizVibe is free to download and play, with an optional paid subscription via Apple StoreKit:
 
-- **Host Game Credits** — one-time purchases (e.g., 5, 10, or 20 credits) that let you host additional games beyond your daily free allowance.
-- **Customized Host Packages** — one-time purchases that unlock themed content packages (e.g., Hip Hop, Rock).
-- **QuizVibe membership subscriptions** — monthly, quarterly, half-yearly, or annual auto-renewing subscriptions that unlock multiplayer features (Individual Devices mode, up to 12 players, up to 20 rounds, etc.).
+- **Free tier** — every registered user gets a daily allowance of free Host Game Credits (see Section 8.6) plus unlimited play as an invited (non-host) player, at no cost.
+- **QuizVibe Premium** — a single **monthly, auto-renewing subscription** that unlocks premium features, including unlimited game hosting, all themed host packages, and expanded multiplayer options (Individual Devices mode, up to 12 players, and more rounds). Themed host packages and extra host capacity are **included in Premium** and are not sold separately.
+
+From time to time we may offer promotional or introductory pricing (for example, a free introductory period at launch). Any such offer, its price, and its duration are shown in the app and in the Apple App Store at the time it is available.
 
 Prices are displayed in the app at the time of purchase, in your local currency as provided by Apple.
 
@@ -170,7 +181,7 @@ By making a purchase, you also agree to Apple's payment terms: https://www.apple
 
 ### 8.3 Subscriptions auto-renew
 
-QuizVibe membership subscriptions **automatically renew** at the end of each billing period unless you cancel at least 24 hours before the renewal date. The renewal charge is taken from your Apple ID account.
+The QuizVibe Premium subscription **automatically renews** for another month at the end of each monthly billing period unless you cancel at least 24 hours before the renewal date. The renewal charge is taken from your Apple ID account. (A promotional free period, if offered, does not renew into a paid subscription unless clearly stated at the time of the offer.)
 
 **To cancel a subscription:**
 1. Open the **Settings** app on your iPhone/iPad.
@@ -198,7 +209,7 @@ Host Game Credits, package unlocks, and subscription benefits are **virtual item
 
 ### 8.6 Daily free credits
 
-Registered users receive a daily allowance of free Host Game Credits (currently 2, refreshing at midnight Central European Time). This allowance may change over time at our discretion. We will give reasonable notice before reducing it.
+Registered users receive a daily allowance of free Host Game Credits (currently 4, refreshing at midnight Central European Time). This allowance may change over time at our discretion. We will give reasonable notice before reducing it.
 
 ---
 
@@ -206,7 +217,7 @@ Registered users receive a daily allowance of free Host Game Credits (currently 
 
 ### 9.1 Our IP
 
-The QuizVibe app, including its visual design, brand name "QuizVibe", logo, question text, gameplay mechanics, and original code, is owned by us and protected by copyright, trademark, and other intellectual property laws.
+The QuizVibe app, including its visual design, user interface (UI) and screen layouts, brand name "QuizVibe", logo, **question text, the curated selection, compilation, and editing of the text hints**, gameplay mechanics, and original code, is owned by us and protected by copyright, trademark, database, and other intellectual property laws. This ownership covers our own curated data — the wording of our questions, the way we assemble and edit hints, and our interface — even where the underlying facts or media are sourced from third parties or the public domain.
 
 You receive a **limited, personal, non-exclusive, non-transferable, revocable license** to use the app for non-commercial entertainment purposes, subject to these Terms.
 
@@ -237,6 +248,7 @@ We do not warrant that:
 - The app will be uninterrupted, error-free, or secure.
 - Quiz content is accurate, complete, or up-to-date (we do our best, but mistakes happen).
 - YouTube clips will always be available (clips can be taken down by rights holders at any time).
+- Third-party integrations (such as YouTube and Spotify) will remain available or unchanged (see Section 10.4).
 - The app will be compatible with future iOS versions or devices.
 
 ### 10.2 You use the app at your own risk
@@ -249,6 +261,12 @@ You are responsible for your own device, internet connection, and data usage. We
 ### 10.3 Statutory consumer rights are not affected
 
 Nothing in this Section 10 limits or excludes any warranty, condition, or other right that you have under mandatory consumer protection laws in your country (e.g., the Swedish Consumer Sales Act for residents of Sweden, or equivalent statutes in your jurisdiction).
+
+### 10.4 Dependence on third-party services
+
+Key parts of QuizVibe rely on third-party services and integrations that we do not own or control — in particular **YouTube** (video playback) and **Spotify** (optional track playback), as well as Apple and our hosting provider. These providers may, at any time and without notice to us, **change, degrade, limit, rate-limit, deprecate, restrict, or permanently discontinue** their services, APIs, or terms.
+
+To the maximum extent permitted by applicable law, **we are not liable if any such third-party service is changed, becomes unavailable, or is discontinued**, and we do not guarantee that features depending on them will keep working. If a third-party integration stops functioning, we may remove, replace, or disable the affected features. This is in addition to the force-majeure provision in Section 15.6, and does not limit your mandatory statutory consumer rights (Section 10.3).
 
 ---
 
@@ -344,7 +362,7 @@ These Terms are between you and us. **Apple Inc. is a third-party beneficiary** 
 
 ### 15.6 Force majeure
 
-We are not liable for failure to perform under these Terms due to events beyond our reasonable control, including but not limited to: internet outages, third-party service failures (Supabase, Apple, YouTube), natural disasters, pandemics, or government actions.
+We are not liable for failure to perform under these Terms due to events beyond our reasonable control, including but not limited to: internet outages, third-party service failures (Supabase, Apple, YouTube, Spotify), natural disasters, pandemics, or government actions.
 
 ---
 

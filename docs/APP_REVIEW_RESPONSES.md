@@ -29,7 +29,7 @@ Senast verifierad: 2026-05-22 mot YouTube API Services ToS + Required Minimum Fu
 
 **Response:**
 
-> No. QuizVibe uses a curated static catalog of approximately 110 YouTube video IDs (songs, movie scenes, sport events, cultural clips) selected by our editorial team. We do NOT expose YouTube Search or any browse interface within the app. Users cannot input arbitrary YouTube URLs or search for content. Each video is a deliberate quiz question selected for cultural recognition within our target audience demographics.
+> No. QuizVibe uses a curated static catalog of approximately 110 YouTube video IDs (songs, movie scenes, and cultural clips) selected by our editorial team. We do NOT expose YouTube Search or any browse interface within the app. Users cannot input arbitrary YouTube URLs or search for content. Each video is a deliberate quiz question selected for cultural recognition within our target audience demographics.
 
 ### Q: "Do you monetize the YouTube content?"
 
