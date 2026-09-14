@@ -182,12 +182,16 @@ const styles = StyleSheet.create({
   // ⚠ Explicit position:absolute, INTE `...StyleSheet.absoluteFillObject`-spread
   // — spreaden applicerades inte som absolut på nya arkitekturen (dev-build)
   // och mosaik-gridet/logon täckte inte bilden/flaggan.
+  // Överskanna 2 px åt varje håll så mosaik-blockens procentbredder (32 kol ×
+  // 3.125 %) alltid täcker containern trots sub-pixel-avrundning — annars syns
+  // en vit remsa i högerkanten där sista kolumnen inte når fram. Parenten
+  // (flagInner / imageMediaCard) har overflow:'hidden' så överskanningen klipps.
   grid: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: -2,
+    left: -2,
+    right: -2,
+    bottom: -2,
     flexDirection: 'row',
     flexWrap: 'wrap',
   },

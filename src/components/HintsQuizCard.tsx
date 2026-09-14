@@ -285,7 +285,7 @@ function HintsQuizCardBase({
               totalSeconds={totalSeconds}
               assistance="standard"
               isRevealed={isRevealed}
-              logoSize={120}
+              logoSize={90}
               active={mosaicEverStarted || (mosaicActive ?? hintsActive)}
             />
           </View>
@@ -498,6 +498,8 @@ const styles = StyleSheet.create({
   flagWrap: {
     flex: 1,
     flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
   },
   natBadgeWrap: {
     alignSelf: 'center',
@@ -517,21 +519,18 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   flagInner: {
-    flex: 1,
+    height: 76,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff',
-    marginHorizontal: 4,
-    marginTop: 6,
-    marginBottom: 20,
+    marginTop: 4,
     borderRadius: 2,
   },
   flagEmoji: {
-    fontSize: 66,
+    fontSize: 64,
     textAlign: 'center',
     lineHeight: 72,
-    marginTop: -5,
     marginLeft: -2,
   },
 
