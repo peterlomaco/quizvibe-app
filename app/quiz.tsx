@@ -25,6 +25,7 @@ import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
+import { checkYoutubeClipsAlive } from '@/src/utils/youtubeLiveness';
 import {
   aggregateLabel,
   attachSeriesToLeaderboard,
@@ -831,6 +832,84 @@ const REVEAL_NEXT_LOCK_SECONDS = 5;
 const START_GATE_MIN_GREY_MS = 1000;
 const START_GATE_TIMEOUT_MS = 8000;
 
+// Hard-timeout escape for the pre-game YouTube clip check (see below). Must be ≥ the
+// util's overallTimeoutMs so the probe normally wins; the setTimeout only guarantees
+// Play unlocks if the promise ever wedges.
+const CLIP_CHECK_HARD_TIMEOUT_MS = 5000;
+// We probe only the PLAYED window + this many reserve items (not the whole filtered
+// pool, which can be hundreds of items → far too many oEmbed calls). The reserve buffer
+// gives substitutes for dead played items; anything beyond it is left unprobed.
+const CLIP_PROBE_RESERVE = 8;
+
+// ── Pre-game YouTube clip liveness (see src/utils/youtubeLiveness.ts) ──────────
+// Host-side pre-flight: before the first question plays, oEmbed-probe the YouTube
+// clips in the FROZEN sequence and (a) seed failedClipVideoIds so a multi-clip item
+// silently switches to a live alternate, (b) substitute any pure-YouTube item whose
+// EVERY clip is dead with a live reserve item. FAIL-OPEN — a network hiccup leaves the
+// sequence untouched and handleYoutubeError stays the safety net.
+function clipVideoIdsOf(q: QuizQuestion): string[] {
+  const clips = (q as { youtubeClips?: { videoId?: string }[] }).youtubeClips;
+  if (!clips) return [];
+  return clips.map((c) => c?.videoId).filter((v): v is string => !!v);
+}
+function collectSequenceVideoIds(seq: QuizQuestion[]): string[] {
+  const ids: string[] = [];
+  for (const q of seq) for (const id of clipVideoIdsOf(q)) ids.push(id);
+  return Array.from(new Set(ids));
+}
+// A pure-YouTube item (no Spotify fallback) whose EVERY clip is dead → would render
+// "Video unavailable". These are the slots we substitute.
+function isDeadYtItem(q: QuizQuestion, dead: Set<string>): boolean {
+  if ((q as { spotifyTrackId?: string }).spotifyTrackId) return false;
+  const ids = clipVideoIdsOf(q);
+  return ids.length > 0 && ids.every((id) => dead.has(id));
+}
+function swapDeadYtItems(
+  seq: QuizQuestion[],
+  windowLen: number,
+  reserveEnd: number,
+  dead: Set<string>,
+): QuizQuestion[] {
+  const usedIds = new Set(seq.slice(0, windowLen).map((q) => q.id));
+  // Reserve = probed unplayed items only [windowLen, reserveEnd), live items only.
+  // Prefer live YouTube items so a substituted slot stays a "video" question.
+  const reserve = seq
+    .slice(windowLen, reserveEnd)
+    .filter((q) => !usedIds.has(q.id) && !isDeadYtItem(q, dead))
+    .sort((a, b) => (clipVideoIdsOf(b).length ? 1 : 0) - (clipVideoIdsOf(a).length ? 1 : 0));
+  let ri = 0;
+  let changed = false;
+  const next = seq.slice();
+  for (let i = 0; i < windowLen; i++) {
+    if (!isDeadYtItem(next[i], dead)) continue;
+    while (ri < reserve.length && usedIds.has(reserve[ri].id)) ri++;
+    if (ri >= reserve.length) continue; // no substitute → leave (reactive net catches it)
+    const sub = reserve[ri++];
+    usedIds.delete(next[i].id);
+    usedIds.add(sub.id);
+    next[i] = sub;
+    changed = true;
+  }
+  return changed ? next : seq;
+}
+// Probes the played window + a small reserve buffer (NOT the whole pool) and returns
+// the (possibly swapped) sequence + the dead-id set. Never throws.
+async function validateSequenceClips(
+  fullSeq: QuizQuestion[],
+  totalQ: number,
+): Promise<{ next: QuizQuestion[]; dead: Set<string> }> {
+  const windowLen = Math.min(totalQ, fullSeq.length);
+  const reserveEnd = Math.min(fullSeq.length, windowLen + CLIP_PROBE_RESERVE);
+  const ids = collectSequenceVideoIds(fullSeq.slice(0, reserveEnd));
+  if (ids.length === 0) return { next: fullSeq, dead: new Set<string>() };
+  const dead = await checkYoutubeClipsAlive(ids, {
+    overallTimeoutMs: 4000,
+    perRequestTimeoutMs: 2500,
+  });
+  if (dead.size === 0) return { next: fullSeq, dead };
+  return { next: swapDeadYtItems(fullSeq, windowLen, reserveEnd, dead), dead };
+}
+
 // Energisk färg för svarsrutan (används oavsett assistance-nivå)
 const BOX_COLOR = '#F5A623';       // gyllene
 const BOX_BG = 'rgba(26,48,80,0.92)'; // mörkare navy – tydligt distinkt mot bakgrund #0B1220
@@ -1519,6 +1598,13 @@ export default function QuizScreen() {
   // klippet är borttaget/region-blockerat faller vi tillbaka på nästa klipp INNAN
   // vi 0-poängar frågan. Resetas per fråga.
   const [failedClipVideoIds, setFailedClipVideoIds] = useState<string[]>([]);
+  // Pre-game YouTube clip liveness check (host-side). clipCheckPending locks Play in
+  // local modes until the probe settles; clipCheckRanRef makes it one-shot.
+  // setSequenceRevision forces a re-render after an in-place sequence swap so
+  // downstream memos recompute. (Remote validates inline in its init effect below.)
+  const [clipCheckPending, setClipCheckPending] = useState(false);
+  const clipCheckRanRef = useRef(false);
+  const [, setSequenceRevision] = useState(0);
   // Antal rundor sätts av host i Lobby (slider 3–20, default 10). Fallback 5
   // om param saknas — t.ex. direkt-nav till /quiz utan att gå via Lobby.
   // SEED_QUESTIONS har 5 frågor i mock; för totalRounds > 5 cyklas listan via
@@ -2453,6 +2539,47 @@ export default function QuizScreen() {
   const gameQuestionsRef = useRef<typeof gameQuestions>(gameQuestions);
   useEffect(() => { gameQuestionsRef.current = gameQuestions; }, [gameQuestions]);
 
+  // ── Pre-game YouTube clip liveness (local modes: single / PtP-host / IndDev-host) ──
+  // Runs ONCE, after the local sequence is frozen. oEmbed-probes the frozen sequence's
+  // clips, seeds failedClipVideoIds (multi-clip items switch to a live alternate) and
+  // swaps dead pure-YT items in place, then bumps a revision so the swap reaches
+  // gameQuestions before the first broadcast. Non-hosts / PtP-spectators / remote skip
+  // (they render host's sequence; remote validates inline in its init effect above).
+  // clipCheckPending locks Play until settled, with a hard-timeout escape (fail-open).
+  useEffect(() => {
+    if (clipCheckRanRef.current) return;
+    if (isRemote || isPtPSpectator || !isHost) return;
+    if (!lockedSequenceRef.current) return; // wait for the sequence freeze
+    const seq = gameQuestionsRef.current;
+    if (collectSequenceVideoIds(seq.slice(0, totalQuestions)).length === 0) {
+      clipCheckRanRef.current = true; // no YouTube will be played → nothing to check
+      return;
+    }
+    clipCheckRanRef.current = true;
+    setClipCheckPending(true);
+    const escape = setTimeout(
+      () => setClipCheckPending(false),
+      CLIP_CHECK_HARD_TIMEOUT_MS,
+    );
+    validateSequenceClips(seq, totalQuestions)
+      .then(({ next, dead }) => {
+        if (dead.size > 0) {
+          setFailedClipVideoIds((prev) => Array.from(new Set([...prev, ...dead])));
+        }
+        if (next !== seq) {
+          lockedSequenceRef.current = next;
+          gameQuestionsRef.current = next;
+          setSequenceRevision((n) => n + 1);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        clearTimeout(escape);
+        setClipCheckPending(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHost, isRemote, isPtPSpectator, localSequenceSettledForLock, totalQuestions]);
+
   // ── Remote 1v1 init: sekvens-auktoritet + resume ─────────────────────
   // Körs EN gång vid mount (efter gameQuestionsRef-syncen ovan):
   //   1. Hämta matchen. question_ids null + host → persistera den lokalt
@@ -2472,9 +2599,20 @@ export default function QuizScreen() {
       let match = await getMatch(remoteMatchId);
       if (cancelled) return;
       if (match && !match.questionIds && isHost) {
-        const localIds = gameQuestionsRef.current
-          .slice(0, totalRounds)
-          .map((q) => q.id);
+        // Pre-flight: swap out any dead YouTube clip BEFORE persisting the
+        // authoritative sequence, so the opponent never receives a dead item.
+        // Fail-open (see validateSequenceClips). The remote "Preparing 1vs1 match"
+        // gate already covers this wait — no extra Play lock needed here.
+        const { next, dead } = await validateSequenceClips(
+          gameQuestionsRef.current,
+          totalRounds,
+        );
+        if (cancelled) return;
+        if (dead.size > 0) {
+          setFailedClipVideoIds((prev) => Array.from(new Set([...prev, ...dead])));
+        }
+        gameQuestionsRef.current = next;
+        const localIds = next.slice(0, totalRounds).map((q) => q.id);
         if (localIds.length > 0) {
           await persistQuestionSequence(remoteMatchId, localIds);
         }
@@ -8740,7 +8878,8 @@ export default function QuizScreen() {
     (startGateApplies &&
       !startGateTimedOut &&
       (!startGateMinGreyDone || unconfirmedPeerCount > 0)) ||
-    getReadySequencePending;
+    getReadySequencePending ||
+    clipCheckPending;
 
   useEffect(() => {
     // syncActive = IndDev ELLER Pass-the-Phone med fler än en spelare. I PtP
