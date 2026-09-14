@@ -706,8 +706,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "TvnYmWpD_T8"
-        startSec: 70
-        endSec: 100
+        startSec: 80
+        endSec: 110
         channelTitle: "Prince"
         notes: "Peter-kurerad 2026-08-14 med explicit startSec 70. Videotitel verifierad: 'Prince - Purple Rain (Official Video)' — ersatte Topic-audion (statisk albumkonst)."
     region: ["global"]
@@ -2455,8 +2455,8 @@ items:
     genrePackages: ["sport"]
     youtubeClips:
       - videoId: "t99KH0TR-J4"
-        startSec: 0
-        endSec: 30
+        startSec: 6
+        endSec: 36
         channelTitle: "Queen Official"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
   - id: roxette-it-must-have-been-love
@@ -3583,9 +3583,9 @@ items:
     wikimediaSearchHints: ["Kärleken är evig - Lena Philipsson 1986"]
     answerMethods: ["timeline"]
     youtubeClips:
-      - videoId: "Mp-P_DhFewE"
-        startSec: 20
-        endSec: 50
+      - videoId: "AAVd_ku3SO0"
+        startSec: 5
+        endSec: 35
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1384)."
   - id: jan-johansen-se-pa-mig
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -3602,3 +3602,162 @@ items:
         startSec: 20
         endSec: 50
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1389)."
+  - id: magnus-uggla-jag-mar-illa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jag mår illa — Magnus Uggla"
+    correctYear: 1989
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Jag mår illa — Magnus Uggla 1989"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    youtubeClips:
+      - videoId: "m-VigThmLWg"
+        startSec: 9
+        endSec: 39
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1404)."
+  - id: magnus-uggla-kung-for-en-dag
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kung för en dag — Magnus Uggla"
+    correctYear: 1992
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Kung för en dag — Magnus Uggla 1992"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    youtubeClips:
+      - videoId: "7aOc2fL2pRM"
+        startSec: 13
+        endSec: 43
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1405)."
+  - id: magnus-uggla-4-sekunder
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "4 sekunder — Magnus Uggla"
+    correctYear: 1993
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["4 sekunder — Magnus Uggla 1993"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    youtubeClips:
+      - videoId: "K4BVY6KAEQc"
+        startSec: 18
+        endSec: 48
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1408)."
+  - id: eva-dahlgren-vem-tander-stjarnorna
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Vem tänder stjärnorna — Eva Dahlgren"
+    correctYear: 1991
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Vem tänder stjärnorna — Eva Dahlgren 1991"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish", "Soft & Love"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "-02uHyU-rjs"
+        startSec: 25
+        endSec: 55
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1410)."
+  - id: marie-fredriksson-tro
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Tro — Marie Fredriksson"
+    correctYear: 1996
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Tro — Marie Fredriksson 1996"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish", "Soft & Love"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "ARvSDkcm0k8"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1411)."
+  - id: ronny-ragge-rara-sota-anna
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rara söta Anna — Ronny & Ragge"
+    correctYear: 1993
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Rara söta Anna — Ronny & Ragge 1993"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "L8EKDeSbLXk"
+        startSec: 18
+        endSec: 48
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1414)."
+  - id: stefan-borsch-det-ar-ju-dej
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Det är ju dej jag går och väntar på — Stefan Borsch"
+    correctYear: 1984
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Det är ju dej jag går och väntar på — Stefan Borsch 1984"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dansband"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "G-YfEn-m-fE"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1415)."
+  - id: drangarna-vill-du-bli-min-fru
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Vill du bli min fru — Drängarna"
+    correctYear: 1995
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Vill du bli min fru — Drängarna 1995"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    inBaseCatalog: false
+    spotifyTrackId: "4ZJNkwzMJJLB7RpLzPcQtn"
+    youtubeClips:
+      - videoId: "OTZxtUxdoSc"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1426)."
+  - id: svenne-rubins-en-gammal-amazon
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "En gammal Amazon — Svenne Rubins"
+    correctYear: 1994
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["En gammal Amazon — Svenne Rubins 1994"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    inBaseCatalog: false
+    spotifyTrackId: "4fSyd0K4fzY0ExNu0SlY11"
+    youtubeClips:
+      - videoId: "aTrzCqltygk"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1431)."
+  - id: anna-book-abc
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "ABC — Anna Book"
+    correctYear: 1986
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["ABC — Anna Book 1986"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    spotifyTrackId: "2YCWUpoVclk9PFo5cDfUPU"
+    youtubeClips:
+      - videoId: "VpCWux9Cjis"
+        startSec: 12
+        endSec: 42
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1432)."
+  - id: lena-philipsson-dansa-i-neon
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dansa i neon — Lena Philipsson"
+    correctYear: 1987
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Dansa i neon — Lena Philipsson 1987"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    spotifyTrackId: "4N0NK4lCncys6hwWhtXRit"

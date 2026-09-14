@@ -2304,3 +2304,114 @@ items:
         startSec: 15
         endSec: 45
         notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1405)."
+  - id: lilla-al-fadji-delulu
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Delulu — Lilla Al-Fadji"
+    correctYear: 2026
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Delulu — Lilla Al-Fadji 2026"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "DRiL2wizEEk"
+        startSec: 8
+        endSec: 38
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1409)."
+  - id: veronica-maggio-vi-mot-varlden
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Vi mot världen — Veronica Maggio"
+    correctYear: 2016
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Vi mot världen — Veronica Maggio 2016"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    youtubeClips:
+      - videoId: "pGUbe0bhOys"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1416)."
+  - id: miss-li-lev-nu-dor-sen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Lev nu dö sen — Miss Li"
+    correctYear: 2019
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Lev nu dö sen — Miss Li 2019"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    spotifyTrackId: "6HJasLoTKvxglAMQH8nPcD"
+  - id: danny-saucedo-happy-that-you-found-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Happy That You Found Me — Danny Saucedo"
+    correctYear: 2024
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Happy That You Found Me — Danny Saucedo 2024"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "e0NdpEYpcJY"
+        startSec: 14
+        endSec: 44
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1422)."
+  - id: danny-saucedo-brinner-i-brostet
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Brinner i bröstet — Danny Saucedo"
+    correctYear: 2015
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Brinner i bröstet — Danny Saucedo 2015"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "t6GekWxcZvo"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1424)."
+  - id: molly-sanden-utan-dig
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Utan dig — Molly Sandén"
+    correctYear: 2017
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Utan dig — Molly Sandén 2017"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish", "Soft & Love"]
+    inBaseCatalog: false
+    spotifyTrackId: "3fiKmyDr615KZDrL51VZDu"
+    youtubeClips:
+      - videoId: "FyO_4OOY8cA"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1425)."
+  - id: norlie-kkv-ingen-annan-ror-mig-som-du
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ingen annan rör mig som du — Norlie & KKV"
+    correctYear: 2015
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Ingen annan rör mig som du — Norlie & KKV 2015"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    inBaseCatalog: false
+    spotifyTrackId: "25V8NDi9if73rYvHwDKKw5"
+  - id: sean-banan-copacabanana
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Copacabanana — Sean Banan"
+    correctYear: 2013
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Copacabanana — Sean Banan 2013"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "HPKBW_Bfqto"
+        startSec: 73
+        endSec: 103
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1430)."

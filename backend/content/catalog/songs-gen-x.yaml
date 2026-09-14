@@ -640,9 +640,9 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["Soft & Love"]
     youtubeClips:
-      - videoId: "Pv00rRagnqA"
-        startSec: 50
-        endSec: 80
+      - videoId: "TfNymCvydHc"
+        startSec: 5
+        endSec: 35
         notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1343)."
     spotifyTrackId: "3PQLYVskjUeRmRIfECsL0X"
     region: ["global"]
@@ -1415,8 +1415,8 @@ items:
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1363)."
     youtubeClips:
       - videoId: "Hphwfq1wLJs"
-        startSec: 20
-        endSec: 50
+        startSec: 1
+        endSec: 31
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1361) - YouTube-kalla tillagd (var Spotify-only)."
   # 1969-1976 klassiker — tillagda 2026-09-09 ur Music.xlsx (rad 1346-1350).
   - id: bellamy-brothers-let-your-love-flow
@@ -1429,8 +1429,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "FQQj2rQBFvA"
-        startSec: 20
-        endSec: 50
+        startSec: 13
+        endSec: 43
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1346)."
   - id: billy-joel-piano-man
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1442,8 +1442,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "gxEPV4kolz0"
-        startSec: 20
-        endSec: 50
+        startSec: 30
+        endSec: 60
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1347)."
   - id: wings-band-on-the-run
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1455,8 +1455,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "__t8wKdMmIw"
-        startSec: 20
-        endSec: 50
+        startSec: 30
+        endSec: 60
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1348)."
   - id: simon-garfunkel-the-boxer
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1468,8 +1468,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "l3LFML_pxlY"
-        startSec: 20
-        endSec: 50
+        startSec: 5
+        endSec: 35
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1349)."
   - id: wild-cherry-play-that-funky-music
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1508,8 +1508,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "jmhoOp2fUzg"
-        startSec: 20
-        endSec: 50
+        startSec: 10
+        endSec: 40
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1353)."
   - id: chicago-if-you-leave-me-now
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1548,7 +1548,7 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["Rock"]
     youtubeClips:
-      - videoId: "7lTwA5xMeTM"
+      - videoId: "co8uyTAJOew"
         startSec: 20
         endSec: 50
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1356)."
@@ -1562,9 +1562,9 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["Soft & Love"]
     youtubeClips:
-      - videoId: "SRCzskCp5rE"
-        startSec: 20
-        endSec: 50
+      - videoId: "d8jgBVtkcRE"
+        startSec: 43
+        endSec: 73
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1357)."
   - id: fleetwood-mac-dont-stop
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1576,8 +1576,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "QV9JJmSCiI8"
-        startSec: 20
-        endSec: 50
+        startSec: 10
+        endSec: 40
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1358)."
   - id: free-all-right-now
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1630,8 +1630,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "-ihs-vT9T3Q"
-        startSec: 20
-        endSec: 50
+        startSec: 18
+        endSec: 48
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1366)."
   - id: jackson-5-ill-be-there
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1657,8 +1657,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "mTUhnIY3oRM"
-        startSec: 20
-        endSec: 50
+        startSec: 6
+        endSec: 36
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1369)."
   - id: bto-you-aint-seen-nothing-yet
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1710,9 +1710,9 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["Rock"]
     youtubeClips:
-      - videoId: "HgzGwKwLmgM"
-        startSec: 20
-        endSec: 50
+      - videoId: "EIv6_yh7p7w"
+        startSec: 4
+        endSec: 34
         notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1374)."
   - id: 10cc-im-not-in-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -1768,3 +1768,13 @@ items:
         startSec: 19
         endSec: 49
         notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1402)."
+  - id: ted-gardestad-jag-ska-fanga-en-angel
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jag ska fånga en ängel — Ted Gärdestad"
+    correctYear: 1973
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Jag ska fånga en ängel — Ted Gärdestad 1973"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    spotifyTrackId: "3No0idjeViPyWDP4gh1YGo"
