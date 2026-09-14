@@ -721,11 +721,10 @@ items:
     probability: 80
     wikimediaSearchHints: ["Veronica Maggio Jag kommer 2011"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "5M2y8QdDepGYMsWyxhoxQU"
     youtubeClips:
-      - videoId: "zNKwziMG5UI"
-        startSec: 30
-        endSec: 45
+      - videoId: "VjZwz3yxS9I"
+        startSec: 40
+        endSec: 55
         channelTitle: "Veronica Maggio - Topic"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
   - id: the-hives-hate-to-say
@@ -796,8 +795,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "LyKYV_7vs6k"
-        startSec: 47
-        endSec: 67
+        startSec: 37
+        endSec: 57
         channelTitle: "PremiunMusicHD"
     spotifyTrackId: "1z9kQ14XBSN0r2v6fx4IdG"
     region: ["global"]
@@ -2784,6 +2783,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Timbaland Morning After Dark 2009"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5sp1KDCNEm1Eoeqxsep01L"
     youtubeClips:
       - videoId: "25LBTSUEU0A"
         startSec: 40
@@ -2800,6 +2800,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Justin Timberlake Rock Your Body 2002"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6W2Ef5Ph6ILTUAedoQ3QIv"
     youtubeClips:
       - videoId: "TSVHoHyErBQ"
         startSec: 0
@@ -2919,6 +2920,7 @@ items:
     wikimediaSearchHints: ["Toni Braxton He Wasnt Man Enough 2000"]
     answerMethods: ["timeline"]
     genrePackages: ["Soft & Love"]
+    spotifyTrackId: "1u0aKJj9kr930YeAa6KXcy"
     youtubeClips:
       - videoId: "9_hKXk2qSuw"
         startSec: 25
@@ -3119,3 +3121,140 @@ items:
         startSec: 6
         endSec: 36
         notes: "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1401)."
+  - id: magnus-uggla-vi-ska-till-vm
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Vi ska till VM — Magnus Uggla"
+    correctYear: 2002
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Vi ska till VM — Magnus Uggla 2002"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "f3oyfdoNPWw"
+        startSec: 51
+        endSec: 81
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1406)."
+  - id: magnus-uggla-jag-och-min-far
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jag och min far — Magnus Uggla"
+    correctYear: 2012
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Jag och min far — Magnus Uggla 2012"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    youtubeClips:
+      - videoId: "fRY6jg2ESbI"
+        startSec: 8
+        endSec: 38
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1407)."
+  - id: petra-marklund-handerna-mot-himlen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Händerna mot himlen — Petra Marklund"
+    correctYear: 2012
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Händerna mot himlen — Petra Marklund 2012"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    youtubeClips:
+      - videoId: "f4fB9EXpMTI"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1412)."
+  - id: den-svenska-bjornstammen-vart-jag-mig
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Vart jag mig i världen vänder — Den Svenska Björnstammen"
+    correctYear: 2011
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Vart jag mig i världen vänder — Den Svenska Björnstammen 2011"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "jI2EcRXR7RU"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1413)."
+  - id: markoolio-ingen-sommar-utan-reggae
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ingen sommar utan reggae — Markoolio"
+    correctYear: 2007
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Ingen sommar utan reggae — Markoolio 2007"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
+    inBaseCatalog: false
+    spotifyTrackId: "5YuLlTsWYK9uslUdGM83dJ"
+    youtubeClips:
+      - videoId: "TznMe5Ev8Dg"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1420)."
+  - id: danny-saucedo-if-only-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "If Only You — Danny Saucedo"
+    correctYear: 2007
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["If Only You — Danny Saucedo 2007"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "PNgqgpzeV8A"
+        startSec: 17
+        endSec: 47
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1421)."
+  - id: danny-saucedo-in-the-club
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "In the Club — Danny Saucedo"
+    correctYear: 2011
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["In the Club — Danny Saucedo 2011"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Melodifestivalen"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "d_iz6e3ETPg"
+        startSec: 42
+        endSec: 72
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1423)."
+  - id: sean-banan-sean-den-forste-banan
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sean den förste banan — Sean Banan"
+    correctYear: 2012
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Sean den förste banan — Sean Banan 2012"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
+    inBaseCatalog: false
+    spotifyTrackId: "5J2UfqBylH8jDQZJnxby81"
+    youtubeClips:
+      - videoId: "a5fceiuy6Po"
+        startSec: 9
+        endSec: 39
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1428)."
+      - videoId: "Rz6OPt1rl58"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1428)."
+  - id: sean-banan-gott-nytt-jul
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gott nytt jul — Sean Banan"
+    correctYear: 2010
+    probability: 75
+    region: ["sweden"]
+    wikimediaSearchHints: ["Gott nytt jul — Sean Banan 2010"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Christmas edition"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "nMcEuS2-CuY"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1429)."

@@ -534,7 +534,6 @@ items:
     wikimediaSearchHints: ["Lill-Babs Leva livet 1963 Swedish schlager"]
     answerMethods: ["timeline"]
     genrePackages: ["100% in swedish"]
-    spotifyTrackId: "6P40lE9SODIcT21NpmRd2I"
     youtubeClips:
       - videoId: "BrYFFIESx3c"
         startSec: 0

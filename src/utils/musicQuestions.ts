@@ -1275,7 +1275,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "100% in swedish"
     ],
-    "spotifyTrackId": "6P40lE9SODIcT21NpmRd2I",
     "youtubeClips": [
       {
         "videoId": "BrYFFIESx3c",
@@ -2299,8 +2298,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "l3LFML_pxlY",
-        "startSec": 20,
-        "endSec": 50,
+        "startSec": 5,
+        "endSec": 35,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1349)."
       }
@@ -3142,8 +3141,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "gxEPV4kolz0",
-        "startSec": 20,
-        "endSec": 50,
+        "startSec": 30,
+        "endSec": 60,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1347)."
       }
@@ -3354,13 +3353,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "7lTwA5xMeTM",
+        "videoId": "co8uyTAJOew",
         "startSec": 20,
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1356)."
       }
     ]
+  },
+  {
+    "id": "ted-gardestad-jag-ska-fanga-en-angel",
+    "displayName": "Jag ska fånga en ängel — Ted Gärdestad",
+    "correctYear": 1973,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "3No0idjeViPyWDP4gh1YGo",
+    "youtubeClips": []
   },
   {
     "id": "ted-gardestad-vilken-harlig-dag",
@@ -3414,8 +3436,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "__t8wKdMmIw",
-        "startSec": 20,
-        "endSec": 50,
+        "startSec": 30,
+        "endSec": 60,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1348)."
       }
@@ -3476,9 +3498,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "SRCzskCp5rE",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "d8jgBVtkcRE",
+        "startSec": 43,
+        "endSec": 73,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1357)."
       }
@@ -3507,9 +3529,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "3PQLYVskjUeRmRIfECsL0X",
     "youtubeClips": [
       {
-        "videoId": "Pv00rRagnqA",
-        "startSec": 50,
-        "endSec": 80,
+        "videoId": "TfNymCvydHc",
+        "startSec": 5,
+        "endSec": 35,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1343)."
       }
@@ -3562,8 +3584,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "jmhoOp2fUzg",
-        "startSec": 20,
-        "endSec": 50,
+        "startSec": 10,
+        "endSec": 40,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1353)."
       }
@@ -3733,8 +3755,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "mTUhnIY3oRM",
-        "startSec": 20,
-        "endSec": 50,
+        "startSec": 6,
+        "endSec": 36,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1369)."
       }
@@ -3959,8 +3981,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "FQQj2rQBFvA",
-        "startSec": 20,
-        "endSec": 50,
+        "startSec": 13,
+        "endSec": 43,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1346)."
       }
@@ -4265,8 +4287,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "-ihs-vT9T3Q",
-        "startSec": 20,
-        "endSec": 50,
+        "startSec": 18,
+        "endSec": 48,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1366)."
       }
@@ -4442,8 +4464,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "QV9JJmSCiI8",
-        "startSec": 20,
-        "endSec": 50,
+        "startSec": 10,
+        "endSec": 40,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1358)."
       }
@@ -4856,9 +4878,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "HgzGwKwLmgM",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "EIv6_yh7p7w",
+        "startSec": 4,
+        "endSec": 34,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1374)."
       }
@@ -4885,8 +4907,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "Hphwfq1wLJs",
-        "startSec": 20,
-        "endSec": 50,
+        "startSec": 1,
+        "endSec": 31,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1361) - YouTube-kalla tillagd (var Spotify-only)."
       }
@@ -6198,8 +6220,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "fK6tf6opIg0",
-        "startSec": 125,
-        "endSec": 140,
+        "startSec": 60,
+        "endSec": 75,
         "channelTitle": "prod. ovr",
         "license": "standard",
         "notes": "Official Shortened 4K Video — rörlig MV (zombiedans). Mid-song."
@@ -7118,8 +7140,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "TvnYmWpD_T8",
-        "startSec": 70,
-        "endSec": 100,
+        "startSec": 80,
+        "endSec": 110,
         "channelTitle": "Prince",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14 med explicit startSec 70. Videotitel verifierad: 'Prince - Purple Rain (Official Video)' — ersatte Topic-audion (statisk albumkonst)."
@@ -7233,6 +7255,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bruce Springsteen - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "stefan-borsch-det-ar-ju-dej",
+    "displayName": "Det är ju dej jag går och väntar på — Stefan Borsch",
+    "correctYear": 1984,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Dansband"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "G-YfEn-m-fE",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1415)."
       }
     ]
   },
@@ -7895,6 +7948,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "anna-book-abc",
+    "displayName": "ABC — Anna Book",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "2YCWUpoVclk9PFo5cDfUPU",
+    "youtubeClips": [
+      {
+        "videoId": "VpCWux9Cjis",
+        "startSec": 12,
+        "endSec": 42,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1432)."
+      }
+    ]
+  },
+  {
     "id": "bon-jovi-livin-on-a-prayer",
     "displayName": "Livin' on a Prayer — Bon Jovi",
     "correctYear": 1986,
@@ -8030,9 +8114,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "Mp-P_DhFewE",
-        "startSec": 20,
-        "endSec": 50,
+        "videoId": "AAVd_ku3SO0",
+        "startSec": 5,
+        "endSec": 35,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1384)."
       }
@@ -8558,6 +8642,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "ESC 1987 vinnare — Irland."
       }
     ]
+  },
+  {
+    "id": "lena-philipsson-dansa-i-neon",
+    "displayName": "Dansa i neon — Lena Philipsson",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "4N0NK4lCncys6hwWhtXRit",
+    "youtubeClips": []
   },
   {
     "id": "lili-sussie-oh-mama",
@@ -9690,6 +9797,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "magnus-uggla-jag-mar-illa",
+    "displayName": "Jag mår illa — Magnus Uggla",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "m-VigThmLWg",
+        "startSec": 9,
+        "endSec": 39,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1404)."
+      }
+    ]
+  },
+  {
     "id": "marc-almond-somethings-gotten-hold-of-my-heart",
     "displayName": "Something's Gotten Hold of My Heart — Marc Almond & Gene Pitney",
     "correctYear": 1989,
@@ -10700,6 +10837,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "eva-dahlgren-vem-tander-stjarnorna",
+    "displayName": "Vem tänder stjärnorna — Eva Dahlgren",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish",
+      "Soft & Love"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "-02uHyU-rjs",
+        "startSec": 25,
+        "endSec": 55,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1410)."
+      }
+    ]
+  },
+  {
     "id": "fresh-prince-summertime",
     "displayName": "Summertime — DJ Jazzy Jeff & The Fresh Prince",
     "correctYear": 1991,
@@ -10942,8 +11111,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "t99KH0TR-J4",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 6,
+        "endSec": 36,
         "channelTitle": "Queen Official",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
@@ -11513,6 +11682,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1992 vinnare — Irland."
+      }
+    ]
+  },
+  {
+    "id": "magnus-uggla-kung-for-en-dag",
+    "displayName": "Kung för en dag — Magnus Uggla",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "7aOc2fL2pRM",
+        "startSec": 13,
+        "endSec": 43,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1405)."
       }
     ]
   },
@@ -12244,6 +12443,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "magnus-uggla-4-sekunder",
+    "displayName": "4 sekunder — Magnus Uggla",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "K4BVY6KAEQc",
+        "startSec": 18,
+        "endSec": 48,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1408)."
+      }
+    ]
+  },
+  {
     "id": "mariah-carey-hero",
     "displayName": "Hero — Mariah Carey",
     "correctYear": 1993,
@@ -12304,6 +12533,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1993 vinnare — Irland."
+      }
+    ]
+  },
+  {
+    "id": "ronny-ragge-rara-sota-anna",
+    "displayName": "Rara söta Anna — Ronny & Ragge",
+    "correctYear": 1993,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "L8EKDeSbLXk",
+        "startSec": 18,
+        "endSec": 48,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1414)."
       }
     ]
   },
@@ -13038,6 +13298,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "svenne-rubins-en-gammal-amazon",
+    "displayName": "En gammal Amazon — Svenne Rubins",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "4fSyd0K4fzY0ExNu0SlY11",
+    "youtubeClips": [
+      {
+        "videoId": "aTrzCqltygk",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1431)."
+      }
+    ]
+  },
+  {
     "id": "the-lion-king-1994",
     "displayName": "The Lion King",
     "correctYear": 1994,
@@ -13224,6 +13516,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Coolio - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "drangarna-vill-du-bli-min-fru",
+    "displayName": "Vill du bli min fru — Drängarna",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "4ZJNkwzMJJLB7RpLzPcQtn",
+    "youtubeClips": [
+      {
+        "videoId": "OTZxtUxdoSc",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1426)."
       }
     ]
   },
@@ -13905,6 +14229,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Los Del Río - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (100). BEHÅLLET 2026-08-12: Peters förslag gwWRjvwlLKg är en privat re-upload; Topic är rättsinnehavarens kanal."
+      }
+    ]
+  },
+  {
+    "id": "marie-fredriksson-tro",
+    "displayName": "Tro — Marie Fredriksson",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish",
+      "Soft & Love"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "ARvSDkcm0k8",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1411)."
       }
     ]
   },
@@ -14873,8 +15229,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "1dfhNimhwNM",
-        "startSec": 0,
-        "endSec": 15,
+        "startSec": 16,
+        "endSec": 31,
         "channelTitle": "thelanoz video Comeback",
         "license": "standard",
         "notes": "Official 4K 60FPS Video — rörlig MV (skoluniform-scen). 'Oh baby baby' + första vers."
@@ -16569,6 +16925,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Soft & Love"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "1u0aKJj9kr930YeAa6KXcy",
     "youtubeClips": [
       {
         "videoId": "9_hKXk2qSuw",
@@ -17275,6 +17632,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "6W2Ef5Ph6ILTUAedoQ3QIv",
     "youtubeClips": [
       {
         "videoId": "TSVHoHyErBQ",
@@ -17316,6 +17674,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Tuga93",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "magnus-uggla-vi-ska-till-vm",
+    "displayName": "Vi ska till VM — Magnus Uggla",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "f3oyfdoNPWw",
+        "startSec": 51,
+        "endSec": 81,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1406)."
       }
     ]
   },
@@ -18863,6 +19252,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "danny-saucedo-if-only-you",
+    "displayName": "If Only You — Danny Saucedo",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "PNgqgpzeV8A",
+        "startSec": 17,
+        "endSec": 47,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1421)."
+      }
+    ]
+  },
+  {
     "id": "enrique-iglesias-tired-of-being-sorry",
     "displayName": "Tired of Being Sorry — Enrique Iglesias",
     "correctYear": 2007,
@@ -18953,6 +19369,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Marija Šerifović",
         "license": "standard",
         "notes": "ESC 2007 vinnare — Serbien. Officiell music video."
+      }
+    ]
+  },
+  {
+    "id": "markoolio-ingen-sommar-utan-reggae",
+    "displayName": "Ingen sommar utan reggae — Markoolio",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "5YuLlTsWYK9uslUdGM83dJ",
+    "youtubeClips": [
+      {
+        "videoId": "TznMe5Ev8Dg",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1420)."
       }
     ]
   },
@@ -19920,6 +20368,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "5sp1KDCNEm1Eoeqxsep01L",
     "youtubeClips": [
       {
         "videoId": "25LBTSUEU0A",
@@ -20418,6 +20867,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sean-banan-gott-nytt-jul",
+    "displayName": "Gott nytt jul — Sean Banan",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Christmas edition"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "nMcEuS2-CuY",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1429)."
+      }
+    ]
+  },
+  {
     "id": "shakira-waka-waka",
     "displayName": "Waka Waka (This Time for Africa) — Shakira",
     "correctYear": 2010,
@@ -20641,6 +21121,68 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "BeyoncéVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "danny-saucedo-in-the-club",
+    "displayName": "In the Club — Danny Saucedo",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "d_iz6e3ETPg",
+        "startSec": 42,
+        "endSec": 72,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1423)."
+      }
+    ]
+  },
+  {
+    "id": "den-svenska-bjornstammen-vart-jag-mig",
+    "displayName": "Vart jag mig i världen vänder — Den Svenska Björnstammen",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "jI2EcRXR7RU",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1413)."
       }
     ]
   },
@@ -21065,12 +21607,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
-    "spotifyTrackId": "5M2y8QdDepGYMsWyxhoxQU",
     "youtubeClips": [
       {
-        "videoId": "zNKwziMG5UI",
-        "startSec": 30,
-        "endSec": 45,
+        "videoId": "VjZwz3yxS9I",
+        "startSec": 40,
+        "endSec": 55,
         "channelTitle": "Veronica Maggio - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
@@ -21296,6 +21837,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "magnus-uggla-jag-och-min-far",
+    "displayName": "Jag och min far — Magnus Uggla",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "fRY6jg2ESbI",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1407)."
+      }
+    ]
+  },
+  {
     "id": "norlie-kkv-dar-jag-hanger-min-hatt",
     "displayName": "Där jag hänger min hatt — Norlie & KKV",
     "correctYear": 2012,
@@ -21340,6 +21911,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "17qZsun9q3L8ceIa3kPz4A",
     "youtubeClips": []
+  },
+  {
+    "id": "petra-marklund-handerna-mot-himlen",
+    "displayName": "Händerna mot himlen — Petra Marklund",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "f4fB9EXpMTI",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1412)."
+      }
+    ]
   },
   {
     "id": "psy-gangnam-style",
@@ -21389,10 +21990,50 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "LyKYV_7vs6k",
-        "startSec": 47,
-        "endSec": 67,
+        "startSec": 37,
+        "endSec": 57,
         "channelTitle": "PremiunMusicHD",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "sean-banan-sean-den-forste-banan",
+    "displayName": "Sean den förste banan — Sean Banan",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen",
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "5J2UfqBylH8jDQZJnxby81",
+    "youtubeClips": [
+      {
+        "videoId": "a5fceiuy6Po",
+        "startSec": 9,
+        "endSec": 39,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1428)."
+      },
+      {
+        "videoId": "Rz6OPt1rl58",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1428)."
       }
     ]
   },
@@ -21873,6 +22514,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2013 vinnare. ESC 2013 performance."
+      }
+    ]
+  },
+  {
+    "id": "sean-banan-copacabanana",
+    "displayName": "Copacabanana — Sean Banan",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "HPKBW_Bfqto",
+        "startSec": 73,
+        "endSec": 103,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1430)."
       }
     ]
   },
@@ -22518,6 +23190,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "danny-saucedo-brinner-i-brostet",
+    "displayName": "Brinner i bröstet — Danny Saucedo",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "t6GekWxcZvo",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1424)."
+      }
+    ]
+  },
+  {
     "id": "dnce-cake-by-the-ocean",
     "displayName": "Cake by the Ocean — DNCE",
     "correctYear": 2015,
@@ -22765,6 +23468,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1404)."
       }
     ]
+  },
+  {
+    "id": "norlie-kkv-ingen-annan-ror-mig-som-du",
+    "displayName": "Ingen annan rör mig som du — Norlie & KKV",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "25V8NDi9if73rYvHwDKKw5",
+    "youtubeClips": []
   },
   {
     "id": "shawn-mendes-i-know-what-you-did-last-summer",
@@ -23437,6 +24164,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "veronica-maggio-vi-mot-varlden",
+    "displayName": "Vi mot världen — Veronica Maggio",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pGUbe0bhOys",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1416)."
+      }
+    ]
+  },
+  {
     "id": "weeknd-starboy",
     "displayName": "Starboy — The Weeknd",
     "correctYear": 2016,
@@ -23864,6 +24621,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 231,
         "channelTitle": "7clouds",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "molly-sanden-utan-dig",
+    "displayName": "Utan dig — Molly Sandén",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish",
+      "Soft & Love"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "3fiKmyDr615KZDrL51VZDu",
+    "youtubeClips": [
+      {
+        "videoId": "FyO_4OOY8cA",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1425)."
       }
     ]
   },
@@ -24636,6 +25426,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
       }
     ]
+  },
+  {
+    "id": "miss-li-lev-nu-dor-sen",
+    "displayName": "Lev nu dö sen — Miss Li",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "6HJasLoTKvxglAMQH8nPcD",
+    "youtubeClips": []
   },
   {
     "id": "nyper-mig-i-armen",
@@ -25897,6 +26710,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "danny-saucedo-happy-that-you-found-me",
+    "displayName": "Happy That You Found Me — Danny Saucedo",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "e0NdpEYpcJY",
+        "startSec": 14,
+        "endSec": 44,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1422)."
+      }
+    ]
+  },
+  {
     "id": "dua-lipa-illusion",
     "displayName": "Illusion — Dua Lipa",
     "correctYear": 2024,
@@ -26586,6 +27430,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2026 vinnare. ESC 2026 official music video."
+      }
+    ]
+  },
+  {
+    "id": "lilla-al-fadji-delulu",
+    "displayName": "Delulu — Lilla Al-Fadji",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "DRiL2wizEEk",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1409)."
       }
     ]
   },
