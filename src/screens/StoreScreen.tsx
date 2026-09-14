@@ -122,7 +122,7 @@ interface SubscriptionFeature {
  * (Home:ns "QuizVibe user vs Guest"-info-modal renderar samma strängar i
  * samma kort-layout). Ändra ALLTID båda.
  */
-const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
+export const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
   { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
   { premium: '20 rounds per game (Individual device)', basic: 'Max 4 rounds per game' },
   { premium: 'Invite 12 players per game (Individual device)', basic: 'Max 4 players' },
