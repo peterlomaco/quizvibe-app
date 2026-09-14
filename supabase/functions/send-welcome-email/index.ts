@@ -69,8 +69,7 @@ Deno.serve(async (req) => {
   const text =
     `${greeting}\n\n` +
     `Your QuizVibe account is activated. Jump in and put your ` +
-    `Music & Film knowledge to the test.\n\n` +
-    `QuizVibe is operated by LoMaCo AB, Sweden.`;
+    `Music & Film knowledge to the test.`;
   const html = `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
        style="background:#F4F7FB;margin:0;padding:0;">
@@ -87,7 +86,7 @@ Deno.serve(async (req) => {
                  alt="QuizVibe" style="display:block;margin:0 auto;border:0;" />
             <div style="font-size:12px;font-weight:700;letter-spacing:2px;
                         text-transform:uppercase;color:#8A97AB;
-                        margin-top:12px;">Music. Film.</div>
+                        margin-top:12px;">Music. Film. Play.</div>
           </td>
         </tr>
         <tr>
@@ -96,7 +95,7 @@ Deno.serve(async (req) => {
           </td>
         </tr>
         <tr>
-          <td align="center" style="padding:20px 32px 0;">
+          <td align="center" style="padding:20px 32px 36px;">
             <h1 style="font-size:22px;font-weight:700;color:#1A2233;
                        margin:0 0 12px;">Your account is activated 🎉</h1>
             <p style="font-size:15px;line-height:1.55;color:#4A5568;margin:0 0 10px;">
@@ -105,14 +104,6 @@ Deno.serve(async (req) => {
             <p style="font-size:15px;line-height:1.55;color:#4A5568;margin:0 0 8px;">
               Your QuizVibe account is ready. Jump in and put your
               Music &amp; Film knowledge to the test.
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:24px 32px 32px;">
-            <div style="height:1px;background:#EDF1F6;margin:16px 0 16px;"></div>
-            <p style="font-size:12px;line-height:1.5;color:#9AA6B8;margin:0;">
-              QuizVibe is operated by LoMaCo AB, Sweden.
             </p>
           </td>
         </tr>
