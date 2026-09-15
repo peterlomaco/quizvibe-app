@@ -268,15 +268,20 @@ export async function claimCarryOverLobbyPlayer(
 ): Promise<void> {
   if (!code || !playerId) return;
   const normalized = normalizeCode(code);
+  // ensureAuthSession() krävs så auth.uid() finns i RPC:n (även guests får en
+  // anon-session). Guarden behålls: utan session kan claim ändå inte ske.
   await ensureAuthSession();
   const { data: userResp } = await supabase.auth.getUser();
   const userId = userResp.user?.id ?? null;
   if (!userId) return;
-  const { error } = await supabase
-    .from('lobby_players')
-    .update({ user_id: userId, has_left: false })
-    .eq('room_code', normalized)
-    .eq('player_id', playerId);
+  // FINDING 2-härdning (migration 0054): claim går via SECURITY DEFINER-RPC
+  // som server-side ENBART sätter user_id + has_left på en obevakad rad —
+  // is_host/approved/name kan inte längre manipuleras av en moddad klient.
+  // Ersätter den tidigare direkta UPDATE:n (vars RLS-policy nu är droppad).
+  const { error } = await supabase.rpc('claim_carry_over_row', {
+    p_room_code: normalized,
+    p_player_id: playerId,
+  });
   if (error) {
     console.warn('[lobbyPlayers] claimCarryOverLobbyPlayer failed:', error.message);
   }
@@ -403,11 +408,16 @@ export async function markOwnPlayerLeft(code: string, playerId: string): Promise
 export async function getLobbyPlayers(code: string): Promise<LobbyPlayer[] | undefined | null> {
   if (!code) return undefined;
   const normalized = normalizeCode(code);
-  const { data, error } = await supabase
-    .from('lobby_players')
-    .select('*')
-    .eq('room_code', normalized)
-    .order('turn_order', { ascending: true });
+  // FINDING 1-härdning (migration 0054): rostern läses via SECURITY DEFINER-
+  // RPC:n get_lobby_roster(code) istället för ett direkt `select *`. Direkt
+  // tabell-SELECT är nu membership-scoped (Realtime + medlemsläsningar), men
+  // JOIN-flödet läser rostern INNAN egen rad finns (dup-detection, guest-
+  // letters, sparade lobbies) — då finns inget medlemskap att scopa mot.
+  // RPC:n kräver ett room_code-argument → massdump av hela tabellen är stängd.
+  // Funktionen gör upper() + order by turn_order server-side; behåll normalized.
+  const { data, error } = await supabase.rpc('get_lobby_roster', {
+    p_room_code: normalized,
+  });
   if (error) {
     console.warn('[lobbyPlayers] getLobbyPlayers query failed:', error.message);
     return null;
