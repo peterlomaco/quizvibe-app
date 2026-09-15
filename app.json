@@ -14,7 +14,7 @@
       "url": "https://u.expo.dev/c918490d-9a4b-48a6-9e46-eeb51c1f83bb"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "se.quizvibe.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
