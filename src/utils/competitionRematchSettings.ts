@@ -115,7 +115,9 @@ export function buildRematchSettings(
     spotifyEnabled: last?.spotifyEnabled ?? false,
     spotifyAnswerYear: true,
     spotifyAnswerName: true,
-    parentControlEnabled: false,
+    // Bärs egentligen via `parentControl`-URL-param (se doc ovan); detta är
+    // bara required-field-defaulten → safe default PÅ.
+    parentControlEnabled: true,
     remoteAssistance: 'full',
     mutualAssistanceEnabled: false,
   };

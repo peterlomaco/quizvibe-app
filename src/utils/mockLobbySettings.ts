@@ -181,8 +181,9 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     // Tolerant: kolumner kanske inte finns ännu → default true (båda aktiva).
     spotifyAnswerYear: row.spotify_answer_year ?? true,
     spotifyAnswerName: row.spotify_answer_name ?? true,
-    // Tolerant: kolumnen saknas i DB → default false (Parent Control av).
-    parentControlEnabled: row.parent_control_enabled ?? false,
+    // Tolerant: kolumnen saknas i DB → default true (Parent Control på, safe
+    // default; kosmetisk non-host-spegling — filtret körs bara på host-enheten).
+    parentControlEnabled: row.parent_control_enabled ?? true,
     // Tolerant: kolumnerna saknas i DB → default true (paketets material spelas).
     packageYoutubeEnabled: row.package_youtube_enabled ?? true,
     packageHintsEnabled: row.package_hints_enabled ?? true,

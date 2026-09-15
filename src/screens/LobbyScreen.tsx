@@ -78,6 +78,7 @@ import { supabase } from '../utils/supabase';
 import { clearGameStarted, isGameStarted, markGameStarted } from '../utils/mockStartedGames';
 import {
   PURCHASED_PACKAGES,
+  isPackageParentRestricted,
   type MusicPackage,
 } from '../utils/mockPurchasedPackages';
 import {
@@ -1103,6 +1104,15 @@ function confirmAsync(
   });
 }
 
+// Blockar aktivering av ett parent-restricted-paket (Hip Hop) medan Parent
+// Control är på i lobbyn. Delas av alla fyra aktiverings-paths.
+function alertParentRestrictedPackage(): void {
+  Alert.alert(
+    'Parent Control',
+    "You're trying to activate a package that is restricted with Parent control. Please switch Parent control off before activating this package.",
+  );
+}
+
 // SequentialDots flyttat till src/components/SequentialDots.tsx för delning
 // med GetReadyIntro (icke-host:s "Waiting for Host to start quiz"-ruta).
 
@@ -1732,8 +1742,9 @@ export default function LobbyScreen() {
           // (fresh lobby) faller vi på host:ens profil-default.
           const carriedParentControl =
             parentControl === undefined ? undefined : parentControl === 'true';
+          // Default PÅ (safe default) — undefined profil-fält läses PÅ.
           setParentControlEnabled(
-            carriedParentControl ?? profile?.parentControlEnabled ?? false,
+            carriedParentControl ?? profile?.parentControlEnabled ?? true,
           );
           // Tillåt debounce-effekten att skriva till setLobbySettings nu när
           // alla initiala värden är satta. Utan denna guard kan debounce:n
@@ -2638,9 +2649,10 @@ export default function LobbyScreen() {
   const [spotifyAnswerYear, setSpotifyAnswerYear] = useState(true);
   const [spotifyAnswerName, setSpotifyAnswerName] = useState(true);
   // Parent Control — host-styrd. När på filtreras YT-items taggade
-  // parentControlled bort ur frågeurvalet (skickas som URL-param till quiz).
-  // Seedas från host:ens profil (parentControlEnabled); non-host speglar host.
-  const [parentControlEnabled, setParentControlEnabled] = useState(false);
+  // parentControlled bort ur frågeurvalet (skickas som URL-param till quiz),
+  // OCH parent-restricted-paket (Hip Hop) får inte aktiveras. Default PÅ (safe
+  // default; seed-effekten sätter om från param/profil). Non-host speglar host.
+  const [parentControlEnabled, setParentControlEnabled] = useState(true);
   // Remote 1v1: EN gemensam hjälpnivå för båda spelarna (default Full).
   // Assistance är annars personligt, men i en duell där båda kör samma
   // frågesekvens var för sig blir olika nivåer inte jämförbart — därför KAN
@@ -3197,6 +3209,16 @@ export default function LobbyScreen() {
   );
 
   const handleToggleExtraPackage = (id: string) => {
+    // Aktivering av ett parent-restricted-paket är blockerad medan Parent
+    // Control är på (avaktivering är alltid tillåten).
+    if (
+      !selectedExtraPackages.includes(id) &&
+      parentControlEnabled &&
+      isPackageParentRestricted(id)
+    ) {
+      alertParentRestrictedPackage();
+      return;
+    }
     setSelectedExtraPackages((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
@@ -3209,9 +3231,17 @@ export default function LobbyScreen() {
   const handleToggleAll = () => {
     if (isAllSelected) {
       setSelectedExtraPackages([]);
-    } else {
-      setSelectedExtraPackages(availablePackages.map((p) => p.id));
+      return;
     }
+    // Select all: aktivera bara icke-restricted-paket när Parent Control är på;
+    // om något restricted-paket hoppas över, informera via block-alerten.
+    const activatable = availablePackages.filter(
+      (p) => !(parentControlEnabled && isPackageParentRestricted(p.id)),
+    );
+    if (activatable.length < availablePackages.length) {
+      alertParentRestrictedPackage();
+    }
+    setSelectedExtraPackages(activatable.map((p) => p.id));
   };
 
   // "+ Add package"-modal: host väljer paket direkt ur HELA katalogen
@@ -3225,9 +3255,53 @@ export default function LobbyScreen() {
       setEnabledHostPackages((prev) => prev.filter((p) => p !== id));
       setSelectedExtraPackages((prev) => prev.filter((p) => p !== id));
     } else {
+      // "+ Add package" aktiverar paketet direkt i lobbyn → blockeras för
+      // parent-restricted-paket medan Parent Control är på.
+      if (parentControlEnabled && isPackageParentRestricted(id)) {
+        alertParentRestrictedPackage();
+        return;
+      }
       setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
       setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
     }
+  };
+
+  // Host-styrd Parent Control-toggle i lobbyn.
+  //  • OFF → bekräfta (mature-content-varning) innan avaktivering.
+  //  • ON medan ett restricted-paket är aktivt → bekräfta att paketet stängs
+  //    av; vid confirm slås PC på OCH restricted-paketen deaktiveras.
+  //  • ON utan aktivt restricted-paket → direkt.
+  const handleToggleParentControlLobby = (next: boolean) => {
+    if (!next) {
+      Alert.alert(
+        'Parent Control',
+        'I am aware that this activates mature content, some of it might not be appropriate for children. Still want to deactivate Parent control?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Deactivate', style: 'destructive', onPress: () => setParentControlEnabled(false) },
+        ],
+      );
+      return;
+    }
+    const activeRestricted = selectedExtraPackages.filter(isPackageParentRestricted);
+    if (activeRestricted.length > 0) {
+      Alert.alert(
+        'Parent Control',
+        'This will turn off the activated package and content that is restricted with Parent control. Still want to activate Parent control?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Activate',
+            onPress: () => {
+              setSelectedExtraPackages((prev) => prev.filter((p) => !isPackageParentRestricted(p)));
+              setParentControlEnabled(true);
+            },
+          },
+        ],
+      );
+      return;
+    }
+    setParentControlEnabled(true);
   };
 
   // ── Host-paket: coverage-graying + Game Era-lås (delad logik i hostPackages.ts) ──
@@ -8041,7 +8115,7 @@ export default function LobbyScreen() {
                 <Text style={styles.sectionLabel}>Parent Control</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => Alert.alert('Parent Control', 'When on, YouTube clips flagged as parent-controlled are removed from the question selection.')}
+                  onPress={() => Alert.alert('Parent Control', 'When on, mature content is kept out of the game: parent-controlled clips are removed from the question selection, and mature packages (e.g. Hip Hop) cannot be activated.')}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -8049,7 +8123,7 @@ export default function LobbyScreen() {
               </View>
               <Switch
                 value={parentControlEnabled}
-                onValueChange={hostMode && !isGuestHost ? setParentControlEnabled : undefined}
+                onValueChange={hostMode && !isGuestHost ? handleToggleParentControlLobby : undefined}
                 disabled={!hostMode || isGuestHost}
                 trackColor={{ false: '#3C3C3C', true: Colors.success }}
                 thumbColor="#FFF"
@@ -8166,7 +8240,15 @@ export default function LobbyScreen() {
                     setAddPackageModalVisible(true);
                     return;
                   }
-                  setSelectedExtraPackages(availablePackages.map((p) => p.id));
+                  // Aktivera bara icke-restricted-paket medan Parent Control är
+                  // på; om något restricted-paket hoppas över, informera.
+                  const activatable = availablePackages.filter(
+                    (p) => !(parentControlEnabled && isPackageParentRestricted(p.id)),
+                  );
+                  if (activatable.length < availablePackages.length) {
+                    alertParentRestrictedPackage();
+                  }
+                  setSelectedExtraPackages(activatable.map((p) => p.id));
                 };
                 const activateIsActive = hasPremium && isPackagesActive;
                 return (
