@@ -129,6 +129,10 @@ function buildExportedQuestion(
     questionText: FIXED_QUESTION_TEXT[contentSubject],
     // Item-HCP (§4.1) = curator-satt probability (0–100).
     itemHcp: item.probability,
+    // Parent Control (item-nivå): taggade image/Hints-items sorteras bort ur
+    // frågeurvalet på klienten när host slår på Parent Control (samma som musik).
+    // Emitteras bara när satt så nuvarande output är oförändrad (inga taggade än).
+    ...(item.parentControlled ? { parentControlled: true } : {}),
   };
 }
 
@@ -222,6 +226,9 @@ export interface ImageQuizQuestion {
   /** Item-HCP (§4.1) = katalogens probability (0–100). Klientens HCP-filter
    *  väljer item om itemHcp >= spelarens HCP (relaxas om poolen blir för tunn). */
   itemHcp: number;
+  /** Item-nivå Parent Control: när true sorteras item:t bort ur frågeurvalet på
+   *  klienten om host slår på Parent Control (samma regel som musik-poolen). */
+  parentControlled?: boolean;
 }
 
 export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = ${JSON.stringify(questions, null, 2)};

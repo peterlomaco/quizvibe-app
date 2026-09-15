@@ -554,8 +554,26 @@ export default function ProfileScreen() {
 
   // ── Parent Control ───────────────────────────────────────────────────
   // Host-default: när på filtreras YT-items taggade parentControlled bort ur
-  // frågeurvalet i alla spel där denna profil är host. Default av.
-  const [parentControlEnabled, setParentControlEnabled] = useState(false);
+  // frågeurvalet i alla spel där denna profil är host. Default PÅ (safe default;
+  // load-effekten sätter om från profilen via `?? true`).
+  const [parentControlEnabled, setParentControlEnabled] = useState(true);
+  // Turning OFF kräver bekräftelse (mature-content-varning); turning ON sker
+  // direkt — ett aktiverat paket i Profile betyder bara "valbart i lobby", så
+  // ingen paket-hantering behövs här (Peter 2026-09-15).
+  const handleToggleParentControl = (next: boolean) => {
+    if (next) {
+      setParentControlEnabled(true);
+      return;
+    }
+    Alert.alert(
+      'Parent Control',
+      'I am aware that this activates mature content, some of it might not be appropriate for children. Still want to deactivate Parent control?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Deactivate', style: 'destructive', onPress: () => setParentControlEnabled(false) },
+      ],
+    );
+  };
 
   const [smColWidth, setSmColWidth] = useState(0);
   const smCellStyle = smColWidth > 0 ? { width: smColWidth } : undefined;
@@ -905,7 +923,9 @@ export default function ProfileScreen() {
         setSpotifyEnabled(augmented.spotifyDefaultEnabled ?? false);
         setSpotifyAnswerYear(augmented.spotifyAnswerYear ?? true);
         setSpotifyAnswerName(augmented.spotifyAnswerName ?? true);
-        setParentControlEnabled(augmented.parentControlEnabled ?? false);
+        // Parent Control är default PÅ (safe default för alla QuizVibe-users,
+        // inkl. befintliga profiler som aldrig satt fältet → undefined läses PÅ).
+        setParentControlEnabled(augmented.parentControlEnabled ?? true);
         // Snapshot av laddad state — jämförs vid navigation bort.
         // gameMode speglar den COERCADE staten (inte rå augmented) så en
         // stale 'remote-1v1'-profil inte fastnar i evig "unsaved changes".
@@ -926,7 +946,7 @@ export default function ProfileScreen() {
           youtubeEnabledCategories: augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories(),
           imagesEnabledCategories: augmented.imagesEnabledCategories ?? defaultEnabledMainCategories(),
           enabledHostPackages: augmented.enabledHostPackages ?? [],
-          parentControlEnabled: augmented.parentControlEnabled ?? false,
+          parentControlEnabled: augmented.parentControlEnabled ?? true,
         });
       });
       loadFriends().then((list) => {
@@ -2006,7 +2026,7 @@ export default function ProfileScreen() {
               <Text style={styles.sectionLabel}>Parent Control</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Parent Control', 'When on, YouTube clips flagged as parent-controlled are removed from the question selection in games you host.')}
+                onPress={() => Alert.alert('Parent Control', 'When on, mature content is kept out of the games you host: parent-controlled clips are removed from the question selection, and mature packages (e.g. Hip Hop) cannot be activated in a lobby.')}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>
@@ -2014,7 +2034,7 @@ export default function ProfileScreen() {
             </View>
             <Switch
               value={parentControlEnabled}
-              onValueChange={setParentControlEnabled}
+              onValueChange={handleToggleParentControl}
               trackColor={{ false: '#3C3C3C', true: Colors.success }}
               thumbColor="#FFF"
               ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}

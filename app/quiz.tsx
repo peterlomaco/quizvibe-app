@@ -374,6 +374,10 @@ const IMAGE_SEED_QUESTIONS: ImageQuestion[] = IMAGE_QUIZ_QUESTIONS
     hints: HINTS_LIBRARY[q.id],
     profession: professionFromSubject(q.contentSubject),
     itemHcp: q.itemHcp,
+    // Parent Control gäller ÄVEN item-nivå för image/Hints (inte bara paket).
+    // Defensiv cast: image-exporten börjar emittera fältet — undefined tills en
+    // curator taggar ett image-item (samma mönster som genrePackages nedan).
+    parentControlled: (q as { parentControlled?: boolean }).parentControlled,
   }),
 );
 
@@ -1506,7 +1510,9 @@ export default function QuizScreen() {
   const spotifyAnswerName = (params.spotifyAnswerName ?? 'true') === 'true';
   // Parent Control — host:ens val (Profile/Lobby-switch). När på filtreras
   // YT-items taggade parentControlled bort ur frågeurvalet (se inEraMusic).
-  const parentControlEnabled = (params.parentControlEnabled ?? 'false') === 'true';
+  // Default PÅ (safe default) om paramet saknas — lobbyn skickar alltid det,
+  // så detta gäller bara direkt-nav/edge cases.
+  const parentControlEnabled = (params.parentControlEnabled ?? 'true') === 'true';
 
   // Deterministisk svarstyp per Spotify-fråga baserat på Spotify-frågens ordinalposition.
   // Båda aktiva → alternerande per "Spotify-runda" = turnOrder.length Spotify-frågor.
@@ -1994,6 +2000,9 @@ export default function QuizScreen() {
     ]);
     const inEraImages = imagesEnabled
       ? packagedImages.filter((q) => {
+          // Parent Control (item-nivå): items taggade parentControlled sorteras
+          // bort ur Hints-poolen — samma regel som musik-poolen (inEraMusic).
+          if (parentControlEnabled && q.parentControlled) return false;
           if (q.peakFrom !== undefined && q.peakTo !== undefined) {
             // Interval-overlap: [eraFrom, eraTo] ∩ [peakFrom, peakTo] ≠ ∅
             return eraFrom <= q.peakTo && eraTo >= q.peakFrom;
@@ -2103,16 +2112,21 @@ export default function QuizScreen() {
     // Använd bara YouTube SEED_QUESTIONS om YouTube faktiskt är aktiverat;
     // annars returnera bildpool ignorerandes era (era-filter kan ha tömt poolen).
     if (!hasSpotify && !hasPureYoutube && !hasImage) {
+      // Parent Control gäller ÄVEN i nödfallbacken — annars kan raw SEED_QUESTIONS
+      // servera parentControlled-items ofiltrerat när alla pooler tömts.
+      const pcOk = (q: QuizQuestion) => !parentControlEnabled || !q.parentControlled;
       // Shufflas — även nödfallback ska vara slumpad, inte katalog-ordning.
       // youtubeActive (INTE råa youtubeEnabled): serva ALDRIG YouTube-seed när
       // YouTube inte är en effektivt vald källa (t.ex. Hints-only-paketspel).
-      if (youtubeActive) return shuffleArray(SEED_QUESTIONS);
+      if (youtubeActive) return shuffleArray(SEED_QUESTIONS.filter(pcOk));
       // YouTube av, Hints tom pga era-filter eller saknad data → visa alla
       // person-items utan era-filter som nödlösning.
       const fallbackImages = IMAGE_SEED_QUESTIONS.filter(
-        (q) => PERSON_SUBJECTS.has(q.source.contentSubject),
+        (q) => PERSON_SUBJECTS.has(q.source.contentSubject) && pcOk(q),
       );
-      return fallbackImages.length > 0 ? shuffleArray(fallbackImages) : shuffleArray(SEED_QUESTIONS);
+      return fallbackImages.length > 0
+        ? shuffleArray(fallbackImages)
+        : shuffleArray(SEED_QUESTIONS.filter(pcOk));
     }
 
     // ── Guest-hostat spel: slumpad käll-mix (Peters trial-design 2026-07-04) ──
@@ -2471,17 +2485,21 @@ export default function QuizScreen() {
     // Nödfallback: alla pools tomma (t.ex. source-toggle av + era utan träffar).
     // Shufflas — även nödfallback ska vara slumpad, inte katalog-ordning.
     if (mixed.length === 0) {
+      // Parent Control gäller ÄVEN här — raw SEED/IMAGE-pooler får inte servera
+      // parentControlled-items ofiltrerat.
+      const pcOk = (q: QuizQuestion) => !parentControlEnabled || !q.parentControlled;
       // youtubeActive (INTE råa youtubeEnabled): en Hints-only-källa får aldrig
       // falla tillbaka på SEED_QUESTIONS (YouTube) — se youtubeActive ovan.
       if (!youtubeActive) {
         const personFallback = IMAGE_SEED_QUESTIONS.filter(
-          (q) => PERSON_SUBJECTS.has(q.source.contentSubject),
+          (q) => PERSON_SUBJECTS.has(q.source.contentSubject) && pcOk(q),
         );
+        const imgAll = IMAGE_SEED_QUESTIONS.filter(pcOk);
         return shuffleArray<QuizQuestion>(
-          personFallback.length > 0 ? personFallback : IMAGE_SEED_QUESTIONS.length > 0 ? IMAGE_SEED_QUESTIONS : SEED_QUESTIONS,
+          personFallback.length > 0 ? personFallback : imgAll.length > 0 ? imgAll : SEED_QUESTIONS.filter(pcOk),
         );
       }
-      return shuffleArray(SEED_QUESTIONS);
+      return shuffleArray(SEED_QUESTIONS.filter(pcOk));
     }
     return mixed;
   }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt, categoryDebt, parentControlEnabled, selectedExtraPackages, regionHcp, packageYoutubeEnabled, packageHintsEnabled]);

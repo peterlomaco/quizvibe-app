@@ -41,6 +41,12 @@ export interface MusicPackage {
   // innehåll finns på Spotify. Sätts INTE (=false) för t.ex. Sport/Football-
   // paket, där sport-events saknar Spotify-spår → Spotify-only ger tom pool.
   allowSpotifyOnly?: boolean;
+  // True = paketet innehåller mature-content och får INTE aktiveras i en lobby
+  // medan Parent Control är på. Gaten sitter i LobbyScreen (aktivering blockeras
+  // + turning Parent Control ON deaktiverar aktiva restricted-paket). I Profile
+  // gäller den INTE — där betyder "aktiverad" bara att paketet är valbart i en
+  // lobby. Optional/undefined = ej restricted (default).
+  parentRestricted?: boolean;
 }
 
 // Första riktiga tema-paketen (2026-08-28). Båda är Music-only. `id` bär
@@ -48,13 +54,20 @@ export interface MusicPackage {
 // matchar `pkg-gen-*`). `tags` speglar genrePackages-strängarna i katalogen.
 export const PURCHASED_PACKAGES: MusicPackage[] = [
   { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'], allowSpotifyOnly: true },
-  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['Hip Hop'], allowSpotifyOnly: true },
+  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['Hip Hop'], allowSpotifyOnly: true, parentRestricted: true },
   // Sport Anthems-paketet (pkg-sport-anthems) är BORTTAGET 2026-09-12. Items som
   // bar genrePackages: [..., "sport-anthems"] i songs-sport.yaml ligger kvar med
   // inBaseCatalog: false → parkerade (surfar aldrig, eftersom inget paket längre
   // bär taggen), exakt som de "football"-taggade items i samma fil vars paket
   // inte heller shippar. Återinför en entry här om paketet ska upp igen.
 ];
+
+// True om paketet är mature-content-flaggat (får ej aktiveras i lobby medan
+// Parent Control är på). Reuse-punkt för alla Parent Control-gates i
+// LobbyScreen — slår upp `parentRestricted` i katalogen via `id`.
+export function isPackageParentRestricted(id: string): boolean {
+  return PURCHASED_PACKAGES.find((p) => p.id === id)?.parentRestricted === true;
+}
 
 // ─── Generation-key (för audience-filter) ────────────────────────────
 // Type + birth-year-mapper används av audienceFilter.ts för att härleda
