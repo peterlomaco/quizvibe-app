@@ -3167,7 +3167,7 @@ export default function HomeScreen() {
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
-                    Join with Room Code
+                    Invitation - Room code
                   </Text>
                 </View>
                 {/* Blinkande guld "New update" till höger — samma signal som
@@ -3255,7 +3255,7 @@ export default function HomeScreen() {
                     numberOfLines={1}
                     adjustsFontSizeToFit
                   >
-                    Join with Room Code
+                    Invitation - Room code
                   </Text>
                   <View style={styles.homeFreeBadge} pointerEvents="none">
                     <Text style={styles.homeFreeBadgeText}>FREE</Text>
