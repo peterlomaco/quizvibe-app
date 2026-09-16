@@ -29,7 +29,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Aqua Barbie Girl 1997"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "twW5slEK8wY"
         startSec: 0
@@ -45,7 +45,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Cher Believe 1998"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "nZXRV4MezEw"
         startSec: 0
@@ -59,7 +59,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Madonna Frozen Ray of Light"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "XS088Opj9o0"
         startSec: 0
@@ -282,7 +282,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Madonna Hung Up Confessions on a Dance Floor"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "EDwb9jOVRtU"
         startSec: 63
@@ -296,7 +296,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Gorillaz Feel Good Inc Demon Days"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "HyHNuVaZJ-k"
         startSec: 15
@@ -324,7 +324,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Shakira Hips Don't Lie Wyclef Jean"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "X8k1FVqtojU"
         startSec: 0
@@ -354,6 +354,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Timbaland OneRepublic Apologize"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "68U7CGrUcsJQ9PcBxk7oxB"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "xTjwTbnX_EA"
@@ -383,7 +384,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Katy Perry I Kissed a Girl One of the Boys"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "usvTbqTHwyw"
         startSec: 0
@@ -398,7 +399,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Lady Gaga Bad Romance The Fame Monster"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "TTOPBQhrvtQ"
         startSec: 0
@@ -412,7 +413,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Black Eyed Peas I Gotta Feeling The E.N.D."]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "uSD4vsh1zDA"
         startSec: 30
@@ -512,7 +513,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Carly Rae Jepsen Call Me Maybe"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "fWNaR-rxAic"
         startSec: 0
@@ -820,7 +821,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Mando Diao Dance with Somebody 2009"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     spotifyTrackId: "28qkNp9shSV8AQrBwxZf48"
     youtubeClips:
       - videoId: "B3SSPURxGJ0"
@@ -866,7 +867,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Icona Pop I Love It 2012"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     spotifyTrackId: "3VZQshi4COChhXaz7cLP02"
     youtubeClips:
       - videoId: "UxxajLWwzqY"
@@ -1293,7 +1294,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Backstreet Boys Everybody Backstreet's Back 1997"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "iUfaW-Utn8Y"
         startSec: 15
@@ -1371,7 +1372,8 @@ items:
     probability: 76
     wikimediaSearchHints: ["Antique Die for You Eurovision 2001 Greece Swedish-Greek duo"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    spotifyTrackId: "2byZAXWOqDx3w8suK3btui"
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "VVLfuW3KiLY"
         startSec: 0
@@ -1450,7 +1452,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Günther Ding Dong Song 2004 Swedish eurodance"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     parentControlled: true
     spotifyTrackId: "2LELFaNglE9B5xlcmd4qtQ"
     # youtubeClips borttagna 2026-08-10: uUYplyWPKGk (Günther) är raderad/privat →
@@ -1591,7 +1593,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Kylie Minogue Cant Get You Out of My Head 2001 Fever"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "c18441Eh_WE"
         startSec: 0
@@ -1719,7 +1721,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Vengaboys Boom Boom Boom Boom"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "llyiQ4I-mcQ"
         startSec: 0
@@ -1779,7 +1781,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Justin Bieber Beauty and a Beat Believe"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "l8hIx9AceOw"
         startSec: 40
@@ -1885,7 +1887,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Katy Perry Firework Teenage Dream"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "QGJuMBdaqIw"
         startSec: 10
@@ -1900,7 +1902,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Jessie J Domino Who You Are"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "UJtB55MaoD0"
         startSec: 0
@@ -1931,7 +1933,8 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Daft Punk Around the World Homework"]
     answerMethods: ["timeline"]
-    genrePackages: ["Dance Music", "Pop music"]
+    spotifyTrackId: "6XKvPNWlmnN0gJejCKm1k7"
+    genrePackages: ["Dance Music", "Disco & Pop"]
     youtubeClips:
       - videoId: "K0HSD_i2DvA"
         startSec: 0
@@ -2096,7 +2099,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Beyonce Crazy in Love Dangerously in Love Jay-Z"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music", "RnB"]
+    genrePackages: ["Disco & Pop", "RnB"]
     youtubeClips:
       - videoId: "ViwtNLUqkMY"
         startSec: 0
@@ -2291,6 +2294,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["K-Ci All My Life"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5AbXJ33KZWOP8EAglwDaJ6"
     youtubeClips:
       - videoId: "DXvMT_mVbqw"
         startSec: 7
@@ -2411,7 +2415,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Destiny's Child Bootylicious"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "IyYnnUcgeMc"
         startSec: 0
@@ -2471,6 +2475,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["blink-182 All the Small Things"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2m1hi0nfMR9vdGC8UcrnwU"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "9Ht5RZpzPqw"
@@ -2595,6 +2600,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Smash Mouth All Star"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3cfOd4CMv2snFaKAnMdnvK"
     youtubeClips:
       - videoId: "L_jWHffIx5E"
         startSec: 37
@@ -2626,6 +2632,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Timbuktu Alla vill till himmelen men ingen vill dö"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6I1kZgg3bGrPKxhZOltbRW"
     youtubeClips:
       - videoId: "NDHlDb9AOsU"
         startSec: 4
@@ -2655,7 +2662,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Antique Dinata Dinata"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "474UjAuu0mc"
         startSec: 0
@@ -2669,7 +2676,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Antique Follow Me"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "ywH2os9XB88"
         startSec: 0

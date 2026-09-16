@@ -211,6 +211,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "61Wh4cqsBmhzsEbGLNulQB",
     "youtubeClips": [
       {
         "videoId": "3zFBAEj7kdA",
@@ -618,6 +619,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "5pCVEMMt40ICn9HXZ5q85o",
     "youtubeClips": [
       {
         "videoId": "zMRoByJI43Q",
@@ -1052,6 +1054,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "1KyKo3vuS8syPToJlR2HEh",
     "youtubeClips": [
       {
         "videoId": "cZag0E32is0",
@@ -1318,6 +1321,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "5J2CHimS7dWYMImCHkEFaJ",
     "youtubeClips": [
       {
         "videoId": "zx2TFk0vh1I",
@@ -1462,6 +1466,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "0YfOnJWqmAKaUvEL1QcNop",
     "youtubeClips": [
       {
         "videoId": "Z5zDRtEC0x0",
@@ -1580,6 +1585,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Rock"
     ],
+    "spotifyTrackId": "13KF3YaPAxbOYmMhFkT9ma",
     "youtubeClips": [
       {
         "videoId": "MSSxnv1_J2g",
@@ -1851,6 +1857,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "3oGGipilQmZTol8qFTR6u1",
     "youtubeClips": [
       {
         "videoId": "Mki34tyoCp0",
@@ -2697,6 +2704,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "1fDsrQ23eTAVFElUMaf38X",
     "youtubeClips": [
       {
         "videoId": "iX_TFkut1PM",
@@ -3369,6 +3377,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "6EtYDiHVO8sldNucNcK8Uk",
     "youtubeClips": [
       {
         "videoId": "t1CvS7aOMa4",
@@ -5039,6 +5048,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "7d7508DNeeg1xjFMoj8Ikm",
     "youtubeClips": [
       {
         "videoId": "uFd5nk2sXow",
@@ -6363,7 +6373,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -6394,7 +6404,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -6455,6 +6465,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "2cKIcepRj6NOc1bKGjHuSl",
     "youtubeClips": [
       {
         "videoId": "rblt2EtFfC4",
@@ -6605,6 +6616,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "2374M0fQpWi3dLnB54qaLX",
     "youtubeClips": [
       {
         "videoId": "U1LB_OerHCE",
@@ -6789,7 +6801,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -7031,6 +7043,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "2NVpYQqdraEcQwqT7GhUkh",
     "youtubeClips": [
       {
         "videoId": "BNirQXe8HOA",
@@ -8340,7 +8353,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -8932,7 +8945,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -9381,7 +9394,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -9535,7 +9548,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -10481,7 +10494,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -10712,6 +10725,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "2BFLtstcRXPnk4uoO3Wi6U",
     "youtubeClips": [
       {
         "videoId": "Qt2mbGP6vFI",
@@ -11742,6 +11756,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "1Eb90nmqTrxylKFhcUzW8P",
     "youtubeClips": [
       {
         "videoId": "Y0pdQU87dc8",
@@ -11936,7 +11951,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -12245,7 +12260,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -12426,7 +12441,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "spotifyTrackId": "6kWJvPfC4DgUpRsXKNa9z9",
     "youtubeClips": [
@@ -13542,6 +13557,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Rock"
     ],
+    "spotifyTrackId": "45Ia1U4KtIjAPPU7Wv1Sea",
     "youtubeClips": [
       {
         "videoId": "i5PZQMwL7iE",
@@ -13829,6 +13845,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Soft & Love"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "2RChe0r2cMoyOvuKobZy44",
     "youtubeClips": [
       {
         "videoId": "9BMwcO6_hyA",
@@ -14889,7 +14906,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -15853,7 +15870,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -15884,7 +15901,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -16012,8 +16029,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Dance Music",
-      "Pop music"
+      "Disco & Pop"
     ],
+    "spotifyTrackId": "6XKvPNWlmnN0gJejCKm1k7",
     "youtubeClips": [
       {
         "videoId": "K0HSD_i2DvA",
@@ -16140,6 +16158,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Soft & Love",
       "RnB"
     ],
+    "spotifyTrackId": "5AbXJ33KZWOP8EAglwDaJ6",
     "youtubeClips": [
       {
         "videoId": "DXvMT_mVbqw",
@@ -16603,8 +16622,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
+    "spotifyTrackId": "3MjUtNVVq3C8Fn0MP3zhXa",
     "youtubeClips": [
       {
         "videoId": "1dfhNimhwNM",
@@ -16695,7 +16715,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -16915,7 +16935,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -17159,7 +17179,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -17221,7 +17241,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -17313,6 +17333,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Rock"
     ],
+    "spotifyTrackId": "2m1hi0nfMR9vdGC8UcrnwU",
     "youtubeClips": [
       {
         "videoId": "9Ht5RZpzPqw",
@@ -17822,6 +17843,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Rock"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "3cfOd4CMv2snFaKAnMdnvK",
     "youtubeClips": [
       {
         "videoId": "L_jWHffIx5E",
@@ -18625,9 +18647,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "2byZAXWOqDx3w8suK3btui",
     "youtubeClips": [
       {
         "videoId": "VVLfuW3KiLY",
@@ -18663,7 +18686,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -18788,7 +18811,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -19134,7 +19157,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -19581,7 +19604,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music",
+      "Disco & Pop",
       "RnB"
     ],
     "youtubeClips": [
@@ -20107,7 +20130,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "parentControlled": true,
     "spotifyTrackId": "2LELFaNglE9B5xlcmd4qtQ",
@@ -20671,7 +20694,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -20733,7 +20756,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -21016,6 +21039,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "100% in swedish"
     ],
+    "spotifyTrackId": "6I1kZgg3bGrPKxhZOltbRW",
     "youtubeClips": [
       {
         "videoId": "NDHlDb9AOsU",
@@ -21357,7 +21381,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -21843,6 +21867,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "68U7CGrUcsJQ9PcBxk7oxB",
     "youtubeClips": [
       {
         "videoId": "xTjwTbnX_EA",
@@ -22124,7 +22149,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -22479,7 +22504,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -22647,7 +22672,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -22709,7 +22734,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "spotifyTrackId": "28qkNp9shSV8AQrBwxZf48",
     "youtubeClips": [
@@ -23120,7 +23145,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -23825,7 +23850,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -24214,7 +24239,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -24308,7 +24333,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "spotifyTrackId": "3VZQshi4COChhXaz7cLP02",
     "youtubeClips": [
@@ -24348,7 +24373,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -25259,7 +25284,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -25411,7 +25436,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music",
+      "Disco & Pop",
       "RnB"
     ],
     "spotifyTrackId": "2lOgTEwxmRPBtjp60opyRN",
@@ -25700,9 +25725,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "5jE48hhRu8E6zBDPRSkEq7",
     "youtubeClips": [
       {
         "videoId": "7PCkvCPvDXk",
@@ -25832,7 +25858,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -26321,7 +26347,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -26383,7 +26409,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "spotifyTrackId": "3S4px9f4lceWdKf0gWciFu",
     "youtubeClips": [
@@ -26851,7 +26877,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -26914,7 +26940,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -27154,8 +27180,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
+    "spotifyTrackId": "0ADG9OgdVTL7fgREP75BrZ",
     "youtubeClips": [
       {
         "videoId": "eC-F_VZ2T1c",
@@ -28187,7 +28214,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -28250,7 +28277,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -28284,6 +28311,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "1Xi84slp6FryDSCbzq4UCD",
     "youtubeClips": [
       {
         "videoId": "Eztx7Wr8PtE",
@@ -28407,7 +28435,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -28590,7 +28618,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -28621,7 +28649,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "spotifyTrackId": "0VjIjW4GlUZAMYd2vXMi3b",
     "youtubeClips": [
@@ -28684,7 +28712,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -28776,7 +28804,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -29340,8 +29368,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
+    "spotifyTrackId": "4Dvkj6JhhA12EX05fT7y2e",
     "youtubeClips": [
       {
         "videoId": "EsY5kRIBM8Y",
@@ -29465,8 +29494,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
+    "spotifyTrackId": "0V3wPSX9ygBnCm8psDIegu",
     "youtubeClips": [
       {
         "videoId": "pXpbKU24cMo",
@@ -29588,7 +29618,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -29653,7 +29683,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -30021,8 +30051,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
+    "spotifyTrackId": "4wJ5Qq0jBN4ajy7ouZIV1c",
     "youtubeClips": [
       {
         "videoId": "ekr2nIex040",
@@ -30271,8 +30302,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop music"
+      "Disco & Pop"
     ],
+    "spotifyTrackId": "6MrLkXsMmHaYt680fhJUAq",
     "youtubeClips": [
       {
         "videoId": "cZgUiR31m-Y",

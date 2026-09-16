@@ -70,6 +70,7 @@ items:
     probability: 75
     wikimediaSearchHints: ["Anything Goes Cole Porter 1934"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "61Wh4cqsBmhzsEbGLNulQB"
     youtubeClips:
       - videoId: "3zFBAEj7kdA"
         startSec: 30
@@ -208,6 +209,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Frank Sinatra Almost Like Being in Love Brigadoon"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5pCVEMMt40ICn9HXZ5q85o"
     youtubeClips:
       - videoId: "zMRoByJI43Q"
         startSec: 30
@@ -407,6 +409,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["The Beatles A Hard Day's Night"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5J2CHimS7dWYMImCHkEFaJ"
     youtubeClips:
       - videoId: "zx2TFk0vh1I"
         startSec: 30
@@ -465,6 +468,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Sam Cooke A Change Is Gonna Come 1964"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0YfOnJWqmAKaUvEL1QcNop"
     youtubeClips:
       - videoId: "Z5zDRtEC0x0"
         startSec: 30
@@ -479,6 +483,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Etta James At Last 1960"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1KyKo3vuS8syPToJlR2HEh"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "cZag0E32is0"

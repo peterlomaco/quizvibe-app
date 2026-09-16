@@ -17,6 +17,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Rolling Stones Satisfaction"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "13KF3YaPAxbOYmMhFkT9ma"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "MSSxnv1_J2g"
@@ -45,6 +46,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["The Beatles All You Need Is Love"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3oGGipilQmZTol8qFTR6u1"
     genrePackages: ["Soft & Love"]
     region: ["global"]
     youtubeClips:
@@ -362,6 +364,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Don McLean American Pie 1971"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1fDsrQ23eTAVFElUMaf38X"
     youtubeClips:
       - videoId: "iX_TFkut1PM"
         startSec: 30
@@ -825,6 +828,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["The Rolling Stones Angie 1973"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6EtYDiHVO8sldNucNcK8Uk"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "t1CvS7aOMa4"
@@ -1000,6 +1004,7 @@ items:
     probability: 66
     wikimediaSearchHints: ["Izhar Cohen A-Ba-Ni-Bi Eurovision 1978 Israel"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7d7508DNeeg1xjFMoj8Ikm"
     youtubeClips:
       - videoId: "uFd5nk2sXow"
         startSec: 5

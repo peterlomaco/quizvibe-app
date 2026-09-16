@@ -240,7 +240,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Billie Eilish Bad Guy When We All Fall Asleep"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "4-TbQnONe_w"
         startSec: 0
@@ -271,7 +271,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["BTS Dynamite 2020"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "kK29Q_LpVUw"
         startSec: 0
@@ -314,7 +314,8 @@ items:
     probability: 92
     wikimediaSearchHints: ["Harry Styles As It Was Harry's House"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    spotifyTrackId: "4Dvkj6JhhA12EX05fT7y2e"
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "EsY5kRIBM8Y"
         startSec: 0
@@ -328,7 +329,8 @@ items:
     probability: 90
     wikimediaSearchHints: ["Taylor Swift Anti-Hero Midnights"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    spotifyTrackId: "0V3wPSX9ygBnCm8psDIegu"
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "pXpbKU24cMo"
         startSec: 30
@@ -345,7 +347,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Miley Cyrus Flowers Endless Summer Vacation"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "iawgB2CDCrw"
         startSec: 7
@@ -419,7 +421,8 @@ items:
     probability: 88
     wikimediaSearchHints: ["ROSE Bruno Mars APT 2024"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    spotifyTrackId: "4wJ5Qq0jBN4ajy7ouZIV1c"
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "ekr2nIex040"
         startSec: 30
@@ -466,7 +469,7 @@ items:
     probability: 83
     wikimediaSearchHints: ["Sia Cheap Thrills 2016"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "nYh-n7EOtMA"
         startSec: 21
@@ -500,7 +503,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Tones and I Dance Monkey 2019"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "q0hyYWKXF0Q"
         startSec: 30
@@ -530,7 +533,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Tove Lo Habits Stay High 2013"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "fG-EIvEiSHs"
         startSec: 30
@@ -607,7 +610,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Dua Lipa Don't Start Now 2019"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "oygrmJFKYZY"
         startSec: 30
@@ -962,6 +965,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Duncan Laurence Arcade Eurovision 2019 Netherlands"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1Xi84slp6FryDSCbzq4UCD"
     youtubeClips:
       - videoId: "Eztx7Wr8PtE"
         startSec: 5
@@ -1239,7 +1243,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Ariana Grande Zedd Break Free"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music", "RnB"]
+    genrePackages: ["Disco & Pop", "RnB"]
     spotifyTrackId: "2lOgTEwxmRPBtjp60opyRN"
     youtubeClips:
       - videoId: "pcRKNslSS5g"
@@ -1313,7 +1317,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Taylor Swift Blank Space 1989"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "e-ORhEE9VVg"
         startSec: 0
@@ -1373,7 +1377,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Shawn Mendes Camila Cabello I Know What You Did Last Summer"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "kalsoK9K3mI"
         startSec: 0
@@ -1493,7 +1497,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Justin Timberlake Can't Stop the Feeling Trolls"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "ru0K8uYEZWw"
         startSec: 0
@@ -1538,8 +1542,9 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Meghan Trainor All About That Bass Title"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5jE48hhRu8E6zBDPRSkEq7"
     inBaseCatalog: false
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "7PCkvCPvDXk"
         startSec: 0
@@ -1569,7 +1574,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Major Lazer Cold Water Justin Bieber MO"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "nBtDsQ4fhXY"
         startSec: 0
@@ -1718,7 +1723,8 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["sombr 12 to 12"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    spotifyTrackId: "6MrLkXsMmHaYt680fhJUAq"
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "cZgUiR31m-Y"
         startSec: 0
@@ -1883,7 +1889,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Dua Lipa Break My Heart"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Nj2U6rhnucI"
         startSec: 10
@@ -1898,7 +1904,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Dua Lipa Houdini"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "suAR1PYFNYA"
         startSec: 20
@@ -1928,7 +1934,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Mabel Don't Call Me Up"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "9TQKyDD9Yig"
         startSec: 8
@@ -1943,7 +1949,8 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Zara Larsson Ain't My Fault"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    spotifyTrackId: "0ADG9OgdVTL7fgREP75BrZ"
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "eC-F_VZ2T1c"
         startSec: 2
