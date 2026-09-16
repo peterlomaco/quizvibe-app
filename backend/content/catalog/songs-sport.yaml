@@ -359,7 +359,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Zombie Nation Kernkraft 400 1999 techno dance"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance", "sport"]
+    genrePackages: ["Dance Music", "sport"]
     youtubeClips:
       - videoId: "SxhwbXYe1XE"
         startSec: 0

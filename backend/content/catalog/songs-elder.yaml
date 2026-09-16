@@ -192,6 +192,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Nat King Cole Christmas Song chestnuts"]
     answerMethods: ["timeline"]
+    genrePackages: ["Christmas edition"]
     youtubeClips:
       - videoId: "1Jp3XIqTR2w"
         startSec: 20
@@ -361,6 +362,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Ben E King Stand by Me 1961"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     spotifyTrackId: "3SdTKo2uVsxFblQjpScoHy"
     youtubeClips:
       - videoId: "dTd2ylacYNU"
@@ -390,6 +392,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["The Beatles She Loves You"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "nGbWU8S3vzs"
         startSec: 10
@@ -447,6 +450,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ritchie Valens La Bamba 1958"]
     answerMethods: ["timeline"]
+    genrePackages: ["Summer"]
     youtubeClips:
       - videoId: "BycLmWI97Nc"
         startSec: 30
@@ -533,6 +537,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Lill-Babs Leva livet 1963 Swedish schlager"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6P40lE9SODIcT21NpmRd2I"
     genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "BrYFFIESx3c"
@@ -546,6 +551,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Lill-Babs Letkis-Jenka 1964 Swedish dansband schlager"]
     answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
     spotifyTrackId: "0ifb42ld8ZGWoVyydt18l7"
     youtubeClips:
       - videoId: "eMiA3xHLXVo"
@@ -593,6 +599,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Edith Piaf La Vie en rose"]
     answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "-0KvBnIvTFs"
         startSec: 0
