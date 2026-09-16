@@ -136,7 +136,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What are Extra packages?',
-        a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. More themes are added over time.',
+        a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop & RnB). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. More themes are added over time.',
       },
     ],
   },
