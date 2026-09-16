@@ -5850,37 +5850,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "tomas-ledin-hon-gor-allt",
-    "displayName": "Hon gör allt för att göra mig lycklig — Tomas Ledin",
-    "correctYear": 1980,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 68,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "100% in swedish"
-    ],
-    "spotifyTrackId": "2eG2VJ3CiHs43XYBRIRQ45",
-    "youtubeClips": [
-      {
-        "videoId": "epuLWrb6AUA",
-        "startSec": 5,
-        "endSec": 50,
-        "channelTitle": "Tomas Ledin - Topic",
-        "license": "standard"
-      }
-    ]
-  },
-  {
     "id": "tomas-ledin-just-nu",
     "displayName": "Just nu! — Tomas Ledin",
     "correctYear": 1980,
@@ -11643,6 +11612,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "videoId": "mIQNpPzCPTg",
         "startSec": 0,
         "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "tomas-ledin-hon-gor-allt",
+    "displayName": "Hon gör allt för att göra mig lycklig — Tomas Ledin",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 68,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "2eG2VJ3CiHs43XYBRIRQ45",
+    "youtubeClips": [
+      {
+        "videoId": "epuLWrb6AUA",
+        "startSec": 5,
+        "endSec": 50,
+        "channelTitle": "Tomas Ledin - Topic",
         "license": "standard"
       }
     ]
@@ -21882,6 +21882,40 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "timbaland-scream",
+    "displayName": "Scream — Timbaland",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop",
+      "RnB"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "5sp1KDCNEm1Eoeqxsep01L",
+    "youtubeClips": [
+      {
+        "videoId": "nXskfsgBihE",
+        "startSec": 3,
+        "endSec": 33,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1292)."
+      }
+    ]
+  },
+  {
     "id": "timbaland-the-way-i-are",
     "displayName": "The Way I Are — Timbaland feat. Keri Hilson",
     "correctYear": 2007,
@@ -22815,40 +22849,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 8,
         "endSec": 38,
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "timbaland-scream",
-    "displayName": "Scream — Timbaland",
-    "correctYear": 2009,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "genrePackages": [
-      "Dance Music",
-      "Disco & Pop",
-      "RnB"
-    ],
-    "inBaseCatalog": false,
-    "spotifyTrackId": "5sp1KDCNEm1Eoeqxsep01L",
-    "youtubeClips": [
-      {
-        "videoId": "nXskfsgBihE",
-        "startSec": 3,
-        "endSec": 33,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1292)."
       }
     ]
   },
