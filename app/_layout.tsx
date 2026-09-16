@@ -117,7 +117,13 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="light" backgroundColor={Colors.background} />
-      <Stack screenOptions={{ headerShown: false }}>
+      {/* gestureEnabled: false — svep-tillbaka avstängt på HELA stacken.
+          Navigation sker enbart via knappar (TopUserBanner / in-screen /
+          router.push/replace), aldrig via svep. Utan detta tolkar iOS ett
+          horisontellt drag på Game Era-slidern (Lobby + Profile) eller
+          TimelineSelector (Quiz) som ett edge-back-svep → Lobby hoppar till
+          Home mitt i att man justerar eran. */}
+      <Stack screenOptions={{ headerShown: false, gestureEnabled: false }}>
         {/* Bottom tab-bar borttagen (D-0 2026-05-12). Alla skärmar ligger
             som plain Stack-routes; navigation mellan dem sker explicit via
             TopUserBanner, in-screen-knappar och router.push/replace med
