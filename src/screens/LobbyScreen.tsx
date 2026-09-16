@@ -4549,6 +4549,13 @@ export default function LobbyScreen() {
     setAddFriendError(null);
     setAddFriendChecking(true);
     try {
+      // Kan inte lägga till sig själv som vän (annars går det att bjuda in sig
+      // själv till sin egen lobby). Speglar Profile:s handleAddFriend.
+      const ownName = (await loadProfile())?.playerName?.trim().toLowerCase();
+      if (ownName && trimmed.toLowerCase() === ownName) {
+        setAddFriendError("You can't add yourself as a friend");
+        return;
+      }
       const exists = await playerNameExists(trimmed);
       if (!exists) {
         setAddFriendError('No QuizVibe user found with that Player Name');
@@ -5999,6 +6006,13 @@ export default function LobbyScreen() {
     }
     const profile = await loadProfile();
     const fromPlayerName = profile?.playerName?.trim() || 'Host';
+    // Self-invite-guard (Layer 2): kan inte bjuda in sig själv. Efter att
+    // self-friend-guarden (Layer 1) hindrar att man ligger i sin egen
+    // friends-lista är detta en backstop (t.ex. stale listor).
+    if (friend.playerName.trim().toLowerCase() === fromPlayerName.toLowerCase()) {
+      Alert.alert("That's you", "You can't invite yourself to your own lobby.");
+      return;
+    }
     await addInvite(friend.playerName, {
       roomCode,
       fromPlayerName,
