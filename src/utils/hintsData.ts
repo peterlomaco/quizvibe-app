@@ -8939,6 +8939,16 @@ const NATIONALITY_OVERRIDES: Record<string, string> = {
   'didier-drogba': 'ivory-coast', 'emmanuel-adebayor': 'togo',
   'charlize-theron': 'south-africa', 'netta-barzilai': 'israel',
   'yao-ming': 'china',        'bts': 'south-korea',
+  // Import 2026-09-16 — band "country of origin" (Wikidata P495) → flag, so
+  // groups with >=8 hints but 'unknown' P27 nationality reach the hint pool.
+  'aerosmith': 'usa',         'all-saints': 'uk',         'chicago': 'usa',
+  'creedence': 'usa',         'crowded-house': 'new-zealand', 'depeche-mode': 'uk',
+  'ebba-gron': 'sweden',      'en-vogue': 'usa',          'foo-fighters': 'usa',
+  'modjo': 'france',          'nsync': 'usa',             'papa-roach': 'usa',
+  'pearl-jam': 'usa',         'pitbull': 'usa',           'semisonic': 'usa',
+  'soul-ii-soul': 'uk',       'sugababes': 'uk',          't-rex': 'uk',
+  'take-that': 'uk',          'the-corrs': 'ireland',     'the-prodigy': 'uk',
+  'wings': 'uk',
 };
 
 // HINTS_LIBRARY: auto-genererade hints + manuellt kuraterade (manuella åsidosätter).

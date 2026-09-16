@@ -1,0 +1,544 @@
+# New bands/groups imported from Music.xlsx profile list (2026-09-16) — hint pool.
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+region: ["global"]
+category: artists
+contentForm: image
+contentSubject: band
+items:
+  - id: 10cc
+    displayName: "10cc"
+    correctYear: 1972
+    probability: 50
+    wikimediaSearchHints: ["10cc"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: 3-doors-down
+    displayName: "3 Doors down"
+    correctYear: 1996
+    probability: 50
+    wikimediaSearchHints: ["3 Doors down"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: 98-degress
+    displayName: "98 Degress"
+    probability: 50
+    wikimediaSearchHints: ["98 Degress"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: aerosmith
+    displayName: "Aerosmith"
+    correctYear: 1969
+    probability: 50
+    wikimediaSearchHints: ["Aerosmith"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: alex-party
+    displayName: "Alex Party"
+    probability: 50
+    wikimediaSearchHints: ["Alex Party"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music", "Disco & Pop"]
+    region: ["europe"]
+  - id: alice-deejay
+    displayName: "Alice Deejay"
+    correctYear: 1999
+    probability: 50
+    wikimediaSearchHints: ["Alice Deejay"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music", "Disco & Pop"]
+  - id: all-saints
+    displayName: "All Saints"
+    correctYear: 1993
+    probability: 50
+    wikimediaSearchHints: ["All Saints"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Film edition"]
+  - id: army-of-lovers
+    displayName: "Army of lovers"
+    correctYear: 1987
+    probability: 50
+    wikimediaSearchHints: ["Army of lovers"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+    region: ["sweden"]
+  - id: atc
+    displayName: "ATC"
+    correctYear: 1999
+    probability: 50
+    wikimediaSearchHints: ["ATC"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: baha-men
+    displayName: "Baha Men"
+    correctYear: 1991
+    probability: 50
+    wikimediaSearchHints: ["Baha Men"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: bomfunk-mcs
+    displayName: "Bomfunk MCs"
+    correctYear: 1998
+    probability: 50
+    wikimediaSearchHints: ["Bomfunk MCs"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: boyz-2-men
+    displayName: "Boyz 2 Men"
+    probability: 50
+    wikimediaSearchHints: ["Boyz 2 Men"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love", "RnB"]
+  - id: bwitched
+    displayName: "Bwitched"
+    probability: 50
+    wikimediaSearchHints: ["Bwitched"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: chemical-brothers
+    displayName: "Chemical Brothers"
+    correctYear: 2019
+    probability: 50
+    wikimediaSearchHints: ["Chemical Brothers"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: chicago
+    displayName: "Chicago"
+    correctYear: 1967
+    probability: 50
+    wikimediaSearchHints: ["Chicago"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: commodores
+    displayName: "Commodores"
+    correctYear: 1968
+    probability: 50
+    wikimediaSearchHints: ["Commodores"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: cornershop
+    displayName: "Cornershop"
+    correctYear: 1991
+    probability: 50
+    wikimediaSearchHints: ["Cornershop"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: corona
+    displayName: "Corona"
+    probability: 50
+    wikimediaSearchHints: ["Corona"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: creed
+    displayName: "Creed"
+    correctYear: 1994
+    probability: 50
+    wikimediaSearchHints: ["Creed"]
+    answerMethods: ["name-letters"]
+  - id: creedence
+    displayName: "Creedence"
+    correctYear: 1968
+    probability: 50
+    wikimediaSearchHints: ["Creedence"]
+    answerMethods: ["name-letters"]
+  - id: crowded-house
+    displayName: "Crowded House"
+    correctYear: 1985
+    probability: 50
+    wikimediaSearchHints: ["Crowded House"]
+    answerMethods: ["name-letters"]
+  - id: deep-blue-something
+    displayName: "Deep Blue something"
+    correctYear: 1992
+    probability: 50
+    wikimediaSearchHints: ["Deep Blue something"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: depeche-mode
+    displayName: "Depeche Mode"
+    correctYear: 1980
+    probability: 50
+    wikimediaSearchHints: ["Depeche Mode"]
+    answerMethods: ["name-letters"]
+  - id: dolly-style
+    displayName: "Dolly Style"
+    correctYear: 2014
+    probability: 50
+    wikimediaSearchHints: ["Dolly Style"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen"]
+    region: ["sweden"]
+  - id: dru-hill
+    displayName: "Dru Hill"
+    correctYear: 1992
+    probability: 50
+    wikimediaSearchHints: ["Dru Hill"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: drangarna
+    displayName: "Drängarna"
+    probability: 50
+    wikimediaSearchHints: ["Drängarna"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish", "Melodifestivalen"]
+    region: ["sweden"]
+  - id: dromhus
+    displayName: "Drömhus"
+    probability: 50
+    wikimediaSearchHints: ["Drömhus"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish", "Disco & Pop"]
+    region: ["sweden"]
+  - id: east-17
+    displayName: "East 17"
+    correctYear: 1991
+    probability: 50
+    wikimediaSearchHints: ["East 17"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: ebba-gron
+    displayName: "Ebba Grön"
+    correctYear: 1977
+    probability: 50
+    wikimediaSearchHints: ["Ebba Grön"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+    region: ["sweden"]
+  - id: emd
+    displayName: "EMD"
+    probability: 50
+    wikimediaSearchHints: ["EMD"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+    region: ["sweden"]
+  - id: en-vogue
+    displayName: "En Vogue"
+    correctYear: 1989
+    probability: 50
+    wikimediaSearchHints: ["En Vogue"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: fine-young-cannibals
+    displayName: "Fine Young Cannibals"
+    correctYear: 1984
+    probability: 50
+    wikimediaSearchHints: ["Fine Young Cannibals"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: five
+    displayName: "Five"
+    correctYear: 1997
+    probability: 50
+    wikimediaSearchHints: ["Five"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: foo-fighters
+    displayName: "Foo Fighters"
+    correctYear: 1995
+    probability: 50
+    wikimediaSearchHints: ["Foo Fighters"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: four-seasons
+    displayName: "Four seasons"
+    probability: 50
+    wikimediaSearchHints: ["Four seasons"]
+    answerMethods: ["name-letters"]
+  - id: free
+    displayName: "Free"
+    correctYear: 1972
+    probability: 50
+    wikimediaSearchHints: ["Free"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: friends
+    displayName: "Friends"
+    probability: 50
+    wikimediaSearchHints: ["Friends"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
+    region: ["sweden"]
+  - id: gala
+    displayName: "Gala"
+    probability: 50
+    wikimediaSearchHints: ["Gala"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop", "sport"]
+  - id: galensakparna
+    displayName: "Galensakparna"
+    probability: 50
+    wikimediaSearchHints: ["Galensakparna"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish", "Summer"]
+    region: ["sweden"]
+  - id: house-of-pain
+    displayName: "House of Pain"
+    correctYear: 1991
+    probability: 50
+    wikimediaSearchHints: ["House of Pain"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: jackson-5
+    displayName: "Jackson 5"
+    probability: 50
+    wikimediaSearchHints: ["Jackson 5"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: latin-kings
+    displayName: "Latin kings"
+    correctYear: 1940
+    probability: 50
+    wikimediaSearchHints: ["Latin kings"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish", "Hip Hop"]
+    region: ["sweden"]
+  - id: lighthouse-family
+    displayName: "Lighthouse Family"
+    correctYear: 1993
+    probability: 50
+    wikimediaSearchHints: ["Lighthouse Family"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: limp-bizkit
+    displayName: "Limp Bizkit"
+    correctYear: 1994
+    probability: 50
+    wikimediaSearchHints: ["Limp Bizkit"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: livin-joy
+    displayName: "Livin Joy"
+    probability: 50
+    wikimediaSearchHints: ["Livin Joy"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music", "Disco & Pop"]
+  - id: modjo
+    displayName: "Modjo"
+    correctYear: 1998
+    probability: 50
+    wikimediaSearchHints: ["Modjo"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: nsync
+    displayName: "Nsync"
+    correctYear: 1995
+    probability: 50
+    wikimediaSearchHints: ["Nsync"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: papa-roach
+    displayName: "Papa Roach"
+    correctYear: 1993
+    probability: 50
+    wikimediaSearchHints: ["Papa Roach"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: pearl-jam
+    displayName: "Pearl jam"
+    correctYear: 1990
+    probability: 50
+    wikimediaSearchHints: ["Pearl jam"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: right-said-fred
+    displayName: "Right said fred"
+    correctYear: 1989
+    probability: 50
+    wikimediaSearchHints: ["Right said fred"]
+    answerMethods: ["name-letters"]
+  - id: rob-n-raz
+    displayName: "Rob n raz"
+    probability: 50
+    wikimediaSearchHints: ["Rob n raz"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["RnB"]
+    region: ["sweden"]
+  - id: run-dmc
+    displayName: "Run DMC"
+    probability: 50
+    wikimediaSearchHints: ["Run DMC"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: safri-duo
+    displayName: "Safri Duo"
+    correctYear: 1990
+    probability: 50
+    wikimediaSearchHints: ["Safri Duo"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: secret-service
+    displayName: "Secret service"
+    correctYear: 1979
+    probability: 50
+    wikimediaSearchHints: ["Secret service"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: semisonic
+    displayName: "Semisonic"
+    correctYear: 1995
+    probability: 50
+    wikimediaSearchHints: ["Semisonic"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: september
+    displayName: "September"
+    probability: 50
+    wikimediaSearchHints: ["September"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+    region: ["sweden"]
+  - id: sonique
+    displayName: "Sonique"
+    correctYear: 1968
+    probability: 50
+    wikimediaSearchHints: ["Sonique"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: soul-ii-soul
+    displayName: "Soul II Soul"
+    probability: 50
+    wikimediaSearchHints: ["Soul II Soul"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["RnB"]
+  - id: southside-spinners
+    displayName: "Southside Spinners"
+    probability: 50
+    wikimediaSearchHints: ["Southside Spinners"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: spooks
+    displayName: "Spooks"
+    probability: 50
+    wikimediaSearchHints: ["Spooks"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: stardust
+    displayName: "Stardust"
+    probability: 50
+    wikimediaSearchHints: ["Stardust"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: steps
+    displayName: "Steps"
+    correctYear: 1997
+    probability: 50
+    wikimediaSearchHints: ["Steps"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: sugababes
+    displayName: "Sugababes"
+    correctYear: 1998
+    probability: 50
+    wikimediaSearchHints: ["Sugababes"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: supertramp
+    displayName: "Supertramp"
+    correctYear: 1969
+    probability: 50
+    wikimediaSearchHints: ["Supertramp"]
+    answerMethods: ["name-letters"]
+  - id: svenne-rubins
+    displayName: "Svenne Rubins"
+    probability: 50
+    wikimediaSearchHints: ["Svenne Rubins"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["sport", "football", "100% in swedish"]
+    region: ["sweden"]
+  - id: svenska-bjornstammen
+    displayName: "Svenska björnstammen"
+    correctYear: 2010
+    probability: 50
+    wikimediaSearchHints: ["Svenska björnstammen"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop", "100% in swedish"]
+    region: ["sweden"]
+  - id: sweet
+    displayName: "Sweet"
+    probability: 50
+    wikimediaSearchHints: ["Sweet"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: t-rex
+    displayName: "T.Rex"
+    correctYear: 1967
+    probability: 50
+    wikimediaSearchHints: ["T.Rex"]
+    answerMethods: ["name-letters"]
+  - id: take-that
+    displayName: "Take that"
+    correctYear: 1990
+    probability: 50
+    wikimediaSearchHints: ["Take that"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: tears-for-fears
+    displayName: "Tears for Fears"
+    correctYear: 1981
+    probability: 50
+    wikimediaSearchHints: ["Tears for Fears"]
+    answerMethods: ["name-letters"]
+  - id: the-bellamy-brothers
+    displayName: "The bellamy brothers"
+    correctYear: 1971
+    probability: 50
+    wikimediaSearchHints: ["The bellamy brothers"]
+    answerMethods: ["name-letters"]
+  - id: the-corrs
+    displayName: "The Corrs"
+    correctYear: 1990
+    probability: 50
+    wikimediaSearchHints: ["The Corrs"]
+    answerMethods: ["name-letters"]
+  - id: the-klf
+    displayName: "The KLF"
+    correctYear: 1987
+    probability: 50
+    wikimediaSearchHints: ["The KLF"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: the-prodigy
+    displayName: "The Prodigy"
+    correctYear: 1990
+    probability: 50
+    wikimediaSearchHints: ["The Prodigy"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: the-shamen
+    displayName: "The Shamen"
+    correctYear: 1985
+    probability: 50
+    wikimediaSearchHints: ["The Shamen"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: toploader
+    displayName: "Toploader"
+    correctYear: 1997
+    probability: 50
+    wikimediaSearchHints: ["Toploader"]
+    answerMethods: ["name-letters"]
+  - id: wild-cherry
+    displayName: "Wild Cherry"
+    probability: 50
+    wikimediaSearchHints: ["Wild Cherry"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: wings
+    displayName: "Wings"
+    correctYear: 1971
+    probability: 50
+    wikimediaSearchHints: ["Wings"]
+    answerMethods: ["name-letters"]
+  - id: wu-tang-clan
+    displayName: "Wu-tang clan"
+    correctYear: 1992
+    probability: 50
+    wikimediaSearchHints: ["Wu-tang clan"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: yes
+    displayName: "Yes"
+    correctYear: 1968
+    probability: 50
+    wikimediaSearchHints: ["Yes"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]

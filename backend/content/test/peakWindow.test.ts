@@ -131,10 +131,15 @@ describe('era-filter mot genererad pool', () => {
     expect(inEra(byId('glenn-miller'), 1981, 2026)).toBe(false);
   });
 
-  it('nästan alla spelbara person-items har nu ett peak-fönster', () => {
+  it('nästan alla spelbara person-items har ett era-ankare (peak-fönster eller correctYear)', () => {
     const persons = IMAGE_QUIZ_QUESTIONS.filter((q) => PERSON_SUBJECTS.has(q.contentSubject));
-    const withPeak = persons.filter((q) => q.peakFrom !== undefined && q.peakTo !== undefined);
-    // Residualen (inget peak-underlag alls) ska vara mycket liten.
-    expect(persons.length - withPeak.length).toBeLessThanOrEqual(10);
+    // Era-ankare = peak-fönster ELLER correctYear (födelse-/bildningsår). Båda
+    // anchorar itemet i tid; `inEra` ovan behandlar dessutom peak-lösa person-
+    // items som era-agnostiska, så residualen (helt utan år) ska vara liten.
+    // Name-letters-hint-importen 2026-09 bär correctYear men inget peak-fönster.
+    const anchored = persons.filter(
+      (q) => (q.peakFrom !== undefined && q.peakTo !== undefined) || q.correctYear !== undefined,
+    );
+    expect(persons.length - anchored.length).toBeLessThanOrEqual(10);
   });
 });

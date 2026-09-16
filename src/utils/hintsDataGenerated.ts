@@ -13716,4 +13716,1945 @@ export const HINTS_LIBRARY_GENERATED: Record<string, HintLibrary> = {
     ],
   },
 
+  '10cc': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rock music', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1972', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Stockport', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'UK Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musical group; art rock band', priority: 1 },
+    ],
+  },
+
+  '3-doors-down': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'alternative rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Brad Arnold', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1996', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'United States', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Republic Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'aaliyah': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Dancer & Model', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 16, 1979', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Brooklyn', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'MTV Video Music Award for Best Female Video', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'MTV Video Music Award for Best Video from a Film', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'American Music Award for Favorite Soul/R&B Album', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'R&B singer (1979–2001)', priority: 1 },
+    ],
+  },
+
+  'aerosmith': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Rock and Roll Hall of Fame', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hard rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Steven Tyler, Joe Perry, Tom Hamilton, Brad Whitford', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1969', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Boston', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Columbia Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Hard rock band', priority: 1 },
+    ],
+  },
+
+  'agnes': {
+    categoryLabel: 'Musikartist',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Pornographic film actor', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pornographic film', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Adult film performer', priority: 1 },
+    ],
+  },
+
+  'al-green': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Singer-songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 13, 1946', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Forrest City', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Lifetime Achievement Award', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Gospel Music Hall of Fame', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Grammy Award for Best Pop Collaboration with Vocals', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'soul', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer', priority: 1 },
+    ],
+  },
+
+  'alex-party': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'Italo house', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Electronic dance group', priority: 1 },
+    ],
+  },
+
+  'alice-cooper': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Vocalist & Rock musician', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 4, 1948', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Detroit', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Rock and Roll Hall of Fame', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'honorary doctorate', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Heritage Award', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rock music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'harmonica', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer (born 1948)', priority: 1 },
+    ],
+  },
+
+  'alice-deejay': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'dance-pop', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Judith Pronk', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1999', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Sony Music', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Electronic music band', priority: 1 },
+    ],
+  },
+
+  'all-saints': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'MTV Europe Music Award for Best Pop', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'MTV Europe Music Award for Best New Act', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Melanie Blatt, Shaznay Lewis, Nicole Appleton, Natalie Appleton', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1993', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'London', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'ZTT Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Girl group', priority: 1 },
+    ],
+  },
+
+  'anna-book': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'September 10, 1970', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stockholm', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'schlager music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer', priority: 1 },
+    ],
+  },
+
+  'army-of-lovers': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'Eurodance', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Alexander Bard, Jean-Pierre Barda, Dominika Peczynski, Michaela Dornonville de la Cour', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1987', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Stockholm', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Stockholm Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Pop band', priority: 1 },
+    ],
+  },
+
+  'atc': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'Eurodance', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Alex Christensen, Sarah Egglestone, Tracey Packham, Livio Salvi', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1999', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Germany', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Bertelsmann Music Group', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Band', priority: 1 },
+    ],
+  },
+
+  'baha-men': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'electronic dance music', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1991', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Nassau', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'EMI', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Bahamian musical group; junkanoo band', priority: 1 },
+    ],
+  },
+
+  'behrang-miri': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 17, 1984', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Kunskapspriset', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rapping', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper, actor, comedian of Iranian origin', priority: 1 },
+    ],
+  },
+
+  'billie-myers': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Singer-songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 14, 1971', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Coventry', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rock music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock singer and songwriter', priority: 1 },
+    ],
+  },
+
+  'billy-ray-cyrus': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer-songwriter & Television actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'August 25, 1961', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Flatwoods', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Favorite Country Single', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Favorite Country New Artist', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Juno Award for Best Selling Single', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'country music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Country singer and actor', priority: 1 },
+    ],
+  },
+
+  'bob-marley': {
+    categoryLabel: 'Musikartist',
+    nationality: 'jamaica',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer-songwriter & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 6, 1945', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Nine Mile', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Lifetime Achievement Award', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Rock and Roll Hall of Fame', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Order of Merit', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'reggae', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Reggae musician (1945–1981)', priority: 1 },
+    ],
+  },
+
+  'bomfunk-mcs': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hip-hop', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Raymond Ebanks, Ville Mäkinen, Ari Toikka, JS16', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1998', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Finland', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Sony Music', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Band', priority: 1 },
+    ],
+  },
+
+  'busta-rhymes': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Rapper & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'May 20, 1972', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'East Flatbush', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'MTV Europe Music Award for Global Icon', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'East Coast hip-hop', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper (born 1972)', priority: 1 },
+    ],
+  },
+
+  'calvin-harris': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Record producer & Disc jockey', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 17, 1984', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Dumfries', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'electronic dance music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'piano', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Electronic music producer and DJ (born 1984)', priority: 1 },
+    ],
+  },
+
+  'carola': {
+    categoryLabel: 'Musikartist',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music artist', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 17, 1992', priority: 2 },
+    ],
+  },
+
+  'chemical-brothers': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'public art', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '2019', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Artwork in public space by Johan Moorman in Deventer, the Netherlands', priority: 1 },
+    ],
+  },
+
+  'chicago': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Rock and Roll Hall of Fame', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'star on Hollywood Walk of Fame', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'jazz', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Terry Kath, Peter Cetera, Robert Lamm, James Pankow', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1967', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Chicago', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Warner Bros. Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'christer-sandelin': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Record producer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 5, 1961', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Stockholm', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer and musician', priority: 1 },
+    ],
+  },
+
+  'commodores': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'funk', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Lionel Richie, Walter Orange, Ronald LaPread', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1968', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Tuskegee', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Motown', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Funk and soul band', priority: 1 },
+    ],
+  },
+
+  'cornershop': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'indie rock', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1991', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Leicester', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Wiiija', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Indie rock band', priority: 1 },
+    ],
+  },
+
+  'corona': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Family name', priority: 1 },
+    ],
+  },
+
+  'craig-david': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Composer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'May 5, 1981', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Southampton', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'MOBO Awards', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Goldene Kamera', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Ivor Novello Awards', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rhythm and blues', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer (born 1981)', priority: 1 },
+    ],
+  },
+
+  'creed': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'alternative rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Scott Stapp, Mark Tremonti, Brian Marshall, Scott Phillips', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1994', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Tallahassee', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Wind-up Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'creedence': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Rock and Roll Hall of Fame', priority: 5 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Proud Mary"', priority: 4 },
+    { id: 'work1', type: 'song', label: 'Notable work', value: '"Cosmo\'s Factory"', priority: 4 },
+    { id: 'work2', type: 'song', label: 'Notable work', value: '"Bad Moon Rising"', priority: 3 },
+    { id: 'work3', type: 'song', label: 'Notable work', value: '"Who\'ll Stop the Rain"', priority: 3 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'roots rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'John Fogerty, Tom Fogerty, Stu Cook, Doug Clifford', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1968', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'El Cerrito', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Fantasy', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Roots rock band', priority: 1 },
+    ],
+  },
+
+  'crowded-house': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'MTV Video Music Award for Best New Artist', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'alternative rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Neil Finn, Nick Seymour, Mitchell Froom, Liam Finn', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1985', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Melbourne', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Capitol Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Australian-New Zealand pop rock band', priority: 1 },
+    ],
+  },
+
+  'curtis-mayfield': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Guitarist & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 3, 1942', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Chicago', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Lifetime Achievement Award', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Grammy Legend Award', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Rock and Roll Hall of Fame', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'soul', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'bass guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer-songwriter (1942–1999)', priority: 1 },
+    ],
+  },
+
+  'darude': {
+    categoryLabel: 'Musikartist',
+    nationality: 'finland',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Disc jockey & Record producer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 17, 1975', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Eura', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'trance', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'synthesizer', priority: 2 },
+    { id: 'nom0', type: 'merit', label: 'Nominated for', value: 'MTV Europe Music Award for Best Nordic Act', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'DJ, music producer and composer', priority: 1 },
+    ],
+  },
+
+  'david-gray': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Singer-songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 13, 1968', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Sale', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'nom0', type: 'merit', label: 'Nominated for', value: 'Grammy Award for Best New Artist', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer-songwriter', priority: 1 },
+    ],
+  },
+
+  'david-lindgren': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Film actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 28, 1982', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Skellefteå', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer, dancer and television presenter', priority: 1 },
+    ],
+  },
+
+  'deep-blue-something': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Breakfast at Tiffany\'s"', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'alternative rock', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1992', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Denton', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Interscope Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'depeche-mode': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Rock and Roll Hall of Fame', priority: 5 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Personal Jesus"', priority: 4 },
+    { id: 'work1', type: 'song', label: 'Notable work', value: '"Enjoy the Silence"', priority: 4 },
+    { id: 'work2', type: 'song', label: 'Notable work', value: '"Just Can\'t Get Enough"', priority: 3 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'synth-pop', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Dave Gahan, Martin Gore, Andrew Fletcher, Alan Wilder', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1980', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Basildon', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Mute Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Band', priority: 1 },
+    ],
+  },
+
+  'desree': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Composer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 30, 1968', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'London', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Pop singer', priority: 1 },
+    ],
+  },
+
+  'dmx': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Rapper & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'December 18, 1970', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Mount Vernon', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'East Coast hip-hop', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper and actor (1970–2021)', priority: 1 },
+    ],
+  },
+
+  'dolly-style': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'Europop', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Vilma Davidsson, Caroline Aronsson, Mikaela Samuelsson, Annie Moreau', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '2014', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Sweden', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Europop group', priority: 1 },
+    ],
+  },
+
+  'drangarna': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rock music', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musical group from Sweden', priority: 1 },
+    ],
+  },
+
+  'dromhus': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Therese Grankvist', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Music group from Sweden', priority: 1 },
+    ],
+  },
+
+  'dru-hill': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rhythm and blues', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Woody Rock', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1992', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Fell\'s Point', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Island Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Contemporary R&B group', priority: 1 },
+    ],
+  },
+
+  'east-17': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Brian Harvey', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1991', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Walthamstow', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'London Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musical group; pop boy band', priority: 1 },
+    ],
+  },
+
+  'ebba-gron': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'punk rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Joakim Thåström', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1977', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Stockholm', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Mistlur Records', priority: 2 },
+    { id: 'disbanded', type: 'characteristic', label: 'Disbanded', value: '1983', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Punk band in Rågsved, Sweden between 1977–1983', priority: 1 },
+    ],
+  },
+
+  'emd': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Protein-coding gene in the species Homo sapiens', priority: 1 },
+    ],
+  },
+
+  'en-vogue': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Soul Train Music Award for Best R&B/Soul Single, Group, Band or Duo', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'MTV Video Music Award for Best Choreography', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Soul Train Music Award for Best R&B/Soul Album, Group Band or Duo', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'soul', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Terry Ellis, Cindy Herron, Rhona Bennett, Dawn Robinson', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1989', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Oakland', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Atlantic Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Vocal girl group', priority: 1 },
+    ],
+  },
+
+  'faith-hill': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Record producer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'September 21, 1967', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Ridgeland', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'American Music Award for Favorite Country Female Artist', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'country music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Country singer (born 1967)', priority: 1 },
+    ],
+  },
+
+  'fine-young-cannibals': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'new wave', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Roland Gift', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1984', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Birmingham', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'I.R.S. Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musical group', priority: 1 },
+    ],
+  },
+
+  'five': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'popular music', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Jason "J" Brown, Abz Love, Scott Robinson, Ritchie Neville', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1997', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'London', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Bertelsmann Music Group', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Boy band', priority: 1 },
+    ],
+  },
+
+  'foo-fighters': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'MTV Video Music Award for Best Rock Video', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Rock and Roll Hall of Fame', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'American Music Award for Favorite Alternative Rock Artist', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'alternative rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Franz Stahl, Dave Grohl, William Goldsmith, Nate Mendel', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1995', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Seattle', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'RCA Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'four-seasons': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Album by Japanese band The Yellow Monkey', priority: 1 },
+    ],
+  },
+
+  'free': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hard rock', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1972', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'London', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Island Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'gala': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Female given name', priority: 1 },
+    ],
+  },
+
+  'gigi-dagostino': {
+    categoryLabel: 'Musikartist',
+    nationality: 'italy',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Disc jockey & Record producer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'December 17, 1967', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Turin', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Amadeus Austrian Music Awards', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'Italo dance', priority: 2 },
+    ],
+  },
+
+  'gladys-knight': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'May 28, 1944', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Atlanta', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'star on Hollywood Walk of Fame', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Kennedy Center Honors', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'National Medal of Arts', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'soul', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer (born 1944)', priority: 1 },
+    ],
+  },
+
+  'harpo': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Pop singer & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 5, 1950', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Brännkyrka parish', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Pop singer', priority: 1 },
+    ],
+  },
+
+  'harry-chapin': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Musician & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'December 7, 1942', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Brooklyn', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Congressional Gold Medal', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'traditional folk music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'harmonica', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer-songwriter (1942–1981)', priority: 1 },
+    ],
+  },
+
+  'house-of-pain': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hardcore hip-hop', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1991', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Los Angeles', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Tommy Boy Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Hip Hop group', priority: 1 },
+    ],
+  },
+
+  'j-cole': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Rapper & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 28, 1985', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Frankfurt', priority: 2 },
+    { id: 'club0', type: 'club', label: 'Club', value: 'Patriots BBC (2021–2021)', priority: 4 },
+    { id: 'club1', type: 'club', label: 'Club', value: 'Scarborough Shooting Stars (2022–2022)', priority: 3 },
+    { id: 'club2', type: 'club', label: 'Club', value: 'Nanjing Monkey Kings (2026–2026)', priority: 3 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hip-hop', priority: 2 },
+    { id: 'nom0', type: 'merit', label: 'Nominated for', value: 'Grammy Award for Best New Artist', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper and record producer (born 1985)', priority: 1 },
+    ],
+  },
+
+  'jackson-5': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Wikimedia band discography', priority: 1 },
+    ],
+  },
+
+  'jennifer-paige': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Composer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'September 3, 1973', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Marietta', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop rock', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer (born 1973)', priority: 1 },
+    ],
+  },
+
+  'jessica-folcker': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 9, 1975', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Täby', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer', priority: 1 },
+    ],
+  },
+
+  'jimmy-nail': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Actor & Singer-songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 16, 1954', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Newcastle upon Tyne', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Guitarist, singer-songwriter, actor, screenwriter', priority: 1 },
+    ],
+  },
+
+  'jon-henrik-fjallgren': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Reindeer herder & Yoiker', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 26, 1987', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Cali', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Saami of the Year Award', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Áillohaš Music Award', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'joik', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'South Saami reindeer herder and joiker from Sweden', priority: 1 },
+    ],
+  },
+
+  'kalle-moraeus': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Composer & Television presenter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 15, 1963', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Orsa församling', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Karamelodiktstipendiet', priority: 5 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'violin', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musician', priority: 1 },
+    ],
+  },
+
+  'klara-hammarstrom': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 20, 2000', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Lidingö Parish', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer and equestrian', priority: 1 },
+    ],
+  },
+
+  'latin-kings': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1940', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Largest Latino street gang', priority: 1 },
+    ],
+  },
+
+  'leann-rimes': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'August 28, 1982', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Jackson', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Award for Best New Artist', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer and actress (born 1982)', priority: 1 },
+    ],
+  },
+
+  'lene-marlin': {
+    categoryLabel: 'Musikartist',
+    nationality: 'norway',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'August 17, 1980', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Tromsø Municipality', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Tromsø kommunes kulturpris', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Karoline Award', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Spellemannprisen for hit of the year', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musician', priority: 1 },
+    ],
+  },
+
+  'lighthouse-family': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'Britpop', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Tunde Baiyewu, Paul Tucker', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1993', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Newcastle upon Tyne', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Universal Music Group', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musical duo', priority: 1 },
+    ],
+  },
+
+  'limp-bizkit': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'nu metal', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'DJ Lethal, Fred Durst, John Otto, Sam Rivers', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1994', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Cash Money Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rap rock band', priority: 1 },
+    ],
+  },
+
+  'linus-svenning': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 13, 1990', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Västerstad parish', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop rock', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer', priority: 1 },
+    ],
+  },
+
+  'lutricia-mcneal': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 27, 1973', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Oklahoma City', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer', priority: 1 },
+    ],
+  },
+
+  'manu-chao': {
+    categoryLabel: 'Musikartist',
+    nationality: 'france',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Composer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 21, 1961', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Paris', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Latin Grammy Award for Best Alternative Song', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Victory of the album of traditional musics or musics of the world', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Victory of the album of traditional musics or musics of the world', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'reggae', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musician', priority: 1 },
+    ],
+  },
+
+  'marc-almond': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 9, 1957', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Southport', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Officer of the Order of the British Empire', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'MOJO Awards', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rock music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer', priority: 1 },
+    ],
+  },
+
+  'martin': {
+    categoryLabel: 'Musikartist',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Painter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 1, 1792', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Munich', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Artist (1792-1865)', priority: 1 },
+    ],
+  },
+
+  'mase': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Rapper & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'August 27, 1975', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hip-hop', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper (born 1975)', priority: 1 },
+    ],
+  },
+
+  'meja': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Composer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 12, 1969', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Nynäshamn', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer', priority: 1 },
+    ],
+  },
+
+  'mel-c': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer-songwriter & Actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 12, 1974', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Whiston', priority: 2 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Never Be the Same Again"', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Pop singer', priority: 1 },
+    ],
+  },
+
+  'melanie-c': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer-songwriter & Actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 12, 1974', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Whiston', priority: 2 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Never Be the Same Again"', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Pop singer', priority: 1 },
+    ],
+  },
+
+  'modjo': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Victory for the electronic, groove, dance music album', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'MTV Europe Music Award for Best French Act', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'alternative rock', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1998', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Paris', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Barclay', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'House duo', priority: 1 },
+    ],
+  },
+
+  'mohombi': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Musician', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'October 17, 1986', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Kinshasa', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Congolese-Swedish musician, singer, composer and dancer', priority: 1 },
+    ],
+  },
+
+  'natalie-cole': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Singer-songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'February 6, 1950', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Los Angeles', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Award for Best New Artist', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'MusiCares Person of the Year', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Grammy Award for Best Traditional Pop Vocal Album', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'piano', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer (1950–2015)', priority: 1 },
+    ],
+  },
+
+  'nelly': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Rapper & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 2, 1974', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Austin', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Award for Best Melodic Rap Performance', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'Midwest hip-hop', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper, singer and actor', priority: 1 },
+    ],
+  },
+
+  'nsync': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'American Music Award for Artist of the Year', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'star on Hollywood Walk of Fame', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'teen pop', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Lance Bass, JC Chasez, Joey Fatone, Chris Kirkpatrick', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1995', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Orlando', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'RCA Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Boy band', priority: 1 },
+    ],
+  },
+
+  'papa-roach': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'alternative rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'David Buckner, Will James, Tobin Esperance, Jerry Horton', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1993', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'California', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Geffen Records', priority: 2 },
+    { id: 'nom0', type: 'merit', label: 'Nominated for', value: 'Grammy Award for Best New Artist', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'pearl-jam': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Award for Best Hard Rock Performance', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'American Music Award for Favorite Alternative Rock Artist', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'American Music Award for Favorite Alternative Rock Artist', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'grunge', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Eddie Vedder, Stone Gossard, Mike McCready, Jeff Ament', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1990', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Seattle', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Monkeywrench Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'peps-persson': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Blues musician & Composer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'December 20, 1946', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Tjörnarp', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Cornelis Vreeswijk scholarship', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'blues', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Blues and reggae musician (1946-2021)', priority: 1 },
+    ],
+  },
+
+  'pitbull': {
+    categoryLabel: 'Musikartist',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Rapper & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 15, 1981', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Miami', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Award for Best Latin Rock or Alternative Album', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Latin Grammy Award for Best Urban Fusion/Performance', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'star on Hollywood Walk of Fame', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hip-hop', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper (born 1981)', priority: 1 },
+    ],
+  },
+
+  'pras': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Rapper & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'October 19, 1972', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Brooklyn', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hip-hop', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper and actor (born 1972)', priority: 1 },
+    ],
+  },
+
+  'richard-marx': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Musician & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'September 16, 1963', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Chicago', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer and songwriter', priority: 1 },
+    ],
+  },
+
+  'right-said-fred': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Richard Fairbrass, Fred Fairbrass', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1989', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'East Grinstead', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Charisma', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Band', priority: 1 },
+    ],
+  },
+
+  'ronan-keating': {
+    categoryLabel: 'Musikartist',
+    nationality: 'ireland',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Film actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 3, 1977', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Dublin', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'honorary doctorate', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer (born 1977)', priority: 1 },
+    ],
+  },
+
+  'run-dmc': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Wikimedia band discography', priority: 1 },
+    ],
+  },
+
+  'safri-duo': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'electronica', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Uffe Savery, Morten Friis', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1990', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Copenhagen', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Chandos Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Electronic percussion duo', priority: 1 },
+    ],
+  },
+
+  'samantha-mumba': {
+    categoryLabel: 'Musikartist',
+    nationality: 'ireland',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Actor & Singer-songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 18, 1983', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Dublin', priority: 2 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Cross"', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'dance-pop', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer, songwriter, actress and model', priority: 1 },
+    ],
+  },
+
+  'sasha': {
+    categoryLabel: 'Musikartist',
+    nationality: 'czechia',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: '1974', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer', priority: 1 },
+    ],
+  },
+
+  'sean-banan': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Actor & Film actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 7, 1985', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Iran', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'improvisational theatre', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Iranian-born Swedish comedian and musician', priority: 1 },
+    ],
+  },
+
+  'sean-paul': {
+    categoryLabel: 'Musikartist',
+    nationality: 'jamaica',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Rapper', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 9, 1973', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Kingston', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Award for Best Reggae Album', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'dancehall', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Dancehall singer and rapper (born 1973)', priority: 1 },
+    ],
+  },
+
+  'secret-service': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'new wave', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Ola Håkansson', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1979', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Attic', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Band', priority: 1 },
+    ],
+  },
+
+  'semisonic': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Closing Time"', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'alternative rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Dan Wilson, Jacob Slichter', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1995', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Minneapolis', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'MCA Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'september': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'September 1, September 2, September 3, September 4', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Ninth month in the Julian and Gregorian calendars', priority: 1 },
+    ],
+  },
+
+  'shabba-ranks': {
+    categoryLabel: 'Musikartist',
+    nationality: 'jamaica',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 17, 1966', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Saint Ann Parish', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'reggae', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Dancehall musician', priority: 1 },
+    ],
+  },
+
+  'shaggy': {
+    categoryLabel: 'Musikartist',
+    nationality: 'jamaica',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Musician', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'October 22, 1968', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Kingston', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'reggae', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Reggae musician', priority: 1 },
+    ],
+  },
+
+  'shanice': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Singer-songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'May 14, 1973', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Pittsburgh', priority: 2 },
+    { id: 'ht', type: 'height', label: 'Height', value: '170 cm', priority: 3 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'soul', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer-songwriter, actress and dancer', priority: 1 },
+    ],
+  },
+
+  'sisqo': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Television actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 9, 1978', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Baltimore', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'contemporary R&B', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'piano', priority: 2 },
+    { id: 'nom0', type: 'merit', label: 'Nominated for', value: 'Grammy Award for Best New Artist', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'R&B artist', priority: 1 },
+    ],
+  },
+
+  'sonique': {
+    categoryLabel: 'Band',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Disc jockey & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'June 21, 1968', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'London', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Universal Republic Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer, musician and disc jockey', priority: 1 },
+    ],
+  },
+
+  'sophie-b-hawkins': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer-songwriter & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 1, 1964', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'New York City', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rock music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'nom0', type: 'merit', label: 'Nominated for', value: 'Grammy Award for Best New Artist', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer', priority: 1 },
+    ],
+  },
+
+  'soul-ii-soul': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Soul Train Music Award for Best R&B/Soul Album, Group Band or Duo', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Soul Train Music Award for Best R&B/Soul Single, Group, Band or Duo', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Soul Train Music Award for Best R&B/Soul Song of the Year', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'contemporary R&B', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Jazzie B, Charlotte, Simon Law, Rose Windross', priority: 3 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Virgin Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musical collective', priority: 1 },
+    ],
+  },
+
+  'southside-spinners': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Marco V, Benjamin Bates', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Introduction to Southside Spinners', priority: 1 },
+    ],
+  },
+
+  'spiller': {
+    categoryLabel: 'Musikartist',
+    nationality: 'italy',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Disc jockey & Record producer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'April 3, 1975', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Venice', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'electronic dance music', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Electronic music DJ', priority: 1 },
+    ],
+  },
+
+  'spooks': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hip-hop', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Philadelphia', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Hip hop band', priority: 1 },
+    ],
+  },
+
+  'stakka-bo': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Film director & Music video director', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'December 5, 1966', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Uppsala', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Primetime Emmy Award for Outstanding Directing for a Limited Series, Movie, or Dramatic Special', priority: 5 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Downloading Nancy"', priority: 4 },
+    { id: 'work1', type: 'song', label: 'Notable work', value: '"Spaceman"', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Director and musician', priority: 1 },
+    ],
+  },
+
+  'stardust': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'shoot \'em up', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: '1993 shoot \'em up computer game for the Amiga', priority: 1 },
+    ],
+  },
+
+  'stefan-borsch': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Dansband singer & Drummer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'January 19, 1947', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Hagfors', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'drum kit', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Dansband singer', priority: 1 },
+    ],
+  },
+
+  'steps': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1997', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'London', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Jive Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musical group; dance-pop band', priority: 1 },
+    ],
+  },
+
+  'sugababes': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Siobhán Donaghy, Mutya Buena, Keisha Buchanan, Heidi Range', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1998', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'London', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'London Records', priority: 2 },
+    { id: 'nom0', type: 'merit', label: 'Nominated for', value: 'MTV Europe Music Award for Best UK & Ireland Act', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Pop girl group', priority: 1 },
+    ],
+  },
+
+  'supertramp': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'progressive rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Roger Hodgson, Rick Davies, Keith Baker, Dougie Thomson', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1969', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'London', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'A&M Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Band', priority: 1 },
+    ],
+  },
+
+  'svenne-rubins': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'svenska-bjornstammen': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '2010', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Norrköping', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Pope', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Band', priority: 1 },
+    ],
+  },
+
+  'sweet': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Family name', priority: 1 },
+    ],
+  },
+
+  'swingfly': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Rapper & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: '1969', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'New York City', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hip-hop', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper and singer', priority: 1 },
+    ],
+  },
+
+  't-rex': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Rock and Roll Hall of Fame', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'psychedelic rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Marc Bolan, Jack Green', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1967', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'London', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Reprise Records', priority: 2 },
+    { id: 'disbanded', type: 'characteristic', label: 'Disbanded', value: '1977', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'take-that': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'The Record of the Year', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Robbie Williams, Howard Donald, Mark Owen, Gary Barlow', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1990', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Manchester', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'CBS Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Five-piece vocal pop group', priority: 1 },
+    ],
+  },
+
+  'tasmin-archer': {
+    categoryLabel: 'Musikartist',
+    nationality: 'uk',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'August 3, 1963', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Brit Award for British Breakthrough Act', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer-songwriter (born 1963)', priority: 1 },
+    ],
+  },
+
+  'tears-for-fears': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'new wave', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Roland Orzabal, Ian Stanley, Manny Elias, Curt Smith', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1981', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Bath', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Mercury Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Pop/rock band', priority: 1 },
+    ],
+  },
+
+  'the-bellamy-brothers': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Country Music Association Award for International Achievement', priority: 5 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'country music', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'David Bellamy, Howard Bellamy', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1971', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Warner Bros. Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Pop and country music duo', priority: 1 },
+    ],
+  },
+
+  'the-corrs': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'NRJ Music Award for International Group/Duo/Troupe of the Year', priority: 5 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Breathless"', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Jim Corr, Sharon Corr, Caroline Corr, Andrea Corr', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1990', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Dundalk', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Atlantic Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musical group', priority: 1 },
+    ],
+  },
+
+  'the-klf': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'techno', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1987', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'London', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Arista Records', priority: 2 },
+    { id: 'disbanded', type: 'characteristic', label: 'Disbanded', value: '1992', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musical group; acid house band', priority: 1 },
+    ],
+  },
+
+  'the-prodigy': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'BRIT Award for Best British Dance Act', priority: 5 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Firestarter"', priority: 4 },
+    { id: 'work1', type: 'song', label: 'Notable work', value: '"Breathe"', priority: 4 },
+    { id: 'work2', type: 'song', label: 'Notable work', value: '"Out of Space"', priority: 3 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'alternative rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Leeroy Thornhill, Keith Flint, Liam Howlett, David Santos', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1990', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Braintree', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Elektra', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Electronic dance music group', priority: 1 },
+    ],
+  },
+
+  'the-shamen': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'psychedelic rock', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1985', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Moksha Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Electronic dance music band', priority: 1 },
+    ],
+  },
+
+  'theoz': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Influencer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'July 17, 2005', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Linköping', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Influencer and singer', priority: 1 },
+    ],
+  },
+
+  'thomas-rusiak': {
+    categoryLabel: 'Musikartist',
+    nationality: 'sweden',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Record producer & Rapper', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'November 8, 1976', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Vantörs parish', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rapper', priority: 1 },
+    ],
+  },
+
+  'timbaland': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Record producer & Songwriter', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'March 10, 1972', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Grammy Award for Best R&B Song', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Time 100', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'hip-hop', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Record producer (born 1972)', priority: 1 },
+    ],
+  },
+
+  'tom-cochrane': {
+    categoryLabel: 'Musikartist',
+    nationality: 'canada',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer-songwriter & Musician', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'May 14, 1953', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Lynn Lake', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Officer of the Order of Canada', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Juno Award for Songwriter of the Year', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Juno Award for Album of the Year', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rock music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Musician', priority: 1 },
+    ],
+  },
+
+  'toploader': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Dancing in the Moonlight"', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'indie rock', priority: 2 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1997', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Eastbourne', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Sony Soho Square', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Rock band', priority: 1 },
+    ],
+  },
+
+  'tq': {
+    categoryLabel: 'Musikartist',
+    nationality: 'usa',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'May 24, 1976', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Compton', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'contemporary R&B', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'R&B singer', priority: 1 },
+    ],
+  },
+
+  'vanessa-amorosi': {
+    categoryLabel: 'Musikartist',
+    nationality: 'australia',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer-songwriter & Singer', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'August 8, 1981', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Melbourne', priority: 2 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'rock music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'voice', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer-songwriter', priority: 1 },
+    ],
+  },
+
+  'vanessa-paradis': {
+    categoryLabel: 'Musikartist',
+    nationality: 'france',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Singer & Actor', priority: 1 },
+    { id: 'bd', type: 'birth_date', label: 'Date of birth', value: 'December 22, 1972', priority: 2 },
+    { id: 'bp', type: 'birth_place', label: 'Place of birth', value: 'Saint-Maur-des-Fossés', priority: 2 },
+    { id: 'merit0', type: 'merit', label: 'Merit/Award', value: 'Chevalier des Arts et des Lettres', priority: 5 },
+    { id: 'merit1', type: 'merit', label: 'Merit/Award', value: 'Prix Romy Schneider', priority: 4 },
+    { id: 'merit2', type: 'merit', label: 'Merit/Award', value: 'Knight of the Legion of Honour', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop music', priority: 2 },
+    { id: 'instr', type: 'characteristic', label: 'Instrument', value: 'guitar', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Singer, model and actress', priority: 1 },
+    ],
+  },
+
+  'wild-cherry': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'funk rock', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'Mingo Junction', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Epic Records', priority: 2 },
+    { id: 'nom0', type: 'merit', label: 'Nominated for', value: 'Grammy Award for Best New Artist', priority: 3 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Funk rock band', priority: 1 },
+    ],
+  },
+
+  'wings': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'work0', type: 'song', label: 'Notable work', value: '"Band on the Run"', priority: 4 },
+    { id: 'work1', type: 'song', label: 'Notable work', value: '"Band on the Run"', priority: 4 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'pop rock', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'Laurence Juber, Denny Seiwell, Linda McCartney, Henry McCullough', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1971', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'England', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Apple Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'British-American rock band led by Paul McCartney', priority: 1 },
+    ],
+  },
+
+  'wu-tang-clan': {
+    categoryLabel: 'Band',
+    nationality: 'unknown',
+    hints: [
+    { id: 'prof', type: 'profession', label: 'Profession', value: 'Music group', priority: 1 },
+    { id: 'genre', type: 'characteristic', label: 'Genre', value: 'East Coast hip-hop', priority: 2 },
+    { id: 'members', type: 'band_member', label: 'Members', value: 'RZA, GZA, Method Man, Ol\' Dirty Bastard', priority: 3 },
+    { id: 'formed', type: 'creation_year', label: 'Formed', value: '1992', priority: 2 },
+    { id: 'formloc', type: 'characteristic', label: 'Formed in', value: 'New York City', priority: 2 },
+    { id: 'reclabel', type: 'characteristic', label: 'Record label', value: 'Asylum Records', priority: 2 },
+    { id: 'desc', type: 'characteristic', label: 'About', value: 'Hip hop group', priority: 1 },
+    ],
+  },
+
 };

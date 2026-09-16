@@ -34,6 +34,9 @@ export const PERSON_GENDER_MANUAL: Record<string, PersonGender> = {
   'ngolo-kante': 'male',
   'sergio-aguero': 'male',
 
+  // 2026-09 hint-import: Wikidata-disambiguering missade (tvetydigt namn).
+  'medina': 'female', // Medina — dansk sångerska
+
   // Sökningen fångade en TV-serie med samma namn ("Olivia Newton-John",
   // Q28224394, "television series") i stället för personen (Q185165,
   // "British–Australian singer (1948–2022)") — bekräftat manuellt 2026-08-27.
