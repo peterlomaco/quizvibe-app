@@ -178,7 +178,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Whitney Houston How Will I Know 1985"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "TO-Tk84ATjw"
         startSec: 15
@@ -316,6 +316,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Phil Collins Another Day in Paradise"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2BFLtstcRXPnk4uoO3Wi6U"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Qt2mbGP6vFI"
@@ -380,6 +381,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bryan Adams Everything I Do I Do It for You Robin Hood"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1Eb90nmqTrxylKFhcUzW8P"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Y0pdQU87dc8"
@@ -394,7 +396,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Michael Jackson Black or White"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "m-y_IxPcx8U"
         startSec: 58
@@ -409,7 +411,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Seal Crazy 1991"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "4Fc67yQsPqQ"
         startSec: 5
@@ -596,6 +598,7 @@ items:
     probability: 89
     wikimediaSearchHints: ["Toto Africa 1982"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2374M0fQpWi3dLnB54qaLX"
     youtubeClips:
       - videoId: "U1LB_OerHCE"
         startSec: 30
@@ -611,7 +614,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Cyndi Lauper Girls Just Want to Have Fun 1983"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "jRr5EasAq84"
         startSec: 0
@@ -641,7 +644,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Whitney Houston I Wanna Dance with Somebody 1987"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "2dzf4T3RbEc"
         startSec: 0
@@ -700,7 +703,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Michael Jackson Beat It Thriller 1982"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "WlTlUseVt7E"
         startSec: 30
@@ -870,7 +873,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Ace of Base All That She Wants 1992"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     spotifyTrackId: "6kWJvPfC4DgUpRsXKNa9z9"
     youtubeClips:
       - videoId: "8JqCWX-MXuk"
@@ -1710,6 +1713,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Prince 1999 album 1982"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2cKIcepRj6NOc1bKGjHuSl"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "rblt2EtFfC4"
@@ -1741,6 +1745,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Rufus Chaka Khan Aint Nobody 1983 Stompin at the Savoy"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2NVpYQqdraEcQwqT7GhUkh"
     youtubeClips:
       - videoId: "BNirQXe8HOA"
         startSec: 0
@@ -2069,7 +2074,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["George Michael Faith 1987"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "i2hLL_UNUSo"
         startSec: 30
@@ -2144,7 +2149,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Madonna Express Yourself 1989 Like a Prayer"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "GsVcUzP_O_8"
         startSec: 0
@@ -2491,6 +2496,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Lenny Kravitz Are You Gonna Go My Way"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "45Ia1U4KtIjAPPU7Wv1Sea"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "i5PZQMwL7iE"
@@ -2736,7 +2742,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Milli Vanilli Girl You Know Its True"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "0ZV9FyngchQ"
         startSec: 0
@@ -2815,7 +2821,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["No Doubt Don't Speak Tragic Kingdom"]
     answerMethods: ["timeline"]
-    genrePackages: ["Pop music"]
+    genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "TR3Vdo5etCQ"
         startSec: 30
@@ -3087,6 +3093,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Bon Jovi Always"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2RChe0r2cMoyOvuKobZy44"
     youtubeClips:
       - videoId: "9BMwcO6_hyA"
         startSec: 20
