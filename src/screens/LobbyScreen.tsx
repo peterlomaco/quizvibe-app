@@ -5710,7 +5710,25 @@ export default function LobbyScreen() {
               {
                 text: 'Follow leaderboard',
                 style: 'cancel',
-                onPress: () => goToQuizAsNonHost(),
+                onPress: async () => {
+                  // Host kan ha hunnit trycka Quit Game EFTER att denna
+                  // Alert visats — den står kvar (cancelable:false) medan
+                  // 2s-pollen fortsätter, och Quit Game kör deactivateRoom()
+                  // som raderar rooms-raden. `lobby_deleted` broadcastas då
+                  // men når oss ALDRIG: spectatorn subscribar quiz_sync först
+                  // vid /quiz-entry och Realtime replayar inte, så vi hade
+                  // hamnat i ett redan avbrutet spel utan väg ut. Re-verifiera
+                  // därför att rummet fortfarande lever INNAN vi navigerar in.
+                  // roomExists fail-open:ar vid nätverksfel (samma semantik
+                  // som deletion-pollingen) → en glitch stänger oss inte ute
+                  // från ett levande spel.
+                  const stillActive = await roomExists(roomCode);
+                  if (!stillActive) {
+                    setRoomDeletedDetected(true);
+                    return;
+                  }
+                  goToQuizAsNonHost();
+                },
               },
               { text: 'Not now', onPress: () => router.replace('/') },
             ],
