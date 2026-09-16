@@ -2906,6 +2906,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Justin Timberlake Rock Your Body 2002"]
     answerMethods: ["timeline"]
+    genrePackages: ["Disco & Pop"]
     spotifyTrackId: "6W2Ef5Ph6ILTUAedoQ3QIv"
     youtubeClips:
       - videoId: "TSVHoHyErBQ"

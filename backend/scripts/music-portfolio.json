@@ -3,9 +3,9 @@
   "desc": "...Baby One More Time — Britney Spears",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/3MjUtNVVq3C8Fn0MP3zhXa",
   "yt": "ja",
   "yt1": "startsec:16 https://www.youtube.com/watch?v=1dfhNimhwNM",
   "yt2": null,
@@ -19,9 +19,9 @@
   "desc": "(Everything I Do) I Do It for You — Bryan Adams",
   "year": null,
   "pkgs": [
-   "soft & love"
+   "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/1Eb90nmqTrxylKFhcUzW8P",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=Y0pdQU87dc8&t=30s",
   "yt2": null,
@@ -51,7 +51,7 @@
   "pkgs": [
    "Rock"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/13KF3YaPAxbOYmMhFkT9ma",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=MSSxnv1_J2g",
   "yt2": null,
@@ -65,9 +65,9 @@
   "desc": "(I Would) Die for You — Antique",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/2byZAXWOqDx3w8suK3btui",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=VVLfuW3KiLY",
   "yt2": "https://www.youtube.com/watch?v=VVLfuW3KiLY",
@@ -81,9 +81,9 @@
   "desc": "12 to 12 — sombr",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/6MrLkXsMmHaYt680fhJUAq",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=cZgUiR31m-Y",
   "yt2": null,
@@ -115,7 +115,7 @@
   "pkgs": [
    "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/2cKIcepRj6NOc1bKGjHuSl",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=rblt2EtFfC4",
   "yt2": null,
@@ -129,7 +129,7 @@
   "desc": "2 Unlimited",
   "year": null,
   "pkgs": [
-   "Hits"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -175,7 +175,7 @@
   "desc": "A Change Is Gonna Come — Sam Cooke",
   "year": null,
   "pkgs": [],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/0YfOnJWqmAKaUvEL1QcNop",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=Z5zDRtEC0x0&t=30s",
   "yt2": null,
@@ -189,7 +189,7 @@
   "desc": "A Hard Day's Night — The Beatles",
   "year": null,
   "pkgs": [],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/5J2CHimS7dWYMImCHkEFaJ",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=zx2TFk0vh1I&t=30s",
   "yt2": null,
@@ -205,7 +205,7 @@
   "pkgs": [
    "Eurovision"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/7d7508DNeeg1xjFMoj8Ikm",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=uFd5nk2sXow&t=5s",
   "yt2": null,
@@ -218,7 +218,9 @@
  {
   "desc": "a-ha",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -246,7 +248,9 @@
  {
   "desc": "A*Teens",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -260,7 +264,11 @@
  {
   "desc": "ABBA",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -275,7 +283,7 @@
   "desc": "AC/DC",
   "year": null,
   "pkgs": [
-   "Rock & Punk"
+   "Rock"
   ],
   "spotify": null,
   "yt": "nej",
@@ -290,7 +298,10 @@
  {
   "desc": "Ace of Base",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Summer",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -318,7 +329,10 @@
  {
   "desc": "Adele",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -333,7 +347,7 @@
   "desc": "Africa — Toto",
   "year": null,
   "pkgs": [],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/2374M0fQpWi3dLnB54qaLX",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=U1LB_OerHCE&t=30s",
   "yt2": null,
@@ -361,9 +375,9 @@
   "desc": "Ain’t My Fault — Zara Larsson",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/0ADG9OgdVTL7fgREP75BrZ",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=eC-F_VZ2T1c&t=2s",
   "yt2": null,
@@ -409,7 +423,7 @@
   "desc": "Ain't Nobody — Rufus and Chaka Khan",
   "year": null,
   "pkgs": [],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/2NVpYQqdraEcQwqT7GhUkh",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=BNirQXe8HOA",
   "yt2": null,
@@ -436,7 +450,9 @@
  {
   "desc": "Albin Lee Meldau",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -450,7 +466,10 @@
  {
   "desc": "Alcazar",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -464,7 +483,10 @@
  {
   "desc": "Alesso",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -478,7 +500,9 @@
  {
   "desc": "Alex Warren",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -492,7 +516,9 @@
  {
   "desc": "Alexander Rybak",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -522,7 +548,9 @@
  {
   "desc": "Alicia Keys",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -537,9 +565,9 @@
   "desc": "All About That Bass — Meghan Trainor",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/5jE48hhRu8E6zBDPRSkEq7",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=7PCkvCPvDXk",
   "yt2": null,
@@ -588,7 +616,7 @@
   "pkgs": [
    "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/5AbXJ33KZWOP8EAglwDaJ6",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=DXvMT_mVbqw&t=7s",
   "yt2": null,
@@ -620,7 +648,7 @@
   "pkgs": [
    "Rock"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/3cfOd4CMv2snFaKAnMdnvK",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=L_jWHffIx5E&t=37s",
   "yt2": null,
@@ -634,7 +662,7 @@
   "desc": "All That She Wants — Ace of Base",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": "https://open.spotify.com/track/6kWJvPfC4DgUpRsXKNa9z9",
   "yt": "ja",
@@ -652,7 +680,7 @@
   "pkgs": [
    "Rock"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/2m1hi0nfMR9vdGC8UcrnwU",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=9Ht5RZpzPqw",
   "yt2": null,
@@ -668,7 +696,7 @@
   "pkgs": [
    "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/3oGGipilQmZTol8qFTR6u1",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=Mki34tyoCp0&t=8s",
   "yt2": "https://www.youtube.com/watch?v=sHBOM8m4ygM&t=8s",
@@ -700,7 +728,7 @@
   "pkgs": [
    "100% swedish"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/6I1kZgg3bGrPKxhZOltbRW",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=NDHlDb9AOsU&t=4s",
   "yt2": "https://www.youtube.com/watch?v=6cdxVmMFN-E&t=30s",
@@ -728,7 +756,7 @@
   "desc": "Almost Like Being in Love — Frank Sinatra",
   "year": null,
   "pkgs": [],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/5pCVEMMt40ICn9HXZ5q85o",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=zMRoByJI43Q&t=30s",
   "yt2": null,
@@ -744,7 +772,7 @@
   "pkgs": [
    "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/2RChe0r2cMoyOvuKobZy44",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=9BMwcO6_hyA&t=20s",
   "yt2": null,
@@ -772,7 +800,7 @@
   "desc": "American Pie — Don McLean",
   "year": null,
   "pkgs": [],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/1fDsrQ23eTAVFElUMaf38X",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=iX_TFkut1PM&t=30s",
   "yt2": null,
@@ -785,7 +813,10 @@
  {
   "desc": "Anastacia",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -799,7 +830,9 @@
  {
   "desc": "Andrea Bocelli",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -816,7 +849,7 @@
   "pkgs": [
    "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/6EtYDiHVO8sldNucNcK8Uk",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=t1CvS7aOMa4&t=30s",
   "yt2": null,
@@ -830,7 +863,7 @@
   "desc": "Anis Don Demina",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -846,7 +879,10 @@
  {
   "desc": "Anna Bergendahl",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen",
+   "Eurovision"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -935,7 +971,7 @@
   "pkgs": [
    "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/2BFLtstcRXPnk4uoO3Wi6U",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=At9FypGZ44M&t=30s",
   "yt2": null,
@@ -965,9 +1001,9 @@
   "desc": "Anti-Hero — Taylor Swift",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/0V3wPSX9ygBnCm8psDIegu",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=pXpbKU24cMo&t=30s",
   "yt2": null,
@@ -997,7 +1033,7 @@
   "desc": "Anything Goes — Cole Porter",
   "year": null,
   "pkgs": [],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/61Wh4cqsBmhzsEbGLNulQB",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=3zFBAEj7kdA&t=30s",
   "yt2": null,
@@ -1013,7 +1049,7 @@
   "pkgs": [
    "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/68U7CGrUcsJQ9PcBxk7oxB",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=xTjwTbnX_EA&t=15s",
   "yt2": null,
@@ -1043,9 +1079,9 @@
   "desc": "APT. — ROSÉ & Bruno Mars",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/4wJ5Qq0jBN4ajy7ouZIV1c",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=ekr2nIex040&t=30s",
   "yt2": null,
@@ -1059,7 +1095,7 @@
   "desc": "Aqua",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -1077,7 +1113,7 @@
   "pkgs": [
    "Eurovision"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/1Xi84slp6FryDSCbzq4UCD",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=Eztx7Wr8PtE&t=5s",
   "yt2": null,
@@ -1107,7 +1143,7 @@
   "pkgs": [
    "Rock"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/45Ia1U4KtIjAPPU7Wv1Sea",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=i5PZQMwL7iE",
   "yt2": null,
@@ -1134,7 +1170,10 @@
  {
   "desc": "Ariana Grande",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "RnB",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1178,9 +1217,9 @@
   "year": null,
   "pkgs": [
    "Dance Music",
-   "Pop music"
+   "Disco & Pop"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/6XKvPNWlmnN0gJejCKm1k7",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=K0HSD_i2DvA",
   "yt2": null,
@@ -1193,7 +1232,11 @@
  {
   "desc": "Arvingarna",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish",
+   "Dansband"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1208,9 +1251,9 @@
   "desc": "As It Was — Harry Styles",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/4Dvkj6JhhA12EX05fT7y2e",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=EsY5kRIBM8Y",
   "yt2": null,
@@ -1240,7 +1283,7 @@
   "pkgs": [
    "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/1KyKo3vuS8syPToJlR2HEh",
   "yt": "ja",
   "yt1": "https://www.youtube.com/watch?v=cZag0E32is0&t=30s",
   "yt2": null,
@@ -1254,7 +1297,7 @@
   "desc": "Ava Max",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -1269,7 +1312,9 @@
  {
   "desc": "Avicii",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1341,7 +1386,10 @@
  {
   "desc": "Backstreet Boys",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1384,7 +1432,7 @@
   "desc": "Bad Guy — Billie Eilish",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -1400,7 +1448,7 @@
   "desc": "Bad Romance — Lady Gaga",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -1496,7 +1544,9 @@
  {
   "desc": "Barbados",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1511,7 +1561,7 @@
   "desc": "Barbie Girl — Aqua",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -1540,7 +1590,9 @@
  {
   "desc": "Barry White",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1570,7 +1622,9 @@
  {
   "desc": "Basshunter",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1601,7 +1655,7 @@
   "desc": "Beat It — Michael Jackson",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -1617,7 +1671,7 @@
   "desc": "Beauty and a Beat — Justin Bieber feat. Nicki Minaj",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -1664,7 +1718,9 @@
  {
   "desc": "Bee Gees",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1695,7 +1751,7 @@
   "desc": "Believe — Cher",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -1724,7 +1780,9 @@
  {
   "desc": "Belinda Carlisle",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1738,7 +1796,9 @@
  {
   "desc": "Ben E. King",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1752,7 +1812,11 @@
  {
   "desc": "Benjamin Ingrosso",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1767,7 +1831,7 @@
   "desc": "Benny Benassi",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -1796,7 +1860,9 @@
  {
   "desc": "Bette Midler",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1810,7 +1876,11 @@
  {
   "desc": "Beyoncé",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "RnB",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1824,7 +1894,10 @@
  {
   "desc": "Billie Eilish",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1839,7 +1912,7 @@
   "desc": "Billie Jean — Michael Jackson",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -1855,7 +1928,7 @@
   "desc": "Billy Idol",
   "year": null,
   "pkgs": [
-   "Rock & Punk"
+   "Rock"
   ],
   "spotify": null,
   "yt": "nej",
@@ -1870,7 +1943,9 @@
  {
   "desc": "Bing Crosby",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Christmas edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1928,7 +2003,11 @@
  {
   "desc": "Björn Skifs",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Disco & Pop",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -1943,7 +2022,7 @@
   "desc": "Black or White — Michael Jackson",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -1973,7 +2052,7 @@
   "desc": "Blank Space — Taylor Swift",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -1989,7 +2068,7 @@
   "desc": "Blinding Lights — The Weeknd",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": "https://open.spotify.com/track/0VjIjW4GlUZAMYd2vXMi3b",
   "yt": "ja",
@@ -2005,7 +2084,7 @@
   "desc": "blink-182",
   "year": null,
   "pkgs": [
-   "Hits"
+   "Rock"
   ],
   "spotify": null,
   "yt": "nej",
@@ -2034,7 +2113,9 @@
  {
   "desc": "Bloodhound Gang",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2065,7 +2146,7 @@
   "desc": "Blur",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -2109,7 +2190,9 @@
  {
   "desc": "Bobby McFerrin",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2123,7 +2206,10 @@
  {
   "desc": "Bobbysocks",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision",
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2152,7 +2238,7 @@
   "desc": "Bolaget",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -2168,7 +2254,10 @@
  {
   "desc": "Bon Jovi",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2182,7 +2271,9 @@
  {
   "desc": "Boney M.",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2196,7 +2287,9 @@
  {
   "desc": "Bonnie Tyler",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2211,7 +2304,7 @@
   "desc": "Boom, Boom, Boom, Boom!! — Vengaboys",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -2227,7 +2320,7 @@
   "desc": "Bootylicious — Destiny’s Child",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -2298,7 +2391,10 @@
  {
   "desc": "Boyz II Men",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2330,7 +2426,7 @@
   "desc": "Brandsta",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -2347,7 +2443,7 @@
   "desc": "Break Free — Ariana Grande feat. Zedd",
   "year": null,
   "pkgs": [
-   "Pop music",
+   "Disco & Pop",
    "RnB"
   ],
   "spotify": "https://open.spotify.com/track/2lOgTEwxmRPBtjp60opyRN",
@@ -2364,7 +2460,7 @@
   "desc": "Break My Heart — Dua Lipa",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -2393,7 +2489,10 @@
  {
   "desc": "Britney Spears",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2423,7 +2522,9 @@
  {
   "desc": "Bruce Springsteen",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2437,7 +2538,10 @@
  {
   "desc": "Bruno Mars",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2451,7 +2555,10 @@
  {
   "desc": "Bryan Adams",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2465,7 +2572,9 @@
  {
   "desc": "BTS",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2554,7 +2663,7 @@
   "desc": "Cajsa Stina Åkerström",
   "year": null,
   "pkgs": [
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": null,
   "yt": "nej",
@@ -2614,7 +2723,7 @@
   "desc": "Call Me Maybe — Carly Rae Jepsen",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -2660,7 +2769,7 @@
   "desc": "Can't Get You Out of My Head — Kylie Minogue",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -2676,7 +2785,7 @@
   "desc": "Can't Stop the Feeling! — Justin Timberlake",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -2721,7 +2830,9 @@
  {
   "desc": "Carly Rae Jepsen",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2808,7 +2919,10 @@
  {
   "desc": "Céline Dion",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Eurovision"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2855,7 +2969,10 @@
  {
   "desc": "Charlotte Perrelli",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2901,7 +3018,7 @@
   "desc": "Cheap Thrills — Sia",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": "https://open.spotify.com/track/3S4px9f4lceWdKf0gWciFu",
   "yt": "ja",
@@ -2932,7 +3049,10 @@
  {
   "desc": "Cher",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2960,7 +3080,9 @@
  {
   "desc": "Chic",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -2975,7 +3097,7 @@
   "desc": "Children — Robert Miles",
   "year": null,
   "pkgs": [
-   "Dance music"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "ja",
@@ -2990,7 +3112,9 @@
  {
   "desc": "Chips",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3034,7 +3158,10 @@
  {
   "desc": "Christina Aguilera",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3107,7 +3234,7 @@
   "desc": "Cold Water — Major Lazer feat. Justin Bieber & MØ",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -3122,7 +3249,9 @@
  {
   "desc": "Coldplay",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3210,7 +3339,9 @@
  {
   "desc": "Conchita Wurst",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3224,7 +3355,9 @@
  {
   "desc": "Coolio",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Hip Hop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3254,7 +3387,10 @@
  {
   "desc": "Cornelia Jakobs",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3268,7 +3404,10 @@
  {
   "desc": "Cornelis Vreeswijk",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Summer",
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3313,7 +3452,7 @@
   "desc": "Crazy — Seal",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -3329,7 +3468,7 @@
   "desc": "Crazy in Love — Beyoncé feat. Jay-Z",
   "year": null,
   "pkgs": [
-   "Pop music",
+   "Disco & Pop",
    "RnB"
   ],
   "spotify": null,
@@ -3437,7 +3576,10 @@
  {
   "desc": "Cyndi Lauper",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3467,7 +3609,10 @@
  {
   "desc": "Daft Punk",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3560,7 +3705,7 @@
   "desc": "Dance Monkey — Tones and I",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -3576,7 +3721,7 @@
   "desc": "Dance with Somebody — Mando Diao",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": "https://open.spotify.com/track/28qkNp9shSV8AQrBwxZf48",
   "yt": "ja",
@@ -3696,7 +3841,10 @@
  {
   "desc": "Danny Saucedo",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3741,7 +3889,7 @@
   "desc": "Dario G",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -3771,7 +3919,9 @@
  {
   "desc": "David Bowie",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3846,7 +3996,9 @@
  {
   "desc": "Deep Purple",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -3861,7 +4013,7 @@
   "desc": "Def Leppard",
   "year": null,
   "pkgs": [
-   "Rock & Punk"
+   "Rock"
   ],
   "spotify": null,
   "yt": "nej",
@@ -3953,7 +4105,7 @@
   "desc": "Destiny's Child",
   "year": null,
   "pkgs": [
-   "Hits"
+   "RnB"
   ],
   "spotify": null,
   "yt": "nej",
@@ -4049,7 +4201,9 @@
  {
   "desc": "Diana Ross",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4132,7 +4286,7 @@
   "desc": "Dinata Dinata — Antique",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -4165,7 +4319,7 @@
   "desc": "Ding Dong Song — Günther",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": "https://open.spotify.com/track/2LELFaNglE9B5xlcmd4qtQ",
   "yt": "ja",
@@ -4227,7 +4381,7 @@
   "desc": "DJ Ötzi",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -4273,7 +4427,9 @@
  {
   "desc": "Doja Cat",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4302,7 +4458,7 @@
   "desc": "Domino — Jessie J",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -4332,7 +4488,7 @@
   "desc": "Don’t Call Me Up — Mabel",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -4378,7 +4534,7 @@
   "desc": "Don't Speak — No Doubt",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -4394,7 +4550,7 @@
   "desc": "Don't Start Now — Dua Lipa",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -4485,7 +4641,9 @@
  {
   "desc": "Donna Summer",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4558,7 +4716,7 @@
   "desc": "Dr. Alban",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -4589,7 +4747,9 @@
  {
   "desc": "Drake",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Hip Hop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4631,7 +4791,11 @@
  {
   "desc": "Dua Lipa",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4722,7 +4886,7 @@
   "desc": "Dynamite — BTS",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -4738,7 +4902,7 @@
   "desc": "Då står pojkarna på rad — Orup",
   "year": null,
   "pkgs": [
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": "https://open.spotify.com/track/0fN96hLpE08LmXFfS5VmdE",
   "yt": "nej",
@@ -4753,7 +4917,9 @@
  {
   "desc": "E-Type",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4767,7 +4933,9 @@
  {
   "desc": "Eagle-Eye Cherry",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4781,7 +4949,9 @@
  {
   "desc": "Eagles",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4795,7 +4965,11 @@
  {
   "desc": "Ed Sheeran",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Christmas edition",
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4809,7 +4983,9 @@
  {
   "desc": "Édith Piaf",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4823,7 +4999,9 @@
  {
   "desc": "Eiffel 65",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4945,7 +5123,9 @@
  {
   "desc": "Ellie Goulding",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4977,7 +5157,10 @@
  {
   "desc": "Elton John",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -4991,7 +5174,9 @@
  {
   "desc": "Elvis Presley",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5152,7 +5337,10 @@
  {
   "desc": "Enrique Iglesias",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Film edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5182,7 +5370,9 @@
  {
   "desc": "Eric Clapton",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5210,7 +5400,9 @@
  {
   "desc": "Eric Prydz",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5224,7 +5416,10 @@
  {
   "desc": "Eric Saade",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen",
+   "Eurovision"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5314,7 +5509,9 @@
  {
   "desc": "Etta James",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5361,7 +5558,9 @@
  {
   "desc": "Europe",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5375,7 +5574,9 @@
  {
   "desc": "Eurythmics",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5389,7 +5590,10 @@
  {
   "desc": "Eva Dahlgren",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5450,7 +5654,7 @@
   "desc": "Everybody (Backstreet's Back) — Backstreet Boys",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -5529,7 +5733,7 @@
   "desc": "Express Yourself — Madonna",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -5577,7 +5781,7 @@
   "desc": "Faith — George Michael",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -5653,7 +5857,7 @@
   "desc": "Feel Good Inc. — Gorillaz",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -5669,7 +5873,7 @@
   "desc": "Firework — Katy Perry",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -5684,7 +5888,9 @@
  {
   "desc": "First Aid Kit",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5731,7 +5937,9 @@
  {
   "desc": "Fleetwood Mac",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5762,7 +5970,7 @@
   "desc": "Flowers — Miley Cyrus",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -5824,7 +6032,7 @@
   "desc": "Follow Me — Antique",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -5855,7 +6063,9 @@
  {
   "desc": "Foreigner",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5897,7 +6107,9 @@
  {
   "desc": "Frans",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5911,7 +6123,9 @@
  {
   "desc": "Fred Astaire",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -5954,7 +6168,7 @@
   "desc": "Frozen — Madonna",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -6002,7 +6216,10 @@
  {
   "desc": "Fugees",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6068,7 +6285,9 @@
  {
   "desc": "Galantis",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6112,7 +6331,9 @@
  {
   "desc": "Genesis",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6171,7 +6392,10 @@
  {
   "desc": "George Michael",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6202,7 +6426,7 @@
   "desc": "GES",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -6283,7 +6507,7 @@
   "desc": "Girl You Know It's True — Milli Vanilli",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -6313,7 +6537,7 @@
   "desc": "Girls Just Want to Have Fun — Cyndi Lauper",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -6370,7 +6594,9 @@
  {
   "desc": "Gloria Estefan",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6384,7 +6610,9 @@
  {
   "desc": "Gloria Gaynor",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6460,7 +6688,7 @@
   "desc": "Goo Goo Dolls",
   "year": null,
   "pkgs": [
-   "Hits"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "nej",
@@ -6503,7 +6731,9 @@
  {
   "desc": "Gorillaz",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6531,7 +6761,9 @@
  {
   "desc": "Gotye",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6545,7 +6777,9 @@
  {
   "desc": "Green Day",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6593,7 +6827,10 @@
  {
   "desc": "Guns N' Roses",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6607,7 +6844,10 @@
  {
   "desc": "Gwen Stefani",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6621,7 +6861,9 @@
  {
   "desc": "Gyllene Tider",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Summer"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6635,7 +6877,9 @@
  {
   "desc": "Günther",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6650,7 +6894,7 @@
   "desc": "Habits (Stay High) — Tove Lo",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -6666,7 +6910,7 @@
   "desc": "Haddaway",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -6713,7 +6957,9 @@
  {
   "desc": "Hanson",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -6773,7 +7019,9 @@
  {
   "desc": "Harry Styles",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -7049,7 +7297,7 @@
   "desc": "Hey Brother — Avicii",
   "year": null,
   "pkgs": [
-   "Dance music"
+   "Dance Music"
   ],
   "spotify": "https://open.spotify.com/track/4lhqb6JvbHId48OUJGwymk",
   "yt": "ja",
@@ -7111,7 +7359,7 @@
   "desc": "Hips Don't Lie — Shakira",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -7192,7 +7440,7 @@
   "desc": "Houdini — Dua Lipa",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -7225,7 +7473,7 @@
   "desc": "How Will I Know — Whitney Houston",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -7271,7 +7519,7 @@
   "desc": "Hung Up — Madonna",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -7316,7 +7564,9 @@
  {
   "desc": "Håkan Hellström",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -7381,7 +7631,7 @@
   "desc": "I Gotta Feeling — The Black Eyed Peas",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -7430,7 +7680,7 @@
   "desc": "I Kissed a Girl — Katy Perry",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -7446,7 +7696,7 @@
   "desc": "I Know What You Did Last Summer — Shawn Mendes & Camila Cabello",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -7462,7 +7712,7 @@
   "desc": "I Love It — Icona Pop",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": "https://open.spotify.com/track/3VZQshi4COChhXaz7cLP02",
   "yt": "ja",
@@ -7525,7 +7775,7 @@
   "desc": "I Wanna Dance with Somebody — Whitney Houston",
   "year": null,
   "pkgs": [
-   "Pop music"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -7669,7 +7919,7 @@
   "desc": "Icona Pop",
   "year": null,
   "pkgs": [
-   "Hits"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "nej",
@@ -8013,7 +8263,9 @@
  {
   "desc": "Irene Cara",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Film edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8261,7 +8513,10 @@
  {
   "desc": "Jan Johansen",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8291,7 +8546,9 @@
  {
   "desc": "Jason Derulo",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8305,7 +8562,10 @@
  {
   "desc": "Jay-Z",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Hip Hop",
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8319,7 +8579,10 @@
  {
   "desc": "Jennifer Lopez",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8377,7 +8640,9 @@
  {
   "desc": "Jessie J",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8391,7 +8656,10 @@
  {
   "desc": "Jill Johnson",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8405,7 +8673,9 @@
  {
   "desc": "Jimi Hendrix",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8435,7 +8705,9 @@
  {
   "desc": "Jo Stafford",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8519,7 +8791,9 @@
  {
   "desc": "John Lennon",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8551,7 +8825,7 @@
   "desc": "John Newman",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -8767,7 +9041,9 @@
  {
   "desc": "Justin Bieber",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8781,7 +9057,10 @@
  {
   "desc": "Justin Timberlake",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8796,7 +9075,7 @@
   "desc": "K'naan",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -8874,7 +9153,9 @@
  {
   "desc": "Kapten Röd",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8902,7 +9183,9 @@
  {
   "desc": "Kate Bush",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8917,7 +9200,7 @@
   "desc": "Kate Ryan",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -8932,7 +9215,11 @@
  {
   "desc": "Katy Perry",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Disco & Pop",
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8962,7 +9249,9 @@
  {
   "desc": "Kendrick Lamar",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Hip Hop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -8976,7 +9265,10 @@
  {
   "desc": "Kent",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9008,7 +9300,7 @@
   "desc": "Kesha",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -9023,7 +9315,10 @@
  {
   "desc": "Kikki Danielsson",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9236,7 +9531,9 @@
  {
   "desc": "Kygo",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9250,7 +9547,10 @@
  {
   "desc": "Kylie Minogue",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9314,7 +9614,7 @@
   "desc": "La Bouche",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -9411,7 +9711,11 @@
  {
   "desc": "Lady Gaga",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9441,7 +9745,9 @@
  {
   "desc": "Laleh",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9517,7 +9823,11 @@
  {
   "desc": "Lasse Berghagen",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Melodifestivalen",
+   "Summer"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9591,7 +9901,9 @@
  {
   "desc": "Lauryn Hill",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9651,7 +9963,9 @@
  {
   "desc": "Led Zeppelin",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9697,7 +10011,10 @@
  {
   "desc": "Lena Philipsson",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9711,7 +10028,10 @@
  {
   "desc": "Lenny Kravitz",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9867,7 +10187,9 @@
  {
   "desc": "Lewis Capaldi",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9941,7 +10263,9 @@
  {
   "desc": "Lil Nas X",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Hip Hop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -9956,7 +10280,7 @@
   "desc": "Lill Lindfors",
   "year": null,
   "pkgs": [
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": null,
   "yt": "nej",
@@ -9972,7 +10296,7 @@
   "desc": "Lill-Babs",
   "year": null,
   "pkgs": [
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": null,
   "yt": "nej",
@@ -10061,7 +10385,9 @@
  {
   "desc": "Lionel Richie",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10103,7 +10429,10 @@
  {
   "desc": "Lisa Nilsson",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10209,7 +10538,9 @@
  {
   "desc": "LMFAO",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10237,7 +10568,9 @@
  {
   "desc": "Londonbeat",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10283,7 +10616,9 @@
  {
   "desc": "Lordi",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10297,7 +10632,10 @@
  {
   "desc": "Loreen",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10311,7 +10649,9 @@
  {
   "desc": "Los del Río",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10341,7 +10681,11 @@
  {
   "desc": "Lotta Engberg",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10355,7 +10699,9 @@
  {
   "desc": "Lou Bega",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10416,7 +10762,7 @@
   "desc": "Love Me Again — John Newman",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": "https://open.spotify.com/track/5TbzAWWc5eJaANpA9kfGCd",
   "yt": "nej",
@@ -10560,7 +10906,9 @@
  {
   "desc": "Lucianoz",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10606,7 +10954,9 @@
  {
   "desc": "Lykke Li",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10620,7 +10970,9 @@
  {
   "desc": "Lynyrd Skynyrd",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10684,7 +11036,7 @@
   "desc": "Mabel",
   "year": null,
   "pkgs": [
-   "Hits"
+   "Disco & Pop"
   ],
   "spotify": null,
   "yt": "nej",
@@ -10715,7 +11067,11 @@
  {
   "desc": "Madonna",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10731,7 +11087,7 @@
   "year": null,
   "pkgs": [
    "Summer",
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": "https://open.spotify.com/track/39ADGrzCrbWwTFlhDcsf9P",
   "yt": "nej",
@@ -10746,7 +11102,10 @@
  {
   "desc": "Magnus Uggla",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Sports edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10774,7 +11133,10 @@
  {
   "desc": "Malena Ernman",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10836,7 +11198,9 @@
  {
   "desc": "Mando Diao",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10908,7 +11272,10 @@
  {
   "desc": "Mariah Carey",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -10936,7 +11303,10 @@
  {
   "desc": "Marie Fredriksson",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11026,7 +11396,9 @@
  {
   "desc": "Mark Morrison",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11040,7 +11412,11 @@
  {
   "desc": "Markoolio",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Sports edition",
+   "Summer",
+   "football"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11068,7 +11444,9 @@
  {
   "desc": "Maroon 5",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11082,7 +11460,9 @@
  {
   "desc": "Martin Stenmarck",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11096,7 +11476,9 @@
  {
   "desc": "Marvin Gaye",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11110,7 +11492,9 @@
  {
   "desc": "Mary J. Blige",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11198,7 +11582,9 @@
  {
   "desc": "Meghan Trainor",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11257,7 +11643,9 @@
  {
   "desc": "Metallica",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11271,7 +11659,10 @@
  {
   "desc": "Michael Jackson",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11332,7 +11723,9 @@
  {
   "desc": "Miley Cyrus",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11346,7 +11739,9 @@
  {
   "desc": "Milli Vanilli",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11388,7 +11783,11 @@
  {
   "desc": "Miss Li",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Sports edition",
+   "football",
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11448,7 +11847,9 @@
  {
   "desc": "Modern Talking",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11507,7 +11908,7 @@
   "desc": "Monica Zetterlund",
   "year": null,
   "pkgs": [
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": null,
   "yt": "nej",
@@ -11756,7 +12157,9 @@
  {
   "desc": "Måneskin",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11770,7 +12173,10 @@
  {
   "desc": "Måns Zelmerlöw",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11798,7 +12204,9 @@
  {
   "desc": "Nat King Cole",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Christmas edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11812,7 +12220,9 @@
  {
   "desc": "Natalie Imbruglia",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11870,7 +12280,9 @@
  {
   "desc": "Ne-Yo",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11898,7 +12310,10 @@
  {
   "desc": "Nelly Furtado",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11928,7 +12343,10 @@
  {
   "desc": "Neneh Cherry",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -11973,7 +12391,7 @@
   "desc": "New Order",
   "year": null,
   "pkgs": [
-   "sport"
+   "Sports edition"
   ],
   "spotify": null,
   "yt": "nej",
@@ -12021,7 +12439,7 @@
   "desc": "Nick Borgen",
   "year": null,
   "pkgs": [
-   "sport"
+   "Sports edition"
   ],
   "spotify": null,
   "yt": "nej",
@@ -12036,7 +12454,9 @@
  {
   "desc": "Nickelback",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -12106,7 +12526,9 @@
  {
   "desc": "Niklas Strömstedt",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -12120,7 +12542,9 @@
  {
   "desc": "Nirvana",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -12166,7 +12590,9 @@
  {
   "desc": "No Doubt",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -12403,7 +12829,9 @@
  {
   "desc": "O-Zone",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -12417,7 +12845,9 @@
  {
   "desc": "Oasis",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -12615,7 +13045,9 @@
  {
   "desc": "One Direction",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -12662,7 +13094,9 @@
  {
   "desc": "OneRepublic",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Film edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -12756,7 +13190,10 @@
  {
   "desc": "Orup",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Summer"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -12828,7 +13265,9 @@
  {
   "desc": "OutKast",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Hip Hop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13008,7 +13447,9 @@
  {
   "desc": "Paula Abdul",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13108,7 +13549,9 @@
  {
   "desc": "Pet Shop Boys",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13122,7 +13565,10 @@
  {
   "desc": "Peter Cetera",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Film edition",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13136,7 +13582,9 @@
  {
   "desc": "Peter Gabriel",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13180,7 +13628,7 @@
   "year": null,
   "pkgs": [
    "Summer",
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": null,
   "yt": "nej",
@@ -13209,7 +13657,9 @@
  {
   "desc": "Petter",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Hip Hop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13223,7 +13673,9 @@
  {
   "desc": "Pharrell Williams",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13237,7 +13689,9 @@
  {
   "desc": "Phil Collins",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13267,7 +13721,10 @@
  {
   "desc": "Pink",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13281,7 +13738,9 @@
  {
   "desc": "Pink Floyd",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13296,7 +13755,7 @@
   "desc": "Planet Funk",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -13375,7 +13834,9 @@
  {
   "desc": "Post Malone",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13437,7 +13898,9 @@
  {
   "desc": "Prince",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13541,7 +14004,10 @@
  {
   "desc": "Queen",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock",
+   "Sports edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13571,7 +14037,9 @@
  {
   "desc": "R.E.M.",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13602,7 +14070,7 @@
   "desc": "Radiohead",
   "year": null,
   "pkgs": [
-   "Rock & Punk"
+   "Rock"
   ],
   "spotify": null,
   "yt": "nej",
@@ -13661,7 +14129,9 @@
  {
   "desc": "Ray Charles",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13709,8 +14179,7 @@
   "desc": "Red Hot Chili Peppers",
   "year": null,
   "pkgs": [
-   "Rock & Punk",
-   "Mega Hits"
+   "Rock"
   ],
   "spotify": null,
   "yt": "nej",
@@ -13725,7 +14194,9 @@
  {
   "desc": "Rednex",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13801,7 +14272,9 @@
  {
   "desc": "Rick Astley",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13815,7 +14288,9 @@
  {
   "desc": "Ricky Martin",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13829,7 +14304,11 @@
  {
   "desc": "Rihanna",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music",
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13891,7 +14370,9 @@
  {
   "desc": "Ritchie Valens",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Summer"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13921,7 +14402,10 @@
  {
   "desc": "Robbie Williams",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13935,7 +14419,9 @@
  {
   "desc": "Robert Miles",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13949,7 +14435,9 @@
  {
   "desc": "Roberta Flack",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13963,7 +14451,10 @@
  {
   "desc": "Robin Bengtsson",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen",
+   "Eurovision"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13977,7 +14468,9 @@
  {
   "desc": "Robin Stjernberg",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -13991,7 +14484,11 @@
  {
   "desc": "Robyn",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music",
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14083,7 +14580,9 @@
  {
   "desc": "Rod Stewart",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14161,7 +14660,10 @@
  {
   "desc": "Roxette",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14267,7 +14769,9 @@
  {
   "desc": "Sabrina Carpenter",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14355,7 +14859,9 @@
  {
   "desc": "Sanna Nielsen",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14541,7 +15047,9 @@
  {
   "desc": "Scatman John",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14556,7 +15064,7 @@
   "desc": "Scooter",
   "year": null,
   "pkgs": [
-   "sport"
+   "Sports edition"
   ],
   "spotify": null,
   "yt": "nej",
@@ -14571,7 +15079,9 @@
  {
   "desc": "Scorpions",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14585,7 +15095,11 @@
  {
   "desc": "Seal",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love",
+   "Film edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14659,7 +15173,9 @@
  {
   "desc": "Selena Gomez",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14860,7 +15376,9 @@
  {
   "desc": "Shakespears Sister",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14874,7 +15392,10 @@
  {
   "desc": "Shakira",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Sports edition",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14904,7 +15425,10 @@
  {
   "desc": "Shania Twain",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -14934,7 +15458,11 @@
  {
   "desc": "Shawn Mendes",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Disco & Pop",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -15026,7 +15554,9 @@
  {
   "desc": "Sia",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -15056,7 +15586,9 @@
  {
   "desc": "Sinéad O'Connor",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -15149,7 +15681,7 @@
   "desc": "Smash Mouth",
   "year": null,
   "pkgs": [
-   "Rock & Punk"
+   "Rock"
   ],
   "spotify": null,
   "yt": "nej",
@@ -15196,7 +15728,9 @@
  {
   "desc": "Snap!",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Dance Music"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -15210,7 +15744,11 @@
  {
   "desc": "Snoop Dogg",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Hip Hop",
+   "Dance Music",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -15256,7 +15794,9 @@
  {
   "desc": "sombr",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -15442,7 +15982,9 @@
  {
   "desc": "Spice Girls",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -15456,7 +15998,9 @@
  {
   "desc": "Spin Doctors",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -15719,7 +16263,10 @@
  {
   "desc": "Stevie Wonder",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -15948,7 +16495,9 @@
  {
   "desc": "Survivor",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Sports edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16041,7 +16590,7 @@
   "desc": "Swedish House Mafia",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -16261,7 +16810,7 @@
   "desc": "Take You Dancing — Jason Derulo",
   "year": null,
   "pkgs": [
-   "Rnb"
+   "RnB"
   ],
   "spotify": null,
   "yt": "ja",
@@ -16307,7 +16856,9 @@
  {
   "desc": "Taylor Swift",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16337,7 +16888,11 @@
  {
   "desc": "Ted Gärdestad",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Summer",
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16411,7 +16966,9 @@
  {
   "desc": "The Ark",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16425,7 +16982,9 @@
  {
   "desc": "The B-52's",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16469,7 +17028,9 @@
  {
   "desc": "The Beatles",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16499,7 +17060,9 @@
  {
   "desc": "The Black Eyed Peas",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16529,7 +17092,10 @@
  {
   "desc": "The Cardigans",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16558,7 +17124,7 @@
   "desc": "The Christmas Song — Nat King Cole",
   "year": null,
   "pkgs": [
-   "Christmas Edition"
+   "Christmas edition"
   ],
   "spotify": null,
   "yt": "ja",
@@ -16818,7 +17384,9 @@
  {
   "desc": "The Police",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16880,7 +17448,9 @@
  {
   "desc": "The Rasmus",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -16924,7 +17494,10 @@
  {
   "desc": "The Rolling Stones",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17090,7 +17663,10 @@
  {
   "desc": "The Weeknd",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17104,7 +17680,9 @@
  {
   "desc": "The White Stripes",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17118,7 +17696,9 @@
  {
   "desc": "The Who",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17278,7 +17858,7 @@
   "desc": "Thomas Di Leva",
   "year": null,
   "pkgs": [
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": null,
   "yt": "nej",
@@ -17343,7 +17923,7 @@
   "desc": "Thåström",
   "year": null,
   "pkgs": [
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": null,
   "yt": "nej",
@@ -17391,7 +17971,7 @@
   "desc": "Timbuktu",
   "year": null,
   "pkgs": [
-   "100% in swedish"
+   "100% swedish"
   ],
   "spotify": null,
   "yt": "nej",
@@ -17422,7 +18002,10 @@
  {
   "desc": "Tina Turner",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Sports edition",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17436,7 +18019,9 @@
  {
   "desc": "Titiyo",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17496,7 +18081,9 @@
  {
   "desc": "Tom Jones",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17510,7 +18097,9 @@
  {
   "desc": "Tom Petty",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17524,7 +18113,11 @@
  {
   "desc": "Tomas Ledin",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish",
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17538,7 +18131,10 @@
  {
   "desc": "Tommy Körberg",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17569,7 +18165,9 @@
  {
   "desc": "Toni Braxton",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17662,7 +18260,9 @@
  {
   "desc": "Tove Lo",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17786,7 +18386,10 @@
  {
   "desc": "Tusse",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Eurovision",
+   "Melodifestivalen"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -17846,7 +18449,9 @@
  {
   "desc": "U2",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -18004,7 +18609,9 @@
  {
   "desc": "Usher",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "RnB"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -18069,7 +18676,7 @@
   "desc": "Vengaboys",
   "year": null,
   "pkgs": [
-   "Club & Dance"
+   "Dance Music"
   ],
   "spotify": null,
   "yt": "nej",
@@ -18084,7 +18691,9 @@
  {
   "desc": "Veronica Maggio",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "100% swedish"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -18195,7 +18804,9 @@
  {
   "desc": "Village People",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -18595,7 +19206,10 @@
  {
   "desc": "Wham!",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Christmas edition",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -18798,7 +19412,10 @@
  {
   "desc": "Whitesnake",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Rock",
+   "Soft & Love"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -18812,7 +19429,11 @@
  {
   "desc": "Whitney Houston",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Soft & Love",
+   "Disco & Pop",
+   "Film edition"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -19078,7 +19699,9 @@
  {
   "desc": "Ylvis",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -19187,7 +19810,7 @@
   "desc": "You're the One That I Want — John Travolta & Olivia Newton-John",
   "year": null,
   "pkgs": [
-   "Film Edition"
+   "Film edition"
   ],
   "spotify": null,
   "yt": "ja",
@@ -19218,7 +19841,10 @@
  {
   "desc": "Zara Larsson",
   "year": null,
-  "pkgs": [],
+  "pkgs": [
+   "Disco & Pop",
+   "Disco & Pop"
+  ],
   "spotify": null,
   "yt": "nej",
   "yt1": null,
@@ -19279,7 +19905,7 @@
   "desc": "Zombie Nation",
   "year": null,
   "pkgs": [
-   "sport",
+   "Sports edition",
    "football"
   ],
   "spotify": null,
@@ -19326,8 +19952,7 @@
   "desc": "Tröjan du hatar - Norlie & KKV",
   "year": null,
   "pkgs": [
-   "100% in swedish",
-   "https://open.spotify.com/track/17qZsun9q3L8ceIa3kPz4A?si=d5856405e2df4234"
+   "100% swedish"
   ],
   "spotify": "https://open.spotify.com/track/17qZsun9q3L8ceIa3kPz4A?si=d5856405e2df4234",
   "yt": "nej",
@@ -19343,8 +19968,7 @@
   "desc": "Där jag hänger min hatt - Norlie & KKV",
   "year": null,
   "pkgs": [
-   "100% in swedish",
-   "https://open.spotify.com/track/2Sl83ewoJgUBQCb3dvSTma?si=98bc7e4ecaf04e70"
+   "100% swedish"
   ],
   "spotify": "https://open.spotify.com/track/2Sl83ewoJgUBQCb3dvSTma?si=98bc7e4ecaf04e70",
   "yt": "nej",
@@ -19648,7 +20272,7 @@
   "parent": null
  },
  {
-  "desc": "Rock Your Body - Justin Timberlak",
+  "desc": "Rock Your Body - Justin Timberlake",
   "year": null,
   "pkgs": [
    "Disco & Pop"
@@ -19749,7 +20373,7 @@
   "year": null,
   "pkgs": [
    "Hip Hop",
-   "Film Edition"
+   "Film edition"
   ],
   "spotify": "https://open.spotify.com/track/12MIoieKIYC1jDgpKGy12F?si=93bb25f41a114bf5",
   "yt": "ja",
@@ -19845,7 +20469,7 @@
   "pkgs": [
    "Soft & Love"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/2BFLtstcRXPnk4uoO3Wi6U",
   "yt": "ja",
   "yt1": "startsec: 12 https://www.youtube.com/watch?v=Qt2mbGP6vFI&list=RDQt2mbGP6vFI&start_radio=1",
   "yt2": null,
@@ -20033,7 +20657,7 @@
   "desc": "License to Kill - Gladys Knight",
   "year": 1989,
   "pkgs": [
-   "Film Edition"
+   "Film edition"
   ],
   "spotify": null,
   "yt": "ja",
@@ -21821,7 +22445,7 @@
   "desc": "Gott Nytt jul - Sean banan",
   "year": 2010,
   "pkgs": [
-   "Christmas Edition"
+   "Christmas edition"
   ],
   "spotify": null,
   "yt": "ja",
@@ -21919,7 +22543,7 @@
   "pkgs": [
    "RnB"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/5AbXJ33KZWOP8EAglwDaJ6",
   "yt": "ja",
   "yt1": null,
   "yt2": null,
@@ -22657,7 +23281,7 @@
   "pkgs": [
    "Rock"
   ],
-  "spotify": null,
+  "spotify": "https://open.spotify.com/track/2m1hi0nfMR9vdGC8UcrnwU",
   "yt": "ja",
   "yt1": null,
   "yt2": null,
@@ -23311,7 +23935,7 @@
   "desc": "Pure Shores - All Saints",
   "year": null,
   "pkgs": [
-   "Film Edition"
+   "Film edition"
   ],
   "spotify": null,
   "yt": "ja",
@@ -24482,7 +25106,7 @@
   "desc": "E det det här du kallar kärlek - Lase Hom",
   "year": null,
   "pkgs": [
-   "100% Swedish"
+   "100% swedish"
   ],
   "spotify": "https://open.spotify.com/track/5MBBQ7P9AozcQ8lF7So1B3?si=zO64h4xEQLiVREJBmY9zwg&utm_source=copy-link&rowId=2f0303c0c6b0a928",
   "yt": "ja",
@@ -24514,7 +25138,7 @@
   "desc": "Husvagn - Galensakparna",
   "year": null,
   "pkgs": [
-   "100% Swedish",
+   "100% swedish",
    "Summer"
   ],
   "spotify": "https://open.spotify.com/track/7rbwpXPzDkbzxFb9PQY8XN?si=LXcnVIm7RAK9LbLdlKGE9g&utm_source=copy-link&rowId=4d692ac96ee67ce7",
@@ -25287,7 +25911,7 @@
   "desc": "Candy shop - 50 Cent",
   "year": null,
   "pkgs": [
-   "Hip hop"
+   "Hip Hop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -25319,7 +25943,7 @@
   "desc": "Signs - Snoop Dogg",
   "year": null,
   "pkgs": [
-   "Hip hop"
+   "Hip Hop"
   ],
   "spotify": null,
   "yt": "ja",
@@ -25584,6 +26208,3222 @@
   ],
   "spotify": null,
   "yt": "ja",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "10cc",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "2Pac",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "3 Doors down",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "98 Degress",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Aaliyah",
+  "year": null,
+  "pkgs": [
+   "RnB"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Aerosmith",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Agnes",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop",
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "Sweden",
+  "parent": null
+ },
+ {
+  "desc": "Al Green",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Alex Party",
+  "year": null,
+  "pkgs": [
+   "Dance Music",
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "Europe",
+  "parent": null
+ },
+ {
+  "desc": "Alice Cooper",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Alice Deejay",
+  "year": null,
+  "pkgs": [
+   "Dance Music",
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Alizee",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "All Saints",
+  "year": null,
+  "pkgs": [
+   "Film edition"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Ameno",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Anna Book",
+  "year": null,
+  "pkgs": [
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Army of lovers",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "ATC",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Axel F",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Bachman",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Back box",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Baha Men",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Behrang Miri",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Bellini",
+  "year": null,
+  "pkgs": [
+   "Summer"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Bill Withers",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Billie Myers",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Billy Ray Cyrus",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Bob Marley",
+  "year": null,
+  "pkgs": [
+   "Soft & Love",
+   "Sports edition"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Bomfunk MCs",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Boyz 2 Men",
+  "year": null,
+  "pkgs": [
+   "Soft & Love",
+   "RnB"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Busta Rhymes",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Bwitched",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Calvin Harris",
+  "year": null,
+  "pkgs": [
+   "Dance Music",
+   "Disco & Pop",
+   "Summer"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Carola",
+  "year": null,
+  "pkgs": [
+   "100% swedish",
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Changes",
+  "year": null,
+  "pkgs": [
+   "Hip Hop",
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Chemical Brothers",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Chicago",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Christer Sandelin",
+  "year": null,
+  "pkgs": [
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Commodores",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Cornershop",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Corona",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Craig David",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Creed",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Creedence",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Crowded House",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Curtis Mayfield",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Darude",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "David Gray",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "David Lindgren",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "De vet du",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Deep Blue something",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Depeche Mode",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Desree",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "DMX",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Dolly Style",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Dru Hill",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Drängarna",
+  "year": null,
+  "pkgs": [
+   "100% swedish",
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Drömhus",
+  "year": null,
+  "pkgs": [
+   "100% swedish",
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "East 17",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Ebba Grön",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Eddie Murphy",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Edivibz",
+  "year": null,
+  "pkgs": [
+   "Sports edition",
+   "football"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "EMD",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "En Vogue",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Faith Hill",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Faithful",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Felicia",
+  "year": null,
+  "pkgs": [
+   "Eurovision",
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "europe",
+  "parent": null
+ },
+ {
+  "desc": "Felix",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Fine Young Cannibals",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Five",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Foo Fighters",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Four seasons",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Free",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Friday",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Friends",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "Sweden",
+  "parent": null
+ },
+ {
+  "desc": "Fröken snusk",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Gala",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop",
+   "Sports edition"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Galensakparna",
+  "year": null,
+  "pkgs": [
+   "100% swedish",
+   "Summer"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Gigi Dágostino",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Gladys Knight",
+  "year": null,
+  "pkgs": [
+   "Film edition"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Harpo",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Harry Chapin",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Hoffmaestro",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "House of Pain",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "imply red",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "J. Cole",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Jackson 5",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Jennifer Paige",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Jessica Folcker",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Jimmy Nail",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "JLC",
+  "year": null,
+  "pkgs": [
+   "Summer"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Jon Henrik Fjällgren",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Judy Garland",
+  "year": null,
+  "pkgs": [
+   "Film edition"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Kalle Moraeus",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Khaliffa",
+  "year": null,
+  "pkgs": [
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "Sweden",
+  "parent": null
+ },
+ {
+  "desc": "Klara Hammarström",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Lase Hom",
+  "year": null,
+  "pkgs": [
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Latin kings",
+  "year": null,
+  "pkgs": [
+   "100% swedish",
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "Sweden",
+  "parent": null
+ },
+ {
+  "desc": "LeAnn Rimes",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Lene Marlin",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Lighthouse Family",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Lilla Al Fadji",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Limp Bizkit",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Linus Svenning",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Livin Joy",
+  "year": null,
+  "pkgs": [
+   "Dance Music",
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Lutricia McNeal",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Manu Chao",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Marc Almond",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Mario",
+  "year": null,
+  "pkgs": [
+   "RnB"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Markus och Martinus",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "nordics",
+  "parent": null
+ },
+ {
+  "desc": "Martin",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Mase",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Matchbo Twenty",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Medina",
+  "year": null,
+  "pkgs": [
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "Sweden",
+  "parent": null
+ },
+ {
+  "desc": "Meja",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "Global",
+  "parent": null
+ },
+ {
+  "desc": "Mel C",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Melanie C",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Modjo",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Mohombi",
+  "year": null,
+  "pkgs": [
+   "Summer"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Molly",
+  "year": null,
+  "pkgs": [
+   "100% swedish",
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Natalie Cole",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Nelly",
+  "year": null,
+  "pkgs": [
+   "RnB",
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Netta",
+  "year": null,
+  "pkgs": [
+   "Eurovision"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "europe",
+  "parent": null
+ },
+ {
+  "desc": "Nsync",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Oh laura",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "Sweden",
+  "parent": null
+ },
+ {
+  "desc": "Panetoz",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Papa Roach",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Pearl jam",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Peps Persson",
+  "year": null,
+  "pkgs": [
+   "100% swedish",
+   "Summer"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Pinkfong",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Pitbull",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop",
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Pras",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Pure shores",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Richard Marx",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Right said fred",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Rob n raz",
+  "year": null,
+  "pkgs": [
+   "RnB"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Ronan Keating",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Run DMC",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Safri Duo",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Samantha Mumba",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Santana",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Sash",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Sasha",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Sean banan",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish",
+   "Christmas edition"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Sean Paul",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Secret service",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Semisonic",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "September",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Shabba Ranks",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Shaggy",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Shanice",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Sisqo",
+  "year": null,
+  "pkgs": [
+   "RnB"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Snow",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Sonique",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Sophie B Hawkins",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Soul II Soul",
+  "year": null,
+  "pkgs": [
+   "RnB"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Southside Spinners",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Spiller",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Spooks",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Stakka Bo",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Stardust",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Stefan Borsch",
+  "year": null,
+  "pkgs": [
+   "Dansband"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Steps",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Sugababes",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Supertramp",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Svenne Rubins",
+  "year": null,
+  "pkgs": [
+   "Sports edition",
+   "football",
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Svenska björnstammen",
+  "year": null,
+  "pkgs": [
+   "Hip Hop",
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Sweet",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Swingfly",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "T.Rex",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Take that",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Tasmin Archer",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Tears for Fears",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "technotronic",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Ten sharp",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "The bellamy brothers",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "The connels",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "The Corrs",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "The cure",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "The KLF",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "the outhere brothers",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "The Prodigy",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "The Shamen",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "The smashing pumpkins",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Theoz",
+  "year": null,
+  "pkgs": [
+   "Melodifestivalen",
+   "100% swedish"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Thomas Rusiak",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "sweden",
+  "parent": null
+ },
+ {
+  "desc": "Three 6 Mafia",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Timbaland",
+  "year": null,
+  "pkgs": [
+   "RnB",
+   "Dance Music",
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Tom Cochrane",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Toploader",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "TQ",
+  "year": null,
+  "pkgs": [
+   "RnB"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "U96",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Undercover",
+  "year": null,
+  "pkgs": [
+   "Dance Music"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "USA for Africa",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Vanessa Amorosi",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Vanessa Paradis",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Wet wet wet",
+  "year": null,
+  "pkgs": [
+   "Soft & Love"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "White liuon",
+  "year": null,
+  "pkgs": [
+   "Rock"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Wild Cherry",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Will Smith",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop",
+   "Film edition"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Wings",
+  "year": null,
+  "pkgs": [],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Wu-tang clan",
+  "year": null,
+  "pkgs": [
+   "Hip Hop"
+  ],
+  "spotify": null,
+  "yt": "nej",
+  "yt1": null,
+  "yt2": null,
+  "yt3": null,
+  "hints": "nej",
+  "inbase": "true",
+  "region": "global",
+  "parent": null
+ },
+ {
+  "desc": "Yes",
+  "year": null,
+  "pkgs": [
+   "Disco & Pop"
+  ],
+  "spotify": null,
+  "yt": "nej",
   "yt1": null,
   "yt2": null,
   "yt3": null,
