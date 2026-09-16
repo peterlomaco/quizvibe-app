@@ -1781,6 +1781,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "parentControlled": true,
     "isAnimated": false,
     "correctNames": [
       "Clint Eastwood"
@@ -4044,7 +4045,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Monty Python and the Holy Grail",
     "correctYear": 1975,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 80,
     "audiences": [
       "elder",
@@ -4056,17 +4057,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
-    "isAnimated": false,
-    "correctNames": [
-      "John Cleese",
-      "Graham Chapman"
-    ],
-    "distractorNames": [
-      "Rowan Atkinson",
-      "Hugh Grant",
-      "Michael Caine",
-      "Gene Hackman"
-    ],
     "youtubeClips": [
       {
         "videoId": "67yCrKqAPQk",
@@ -4074,7 +4064,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "channelTitle": "HD Retro Trailers",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Titeln 'Monty Python and the Holy Grail (1975) Original Trailer' innehaller aret; kord som Name sa aret inte ar svaret (svar = John Cleese/Graham Chapman, ingen skadespelare i titeln). Fan/aggregator-kanal, takedown-risk."
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: titeln 'Monty Python and the Holy Grail (1975) Original Trailer' innehaller aret (1975) som nu AR svaret — verifiera i spelaren om '(1975)' syns (kort titel = farlig) och byt annars till ett klipp utan aret i titeln. Fan/aggregator-kanal, takedown-risk."
       }
     ]
   },
@@ -4318,6 +4308,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "sport"
     ],
+    "parentControlled": true,
     "isAnimated": false,
     "correctNames": [
       "Sylvester Stallone"
@@ -9738,11 +9729,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "strul-1988",
+    "displayName": "Strul",
+    "correctYear": 1988,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "PhXR_cjRh7o",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "the-naked-gun-1988",
     "displayName": "The Naked Gun",
     "correctYear": 1988,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 80,
     "audiences": [
       "elder",
@@ -9754,16 +9773,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
-    "isAnimated": false,
-    "correctNames": [
-      "Leslie Nielsen"
-    ],
-    "distractorNames": [
-      "Chevy Chase",
-      "Steve Martin",
-      "John Cleese",
-      "Bill Murray"
-    ],
     "youtubeClips": [
       {
         "videoId": "ocxp2kns6jw",
@@ -9771,7 +9780,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 34,
         "channelTitle": "TrailerHome",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1988 star i titeln). OBS: titeln namner ocksa 'Leslie Nielsen' (= svaret) men vid ~tecken 55, forbi spelarens titel-trunkering (samma grund som the-good-the-bad-and-the-ugly). VERIFIERA i spelaren att namnet inte syns; byt annars klipp eller satt correctNames till en huvudroll som inte star i titeln."
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: aret 1988 star i titeln och AR nu svaret — verifiera i spelaren om '1988' syns och byt annars till ett klipp utan aret i titeln. TrailerHome, takedown-risk."
       }
     ]
   },
@@ -11148,7 +11157,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
-    "parentControlled": true,
     "youtubeClips": [
       {
         "videoId": "LO0Oe-sdG4g",
@@ -11156,7 +11164,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 37,
         "channelTitle": "Billy Barnell",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). VARNING: titeln 'When Harry Met Sally... | New Trailer 2020' visar '2020' (aterutgivningsar) men RATT SVAR ar 1989 — en spelare som laser titeln kan svara fel. VERIFIERA i spelaren; byt klipp om '2020' syns. parentControlled=true per Film.xlsx. Privat kanal, takedown-risk."
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). VARNING: titeln 'When Harry Met Sally... | New Trailer 2020' visar '2020' (aterutgivningsar) men RATT SVAR ar 1989 — en spelare som laser titeln kan svara fel. VERIFIERA i spelaren; byt klipp om '2020' syns. parentControlled borttaget 2026-09-15 (ej langre flaggad i uppdaterad Film.xlsx). Privat kanal, takedown-risk."
       }
     ]
   },
@@ -11321,6 +11329,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "macken-1990",
+    "displayName": "Macken",
+    "correctYear": 1990,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6E75oxJJSiw",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "madonna-vogue",
     "displayName": "Vogue — Madonna",
     "correctYear": 1990,
@@ -11413,6 +11448,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "New Order - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "pretty-woman-1990",
+    "displayName": "Pretty Woman",
+    "correctYear": 1990,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "jvd3TjJaf3c",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -12262,7 +12325,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "The Naked Gun 2½: The Smell of Fear",
     "correctYear": 1991,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 78,
     "audiences": [
       "elder",
@@ -12274,16 +12337,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
-    "isAnimated": false,
-    "correctNames": [
-      "Leslie Nielsen"
-    ],
-    "distractorNames": [
-      "Chevy Chase",
-      "Steve Martin",
-      "John Cleese",
-      "Bill Murray"
-    ],
     "youtubeClips": [
       {
         "videoId": "EW66cjw-3xI",
@@ -12291,7 +12344,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 34,
         "channelTitle": "Trailer World",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1991 star i titeln). OBS: titeln namner 'Leslie Nielsen' (= svaret) vid ~tecken 55, forbi trunkeringen. VERIFIERA i spelaren; byt annars klipp/correctNames."
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: aret 1991 star i titeln och AR nu svaret — verifiera i spelaren om '1991' syns och byt annars till ett klipp utan aret i titeln. Trailer World, takedown-risk."
       }
     ]
   },
@@ -13331,6 +13384,43 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dromkaken-1993",
+    "displayName": "Drömkåken",
+    "correctYear": 1993,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Björn Skifs"
+    ],
+    "distractorNames": [
+      "Robert Gustafsson",
+      "Mikael Nyqvist",
+      "Mikael Persbrandt",
+      "Rolf Lassgård"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Xtrx3k9IceE",
+        "startSec": 3,
+        "endSec": 33,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). Name/actor-select (svar = Björn Skifs, bekraftat av Peter 2026-09-16). VERIFIERA i spelaren att titeln inte visar skadespelarnamnet."
+      }
+    ]
+  },
+  {
     "id": "haddaway-what-is-love",
     "displayName": "What Is Love — Haddaway",
     "correctYear": 1993,
@@ -13409,6 +13499,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "parentControlled": true,
     "isAnimated": false,
     "correctNames": [
       "Sam Neill",
@@ -13654,6 +13745,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ZorbaMovies",
         "license": "standard",
         "notes": "Trailer. Familjefilm, stark igenkänning hos millennials som barn."
+      }
+    ]
+  },
+  {
+    "id": "the-piano-1993",
+    "displayName": "The Piano",
+    "correctYear": 1993,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "IeHHVJGrfpk",
+        "startSec": 43,
+        "endSec": 73,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). Bekraftat 'The Piano' (1993) av Peter. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -14448,6 +14566,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "yrrol-1994",
+    "displayName": "Yrrol",
+    "correctYear": 1994,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "GFgD4_6qJig",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "2pac-california-love",
     "displayName": "California Love — 2Pac feat. Dr. Dre",
     "correctYear": 1995,
@@ -15137,7 +15282,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Fargo",
     "correctYear": 1996,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 80,
     "audiences": [
       "elder",
@@ -15149,16 +15294,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
-    "isAnimated": false,
-    "correctNames": [
-      "Frances McDormand"
-    ],
-    "distractorNames": [
-      "Holly Hunter",
-      "Laura Dern",
-      "Susan Sarandon",
-      "Sharon Stone"
-    ],
     "youtubeClips": [
       {
         "videoId": "h2tY82z3xXU",
@@ -15166,7 +15301,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 40,
         "channelTitle": "Rotten Tomatoes Classic Trailers",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1996 star i titeln). Titeln namner 'Steve Buscemi' men svaret ar Frances McDormand (huvudrollen, ej i titeln) — sa ingen spoiler. Fargo ar en R-vald valdsfilm; overvag parentControlled (ej markt av Peter)."
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: aret 1996 star i titeln och AR nu svaret — verifiera i spelaren om '1996' syns och byt annars till ett klipp utan aret i titeln. Fargo ar en R-vald valdsfilm; overvag parentControlled (ej markt av Peter)."
       }
     ]
   },
@@ -15262,6 +15397,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Gyllene Tider - Topic",
         "license": "standard",
         "notes": "Studio-audio från officiell Topic-kanal."
+      }
+    ]
+  },
+  {
+    "id": "happy-gilmore-1996",
+    "displayName": "Happy Gilmore",
+    "correctYear": 1996,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "y1emDAYCfVQ",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). genrePackages:sport (golf-komedi) → surfar under Sport-filtret. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -17949,6 +18114,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dude-wheres-my-car-2000",
+    "displayName": "Dude, Where's My Car?",
+    "correctYear": 2000,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "jH_nkW3QtFg",
+        "startSec": 1,
+        "endSec": 31,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "gladiator-2000",
     "displayName": "Gladiator",
     "correctYear": 2000,
@@ -17965,6 +18157,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "parentControlled": true,
     "isAnimated": false,
     "correctNames": [
       "Russell Crowe"
@@ -17983,6 +18176,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Paramount Movies",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
+      }
+    ]
+  },
+  {
+    "id": "jalla-jalla-2000",
+    "displayName": "Jalla! Jalla!",
+    "correctYear": 2000,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "oV-KgVNO9C0",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -18195,6 +18416,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "sport"
     ],
+    "parentControlled": true,
     "isAnimated": false,
     "correctNames": [
       "Brad Pitt",
@@ -18214,6 +18436,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Movieclips Classic Trailers",
         "license": "standard",
         "notes": "Snatch (2000) — officiell trailer. Vinnie Jones (f.d. Wimbledon FC) som Bullet Tooth Tony. genrePackages:sport → surfar under Athletes/Sport-filtret trots Film-nativ-kategori."
+      }
+    ]
+  },
+  {
+    "id": "the-beach-2000",
+    "displayName": "The Beach",
+    "correctYear": 2000,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "t99_nC_tYVM",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -18328,6 +18577,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 211,
         "channelTitle": "Bussin",
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "american-pie-2-2001",
+    "displayName": "American Pie 2",
+    "correctYear": 2001,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FLWu4KewJlU",
+        "startSec": 6,
+        "endSec": 36,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -18814,6 +19090,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "zoolander-2001",
+    "displayName": "Zoolander",
+    "correctYear": 2001,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "YtQq0T3ExLs",
+        "startSec": 21,
+        "endSec": 51,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "antique-follow-me",
     "displayName": "Follow Me — Antique",
     "correctYear": 2002,
@@ -19132,6 +19435,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "my-big-fat-greek-wedding-2002",
+    "displayName": "My Big Fat Greek Wedding",
+    "correctYear": 2002,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "dZmrMJmAfF0",
+        "startSec": 10,
+        "endSec": 40,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "nelly-dilemma",
     "displayName": "Dilemma — Nelly feat. Kelly Rowland",
     "correctYear": 2002,
@@ -19325,6 +19655,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "kopps-2003",
+    "displayName": "Kopps",
+    "correctYear": 2003,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nFtXroFCiLE",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "lost-in-translation-2003",
     "displayName": "Lost in Translation",
     "correctYear": 2003,
@@ -19349,6 +19706,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Ondreia Pedraza",
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Titel 'Lost In Translation - Official Trailer HD' — inget ar. Privat kanal, takedown-risk."
+      }
+    ]
+  },
+  {
+    "id": "love-actually-2003",
+    "displayName": "Love Actually",
+    "correctYear": 2003,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Christmas edition"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "H9Z3_ifFheQ",
+        "startSec": 26,
+        "endSec": 56,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). genrePackages:['Christmas edition'] — ny paket-tagg (paketet saljs inte an; forbereder framtida Christmas Edition). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -20672,6 +21059,43 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "borat-2006",
+    "displayName": "Borat",
+    "correctYear": 2006,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Sacha Baron Cohen"
+    ],
+    "distractorNames": [
+      "Ben Stiller",
+      "Adam Sandler",
+      "Will Ferrell",
+      "Steve Carell"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "vlnUa_dNsRQ",
+        "startSec": 5,
+        "endSec": 35,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). Name/actor-select (svar = Sacha Baron Cohen). VERIFIERA i spelaren att titeln inte visar skadespelarnamnet."
+      }
+    ]
+  },
+  {
     "id": "carola-evighet",
     "displayName": "Evighet — Carola",
     "correctYear": 2006,
@@ -21810,6 +22234,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "mamma-mia-2008",
+    "displayName": "Mamma Mia!",
+    "correctYear": 2008,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "lkN-A00WLYE",
+        "startSec": 5,
+        "endSec": 35,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "rio-shine-on",
     "displayName": "Shine On — R.I.O.",
     "correctYear": 2008,
@@ -21843,6 +22294,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sex-and-the-city-2008",
+    "displayName": "Sex and the City",
+    "correctYear": 2008,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "b58gZlXm2yI",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "the-dark-knight-2008",
     "displayName": "The Dark Knight",
     "correctYear": 2008,
@@ -21859,6 +22337,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "parentControlled": true,
     "isAnimated": false,
     "correctNames": [
       "Christian Bale",
@@ -22245,6 +22724,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-hangover-2009",
+    "displayName": "The Hangover",
+    "correctYear": 2009,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 84,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TZc39afdeXU",
+        "startSec": 10,
+        "endSec": 40,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "timbaland-morning-after-dark",
     "displayName": "Morning After Dark — Timbaland",
     "correctYear": 2009,
@@ -22472,6 +22978,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "David Guetta",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "despicable-me-2010",
+    "displayName": "Dumma mig",
+    "correctYear": 2010,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "M2DaSWoK_Ig",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). Svensk titel 'Dumma mig' (Despicable Me). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -24469,6 +25002,33 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lassemajas-detektivbyra-2013",
+    "displayName": "LasseMajas Detektivbyrå – Det första mysteriet",
+    "correctYear": 2013,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "2C1qbrYfdy8",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "one-direction-story-of-my-life",
     "displayName": "Story of My Life — One Direction",
     "correctYear": 2013,
@@ -24650,6 +25210,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 103,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1430)."
+      }
+    ]
+  },
+  {
+    "id": "the-wolf-of-wall-street-2013",
+    "displayName": "The Wolf of Wall Street",
+    "correctYear": 2013,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "iszwuX1AK6A",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -25292,7 +25880,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "The Grand Budapest Hotel",
     "correctYear": 2014,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 80,
     "audiences": [
       "elder",
@@ -25304,16 +25892,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
-    "isAnimated": false,
-    "correctNames": [
-      "Ralph Fiennes"
-    ],
-    "distractorNames": [
-      "Colin Firth",
-      "Hugh Grant",
-      "Ewan McGregor",
-      "Edward Norton"
-    ],
     "youtubeClips": [
       {
         "videoId": "zru-1DbbcsA",
@@ -25321,7 +25899,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 36,
         "channelTitle": "FilmIsNow Movies",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 2014 star i titeln, ingen skadespelare). OBS: detta ar en RED BAND-trailer (moget innehall) — Peter markerade INTE parentControlled i Film.xlsx, men overvag det. Ralph Fiennes = huvudroll, ej i titeln."
+        "notes": "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: aret 2014 star i titeln och AR nu svaret — verifiera i spelaren om '2014' syns och byt annars till ett klipp utan aret i titeln. OBS: RED BAND-trailer (moget innehall) — Peter markerade INTE parentControlled i Film.xlsx, men overvag det."
       }
     ]
   },

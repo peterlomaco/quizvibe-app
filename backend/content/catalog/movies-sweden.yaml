@@ -126,3 +126,98 @@ items:
         endSec: 47
         channelTitle: "MovieZine"
         notes: "Officiell svensk trailer. Rolf Lassgård. SF Studios-produktion."
+
+  # === Tillägg 2026-09-15 (Peters Film.xlsx) — nya svenska filmer ===
+  # Year/timeline om inte annat anges. region ärvs sweden fran fil-headern.
+  # YouTube-titlar ej sedda av mig — VERIFIERA i spelaren att titeln inte
+  # visar aret (Year-fraga) innan release.
+
+  - id: dromkaken-1993
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Drömkåken"
+    correctYear: 1993
+    probability: 82
+    wikimediaSearchHints: ["Drömkåken 1993 svensk film Björn Skifs"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Björn Skifs"]
+    # Distraktorer ar svenska skadespelare som INTE ar med i Dromkaken.
+    distractorNames: ["Robert Gustafsson", "Mikael Nyqvist", "Mikael Persbrandt", "Rolf Lassgård"]
+    youtubeClips:
+      - videoId: "Xtrx3k9IceE"
+        startSec: 3
+        endSec: 33
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). Name/actor-select (svar = Björn Skifs, bekraftat av Peter 2026-09-16). VERIFIERA i spelaren att titeln inte visar skadespelarnamnet."
+  - id: strul-1988
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Strul"
+    correctYear: 1988
+    probability: 78
+    parentControlled: true
+    wikimediaSearchHints: ["Strul 1988 svensk film Stefan Sauk"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "PhXR_cjRh7o"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: jalla-jalla-2000
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jalla! Jalla!"
+    correctYear: 2000
+    probability: 80
+    parentControlled: true
+    wikimediaSearchHints: ["Jalla Jalla 2000 svensk film Josef Fares"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "oV-KgVNO9C0"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: yrrol-1994
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Yrrol"
+    correctYear: 1994
+    probability: 76
+    wikimediaSearchHints: ["Yrrol 1994 svensk film Galenskaparna After Shave"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "GFgD4_6qJig"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: kopps-2003
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kopps"
+    correctYear: 2003
+    probability: 80
+    wikimediaSearchHints: ["Kopps 2003 svensk film Josef Fares"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "nFtXroFCiLE"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: macken-1990
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Macken"
+    correctYear: 1990
+    probability: 80
+    wikimediaSearchHints: ["Macken Roy och Roger 1990 svensk film Galenskaparna"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "6E75oxJJSiw"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: lassemajas-detektivbyra-2013
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "LasseMajas Detektivbyrå – Det första mysteriet"
+    correctYear: 2013
+    probability: 80
+    wikimediaSearchHints: ["LasseMajas Detektivbyrå Det första mysteriet 2013 svensk film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "2C1qbrYfdy8"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
