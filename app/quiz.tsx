@@ -6436,6 +6436,12 @@ export default function QuizScreen() {
       // ⚠ Fönster-gaten (§2.1): HCP rör sig först när nivåns fönster har 20
       // svar (~5 spel à 4 rundor) — ett enstaka testspel ändrar inte siffran.
       if (!isGuestHostGame && !isRemote && !isPtPSpectator) {
+        // §2.1 — Game Era-span (eraTo − eraFrom) skalar HCP-deltat (bredare era
+        // = svårare = mer progression). Ogiltigt span → 15 (neutralt ×1.0).
+        const eraYears =
+          Number.isFinite(eraTo) && Number.isFinite(eraFrom)
+            ? Math.max(0, eraTo - eraFrom)
+            : 15;
         const flat = allRoundScoresHistory.flat();
         // §1.3 — bucketa spelarens svar per kategori via den auktoritativa
         // index→kategori-mappen (effectiveCategoryByQuestion). En Music-fråga
@@ -6466,8 +6472,8 @@ export default function QuizScreen() {
               const level: AssistanceLevel = p.assistance ?? fallbackAssistance;
               const { before, after } =
                 p.id === selfPlayerId
-                  ? await recordSelfGameResult(region, level, byCat)
-                  : await recordGameResultForName(p.name, region, level, byCat);
+                  ? await recordSelfGameResult(region, level, byCat, eraYears)
+                  : await recordGameResultForName(p.name, region, level, byCat, eraYears);
               // §5-raden visar Total (nytt värde + delta) under assistance/age.
               changes[p.id] = { before: before.total, after: after.total };
               // Per-kategori-FÖRÄNDRING för leaderboardens "+"-utfällning.
@@ -6502,7 +6508,7 @@ export default function QuizScreen() {
           const selfByCat = selfPlayerId ? answersByCategoryFor(selfPlayerId) : {};
           if (selfEntry?.type !== 'guest' && hasAnswers(selfByCat)) {
             const level: AssistanceLevel = selfEntry?.assistance ?? fallbackAssistance;
-            void recordSelfGameResult(region, level, selfByCat).then(({ before, after }) => {
+            void recordSelfGameResult(region, level, selfByCat, eraYears).then(({ before, after }) => {
               const beforeT = before.total;
               const afterT = after.total;
               setPlayerHcpChanges((prev) => ({ ...prev, [selfPlayerId]: { before: beforeT, after: afterT } }));

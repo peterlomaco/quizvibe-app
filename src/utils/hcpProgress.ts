@@ -7,6 +7,7 @@ import {
   emptyCategoryProgress,
   emptyHcpProgress,
   HCP_START,
+  HCP_WINDOW_SIZE,
   totalHcp,
   type HcpProgress,
 } from './hcpEngine';
@@ -60,15 +61,21 @@ async function resolveOwnKey(region: string): Promise<string | null> {
 }
 
 // Defensiv parse — säkerställ kategori-strukturen även om lagrad data är gammal.
+// Fönstren trimmas till senaste HCP_WINDOW_SIZE vid läsning så befintliga
+// spelares gamla 20-långa fönster inte utvärderas mot de nya 10-fönster-
+// trösklarna på nästa spel (skulle avfyra ETT översstort delta). Självläkande.
+function trimWindow(w: unknown): boolean[] {
+  return Array.isArray(w) ? w.slice(-HCP_WINDOW_SIZE) : [];
+}
 function coerceCategory(raw: unknown) {
   const p = (raw ?? {}) as Partial<ReturnType<typeof emptyCategoryProgress>>;
   const w = (p.windows ?? {}) as Partial<HcpProgress['categories']['Music']['windows']>;
   return {
     hcp: typeof p.hcp === 'number' ? p.hcp : HCP_START,
     windows: {
-      minimal: Array.isArray(w.minimal) ? w.minimal : [],
-      standard: Array.isArray(w.standard) ? w.standard : [],
-      full: Array.isArray(w.full) ? w.full : [],
+      minimal: trimWindow(w.minimal),
+      standard: trimWindow(w.standard),
+      full: trimWindow(w.full),
     },
     lastPlayedISO: typeof p.lastPlayedISO === 'string' ? p.lastPlayedISO : null,
   };
@@ -142,13 +149,14 @@ function applyAllCategories(
   progress: HcpProgress,
   level: AssistanceLevel,
   answersByCategory: CategoryAnswers,
+  eraYears: number,
   nowISO: string,
 ): HcpProgress {
   let next = progress;
   (Object.keys(answersByCategory) as MainCategory[]).forEach((cat) => {
     const answers = answersByCategory[cat];
     if (answers && answers.length > 0) {
-      next = applyGameResult(next, cat, level, answers, nowISO);
+      next = applyGameResult(next, cat, level, answers, eraYears, nowISO);
     }
   });
   return next;
@@ -203,12 +211,13 @@ export async function recordSelfGameResult(
   region: string,
   level: AssistanceLevel,
   answersByCategory: CategoryAnswers,
+  eraYears: number,
   now: Date = new Date(),
 ): Promise<{ before: HcpBundle; after: HcpBundle }> {
   const key = await resolveOwnKey(region);
   const decayed = applyInactivityDecay(await readByKey(key, region), now);
   const before = bundleOf(decayed);
-  const next = applyAllCategories(decayed, level, answersByCategory, now.toISOString());
+  const next = applyAllCategories(decayed, level, answersByCategory, eraYears, now.toISOString());
   await writeByKey(key, region, next);
   await mirrorToProfile(region, bundleOf(next));
   return { before, after: bundleOf(next) };
@@ -224,12 +233,13 @@ export async function recordGameResultForName(
   region: string,
   level: AssistanceLevel,
   answersByCategory: CategoryAnswers,
+  eraYears: number,
   now: Date = new Date(),
 ): Promise<{ before: HcpBundle; after: HcpBundle }> {
   const key = keyFor(region, playerName);
   const decayed = applyInactivityDecay(await readByKey(key, region), now);
   const before = bundleOf(decayed);
-  const next = applyAllCategories(decayed, level, answersByCategory, now.toISOString());
+  const next = applyAllCategories(decayed, level, answersByCategory, eraYears, now.toISOString());
   await writeByKey(key, region, next);
   return { before, after: bundleOf(next) };
 }

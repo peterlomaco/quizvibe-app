@@ -136,7 +136,30 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What are Extra packages?',
-        a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. More themes are added over time.',
+        a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop & RnB). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. More themes are added over time.',
+      },
+    ],
+  },
+  {
+    id: 'hcp',
+    emoji: '🎯',
+    title: 'Handicap (HCP)',
+    items: [
+      {
+        q: 'What is HCP?',
+        a: 'HCP (handicap) is your skill rating in QuizVibe, on a scale from 99 (beginner) down to 1 (elite) — the lower the number, the better. Every registered player starts at 99 and earns their way down by playing. You have a separate HCP for Music and for Film, plus a Total (the average of the two), each shown as a coloured shield on your Profile, on the Lobby player cards, and after each game on the leaderboard.',
+      },
+      {
+        q: 'How does my HCP change?',
+        a: 'It follows your recent form. The game looks at your last 10 answers on each assistance level, per category: consistently strong games lower your HCP (you improve), weaker games raise it. A new player\'s HCP holds steady until they\'ve played a few games, then it moves continuously. A single game can never move it by more than 10 points, and it drifts very slightly back toward beginner if you stop playing for several weeks.',
+      },
+      {
+        q: 'How do I earn HCP faster?',
+        a: 'Challenge yourself — the less help you use and the wider the era you play, the more each good game counts:\n• Assistance level: Minimal earns the most, then Standard, then Full. With less help a strong result moves your HCP more (and a weak result costs you less).\n• Game Era: a wider year range is harder to place, so a wide era earns more than a narrow one.\nSo a great game on Minimal assistance across a wide Game Era moves your HCP the most.',
+      },
+      {
+        q: 'Do guests earn HCP?',
+        a: 'No. HCP is earned only when you play signed in to your own account. Guest games, guest-hosted games, and simply watching the leaderboard don\'t change anyone\'s HCP.',
       },
     ],
   },
