@@ -390,7 +390,7 @@ Helpers exporteras: `appendPlayerNameLetter`, `appendPlayerNameDigit`, `backspac
 
 `handleLogin` accepts **Player Name OR email** as identifier — if input contains `@`, the email-prefix is derived as the saved `playerName` (mock; real auth will resolve email → playerName via backend lookup).
 
-Default Assistance='full', Region='sweden' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
+Assistance and Region are NOT shown on the Register form (2026-09-16) — Year of birth is the last gate. The created profile always gets Assistance='full' and Region='sweden' (App Store registration country, currently only Sweden) as defaults via the `regAssistance`/`regRegion` state that `handleRegisterSubmit` writes. The pickers, their overlays, `regAssistanceUnlocked`/`regRegionUnlocked`, `REG_REGION_OPTIONS` and the "Use default or select prefered setup" hint were removed; `RegRegion` type + `ASSISTANCE_OPTIONS` stay (the latter still drives the guest-join form).
 
 **Registration host-defaults** (sätts i `handleRegisterSubmit` i [app/index.tsx](app/index.tsx) och speglas i ProfileScreen:s auto-augment för ofullständiga profiler):
 - `gameMode: 'pass-the-phone'`, `singlePlayerDefault: false` — Pass-the-Phone är default-läge.
@@ -411,7 +411,7 @@ Default Assistance='full', Region='sweden' on the Register form so the user can 
 
 `handleLogin` accepts **Player Name OR email** as identifier — if input contains `@`, the email-prefix is derived as the saved `playerName` (mock; real auth will resolve email → playerName via backend lookup).
 
-Default Assistance='full', Region='sweden' on the Register form so the user can submit immediately after Year of birth — both fields show under a "Use default or select prefered setup" hint.
+Assistance and Region are NOT shown on the Register form (2026-09-16) — Year of birth is the last gate. The created profile always gets Assistance='full' and Region='sweden' (App Store registration country, currently only Sweden) as defaults via the `regAssistance`/`regRegion` state that `handleRegisterSubmit` writes. The pickers, their overlays, `regAssistanceUnlocked`/`regRegionUnlocked`, `REG_REGION_OPTIONS` and the "Use default or select prefered setup" hint were removed; `RegRegion` type + `ASSISTANCE_OPTIONS` stay (the latter still drives the guest-join form).
 
 **Year of birth-caps**: Profile, Register-form och Guest-form har gemensamma cap:ar `MIN_BIRTH_YEAR = 1930`, `MAX_BIRTH_YEAR = CURRENT_YEAR - 15` (dynamisk — 15+ minimum ålder; höjt från 13+ 2026-06-01 pga 15+-gränsat film-/innehåll i appen, utöver App Store / GDPR). Endpoints renderas via `formatBirthYear`-helper som lägger till "or earlier" på 1930 och "or later" på MAX_BIRTH_YEAR — representerar öppna intervall (alla födda ≤1930 / ≥CURRENT_YEAR-15). `formatBirthYear` används både i picker-listan och i selector-trigger-texten så framing är konsistent. Profile + Register + Guest delar samma `BIRTH_YEARS`-array och format-helper (Profile har egen kopia eftersom den lever i en annan fil — håll dem synkade vid framtida ändringar). LobbyScreen har egen kopia med samma formel.
 
