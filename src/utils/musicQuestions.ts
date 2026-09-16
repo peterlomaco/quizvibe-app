@@ -19378,6 +19378,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "6W2Ef5Ph6ILTUAedoQ3QIv",
     "youtubeClips": [
       {
@@ -24990,7 +24993,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "spotifyTrackId": "5TbzAWWc5eJaANpA9kfGCd",
     "youtubeClips": []
