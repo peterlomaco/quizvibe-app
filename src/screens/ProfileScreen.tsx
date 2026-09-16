@@ -789,11 +789,14 @@ export default function ProfileScreen() {
     }
     setSpotifyEnabled(val);
   };
-  // V1 har inga themed packages i PURCHASED_PACKAGES (parkerade till v1.1+
-  // per project_launch_scope_v1) och gen-paketen är borttagna 2026-05-27.
-  // availablePackages är därmed tom i hela V1 — UI:t visar empty-state.
+  // Alla tema-paket i PURCHASED_PACKAGES, sorterade alfabetiskt på display-
+  // namn (samma localeCompare-ordning som Lobby-listan) så de två vyerna
+  // visar paketen i samma sekvens.
   const availablePackages = useMemo<MusicPackage[]>(
-    () => [...PURCHASED_PACKAGES],
+    () =>
+      [...PURCHASED_PACKAGES].sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { numeric: true }),
+      ),
     [],
   );
   // "Select all"-state — true bara när alla synliga paket är aktiverade.
