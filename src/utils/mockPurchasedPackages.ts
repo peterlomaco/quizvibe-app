@@ -49,11 +49,19 @@ export interface MusicPackage {
   parentRestricted?: boolean;
 }
 
-// Första riktiga tema-paketen (2026-08-28). Båda är Music-only. `id` bär
+// Tema-paketen (2026-08-28, utökade 2026-09-16). Alla Music-only. `id` bär
 // `pkg-`-prefix (plockas INTE av LEGACY_GEN_PKG_IDS-strippningen som bara
-// matchar `pkg-gen-*`). `tags` speglar genrePackages-strängarna i katalogen.
+// matchar `pkg-gen-*`). `tags` speglar genrePackages-strängarna i katalogen
+// EXAKT (case-känsligt) — därför skiljer sig ibland `name` (display) från
+// `tags` (t.ex. name '100% Swedish' vs katalog-tagg '100% in swedish').
+// Innehållet fylls på automatiskt: ett item surfar i paketet så fort dess
+// genrePackages innehåller någon av `tags` (se itemInActivePackages).
 export const PURCHASED_PACKAGES: MusicPackage[] = [
   { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'], allowSpotifyOnly: true },
+  { id: 'pkg-disco-pop', name: 'Disco & Pop', tags: ['Disco & Pop'], allowSpotifyOnly: true },
+  { id: 'pkg-100-swedish', name: '100% Swedish', tags: ['100% in swedish'], allowSpotifyOnly: true },
+  { id: 'pkg-dance-music', name: 'Dance Music', tags: ['Dance Music'], allowSpotifyOnly: true },
+  { id: 'pkg-soft-love', name: 'Soft & Love', tags: ['Soft & Love'], allowSpotifyOnly: true },
   // "Hip Hop & RnB" — union av katalogens "Hip Hop"- OCH "RnB"-taggade items
   // (itemInActivePackages matchar valfri tagg). id behållet som `pkg-hiphop` så
   // sparade enabledHostPackages-toggles + parentRestricted-lookup är oförändrade.
