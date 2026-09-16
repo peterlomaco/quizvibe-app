@@ -86,6 +86,7 @@ items:
     correctYear: 1966
     probability: 80
     region: ["global"]
+    parentControlled: true
     wikimediaSearchHints: ["The Good the Bad and the Ugly 1966 film Clint Eastwood Leone"]
     answerMethods: ["actor-select"]
     correctNames: ["Clint Eastwood"]
@@ -147,6 +148,7 @@ items:
     displayName: "Rocky"
     correctYear: 1976
     probability: 92
+    parentControlled: true
     wikimediaSearchHints: ["Rocky 1976 Stallone"]
     answerMethods: ["actor-select"]
     correctNames: ["Sylvester Stallone"]
@@ -332,6 +334,7 @@ items:
     displayName: "Jurassic Park"
     correctYear: 1993
     probability: 95
+    parentControlled: true
     wikimediaSearchHints: ["Jurassic Park 1993 film"]
     answerMethods: ["actor-select"]
     correctNames: ["Sam Neill", "Jeff Goldblum"]
@@ -366,7 +369,9 @@ items:
     wikimediaSearchHints: ["The Lion King 1994 Disney film Simba Mufasa"]
     answerMethods: ["actor-select"]
     correctNames: ["Simba"]
-    distractorNames: ["Mufasa", "Scar", "Nala", "Timon"]
+    # Distraktorer MÅSTE vara karaktärer ur ANDRA filmer — Mufasa/Scar/Nala/Timon
+    # är också huvudkaraktärer i Lejonkungen och skulle bli felmarkerade rätta svar.
+    distractorNames: ["Nemo", "Shrek", "Mulan", "Aladdin"]
     youtubeClips:
       - videoId: "lfiprM5l_cE"
         startSec: 10
@@ -424,6 +429,7 @@ items:
     displayName: "Gladiator"
     correctYear: 2000
     probability: 90
+    parentControlled: true
     wikimediaSearchHints: ["Gladiator 2000 film Russell Crowe Ridley Scott"]
     answerMethods: ["actor-select"]
     correctNames: ["Russell Crowe"]
@@ -439,6 +445,7 @@ items:
     displayName: "Snatch"
     correctYear: 2000
     probability: 82
+    parentControlled: true
     wikimediaSearchHints: ["Snatch 2000 film Guy Ritchie Brad Pitt Vinnie Jones"]
     answerMethods: ["actor-select"]
     correctNames: ["Brad Pitt", "Jason Statham"]
@@ -518,6 +525,7 @@ items:
     displayName: "The Dark Knight"
     correctYear: 2008
     probability: 90
+    parentControlled: true
     wikimediaSearchHints: ["The Dark Knight 2008 film Nolan Batman"]
     answerMethods: ["actor-select"]
     correctNames: ["Christian Bale", "Heath Ledger"]
@@ -584,7 +592,9 @@ items:
     wikimediaSearchHints: ["Frozen 2013 Disney film Let It Go"]
     answerMethods: ["actor-select"]
     correctNames: ["Elsa", "Anna"]
-    distractorNames: ["Olaf", "Kristoff", "Hans", "Sven"]
+    # Distraktorer MÅSTE vara karaktärer ur ANDRA filmer — Olaf/Kristoff/Hans/Sven
+    # är också karaktärer i Frozen och skulle bli felmarkerade rätta svar.
+    distractorNames: ["Simba", "Nemo", "Shrek", "Mulan"]
   - id: borg-vs-mcenroe-2017
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Borg vs McEnroe"
@@ -679,15 +689,13 @@ items:
     probability: 80
     region: ["global"]
     wikimediaSearchHints: ["Monty Python and the Holy Grail 1975 John Cleese Graham Chapman"]
-    answerMethods: ["actor-select"]
-    correctNames: ["John Cleese", "Graham Chapman"]
-    distractorNames: ["Rowan Atkinson", "Hugh Grant", "Michael Caine", "Gene Hackman"]
+    answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "67yCrKqAPQk"
         startSec: 0
         endSec: 30
         channelTitle: "HD Retro Trailers"
-        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Titeln 'Monty Python and the Holy Grail (1975) Original Trailer' innehaller aret; kord som Name sa aret inte ar svaret (svar = John Cleese/Graham Chapman, ingen skadespelare i titeln). Fan/aggregator-kanal, takedown-risk."
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: titeln 'Monty Python and the Holy Grail (1975) Original Trailer' innehaller aret (1975) som nu AR svaret — verifiera i spelaren om '(1975)' syns (kort titel = farlig) och byt annars till ett klipp utan aret i titeln. Fan/aggregator-kanal, takedown-risk."
 
   - id: the-naked-gun-1988
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -696,15 +704,13 @@ items:
     probability: 80
     region: ["global"]
     wikimediaSearchHints: ["The Naked Gun 1988 film Leslie Nielsen"]
-    answerMethods: ["actor-select"]
-    correctNames: ["Leslie Nielsen"]
-    distractorNames: ["Chevy Chase", "Steve Martin", "John Cleese", "Bill Murray"]
+    answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "ocxp2kns6jw"
         startSec: 4
         endSec: 34
         channelTitle: "TrailerHome"
-        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1988 star i titeln). OBS: titeln namner ocksa 'Leslie Nielsen' (= svaret) men vid ~tecken 55, forbi spelarens titel-trunkering (samma grund som the-good-the-bad-and-the-ugly). VERIFIERA i spelaren att namnet inte syns; byt annars klipp eller satt correctNames till en huvudroll som inte star i titeln."
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: aret 1988 star i titeln och AR nu svaret — verifiera i spelaren om '1988' syns och byt annars till ett klipp utan aret i titeln. TrailerHome, takedown-risk."
 
   - id: the-naked-gun-2-5-1991
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -713,15 +719,13 @@ items:
     probability: 78
     region: ["global"]
     wikimediaSearchHints: ["The Naked Gun 2 1/2 The Smell of Fear 1991 Leslie Nielsen"]
-    answerMethods: ["actor-select"]
-    correctNames: ["Leslie Nielsen"]
-    distractorNames: ["Chevy Chase", "Steve Martin", "John Cleese", "Bill Murray"]
+    answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "EW66cjw-3xI"
         startSec: 4
         endSec: 34
         channelTitle: "Trailer World"
-        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1991 star i titeln). OBS: titeln namner 'Leslie Nielsen' (= svaret) vid ~tecken 55, forbi trunkeringen. VERIFIERA i spelaren; byt annars klipp/correctNames."
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: aret 1991 star i titeln och AR nu svaret — verifiera i spelaren om '1991' syns och byt annars till ett klipp utan aret i titeln. Trailer World, takedown-risk."
 
   - id: the-grand-budapest-hotel-2014
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -730,15 +734,13 @@ items:
     probability: 80
     region: ["global"]
     wikimediaSearchHints: ["The Grand Budapest Hotel 2014 film Ralph Fiennes Wes Anderson"]
-    answerMethods: ["actor-select"]
-    correctNames: ["Ralph Fiennes"]
-    distractorNames: ["Colin Firth", "Hugh Grant", "Ewan McGregor", "Edward Norton"]
+    answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "zru-1DbbcsA"
         startSec: 6
         endSec: 36
         channelTitle: "FilmIsNow Movies"
-        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 2014 star i titeln, ingen skadespelare). OBS: detta ar en RED BAND-trailer (moget innehall) — Peter markerade INTE parentControlled i Film.xlsx, men overvag det. Ralph Fiennes = huvudroll, ej i titeln."
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: aret 2014 star i titeln och AR nu svaret — verifiera i spelaren om '2014' syns och byt annars till ett klipp utan aret i titeln. OBS: RED BAND-trailer (moget innehall) — Peter markerade INTE parentControlled i Film.xlsx, men overvag det."
 
   - id: fargo-1996
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -747,15 +749,13 @@ items:
     probability: 80
     region: ["global"]
     wikimediaSearchHints: ["Fargo 1996 film Frances McDormand Coen brothers"]
-    answerMethods: ["actor-select"]
-    correctNames: ["Frances McDormand"]
-    distractorNames: ["Holly Hunter", "Laura Dern", "Susan Sarandon", "Sharon Stone"]
+    answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "h2tY82z3xXU"
         startSec: 10
         endSec: 40
         channelTitle: "Rotten Tomatoes Classic Trailers"
-        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Kord som Name (aret 1996 star i titeln). Titeln namner 'Steve Buscemi' men svaret ar Frances McDormand (huvudrollen, ej i titeln) — sa ingen spoiler. Fargo ar en R-vald valdsfilm; overvag parentControlled (ej markt av Peter)."
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx), bytt actor-select->timeline 2026-09-15 per uppdaterad Film.xlsx + Peters bekraftelse. ⚠ SPOILER-RISK: aret 1996 star i titeln och AR nu svaret — verifiera i spelaren om '1996' syns och byt annars till ett klipp utan aret i titeln. Fargo ar en R-vald valdsfilm; overvag parentControlled (ej markt av Peter)."
 
   # === Tillägg 2026-09-11 (Peters Film.xlsx) — timeline (Year) ===
 
@@ -886,7 +886,6 @@ items:
     correctYear: 1989
     probability: 80
     region: ["global"]
-    parentControlled: true
     wikimediaSearchHints: ["When Harry Met Sally 1989 film Meg Ryan Billy Crystal"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -894,7 +893,7 @@ items:
         startSec: 7
         endSec: 37
         channelTitle: "Billy Barnell"
-        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). VARNING: titeln 'When Harry Met Sally... | New Trailer 2020' visar '2020' (aterutgivningsar) men RATT SVAR ar 1989 — en spelare som laser titeln kan svara fel. VERIFIERA i spelaren; byt klipp om '2020' syns. parentControlled=true per Film.xlsx. Privat kanal, takedown-risk."
+        notes: "Peter-kurerad 2026-09-11 (Film.xlsx). VARNING: titeln 'When Harry Met Sally... | New Trailer 2020' visar '2020' (aterutgivningsar) men RATT SVAR ar 1989 — en spelare som laser titeln kan svara fel. VERIFIERA i spelaren; byt klipp om '2020' syns. parentControlled borttaget 2026-09-15 (ej langre flaggad i uppdaterad Film.xlsx). Privat kanal, takedown-risk."
 
   - id: taxi-driver-1976
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -926,3 +925,211 @@ items:
         endSec: 45
         channelTitle: "Christian J Romero"
         notes: "Peter-kurerad 2026-09-11 (Film.xlsx). Andra Godfather-item: detta ar Year/global, samexisterar med det befintliga 'the-godfather' (Name/sweden). Titel 'The Godfather | Modern Trailer | 4k' — inget ar. OBS: fan-gjord 'Modern Trailer' pa privat kanal (ej rattsinnehavare), takedown-risk — samma klass som citizen-kane-1941. parentControlled=true per Film.xlsx."
+
+  # === Tillägg 2026-09-15 (Peters Film.xlsx) — nya globala filmer ===
+  # Alla region ["global"] (overrider fil-defaulten sweden). Year/timeline om
+  # inte annat anges. YouTube-titlar ej sedda av mig — VERIFIERA i spelaren att
+  # titeln inte visar aret (Year-fraga) innan release.
+
+  - id: pretty-woman-1990
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Pretty Woman"
+    correctYear: 1990
+    probability: 84
+    region: ["global"]
+    parentControlled: true
+    wikimediaSearchHints: ["Pretty Woman 1990 film Julia Roberts Richard Gere"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jvd3TjJaf3c"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: happy-gilmore-1996
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Happy Gilmore"
+    correctYear: 1996
+    probability: 82
+    region: ["global"]
+    genrePackages: ["sport"]
+    wikimediaSearchHints: ["Happy Gilmore 1996 film Adam Sandler golf"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "y1emDAYCfVQ"
+        startSec: 8
+        endSec: 38
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). genrePackages:sport (golf-komedi) → surfar under Sport-filtret. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: the-piano-1993
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Piano"
+    correctYear: 1993
+    probability: 76
+    region: ["global"]
+    wikimediaSearchHints: ["The Piano 1993 film Jane Campion Holly Hunter"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "IeHHVJGrfpk"
+        startSec: 43
+        endSec: 73
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). Bekraftat 'The Piano' (1993) av Peter. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: dude-wheres-my-car-2000
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dude, Where's My Car?"
+    correctYear: 2000
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Dude Where's My Car 2000 film Ashton Kutcher"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "jH_nkW3QtFg"
+        startSec: 1
+        endSec: 31
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: the-beach-2000
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Beach"
+    correctYear: 2000
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["The Beach 2000 film Leonardo DiCaprio Danny Boyle"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "t99_nC_tYVM"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: american-pie-2-2001
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "American Pie 2"
+    correctYear: 2001
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["American Pie 2 2001 film comedy"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "FLWu4KewJlU"
+        startSec: 6
+        endSec: 36
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: zoolander-2001
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Zoolander"
+    correctYear: 2001
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Zoolander 2001 film Ben Stiller"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "YtQq0T3ExLs"
+        startSec: 21
+        endSec: 51
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: my-big-fat-greek-wedding-2002
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "My Big Fat Greek Wedding"
+    correctYear: 2002
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["My Big Fat Greek Wedding 2002 film Nia Vardalos"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "dZmrMJmAfF0"
+        startSec: 10
+        endSec: 40
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: love-actually-2003
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Love Actually"
+    correctYear: 2003
+    probability: 84
+    region: ["global"]
+    genrePackages: ["Christmas edition"]
+    wikimediaSearchHints: ["Love Actually 2003 film Richard Curtis"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "H9Z3_ifFheQ"
+        startSec: 26
+        endSec: 56
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). genrePackages:['Christmas edition'] — ny paket-tagg (paketet saljs inte an; forbereder framtida Christmas Edition). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: sex-and-the-city-2008
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sex and the City"
+    correctYear: 2008
+    probability: 80
+    region: ["global"]
+    wikimediaSearchHints: ["Sex and the City 2008 film Sarah Jessica Parker"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "b58gZlXm2yI"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: mamma-mia-2008
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mamma Mia!"
+    correctYear: 2008
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Mamma Mia 2008 film ABBA Meryl Streep"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "lkN-A00WLYE"
+        startSec: 5
+        endSec: 35
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: the-hangover-2009
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Hangover"
+    correctYear: 2009
+    probability: 84
+    region: ["global"]
+    wikimediaSearchHints: ["The Hangover 2009 film Bradley Cooper Zach Galifianakis"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TZc39afdeXU"
+        startSec: 10
+        endSec: 40
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: despicable-me-2010
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dumma mig"
+    correctYear: 2010
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Despicable Me 2010 animated film Gru minions"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "M2DaSWoK_Ig"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). Svensk titel 'Dumma mig' (Despicable Me). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: the-wolf-of-wall-street-2013
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Wolf of Wall Street"
+    correctYear: 2013
+    probability: 82
+    region: ["global"]
+    parentControlled: true
+    wikimediaSearchHints: ["The Wolf of Wall Street 2013 film Leonardo DiCaprio Scorsese"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iszwuX1AK6A"
+        startSec: 8
+        endSec: 38
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: borat-2006
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Borat"
+    correctYear: 2006
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Borat 2006 film Sacha Baron Cohen"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Sacha Baron Cohen"]
+    # Distraktorer ar skadespelare som INTE ar med i Borat (samma regel som Lion King/Frozen).
+    distractorNames: ["Ben Stiller", "Adam Sandler", "Will Ferrell", "Steve Carell"]
+    youtubeClips:
+      - videoId: "vlnUa_dNsRQ"
+        startSec: 5
+        endSec: 35
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). Name/actor-select (svar = Sacha Baron Cohen). VERIFIERA i spelaren att titeln inte visar skadespelarnamnet."
