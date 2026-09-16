@@ -42,6 +42,7 @@ import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 // Spotify OAuth-status-import borttagen (Plan B 2026-07-22) — self-attest via
 // profile.spotifyAppConfirmed ersätter getSpotifyConnectionStatus.
 import { SequentialDots } from '../components/SequentialDots';
+import { SYNC_TIMEOUT_MS, withTimeout } from '../utils/withTimeout';
 import {
     ROUNDS_DEFAULT,
     ROUNDS_MAX_INDIV,
@@ -1201,6 +1202,11 @@ function parseCarryPackages(raw: string | undefined): string[] | undefined {
   }
 }
 
+// Max antal gånger en non-host re-försöker sin egen roster-insert om den
+// tyst misslyckats (se self-heal i players-sync nedan). Bounded så en
+// permanent misslyckad insert inte blir en oändlig retry-loop.
+const MAX_SELF_HEAL = 4;
+
 export default function LobbyScreen() {
   const {
     code,
@@ -1386,6 +1392,19 @@ export default function LobbyScreen() {
   // (true men nu missing → trigga eject-popup). Resetas vid rumkods-byte
   // i mount-useEffect:n.
   const selfEverInStoredRef = useRef(false);
+  // Self-heal-stöd (non-host): egen player-payload att re-insert:a om vår
+  // upsertOwnLobbyPlayer tyst misslyckades på join (.catch swallow:ar felet),
+  // + bounded försökräknare. Utan detta fastnar en non-host som aldrig
+  // hamnade i rostern permanent (settings/roster fryser på defaults tills
+  // appen tvångsstängs). Sätts vid join, resetas vid rumkods-byte.
+  const ownPlayerRef = useRef<LobbyPlayer | null>(null);
+  const selfHealAttemptsRef = useRef(0);
+  // "Reconnecting…"-indikator (non-host): antal på varandra följande
+  // players-sync-tickar där DB-läsningen failade/timeout:ade. Efter 3 (~6s)
+  // visas en liten icke-blockerande indikator så användaren inte lämnas
+  // gissande om de måste tvångsstänga appen. Nollställs vid lyckad läsning.
+  const stalledTicksRef = useRef(0);
+  const [reconnecting, setReconnecting] = useState(false);
   // Markeras true när seed-effektens Promise.all är klar. Debounce-effekten
   // skriver INTE till setLobbySettings förrän seeding är klar — annars kan
   // debounce:n skriva med default-värden (spotifyEnabled=false) 300 ms
@@ -1500,6 +1519,10 @@ export default function LobbyScreen() {
     );
     ownPlayerIdRef.current = null;
     selfEverInStoredRef.current = false;
+    ownPlayerRef.current = null;
+    selfHealAttemptsRef.current = 0;
+    stalledTicksRef.current = 0;
+    setReconnecting(false);
     navigatedToQuizRef.current = false;
     lobbySeededRef.current = false;
     setLobbySeeded(false);
@@ -1803,6 +1826,8 @@ export default function LobbyScreen() {
           // (eller auto-approvar via friends-listan för registrerade).
           approved: false,
         };
+        // Spara payloaden för self-heal om upsert:en nedan tyst misslyckas.
+        ownPlayerRef.current = guestPlayer;
         // Sätt in gästen direkt efter host (index 1) så de syns högt upp.
         setPlayers((prev) => {
           const hostIdx = prev.findIndex((p) => p.isHost);
@@ -1884,7 +1909,7 @@ export default function LobbyScreen() {
         if (carryOverPlayerId?.trim()) {
           joinerId = carryOverPlayerId.trim();
         } else {
-          const existingPlayers = await getLobbyPlayers(roomCode);
+          const existingPlayers = await withTimeout(getLobbyPlayers(roomCode), SYNC_TIMEOUT_MS, undefined, 'getLobbyPlayers(joiner)');
           existingMatch = existingPlayers?.find(
             (p) =>
               !p.isHost &&
@@ -1913,6 +1938,8 @@ export default function LobbyScreen() {
           approved: joinerApproved,
           spotifyConnected: ownSpotifyAttested,
         };
+        // Spara payloaden för self-heal om upsert:en nedan tyst misslyckas.
+        ownPlayerRef.current = joiner;
         // Sätt non-host:s egna Spotify-attest så Source Mixerboard visar
         // rätt (samma som host-pathen gör i useFocusEffect nedan).
         setSpotifyConnected(ownSpotifyAttested);
@@ -5039,7 +5066,10 @@ export default function LobbyScreen() {
     if (hostMode) return;
     let cancelled = false;
     const check = async () => {
-      const exists = await roomExists(roomCode);
+      // Fallback MÅSTE vara `true`: en timeout/stall får ALDRIG tolkas som
+      // att rummet raderats (skulle fyra "host deleted room"-ejectpopupen och
+      // kasta ut non-host felaktigt). Vid stall antar vi att rummet lever kvar.
+      const exists = await withTimeout(roomExists(roomCode), SYNC_TIMEOUT_MS, true, 'roomExists');
       if (cancelled) return;
       if (!exists) setRoomDeletedDetected(true);
     };
@@ -5058,7 +5088,7 @@ export default function LobbyScreen() {
     if (hostMode) return;
     let cancelled = false;
     const syncFromMeta = async () => {
-      const meta = await getRoomMeta(roomCode);
+      const meta = await withTimeout(getRoomMeta(roomCode), SYNC_TIMEOUT_MS, undefined, 'getRoomMeta(meta-poll)');
       if (cancelled) return;
       if (meta && meta.maxPlayers !== maxPlayers) {
         setMaxPlayers(meta.maxPlayers);
@@ -5175,7 +5205,7 @@ export default function LobbyScreen() {
     if (hostMode) return;
     let cancelled = false;
     const syncFromStore = async () => {
-      const stored = await getLobbySettings(roomCode);
+      const stored = await withTimeout(getLobbySettings(roomCode), SYNC_TIMEOUT_MS, undefined, 'getLobbySettings');
       if (cancelled || !stored) return;
       // Remote 1vs1-backstop (2026-08-08): läget spelas ENBART av
       // QuizVibe-users mot varandra. Home:s guest-join-gate är fail-open
@@ -5504,7 +5534,7 @@ export default function LobbyScreen() {
       // Om host startat:
       //  • Approved spelare → navigera till /quiz med turnOrder från lobby_players
       //  • Oapprovaderade  → "Host started game without this user"-popup → Home
-      const meta = await getRoomMeta(roomCode);
+      const meta = await withTimeout(getRoomMeta(roomCode), SYNC_TIMEOUT_MS, undefined, 'getRoomMeta(game-started)');
       if (cancelled) return;
       const remoteGameStarted = !!meta?.gameStarted;
       const localGameStarted = ownId ? isGameStarted(roomCode) : false;
@@ -5515,8 +5545,8 @@ export default function LobbyScreen() {
         // polling inte hunnit propagera än. settings här är canonical
         // (samma DB-rad som host skrev till).
         const [playersStored, settingsStored] = await Promise.all([
-          getLobbyPlayers(roomCode),
-          getLobbySettings(roomCode),
+          withTimeout(getLobbyPlayers(roomCode), SYNC_TIMEOUT_MS, null, 'getLobbyPlayers(game-started)'),
+          withTimeout(getLobbySettings(roomCode), SYNC_TIMEOUT_MS, undefined, 'getLobbySettings(game-started)'),
         ]);
         if (cancelled) return;
         // ID-heal (game-started-path): Play Again-race kan ge att ownId
@@ -5680,7 +5710,25 @@ export default function LobbyScreen() {
               {
                 text: 'Follow leaderboard',
                 style: 'cancel',
-                onPress: () => goToQuizAsNonHost(),
+                onPress: async () => {
+                  // Host kan ha hunnit trycka Quit Game EFTER att denna
+                  // Alert visats — den står kvar (cancelable:false) medan
+                  // 2s-pollen fortsätter, och Quit Game kör deactivateRoom()
+                  // som raderar rooms-raden. `lobby_deleted` broadcastas då
+                  // men når oss ALDRIG: spectatorn subscribar quiz_sync först
+                  // vid /quiz-entry och Realtime replayar inte, så vi hade
+                  // hamnat i ett redan avbrutet spel utan väg ut. Re-verifiera
+                  // därför att rummet fortfarande lever INNAN vi navigerar in.
+                  // roomExists fail-open:ar vid nätverksfel (samma semantik
+                  // som deletion-pollingen) → en glitch stänger oss inte ute
+                  // från ett levande spel.
+                  const stillActive = await roomExists(roomCode);
+                  if (!stillActive) {
+                    setRoomDeletedDetected(true);
+                    return;
+                  }
+                  goToQuizAsNonHost();
+                },
               },
               { text: 'Not now', onPress: () => router.replace('/') },
             ],
@@ -5752,13 +5800,26 @@ export default function LobbyScreen() {
         }
         return;
       }
-      const stored = await getLobbyPlayers(roomCode);
+      const stored = await withTimeout(getLobbyPlayers(roomCode), SYNC_TIMEOUT_MS, null, 'getLobbyPlayers');
       if (cancelled) return;
-      // D-vii bugfix: `null` = Supabase-query failade (network-glitch).
-      // Skippa hela sync:en så local players-state inte clearas — host
-      // skulle annars försvinna från non-host:s vy vid varje connection-
-      // hicka. Polling-loopen försöker igen om 2s med fresh connection.
-      if (stored === null) return;
+      // D-vii bugfix: `null` = Supabase-query failade (network-glitch) ELLER
+      // en withTimeout-stall (fallback null). Skippa hela sync:en så local
+      // players-state inte clearas — host skulle annars försvinna från
+      // non-host:s vy vid varje connection-hicka. Polling-loopen försöker
+      // igen om 2s med fresh connection. Räkna på varandra följande stalls →
+      // visa "Reconnecting…"-indikatorn efter 3 (~6s) så användaren inte
+      // lämnas gissande om de måste tvångsstänga appen.
+      if (stored === null) {
+        stalledTicksRef.current += 1;
+        if (!cancelled && stalledTicksRef.current >= 3) setReconnecting(true);
+        return;
+      }
+      // Lyckad läsning → nollställ stall-räknaren + dölj indikatorn.
+      // (React bail:ar på oförändrad boolean, så detta är gratis när allt är ok.)
+      if (stalledTicksRef.current !== 0) {
+        stalledTicksRef.current = 0;
+        if (!cancelled) setReconnecting(false);
+      }
       // DB-eject-detection: om self-rad TIDIGARE syntes i stored men nu är
       // borta → host har raderat oss via lobby_players DELETE. Triggar
       // samma popup som in-memory-baserad markEjected. Guard:as på
@@ -5775,6 +5836,26 @@ export default function LobbyScreen() {
       // som faktisk ejection (inte bara att vår INSERT inte hunnit än).
       if (ownId && stored?.some((p) => p.id === ownId)) {
         selfEverInStoredRef.current = true;
+      }
+      // Self-heal: om vår egen roster-insert tyst misslyckades på join
+      // (upsertOwnLobbyPlayer .catch swallow:ar felet) syns vi ALDRIG i
+      // stored → host ser oss aldrig och vi kan lämnas kvar vid Start Game.
+      // Om vi aldrig synts (selfEverInStoredRef=false → INTE en host-ejection,
+      // den hanteras ovan) och genuint saknas: re-försök insert:en, bounded
+      // så ingen oändlig loop. Idempotent UPSERT, fire-and-forget (ingen
+      // setState, bumpar inte realtimeTick → ingen re-render-loop). När
+      // insert:en landar innehåller nästa tick:s stored self → selfEverIn-
+      // StoredRef sätts true ovan och heal:en slutar permanent.
+      if (
+        ownId &&
+        ownPlayerRef.current &&
+        stored !== null &&
+        !selfEverInStoredRef.current &&
+        !stored?.some((p) => p.id === ownId) &&
+        selfHealAttemptsRef.current < MAX_SELF_HEAL
+      ) {
+        selfHealAttemptsRef.current += 1;
+        upsertOwnLobbyPlayer(roomCode, ownPlayerRef.current).catch(() => { /* loggas i lobbyPlayers */ });
       }
       const leftSnapshots = await getLeftPlayers(roomCode);
       if (cancelled) return;
@@ -5803,7 +5884,7 @@ export default function LobbyScreen() {
       // att host:s write har körts.
       const hasHost = approvedFromHost.some((p) => p.isHost);
       if (!hasHost) {
-        const meta = await getRoomMeta(roomCode);
+        const meta = await withTimeout(getRoomMeta(roomCode), SYNC_TIMEOUT_MS, undefined, 'getRoomMeta(host-synth)');
         if (cancelled) return;
         if (meta?.hostPlayerName) {
           const syntheticHost: LobbyPlayer = {
@@ -7082,6 +7163,17 @@ export default function LobbyScreen() {
             </TouchableOpacity>
           )}
         </Card>
+        )}
+
+        {/* Icke-blockerande "Reconnecting…"-rad för non-host när players-syncen
+            failat/timeout:at 3+ tickar i rad (~6s). Ligger mellan rumskortet
+            och Players-sektionen — täcker aldrig settings-listan eller Leave-
+            kontrollen. Försvinner direkt vid nästa lyckade läsning. */}
+        {!hostMode && reconnecting && (
+          <View style={styles.reconnectingRow}>
+            <Text style={styles.reconnectingText}>Reconnecting</Text>
+            <SequentialDots color={Colors.warning} />
+          </View>
         )}
 
         {/* ── Players in Lobby ─────────────────────────────────── */}
@@ -10619,6 +10711,18 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
     color: Colors.primary,
+  },
+  reconnectingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.xs,
+  },
+  reconnectingText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.warning,
   },
   // Cell-rad för rumskoden — speglar Join-modalens "Enter Room Code"-cells
   // i fyllt läge. Storleken (36×50) håller raden tillräckligt smal för att
