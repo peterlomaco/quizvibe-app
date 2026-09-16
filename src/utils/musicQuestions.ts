@@ -23581,9 +23581,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
-    "inBaseCatalog": false,
     "spotifyTrackId": "0R42XHlMMu4hBgOvdICIsU",
     "youtubeClips": [
       {

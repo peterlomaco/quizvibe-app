@@ -2807,10 +2807,9 @@ items:
     correctYear: 2011
     probability: 84
     region: ["global"]
-    inBaseCatalog: false
     wikimediaSearchHints: ["Swedish House Mafia Save the World 2011"]
     answerMethods: ["timeline"]
-    genrePackages: ["Club & Dance"]
+    genrePackages: ["Dance Music"]
     spotifyTrackId: "0R42XHlMMu4hBgOvdICIsU"
     youtubeClips:
       - videoId: "-ea-R_90WQI"
