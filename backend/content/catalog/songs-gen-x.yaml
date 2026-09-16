@@ -874,7 +874,7 @@ items:
   - id: tomas-ledin-hon-gor-allt
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Hon gör allt för att göra mig lycklig — Tomas Ledin"
-    correctYear: 1980
+    correctYear: 1990
     probability: 68
     wikimediaSearchHints: ["Tomas Ledin Hon gör allt för att göra mig lycklig"]
     answerMethods: ["timeline"]

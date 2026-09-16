@@ -2849,10 +2849,10 @@ items:
   - id: timbaland-scream
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Scream — Timbaland"
-    correctYear: 2009
+    correctYear: 2007
     probability: 78
     region: ["global"]
-    wikimediaSearchHints: ["Timbaland Scream Keri Hilson 2009"]
+    wikimediaSearchHints: ["Timbaland Scream Keri Hilson 2007"]
     answerMethods: ["timeline"]
     inBaseCatalog: false
     genrePackages: ["Dance Music", "Disco & Pop", "RnB"]
