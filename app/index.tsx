@@ -250,12 +250,10 @@ function validatePlayerName(name: string): 'available' | 'taken' | 'invalid' {
 // sker server-side via aktiverings-/recovery-mail.
 const REG_EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// V1: region visas inte i Register-formen. Den defaultar till 'sweden'
+// (App Store-registreringsland, tills vidare bara Sverige). Type:n stannar
+// bred för bakåtkompat — profileStorage:s Region-typ är identisk.
 type RegRegion = 'sweden' | 'nordics' | 'global';
-// V1: bara Sweden — type:n stannar bred för bakåtkompat (profileStorage:s
-// Region-typ är identisk) men Register-formens picker exponerar bara Sweden.
-const REG_REGION_OPTIONS: { id: RegRegion; label: string }[] = [
-  { id: 'sweden', label: 'Sweden' },
-];
 
 const CURRENT_YEAR = new Date().getFullYear();
 const MIN_BIRTH_YEAR = 1950;
@@ -2017,8 +2015,6 @@ export default function HomeScreen() {
   const [regAssistance, setRegAssistance] = useState<AssistanceLevel>('full');
   const [regRegion, setRegRegion] = useState<RegRegion>('sweden');
   const [regYearPickerOpen, setRegYearPickerOpen] = useState(false);
-  const [regAssistancePickerOpen, setRegAssistancePickerOpen] = useState(false);
-  const [regRegionPickerOpen, setRegRegionPickerOpen] = useState(false);
 
   const pulse = useRef(new Animated.Value(1)).current;
 
@@ -2119,8 +2115,6 @@ export default function HomeScreen() {
         setRegAssistance('full');
         setRegRegion('sweden');
         setRegYearPickerOpen(false);
-        setRegAssistancePickerOpen(false);
-        setRegRegionPickerOpen(false);
         setRegPlayerNameFocused(false);
         setRegPlayerNameKbMode('letter');
       }, 300);
@@ -2196,8 +2190,6 @@ export default function HomeScreen() {
       setRegAssistance('full');
       setRegRegion('sweden');
       setRegYearPickerOpen(false);
-      setRegAssistancePickerOpen(false);
-      setRegRegionPickerOpen(false);
       setRegPlayerNameFocused(false);
       setRegPlayerNameKbMode('letter');
     }
@@ -2221,8 +2213,6 @@ export default function HomeScreen() {
       setRegAssistance('full');
       setRegRegion('sweden');
       setRegYearPickerOpen(false);
-      setRegAssistancePickerOpen(false);
-      setRegRegionPickerOpen(false);
       setRegPlayerNameFocused(false);
       setRegPlayerNameKbMode('letter');
     }
@@ -2728,9 +2718,8 @@ export default function HomeScreen() {
   const regPlayerNameUnlocked = regEmailStatus === 'available';
   const regPasswordUnlocked = regPlayerNameUnlocked && regPlayerNameStatus === 'available';
   const regYearUnlocked = regPasswordUnlocked && regPasswordConfirmed;
-  const regAssistanceUnlocked = regYearUnlocked && regParsedBirthYear !== null;
-  // Assistance och Region är default-ifyllda, så region-låset följer assistance-låset.
-  const regRegionUnlocked = regAssistanceUnlocked;
+  // Assistance ('full') och Region ('sweden') visas inte i formuläret — de
+  // sätts som default i den skapade profilen. Year of birth är sista gaten.
   const isRegisterFormValid =
     regEmailStatus === 'available' &&
     regPlayerNameStatus === 'available' &&
@@ -4295,60 +4284,10 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                   </View>
 
-                  {/* Assistance level + Region scope side by side, drop-down pickers.
-                      Default-värden ('standard'/'global') är förvalda så
-                      användaren kan registrera direkt efter year of birth. */}
-                  <Text
-                    style={[
-                      modal.statusHint,
-                      !regAssistanceUnlocked && modal.fieldGroupLocked,
-                    ]}
-                  >
-                    Use default or select prefered setup
-                  </Text>
-                  <View style={modal.fieldRow}>
-                    {/* Assistance level (vänster halva) */}
-                    <View
-                      style={[modal.fieldGroupHalf, !regAssistanceUnlocked && modal.fieldGroupLocked]}
-                      pointerEvents={regAssistanceUnlocked ? 'auto' : 'none'}
-                    >
-                      <Text style={modal.fieldLabel}>Assistance Level</Text>
-                      <TouchableOpacity
-                        style={modal.yearTrigger}
-                        activeOpacity={0.7}
-                        onPress={() => {
-                          Keyboard.dismiss();
-                          setRegAssistancePickerOpen(true);
-                        }}
-                      >
-                        <Text style={modal.yearTriggerText} numberOfLines={1}>
-                          {ASSISTANCE_OPTIONS.find((o) => o.id === regAssistance)?.label}
-                        </Text>
-                        <Text style={modal.yearTriggerArrow}>›</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {/* Region scope (höger halva) */}
-                    <View
-                      style={[modal.fieldGroupHalf, !regRegionUnlocked && modal.fieldGroupLocked]}
-                      pointerEvents={regRegionUnlocked ? 'auto' : 'none'}
-                    >
-                      <Text style={modal.fieldLabel}>Region Scope</Text>
-                      <TouchableOpacity
-                        style={modal.yearTrigger}
-                        activeOpacity={0.7}
-                        onPress={() => {
-                          Keyboard.dismiss();
-                          setRegRegionPickerOpen(true);
-                        }}
-                      >
-                        <Text style={modal.yearTriggerText} numberOfLines={1}>
-                          {REG_REGION_OPTIONS.find((o) => o.id === regRegion)?.label}
-                        </Text>
-                        <Text style={modal.yearTriggerArrow}>›</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                  {/* Assistance level + Region scope visas INTE i formuläret.
+                      Assistance defaultar alltid till 'full' och Region till
+                      'sweden' (App Store-registreringsland, tills vidare bara
+                      Sverige) — se regAssistance/regRegion-state. */}
                 </ScrollView>
 
                 {regPlayerNameFocused && (
@@ -4423,77 +4362,6 @@ export default function HomeScreen() {
             </View>
           )}
 
-          {/* Assistance picker overlay för register-formen */}
-          {regAssistancePickerOpen && (
-            <View style={modal.yearPickerOverlay}>
-              <TouchableOpacity
-                style={StyleSheet.absoluteFill}
-                activeOpacity={1}
-                onPress={() => setRegAssistancePickerOpen(false)}
-              />
-              <View style={modal.yearPickerSheet}>
-                <View style={modal.yearPickerHandle} />
-                <Text style={modal.title}>Select Assistance Level</Text>
-                {ASSISTANCE_OPTIONS.map((opt) => {
-                  const selected = regAssistance === opt.id;
-                  return (
-                    <TouchableOpacity
-                      key={opt.id}
-                      style={[modal.yearItem, selected && modal.yearItemSelected]}
-                      onPress={() => {
-                        setRegAssistance(opt.id);
-                        setRegAssistancePickerOpen(false);
-                      }}
-                    >
-                      <Text style={[modal.yearItemText, selected && modal.yearItemTextSelected]}>
-                        {opt.label}
-                      </Text>
-                      {selected && <Text style={modal.yearItemCheck}>✓</Text>}
-                    </TouchableOpacity>
-                  );
-                })}
-                <TouchableOpacity onPress={() => setRegAssistancePickerOpen(false)} style={modal.cancelBtn}>
-                  <Text style={modal.cancelText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-
-          {/* Region picker overlay för register-formen */}
-          {regRegionPickerOpen && (
-            <View style={modal.yearPickerOverlay}>
-              <TouchableOpacity
-                style={StyleSheet.absoluteFill}
-                activeOpacity={1}
-                onPress={() => setRegRegionPickerOpen(false)}
-              />
-              <View style={modal.yearPickerSheet}>
-                <View style={modal.yearPickerHandle} />
-                <Text style={modal.title}>Select Region Scope</Text>
-                {REG_REGION_OPTIONS.map((opt) => {
-                  const selected = regRegion === opt.id;
-                  return (
-                    <TouchableOpacity
-                      key={opt.id}
-                      style={[modal.yearItem, selected && modal.yearItemSelected]}
-                      onPress={() => {
-                        setRegRegion(opt.id);
-                        setRegRegionPickerOpen(false);
-                      }}
-                    >
-                      <Text style={[modal.yearItemText, selected && modal.yearItemTextSelected]}>
-                        {opt.label}
-                      </Text>
-                      {selected && <Text style={modal.yearItemCheck}>✓</Text>}
-                    </TouchableOpacity>
-                  );
-                })}
-                <TouchableOpacity onPress={() => setRegRegionPickerOpen(false)} style={modal.cancelBtn}>
-                  <Text style={modal.cancelText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
         </KeyboardAvoidingView>
       </Modal>
 
