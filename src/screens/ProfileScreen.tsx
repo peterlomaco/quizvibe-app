@@ -2041,7 +2041,7 @@ export default function ProfileScreen() {
               <Text style={styles.sectionLabel}>Parent Control</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Parent Control', 'When on, mature content is kept out of the games you host: parent-controlled clips are removed from the question selection, and mature packages (e.g. Hip Hop) cannot be activated in a lobby.')}
+                onPress={() => Alert.alert('Parent Control', 'When on, mature content is kept out of the games you host — parent-controlled clips and mature packages are excluded from the question selection.')}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>

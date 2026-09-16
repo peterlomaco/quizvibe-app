@@ -54,7 +54,10 @@ export interface MusicPackage {
 // matchar `pkg-gen-*`). `tags` speglar genrePackages-strängarna i katalogen.
 export const PURCHASED_PACKAGES: MusicPackage[] = [
   { id: 'pkg-melodifestivalen', name: 'Melodifestivalen', tags: ['Melodifestivalen'], allowSpotifyOnly: true },
-  { id: 'pkg-hiphop', name: 'Hip Hop', tags: ['Hip Hop'], allowSpotifyOnly: true, parentRestricted: true },
+  // "Hip Hop & RnB" — union av katalogens "Hip Hop"- OCH "RnB"-taggade items
+  // (itemInActivePackages matchar valfri tagg). id behållet som `pkg-hiphop` så
+  // sparade enabledHostPackages-toggles + parentRestricted-lookup är oförändrade.
+  { id: 'pkg-hiphop', name: 'Hip Hop & RnB', tags: ['Hip Hop', 'RnB'], allowSpotifyOnly: true, parentRestricted: true },
   // Sport Anthems-paketet (pkg-sport-anthems) är BORTTAGET 2026-09-12. Items som
   // bar genrePackages: [..., "sport-anthems"] i songs-sport.yaml ligger kvar med
   // inBaseCatalog: false → parkerade (surfar aldrig, eftersom inget paket längre
