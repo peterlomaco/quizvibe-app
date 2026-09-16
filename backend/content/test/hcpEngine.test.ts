@@ -2,10 +2,12 @@ import { describe, it, expect } from 'vitest';
 import {
   applyGameResult,
   applyInactivityDecay,
+  ASSIST_DIRECTION_MULT,
   clampHcp,
   displayHcp,
   emptyCategoryProgress,
   emptyHcpProgress,
+  eraWidthMultiplier,
   evaluateWindow,
   filterByItemHcp,
   hcpRecognitionLowerBound,
@@ -20,6 +22,9 @@ import {
   type HcpProgress,
   type HcpWindow,
 } from '../../../src/utils/hcpEngine';
+
+// Neutral Game Era-span (15 år → ×1.0) för att isolera övriga faktorer i tester.
+const ERA = 15;
 
 // Hjälpare: ett fönster med `nCorrect` rätt av `size` svar (resten fel).
 function win(nCorrect: number, size = HCP_WINDOW_SIZE): HcpWindow {
@@ -93,123 +98,151 @@ describe('totalHcp / resolveDisplayTotalHcp (Total = snittet Music + Film)', () 
   });
 });
 
-describe('evaluateWindow (§2.1 — råa signerade steg, okapat)', () => {
-  it('kräver ett FULLT fönster (20 svar) innan något steg', () => {
-    expect(evaluateWindow(win(0, 19), 'full')).toBe(0);
-    expect(evaluateWindow(win(19, 19), 'full')).toBe(0);
+describe('evaluateWindow (§2.1 — råa signerade steg, okapat, 10-fönster)', () => {
+  it('kräver ett FULLT fönster (10 svar) innan något steg', () => {
+    expect(evaluateWindow(win(0, 9), 'full')).toBe(0);
+    expect(evaluateWindow(win(9, 9), 'full')).toBe(0);
   });
-  it('Full: ett steg per svar förbi tröskeln (12/18)', () => {
-    expect(evaluateWindow(win(18), 'full')).toBe(-1);
-    expect(evaluateWindow(win(19), 'full')).toBe(-2);
-    expect(evaluateWindow(win(20), 'full')).toBe(-3);
-    expect(evaluateWindow(win(12), 'full')).toBe(1);
-    expect(evaluateWindow(win(11), 'full')).toBe(2);
-    expect(evaluateWindow(win(0), 'full')).toBe(13);
-    expect(evaluateWindow(win(13), 'full')).toBe(0);
-    expect(evaluateWindow(win(17), 'full')).toBe(0);
+  it('Full: ett steg per svar förbi tröskeln (3/7)', () => {
+    expect(evaluateWindow(win(10), 'full')).toBe(-4);
+    expect(evaluateWindow(win(7), 'full')).toBe(-1);
+    expect(evaluateWindow(win(8), 'full')).toBe(-2);
+    expect(evaluateWindow(win(6), 'full')).toBe(0);
+    expect(evaluateWindow(win(4), 'full')).toBe(0);
+    expect(evaluateWindow(win(3), 'full')).toBe(1);
+    expect(evaluateWindow(win(0), 'full')).toBe(4);
   });
-  it('Standard: (10/16)', () => {
-    expect(evaluateWindow(win(16), 'standard')).toBe(-1);
-    expect(evaluateWindow(win(20), 'standard')).toBe(-5);
-    expect(evaluateWindow(win(10), 'standard')).toBe(1);
-    expect(evaluateWindow(win(0), 'standard')).toBe(11);
-    expect(evaluateWindow(win(11), 'standard')).toBe(0);
-    expect(evaluateWindow(win(15), 'standard')).toBe(0);
+  it('Standard: (3/6)', () => {
+    expect(evaluateWindow(win(10), 'standard')).toBe(-5);
+    expect(evaluateWindow(win(6), 'standard')).toBe(-1);
+    expect(evaluateWindow(win(3), 'standard')).toBe(1);
+    expect(evaluateWindow(win(0), 'standard')).toBe(4);
   });
-  it('Minimal: (8/14)', () => {
-    expect(evaluateWindow(win(14), 'minimal')).toBe(-1);
-    expect(evaluateWindow(win(20), 'minimal')).toBe(-7);
-    expect(evaluateWindow(win(8), 'minimal')).toBe(1);
-    expect(evaluateWindow(win(0), 'minimal')).toBe(9);
-    expect(evaluateWindow(win(9), 'minimal')).toBe(0);
-    expect(evaluateWindow(win(13), 'minimal')).toBe(0);
+  it('Minimal: (2/5)', () => {
+    expect(evaluateWindow(win(10), 'minimal')).toBe(-6);
+    expect(evaluateWindow(win(5), 'minimal')).toBe(-1);
+    expect(evaluateWindow(win(2), 'minimal')).toBe(1);
+    expect(evaluateWindow(win(0), 'minimal')).toBe(3);
   });
 });
 
 describe('hcpTier / hcpTierFactor (steg-faktor per HCP-nivå)', () => {
-  it('>60 → high/0.75', () => {
+  it('>60 → high/1.0', () => {
     expect(hcpTier(99)).toBe('high');
     expect(hcpTier(61)).toBe('high');
-    expect(hcpTierFactor(99)).toBe(0.75);
-    expect(hcpTierFactor(61)).toBe(0.75);
+    expect(hcpTierFactor(99)).toBe(1.0);
+    expect(hcpTierFactor(61)).toBe(1.0);
   });
-  it('30–60 → mid/0.5 (gränserna 60 och 30 inklusive)', () => {
+  it('30–60 → mid/0.7 (gränserna 60 och 30 inklusive)', () => {
     expect(hcpTier(60)).toBe('mid');
     expect(hcpTier(30)).toBe('mid');
-    expect(hcpTierFactor(60)).toBe(0.5);
-    expect(hcpTierFactor(30)).toBe(0.5);
+    expect(hcpTierFactor(60)).toBe(0.7);
+    expect(hcpTierFactor(30)).toBe(0.7);
   });
-  it('1–29 → low/0.25', () => {
+  it('1–29 → low/0.4', () => {
     expect(hcpTier(29)).toBe('low');
     expect(hcpTier(1)).toBe('low');
-    expect(hcpTierFactor(29)).toBe(0.25);
-    expect(hcpTierFactor(1)).toBe(0.25);
+    expect(hcpTierFactor(29)).toBe(0.4);
+    expect(hcpTierFactor(1)).toBe(0.4);
   });
 });
 
-describe('applyGameResult (§2.1 — per kategori)', () => {
-  it('trimmar den spelade kategorins fönster till senaste 20 svar', () => {
+describe('eraWidthMultiplier (§2.1 — Game Era-bredd, span/15 klampad 0.5–3.0)', () => {
+  it('15-årsspann = ×1.0 (baslinje)', () => {
+    expect(eraWidthMultiplier(15)).toBe(1.0);
+  });
+  it('skalar proportionellt', () => {
+    expect(eraWidthMultiplier(30)).toBe(2.0);
+    expect(eraWidthMultiplier(10)).toBeCloseTo(0.667, 3);
+  });
+  it('cappar vid 3.0 för breda eror', () => {
+    expect(eraWidthMultiplier(45)).toBe(3.0);
+    expect(eraWidthMultiplier(96)).toBe(3.0);
+  });
+  it('golv 0.5 för smala eror', () => {
+    expect(eraWidthMultiplier(7.5)).toBe(0.5);
+  });
+  it('ogiltigt/tomt span → ×1.0 (neutralt)', () => {
+    expect(eraWidthMultiplier(0)).toBe(1);
+    expect(eraWidthMultiplier(NaN)).toBe(1);
+  });
+});
+
+describe('ASSIST_DIRECTION_MULT (§2.1 — hårdare assistance belönas)', () => {
+  it('Full är neutral (×1.0 båda hållen)', () => {
+    expect(ASSIST_DIRECTION_MULT.full).toEqual({ improve: 1.0, worsen: 1.0 });
+  });
+  it('Standard: improve ×1.2, worsen ×0.8', () => {
+    expect(ASSIST_DIRECTION_MULT.standard).toEqual({ improve: 1.2, worsen: 0.8 });
+  });
+  it('Minimal: improve ×1.3, worsen ×0.6', () => {
+    expect(ASSIST_DIRECTION_MULT.minimal).toEqual({ improve: 1.3, worsen: 0.6 });
+  });
+});
+
+describe('applyGameResult (§2.1 — stackad delta, per kategori)', () => {
+  it('trimmar den spelade kategorins fönster till senaste 10 svar', () => {
     let p = emptyHcpProgress();
-    p = applyGameResult(p, 'Music', 'full', Array(25).fill(true), ISO);
+    p = applyGameResult(p, 'Music', 'full', Array(25).fill(true), ERA, ISO);
     expect(p.categories.Music.windows.full.length).toBe(HCP_WINDOW_SIZE);
     expect(p.categories.Music.lastPlayedISO).toBe(ISO);
   });
 
   it('rör bara den spelade kategorins (och nivåns) fönster', () => {
     let p = emptyHcpProgress();
-    p = applyGameResult(p, 'Music', 'standard', [true, false], ISO);
+    p = applyGameResult(p, 'Music', 'standard', [true, false], ERA, ISO);
     expect(p.categories.Music.windows.standard.length).toBe(2);
     expect(p.categories.Music.windows.full).toEqual([]);
     // Film helt orörd.
     expect(p.categories.Film).toEqual(emptyCategoryProgress());
   });
 
-  it('20/20 FULL vid HCP 99 → −3 × 0.75 = −2.25 (nedåt okapat)', () => {
-    const p = progress(cat(99, { full: win(19, 19) }));
-    const next = applyGameResult(p, 'Music', 'full', [true], ISO); // fönster → 20/20
-    expect(next.categories.Music.hcp).toBeCloseTo(96.75, 5);
-    // Övriga kategorier oförändrade.
+  it('10/10 FULL vid HCP 99, era 15 → −4 × 1.0 × 1.0 × 1.0 = −4.0', () => {
+    const p = progress(cat(99, { full: win(9, 9) }));
+    const next = applyGameResult(p, 'Music', 'full', [true], ERA, ISO); // fönster → 10/10
+    expect(next.categories.Music.hcp).toBeCloseTo(95.0, 5);
     expect(next.categories.Film.hcp).toBe(99);
   });
 
-  it('kontinuerligt glidande: sänker igen nästa spel (mid-tier ×0.5)', () => {
-    let p = progress(cat(50, { full: win(20) }));
-    p = applyGameResult(p, 'Music', 'full', [true], ISO); // −3 × 0.5 = −1.5
-    expect(p.categories.Music.hcp).toBeCloseTo(48.5, 5);
-    p = applyGameResult(p, 'Music', 'full', [true], ISO);
-    expect(p.categories.Music.hcp).toBeCloseTo(47.0, 5);
+  it('assist-improve-mult (high): STANDARD ×1.2, MINIMAL ×1.3', () => {
+    const std = progress(cat(99, { standard: win(9, 9) }));
+    expect(applyGameResult(std, 'Music', 'standard', [true], ERA, ISO).categories.Music.hcp).toBeCloseTo(93.0, 5); // −5×1.2
+    const min = progress(cat(99, { minimal: win(9, 9) }));
+    expect(applyGameResult(min, 'Music', 'minimal', [true], ERA, ISO).categories.Music.hcp).toBeCloseTo(91.2, 5); // −6×1.3
   });
 
-  it('uppåt-cappen biter: 0/20 MINIMAL vid HCP 40 → +9×0.5=+4.5 cappat till mid +2.0', () => {
-    const p = progress(cat(40, { minimal: win(0, 19) }));
-    const next = applyGameResult(p, 'Music', 'minimal', [false], ISO);
-    expect(next.categories.Music.hcp).toBeCloseTo(42.0, 5);
+  it('kontinuerligt glidande: sänker igen nästa spel (mid-tier ×0.7)', () => {
+    let p = progress(cat(50, { full: win(9, 9) }));
+    p = applyGameResult(p, 'Music', 'full', [true], ERA, ISO); // −4 × 0.7 = −2.8
+    expect(p.categories.Music.hcp).toBeCloseTo(47.2, 5);
+    p = applyGameResult(p, 'Music', 'full', [true], ERA, ISO);
+    expect(p.categories.Music.hcp).toBeCloseTo(44.4, 5);
   });
 
-  it('uppåt-cappen per tier (FULL): high +5, mid +3.5', () => {
-    const high = progress(cat(70, { full: win(0, 19) }));
-    expect(applyGameResult(high, 'Music', 'full', [false], ISO).categories.Music.hcp).toBeCloseTo(75, 5); // +9.75 → cap +5
-    const mid = progress(cat(50, { full: win(0, 19) }));
-    expect(applyGameResult(mid, 'Music', 'full', [false], ISO).categories.Music.hcp).toBeCloseTo(53.5, 5); // +6.5 → cap +3.5
+  it('worsen-mult (mid): STANDARD +4×0.7×0.8, MINIMAL +3×0.7×0.6', () => {
+    const std = progress(cat(50, { standard: win(0, 9) }));
+    expect(applyGameResult(std, 'Music', 'standard', [false], ERA, ISO).categories.Music.hcp).toBeCloseTo(52.24, 5);
+    const min = progress(cat(50, { minimal: win(0, 9) }));
+    expect(applyGameResult(min, 'Music', 'minimal', [false], ERA, ISO).categories.Music.hcp).toBeCloseTo(51.26, 5);
   });
 
-  it('uppåt-cappen (STANDARD low): 0/20 vid HCP 20 → +2.75 cappat till +1.25', () => {
-    const p = progress(cat(20, { standard: win(0, 19) }));
-    const next = applyGameResult(p, 'Music', 'standard', [false], ISO);
-    expect(next.categories.Music.hcp).toBeCloseTo(21.25, 5);
+  it('era-bredd skalar deltat: 10/10 FULL @99 era 30 → −4 × 2.0 = −8.0', () => {
+    const p = progress(cat(99, { full: win(9, 9) }));
+    const next = applyGameResult(p, 'Music', 'full', [true], 30, ISO);
+    expect(next.categories.Music.hcp).toBeCloseTo(91.0, 5);
   });
 
-  it('positiv delta under cappen är orörd: FULL 11/20 vid HCP 70 → +2×0.75 = +1.5', () => {
-    const p = progress(cat(70, { full: win(11, 19) }));
-    const next = applyGameResult(p, 'Music', 'full', [false], ISO); // fönster → 11/20
-    expect(next.categories.Music.hcp).toBeCloseTo(71.5, 5);
+  it('per-game-cap: 10/10 MINIMAL @99 era 45 → −23.4 cappat till −10', () => {
+    const p = progress(cat(99, { minimal: win(9, 9) }));
+    const next = applyGameResult(p, 'Music', 'minimal', [true], 45, ISO); // −6×1.0×3.0×1.3 = −23.4
+    expect(next.categories.Music.hcp).toBeCloseTo(89.0, 5);
   });
 
   it('klampar HCP till [1, 99]', () => {
-    const atFloor = progress(cat(1, { full: win(20) }));
-    expect(applyGameResult(atFloor, 'Music', 'full', [true], ISO).categories.Music.hcp).toBe(1);
-    const atCap = progress(cat(99, { full: win(0, 19) }));
-    expect(applyGameResult(atCap, 'Music', 'full', [false], ISO).categories.Music.hcp).toBe(99);
+    const atFloor = progress(cat(1, { full: win(9, 9) }));
+    expect(applyGameResult(atFloor, 'Music', 'full', [true], ERA, ISO).categories.Music.hcp).toBe(1);
+    const atCap = progress(cat(99, { full: win(0, 9) }));
+    expect(applyGameResult(atCap, 'Music', 'full', [false], ERA, ISO).categories.Music.hcp).toBe(99);
   });
 });
 
