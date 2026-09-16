@@ -251,6 +251,25 @@ export async function loadOwnCategoryHcp(
   };
 }
 
+/**
+ * Läser den inloggade spelarens display-HCP-bundle (Total + Music + Film, avrundade
+ * uppåt) DIREKT från den auktoritativa progress-storen — SAMMA källa som motorn
+ * skriver atomiskt vid game-end via recordSelfGameResult. Används av sköldarna i
+ * Profile + av lobby-publiceringen så de INTE är beroende av profil-spegeln
+ * (profile.hcp), som kan bli stale om en samtidig loadProfile-cache-back råkar
+ * skriva över hcp-fältet (se profileStorage). Ren läsning: decay appliceras för
+ * display men persisteras inte här (mount:ens refreshOwnHcpDecay sköter det).
+ * Gäst/ohydrerad → all-99-bundle.
+ */
+export async function loadOwnHcpBundle(
+  region: string,
+  now: Date = new Date(),
+): Promise<HcpBundle> {
+  const key = await resolveOwnKey(region);
+  const decayed = applyInactivityDecay(await readByKey(key, region), now);
+  return bundleOf(decayed);
+}
+
 /** Rensar den inloggade spelarens persisterade progress (alla regioner + sessionen). */
 export async function clearOwnHcpProgress(region?: string): Promise<void> {
   sessionProgress.clear();

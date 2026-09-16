@@ -59,7 +59,8 @@ import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
 import { playVoiceClip } from '../utils/voicePlayback';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
-import { displayHcp, resolveDisplayHcp, HCP_START } from '../utils/hcpEngine';
+import { resolveDisplayHcp } from '../utils/hcpEngine';
+import { loadOwnHcpBundle } from '../utils/hcpProgress';
 import { addLeftPlayer, clearLeftPlayers, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, registerActiveRoom, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
@@ -1053,23 +1054,18 @@ function publishOwnAccountAlias(roomCode: string, playerId: string): void {
  * Publicerar spelarens EGET intjänade display-HCP (1–99, ceil per §1.2.3) till
  * sin egen lobby_players-rad så övriga enheter kan visa det på spelarkortet.
  * Samma fire-and-forget-kedjning som publishOwnAccountAlias — MÅSTE anropas
- * efter att egen rad finns i DB. No-op för gäster + ännu ej progressade
- * spelare (ingen profile.hcp) → kolumnen förblir null → skölden visar 99.
+ * efter att egen rad finns i DB. No-op för gäster → kolumnen förblir null →
+ * skölden visar "Guest". Läser HCP:t DIREKT ur den auktoritativa progress-storen
+ * (loadOwnHcpBundle), INTE ur profil-spegeln (profile.hcp) — spegeln kan vara
+ * stale om en samtidig loadProfile-cache-back skrivit över hcp-fältet, vilket
+ * gjorde att en NY lobby publicerade ett gammalt HCP efter ett spel.
  */
 function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
-  loadProfile()
-    .then((profile) => {
-      const total = profile?.hcp;
-      if (typeof total !== 'number') return;
-      // Per-kategori-bundle från profilspegeln (senast spelade region). Saknas
-      // den (aldrig spelat en v2-omgång) → 99 för kategorierna, Total från `hcp`.
-      const cat = profile?.hcpByCategory;
-      return publishOwnHcp(roomCode, playerId, {
-        total: displayHcp(total),
-        music: cat?.music ?? HCP_START,
-        film: cat?.film ?? HCP_START,
-      });
-    })
+  const profile = getCachedProfile();
+  if (!profile?.playerName) return; // gäster publicerar inte (kolumnen förblir null)
+  const region = profile.region ?? 'sweden';
+  loadOwnHcpBundle(region)
+    .then((bundle) => publishOwnHcp(roomCode, playerId, bundle))
     .catch(() => {});
 }
 
@@ -1355,14 +1351,35 @@ export default function LobbyScreen() {
   // markera rätt spelare som "left" i leftPlayers-storen så övriga ser
   // status:en när de öppnar lobby:n.
   const ownPlayerIdRef = useRef<string | null>(null);
-  // Eget intjänat Player-HCP (§2 UI) från den synkrona profil-spegeln —
-  // visas på DENNA enhets egen spelarrad (host eller non-host). Lobbyn
-  // mountas färskt efter varje spel, så spegeln bär redan motorns senaste
-  // skrivning. Andra spelares intjänade HCP kräver cross-device-sync
-  // (uppskjutet) och faller därför tillbaka på startvärdet 99.
-  const selfHcp = getCachedProfile()?.hcp;
+  // Eget intjänat Player-HCP (§2 UI) som visas på DENNA enhets egen spelarrad
+  // (host eller non-host). Seedas synkront ur profil-spegeln (undviker flimmer)
+  // men uppdateras på FOCUS ur den AUKTORITATIVA progress-storen (loadOwnHcpBundle)
+  // så ett HCP som ändrades i ett nyss spelat spel garanterat syns — även om
+  // profil-spegeln blivit stale. Andra spelares intjänade HCP kommer via
+  // lobby_players-syncen (syncFromStore) och faller annars tillbaka på 99.
+  const [selfHcpBundle, setSelfHcpBundle] = useState(() => {
+    const cat = getCachedProfile()?.hcpByCategory;
+    return {
+      total: resolveDisplayHcp(cat?.total ?? getCachedProfile()?.hcp),
+      music: resolveDisplayHcp(cat?.music),
+      film: resolveDisplayHcp(cat?.film),
+    };
+  });
+  useFocusEffect(
+    useCallback(() => {
+      const region = getCachedProfile()?.region ?? 'sweden';
+      let active = true;
+      void loadOwnHcpBundle(region).then((b) => {
+        if (active) setSelfHcpBundle({ total: b.total, music: b.music, film: b.film });
+      });
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
+  const selfHcp = selfHcpBundle.total;
   // Egna per-kategori-HCP (§1.3) för "+"-utfällningen på det egna kortet.
-  const selfHcpCat = getCachedProfile()?.hcpByCategory;
+  const selfHcpCat = { music: selfHcpBundle.music, film: selfHcpBundle.film };
   // Markeras true när self-rad först ses i stored från DB. Används av
   // syncFromStore för att skilja "vår INSERT har inte propagerat än"
   // (false → injecta från prev) från "host har raderat oss via DB DELETE"

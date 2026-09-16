@@ -97,7 +97,7 @@ import { checkSpotifyInstalled } from '../utils/spotifyDJ';
 import { resolveDisplayHcp } from '../utils/hcpEngine';
 import { DEFAULT_VOICE_ID, isValidVoiceId, SILENT_VOICE_ID, VOICE_OPTIONS } from '../utils/voicePacks';
 import { playVoiceClip } from '../utils/voicePlayback';
-import { refreshOwnHcpDecay } from '../utils/hcpProgress';
+import { loadOwnHcpBundle, refreshOwnHcpDecay } from '../utils/hcpProgress';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -364,14 +364,42 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (!hasPremium && maxPlayers > 4) setMaxPlayers(4);
   }, [hasPremium, maxPlayers]);
-  // §2.4 — kör inaktivitets-decay vid Profile-open så HCP-skölden reflekterar
-  // ev. inaktivitet redan innan nästa spel (motorn applicerar annars decayen
-  // först vid nästa spelomgång). Fire-and-forget; speglar till profile.hcp.
-  useEffect(() => {
-    // Region scope HCP är kopplat till — spelarens egen content-breadth (V1
-    // alltid 'sweden'). Skölden nedan läser samma regions hcpByCategory-bundle.
-    void refreshOwnHcpDecay(getCachedProfile()?.region ?? 'sweden');
-  }, []);
+  // HCP-sköldarnas visningsvärde. Seedas synkront ur profil-spegeln (undviker
+  // flimmer vid mount) men uppdateras på FOCUS ur den AUKTORITATIVA progress-
+  // storen (loadOwnHcpBundle), så ett HCP som ändrades i ett nyss spelat spel
+  // garanterat visas här — även om profil-spegeln (profile.hcp) råkat bli stale.
+  const [hcpDisplayBundle, setHcpDisplayBundle] = useState(() => {
+    const cat = getCachedProfile()?.hcpByCategory;
+    return {
+      total: resolveDisplayHcp(cat?.total ?? getCachedProfile()?.hcp),
+      music: resolveDisplayHcp(cat?.music),
+      film: resolveDisplayHcp(cat?.film),
+    };
+  });
+  // §2.4 — kör inaktivitets-decay vid varje Profile-focus (persisterar + speglar)
+  // och läs sedan det färska display-bundlet ur progress-storen. useFocusEffect
+  // (inte mount-only) så återkomst efter ett spel alltid visar rätt HCP.
+  useFocusEffect(
+    useCallback(() => {
+      // Region scope HCP är kopplat till — spelarens egen content-breadth (V1
+      // alltid 'sweden').
+      const region = getCachedProfile()?.region ?? 'sweden';
+      let active = true;
+      void refreshOwnHcpDecay(region);
+      void loadOwnHcpBundle(region).then((b) => {
+        if (active) {
+          setHcpDisplayBundle({
+            total: resolveDisplayHcp(b.total),
+            music: resolveDisplayHcp(b.music),
+            film: resolveDisplayHcp(b.film),
+          });
+        }
+      });
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
   const handleSelectMaxPlayers = (n: 4 | 12) => {
     if (n === 12 && gameMode !== 'individual-devices') {
       Alert.alert(
@@ -1104,12 +1132,9 @@ export default function ProfileScreen() {
   // profil-spegeln (motorn skriver profile.hcpByCategory efter varje spel).
   // Saknas den → 99 för alla (ny spelare / aldrig spelat). Total-sköld + två
   // sub-sköldar (Music/Film) visas alltid i Profile.
-  const hcpBundle = getCachedProfile()?.hcpByCategory;
-  const hcpShieldBundle = {
-    total: resolveDisplayHcp(hcpBundle?.total ?? getCachedProfile()?.hcp),
-    music: resolveDisplayHcp(hcpBundle?.music),
-    film: resolveDisplayHcp(hcpBundle?.film),
-  };
+  // Läses ur focus-uppdaterade state:n (auktoritativa progress-storen), inte
+  // direkt ur profil-spegeln — se hcpDisplayBundle ovan.
+  const hcpShieldBundle = hcpDisplayBundle;
   const regionLabel = REGION_OPTIONS.find((r) => r.id === region)?.label;
   const answerResponseLabel = ANSWER_RESPONSE_OPTIONS.find(
     (o) => o.id === answerResponseSeconds,
