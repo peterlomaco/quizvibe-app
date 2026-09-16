@@ -88,7 +88,8 @@ import {
 import { clearEjected } from '../utils/ejectedPlayers';
 import { clearLeftPlayers } from '../utils/leftPlayers';
 import { registerActiveRoom } from '../utils/mockActiveRooms';
-import { clearLobbyPlayers } from '../utils/mockLobbyPlayers';
+import { checkActiveElsewhere } from '../utils/activeLobbyGuard';
+import { clearLobbyPlayers, leaveAllActiveMembershipsForUser } from '../utils/mockLobbyPlayers';
 import { clearLobbySettings } from '../utils/mockLobbySettings';
 import { clearGameStarted } from '../utils/mockStartedGames';
 import { generateRoomCode } from '../utils/roomCode';
@@ -1000,6 +1001,13 @@ export default function ProfileScreen() {
     setAddFriendError(null);
     setAddFriendChecking(true);
     try {
+      // Kan inte lägga till sig själv som vän (annars går det att bjuda in sig
+      // själv till sin egen lobby). Speglar Lobby:s handleAddFriendFromShare.
+      const ownName = (await loadProfile())?.playerName?.trim().toLowerCase();
+      if (ownName && trimmed.toLowerCase() === ownName) {
+        setAddFriendError("You can't add yourself as a friend");
+        return;
+      }
       const exists = await playerNameExists(trimmed);
       if (!exists) {
         setAddFriendError('No QuizVibe user found with that Player Name');
@@ -1245,6 +1253,10 @@ export default function ProfileScreen() {
     // är borta. Konsekvensen är att efterföljande supabase.functions.invoke()
     // skickar en stale JWT (förmodlig orsak till delete-account-bugen som
     // dök upp 2026-05-23). Speglar Home-skärmens handleLogout-pattern.
+    // FÖRE signOut (kräver levande session): städa bort kontots aktiva
+    // lobby-deltaganden så en annan enhet med samma konto inte längre
+    // blockeras av "redan aktiv login"-guarden. Best-effort.
+    await leaveAllActiveMembershipsForUser();
     try {
       await supabase.auth.signOut();
     } catch (err) {
@@ -1333,6 +1345,9 @@ export default function ProfileScreen() {
         return;
       }
     }
+    // Two-device-guard: kan inte hosta ett nytt spel medan kontot redan är
+    // aktivt i en annan lobby på en annan enhet.
+    if (await checkActiveElsewhere()) return;
     const code = generateRoomCode();
     // Remote 1vs1 är alltid exakt 2 spelare. Sätts redan här (i stället för
     // att vänta på LobbyScreen:s setRoomMaxPlayers-effekt) så kapacitets-

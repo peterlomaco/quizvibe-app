@@ -10,10 +10,11 @@ import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
-import { clearLobbyPlayers, getLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
+import { clearLobbyPlayers, getLobbyPlayers, leaveAllActiveMembershipsForUser } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
+import { checkActiveElsewhere } from '@/src/utils/activeLobbyGuard';
 import { buildRemoteQuizParams, getMatchByRoomCode, getOwnUserId, splitMatchForUser } from '@/src/utils/remoteMatches';
 import { MyMatchesSection } from '@/src/components/MyMatchesSection';
 import { HomeExtrasRow } from '@/src/components/HomeExtrasRow';
@@ -679,6 +680,15 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       );
       return;
     }
+    // Own-lobby-guard (self-invite Layer 3): inbjudan pekar på din EGEN lobby
+    // (du är host). Städa bort den stale inviten och stanna kvar. Speglar
+    // isOwnLobby-checken i handleJoinWithCode; invite-accept-vägen saknade den.
+    if (await isOwnLobby(invite.roomCode, currentPlayerName)) {
+      const updated = await removeInvite(invite.id);
+      setInvites(updated);
+      Alert.alert('Already in lobby', 'This is your own lobby.');
+      return;
+    }
     // Single-player-lobby: host kan ha skickat inbjudan och sedan bytt till
     // single. Inviten ligger KVAR i listan (som capacity-fallet) — host kan
     // byta tillbaka, och då ska den fortfarande gå att tacka ja till.
@@ -690,6 +700,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // popup och inviten ligga kvar i listan, så de kan försöka igen om
     // någon lämnar. Speglar samma check som handleJoinWithCode kör.
     if (await checkLobbyCapacity(invite.roomCode)) return;
+    // Two-device-guard: blockera om kontot redan är aktivt i en annan lobby.
+    if (await checkActiveElsewhere(invite.roomCode)) return;
     // Ömsesidig friend-add (Peter 2026-08-27): att acceptera lägger till
     // HOST:en på RECIPIENT:ens egna friends-lista också — host-sidans add
     // sker separat via LobbyScreen:s pending→confirmed-watcher när den här
@@ -780,6 +792,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       Alert.alert('Already in lobby', 'User already exists in the lobby');
       return;
     }
+    // Two-device-guard: blockera om kontot redan är aktivt i en ANNAN lobby
+    // (excludeCode=code → rejoin av samma lobby är tillåtet).
+    if (await checkActiveElsewhere(code)) return;
     // Single-player-lobby: ingen plats att joina förrän host byter läge.
     if (await checkSinglePlayerLobby(code)) return;
     // Re-match-lobby: låst uppsättning — bara förra spelets spelare släpps in.
@@ -1023,6 +1038,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       Alert.alert('Already in lobby', 'User already exists in the lobby');
       return;
     }
+    // Two-device-guard: en inloggad user som joinar via guest-formen har ändå
+    // sitt riktiga (icke-anon) konto → blockera om det redan är aktivt i en
+    // annan lobby. Rena gäster (anon) resolvar till [] och släpps igenom.
+    if (await checkActiveElsewhere(code)) return;
     // Single-player-lobby: speglar handleJoinWithCode.
     if (await checkSinglePlayerLobby(code)) return;
     // Re-match-lobby: speglar handleJoinWithCode. En gäst som VAR med i
@@ -2429,6 +2448,11 @@ export default function HomeScreen() {
     if (!credits) return;
     const { freshProfile, hasPremium } = credits;
 
+    // Two-device-guard: kan inte hosta ett nytt spel medan kontot redan är
+    // aktivt i en annan lobby på en annan enhet (excludeCode saknas — detta
+    // är ett fräscht rum).
+    if (await checkActiveElsewhere()) return;
+
     const code = generateRoomCode();
     // Registrera koden i Supabase rooms-tabellen + lagra host:s metadata så
     // join-flödena (handleJoinWithCode, handleJoinAsGuest) kan validera mot
@@ -2944,6 +2968,10 @@ export default function HomeScreen() {
           text: 'Log out',
           style: 'destructive',
           onPress: async () => {
+            // FÖRE signOut (kräver levande session): städa bort kontots aktiva
+            // lobby-deltaganden så en annan enhet med samma konto inte längre
+            // blockeras av "redan aktiv login"-guarden. Best-effort.
+            await leaveAllActiveMembershipsForUser();
             const { error } = await supabase.auth.signOut();
             if (error) {
               // Forsätt med lokal cleanup ändå — session kan ha gått ut server-side

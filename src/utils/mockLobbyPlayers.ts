@@ -20,7 +20,8 @@
 //     på lobby_players-tabellen — getLobbyPlayers används initialt och som
 //     fallback om Realtime-channel skulle drop:as.
 
-import { ensureAuthSession } from './auth';
+import { ensureAuthSession, getCurrentUserId, isAnonymousSession } from './auth';
+import { deactivateRoom, roomExists } from './mockActiveRooms';
 import { supabase } from './supabase';
 import type { LobbyPlayer } from '../screens/LobbyScreen';
 
@@ -455,6 +456,103 @@ export async function getLobbyPlayerUserIds(
   return ((data as { player_id: string; user_id: string | null; type: string }[]) ?? []).map(
     (r) => ({ playerId: r.player_id, userId: r.user_id, type: r.type }),
   );
+}
+
+/** Ett aktivt deltagande i en lobby/spel som det inloggade kontot har. */
+export interface OtherActiveMembership {
+  roomCode: string;
+  playerId: string;
+  isHost: boolean;
+}
+
+/**
+ * Rum (utom `excludeCode`) där det INLOGGADE kontot är aktiv deltagare
+ * (`has_left = false`) OCH rummet fortfarande finns (ej 24h-expirerat).
+ * Driver "kan inte spela på två enheter samtidigt"-guarden (checkActiveElsewhere).
+ *
+ * Bara REGISTRERADE konton kan kollidera cross-device — gäster får en egen
+ * anon-uid per enhet — så anon/utloggad resolvar till [] (fail-open). Alla
+ * DB-fel resolvar också till [] så en misslyckad uppslagning aldrig låser ute
+ * en legitim spelare.
+ *
+ * ⚠ Läser ENBART egna rader (`user_id = auth.uid()`), vilket 0054:s
+ *   membership-SELECT-policy tillåter över ALLA rum utan room_code-scoping —
+ *   ingen massdump av andras rader sker. `roomExists` inkluderar rum där
+ *   spelet redan startat (game_started=true) — "spelar på andra enheten" ska
+ *   räknas — men filtrerar bort expirerade/raderade rum (stale rader).
+ *
+ * `excludeCode` = rummet man just nu joinar/är i, så "rejoin samma lobby"
+ * alltid är tillåtet.
+ */
+export async function findOtherActiveMembershipsForUser(
+  excludeCode?: string,
+): Promise<OtherActiveMembership[]> {
+  if (await isAnonymousSession()) return [];
+  const uid = await getCurrentUserId();
+  if (!uid) return [];
+  const { data, error } = await supabase
+    .from('lobby_players')
+    .select('room_code, player_id, is_host')
+    .eq('user_id', uid)
+    .eq('has_left', false);
+  if (error) {
+    console.warn('[lobbyPlayers] findOtherActiveMembershipsForUser failed:', error.message);
+    return [];
+  }
+  const exclude = excludeCode ? normalizeCode(excludeCode) : null;
+  const rows = (
+    (data as { room_code: string; player_id: string; is_host: boolean }[]) ?? []
+  ).filter((r) => normalizeCode(r.room_code) !== exclude);
+  const live: OtherActiveMembership[] = [];
+  for (const r of rows) {
+    if (await roomExists(r.room_code)) {
+      live.push({
+        roomCode: normalizeCode(r.room_code),
+        playerId: r.player_id,
+        isHost: r.is_host,
+      });
+    }
+  }
+  return live;
+}
+
+/**
+ * "Continue here"-återhämtning: lämna varje ANNAT aktivt deltagande så det
+ * här kontot kan spela vidare på DENNA enhet. Ett hostat rum raderas
+ * (`deactivateRoom` — den andra enheten får "lobby deleted" via sin
+ * room-deletion-polling; ett rum kan inte "lämnas" av sin host); en non-host-
+ * rad flaggas `has_left = true`. Rensar även en force-quit-"spöksession" så
+ * kontot inte låses ute till 24h-expiryn.
+ */
+export async function leaveOtherActiveMemberships(
+  memberships: OtherActiveMembership[],
+): Promise<void> {
+  for (const m of memberships) {
+    if (m.isHost) {
+      await deactivateRoom(m.roomCode);
+    } else {
+      await markOwnPlayerLeft(m.roomCode, m.playerId);
+    }
+  }
+}
+
+/**
+ * Städar bort ALLA aktiva lobby-deltaganden för det inloggade kontot. Körs vid
+ * logout så en ANNAN enhet med samma konto inte längre blockeras av
+ * "redan aktiv login"-guarden (checkActiveElsewhere) — det är själva remedyn
+ * popupen instruerar ("log out from other device and then try again").
+ *
+ * Rummen kontot hostar raderas (deactivateRoom); non-host-deltaganden flaggas
+ * has_left=true. ⚠ MÅSTE köras MEDAN sessionen fortfarande finns (dvs. FÖRE
+ * supabase.auth.signOut()) — både uppslagningen (user_id = auth.uid()) och
+ * deactivateRoom/markOwnPlayerLeft kräver en levande auth-session.
+ *
+ * Best-effort: fel loggas i respektive helper, kastar aldrig, så en
+ * misslyckad städning aldrig blockerar själva utloggningen.
+ */
+export async function leaveAllActiveMembershipsForUser(): Promise<void> {
+  const memberships = await findOtherActiveMembershipsForUser();
+  await leaveOtherActiveMemberships(memberships);
 }
 
 /**

@@ -122,6 +122,15 @@ export async function addFriend(playerName: string, avatarId?: string): Promise<
   const trimmed = playerName.trim();
   if (!trimmed) return loadFriends();
   const current = await loadFriends();
+  // Defensivt: kan inte lägga till sig själv som vän. UI-lagren (Profile:s
+  // handleAddFriend + Lobby:s handleAddFriendFromShare) visar ett eget
+  // fel-meddelande; detta är backstoppen så en självreferens aldrig kan
+  // hamna i listan → aldrig visas som inbjudningsbar → aldrig bli en
+  // själv-inbjudan. loadProfile() är redan varm (loadFriends läste den).
+  const ownName = (await loadProfile())?.playerName?.trim().toLowerCase();
+  if (ownName && trimmed.toLowerCase() === ownName) {
+    return current;
+  }
   // Inga duplicates på Player Name (case-insensitive)
   if (current.some((f) => f.playerName.toLowerCase() === trimmed.toLowerCase())) {
     return current;
