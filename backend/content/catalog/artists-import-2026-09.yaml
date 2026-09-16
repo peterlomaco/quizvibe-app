@@ -1,0 +1,754 @@
+# New artists imported from Music.xlsx profile list (2026-09-16) — hint pool.
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+region: ["global"]
+category: artists
+contentForm: image
+contentSubject: artist
+items:
+  - id: 2pac
+    displayName: "2Pac"
+    probability: 50
+    wikimediaSearchHints: ["2Pac"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: aaliyah
+    displayName: "Aaliyah"
+    correctYear: 1979
+    probability: 50
+    wikimediaSearchHints: ["Aaliyah"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["RnB"]
+  - id: agnes
+    displayName: "Agnes"
+    probability: 50
+    wikimediaSearchHints: ["Agnes"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop", "Soft & Love"]
+    region: ["sweden"]
+  - id: al-green
+    displayName: "Al Green"
+    correctYear: 1946
+    probability: 50
+    wikimediaSearchHints: ["Al Green"]
+    answerMethods: ["name-letters"]
+  - id: alice-cooper
+    displayName: "Alice Cooper"
+    correctYear: 1948
+    probability: 50
+    wikimediaSearchHints: ["Alice Cooper"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: alizee
+    displayName: "Alizee"
+    probability: 50
+    wikimediaSearchHints: ["Alizee"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: anna-book
+    displayName: "Anna Book"
+    correctYear: 1970
+    probability: 50
+    wikimediaSearchHints: ["Anna Book"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish"]
+    region: ["sweden"]
+  - id: bachman
+    displayName: "Bachman"
+    probability: 50
+    wikimediaSearchHints: ["Bachman"]
+    answerMethods: ["name-letters"]
+  - id: behrang-miri
+    displayName: "Behrang Miri"
+    correctYear: 1984
+    probability: 50
+    wikimediaSearchHints: ["Behrang Miri"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen"]
+    region: ["sweden"]
+  - id: bellini
+    displayName: "Bellini"
+    probability: 50
+    wikimediaSearchHints: ["Bellini"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Summer"]
+  - id: bill-withers
+    displayName: "Bill Withers"
+    correctYear: 1938
+    probability: 50
+    wikimediaSearchHints: ["Bill Withers"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: billie-myers
+    displayName: "Billie Myers"
+    correctYear: 1971
+    probability: 50
+    wikimediaSearchHints: ["Billie Myers"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: billy-ray-cyrus
+    displayName: "Billy Ray Cyrus"
+    correctYear: 1961
+    probability: 50
+    wikimediaSearchHints: ["Billy Ray Cyrus"]
+    answerMethods: ["name-letters"]
+  - id: bob-marley
+    displayName: "Bob Marley"
+    correctYear: 1945
+    probability: 50
+    wikimediaSearchHints: ["Bob Marley"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love", "sport"]
+  - id: busta-rhymes
+    displayName: "Busta Rhymes"
+    correctYear: 1972
+    probability: 50
+    wikimediaSearchHints: ["Busta Rhymes"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: calvin-harris
+    displayName: "Calvin Harris"
+    correctYear: 1984
+    probability: 50
+    wikimediaSearchHints: ["Calvin Harris"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music", "Disco & Pop", "Summer"]
+  - id: carola
+    displayName: "Carola"
+    correctYear: 1992
+    probability: 50
+    wikimediaSearchHints: ["Carola"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish", "Melodifestivalen"]
+    region: ["sweden"]
+  - id: christer-sandelin
+    displayName: "Christer Sandelin"
+    correctYear: 1961
+    probability: 50
+    wikimediaSearchHints: ["Christer Sandelin"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish"]
+    region: ["sweden"]
+  - id: craig-david
+    displayName: "Craig David"
+    correctYear: 1981
+    probability: 50
+    wikimediaSearchHints: ["Craig David"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: curtis-mayfield
+    displayName: "Curtis Mayfield"
+    correctYear: 1942
+    probability: 50
+    wikimediaSearchHints: ["Curtis Mayfield"]
+    answerMethods: ["name-letters"]
+  - id: darude
+    displayName: "Darude"
+    correctYear: 1975
+    probability: 50
+    wikimediaSearchHints: ["Darude"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: david-gray
+    displayName: "David Gray"
+    correctYear: 1968
+    probability: 50
+    wikimediaSearchHints: ["David Gray"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: david-lindgren
+    displayName: "David Lindgren"
+    correctYear: 1982
+    probability: 50
+    wikimediaSearchHints: ["David Lindgren"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen"]
+    region: ["sweden"]
+  - id: de-vet-du
+    displayName: "De vet du"
+    probability: 50
+    wikimediaSearchHints: ["De vet du"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
+    region: ["sweden"]
+  - id: desree
+    displayName: "Desree"
+    correctYear: 1968
+    probability: 50
+    wikimediaSearchHints: ["Desree"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: dmx
+    displayName: "DMX"
+    correctYear: 1970
+    probability: 50
+    wikimediaSearchHints: ["DMX"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: edivibz
+    displayName: "Edivibz"
+    probability: 50
+    wikimediaSearchHints: ["Edivibz"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["sport", "football"]
+    region: ["sweden"]
+  - id: faith-hill
+    displayName: "Faith Hill"
+    correctYear: 1967
+    probability: 50
+    wikimediaSearchHints: ["Faith Hill"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: felicia
+    displayName: "Felicia"
+    probability: 50
+    wikimediaSearchHints: ["Felicia"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Eurovision", "Melodifestivalen"]
+    region: ["europe"]
+  - id: felix
+    displayName: "Felix"
+    probability: 50
+    wikimediaSearchHints: ["Felix"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: froken-snusk
+    displayName: "Fröken snusk"
+    probability: 50
+    wikimediaSearchHints: ["Fröken snusk"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
+    region: ["sweden"]
+  - id: gigi-dagostino
+    displayName: "Gigi Dágostino"
+    correctYear: 1967
+    probability: 50
+    wikimediaSearchHints: ["Gigi Dágostino"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: gladys-knight
+    displayName: "Gladys Knight"
+    correctYear: 1944
+    probability: 50
+    wikimediaSearchHints: ["Gladys Knight"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Film edition"]
+  - id: harpo
+    displayName: "Harpo"
+    correctYear: 1950
+    probability: 50
+    wikimediaSearchHints: ["Harpo"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: harry-chapin
+    displayName: "Harry Chapin"
+    correctYear: 1942
+    probability: 50
+    wikimediaSearchHints: ["Harry Chapin"]
+    answerMethods: ["name-letters"]
+  - id: hoffmaestro
+    displayName: "Hoffmaestro"
+    probability: 50
+    wikimediaSearchHints: ["Hoffmaestro"]
+    answerMethods: ["name-letters"]
+    region: ["sweden"]
+  - id: j-cole
+    displayName: "J. Cole"
+    correctYear: 1985
+    probability: 50
+    wikimediaSearchHints: ["J. Cole"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: jennifer-paige
+    displayName: "Jennifer Paige"
+    correctYear: 1973
+    probability: 50
+    wikimediaSearchHints: ["Jennifer Paige"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: jessica-folcker
+    displayName: "Jessica Folcker"
+    correctYear: 1975
+    probability: 50
+    wikimediaSearchHints: ["Jessica Folcker"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: jimmy-nail
+    displayName: "Jimmy Nail"
+    correctYear: 1954
+    probability: 50
+    wikimediaSearchHints: ["Jimmy Nail"]
+    answerMethods: ["name-letters"]
+  - id: jlc
+    displayName: "JLC"
+    probability: 50
+    wikimediaSearchHints: ["JLC"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Summer"]
+    region: ["sweden"]
+  - id: jon-henrik-fjallgren
+    displayName: "Jon Henrik Fjällgren"
+    correctYear: 1987
+    probability: 50
+    wikimediaSearchHints: ["Jon Henrik Fjällgren"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen"]
+    region: ["sweden"]
+  - id: kalle-moraeus
+    displayName: "Kalle Moraeus"
+    correctYear: 1963
+    probability: 50
+    wikimediaSearchHints: ["Kalle Moraeus"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
+    region: ["sweden"]
+  - id: khaliffa
+    displayName: "Khaliffa"
+    probability: 50
+    wikimediaSearchHints: ["Khaliffa"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish"]
+    region: ["sweden"]
+  - id: klara-hammarstrom
+    displayName: "Klara Hammarström"
+    correctYear: 2000
+    probability: 50
+    wikimediaSearchHints: ["Klara Hammarström"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen"]
+    region: ["sweden"]
+  - id: leann-rimes
+    displayName: "LeAnn Rimes"
+    correctYear: 1982
+    probability: 50
+    wikimediaSearchHints: ["LeAnn Rimes"]
+    answerMethods: ["name-letters"]
+  - id: lene-marlin
+    displayName: "Lene Marlin"
+    correctYear: 1980
+    probability: 50
+    wikimediaSearchHints: ["Lene Marlin"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: lilla-al-fadji
+    displayName: "Lilla Al Fadji"
+    probability: 50
+    wikimediaSearchHints: ["Lilla Al Fadji"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen"]
+    region: ["sweden"]
+  - id: linus-svenning
+    displayName: "Linus Svenning"
+    correctYear: 1990
+    probability: 50
+    wikimediaSearchHints: ["Linus Svenning"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
+    region: ["sweden"]
+  - id: lutricia-mcneal
+    displayName: "Lutricia McNeal"
+    correctYear: 1973
+    probability: 50
+    wikimediaSearchHints: ["Lutricia McNeal"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: manu-chao
+    displayName: "Manu Chao"
+    correctYear: 1961
+    probability: 50
+    wikimediaSearchHints: ["Manu Chao"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+    region: ["sweden"]
+  - id: marc-almond
+    displayName: "Marc Almond"
+    correctYear: 1957
+    probability: 50
+    wikimediaSearchHints: ["Marc Almond"]
+    answerMethods: ["name-letters"]
+  - id: mario
+    displayName: "Mario"
+    probability: 50
+    wikimediaSearchHints: ["Mario"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["RnB"]
+  - id: markus-och-martinus
+    displayName: "Markus och Martinus"
+    probability: 50
+    wikimediaSearchHints: ["Markus och Martinus"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+    region: ["nordic"]
+  - id: martin
+    displayName: "Martin"
+    probability: 50
+    wikimediaSearchHints: ["Martin"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
+    region: ["sweden"]
+  - id: mase
+    displayName: "Mase"
+    correctYear: 1975
+    probability: 50
+    wikimediaSearchHints: ["Mase"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: medina
+    displayName: "Medina"
+    probability: 50
+    wikimediaSearchHints: ["Medina"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish"]
+    region: ["sweden"]
+  - id: meja
+    displayName: "Meja"
+    correctYear: 1969
+    probability: 50
+    wikimediaSearchHints: ["Meja"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: mel-c
+    displayName: "Mel C"
+    correctYear: 1974
+    probability: 50
+    wikimediaSearchHints: ["Mel C"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: melanie-c
+    displayName: "Melanie C"
+    correctYear: 1974
+    probability: 50
+    wikimediaSearchHints: ["Melanie C"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: mohombi
+    displayName: "Mohombi"
+    correctYear: 1986
+    probability: 50
+    wikimediaSearchHints: ["Mohombi"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Summer"]
+    region: ["sweden"]
+  - id: molly
+    displayName: "Molly"
+    probability: 50
+    wikimediaSearchHints: ["Molly"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish", "Soft & Love"]
+    region: ["sweden"]
+  - id: natalie-cole
+    displayName: "Natalie Cole"
+    correctYear: 1950
+    probability: 50
+    wikimediaSearchHints: ["Natalie Cole"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: nelly
+    displayName: "Nelly"
+    correctYear: 1974
+    probability: 50
+    wikimediaSearchHints: ["Nelly"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["RnB", "Soft & Love"]
+  - id: netta
+    displayName: "Netta"
+    probability: 50
+    wikimediaSearchHints: ["Netta"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Eurovision"]
+    region: ["europe"]
+  - id: oh-laura
+    displayName: "Oh laura"
+    probability: 50
+    wikimediaSearchHints: ["Oh laura"]
+    answerMethods: ["name-letters"]
+    region: ["sweden"]
+  - id: panetoz
+    displayName: "Panetoz"
+    probability: 50
+    wikimediaSearchHints: ["Panetoz"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen"]
+    region: ["sweden"]
+  - id: peps-persson
+    displayName: "Peps Persson"
+    correctYear: 1946
+    probability: 50
+    wikimediaSearchHints: ["Peps Persson"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["100% in swedish", "Summer"]
+    region: ["sweden"]
+  - id: pinkfong
+    displayName: "Pinkfong"
+    probability: 50
+    wikimediaSearchHints: ["Pinkfong"]
+    answerMethods: ["name-letters"]
+  - id: pitbull
+    displayName: "Pitbull"
+    correctYear: 1981
+    probability: 50
+    wikimediaSearchHints: ["Pitbull"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop", "Dance Music"]
+  - id: pras
+    displayName: "Pras"
+    correctYear: 1972
+    probability: 50
+    wikimediaSearchHints: ["Pras"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: richard-marx
+    displayName: "Richard Marx"
+    correctYear: 1963
+    probability: 50
+    wikimediaSearchHints: ["Richard Marx"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: ronan-keating
+    displayName: "Ronan Keating"
+    correctYear: 1977
+    probability: 50
+    wikimediaSearchHints: ["Ronan Keating"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: samantha-mumba
+    displayName: "Samantha Mumba"
+    correctYear: 1983
+    probability: 50
+    wikimediaSearchHints: ["Samantha Mumba"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: santana
+    displayName: "Santana"
+    probability: 50
+    wikimediaSearchHints: ["Santana"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: sash
+    displayName: "Sash"
+    probability: 50
+    wikimediaSearchHints: ["Sash"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: sasha
+    displayName: "Sasha"
+    correctYear: 1974
+    probability: 50
+    wikimediaSearchHints: ["Sasha"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: sean-banan
+    displayName: "Sean banan"
+    correctYear: 1985
+    probability: 50
+    wikimediaSearchHints: ["Sean banan"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen", "100% in swedish", "Christmas edition"]
+    region: ["sweden"]
+  - id: sean-paul
+    displayName: "Sean Paul"
+    correctYear: 1973
+    probability: 50
+    wikimediaSearchHints: ["Sean Paul"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: shabba-ranks
+    displayName: "Shabba Ranks"
+    correctYear: 1966
+    probability: 50
+    wikimediaSearchHints: ["Shabba Ranks"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: shaggy
+    displayName: "Shaggy"
+    correctYear: 1968
+    probability: 50
+    wikimediaSearchHints: ["Shaggy"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: shanice
+    displayName: "Shanice"
+    correctYear: 1973
+    probability: 50
+    wikimediaSearchHints: ["Shanice"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: sisqo
+    displayName: "Sisqo"
+    correctYear: 1978
+    probability: 50
+    wikimediaSearchHints: ["Sisqo"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["RnB"]
+  - id: snow
+    displayName: "Snow"
+    probability: 50
+    wikimediaSearchHints: ["Snow"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: sophie-b-hawkins
+    displayName: "Sophie B Hawkins"
+    correctYear: 1964
+    probability: 50
+    wikimediaSearchHints: ["Sophie B Hawkins"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: spiller
+    displayName: "Spiller"
+    correctYear: 1975
+    probability: 50
+    wikimediaSearchHints: ["Spiller"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: stakka-bo
+    displayName: "Stakka Bo"
+    correctYear: 1966
+    probability: 50
+    wikimediaSearchHints: ["Stakka Bo"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: stefan-borsch
+    displayName: "Stefan Borsch"
+    correctYear: 1947
+    probability: 50
+    wikimediaSearchHints: ["Stefan Borsch"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dansband"]
+    region: ["sweden"]
+  - id: swingfly
+    displayName: "Swingfly"
+    correctYear: 1969
+    probability: 50
+    wikimediaSearchHints: ["Swingfly"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen"]
+    region: ["sweden"]
+  - id: tasmin-archer
+    displayName: "Tasmin Archer"
+    correctYear: 1963
+    probability: 50
+    wikimediaSearchHints: ["Tasmin Archer"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: technotronic
+    displayName: "technotronic"
+    probability: 50
+    wikimediaSearchHints: ["technotronic"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: ten-sharp
+    displayName: "Ten sharp"
+    probability: 50
+    wikimediaSearchHints: ["Ten sharp"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: the-connels
+    displayName: "The connels"
+    probability: 50
+    wikimediaSearchHints: ["The connels"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: the-cure
+    displayName: "The cure"
+    probability: 50
+    wikimediaSearchHints: ["The cure"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: the-outhere-brothers
+    displayName: "the outhere brothers"
+    probability: 50
+    wikimediaSearchHints: ["the outhere brothers"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Disco & Pop"]
+  - id: the-smashing-pumpkins
+    displayName: "The smashing pumpkins"
+    probability: 50
+    wikimediaSearchHints: ["The smashing pumpkins"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: theoz
+    displayName: "Theoz"
+    correctYear: 2005
+    probability: 50
+    wikimediaSearchHints: ["Theoz"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Melodifestivalen", "100% in swedish"]
+    region: ["sweden"]
+  - id: thomas-rusiak
+    displayName: "Thomas Rusiak"
+    correctYear: 1976
+    probability: 50
+    wikimediaSearchHints: ["Thomas Rusiak"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+    region: ["sweden"]
+  - id: three-6-mafia
+    displayName: "Three 6 Mafia"
+    probability: 50
+    wikimediaSearchHints: ["Three 6 Mafia"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Hip Hop"]
+  - id: timbaland
+    displayName: "Timbaland"
+    correctYear: 1972
+    probability: 50
+    wikimediaSearchHints: ["Timbaland"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["RnB", "Dance Music", "Disco & Pop"]
+  - id: tom-cochrane
+    displayName: "Tom Cochrane"
+    correctYear: 1953
+    probability: 50
+    wikimediaSearchHints: ["Tom Cochrane"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
+  - id: tq
+    displayName: "TQ"
+    correctYear: 1976
+    probability: 50
+    wikimediaSearchHints: ["TQ"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["RnB"]
+  - id: u96
+    displayName: "U96"
+    probability: 50
+    wikimediaSearchHints: ["U96"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: undercover
+    displayName: "Undercover"
+    probability: 50
+    wikimediaSearchHints: ["Undercover"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Dance Music"]
+  - id: usa-for-africa
+    displayName: "USA for Africa"
+    correctYear: 1985
+    probability: 50
+    wikimediaSearchHints: ["USA for Africa"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: vanessa-amorosi
+    displayName: "Vanessa Amorosi"
+    correctYear: 1981
+    probability: 50
+    wikimediaSearchHints: ["Vanessa Amorosi"]
+    answerMethods: ["name-letters"]
+  - id: vanessa-paradis
+    displayName: "Vanessa Paradis"
+    correctYear: 1972
+    probability: 50
+    wikimediaSearchHints: ["Vanessa Paradis"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: wet-wet-wet
+    displayName: "Wet wet wet"
+    probability: 50
+    wikimediaSearchHints: ["Wet wet wet"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Soft & Love"]
+  - id: white-liuon
+    displayName: "White liuon"
+    probability: 50
+    wikimediaSearchHints: ["White liuon"]
+    answerMethods: ["name-letters"]
+    genrePackages: ["Rock"]
