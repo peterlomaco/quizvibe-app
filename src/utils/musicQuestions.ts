@@ -556,6 +556,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Christmas edition"
+    ],
     "youtubeClips": [
       {
         "videoId": "1Jp3XIqTR2w",
@@ -583,6 +586,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -984,6 +990,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Summer"
+    ],
     "youtubeClips": [
       {
         "videoId": "BycLmWI97Nc",
@@ -1130,6 +1139,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "3SdTKo2uVsxFblQjpScoHy",
     "youtubeClips": [
       {
@@ -1215,6 +1227,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "nGbWU8S3vzs",
@@ -1275,6 +1290,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "100% in swedish"
     ],
+    "spotifyTrackId": "6P40lE9SODIcT21NpmRd2I",
     "youtubeClips": [
       {
         "videoId": "BrYFFIESx3c",
@@ -1385,6 +1401,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
     ],
     "spotifyTrackId": "0ifb42ld8ZGWoVyydt18l7",
     "youtubeClips": [
@@ -1498,6 +1517,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -1859,6 +1881,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Rock"
     ],
     "youtubeClips": [
       {
@@ -2239,6 +2264,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "xt8XQLvKBUs",
@@ -2321,6 +2349,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -2430,6 +2461,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "FT3D1Cu6g10",
@@ -2468,6 +2502,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1360)."
+      }
+    ]
+  },
+  {
+    "id": "jackson-5-i-ll-be-there",
+    "displayName": "I´ll be there — Jackson 5",
+    "correctYear": 1970,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Xg2vMrDzoXM",
+        "startSec": 10,
+        "endSec": 25,
+        "license": "standard"
       }
     ]
   },
@@ -2690,6 +2753,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "zHxobd1WLno",
@@ -2718,6 +2784,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Rock"
+    ],
     "youtubeClips": [
       {
         "videoId": "X791IzOwt3Q",
@@ -2745,6 +2814,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -2921,6 +2993,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Rock"
+    ],
     "youtubeClips": [
       {
         "videoId": "qK7j_EERgT4",
@@ -2948,6 +3023,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -3076,6 +3154,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "spotifyTrackId": "1GUpCVoNqQoriLkftXc3S3",
     "youtubeClips": [
@@ -3477,6 +3558,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bachman-you-aint-seen-nothin-yet",
+    "displayName": "You Aint seen nothin yet — Bachman",
+    "correctYear": 1974,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "4cia_v4vxfE",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "barry-white-youre-the-first-the-last-my-everything",
     "displayName": "You're the First, the Last, My Everything — Barry White",
     "correctYear": 1974,
@@ -3608,6 +3715,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "iL-jC7XyLeo",
@@ -3666,6 +3776,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "2TxCwUlqaOH3TIyJqGgR91",
     "youtubeClips": [
       {
@@ -3694,6 +3807,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Disco & Pop",
+      "100% in swedish"
     ],
     "spotifyTrackId": "3qChO81Z9r3KDyIj4w1m4T",
     "youtubeClips": [
@@ -3763,6 +3880,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "harpo-moviestar",
+    "displayName": "Moviestar — Harpo",
+    "correctYear": 1975,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "n6AGHnLO-VA",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "jaws",
     "displayName": "Jaws",
     "correctYear": 1975,
@@ -3817,6 +3963,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -4067,6 +4216,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "0GjEhVFGZW8afUYGChu3Rr",
     "youtubeClips": [
       {
@@ -4131,6 +4283,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -4213,6 +4368,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-bellamy-brothers-let-your-love-flow",
+    "displayName": "Let Your Love flow — The bellamy brothers",
+    "correctYear": 1976,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "FQQj2rQBFvA",
+        "startSec": 13,
+        "endSec": 28,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "wild-cherry-play-that-funky-music",
     "displayName": "Play That Funky Music — Wild Cherry",
     "correctYear": 1976,
@@ -4228,6 +4409,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -4255,6 +4439,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -4284,6 +4471,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "-ihs-vT9T3Q",
@@ -4310,6 +4500,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "spotifyTrackId": "4UDmDIqJIbrW0hMBQMFOsM",
     "youtubeClips": [
@@ -4339,6 +4532,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -4441,6 +4637,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1377)."
+      }
+    ]
+  },
+  {
+    "id": "fleetwod-mac-dont-stop",
+    "displayName": "Dont stop — Fleetwod mac",
+    "correctYear": 1977,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "QV9JJmSCiI8",
+        "startSec": 10,
+        "endSec": 25,
+        "license": "standard"
       }
     ]
   },
@@ -4683,6 +4905,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "aXgSHL7efKg",
@@ -4719,6 +4944,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "aqZxIL4YE2I",
@@ -4746,6 +4974,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -4845,6 +5076,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "Cdu3a2arXdw",
@@ -4915,6 +5149,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rod-stewart-do-ya-think-im-sexy",
+    "displayName": "Do Ya Think Im Sexy — Rod Stewart",
+    "correctYear": 1978,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "spotifyTrackId": "3wsPg2KrRYZFi0inIFa41x",
+    "youtubeClips": [
+      {
+        "videoId": "Hphwfq1wLJs",
+        "startSec": 1,
+        "endSec": 16,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "travolta-newton-john-youre-the-one-that-i-want",
     "displayName": "You're the One That I Want — John Travolta & Olivia Newton-John",
     "correctYear": 1978,
@@ -4930,6 +5194,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -4959,6 +5226,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "54OR1VDpfkBuOY5zZjhZAY",
     "youtubeClips": [
       {
@@ -4987,6 +5257,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -5077,6 +5350,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -5231,6 +5507,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
     "spotifyTrackId": "2BVoNm43uY07T5JKI2SjCW",
     "youtubeClips": [
       {
@@ -5240,6 +5519,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Vikinger - Topic",
         "license": "standard",
         "notes": "Officiell Topic-kanal. Studio 1979. Ersatte blockerat klipp (HRn0KKd03uk)."
+      }
+    ]
+  },
+  {
+    "id": "abba-the-winner-takes-it-all",
+    "displayName": "The Winner Takes It All — ABBA",
+    "correctYear": 1980,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "92cwKCU8Z5c",
+        "startSec": 35,
+        "endSec": 50,
+        "license": "standard"
       }
     ]
   },
@@ -5316,6 +5624,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -5402,6 +5713,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Rock"
     ],
     "spotifyTrackId": "5HkFTCxSeJ3kGNyQJbT4rJ",
     "youtubeClips": [
@@ -5956,6 +6270,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
     "youtubeClips": [
       {
         "videoId": "tUE0zbkmv0Q",
@@ -6023,6 +6340,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "9LxPoJ4QoSk",
@@ -6051,6 +6371,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "WlTlUseVt7E",
@@ -6078,6 +6401,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -6135,6 +6461,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "rblt2EtFfC4",
@@ -6161,6 +6490,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -6189,6 +6521,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "sport"
+    ],
     "youtubeClips": [
       {
         "videoId": "YKXTSOf5SA0",
@@ -6216,6 +6551,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -6246,7 +6584,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% in swedish",
       "Summer"
     ],
     "youtubeClips": [
@@ -6428,6 +6765,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "4cVHMHgmWgudD399ZdhQ3L",
     "youtubeClips": [
       {
@@ -6457,6 +6797,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "jRr5EasAq84",
@@ -6485,6 +6828,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "N8EkGUm9q_A",
@@ -6511,6 +6857,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -6540,6 +6889,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "6KR52lEWLEM",
@@ -6567,6 +6919,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Film edition"
     ],
     "youtubeClips": [
       {
@@ -6625,6 +6980,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -6740,6 +7098,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -6885,6 +7246,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -7081,6 +7445,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "4u6UkngBufI",
@@ -7108,6 +7475,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -7137,6 +7507,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "TvnYmWpD_T8",
@@ -7165,6 +7538,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "UG3VcCAlUgE",
@@ -7191,6 +7567,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Rock"
     ],
     "youtubeClips": [
       {
@@ -7433,6 +7812,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "3ErsOxqe2RmXkR65wkygDz",
     "youtubeClips": [
       {
@@ -7534,6 +7916,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "Uj2K3rerzT4",
@@ -7561,6 +7946,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -7627,6 +8015,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "nordic"
+    ],
+    "genrePackages": [
+      "Eurovision",
+      "100% in swedish"
     ],
     "youtubeClips": [
       {
@@ -7738,6 +8130,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "loFlGLLWdp8",
@@ -7764,6 +8160,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -7793,6 +8192,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
+      "100% in swedish",
       "Melodifestivalen"
     ],
     "spotifyTrackId": "0FSlaiuv4eBrrjz05jpxz6",
@@ -7824,6 +8224,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "52iW3lcpK5M",
@@ -7851,6 +8254,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "p3j2NYZ8FKs",
@@ -7877,6 +8283,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "sport"
     ],
     "spotifyTrackId": "50XXRUFNjs85P0MjCZ1c9X",
     "youtubeClips": [
@@ -7907,6 +8316,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "3Z2tPWiNiIpg8UMMoowHIk",
     "youtubeClips": [
       {
@@ -7935,6 +8347,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -7995,6 +8410,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Rock"
+    ],
     "youtubeClips": [
       {
         "videoId": "lDK9QqIzhwk",
@@ -8023,6 +8441,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "LPn0KFlbqX8",
@@ -8048,6 +8469,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Rock"
     ],
     "youtubeClips": [
       {
@@ -8139,6 +8563,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "zpzdgmqIHOQ",
@@ -8198,6 +8625,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -8510,6 +8940,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "i2hLL_UNUSo",
@@ -8683,6 +9116,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "4orJQkF2exPD4xSFmMY00U",
     "youtubeClips": [
       {
@@ -8743,6 +9179,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
     "spotifyTrackId": "6AbOYPLZy8epirlVNAOVDK",
     "youtubeClips": [
       {
@@ -8771,6 +9210,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -8827,6 +9269,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "oNvWDP_GkiY",
@@ -8865,6 +9310,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1331)."
+      }
+    ]
+  },
+  {
+    "id": "white-liuon-when-the-children-cry",
+    "displayName": "when the children cry — White liuon",
+    "correctYear": 1987,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Rock"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "6tatKFXlYiY",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -8914,6 +9388,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -9006,6 +9483,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "UtvmTu4zAMg",
@@ -9033,6 +9513,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "POWsFzSFLCE",
@@ -9059,6 +9542,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -9099,6 +9585,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "neneh-cherry-buffalo-stands",
+    "displayName": "Buffalo Stands — Neneh Cherry",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "JWsRz3TJDEY",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "paula-abdul-straight-up",
     "displayName": "Straight Up — Paula Abdul",
     "correctYear": 1988,
@@ -9115,6 +9630,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "8yFwvifjuf4",
@@ -9123,6 +9641,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MVIDEO4K",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "roxette-dangerous",
+    "displayName": "Dangerous — Roxette",
+    "correctYear": 1988,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "VFNRh26TPmM",
+        "startSec": 26,
+        "endSec": 41,
+        "license": "standard"
       }
     ]
   },
@@ -9142,6 +9689,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "spotifyTrackId": "2sDaqQj5VptFuLztuKxMSU",
     "youtubeClips": [
@@ -9171,6 +9721,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "spotifyTrackId": "79LdvxXi5JYUjhnO7v9Fi3",
     "youtubeClips": [
@@ -9240,7 +9793,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% in swedish"
+      "100% in swedish",
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -9385,6 +9939,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "alice-cooper-posion",
+    "displayName": "Posion — Alice Cooper",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Rock"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Qq4j1LtCdww",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "b52s-love-shack",
     "displayName": "Love Shack — The B-52's",
     "correctYear": 1989,
@@ -9401,6 +9984,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "9SOryJvTAGs",
@@ -9408,6 +9994,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Kanal ej verifierad."
+      }
+    ]
+  },
+  {
+    "id": "back-box-ride-on-time",
+    "displayName": "Ride on time — Back box",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "M0quXl_od3g",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -9499,6 +10114,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "christer-sandelin-det-hon-vill-ha",
+    "displayName": "Det hon vill ha — Christer Sandelin",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "5gyPbAixchH4iPhqKWthfB",
+    "youtubeClips": []
+  },
+  {
     "id": "depeche-mode-personal-jesus",
     "displayName": "Personal Jesus — Depeche Mode",
     "correctYear": 1989,
@@ -9524,6 +10162,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1322)."
       }
     ]
+  },
+  {
+    "id": "ebba-gron-800-grader",
+    "displayName": "800 grader — Ebba Grön",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Rock"
+    ],
+    "spotifyTrackId": "3zgJHNEorjbLLThp6TiMhz",
+    "youtubeClips": []
   },
   {
     "id": "field-of-dreams-1989",
@@ -9683,6 +10344,55 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "imply-red-if-iyou-dont-know-me-by-now",
+    "displayName": "If Iyou dont know me by now — imply red",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zTcu7MCtuTs",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "jerry-williams-did-i-tell-you",
+    "displayName": "Did I Tell You — Jerry Williams",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "6OjTQyRybsRv9GUmKKbAvp",
+    "youtubeClips": []
+  },
+  {
     "id": "kaoma-lambada",
     "displayName": "Lambada — Kaoma",
     "correctYear": 1989,
@@ -9731,6 +10441,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "8q2WS6ahCnY",
@@ -9758,6 +10471,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "GsVcUzP_O_8",
@@ -9784,6 +10500,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -9823,6 +10542,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 39,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1404)."
+      }
+    ]
+  },
+  {
+    "id": "marc-almond-something-gotten-hold-of-my-heart",
+    "displayName": "Something Gotten Hold of my heart — Marc Almond",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "LZ8Yn9QJi_o",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -9999,6 +10744,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "rchard-marx-right-here-waiting-for-you",
+    "displayName": "Right Here Waiting for You — Rchard Marx",
+    "correctYear": 1989,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "S_E2EHVxNAE",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "richard-marx-right-here-waiting",
     "displayName": "Right Here Waiting — Richard Marx",
     "correctYear": 1989,
@@ -10167,6 +10941,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "RnB"
+    ],
     "youtubeClips": [
       {
         "videoId": "LC3Zu4puC1w",
@@ -10222,6 +10999,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "youtubeClips": [
       {
         "videoId": "9EcjWd-O4jI",
@@ -10275,6 +11055,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "sport"
     ],
     "spotifyTrackId": "6pPWRBubXOBAHnjl5ZIujB",
     "youtubeClips": [
@@ -10408,6 +11191,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bjorn-skifs-and-blablus-hooked-on-a-feeling",
+    "displayName": "Hooked on a Feeling — Björn Skifs & Blåblus",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "l6DepmNwbn8",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "dr-alban-no-coke",
     "displayName": "No Coke — Dr. Alban",
     "correctYear": 1990,
@@ -10425,7 +11237,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -10493,6 +11305,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "50PeqUz1BjMw9ayNTk5O4d",
     "youtubeClips": [
       {
@@ -10521,6 +11336,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -10646,6 +11464,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "F_-ZuVy76yg",
@@ -10673,6 +11494,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -10702,6 +11526,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "youtubeClips": [
       {
         "videoId": "nm6DO_7px1I",
@@ -10710,6 +11537,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SNAP!",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14 med explicit startSec 10. Videotitel verifierad: 'SNAP! - The Power (Official 4K Music Video)' pa gruppens egen kanal — inget ar i titeln."
+      }
+    ]
+  },
+  {
+    "id": "sven-ingvars-sommar-och-sol",
+    "displayName": "Sommar och sol — Sven‐Ingvars",
+    "correctYear": 1990,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Summer"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "mIQNpPzCPTg",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -10742,6 +11599,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 1990 vinnare — Italien."
+      }
+    ]
+  },
+  {
+    "id": "army-of-lovers-obsession",
+    "displayName": "Obsession — Army of Lovers",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "zNmO233OztQ",
+        "startSec": 12,
+        "endSec": 27,
+        "license": "standard"
       }
     ]
   },
@@ -10869,6 +11755,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ewa-dahlgren-vem-tander-stjarnorna",
+    "displayName": "Vem tänder stjärnorna — Ewa Dahlgren",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish",
+      "Soft & Love"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "-02uHyU-rjs",
+        "startSec": 25,
+        "endSec": 40,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "fresh-prince-summertime",
     "displayName": "Summertime — DJ Jazzy Jeff & The Fresh Prince",
     "correctYear": 1991,
@@ -10954,6 +11871,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -11045,6 +11965,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Rock"
     ],
     "youtubeClips": [
       {
@@ -11167,6 +12090,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "xwtdhWltSIg",
@@ -11195,6 +12121,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "YYOKMUTTDdA",
@@ -11203,6 +12132,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "remhq",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "roxette-fading-like-a-flower-everytime-you-leave",
+    "displayName": "Fading Like a Flower (Everytime You Leave) — Roxette",
+    "correctYear": 1991,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "8fGLiIvKKys",
+        "startSec": 17,
+        "endSec": 32,
+        "license": "standard"
       }
     ]
   },
@@ -11222,6 +12180,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -11251,6 +12212,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Rock"
+    ],
     "youtubeClips": [
       {
         "videoId": "V7f03mfxN4I",
@@ -11278,6 +12242,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -11405,6 +12372,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "spotifyTrackId": "6kWJvPfC4DgUpRsXKNa9z9",
     "youtubeClips": [
       {
@@ -11494,7 +12464,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Love"
+      "Soft & Love",
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -11525,7 +12496,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "spotifyTrackId": "6bjl81yfCztuBXLC9Mqs2N",
     "youtubeClips": [
@@ -11557,7 +12528,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -11586,6 +12557,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Rock",
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -11686,6 +12661,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lisa-nilsson-himlen-runt-hornet",
+    "displayName": "Himlen runt hörnet — Lisa Nilsson",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Soft & Love",
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "3uhF5EBcuqqXELlszBhIOy",
+    "youtubeClips": []
+  },
+  {
     "id": "magnus-uggla-kung-for-en-dag",
     "displayName": "Kung för en dag — Magnus Uggla",
     "correctYear": 1992,
@@ -11731,6 +12730,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
     ],
     "spotifyTrackId": "6Y4TjH3wA2r76NML5BGASz",
     "youtubeClips": [
@@ -11854,6 +12856,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "YCYaALgW80c",
@@ -11915,6 +12920,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "youtubeClips": [
       {
         "videoId": "JYIaWeVL1JM",
@@ -11942,6 +12950,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
     ],
     "youtubeClips": [
       {
@@ -12074,6 +13085,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "tP0zj220CbQ",
@@ -12102,6 +13116,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "youtubeClips": [
       {
         "videoId": "7kmEEkECFQw",
@@ -12129,6 +13146,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "spotifyTrackId": "0hrBpAOgrt8RXigk83LLNE",
     "youtubeClips": [
@@ -12328,7 +13348,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -12655,7 +13675,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Love"
+      "Soft & Love",
+      "RnB"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -12733,6 +13754,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "carola-sanna-vanner",
+    "displayName": "Sanna vänner — Carola",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "5AGXO3iao804D7WuOm0Lyl",
+    "youtubeClips": []
+  },
+  {
     "id": "corona-the-rhythm-of-the-night",
     "displayName": "The Rhythm of the Night — Corona",
     "correctYear": 1994,
@@ -12750,7 +13794,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -12809,7 +13853,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -12840,7 +13884,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -12871,7 +13915,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -12902,7 +13946,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -13067,7 +14111,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -13168,6 +14212,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "nordic"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "spotifyTrackId": "0Jg602cHeMCnPez9baacIe",
     "youtubeClips": [
       {
@@ -13219,6 +14266,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -13281,8 +14331,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Summer",
-      "100% in swedish"
+      "Summer"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "7s8EmGKCWKHsKXhhEZBdaM",
@@ -13351,10 +14400,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Simba"
     ],
     "distractorNames": [
-      "Mufasa",
-      "Scar",
-      "Nala",
-      "Timon"
+      "Nemo",
+      "Shrek",
+      "Mulan",
+      "Aladdin"
     ],
     "youtubeClips": [
       {
@@ -13427,6 +14476,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1280)."
+      }
+    ]
+  },
+  {
+    "id": "2pac-ft-dr-dre-california-love",
+    "displayName": "California Love — 2Pac ft. Dr. Dre",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "3ia3dJETSOllPsv3LJkE35",
+    "youtubeClips": [
+      {
+        "videoId": "99zZ4fGZlgk",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -13663,6 +14743,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "TR3Vdo5etCQ",
@@ -13690,9 +14773,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "europe"
-    ],
-    "genrePackages": [
-      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -13722,6 +14802,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "bx1Bh8ZvH84",
@@ -13749,6 +14832,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -13935,6 +15021,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "europe"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "7aQjPecQdIuNd1sz3KCDhD",
     "youtubeClips": [
       {
@@ -13965,7 +15054,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "100% in swedish"
+      "100% in swedish",
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -14097,6 +15187,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "oKOtzIo-uYw",
@@ -14126,6 +15219,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
+      "RnB",
       "Soft & Love"
     ],
     "youtubeClips": [
@@ -14221,6 +15315,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "Z7EsuR5I8SE",
@@ -14280,6 +15377,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "europe"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -14341,7 +15441,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Hip Hop"
+      "Hip Hop",
+      "RnB"
     ],
     "parentControlled": true,
     "spotifyTrackId": "5PQmSHzWnlgG4EBuIqjac2",
@@ -14434,7 +15535,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "100% in swedish"
     ],
-    "inBaseCatalog": false,
     "spotifyTrackId": "6WhseDHUvM0lOk5oavjztk",
     "youtubeClips": [
       {
@@ -14463,7 +15563,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -14587,6 +15687,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "twW5slEK8wY",
@@ -14614,6 +15717,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -14708,6 +15814,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "CUmOFqQRkco",
@@ -14735,6 +15844,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -14827,6 +15940,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "NHozn0YXAeE",
@@ -14856,7 +15972,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Love"
+      "Soft & Love",
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -14918,6 +16035,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
     "youtubeClips": [
       {
         "videoId": "gicVQ52huT0",
@@ -14947,7 +16067,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "nordic"
     ],
     "genrePackages": [
-      "Soft & Love"
+      "Soft & Love",
+      "100% in swedish"
     ],
     "spotifyTrackId": "5eJ314ozT4CTPlyjdsGq78",
     "youtubeClips": [
@@ -14958,6 +16079,61 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "7clouds Sweden",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "lighthouse-family-high",
+    "displayName": "High — Lighthouse Family",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "taOL5HJdx1A",
+        "startSec": 40,
+        "endSec": 55,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "mariah-carey-honey",
+    "displayName": "Honey — Mariah Carey",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Oy2bwwIsS40",
+        "startSec": 22,
+        "endSec": 37,
+        "license": "standard"
       }
     ]
   },
@@ -14977,6 +16153,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -15038,6 +16217,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "ZJL4UGSbeFg",
@@ -15078,6 +16260,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "ShaniaTwainVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1997 = albumet Come On Over (nov 1997); singeln kom 1998."
+      }
+    ]
+  },
+  {
+    "id": "steps-5-6-7-8",
+    "displayName": "5, 6, 7, 8 — Steps",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "4NO-h9PFum4",
+        "startSec": 4,
+        "endSec": 19,
+        "license": "standard"
       }
     ]
   },
@@ -15226,6 +16437,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "1dfhNimhwNM",
@@ -15285,6 +16499,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "7p9dd71JR2ucoAuO1Sy0VZ",
     "youtubeClips": [
       {
@@ -15311,6 +16528,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -15406,6 +16626,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "NdYWuo9OFAw",
@@ -15414,6 +16637,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Goo Goo Dolls",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "jessica-folcker-how-will-i-know-who-you-are",
+    "displayName": "How Will I Know (Who You Are) — Jessica Folcker",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "na9U2GBu-KU",
+        "startSec": 9,
+        "endSec": 24,
+        "license": "standard"
       }
     ]
   },
@@ -15466,6 +16718,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Rock"
+    ],
     "youtubeClips": [
       {
         "videoId": "EvuL5jyCHOw",
@@ -15493,6 +16748,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -15642,7 +16900,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "sport"
+      "sport",
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -15672,6 +16931,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "5kW0BW8B5hjrbpe0OuFUr9",
     "youtubeClips": [
       {
@@ -15681,6 +16944,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Southside Spinners",
         "license": "standard",
         "notes": "Official video 2000."
+      }
+    ]
+  },
+  {
+    "id": "the-cardigans-my-favourite-game",
+    "displayName": "My Favourite Game — The Cardigans",
+    "correctYear": 1998,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "u9WgtlgGAgs",
+        "startSec": 30,
+        "endSec": 45,
+        "license": "standard"
       }
     ]
   },
@@ -15700,6 +16992,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "europe"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -15761,7 +17056,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Pop music"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -15789,6 +17084,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -15847,6 +17145,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Rock"
+    ],
     "youtubeClips": [
       {
         "videoId": "9Ht5RZpzPqw",
@@ -15874,6 +17175,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -15904,8 +17208,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "genrePackages": [
       "Eurovision",
-      "Melodifestivalen"
+      "Melodifestivalen",
+      "100% in swedish"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "a0cERXG3m90",
@@ -15933,6 +17239,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -16058,6 +17367,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -16217,6 +17529,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
     "youtubeClips": [
       {
         "videoId": "HJXsv1UIDmQ",
@@ -16244,6 +17559,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -16303,6 +17621,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -16404,7 +17725,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance",
+      "Dance Music",
       "sport"
     ],
     "inBaseCatalog": false,
@@ -16448,6 +17769,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "all-saints-pure-shores",
+    "displayName": "Pure Shores — All Saints",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "dVNdTXEJv1A",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "barbados-kom-hem",
     "displayName": "Kom hem — Barbados",
     "correctYear": 2000,
@@ -16463,6 +17813,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
     ],
     "spotifyTrackId": "71IcKgzWI4wyjBmar9hzy5",
     "youtubeClips": [
@@ -16493,6 +17846,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Rock"
+    ],
     "youtubeClips": [
       {
         "videoId": "bY3vXr7fm8k",
@@ -16521,6 +17877,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "gmWlNI4Zl2s",
@@ -16547,6 +17906,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -16671,6 +18033,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -16953,6 +18318,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "RnB"
+    ],
     "youtubeClips": [
       {
         "videoId": "abcZMQASXF8",
@@ -16981,7 +18349,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Eurovision"
+      "Pop music"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -17018,6 +18386,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "IyYnnUcgeMc",
@@ -17046,6 +18417,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "RnB"
+    ],
     "youtubeClips": [
       {
         "videoId": "Wmc8bQoL-J0",
@@ -17056,6 +18430,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
       }
     ]
+  },
+  {
+    "id": "friends-lyssna-till-ditt-hjarta",
+    "displayName": "Lyssna till ditt hjärta — Friends",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen",
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "4BhEDrbVxPgu13SQFwoDCV",
+    "youtubeClips": []
   },
   {
     "id": "harry-potter-philosophers-stone-2001",
@@ -17113,6 +18511,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "c18441Eh_WE",
@@ -17139,6 +18540,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -17271,6 +18675,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "RnB"
+    ],
     "youtubeClips": [
       {
         "videoId": "znlFu_lemsU",
@@ -17298,6 +18705,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Rock"
     ],
     "youtubeClips": [
       {
@@ -17421,7 +18831,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Pop music"
     ],
     "inBaseCatalog": false,
     "youtubeClips": [
@@ -17478,7 +18888,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -17509,6 +18919,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -17577,6 +18990,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
     "youtubeClips": [
       {
         "videoId": "N9KSvSBfFYA",
@@ -17604,6 +19020,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "6W2Ef5Ph6ILTUAedoQ3QIv",
     "youtubeClips": [
       {
@@ -17666,6 +19086,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "europe"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "youtubeClips": [
       {
         "videoId": "f_vyYpNDXkI",
@@ -17726,7 +19149,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Love"
+      "Soft & Love",
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -17826,6 +19250,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music",
+      "RnB"
+    ],
     "youtubeClips": [
       {
         "videoId": "ViwtNLUqkMY",
@@ -17853,6 +19281,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -17970,7 +19401,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Melodifestivalen"
+      "Melodifestivalen",
+      "100% in swedish"
     ],
     "spotifyTrackId": "20NfHnLzpw6qoAKOX8BFaQ",
     "youtubeClips": [
@@ -18045,6 +19477,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-latin-kings-cashen-dom-tas",
+    "displayName": "Cashen dom tas — The Latin Kings",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish",
+      "Hip Hop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "JbfaWv9rHZk",
+        "startSec": 20,
+        "endSec": 35,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "the-rasmus-in-the-shadows",
     "displayName": "In the Shadows — The Rasmus",
     "correctYear": 2003,
@@ -18060,6 +19522,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "europe"
+    ],
+    "genrePackages": [
+      "Rock"
     ],
     "youtubeClips": [
       {
@@ -18089,6 +19554,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "europe"
     ],
+    "genrePackages": [
+      "Rock"
+    ],
     "youtubeClips": [
       {
         "videoId": "0J2QdDbelmY",
@@ -18117,6 +19585,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "t65NQg6iXDw",
@@ -18143,6 +19614,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "europe"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -18173,7 +19647,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
@@ -18245,6 +19719,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "parentControlled": true,
     "spotifyTrackId": "2LELFaNglE9B5xlcmd4qtQ",
     "youtubeClips": [
@@ -18273,6 +19750,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "Kgjkth6BRRY",
@@ -18299,6 +19779,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop",
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -18338,6 +19822,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 33,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-11 ur Music.xlsx (rad 1395)."
+      }
+    ]
+  },
+  {
+    "id": "mario-let-me-love-you",
+    "displayName": "Let Me Love You — Mario",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "RnB"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "H64QG4UsrGI",
+        "startSec": 30,
+        "endSec": 45,
+        "license": "standard"
       }
     ]
   },
@@ -18416,6 +19929,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "nelly-feat-tim-mcgraw-over-and-over",
+    "displayName": "Over and Over — Nelly feat. Tim McGraw",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "RnB"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "n3htOCjafTc",
+        "startSec": 20,
+        "endSec": 35,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "o-zone-dragostea-din-tei",
     "displayName": "Dragostea Din Tei — O-Zone",
     "correctYear": 2004,
@@ -18432,6 +19975,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "europe"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "3xx0s147Xj4",
@@ -18513,6 +20060,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-chemical-brothers-galvanize",
+    "displayName": "Galvanize — The Chemical Brothers",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Xu3FTEmN-eg",
+        "startSec": 19,
+        "endSec": 34,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "usher-yeah",
     "displayName": "Yeah! — Usher",
     "correctYear": 2004,
@@ -18529,12 +20105,104 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "RnB"
+    ],
     "youtubeClips": [
       {
         "videoId": "iCL04cxeMOE",
         "startSec": 0,
         "endSec": 251,
         "channelTitle": "7clouds",
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "50-cent-candy-shop",
+    "displayName": "Candy Shop — 50 Cent",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "SRcnnId15BA",
+        "startSec": 29,
+        "endSec": 44,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "agnes-right-here-right-now-my-heart-belongs-to-you",
+    "displayName": "Right Here, Right Now (My Heart Belongs to You) — Agnes",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "rkmD-ZGdnWs",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "axel-f-crazy-frog",
+    "displayName": "Crazy Frog — Axel F.",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "k85mRPqvMbE",
+        "startSec": 5,
+        "endSec": 20,
         "license": "standard"
       }
     ]
@@ -18556,6 +20224,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "ZaI2IlHwmgQ",
@@ -18563,6 +20234,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 47,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1337)."
+      }
+    ]
+  },
+  {
+    "id": "coldplay-speed-of-sound",
+    "displayName": "Speed of Sound — Coldplay",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "0k_1kvDh2UA",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
       }
     ]
   },
@@ -18582,6 +20282,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -18642,6 +20345,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "EDwb9jOVRtU",
@@ -18700,6 +20406,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "RnB"
+    ],
     "youtubeClips": [
       {
         "videoId": "VCLxJd1d84s",
@@ -18727,6 +20436,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -18756,6 +20468,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "bMoNV9oWs2E",
@@ -18763,6 +20478,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 43,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1346)."
+      }
+    ]
+  },
+  {
+    "id": "sugababes-push-the-button",
+    "displayName": "Push the Button — Sugababes",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "oJDGcxAf9D8",
+        "startSec": 16,
+        "endSec": 31,
+        "license": "standard"
       }
     ]
   },
@@ -18914,7 +20658,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -19034,6 +20778,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "O0lf_fE3HwA",
@@ -19093,7 +20840,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -19124,7 +20871,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -19154,6 +20901,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "6JnGBs88sL0",
@@ -19182,6 +20932,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "X8k1FVqtojU",
@@ -19209,6 +20962,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -19268,6 +21024,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "PNgqgpzeV8A",
@@ -19310,6 +21069,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "eric-prydz-pjanoo",
+    "displayName": "Pjanoo — Eric Prydz",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Gz3yCrMJXpk",
+        "startSec": 26,
+        "endSec": 41,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "kate-ryan-voyage-voyage",
     "displayName": "Voyage, voyage — Kate Ryan",
     "correctYear": 2007,
@@ -19327,7 +21115,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -19436,6 +21224,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "oh-laura-release-me",
+    "displayName": "Release Me — Oh Laura",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "spotifyTrackId": "66Bzmhj4cOinK5bxjx5DAK",
+    "youtubeClips": []
+  },
+  {
     "id": "rihanna-dont-stop-the-music",
     "displayName": "Don’t Stop the Music — Rihanna",
     "correctYear": 2007,
@@ -19451,6 +21259,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -19511,6 +21322,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop",
+      "Hip Hop",
+      "RnB"
+    ],
     "youtubeClips": [
       {
         "videoId": "HuQ0ni6AlrU",
@@ -19538,8 +21354,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "nordic"
     ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "0NEw29HKkDkt1yDyBJOgXe",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "-ojHWQrm4UM",
+        "startSec": 30,
+        "endSec": 45,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "the-ark-the-worrying-kind",
@@ -19620,7 +21447,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -19651,7 +21478,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -19661,6 +21488,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Energy TV",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "agnes-release-me",
+    "displayName": "Release Me — Agnes",
+    "correctYear": 2008,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "keYXzDh5JEQ",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -19682,7 +21538,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Soft & Love"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -19752,6 +21608,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "dvgZkm1xWPE",
@@ -19778,6 +21637,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "europe"
+    ],
+    "genrePackages": [
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -19807,6 +21669,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "kTHNpusq654",
@@ -19834,6 +21699,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "usvTbqTHwyw",
@@ -19860,6 +21728,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "spotifyTrackId": "5vQXxfGn1bjv5WESrYVVpw",
     "youtubeClips": [
@@ -19894,6 +21765,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "d2smz_1L2_0",
@@ -19920,6 +21794,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -20122,6 +21999,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "uSD4vsh1zDA",
@@ -20157,6 +22037,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop"
     ],
     "spotifyTrackId": "0GWGZA5mxo9nHuSyrj70uo",
     "youtubeClips": [
@@ -20220,6 +22104,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
     "spotifyTrackId": "2igwFfvr1OAGX9SKDCPBwO",
     "youtubeClips": [
       {
@@ -20250,7 +22137,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -20279,6 +22166,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -20339,6 +22229,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "spotifyTrackId": "28qkNp9shSV8AQrBwxZf48",
     "youtubeClips": [
       {
@@ -20368,6 +22261,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop",
+      "RnB"
+    ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "5sp1KDCNEm1Eoeqxsep01L",
     "youtubeClips": [
       {
@@ -20402,6 +22301,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop",
+      "RnB"
+    ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "5sp1KDCNEm1Eoeqxsep01L",
     "youtubeClips": [
       {
@@ -20429,6 +22334,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -20491,6 +22399,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "LjhCEhWiKXk",
@@ -20518,6 +22429,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -20548,7 +22462,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "europe"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -20577,6 +22491,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love",
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -20638,7 +22556,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -20667,6 +22585,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -20793,7 +22714,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -20822,6 +22743,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "nordic"
+    ],
+    "genrePackages": [
+      "Dance Music"
     ],
     "spotifyTrackId": "6aqNCrRA7vs7v6QvRpI50t",
     "youtubeClips": [
@@ -20937,6 +22861,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "snoop-dogg-sweat",
+    "displayName": "Sweat — Snoop Dogg",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "KnEXrbAQyIo",
+        "startSec": 6,
+        "endSec": 21,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "swedish-house-mafia-one",
     "displayName": "One (Your Name) — Swedish House Mafia",
     "correctYear": 2010,
@@ -20954,7 +22909,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -21054,6 +23009,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "hLQl3WQQoQ0",
@@ -21081,6 +23039,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
     ],
     "spotifyTrackId": "5UqCQaDshqbIk3pkhy4Pjg",
     "youtubeClips": [
@@ -21239,6 +23200,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision",
       "Melodifestivalen"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "g_67DS2j9hs",
@@ -21266,6 +23228,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -21295,6 +23260,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "t4H_Zoh7G5A",
@@ -21322,6 +23290,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -21351,6 +23322,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "qMxX-QOV9tI",
@@ -21379,6 +23353,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "XD96scj1kd8",
@@ -21387,6 +23365,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Musikmix Germany",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "lykke-li-i-follow-rivers",
+    "displayName": "I Follow Rivers — Lykke Li",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9dzub7uXWl4",
+        "startSec": 7,
+        "endSec": 22,
+        "license": "standard"
       }
     ]
   },
@@ -21406,6 +23413,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -21477,7 +23487,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Disco & Pop",
+      "Dance Music"
     ],
     "youtubeClips": [
       {
@@ -21518,6 +23529,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SelenaGomezVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "svenska-bjornstammen-vart-jag-mig-an-i-varlden-vander",
+    "displayName": "Vart jag mig än i världen vänder — Svenska björnstammen",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Hip Hop",
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "jI2EcRXR7RU",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
       }
     ]
   },
@@ -21607,6 +23649,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "sweden"
     ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "5M2y8QdDepGYMsWyxhoxQU",
     "youtubeClips": [
       {
         "videoId": "VjZwz3yxS9I",
@@ -21634,6 +23680,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -21694,6 +23743,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "nordic"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "2bU3gg0M8GGBs7ItBKsJX9",
     "youtubeClips": [
       {
@@ -21722,6 +23774,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "spotifyTrackId": "3VZQshi4COChhXaz7cLP02",
     "youtubeClips": [
@@ -21760,6 +23815,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "l8hIx9AceOw",
@@ -21789,7 +23847,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "genrePackages": [
-      "Hip Hop"
+      "100% in swedish"
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "68GdZAAowWDac3SkdNWOwo",
@@ -21863,6 +23921,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 38,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1407)."
+      }
+    ]
+  },
+  {
+    "id": "medina-dar-palmerna-bor",
+    "displayName": "Där palmerna bor — Medina",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TLD74qRkhs8",
+        "startSec": 55,
+        "endSec": 70,
+        "license": "standard"
       }
     ]
   },
@@ -21986,6 +24073,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "spotifyTrackId": "1z9kQ14XBSN0r2v6fx4IdG",
     "youtubeClips": [
       {
@@ -22055,7 +24145,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "spotifyTrackId": "3zu2CuVTJwaZn2m4rBzaUO",
     "youtubeClips": [
@@ -22115,6 +24205,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "spotifyTrackId": "4lhqb6JvbHId48OUJGwymk",
     "youtubeClips": [
       {
@@ -22143,6 +24236,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
     ],
     "spotifyTrackId": "0nrRP2bk19rLc0orkWPQk2",
     "youtubeClips": [
@@ -22204,6 +24300,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "spotifyTrackId": "2Foc5Q5nqNiosCNqttzHof",
     "youtubeClips": [
       {
@@ -22235,6 +24334,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "k59E7T0H-Us",
@@ -22356,7 +24456,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Pop"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -22386,6 +24486,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "W-TE_Ys4iwM",
@@ -22413,6 +24516,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -22443,7 +24549,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -22565,6 +24671,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "nordic"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "fG-EIvEiSHs",
@@ -22573,6 +24682,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Tove Lo",
         "license": "standard",
         "notes": "Officiell OG Independent Video från Tove Lo:s egen kanal. Ersätter Topic-versionen."
+      }
+    ]
+  },
+  {
+    "id": "veronica-maggio-and-hakan-hellstrom-hela-huset",
+    "displayName": "Hela huset — Veronica Maggio & Håkan Hellström",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "nPUtRUoW_Qc",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -22592,6 +24730,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "spotifyTrackId": "5HOpkTTVcmZHnthgyxrIL8",
     "youtubeClips": [
@@ -22637,6 +24778,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "alesso-feat-tove-lo-heroes-we-could-be",
+    "displayName": "Heroes (We Could Be) — Alesso feat. Tove Lo",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "a7SouU3ECpU",
+        "startSec": 70,
+        "endSec": 85,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "ariana-grande-break-free",
     "displayName": "Break Free — Ariana Grande feat. Zedd",
     "correctYear": 2014,
@@ -22652,6 +24822,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music",
+      "RnB"
     ],
     "spotifyTrackId": "2lOgTEwxmRPBtjp60opyRN",
     "youtubeClips": [
@@ -22714,6 +24888,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop",
+      "RnB"
+    ],
     "youtubeClips": [
       {
         "videoId": "BPgEgaPk62M",
@@ -22773,6 +24951,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -22900,6 +25081,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "fmsv4gPe9bg",
@@ -22928,6 +25112,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "7PCkvCPvDXk",
@@ -22986,6 +25174,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop",
+      "Dance Music"
     ],
     "spotifyTrackId": "4Y7XAxTANhu3lmnLAzhWJW",
     "youtubeClips": [
@@ -23052,6 +25244,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "e-ORhEE9VVg",
@@ -23079,6 +25274,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -23265,6 +25463,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "AJtDXIazrMo",
@@ -23399,6 +25600,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "YqeW9_5kURI",
@@ -23470,6 +25674,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "markus-och-martinus-elektrisk",
+    "displayName": "Elektrisk — Markus och Martinus",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ri5_fzndMBg",
+        "startSec": 13,
+        "endSec": 28,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "norlie-kkv-ingen-annan-ror-mig-som-du",
     "displayName": "Ingen annan rör mig som du — Norlie & KKV",
     "correctYear": 2015,
@@ -23510,6 +25743,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "kalsoK9K3mI",
@@ -23538,6 +25774,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "Lguev0C0F-g",
@@ -23565,6 +25804,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "spotifyTrackId": "3S4px9f4lceWdKf0gWciFu",
     "youtubeClips": [
@@ -23603,6 +25845,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "RgKAFK5djSk",
@@ -23629,6 +25874,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -23686,6 +25934,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "SXiSVQZLje8",
@@ -23713,6 +25964,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -23769,6 +26024,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "papuvlVeZg8",
@@ -23796,6 +26054,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -23856,6 +26117,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
     "youtubeClips": [
       {
         "videoId": "ki0Ocze98U8",
@@ -23883,6 +26147,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "nordic"
     ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
     "youtubeClips": [
       {
         "videoId": "jLkHNqQS1fw",
@@ -23891,6 +26158,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Frans - Topic",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26. startSec 5 satt av Peter. Bytt fran nANXQA9JEMY: den lag pa reupload-kanalen Bad Boy Edd trots att noten pastod officiell video. Detta ar Frans egen Topic-kanal (officiell studio-audio)."
+      }
+    ]
+  },
+  {
+    "id": "galantis-no-money",
+    "displayName": "No Money — Galantis",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xUVz4nRmxn4",
+        "startSec": 20,
+        "endSec": 35,
+        "license": "standard"
       }
     ]
   },
@@ -23977,6 +26273,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "ru0K8uYEZWw",
@@ -24036,6 +26335,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -24136,6 +26438,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "robin-bengtsson-constellaztion-prize",
+    "displayName": "Constellaztion Prize — Robin Bengtsson",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Melodifestivalen"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "U2HPDlVdSyk",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "sean-paul-no-lie",
     "displayName": "No Lie — Sean Paul feat. Dua Lipa",
     "correctYear": 2016,
@@ -24151,6 +26483,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -24210,6 +26545,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "3_g2un5M350",
@@ -24237,6 +26575,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -24378,6 +26719,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "aatr_2MstrI",
@@ -24438,6 +26782,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "Mgfe5tIwOj0",
@@ -24465,6 +26812,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -24585,6 +26935,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "nordic"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "spotifyTrackId": "6YutTqJz3jGfLMfzIHpSTf",
     "youtubeClips": [
       {
@@ -24658,6 +27011,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "molly-utan-dig",
+    "displayName": "Utan dig — Molly",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish",
+      "Soft & Love"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "3fiKmyDr615KZDrL51VZDu",
+    "youtubeClips": [
+      {
+        "videoId": "FyO_4OOY8cA",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "post-malone-rockstar",
     "displayName": "Rockstar — Post Malone",
     "correctYear": 2017,
@@ -24673,6 +27058,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Rock"
     ],
     "youtubeClips": [
       {
@@ -24733,6 +27121,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "JGwWNGJdvx8",
@@ -24760,6 +27151,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -24882,6 +27276,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "8JnfIa84TnU",
@@ -24975,6 +27372,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "7hiVIixor_Q",
@@ -25050,6 +27450,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
     ],
     "youtubeClips": [
       {
@@ -25206,6 +27609,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "4-TbQnONe_w",
@@ -25265,6 +27671,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -25326,6 +27735,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "dZwffaluIgg",
@@ -25357,6 +27769,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision",
       "Melodifestivalen"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "iEEuG5XML-A",
@@ -25415,6 +27828,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -25500,6 +27916,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love",
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "Pkh8UtuejGw",
@@ -25527,6 +27947,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -25589,6 +28012,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "q0hyYWKXF0Q",
@@ -25616,6 +28042,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "spotifyTrackId": "0VjIjW4GlUZAMYd2vXMi3b",
     "youtubeClips": [
@@ -25647,7 +28076,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -25676,6 +28105,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -25766,6 +28198,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "Nj2U6rhnucI",
@@ -25793,6 +28228,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -25885,6 +28323,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "RnB"
     ],
     "youtubeClips": [
       {
@@ -26045,6 +28486,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "yWHrYNP6j4k",
@@ -26159,6 +28603,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "rhTl_OyehF8",
@@ -26191,6 +28638,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision",
       "Melodifestivalen"
     ],
+    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "5P1ueI9j6gk",
@@ -26218,6 +28666,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "europe"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -26280,7 +28731,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "genrePackages": [
-      "Club & Dance"
+      "Dance Music"
     ],
     "spotifyTrackId": "4uUG5RXrOk84mYEfFvj3cK",
     "youtubeClips": [
@@ -26310,6 +28761,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -26433,6 +28887,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "pXpbKU24cMo",
@@ -26496,7 +28953,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "100% in swedish"
     ],
-    "inBaseCatalog": false,
     "youtubeClips": [
       {
         "videoId": "ASzgTmKlTRA",
@@ -26524,6 +28980,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "EiAMmYbr3vA",
@@ -26550,6 +29009,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Pop music"
     ],
     "youtubeClips": [
       {
@@ -26583,6 +29045,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision",
       "Melodifestivalen"
     ],
+    "inBaseCatalog": false,
     "spotifyTrackId": "1DmW5Ep6ywYwxc2HMT5BG6",
     "youtubeClips": [
       {
@@ -26612,6 +29075,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "iawgB2CDCrw",
@@ -26638,6 +29104,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "nordic"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -26666,6 +29135,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "nordic"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -26756,6 +29228,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -26874,6 +29349,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "spotifyTrackId": "7nEHTOQJqKCx7Dvgng3l8t",
     "youtubeClips": [
       {
@@ -26965,6 +29443,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "ekr2nIex040",
@@ -26993,6 +29474,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
     "youtubeClips": [
       {
         "videoId": "YnguM4ED3bw",
@@ -27019,6 +29503,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -27047,6 +29534,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
     ],
     "youtubeClips": [
       {
@@ -27203,6 +29693,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Pop music"
+    ],
     "youtubeClips": [
       {
         "videoId": "cZgUiR31m-Y",
@@ -27231,6 +29724,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
     "youtubeClips": [
       {
         "videoId": "ko70cExuzZM",
@@ -27258,6 +29754,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
@@ -27480,6 +29979,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
     ],
     "youtubeClips": [
       {
