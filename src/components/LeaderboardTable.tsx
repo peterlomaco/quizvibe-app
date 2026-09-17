@@ -356,6 +356,9 @@ export function LeaderboardTable({
                     </Text>
                     <Text style={styles.lbHcpModalSub}>HCP Progression</Text>
                   </View>
+                  {/* Balanserar avataren till vänster så namn/undertitel
+                      hamnar i kortets faktiska mitt, inte förskjutet höger. */}
+                  <View style={styles.lbHcpModalTitleSpacer} />
                 </View>
                 <View style={styles.lbHcpModalRow}>
                   <HCPShieldCard hcp={expandedCat.total.after} size={48} label="Total" deltaBadge={expandedCat.total.delta} />
@@ -509,21 +512,30 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     alignSelf: 'stretch',
   },
-  // Namn på rad 1, "HCP Progression" på rad 2.
+  // Namn på rad 1, "HCP Progression" på rad 2 — centrerat i kortet.
+  // flex:1 så stacken fyller mitten mellan avatar (vänster) och spacer
+  // (höger, samma bredd) → texten landar i kortets faktiska mitt.
   lbHcpModalTitleStack: {
-    flexShrink: 1,
+    flex: 1,
     flexDirection: 'column',
+    alignItems: 'center',
+  },
+  // Samma bredd som avataren (30) så texten centreras i kortet.
+  lbHcpModalTitleSpacer: {
+    width: 30,
   },
   lbHcpModalName: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
+    textAlign: 'center',
   },
   lbHcpModalSub: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.textSecondary,
     letterSpacing: 0.3,
+    textAlign: 'center',
   },
   lbHcpModalRow: {
     flexDirection: 'row',
