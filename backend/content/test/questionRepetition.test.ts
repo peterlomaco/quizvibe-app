@@ -278,6 +278,94 @@ describe('buildEpochPhase borrow ordering', () => {
   });
 });
 
+// ─── 3b. buildEpochPhase — färskhet är absolut inom eran ───────────────────
+
+describe('buildEpochPhase freshness is absolute across in-era epochs', () => {
+  const WIDE = getActiveEpochs(1950, 2012); // E1..E4
+
+  it('serves an unseen item from another in-era epoch before repeating a SEEN item from the target epoch', () => {
+    // Buggen Peter rapporterade: målepoken (E1) har items kvar men ALLA är
+    // sedda inom de senaste 20 spelen, medan E2 har osedda. Gamla popFromPool
+    // serverade en sedd E1-item i stället för att låna en osedd E2-item →
+    // repris inom 20-spelsfönstret trots att färskt fanns.
+    const e1Seen = makeQuestions('Music', 3, 1950, 1964).map((q) => ({ ...q, id: `e1-seen-${q.id}` }));
+    const e2Fresh = makeQuestions('Music', 6, 1965, 1980).map((q) => ({ ...q, id: `e2-fresh-${q.id}` }));
+    const seenIds = new Set(ids(e1Seen)); // sedda, men INTE i senaste sessionen
+
+    for (let run = 0; run < 25; run++) {
+      const out = buildEpochPhase<Q>({
+        pool: [...e1Seen, ...e2Fresh],
+        totalQuestions: 1,
+        activeEpochs: WIDE,
+        recentIds: seenIds,
+        lastSessionIds: new Set(),
+        isPtP: false,
+        players: [],
+        turnOrderIds: [],
+        getEpochYear: getYear,
+        quotas: [{ epochId: 1, quota: 1 }], // slot planerad för E1
+      });
+      expect(out).toHaveLength(1);
+      expect(out[0].id).toMatch(/^e2-fresh-/); // aldrig en sedd E1-item
+      expect(seenIds.has(out[0].id)).toBe(false);
+    }
+  });
+
+  it('exhausts every unseen item in the era before serving any seen item', () => {
+    // 2 osedda + 3 sedda, 4 slots. De 2 osedda MÅSTE komma först; bara den
+    // fjärde platsen (äkta dry-out) får vara en sedd item.
+    const unseen = makeQuestions('Music', 2, 1965, 1980).map((q) => ({ ...q, id: `unseen-${q.id}` }));
+    const seen = makeQuestions('Music', 3, 1965, 1980).map((q) => ({ ...q, id: `seen-${q.id}` }));
+    const seenIds = new Set(ids(seen));
+
+    const out = buildEpochPhase<Q>({
+      pool: [...unseen, ...seen],
+      totalQuestions: 4,
+      activeEpochs: WIDE,
+      recentIds: seenIds,
+      lastSessionIds: new Set(),
+      isPtP: false,
+      players: [],
+      turnOrderIds: [],
+      getEpochYear: getYear,
+      quotas: [{ epochId: 2, quota: 4 }],
+    });
+
+    expect(out).toHaveLength(4);
+    const unseenServed = out.filter((q) => !seenIds.has(q.id));
+    expect(unseenServed).toHaveLength(2); // båda osedda serverade
+    // Ingen sedd item får dyka upp bland de FÖRSTA två (osedda tar de platserna).
+    expect(seenIds.has(out[0].id)).toBe(false);
+    expect(seenIds.has(out[1].id)).toBe(false);
+  });
+
+  it('on full dry-out prefers older-seen over last-session', () => {
+    // Alla items sedda; ett av dem sågs i SENASTE sessionen. Med 2 slots ska de
+    // två äldre-sedda väljas före det senast-sedda.
+    const pool = makeQuestions('Music', 3, 1965, 1980);
+    const recent = new Set(ids(pool));         // alla sedda
+    const last = new Set([pool[0].id]);        // pool[0] sågs senast
+
+    for (let run = 0; run < 25; run++) {
+      const out = buildEpochPhase<Q>({
+        pool,
+        totalQuestions: 2,
+        activeEpochs: WIDE,
+        recentIds: recent,
+        lastSessionIds: last,
+        isPtP: false,
+        players: [],
+        turnOrderIds: [],
+        getEpochYear: getYear,
+        quotas: [{ epochId: 2, quota: 2 }],
+      });
+      expect(out).toHaveLength(2);
+      expect(ids(out)).not.toContain(pool[0].id); // last-session undviks
+      expect(ids(out).sort()).toEqual([pool[1].id, pool[2].id].sort());
+    }
+  });
+});
+
 // ─── 4. 20-spelssimulering — hela kedjan ───────────────────────────────────
 
 describe('no repeats across 20 consecutive games (era 1950-1980, gen-z)', () => {

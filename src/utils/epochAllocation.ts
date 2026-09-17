@@ -484,17 +484,17 @@ export function buildEpochPhase<T extends EpochQuestion>(
   }
 
   // ── Step 2b: samma 3-tier-split + shuffle för era-agnostiska poolen ────
-  // Utan detta konsumerades agnosticPool i KATALOG-ordning (deterministisk —
-  // två fresh hosts fick samma överflödes-sekvens) och utan seen-hänsyn (en
-  // last-session-fråga kunde väljas trots att osedda fanns). Vanligt läge
-  // vid smala Game Era-fönster där många person/Hints-items hamnar utanför
-  // aktiva epoker. splice-in-place så shift()-konsumenterna nedan är orörda.
-  const orderedAgnostic = [
-    ...shuffleArr(agnosticPool.filter((q) => !recentIds.has(q.id) && !lastIds.has(q.id))),
-    ...shuffleArr(agnosticPool.filter((q) => recentIds.has(q.id) && !lastIds.has(q.id))),
-    ...shuffleArr(agnosticPool.filter((q) => lastIds.has(q.id))),
-  ];
-  agnosticPool.splice(0, agnosticPool.length, ...orderedAgnostic);
+  // Tierad struktur (inte längre en platt tier-ordnad array) så fresh-passet
+  // nedan kan konsumera dess OSEDDA items före någon sedd item serveras. Utan
+  // seen-hänsyn kunde en last-session-fråga väljas trots att osedda fanns;
+  // utan shuffle konsumerades den i KATALOG-ordning (deterministisk — två
+  // fresh hosts fick samma överflödes-sekvens). Vanligt läge vid smala Game
+  // Era-fönster där många person/Hints-items hamnar utanför aktiva epoker.
+  const agnostic = {
+    unseen: shuffleArr(agnosticPool.filter((q) => !recentIds.has(q.id) && !lastIds.has(q.id))),
+    seen: shuffleArr(agnosticPool.filter((q) => recentIds.has(q.id) && !lastIds.has(q.id))),
+    lastSession: shuffleArr(agnosticPool.filter((q) => lastIds.has(q.id))),
+  };
 
   // ── Step 3: Allocate total questions across epochs ─────────────────────
   // Föredra kvoter planerade av epochLedger (löpande fördelning över spel);
@@ -502,59 +502,96 @@ export function buildEpochPhase<T extends EpochQuestion>(
   const allocation = quotas ?? allocateByEpoch(totalQuestions, activeEpochs);
   const epochNormWeights = new Map(activeEpochs.map((e) => [e.id, e.normWeight]));
 
-  // Pop one question from an epoch pool (fresh → older-seen → last-session)
-  const popFromPool = (epochId: EpochId): T | undefined => {
+  // ── Pop-helpers — färskhet är ABSOLUT ─────────────────────────────────
+  // En SEDD item serveras aldrig så länge NÅGON osedd item finns kvar i den
+  // (redan era-filtrerade) poolen — annars kan ett item återkomma inom
+  // 20-spelsfönstret trots att osedda items väntar i en annan epok av samma
+  // era (buggen Peter rapporterade). Alla epok-buckets + agnostic är
+  // era-scopade av anroparen, så inget lån når UTANFÖR vald Game Era; bara
+  // vilken IN-ERA item som fyller en färskhets-tömd slot ändras.
+
+  // Osedd item ur MÅLEPOKEN (annars undefined — ingen degradering till sedd här).
+  const popUnseen = (epochId: EpochId): T | undefined => {
+    const ep = epochPools.get(epochId);
+    return ep && ep.unseen.length > 0 ? ep.unseen.shift() : undefined;
+  };
+
+  // Låna en OSEDD item från valfri ANNAN (in-era) epok; tie-break färre
+  // extraDraws, sedan högst normWeight. Faller till agnostic-osedd sist.
+  const borrowUnseen = (excludeId: EpochId): T | undefined => {
+    const candidates = [...epochPools.entries()]
+      .filter(([id, ep]) => id !== excludeId && ep.unseen.length > 0)
+      .sort(([aId, aEp], [bId, bEp]) => {
+        const drawDiff = aEp.extraDraws - bEp.extraDraws;
+        if (drawDiff !== 0) return drawDiff;
+        return (epochNormWeights.get(bId) ?? 0) - (epochNormWeights.get(aId) ?? 0);
+      });
+    if (candidates.length > 0) {
+      const [, winnerEp] = candidates[0];
+      winnerEp.extraDraws++;
+      return winnerEp.unseen.shift();
+    }
+    return agnostic.unseen.length > 0 ? agnostic.unseen.shift() : undefined;
+  };
+
+  // Dry-out: SEDD item ur målepoken (äldre-sedd före senaste sessionen).
+  const popSeenFromEpoch = (epochId: EpochId): T | undefined => {
     const ep = epochPools.get(epochId);
     if (!ep) return undefined;
-    if (ep.unseen.length > 0) return ep.unseen.shift();
     if (ep.seen.length > 0) return ep.seen.shift();
     if (ep.lastSession.length > 0) return ep.lastSession.shift();
     return undefined;
   };
 
-  // Fallback: borrow from epoch with fewest extra-draws.
-  // Föredrar epoker med fresh/older-seen items (undviker last-session).
-  // Tie-break: highest normWeight (epoch "deserves" more questions).
-  const fallbackQuestion = (excludeId: EpochId): T | undefined => {
-    // Färskhet går FÖRE epok-balans. Tidigare sorterades kandidaterna enbart på
-    // extraDraws/normWeight, så en epok vars enda kvarvarande items sågs i FÖRRA
-    // spelet kunde vinna lånet över en epok med osedda items — tvärtemot vad
-    // kommentaren påstod, och tvärtemot 20-spelars-löftet. Tier-nyckeln nedan
-    // (0 = har osedda, 1 = har äldre-sedda, 2 = bara senaste sessionen)
-    // dominerar därför sorteringen; extraDraws/normWeight bryter lika.
-    const freshnessTier = (ep: { unseen: T[]; seen: T[] }): number =>
-      ep.unseen.length > 0 ? 0 : ep.seen.length > 0 ? 1 : 2;
+  // Dry-out: låna en sedd item från annan epok (äldre-sedd före senaste
+  // sessionen; tie-break extraDraws → normWeight). Faller till agnostic sist.
+  const borrowSeen = (excludeId: EpochId): T | undefined => {
+    const seenTier = (ep: { seen: T[] }): number => (ep.seen.length > 0 ? 0 : 1);
     const candidates = [...epochPools.entries()]
-      .filter(([id, ep]) => id !== excludeId && (ep.unseen.length + ep.seen.length + ep.lastSession.length) > 0)
+      .filter(([id, ep]) => id !== excludeId && ep.seen.length + ep.lastSession.length > 0)
       .sort(([aId, aEp], [bId, bEp]) => {
-        const tierDiff = freshnessTier(aEp) - freshnessTier(bEp);
+        const tierDiff = seenTier(aEp) - seenTier(bEp);
         if (tierDiff !== 0) return tierDiff;
-        const normA = epochNormWeights.get(aId) ?? 0;
-        const normB = epochNormWeights.get(bId) ?? 0;
-        const scoreA = aEp.extraDraws * 10000 - normA;
-        const scoreB = bEp.extraDraws * 10000 - normB;
-        return scoreA - scoreB;
+        const drawDiff = aEp.extraDraws - bEp.extraDraws;
+        if (drawDiff !== 0) return drawDiff;
+        return (epochNormWeights.get(bId) ?? 0) - (epochNormWeights.get(aId) ?? 0);
       });
-    if (candidates.length === 0) {
-      return agnosticPool.length > 0 ? agnosticPool.shift() : undefined;
+    if (candidates.length > 0) {
+      const [winnerEpochId, winnerEp] = candidates[0];
+      winnerEp.extraDraws++;
+      return popSeenFromEpoch(winnerEpochId);
     }
-    const [winnerEpochId, winnerEp] = candidates[0];
-    winnerEp.extraDraws++;
-    return popFromPool(winnerEpochId);
+    if (agnostic.seen.length > 0) return agnostic.seen.shift();
+    return agnostic.lastSession.length > 0 ? agnostic.lastSession.shift() : undefined;
   };
 
-  // ── Step 4: Collect questions in epoch order 1→5 ─────────────────────
+  // ── Step 4: Collect — två pass, färskhet före allt ──────────────────
+  // Pass A: fyll varje slot med en OSEDD item (målepok → låna in-era → agnostic).
+  // En slot skjuts upp ENDAST när ingen osedd item finns kvar någonstans i den
+  // in-era poolen (= äkta dry-out; osedda minskar monotont, så alla följande
+  // slots skjuts då också upp).
   const collected: T[] = [];
+  const deferred: EpochId[] = [];
   for (const { epochId, quota } of allocation) {
     for (let i = 0; i < quota; i++) {
-      const q = popFromPool(epochId) ?? fallbackQuestion(epochId) ?? agnosticPool.shift();
+      const q = popUnseen(epochId) ?? borrowUnseen(epochId);
       if (q) collected.push(q);
+      else deferred.push(epochId);
     }
   }
 
-  // Fill remaining from era-agnostic overflow if collected < totalQuestions
-  while (collected.length < totalQuestions && agnosticPool.length > 0) {
-    collected.push(agnosticPool.shift()!);
+  // Pass B (dry-out): inga osedda kvar → servera sedd item (repris inom
+  // 20-spelsfönstret, men fortfarande IN-ERA). Målepok först, sedan lån.
+  for (const epochId of deferred) {
+    const q = popSeenFromEpoch(epochId) ?? borrowSeen(epochId);
+    if (q) collected.push(q);
+  }
+
+  // Sista skyddsnät: fyll ev. återstående ur agnostic (osedd först).
+  while (collected.length < totalQuestions) {
+    const q = agnostic.unseen.shift() ?? agnostic.seen.shift() ?? agnostic.lastSession.shift();
+    if (!q) break;
+    collected.push(q);
   }
 
   if (collected.length === 0) return [];
