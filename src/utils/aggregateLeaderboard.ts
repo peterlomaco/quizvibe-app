@@ -128,18 +128,23 @@ export function defaultAggregateName(playerNames: string[]): string {
  * oavsett spelform (solo/multi) — matchar bara namn på exakt formen
  * "Marathon N" (custom-döpta serier räknas inte). Enumeration av namnen sker
  * hos anroparen (async RPC); denna funktion är ren så den kan testas i vitest.
+ *
+ * Föreslår det LÄGSTA lediga numret (fyller luckor): finns "Marathon 1",
+ * "Marathon 2" och "Marathon 4" → "Marathon 3", inte "Marathon 5".
  */
 export function nextMarathonName(existingNames: string[]): string {
-  let max = 0;
+  const used = new Set<number>();
   const re = /^Marathon\s+(\d+)$/i;
   for (const n of existingNames) {
     const m = re.exec(n.trim());
     if (m) {
       const v = parseInt(m[1], 10);
-      if (Number.isFinite(v) && v > max) max = v;
+      if (Number.isFinite(v) && v > 0) used.add(v);
     }
   }
-  return `Marathon ${max + 1}`;
+  let next = 1;
+  while (used.has(next)) next += 1;
+  return `Marathon ${next}`;
 }
 
 export interface AggregateLeaderboardData {
