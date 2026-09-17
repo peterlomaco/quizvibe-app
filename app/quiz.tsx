@@ -90,6 +90,7 @@ import {
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
+import { filterByGenerationRecognition } from '@/src/utils/generationRecognition';
 import { isMainCategory, subjectToMainCategory, itemInEnabledCategories, displayCategoryForItem, defaultEnabledMainCategories, MAIN_CATEGORIES, YT_CATEGORY_WEIGHTS, type MainCategory } from '@/src/utils/mainCategory';
 import { buildMatchHighlights } from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
@@ -143,7 +144,7 @@ import { consumePendingPeerSeenIds } from '@/src/utils/pendingSeenQuestions';
 import { allocateCategoryBlocks, buildActiveCategories, buildEpochPhase, emptyCategoryDebt, emptyEpochDebt, getActiveEpochs, pickTiered, planCategorySequence, planEpochSequence, sequenceToCategoryQuotas, sequenceToQuotas, type CategoryCapacity, type CategoryDebt, type EpochDebt, type EpochId, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
 import { loadEpochLedger, saveEpochLedger } from '@/src/utils/epochLedger';
 import { loadCategoryLedger, saveCategoryLedger } from '@/src/utils/categoryLedger';
-import { getGenerationKeyFromBirthYear } from '@/src/utils/mockPurchasedPackages';
+import { getGenerationKeyFromBirthYear, GenerationKey } from '@/src/utils/mockPurchasedPackages';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 // ── FUTURE VERSION 2 — Automated API Flow (archived imports) ─────────────────────
@@ -427,6 +428,45 @@ function filterPoolByCategoryHcp<T extends { itemHcp?: number; mainCategory: Mai
   activeCats.forEach((c) => {
     const catHcp = regionHcp?.[c] ?? HCP_START;
     out.push(...filterByItemHcp(byCat[c], catHcp, perCatMin));
+  });
+  return out;
+}
+
+// Gentle generations-screen — ENBART bild/Hints-poolen (musik styrs redan av
+// Game Era-slidern). Speglar filterPoolByCategoryHcp:s partition-per-kategori
+// (Music-bild mot Music-HCP osv.) och delegerar per delpool till den rena
+// filterByGenerationRecognition (asymmetriskt avstånds-golv + anti-kollaps).
+// Origin-generationen bor nästlat i q.source (ImageQuizQuestion); non-image-
+// items (aldrig i denna pool) passerar ospecificerade.
+function filterImagePoolByGeneration<
+  T extends { mainCategory: MainCategory | null },
+>(
+  pool: T[],
+  regionHcp: Record<MainCategory, number> | null,
+  playerGens: GenerationKey[],
+  minCount: number,
+  getData: (item: T) => {
+    originGenerations?: readonly GenerationKey[];
+    itemHcp?: number;
+  },
+): T[] {
+  if (playerGens.length === 0) return pool;
+  const byCat: Record<MainCategory, T[]> = { Music: [], Film: [] };
+  const passthrough: T[] = [];
+  pool.forEach((q) => {
+    if (q.mainCategory) byCat[q.mainCategory].push(q);
+    else passthrough.push(q);
+  });
+  const activeCats = (Object.keys(byCat) as MainCategory[]).filter(
+    (c) => byCat[c].length > 0,
+  );
+  const perCatMin = Math.max(10, Math.floor(minCount / Math.max(1, activeCats.length)));
+  const out: T[] = [...passthrough];
+  activeCats.forEach((c) => {
+    const catHcp = regionHcp?.[c] ?? HCP_START;
+    out.push(
+      ...filterByGenerationRecognition(byCat[c], getData, playerGens, catHcp, perCatMin),
+    );
   });
   return out;
 }
@@ -2065,6 +2105,24 @@ export default function QuizScreen() {
     const hcpSource = isGuestHostGame ? null : regionHcp;
     const applyItemHcp = (pool: QuizQuestion[]): QuizQuestion[] =>
       applyHcp ? filterPoolByCategoryHcp(pool, hcpSource, HCP_FILTER_MIN_POOL) : pool;
+    // Gentle generations-screen — BARA bild/Hints-poolen (musik styrs av era-
+    // slidern). Samma applyHcp-gate (Single/PtP; IndDev + remote hoppar över) och
+    // samma per-kategori-HCP-källa (hcpSource) som item-HCP-filtret. Läser
+    // origin-generationen ur q.source (ImageQuizQuestion). Body för non-image är
+    // död — poolen innehåller bara image-items — men union-typen kräver grenen.
+    const applyGenerationScreen = (pool: QuizQuestion[]): QuizQuestion[] =>
+      applyHcp
+        ? filterImagePoolByGeneration(
+            pool,
+            hcpSource,
+            [...audienceSet] as GenerationKey[],
+            HCP_FILTER_MIN_POOL,
+            (q) =>
+              q.type === 'image'
+                ? { originGenerations: q.source.originGenerations, itemHcp: q.source.itemHcp }
+                : {},
+          )
+        : pool;
     const youtubePool = isAllYoutubeCats
       ? youtubePoolPreCategory
       : youtubePoolPreCategory.filter((q) =>
@@ -2080,11 +2138,11 @@ export default function QuizScreen() {
       imagesEnabledCategories.length === MAIN_CATEGORIES.length &&
       imagesEnabledCategories.includes('Music') &&
       imagesEnabledCategories.includes('Film');
-    const imagePool: QuizQuestion[] = applyItemHcp(isAllImageCats
+    const imagePool: QuizQuestion[] = applyItemHcp(applyGenerationScreen(isAllImageCats
       ? imagePoolPreCategory
       : imagePoolPreCategory.filter((q) =>
           itemInEnabledCategories(q.mainCategory, imagesEnabledCategories),
-        ));
+        )));
 
     // ── Spotify-pool (separat tredje pool) ──────────────────────────────
     // Byggs från pre-category-poolen (youtubePoolPreCategory) för att vara

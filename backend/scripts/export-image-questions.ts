@@ -22,7 +22,9 @@ import {
   Category,
   ContentSubject,
   FIXED_QUESTION_TEXT,
+  Generation,
 } from '../content/schema';
+import { originGenerationsFromFilename } from '../content/originGeneration';
 import { loadDistractorPool } from '../content/distractor-pool';
 import { HINTS_LIBRARY } from '../../src/utils/hintsData';
 import { meetsHintsThreshold, MIN_RAW_HINTS } from '../../src/utils/hintsText';
@@ -52,6 +54,11 @@ interface ExportedQuestion {
   peakFrom?: number;
   peakTo?: number;
   audiences: Audience[];
+  /** Origin-generation(er) härledda ur källfilens namn (recognition-audience).
+   *  Driver klientens gentle generations-filter (src/utils/generationRecognition.ts).
+   *  Tom = ospecificerad (tematisk/regional/import-fil) → filtreras aldrig på
+   *  generation. Emitteras bara när non-empty. */
+  originGenerations?: Generation[];
   /** Region-hierarki global ⊃ europe ⊃ nordic ⊃ land. Item-level overridar
    *  fil-headern. Sedan 2026-08-11 ENDA källan för bild-items region —
    *  HINTS_REGION_MAP:s region-roll är retirerad. */
@@ -84,6 +91,10 @@ function buildExportedQuestion(
   // så unionen är i praktiken ett enda värde — men union är rätt semantik
   // om en framtida curation låter kopiorna gå isär.
   const regionSet = new Set<string>();
+  // Origin-generation-unionen över alla fil-träffar. En figur som lever i både
+  // t.ex. gen-z- och gen-alpha-filen får [gen-z, gen-alpha]; en fil utan
+  // generations-suffix bidrar med inget (ospecificerad).
+  const originGenSet = new Set<Generation>();
   let category: Category | null = null;
   let contentSubject: ContentSubject | null = null;
   for (const match of matches) {
@@ -94,6 +105,7 @@ function buildExportedQuestion(
     const effectiveAudience = match.item.audience ?? file.audience;
     for (const a of effectiveAudience) audiencesSet.add(a);
     for (const r of match.item.region ?? file.region) regionSet.add(r);
+    for (const g of originGenerationsFromFilename(match.filename)) originGenSet.add(g);
   }
   if (!category || !contentSubject) return null;
 
@@ -125,6 +137,7 @@ function buildExportedQuestion(
     ...(item.correctYear !== undefined ? { correctYear: item.correctYear } : {}),
     ...(peak ? { peakFrom: peak.peakFrom, peakTo: peak.peakTo } : {}),
     audiences: Array.from(audiencesSet),
+    ...(originGenSet.size > 0 ? { originGenerations: Array.from(originGenSet) } : {}),
     region: Array.from(regionSet),
     questionText: FIXED_QUESTION_TEXT[contentSubject],
     // Item-HCP (§4.1) = curator-satt probability (0–100).
@@ -219,6 +232,10 @@ export interface ImageQuizQuestion {
   peakTo?: number;
   /** Vilka generationer item:t passar för (driver per-spelare-pool på klienten). */
   audiences: ImageQuestionAudience[];
+  /** Origin-generation(er) ur källfilens namn (recognition-audience). Driver
+   *  klientens gentle generations-filter. Saknas/tom = ospecificerad (tematisk/
+   *  regional/import-fil) → aldrig generations-filtrerad. */
+  originGenerations?: ('elder' | 'gen-x' | 'millennials' | 'gen-z' | 'gen-alpha')[];
   /** Region-hierarki global ⊃ europe ⊃ nordic ⊃ land — se src/utils/regionScope.ts.
    *  'unknown-region' når ingen spelare. */
   region: string[];
