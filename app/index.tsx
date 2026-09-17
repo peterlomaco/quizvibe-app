@@ -170,6 +170,7 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
   { label: 'Single & Multiplayer Game', user: true, guest: true },
   { label: 'Head-to-head matches', user: true, guest: false },
   { label: 'Saved results & player history', user: true, guest: false },
+  { label: 'Skill & HCP progression', user: true, guest: false },
   { label: 'Friends list & in-app invites', user: true, guest: false },
   { label: 'Custom Game era', user: true, guest: true },
   { label: 'Select categories and source (Source mixerboard)', user: true, guest: false },
