@@ -1851,8 +1851,8 @@ items:
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "UG3VcCAlUgE"
-        startSec: 0
-        endSec: 30
+        startSec: 50
+        endSec: 80
         notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Prince and the Revolution - When Doves Cry (Official Music Video)' — Peter angav ingen latttitel i listan, harledd ur klippet."
     notes: "correctYear = singeln (16 maj 1984), fore albumet Purple Rain (25 juni 1984)."
   # --- 1985 ---
@@ -2882,8 +2882,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "u4ucz96rbMA"
-        startSec: 0
-        endSec: 30
+        startSec: 55
+        endSec: 85
         channelTitle: "Ted Gärdestad - Topic"
         notes: "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). xlsx saknade YT-lank; officiell Topic-audio uppsokt. correctYear 1981 enligt MusicBrainz."
     genrePackages: ["Soft & Love"]

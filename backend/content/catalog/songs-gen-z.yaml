@@ -547,8 +547,8 @@ items:
     genrePackages: ["Hip Hop"]
     youtubeClips:
       - videoId: "_pYHJWd_yto"
-        startSec: 30
-        endSec: 45
+        startSec: 68
+        endSec: 83
         channelTitle: "MASTER RJ"
         notes: "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
     region: ["global"]
@@ -839,8 +839,8 @@ items:
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "LyKYV_7vs6k"
-        startSec: 37
-        endSec: 57
+        startSec: 48
+        endSec: 68
         channelTitle: "PremiunMusicHD"
     spotifyTrackId: "1z9kQ14XBSN0r2v6fx4IdG"
     region: ["global"]
@@ -1297,8 +1297,8 @@ items:
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "iUfaW-Utn8Y"
-        startSec: 15
-        endSec: 45
+        startSec: 46
+        endSec: 76
         channelTitle: "MASTER RJ"
         notes: "Peter-kurerad 2026-08-12. ⚠ MASTER RJ är SAMMA re-upload-kanal vars klipp (TJLAJWSEd6U, Thriller) blev region-blockerat i 249 länder inkl. SE 2026-08-10. Spelbar i SE 2026-08-12, men kanalen har redan fallerat en gång — prioritera officiellt ersättningsklipp."
     notes: "correctYear = albumet Backstreet's Back / singeln, bada aug 1997."

@@ -78,8 +78,15 @@ items:
     displayName: "Shrek"
     correctYear: 2001
     probability: 90
+    isAnimated: true
     wikimediaSearchHints: ["Shrek 2001 DreamWorks animated film ogre"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    # Svaret är en KARAKTÄR — "Shrek" vore samma som titeln (spoiler), så
+    # frågan efterlyser Princess Fiona. Distraktorer = karaktärer ur ANDRA
+    # filmer; inga Shrek-karaktärer (Åsnan/Farquaad/Puss) som skulle bli
+    # felmarkerade rätta svar.
+    correctNames: ["Princess Fiona"]
+    distractorNames: ["Simba", "Nemo", "Mulan", "Elsa"]
     youtubeClips:
       - videoId: "s9nVUOP3Oik"
         startSec: 10

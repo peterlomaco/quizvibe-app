@@ -1045,12 +1045,16 @@ items:
     region: ["global"]
     genrePackages: ["Christmas edition"]
     wikimediaSearchHints: ["Love Actually 2003 film Richard Curtis"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Hugh Grant", "Emma Thompson", "Colin Firth", "Liam Neeson", "Keira Knightley", "Bill Nighy", "Alan Rickman"]
+    # Distraktorer MÅSTE vara skådespelare ur ANDRA filmer — Love Actually har
+    # en stor ensemble, så håll dessa fyra fria från filmens cast.
+    distractorNames: ["Tom Hanks", "Brad Pitt", "Leonardo DiCaprio", "Russell Crowe"]
     youtubeClips:
       - videoId: "H9Z3_ifFheQ"
         startSec: 26
         endSec: 56
-        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). genrePackages:['Christmas edition'] — ny paket-tagg (paketet saljs inte an; forbereder framtida Christmas Edition). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). genrePackages:['Christmas edition'] — ny paket-tagg (paketet saljs inte an; forbereder framtida Christmas Edition). Name-fraga (actor-select) sedan 2026-09-17 — ar/titel i klippet spoilar inte langre svaret."
   - id: sex-and-the-city-2008
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Sex and the City"

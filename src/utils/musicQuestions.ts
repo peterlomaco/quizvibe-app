@@ -6187,8 +6187,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "u4ucz96rbMA",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 55,
+        "endSec": 85,
         "channelTitle": "Ted Gärdestad - Topic",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). xlsx saknade YT-lank; officiell Topic-audio uppsokt. correctYear 1981 enligt MusicBrainz."
@@ -7517,8 +7517,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "UG3VcCAlUgE",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 50,
+        "endSec": 80,
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Prince and the Revolution - When Doves Cry (Official Music Video)' — Peter angav ingen latttitel i listan, harledd ur klippet."
       }
@@ -15906,8 +15906,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "iUfaW-Utn8Y",
-        "startSec": 15,
-        "endSec": 45,
+        "startSec": 46,
+        "endSec": 76,
         "channelTitle": "MASTER RJ",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-12. ⚠ MASTER RJ är SAMMA re-upload-kanal vars klipp (TJLAJWSEd6U, Thriller) blev region-blockerat i 249 länder inkl. SE 2026-08-10. Spelbar i SE 2026-08-12, men kanalen har redan fallerat en gång — prioritera officiellt ersättningsklipp."
@@ -19057,7 +19057,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Shrek",
     "correctYear": 2001,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "What is the name of the main character in this film?",
     "itemHcp": 90,
     "audiences": [
       "elder",
@@ -19068,6 +19068,16 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "isAnimated": true,
+    "correctNames": [
+      "Princess Fiona"
+    ],
+    "distractorNames": [
+      "Simba",
+      "Nemo",
+      "Mulan",
+      "Elsa"
     ],
     "youtubeClips": [
       {
@@ -19740,7 +19750,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Love Actually",
     "correctYear": 2003,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "Select one of the main actors in this film?",
     "itemHcp": 84,
     "audiences": [
       "elder",
@@ -19755,13 +19765,29 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Christmas edition"
     ],
+    "isAnimated": false,
+    "correctNames": [
+      "Hugh Grant",
+      "Emma Thompson",
+      "Colin Firth",
+      "Liam Neeson",
+      "Keira Knightley",
+      "Bill Nighy",
+      "Alan Rickman"
+    ],
+    "distractorNames": [
+      "Tom Hanks",
+      "Brad Pitt",
+      "Leonardo DiCaprio",
+      "Russell Crowe"
+    ],
     "youtubeClips": [
       {
         "videoId": "H9Z3_ifFheQ",
         "startSec": 26,
         "endSec": 56,
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). genrePackages:['Christmas edition'] — ny paket-tagg (paketet saljs inte an; forbereder framtida Christmas Edition). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). genrePackages:['Christmas edition'] — ny paket-tagg (paketet saljs inte an; forbereder framtida Christmas Edition). Name-fraga (actor-select) sedan 2026-09-17 — ar/titel i klippet spoilar inte langre svaret."
       }
     ]
   },
@@ -19788,8 +19814,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "_pYHJWd_yto",
-        "startSec": 30,
-        "endSec": 45,
+        "startSec": 68,
+        "endSec": 83,
         "channelTitle": "MASTER RJ",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
@@ -24640,8 +24666,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "LyKYV_7vs6k",
-        "startSec": 37,
-        "endSec": 57,
+        "startSec": 48,
+        "endSec": 68,
         "channelTitle": "PremiunMusicHD",
         "license": "standard"
       }
