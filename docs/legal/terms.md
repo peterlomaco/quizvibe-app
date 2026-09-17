@@ -5,7 +5,7 @@ description: The rules for using QuizVibe.
 
 # Terms of Service
 
-**Last updated:** 2026-09-14
+**Last updated:** 2026-09-17
 **Effective date:** Upon app launch on the Apple App Store
 
 These Terms of Service ("Terms") govern your use of the **QuizVibe** mobile application ("the app", "we", "us"). By downloading, installing, or using the app, you agree to these Terms. If you don't agree, please don't use the app.
@@ -275,7 +275,7 @@ To the maximum extent permitted by applicable law, **we are not liable if any su
 To the maximum extent permitted by applicable law:
 
 - We are **not liable** for indirect, consequential, incidental, special, or punitive damages arising from your use of the app — including loss of data, loss of profits, business interruption, or emotional distress.
-- Our **total liability** for any claim related to the app is limited to the amount you paid us for the app in the 12 months preceding the claim. For free users, this is zero. For paying users, this is the total of your purchases.
+- Our **total liability** for any claim related to the app is limited to the amount you paid us for the app in the 1 month preceding the claim. For free users, this is zero. For paying users, this is the amount of your most recent monthly payment. Because the subscription is billed monthly and can be cancelled at any time, one month is the maximum amount at risk for any user.
 - The above limitations **do not apply** to damages caused by our gross negligence or intentional misconduct, or to liability that cannot be limited under mandatory law (e.g., consumer protection law in Sweden and the EU).
 
 ---
