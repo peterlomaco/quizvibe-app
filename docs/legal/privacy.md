@@ -5,7 +5,7 @@ description: How QuizVibe collects, uses, and protects your information.
 
 # Privacy Policy
 
-**Last updated:** 2026-09-14
+**Last updated:** 2026-09-17
 **Effective date:** Upon app launch on the Apple App Store
 
 This Privacy Policy explains how **QuizVibe** ("we", "us", "the app") collects, uses, and protects your information when you use our mobile application. We've tried to write it in plain English with the legal anchor points clearly marked.
