@@ -78,6 +78,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "louis-armstrong-body-and-soul",
+    "displayName": "Body and Soul — Louis Armstrong",
+    "correctYear": 1930,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "spotifyTrackId": "3k3WlYkt3qYNtLFkT5yGox",
+    "youtubeClips": []
+  },
+  {
     "id": "cab-calloway-minnie-the-moocher",
     "displayName": "Minnie the Moocher — Cab Calloway",
     "correctYear": 1931,
@@ -250,6 +270,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-09-11 (Film.xlsx). Svensk scen 'The Silly Song (Swedish)'. Ingen ar-spoiler i titeln. Privat kanal — hog takedown-/embed-block-risk, kontrollera nightly-validate."
       }
     ]
+  },
+  {
+    "id": "ella-fitzgerald-a-tisket-a-tasket",
+    "displayName": "A-Tisket, A-Tasket — Ella Fitzgerald",
+    "correctYear": 1938,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "spotifyTrackId": "0nV1rouDdrSBNKCogIE6us",
+    "youtubeClips": []
   },
   {
     "id": "glenn-miller-in-the-mood",
@@ -483,6 +523,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-08-12. Original-trailer i HD, titeln avslöjar varken skådespelare eller år."
       }
     ]
+  },
+  {
+    "id": "dooley-wilson-as-time-goes-by",
+    "displayName": "As Time Goes By — Dooley Wilson",
+    "correctYear": 1943,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "spotifyTrackId": "65CTjOeuGBDfXZjsHMEK8d",
+    "youtubeClips": []
   },
   {
     "id": "bing-crosby-swinging-on-a-star",
@@ -747,6 +807,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "patti-page-doggie-in-the-window",
+    "displayName": "(How Much Is) That Doggie in the Window — Patti Page",
+    "correctYear": 1953,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "spotifyTrackId": "1vqv2mq6XVBnL9tKOsMkFA",
+    "youtubeClips": []
+  },
+  {
     "id": "bill-haley-rock-around-the-clock",
     "displayName": "Rock Around the Clock — Bill Haley & His Comets",
     "correctYear": 1954,
@@ -880,6 +960,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "6xNwKNYZcvgV3XTIwsgNio",
     "youtubeClips": [
       {
         "videoId": "LGwO2BaDJQc",
@@ -1083,6 +1164,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "73u7MU2IWvV1zpdcUEIjtw",
     "youtubeClips": [
       {
         "videoId": "K8fcGgmUv_w",
@@ -1114,6 +1196,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "47mA6f44zxLtdATOoY7GjN",
     "youtubeClips": [
       {
         "videoId": "JJoRBtz1fHg",
@@ -1350,6 +1433,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "7Ft4nK7wJdMEBrk3KChQsk",
     "youtubeClips": [
       {
         "videoId": "ZEcqHA7dbwM",
@@ -1495,6 +1579,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "7DD7eSuYSC5xk2ArU62esN",
     "youtubeClips": [
       {
         "videoId": "MKUex3fci5c",
@@ -1698,6 +1783,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "5t9KYe0Fhd5cW6UYT4qP8f",
     "youtubeClips": [
       {
         "videoId": "mdt0SOqPJcg",
@@ -2075,6 +2161,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "0aym2LBJBk9DAYuHHutrIl",
     "youtubeClips": [
       {
         "videoId": "mQER0A0ej0M",
@@ -2188,6 +2275,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "0bsoiyh1eNoWTN9qQVFnNz",
     "youtubeClips": [
       {
         "videoId": "igvP806798U",
@@ -2244,6 +2332,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "2EqlS6tkEnglzr7tkKAAYD",
     "youtubeClips": [
       {
         "videoId": "oolpPmuK2I8",
@@ -2441,6 +2530,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "3SRvWfTizSiBwKidBDPBgL",
     "youtubeClips": [
       {
         "videoId": "sZ8W9oOgjM4",
@@ -2626,6 +2716,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "6l8EbYRtQMgKOyc1gcDHF9",
     "youtubeClips": [
       {
         "videoId": "nvF5imxSaLI",
@@ -3136,6 +3227,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "13tx9je0ftBgu6BKpsQDo4",
     "youtubeClips": [
       {
         "videoId": "52W1665yI1Y",
@@ -3283,6 +3375,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "6WCeFNVAXUtNczb7lqLiZU",
     "youtubeClips": [
       {
         "videoId": "75r0nQu-hMs",
@@ -3851,6 +3944,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "6hTcuIQa0sxrrByu9wTD7s",
     "youtubeClips": [
       {
         "videoId": "Wu4_zVxmufY",
@@ -4098,6 +4192,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "3ML1JVicjXbdsyYrPdfr5E",
     "youtubeClips": [
       {
         "videoId": "jqqJvMTNeq4",
@@ -4286,6 +4381,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "15rjQH7nTcTomKwfVMd4xl",
     "youtubeClips": [
       {
         "videoId": "oiosqtFLBBA",
@@ -4710,6 +4806,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "51LY0VVo4mu1Q8HpkAldQZ",
     "youtubeClips": [
       {
         "videoId": "5oWyMakvQew",
@@ -4878,6 +4975,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "1R3jOrEeHThzcuMBWVWxUc",
     "youtubeClips": [
       {
         "videoId": "WGU_4-5RaxU",
@@ -5262,6 +5360,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "2PHcsDaj1v2YTVnGatoyxV",
     "youtubeClips": [
       {
         "videoId": "XEjLoHdbVeE",
@@ -5386,6 +5485,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "5zFxBmlSLduUJbdGFVnZvz",
     "youtubeClips": [
       {
         "videoId": "vvmHIhhlzOA",
@@ -5656,6 +5756,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "62GYoGszQfROZswLee6W3O",
     "youtubeClips": [
       {
         "videoId": "FIF7wKJb2iU",
@@ -5911,6 +6012,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "100% in swedish",
       "Melodifestivalen"
     ],
+    "spotifyTrackId": "5Vu25xkAIliFJTMpkXHPGh",
     "youtubeClips": [
       {
         "videoId": "LvbW7lWZbVo",
@@ -6005,6 +6107,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "59GNFIvgMlkidU3BuLVrni",
     "youtubeClips": [
       {
         "videoId": "8fKR23rWI6g",
@@ -6020,7 +6123,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Indiana Jones: Raiders of the Lost Ark",
     "correctYear": 1981,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 92,
     "audiences": [
       "elder",
@@ -6031,16 +6134,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Harrison Ford"
-    ],
-    "distractorNames": [
-      "Tom Selleck",
-      "Mel Gibson",
-      "Bruce Willis",
-      "Kurt Russell"
     ],
     "youtubeClips": [
       {
@@ -6070,6 +6163,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "4bHsxqR3GMrXTxEPLuK5ue",
     "youtubeClips": [
       {
         "videoId": "PIFUWHvSixw",
@@ -6098,6 +6192,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "0odIT9B9BvOCnXfS0e4lB5",
     "youtubeClips": [
       {
         "videoId": "jIG9whz2oxY",
@@ -6126,6 +6221,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "46RVKt5Edm1zl0rXhPJZxz",
     "youtubeClips": [
       {
         "videoId": "XfR9iY5y94s",
@@ -6243,6 +6339,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "100% in swedish"
     ],
+    "spotifyTrackId": "4aJ1AoiwjzsOxWqabRTJd3",
     "youtubeClips": [
       {
         "videoId": "tUE0zbkmv0Q",
@@ -6259,7 +6356,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "E.T. the Extra-Terrestrial",
     "correctYear": 1982,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 92,
     "audiences": [
       "elder",
@@ -6270,17 +6367,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Henry Thomas",
-      "Drew Barrymore"
-    ],
-    "distractorNames": [
-      "Macaulay Culkin",
-      "River Phoenix",
-      "Elijah Wood",
-      "Jake Gyllenhaal"
     ],
     "youtubeClips": [
       {
@@ -6375,6 +6461,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "7J1uxwnxfQLu4APicE5Rnj",
     "youtubeClips": [
       {
         "videoId": "Kr4EQDVETuA",
@@ -6403,6 +6490,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "unknown-region"
     ],
+    "spotifyTrackId": "50Giaeo3ARSlfuDPpd49uR",
     "youtubeClips": [
       {
         "videoId": "hp_b-095yPc",
@@ -6495,6 +6583,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "sport"
     ],
+    "spotifyTrackId": "2KH16WveTQWT6KOG9Rg6e2",
     "youtubeClips": [
       {
         "videoId": "YKXTSOf5SA0",
@@ -6618,6 +6707,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Summer"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "2EGaDf0cPX789H3LNeB03D",
     "youtubeClips": [
       {
         "videoId": "l9ml3nyww80",
@@ -6772,6 +6862,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "4y1LsJpmMti1PfRQV9AWWe",
     "youtubeClips": [
       {
         "videoId": "jRr5EasAq84",
@@ -6895,6 +6986,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Film edition"
     ],
+    "spotifyTrackId": "5EkQYd9xvBrNchHDaDSKa5",
     "youtubeClips": [
       {
         "videoId": "ILWSp0m9G2U",
@@ -6956,6 +7048,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "1JSTJqkT5qHq8MDJnJbRE1",
     "youtubeClips": [
       {
         "videoId": "LPr3N4AMXNQ",
@@ -7106,6 +7199,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Rock"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "29uKzagduhFDTWPCjqaGOg",
     "youtubeClips": [
       {
         "videoId": "Ae829mFAGGE",
@@ -7223,6 +7317,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "4jDmJ51x1o9NZB5Nxxc7gY",
     "youtubeClips": [
       {
         "videoId": "gTwn_LoH7ig",
@@ -7295,6 +7390,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen",
       "100% in swedish"
     ],
+    "spotifyTrackId": "4NzirQ4BrNkVaPEla2ipG4",
     "youtubeClips": [
       {
         "videoId": "ySOCalwr6Yo",
@@ -7571,6 +7667,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "0dOg1ySSI7NkpAe89Zo0b9",
     "youtubeClips": [
       {
         "videoId": "tRx212PUa4g",
@@ -7599,6 +7696,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "7FwBtcecmlpc1sLySPXeGE",
     "youtubeClips": [
       {
         "videoId": "nCFTL4IO6t4",
@@ -7939,7 +8037,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Back to the Future",
     "correctYear": 1985,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 95,
     "audiences": [
       "elder",
@@ -7950,16 +8048,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Michael J. Fox"
-    ],
-    "distractorNames": [
-      "Rob Lowe",
-      "Tom Hanks",
-      "Emilio Estevez",
-      "Patrick Swayze"
     ],
     "youtubeClips": [
       {
@@ -8049,6 +8137,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "4H3vuLX59XPqdtTpIesGyS",
     "youtubeClips": [
       {
         "videoId": "53LZ0-m-8Vg",
@@ -8324,6 +8413,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "5tdKaKLnC4SgtDZ6RlWeal",
     "youtubeClips": [
       {
         "videoId": "TO-Tk84ATjw",
@@ -8571,6 +8661,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Soft & Love"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "1eyq8cjUQ2daFthW2PC2GM",
     "youtubeClips": [
       {
         "videoId": "wktJg27TXx4",
@@ -8832,6 +8923,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "254bXAqt3zP6P50BdQvEsq",
     "youtubeClips": [
       {
         "videoId": "YF1R0hc5Q2I",
@@ -8886,6 +8978,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "4wswaG5vmNINMZcVBsAyBP",
     "youtubeClips": [
       {
         "videoId": "OnggBmaY4D4",
@@ -8916,6 +9009,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "1eKhntRLUPDV7h6tATtzsv",
     "youtubeClips": [
       {
         "videoId": "i2hLL_UNUSo",
@@ -9038,6 +9132,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "2eK478aJN3hUiJodJYCmbv",
     "youtubeClips": [
       {
         "videoId": "gl2yKH5zbyo",
@@ -9124,6 +9219,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen",
       "100% in swedish"
     ],
+    "spotifyTrackId": "4UuKT9xgMQQUPD3VWRGLJb",
     "youtubeClips": [
       {
         "videoId": "U7hLR82zSE0",
@@ -9336,6 +9432,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Rock",
       "Soft & Love"
     ],
+    "spotifyTrackId": "1Ll8UuomlZEhuZYLxUz09J",
     "youtubeClips": [
       {
         "videoId": "WyF8RHM1OCg",
@@ -9396,6 +9493,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "4hObp5bmIJ3PP3cKA9K9GY",
     "youtubeClips": [
       {
         "videoId": "qTuntvl6oLQ",
@@ -9519,6 +9617,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "0C7dYeCLF6ukChtW64UNge",
     "youtubeClips": [
       {
         "videoId": "0ZV9FyngchQ",
@@ -9856,6 +9955,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "2M9ro2krNb7nr7HSprkEgo",
     "youtubeClips": [
       {
         "videoId": "AIOAlaACuv4",
@@ -10465,6 +10565,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "6ioBgySxoeQKALvAeLEmId",
     "youtubeClips": [
       {
         "videoId": "GsVcUzP_O_8",
@@ -11789,6 +11890,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen",
       "100% in swedish"
     ],
+    "spotifyTrackId": "06xX9E1BTTwyOwyaBuszSK",
     "youtubeClips": [
       {
         "videoId": "4Ml6pJqc_bw",
@@ -11922,6 +12024,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Rock"
     ],
+    "spotifyTrackId": "5BIMPccDwShpXq784RJlJp",
     "youtubeClips": [
       {
         "videoId": "XZuM4zFg-60",
@@ -11953,6 +12056,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "5gu6nQpz5ELQpxt0QkvhUr",
     "youtubeClips": [
       {
         "videoId": "m-y_IxPcx8U",
@@ -12047,6 +12151,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Rock"
     ],
+    "spotifyTrackId": "27LuGw8pE0WSELYYuptRjK",
     "youtubeClips": [
       {
         "videoId": "f1IdyrhOrGs",
@@ -12262,6 +12367,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "4mFkf4tw0HzBRxY1bgdyZa",
     "youtubeClips": [
       {
         "videoId": "4Fc67yQsPqQ",
@@ -12535,6 +12641,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Soft & Love",
       "RnB"
     ],
+    "spotifyTrackId": "3XcDCh0hHP9Q659pjjyK3Q",
     "youtubeClips": [
       {
         "videoId": "CmeriHkAF5c",
@@ -12860,6 +12967,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Rock"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "70LcF31zb1H0PyJoS1Sx1r",
     "youtubeClips": [
       {
         "videoId": "XFkzRNyygfk",
@@ -13071,7 +13179,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "The Bodyguard",
     "correctYear": 1992,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 84,
     "audiences": [
       "elder",
@@ -13082,17 +13190,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "global"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Kevin Costner",
-      "Whitney Houston"
-    ],
-    "distractorNames": [
-      "Tom Cruise",
-      "Mel Gibson",
-      "Julia Roberts",
-      "Demi Moore"
     ],
     "youtubeClips": [
       {
@@ -13125,6 +13222,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Soft & Love",
       "Film edition"
     ],
+    "spotifyTrackId": "31er9IGsfFbwqy1pH4aiTP",
     "youtubeClips": [
       {
         "videoId": "FxYw0XPEoKE",
@@ -13252,6 +13350,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen",
       "100% in swedish"
     ],
+    "spotifyTrackId": "4QZ6hp2CKRaZG5RI9zXQqg",
     "youtubeClips": [
       {
         "videoId": "a6MCRuE6tx8",
@@ -13620,6 +13719,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Soft & Love"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "5mgCMlxQW7fmHbrdJuowbB",
     "youtubeClips": [
       {
         "videoId": "0IA3ZvCkRkQ",
@@ -14750,6 +14850,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Hip Hop"
     ],
+    "spotifyTrackId": "1DIXPcTDzTj8ZMHt3PDt8p",
     "youtubeClips": [
       {
         "videoId": "7DXlY8LhWnI",
@@ -14877,6 +14978,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "1vbaVUGd4mAwJRYZZC5IPS",
     "youtubeClips": [
       {
         "videoId": "QgppLdY0QjU",
@@ -14908,6 +15010,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "6urCAbunOQI4bLhmGpX7iS",
     "youtubeClips": [
       {
         "videoId": "TR3Vdo5etCQ",
@@ -14998,6 +15101,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Dance Music"
     ],
+    "spotifyTrackId": "4wtR6HB3XekEengMX17cpc",
     "youtubeClips": [
       {
         "videoId": "DvyCbevQbtI",
@@ -15594,6 +15698,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Summer"
     ],
+    "spotifyTrackId": "5fRvePkRGdpn2nKacG7I6d",
     "youtubeClips": [
       {
         "videoId": "EScLmWJs82I",
@@ -15686,6 +15791,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "7ppPZa3TRUSGKaks9wH7VT",
     "youtubeClips": [
       {
         "videoId": "oplra1FJxWI",
@@ -15903,6 +16009,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "3FMSEeODpywjD8BMY6Umj6",
     "youtubeClips": [
       {
         "videoId": "iUfaW-Utn8Y",
@@ -16493,6 +16600,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "1ZAhmC1We4HpL2VWK01qpC",
     "youtubeClips": [
       {
         "videoId": "F2fGReDlQa0",
@@ -16509,7 +16617,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Titanic",
     "correctYear": 1997,
     "contentSubject": "movie",
-    "questionText": "Select one of the main actors in this film?",
+    "questionText": "Which Year was this Movie launched?",
     "itemHcp": 95,
     "audiences": [
       "elder",
@@ -16520,17 +16628,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
-    ],
-    "isAnimated": false,
-    "correctNames": [
-      "Leonardo DiCaprio",
-      "Kate Winslet"
-    ],
-    "distractorNames": [
-      "Brad Pitt",
-      "Matt Damon",
-      "Julia Roberts",
-      "Sandra Bullock"
     ],
     "youtubeClips": [
       {
@@ -16717,6 +16814,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "2goLsvvODILDzeeiT4dAoR",
     "youtubeClips": [
       {
         "videoId": "nZXRV4MezEw",
@@ -16906,6 +17004,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Rock"
     ],
+    "spotifyTrackId": "1dRWTMslNWdfL8SiToJiB5",
     "youtubeClips": [
       {
         "videoId": "EvuL5jyCHOw",
@@ -17088,6 +17187,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport",
       "Dance Music"
     ],
+    "spotifyTrackId": "31JhTEAWmmhZIZTm40pQZr",
     "youtubeClips": [
       {
         "videoId": "0IDOUiQj5hY",
@@ -17181,6 +17281,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "2Ld2LehpgQNREMxl9LlIzm",
     "youtubeClips": [
       {
         "videoId": "llyiQ4I-mcQ",
@@ -17244,6 +17345,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Disco & Pop"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "28nEArUuaUk4tYkdQfQ4Ov",
     "youtubeClips": [
       {
         "videoId": "474UjAuu0mc",
@@ -17557,6 +17659,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Dance Music"
     ],
+    "spotifyTrackId": "2aPbkXxYRTQ1cQrscHswuM",
     "youtubeClips": [
       {
         "videoId": "kyzIQKuSqBs",
@@ -18343,6 +18446,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "spotifyTrackId": "0wyLws467FJpIthouxPCNh",
     "youtubeClips": [
       {
         "videoId": "JF8fkHK0AWs",
@@ -18592,6 +18696,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "RnB"
     ],
+    "spotifyTrackId": "3unsLiH5FXmaDWtT5Imolu",
     "youtubeClips": [
       {
         "videoId": "abcZMQASXF8",
@@ -18688,6 +18793,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "41nT1Sp6ChR65FbsdLlFHW",
     "youtubeClips": [
       {
         "videoId": "IyYnnUcgeMc",
@@ -18813,6 +18919,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "2HpWHLtZldOcDn5qzX8kb2",
     "youtubeClips": [
       {
         "videoId": "c18441Eh_WE",
@@ -18977,6 +19084,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "RnB"
     ],
+    "spotifyTrackId": "2rMh4be4SAJ2Q4eKnPtmGt",
     "youtubeClips": [
       {
         "videoId": "znlFu_lemsU",
@@ -19008,6 +19116,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Rock"
     ],
+    "spotifyTrackId": "0gmbgwZ8iqyMPmXefof8Yf",
     "youtubeClips": [
       {
         "videoId": "1cQh1ccqu8M",
@@ -19041,6 +19150,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "football"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "5uD0zfqIAd4ZUqa2l90rxi",
     "youtubeClips": [
       {
         "videoId": "2ZlJLzKzRGA",
@@ -19170,6 +19280,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Disco & Pop"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "6KN2Yb9kxJBoJ1qiMgusYy",
     "youtubeClips": [
       {
         "videoId": "ywH2os9XB88",
@@ -19196,6 +19307,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "5xEM5hIgJ1jjgcEBfpkt2F",
     "youtubeClips": [
       {
         "videoId": "5eGbnVlRcRg",
@@ -19428,6 +19540,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Dance Music"
     ],
+    "spotifyTrackId": "0eAvGqc9t4Wuc6gDcSi5Aa",
     "youtubeClips": [
       {
         "videoId": "f_vyYpNDXkI",
@@ -19518,6 +19631,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Soft & Love",
       "RnB"
     ],
+    "spotifyTrackId": "0ARK753YaiJbpLUk7z5yIM",
     "youtubeClips": [
       {
         "videoId": "8WYHDfJDPDc",
@@ -19620,6 +19734,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Disco & Pop",
       "RnB"
     ],
+    "spotifyTrackId": "3y4KY2HvTEkFLrkHfIPWAl",
     "youtubeClips": [
       {
         "videoId": "ViwtNLUqkMY",
@@ -19667,7 +19782,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Finding Nemo",
     "correctYear": 2003,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "What is the name of the main character in this film?",
     "itemHcp": 90,
     "audiences": [
       "elder",
@@ -19678,6 +19793,16 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "isAnimated": true,
+    "correctNames": [
+      "Dory"
+    ],
+    "distractorNames": [
+      "Simba",
+      "Shrek",
+      "Mulan",
+      "Elsa"
     ],
     "youtubeClips": [
       {
@@ -19811,6 +19936,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Hip Hop"
     ],
+    "spotifyTrackId": "2PpruBYCo4H7WOBJ7Q2EwM",
     "youtubeClips": [
       {
         "videoId": "_pYHJWd_yto",
@@ -19876,6 +20002,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "7B2eFoaBjo2kCEh6V81xdx",
     "youtubeClips": [
       {
         "videoId": "j0_QrKnqd5E",
@@ -20254,6 +20381,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen",
       "100% in swedish"
     ],
+    "spotifyTrackId": "250KZYNeR2FYDjab74Uib1",
     "youtubeClips": [
       {
         "videoId": "5JDFnN-WYGA",
@@ -20418,6 +20546,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Dance Music"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "4nnHlGaBwJHb1rBetqj0Yl",
     "youtubeClips": [
       {
         "videoId": "3xx0s147Xj4",
@@ -20725,6 +20854,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "0d28khcov6AiegSCpG5TuT",
     "youtubeClips": [
       {
         "videoId": "HyHNuVaZJ-k",
@@ -20787,6 +20917,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "03UAID5OeTwjDIKCM7M3rg",
     "youtubeClips": [
       {
         "videoId": "EDwb9jOVRtU",
@@ -20848,6 +20979,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "RnB"
     ],
+    "spotifyTrackId": "0bwNTjZGhlD0mhePV6om1j",
     "youtubeClips": [
       {
         "videoId": "VCLxJd1d84s",
@@ -20879,6 +21011,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "RnB"
     ],
+    "spotifyTrackId": "1gZ7i4qxXkHZb1r6eioaAP",
     "youtubeClips": [
       {
         "videoId": "YNSxNsr4wmA",
@@ -21100,6 +21233,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Dance Music"
     ],
+    "spotifyTrackId": "5bBfXSYmvPCc9VC8zWm1CQ",
     "youtubeClips": [
       {
         "videoId": "Kq4OtRsdXls",
@@ -21169,6 +21303,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen",
       "100% in swedish"
     ],
+    "spotifyTrackId": "6XGIQNU8VmOBRIdL5OBYKp",
     "youtubeClips": [
       {
         "videoId": "m9ghEC3wiIc",
@@ -21228,6 +21363,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "2N5zMZX7YeL1tico8oQxa9",
     "youtubeClips": [
       {
         "videoId": "-N4jf6rtyuw",
@@ -21288,6 +21424,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "spotifyTrackId": "6hBd7OkzsWWJ7zgoaMwv7k",
     "youtubeClips": [
       {
         "videoId": "gAh9NRGNhUU",
@@ -21412,6 +21549,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "3d0WouFnFmr0K3kjeza3fF",
     "youtubeClips": [
       {
         "videoId": "X8k1FVqtojU",
@@ -21689,6 +21827,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "6CFPFnS9EcLs2I0nWqtWci",
     "youtubeClips": [
       {
         "videoId": "atz_aZA3rf0",
@@ -21740,6 +21879,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Dance Music"
     ],
+    "spotifyTrackId": "0ByMNEPAPpOR5H69DVrTNy",
     "youtubeClips": [
       {
         "videoId": "yd8jh9QYfEs",
@@ -21771,6 +21911,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "669Zz4glMcFwFl1BRltkXP",
     "youtubeClips": [
       {
         "videoId": "KMOOr7GEkj8",
@@ -22092,6 +22233,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision",
       "Melodifestivalen"
     ],
+    "spotifyTrackId": "3KoKv5fIoawjvDdGHOhSmE",
     "youtubeClips": [
       {
         "videoId": "x_iSoluR53U",
@@ -22153,6 +22295,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Dance Music"
     ],
+    "spotifyTrackId": "0HKgFrp02ixksDh9t0UB8Q",
     "youtubeClips": [
       {
         "videoId": "hdJN0ss7jA0",
@@ -22214,6 +22357,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "25ZttbpeUKDOm3aghD2oBJ",
     "youtubeClips": [
       {
         "videoId": "usvTbqTHwyw",
@@ -22499,6 +22643,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Eurovision"
     ],
+    "spotifyTrackId": "6NgYIETQ8U72CVfkzYhK30",
     "youtubeClips": [
       {
         "videoId": "WXwgZL4zx9o",
@@ -22569,6 +22714,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "2H1047e0oMSj10dgp7p2VG",
     "youtubeClips": [
       {
         "videoId": "uSD4vsh1zDA",
@@ -23024,6 +23170,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Dance Music"
     ],
+    "spotifyTrackId": "6FbGlkHKGkYqpSCuBgurn3",
     "youtubeClips": [
       {
         "videoId": "hWjrMTWXH28",
@@ -23145,6 +23292,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Dance Music"
     ],
+    "spotifyTrackId": "6KOEK6SeCEZOQkLj5M1PxH",
     "youtubeClips": [
       {
         "videoId": "F57P9C4SAW4",
@@ -23176,6 +23324,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "1Rpn7ZrCH9YzPjwImoMdu0",
     "youtubeClips": [
       {
         "videoId": "QGJuMBdaqIw",
@@ -23881,6 +24030,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "2fQxE0jVrjNMT9oJAXtSJR",
     "youtubeClips": [
       {
         "videoId": "UJtB55MaoD0",
@@ -24270,6 +24420,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "20I6sIOMTCkB6w7ryavxtO",
     "youtubeClips": [
       {
         "videoId": "fWNaR-rxAic",
@@ -24404,6 +24555,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "6QFCMUUq1T2Vf5sFUXcuQ7",
     "youtubeClips": [
       {
         "videoId": "l8hIx9AceOw",
@@ -24632,6 +24784,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "5LFI2thMPBo2viCRVVqFFa",
     "youtubeClips": [
       {
         "videoId": "9bZkp7q19f0",
@@ -24952,6 +25105,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "100% in swedish"
     ],
+    "spotifyTrackId": "3SjXx3rbNGk8nCho8YEoz5",
     "youtubeClips": [
       {
         "videoId": "z0hiC9rCG1c",
@@ -25133,6 +25287,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "RnB"
     ],
+    "spotifyTrackId": "6NPVjNh8Jhru9xOmyQigds",
     "youtubeClips": [
       {
         "videoId": "ZbZSe6N_BXs",
@@ -25196,6 +25351,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sport"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "1gkzmB8NwKDFgKvZDSG6qU",
     "youtubeClips": [
       {
         "videoId": "MxUhHQKZRGs",
@@ -25315,6 +25471,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "45bjfDupYDRGIAmZxPG5RL",
     "youtubeClips": [
       {
         "videoId": "fG-EIvEiSHs",
@@ -25889,6 +26046,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "1p80LdxRV74UKvL8gnD7ky",
     "youtubeClips": [
       {
         "videoId": "e-ORhEE9VVg",
@@ -25978,6 +26136,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "1Yk0cQdMLx5RzzFTYwmuld",
     "youtubeClips": [
       {
         "videoId": "YQHsXMglC9A",
@@ -26008,6 +26167,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "3RiPr603aXAoi4GHyXx0uy",
     "youtubeClips": [
       {
         "videoId": "YykjpeuMNEk",
@@ -26067,6 +26227,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "7L5jgZtAyfiU7elB8DIqCx",
     "youtubeClips": [
       {
         "videoId": "vWaRiD5ym74",
@@ -26268,6 +26429,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Melodifestivalen"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "21BYhl07wWqGRQaj7sUxdV",
     "youtubeClips": [
       {
         "videoId": "oAQKr5aJJjQ",
@@ -26378,6 +26540,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "2GyA33q5rti5IxkMQemRDH",
     "youtubeClips": [
       {
         "videoId": "kalsoK9K3mI",
@@ -26629,6 +26792,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "7BKLCZ1jbUBVqRi2FVlTVw",
     "youtubeClips": [
       {
         "videoId": "OGP499ko5EQ",
@@ -26877,6 +27041,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision"
     ],
     "inBaseCatalog": false,
+    "spotifyTrackId": "6KCAlbeqrJ3pOn6Z3OdHWY",
     "youtubeClips": [
       {
         "videoId": "wNECV2h-y58",
@@ -26908,6 +27073,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "5r14fWQezWLWqE1Pqg1Hd1",
     "youtubeClips": [
       {
         "videoId": "ru0K8uYEZWw",
@@ -26971,6 +27137,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "6DNtNfH8hXkqOX1sjqmI7p",
     "youtubeClips": [
       {
         "videoId": "nBtDsQ4fhXY",
@@ -27027,6 +27194,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "58zsLZPvfflaiIbNWoA22O",
     "youtubeClips": [
       {
         "videoId": "L3wKzyIN1yk",
@@ -27600,6 +27768,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "6habFhsOp2NvshLv26DqMb",
     "youtubeClips": [
       {
         "videoId": "TfkP5ubz1z4",
@@ -27726,6 +27895,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision",
       "Melodifestivalen"
     ],
+    "spotifyTrackId": "57Y51hxqMn2j3dosW75R6n",
     "youtubeClips": [
       {
         "videoId": "1jSrBdN4b5c",
@@ -27819,6 +27989,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "2gVOhnMkK8XngKgf0YdlXQ",
     "youtubeClips": [
       {
         "videoId": "tt2k8PGm-TI",
@@ -27850,6 +28021,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "5J783SDlyitqvLFAzTm0jU",
     "youtubeClips": [
       {
         "videoId": "W5kM5wAwRug",
@@ -27945,6 +28117,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "parentControlled": true,
+    "spotifyTrackId": "6DCZcSspjsKoFjzjrWoCdn",
     "youtubeClips": [
       {
         "videoId": "xpVfcZ0ZcFM",
@@ -28308,6 +28481,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "3PfIrDoz19wz7qK7tYeu62",
     "youtubeClips": [
       {
         "videoId": "oygrmJFKYZY",
@@ -28466,6 +28640,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "3BxKECJorB19BEQSPC9n7D",
     "youtubeClips": [
       {
         "videoId": "9TQKyDD9Yig",
@@ -28649,6 +28824,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "2XU0oxnq2qxCpomAAuJY8K",
     "youtubeClips": [
       {
         "videoId": "q0hyYWKXF0Q",
@@ -28743,6 +28919,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "1hIuSG6xV4RDgD8bDVKP7N",
     "youtubeClips": [
       {
         "videoId": "kK29Q_LpVUw",
@@ -28835,6 +29012,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "5YDD6DuZ04mKQtm0avJTJd",
     "youtubeClips": [
       {
         "videoId": "Nj2U6rhnucI",
@@ -29182,6 +29360,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "7lPN2DXiMsVn7XUKtOW1CS",
     "youtubeClips": [
       {
         "videoId": "ttRz03c208g",
@@ -29209,6 +29388,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "spotifyTrackId": "6P4d1NWBCNIYZjzF9k1mVN",
     "youtubeClips": [
       {
         "videoId": "Bc9ijogGmtU",
@@ -29336,6 +29516,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "Eurovision",
       "Melodifestivalen"
     ],
+    "spotifyTrackId": "697bFWgzBRm6bmnYWd8GyD",
     "youtubeClips": [
       {
         "videoId": "wWDThAfryW4",
@@ -29494,6 +29675,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Film edition"
     ],
+    "spotifyTrackId": "4h9wh7iOZ0GGn8QVp4RAOB",
     "youtubeClips": [
       {
         "videoId": "mNEUkkoUoIA",
@@ -29649,6 +29831,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "4OMJGnvZfDvsePyCwRGO7X",
     "youtubeClips": [
       {
         "videoId": "suAR1PYFNYA",
@@ -29714,6 +29897,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Disco & Pop"
     ],
+    "spotifyTrackId": "7DSAEUvxU8FajXtRloy8M0",
     "youtubeClips": [
       {
         "videoId": "iawgB2CDCrw",
@@ -29806,6 +29990,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "6dOtVTDdiauQNBQEDOtlAB",
     "youtubeClips": [
       {
         "videoId": "cz_lZAPlEAE",
@@ -30114,6 +30299,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "2qSkIjg1o9h3YT9RAgYN75",
     "youtubeClips": [
       {
         "videoId": "YnguM4ED3bw",
@@ -30144,6 +30330,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "Soft & Love"
     ],
+    "spotifyTrackId": "6wHpLMmp98aHcV8L1JFrj8",
     "youtubeClips": [
       {
         "videoId": "jXqf3uqLkkU",
@@ -30652,6 +30839,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "genrePackages": [
       "sport"
     ],
+    "spotifyTrackId": "0kosUz0jePvjiz4ctmR6wL",
     "youtubeClips": [
       {
         "videoId": "fcnDmrtj6Sk",
