@@ -60,6 +60,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Madonna Frozen Ray of Light"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2II03llydk4YnkBBvoYB3B"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "XS088Opj9o0"
