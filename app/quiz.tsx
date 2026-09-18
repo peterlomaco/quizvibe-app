@@ -3256,6 +3256,10 @@ export default function QuizScreen() {
   phaseRef.current = phase;
   const questionIndexRef = useRef(questionIndex);
   questionIndexRef.current = questionIndex;
+  // Synkron spegel av totalQuestions så callbacks (t.ex. triggerGameEndedAlert)
+  // kan läsa aktuellt värde utan att capture:a en stale mount-closure.
+  const totalQuestionsRef = useRef(totalQuestions);
+  totalQuestionsRef.current = totalQuestions;
   // Skyddar mot double-scoring per fråga oavsett React-batching/scheduling.
   // Sätts true av första anropet till recordRoundScore; resetas i
   // handleAdvanceToNextRound när nästa fråga börjar.
@@ -6501,6 +6505,12 @@ export default function QuizScreen() {
     };
   });
 
+  // Engångs-guard: appendGameHistoryEntry får skrivas EXAKT en gång per spel.
+  // Krävs sedan spectatorn har TVÅ triggers (leaderboard-effekten + den nya
+  // spectator-effekten) — claimas synkront vid write-commit så de aldrig
+  // dubbelskriver. Sätts BARA när vi faktiskt skriver, så en tom/för-tidig
+  // invokation bränner inte guarden och en senare riktig save skriver ändå.
+  const savedFinalGameRef = useRef(false);
   // Spara det avslutade spelet till AsyncStorage (görs när final leaderboard visas).
   // Player history (i Fas 5) kan sedan hämta denna data.
   const saveFinalGame = async () => {
@@ -6513,9 +6523,43 @@ export default function QuizScreen() {
     // Detta stänger den dokumenterade luckan: en registrerad spelare som
     // deltog i ett PtP-spel på någon annans enhet fick tidigare aldrig
     // spelet i sin egen Player history.
-    const selfScores = isPtPSpectator
+    // Strikt matchning på selfPlayerId är primär/snabb-väg. I ett fresh
+    // PtP-spel ÄR ids:en byggda för att matcha (samma lobby_players-id på
+    // båda enheter), men en join-race kan ge dubblettrader + ID-heal så att
+    // selfPlayerId divergerar från det id host attribuerar våra scores under.
+    const strictSelfScores = isPtPSpectator
       ? allRoundScoresHistory.flat().filter((sc) => sc.playerId === selfPlayerId)
       : null;
+    if (__DEV__ && isPtPSpectator && strictSelfScores && strictSelfScores.length === 0) {
+      const flat = allRoundScoresHistory.flat();
+      const idCounts: Record<string, number> = {};
+      flat.forEach((sc) => {
+        idCounts[sc.playerId] = (idCounts[sc.playerId] ?? 0) + 1;
+      });
+      console.warn('[PtP spectator save] no self-scores under strict id', {
+        selfPlayerId,
+        idCounts,
+        turnOrder: turnOrder.map((p) => ({ id: p.id, name: p.name })),
+      });
+    }
+    // Fallback (bara spectator + strikt tom): identifiera "mina" scores via
+    // NAMN. Löser id-divergensen ovan utan att röra den distribuerade
+    // dubblettrad-racen i lobbyn. saveFinalGame är redan async → loadProfile OK.
+    let selfScores = strictSelfScores;
+    if (isPtPSpectator && strictSelfScores && strictSelfScores.length === 0) {
+      const norm = (s?: string) => (s ?? '').trim().toLowerCase();
+      let myName = turnOrder.find((p) => p.id === selfPlayerId)?.name;
+      if (!myName) myName = (await loadProfile())?.playerName;
+      const myNameNorm = norm(myName);
+      if (myNameNorm) {
+        const idSet = new Set(
+          turnOrder.filter((p) => norm(p.name) === myNameNorm).map((p) => p.id),
+        );
+        if (idSet.size > 0) {
+          selfScores = allRoundScoresHistory.flat().filter((sc) => idSet.has(sc.playerId));
+        }
+      }
+    }
     // RoundResult saknar årtal på spectatorn — vi vet bara rätt/fel + tid.
     // 0/0 är samma konvention som bildfrågor redan använder, och HistoryEntry
     // läser bara `correct`, `timeUsed` och antalet.
@@ -6532,8 +6576,13 @@ export default function QuizScreen() {
             timeUsed: sc.timeUsed,
           }))
         : rounds;
+    // Summera över de faktiskt valda scoresen (INTE gameTotals[selfPlayerId] —
+    // det pekar fel när id divergerat). På strikt-vägen är summan identisk med
+    // gameTotals[selfPlayerId], så inget beteende ändras i normalfallet.
     const effectiveTotalPoints =
-      selfScores !== null ? gameTotals[selfPlayerId] ?? 0 : totalPoints;
+      selfScores !== null
+        ? selfScores.reduce((sum, sc) => sum + sc.points, 0)
+        : totalPoints;
     // Spectatorns egen assistance ligger per spelare i turnOrder — params
     // hårdkodar 'standard'/'32' på non-host-vägen från Lobby.
     const effectiveAssistance: AssistanceLevel =
@@ -6574,7 +6623,11 @@ export default function QuizScreen() {
     // Remote 1v1 skrivs INTE heller hit — server-tabellerna (remote_matches)
     // är remote-historikkällan (visas i "1vs1 Duels"-blocket i Player
     // History); en AsyncStorage-append hade dubbelräknat spelet.
-    if (effectiveRounds.length > 0 && !isGuestHostGame && !isRemote) {
+    if (effectiveRounds.length > 0 && !isGuestHostGame && !isRemote && !savedFinalGameRef.current) {
+      // Claima skrivningen SYNKRONT innan första await (loadProfile nedan) så
+      // en samtidig andra trigger ser true och hoppar över. Sätts BARA här
+      // (inuti write-blocket) → en tom/för-tidig invokation bränner inte guarden.
+      savedFinalGameRef.current = true;
       const totalTime = effectiveRounds.reduce((sum, r) => sum + (r.timeUsed ?? 0), 0);
       const correctAnswers = effectiveRounds.filter((r) => r.correct).length;
       const profile = await loadProfile();
@@ -6798,6 +6851,21 @@ export default function QuizScreen() {
       });
     }
   }, [phase, isLastQuestion]);
+
+  // PtP-spectator: spara spelet så fort game-over-signalen kommer, OBEROENDE
+  // av om render:n någonsin når phase 'leaderboard'. Fångar cause B (den
+  // terminala question_advance(next=null)/leaderboard-pingen tappades →
+  // 6774-effekten fyrar aldrig, eller host går Home innan den hann köra).
+  // spectatorGameOver sätts BARA på en spectator-enhet, så host/IndDev/remote/
+  // non-spectator når aldrig hit. savedFinalGameRef gör varje extra körning
+  // till en no-op; allRoundScoresHistory i deps kör om effekten om flaggan
+  // hann sättas före flush-committen.
+  useEffect(() => {
+    if (isPtPSpectator && spectatorGameOver) {
+      void saveFinalGame();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spectatorGameOver, allRoundScoresHistory]);
 
   // ── Aggregate Leaderboard ───────────────────────────────────────────────
   // Slutskärmen visar ALLTID spelet som just spelats. Har host kört
@@ -8282,11 +8350,25 @@ export default function QuizScreen() {
   const triggerGameEndedAlert = useCallback(() => {
     if (lobbyDeletedAlertedRef.current) return;
     lobbyDeletedAlertedRef.current = true;
+    // PtP-spectator: host avslutade spelet. Nådde den terminala
+    // question_advance(next=null)/leaderboard-pingen aldrig oss (cause B) blev
+    // spectatorGameOver aldrig satt och spelet skulle inte sparas innan vi
+    // navigerar Home. Committa buffrade scores + markera game-over så
+    // spectator-save-effekten kör INNAN OK → router.replace('/'). Gate:as på
+    // att vi FAKTISKT nådde sista frågan (via färska refs) så en host som
+    // quittar MITT i spelet inte sparar ett partiellt spel — precis som host
+    // själv inte sparar vid mid-game-quit. saveFinalGame anropas INTE inline
+    // (skulle läsa stale pre-flush closure); effekten kör den efter commit.
+    if (isPtPSpectator && questionIndexRef.current >= totalQuestionsRef.current - 1) {
+      flushSpectatorScores();
+      setSpectatorGameOver(true);
+    }
     if (celebrationVisibleRef.current) {
       pendingLobbyDeletedRef.current = true;
       return;
     }
     showLobbyDeletedAlert();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showLobbyDeletedAlert]);
   useEffect(() => {
     playAgainInitiatedHandlerRef.current = () => {
