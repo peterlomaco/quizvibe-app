@@ -4835,33 +4835,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "fleetwod-mac-dont-stop",
-    "displayName": "Don't Stop — Fleetwood Mac",
-    "correctYear": 1977,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "spotifyTrackId": "4SXU3lUZ1eb4JWWbkQw43Y",
-    "youtubeClips": [
-      {
-        "videoId": "QV9JJmSCiI8",
-        "startSec": 10,
-        "endSec": 25,
-        "license": "standard"
-      }
-    ]
-  },
-  {
     "id": "fleetwood-mac-dont-stop",
     "displayName": "Don't Stop — Fleetwood Mac",
     "correctYear": 1977,
@@ -5343,34 +5316,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
-    "spotifyTrackId": "3wsPg2KrRYZFi0inIFa41x",
-    "youtubeClips": [
-      {
-        "videoId": "Hphwfq1wLJs",
-        "startSec": 1,
-        "endSec": 31,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1361) - YouTube-kalla tillagd (var Spotify-only)."
-      }
-    ]
-  },
-  {
-    "id": "rod-stewart-do-ya-think-im-sexy",
-    "displayName": "Do Ya Think Im Sexy — Rod Stewart",
-    "correctYear": 1978,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
     "genrePackages": [
       "Disco & Pop"
     ],
@@ -5379,8 +5324,9 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       {
         "videoId": "Hphwfq1wLJs",
         "startSec": 1,
-        "endSec": 16,
-        "license": "standard"
+        "endSec": 31,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1361) - YouTube-kalla tillagd (var Spotify-only)."
       }
     ]
   },
@@ -11024,36 +10970,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "rchard-marx-right-here-waiting-for-you",
-    "displayName": "Right Here Waiting — Richard Marx",
-    "correctYear": 1989,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "genrePackages": [
-      "Soft & Love"
-    ],
-    "spotifyTrackId": "4LFwNJWoj74Yd71fIr1W8x",
-    "youtubeClips": [
-      {
-        "videoId": "S_E2EHVxNAE",
-        "startSec": 0,
-        "endSec": 15,
-        "license": "standard"
-      }
-    ]
-  },
-  {
     "id": "richard-marx-right-here-waiting",
     "displayName": "Right Here Waiting — Richard Marx",
     "correctYear": 1989,
@@ -14983,37 +14899,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-03 ur Music.xlsx (rad 1280)."
-      }
-    ]
-  },
-  {
-    "id": "2pac-ft-dr-dre-california-love",
-    "displayName": "California Love — 2Pac ft. Dr. Dre",
-    "correctYear": 1995,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "genrePackages": [
-      "Hip Hop"
-    ],
-    "inBaseCatalog": false,
-    "spotifyTrackId": "3ia3dJETSOllPsv3LJkE35",
-    "youtubeClips": [
-      {
-        "videoId": "99zZ4fGZlgk",
-        "startSec": 0,
-        "endSec": 15,
-        "license": "standard"
       }
     ]
   },
@@ -28257,38 +28142,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1425)."
-      }
-    ]
-  },
-  {
-    "id": "molly-utan-dig",
-    "displayName": "Utan dig — Molly",
-    "correctYear": 2017,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "genrePackages": [
-      "100% in swedish",
-      "Soft & Love"
-    ],
-    "inBaseCatalog": false,
-    "spotifyTrackId": "3fiKmyDr615KZDrL51VZDu",
-    "youtubeClips": [
-      {
-        "videoId": "FyO_4OOY8cA",
-        "startSec": 0,
-        "endSec": 15,
-        "license": "standard"
       }
     ]
   },

@@ -1502,6 +1502,7 @@ items:
     wikimediaSearchHints: ["Rod Stewart Da Ya Think Im Sexy 1978"]
     answerMethods: ["timeline"]
     spotifyTrackId: "3wsPg2KrRYZFi0inIFa41x"
+    genrePackages: ["Disco & Pop"]
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1363)."
     youtubeClips:
       - videoId: "Hphwfq1wLJs"
@@ -1898,31 +1899,6 @@ items:
       - videoId: "FQQj2rQBFvA"
         startSec: 13
         endSec: 28
-  - id: fleetwod-mac-dont-stop
-    displayName: "Don't Stop — Fleetwood Mac"
-    correctYear: 1977
-    probability: 80
-    wikimediaSearchHints: ["Fleetwod mac Dont stop"]
-    answerMethods: ["timeline"]
-    spotifyTrackId: "4SXU3lUZ1eb4JWWbkQw43Y"
-    region: ["global"]
-    youtubeClips:
-      - videoId: "QV9JJmSCiI8"
-        startSec: 10
-        endSec: 25
-  - id: rod-stewart-do-ya-think-im-sexy
-    displayName: "Do Ya Think Im Sexy — Rod Stewart"
-    correctYear: 1978
-    probability: 80
-    wikimediaSearchHints: ["Rod Stewart Do Ya Think Im Sexy"]
-    answerMethods: ["timeline"]
-    spotifyTrackId: "3wsPg2KrRYZFi0inIFa41x"
-    genrePackages: ["Disco & Pop"]
-    region: ["global"]
-    youtubeClips:
-      - videoId: "Hphwfq1wLJs"
-        startSec: 1
-        endSec: 16
   - id: jackson-5-i-ll-be-there
     displayName: "I´ll be there — Jackson 5"
     correctYear: 1970

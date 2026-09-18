@@ -4076,19 +4076,6 @@ items:
       - videoId: "M0quXl_od3g"
         startSec: 0
         endSec: 15
-  - id: rchard-marx-right-here-waiting-for-you
-    displayName: "Right Here Waiting — Richard Marx"
-    correctYear: 1989
-    probability: 80
-    wikimediaSearchHints: ["Rchard Marx Right Here Waiting for You"]
-    answerMethods: ["timeline"]
-    spotifyTrackId: "4LFwNJWoj74Yd71fIr1W8x"
-    genrePackages: ["Soft & Love"]
-    region: ["global"]
-    youtubeClips:
-      - videoId: "S_E2EHVxNAE"
-        startSec: 0
-        endSec: 15
   - id: marc-almond-something-gotten-hold-of-my-heart
     displayName: "Something Gotten Hold of my heart — Marc Almond"
     correctYear: 1989
@@ -4127,20 +4114,6 @@ items:
       - videoId: "-02uHyU-rjs"
         startSec: 25
         endSec: 40
-  - id: 2pac-ft-dr-dre-california-love
-    displayName: "California Love — 2Pac ft. Dr. Dre"
-    correctYear: 1995
-    probability: 80
-    wikimediaSearchHints: ["2Pac ft. Dr. Dre California Love"]
-    answerMethods: ["timeline"]
-    spotifyTrackId: "3ia3dJETSOllPsv3LJkE35"
-    genrePackages: ["Hip Hop"]
-    inBaseCatalog: false
-    region: ["global"]
-    youtubeClips:
-      - videoId: "99zZ4fGZlgk"
-        startSec: 0
-        endSec: 15
   - id: sven-ingvars-sommar-och-sol
     displayName: "Sommar och sol — Sven‐Ingvars"
     correctYear: 1990

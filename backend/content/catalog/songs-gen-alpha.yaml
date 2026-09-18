@@ -2639,19 +2639,6 @@ items:
       - videoId: "ri5_fzndMBg"
         startSec: 13
         endSec: 28
-  - id: molly-utan-dig
-    displayName: "Utan dig — Molly"
-    correctYear: 2017
-    probability: 80
-    wikimediaSearchHints: ["Molly Utan dig"]
-    answerMethods: ["timeline"]
-    spotifyTrackId: "3fiKmyDr615KZDrL51VZDu"
-    genrePackages: ["100% in swedish", "Soft & Love"]
-    inBaseCatalog: false
-    youtubeClips:
-      - videoId: "FyO_4OOY8cA"
-        startSec: 0
-        endSec: 15
   - id: veronica-maggio-and-hakan-hellstrom-hela-huset
     displayName: "Hela huset — Veronica Maggio & Håkan Hellström"
     correctYear: 2013
