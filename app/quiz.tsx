@@ -1513,16 +1513,41 @@ export default function QuizScreen() {
   // svarsalternativ på samma fråga. Se audienceSetForVariants nedan.
   const [remoteMatchAges, setRemoteMatchAges] = useState<number[] | null>(null);
   /**
-   * Deterministisk seed för allt slumpat innehåll i en remote-fråga (hint-urval,
-   * svarsalternativ, deras ordning). Båda enheterna kör samma kod med samma
-   * seed → identiskt underlag, trots att det inte finns någon sync-kanal under
-   * spelet. Returnerar undefined i lokala lägen (alla ser samma skärm där, och
-   * variation per runda är önskvärd).
+   * Deterministisk seed för allt slumpat innehåll i en fråga som renderas på
+   * FLERA enheter parallellt (hint-urval, Name-svarsalternativ, deras ordning).
+   * Alla enheter kör samma kod med samma seed → identiskt underlag och därmed
+   * exakt lika svåra alternativ, trots att ingen enhet under spelet vet vad de
+   * andra genererar. Två lägen behöver detta:
+   *
+   *   • Remote 1v1 (H2H): ingen sync-kanal alls under spelet. Nyckel =
+   *     remoteMatchId (delas av båda spelarna, unik per match).
+   *   • Individual Devices: varje enhet bygger sitt EGET svarsblock lokalt
+   *     (frågan spelas samtidigt på N enheter). Utan seed ger Math.random olika
+   *     distraktorer/ordning per enhet → samma fråga blir olika svår. Nyckel =
+   *     roomCode: delas av alla enheter i spelet och nygenereras per spel
+   *     (Create Game / Play Again) så alternativen är identiska INOM ett spel
+   *     men varierar MELLAN spel.
+   *
+   * PtP och Single Player kör på EN enhet — alla ser samma skärm och variation
+   * per runda är önskvärd → ingen seed (Math.random). Saknas nyckeln (dev
+   * direkt-nav) faller vi också på Math.random.
+   *
+   * OBS: identiskt utfall kräver även identisk `audienceSetForVariants` (byggs
+   * ur turnOrder, som är samma spelaruppsättning på alla enheter i båda lägena)
+   * och identisk `question.id` (IndDev pinnar host:ens broadcastade sekvens via
+   * ALL_QUESTIONS_MAP). `currentAssistance` är MEDVETET per enhet — den styr
+   * vilket variant-läge (full-names vs prefix-rutnät) som byggs, vilket är den
+   * personliga svårighetsnivån, inte en olikhet i själva urvalet.
    */
-  const seedForRemoteQuestion = useCallback(
-    (questionId: string): string | undefined =>
-      isRemote && remoteMatchId ? `${remoteMatchId}:${questionId}` : undefined,
-    [isRemote, remoteMatchId],
+  const seedForSyncedQuestion = useCallback(
+    (questionId: string): string | undefined => {
+      if (isRemote && remoteMatchId) return `${remoteMatchId}:${questionId}`;
+      if (gameMode === 'individual-devices' && params.roomCode) {
+        return `${params.roomCode}:${questionId}`;
+      }
+      return undefined;
+    },
+    [isRemote, remoteMatchId, gameMode, params.roomCode],
   );
   // Det egna player_id:t (= lobby_players.player_id) som Lobby skickade.
   // Används av non-host:s Leave-flöde för att broadcasta `player_left` så
@@ -3892,9 +3917,10 @@ export default function QuizScreen() {
       IMAGE_QUIZ_QUESTIONS,
     );
 
-    // Remote 1v1: seedad RNG så båda spelarnas enheter genererar identiska
-    // alternativ i identisk ordning (ingen sync-kanal under spelet).
-    const variantSeed = seedForRemoteQuestion(question.id);
+    // Remote 1v1 + Individual Devices: seedad RNG så alla enheter genererar
+    // identiska Name-alternativ i identisk ordning (samma svårighetsgrad).
+    // Remote har ingen sync-kanal; IndDev bygger varianten lokalt per enhet.
+    const variantSeed = seedForSyncedQuestion(question.id);
 
     return buildImageVariant(
       question.source,
@@ -3909,7 +3935,7 @@ export default function QuizScreen() {
       variantSeed ? createSeededRng(variantSeed) : undefined,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [question.id, currentAssistance, audienceSetForVariants, seedForRemoteQuestion]);
+  }, [question.id, currentAssistance, audienceSetForVariants, seedForSyncedQuestion]);
 
   // Bygg Letter Grid-variant för Spotify Name-frågor.
   // Kör som useEffect (inte useMemo) eftersom derivedArtistName är en string
@@ -4031,6 +4057,13 @@ export default function QuizScreen() {
     // buildImageVariant) och Film (ActorSelectBlock) är oberörda.
     const spotifyNamePrefixLength =
       currentAssistance === 'full' ? 3 : currentAssistance === 'standard' ? 2 : 1;
+    // Individual Devices (Spotify DJ är IndDev-only): gissarnas enheter bygger
+    // var sitt svarsblock lokalt. Seeda på samma synk-nyckel som Hints/Film
+    // (roomCode:question.id) → alla gissare får identiska Name-alternativ i
+    // identisk ordning. Pool-bygget ovan är redan deterministiskt (rena filter),
+    // så seeden är sista biten som saknades. Undefined → Math.random (dev direkt-
+    // nav utan roomCode); DJ-enheten bygger också varianten men svarar aldrig.
+    const spotifyNameSeed = seedForSyncedQuestion(question.id);
     const variant = buildImageVariant(
       syntheticItem,
       currentAssistance,
@@ -4038,11 +4071,11 @@ export default function QuizScreen() {
       pool.map((c) => c.item),
       DISTRACTOR_POOL_NAMES['artists'] ?? [],
       5,
-      undefined, // rng — behåll Math.random (7:e arg, så 8:e kan skickas)
+      spotifyNameSeed ? createSeededRng(spotifyNameSeed) : undefined,
       spotifyNamePrefixLength,
     );
     setSpotifyNameVariant(variant);
-  }, [questionIndex, isSpotifyNameQuestion, currentAssistance, derivedArtistName, audienceSetForVariants]);
+  }, [questionIndex, isSpotifyNameQuestion, currentAssistance, derivedArtistName, audienceSetForVariants, question.id, seedForSyncedQuestion]);
 
   // Aktiv media-källa för aktuell fråga. Returneras `kind: 'none'` om
   // host stängt av alla källor eller frågan saknar curerade klipp —
@@ -10842,7 +10875,7 @@ export default function QuizScreen() {
                   isRevealed={phase === 'reveal'}
                   hintsActive={hintsReady}
                   mosaicActive={mosaicRunning}
-                  hintsSeed={seedForRemoteQuestion(question.id)}
+                  hintsSeed={seedForSyncedQuestion(question.id)}
                 />
               </View>
             ) : youtubeError ? (
@@ -11314,7 +11347,7 @@ export default function QuizScreen() {
                   assistance={currentAssistance}
                   movieTitle={question.displayName}
                   movieYear={question.correctYear}
-                  optionsSeed={seedForRemoteQuestion(question.id)}
+                  optionsSeed={seedForSyncedQuestion(question.id)}
                 />
               </View>
             ) : imageVariant ? (
