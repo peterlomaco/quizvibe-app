@@ -89,7 +89,6 @@ import {
   computePackageEraRange,
   resolveActivePackageTags,
   itemInActivePackages,
-  packagesAllowSpotifyOnly,
 } from '../utils/hostPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import {
@@ -3400,14 +3399,13 @@ export default function LobbyScreen() {
   const pkgHasSpotify = anyPackageActive && !pkgGraySpotify;
   const pkgYtActive = pkgHasYoutube && packageYoutubeEnabled;
   const pkgHintsActive = pkgHasHints && packageHintsEnabled;
-  // Spotify som ENDA källa: bara tillåtet för paket som markerats
-  // allowSpotifyOnly (musik-genrer) OCH när Spotify faktiskt är aktiv i lobbyn.
+  // Spotify som ENDA källa: tillåtet för VILKET paket som helst så länge Spotify
+  // faktiskt är aktiv i lobbyn OCH paketet har Spotify-täckning (pkgHasSpotify).
+  // Det senare skyddar mot tom pool — ett paket utan Spotify-spår kan aldrig gå
+  // Spotify-only. Den gamla allowSpotifyOnly-grinden är borttagen (Peter 2026-09-18).
   const pkgSpotifyActive =
     pkgHasSpotify && spotifyEnabled && isSpotifyAvailable;
-  const pkgSpotifyOnlyOk =
-    anyPackageActive &&
-    pkgSpotifyActive &&
-    packagesAllowSpotifyOnly(selectedExtraPackages);
+  const pkgSpotifyOnlyOk = anyPackageActive && pkgSpotifyActive;
   // Paket LÅSER hela mixerboarden: en täckt cell visas grön + låst (kan ej stängas
   // av), en otäckt cell visas grå/av + låst (green-lock tas bort). Host:s egna
   // toggle-värde göms medan paket är aktivt — paketet dikterar källorna helt.
@@ -3428,18 +3426,16 @@ export default function LobbyScreen() {
   const effectiveEraValues: [number, number] =
     packageEraLocked && packageEraRange ? packageEraRange : [eraValues[0], eraValues[1]];
 
-  // Paket-läge: aggregat-toggle-handlers. Minst en av YT/Hints måste förbli
-  // AKTIV (på + täckning) — Spotify får aldrig vara enda källan när ett paket
-  // är valt. guestLockAlert som skyddsnät (paket kräver Premium → ej guest host).
-  // Spotify FÅR vara enda källan för allowSpotifyOnly-paket (musik-genrer) →
-  // då är det OK att stänga av både YT och Hints. För övriga paket
-  // (t.ex. Sport/Football) krävs minst en av YT/Hints.
+  // Paket-läge: aggregat-toggle-handlers. Minst EN källa måste förbli aktiv —
+  // YT, Hints ELLER Spotify (Spotify får numera vara enda källan för vilket
+  // paket som helst med Spotify-täckning, se pkgSpotifyOnlyOk). guestLockAlert
+  // som skyddsnät (paket kräver Premium → ej guest host).
   const handleTogglePackageYoutube = (v: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!v && !pkgHintsActive && !pkgSpotifyOnlyOk) {
       Alert.alert(
         'At least one source required',
-        'Turn on YouTube or Hints for this package. Spotify can only be the sole source for music packages.',
+        'Turn on YouTube, Hints, or Spotify for this package.',
       );
       return;
     }
@@ -3450,7 +3446,7 @@ export default function LobbyScreen() {
     if (!v && !pkgYtActive && !pkgSpotifyOnlyOk) {
       Alert.alert(
         'At least one source required',
-        'Turn on YouTube or Hints for this package. Spotify can only be the sole source for music packages.',
+        'Turn on YouTube, Hints, or Spotify for this package.',
       );
       return;
     }
@@ -6154,12 +6150,12 @@ export default function LobbyScreen() {
 
     // Paket-läge: source-valideringen nedan gäller BASE-mode-arrayerna, som
     // ignoreras när ett paket är valt. Kräv istället att minst en av paketets
-    // aggregat-toggles (YT/Hints) är aktiv — ELLER att Spotify är enda källan
-    // för ett paket som tillåter det (allowSpotifyOnly, musik-genrer).
+    // källor är aktiv — YT, Hints ELLER Spotify (Spotify får vara enda källan
+    // för vilket paket som helst med Spotify-täckning, se pkgSpotifyOnlyOk).
     if (anyPackageActive && !pkgYtActive && !pkgHintsActive && !pkgSpotifyOnlyOk) {
       Alert.alert(
         'At least one source required',
-        'Turn on YouTube or Hints for this package. Spotify can only be the sole source for music packages.',
+        'Turn on YouTube, Hints, or Spotify for this package.',
       );
       return;
     }
