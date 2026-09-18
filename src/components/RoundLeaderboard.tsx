@@ -646,9 +646,9 @@ export function RoundLeaderboard({
    *  Förklarar varför re-match-frågan uteblev. Utelämnas → ingen rad. */
   rematchUnavailableNote?: string;
   /** Spelet kan ALDRIG producera en re-match-inbjudan (guest host, eller ett
-   *  PtP-spel med minst en gäst). Non-host får då bara Home i stället för
-   *  den dimmade "Accept / Re-match"-platshållaren, som annars vore ett
-   *  löfte om något som aldrig kommer. */
+   *  lokalt multiplayer-spel — PtP eller IndDev — med minst en gäst). Non-host
+   *  får då bara Home i stället för den dimmade "Accept / Re-match"-
+   *  platshållaren, som annars vore ett löfte om något som aldrig kommer. */
   rematchImpossible?: boolean;
   /** Ersätter "Next Round →"-knappen på INTERIM-leaderboarden.
    *  ⚠ Den knappen renderas annars identiskt tänd även utan `onNextRound`

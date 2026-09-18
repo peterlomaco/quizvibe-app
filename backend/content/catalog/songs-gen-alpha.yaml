@@ -2688,3 +2688,94 @@ items:
       - videoId: "xUVz4nRmxn4"
         startSec: 20
         endSec: 35
+  # --- Spotify backlog import 2026-09 (sourced from Music.xlsx col H) ---
+  - id: khaliffa-det-stralar-sa-om-dig
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "det strålar så om dig — Khaliffa"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Khaliffa det strålar så om dig"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5oyoSYc1CKzx9Bz5SHQhdo"
+    region: ["sweden"]
+  - id: khaliffa-helt-seriost
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Helt seriöst — Khaliffa"
+    correctYear: 2017
+    probability: 80
+    wikimediaSearchHints: ["Khaliffa Helt seriöst"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7shcnBgfWJ6AT7jmvAw4xO"
+    region: ["sweden"]
+  - id: danny-saucedo-sa-som-i-himlen
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Så som i himlen — Danny Saucedo"
+    correctYear: 2015
+    probability: 80
+    wikimediaSearchHints: ["Danny Saucedo Så som i himlen"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "66J13KTyLKy0nNygx1CKU4"
+    region: ["sweden"]
+  - id: alesso-under-control
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Under control — Alesso"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Alesso Under control"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4J7CKHCF3mdL4diUsmW8lq"
+    region: ["global"]
+  - id: calvin-harris-summer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Summer — Calvin Harris"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Calvin Harris Summer"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6YUTL4dYpB9xZO5qExPf05"
+    region: ["global"]
+  - id: swedish-house-mafia-moth-to-flame
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Moth to Flame — Swedish House Mafia"
+    correctYear: 2021
+    probability: 80
+    wikimediaSearchHints: ["Swedish House Mafia Moth to Flame"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2gpWyfu7eZ01zzncHpxOtA"
+    region: ["global"]
+  - id: lov1-kan-inte-sitta-still
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kan inte sitta still — Lov1"
+    correctYear: 2023
+    probability: 80
+    wikimediaSearchHints: ["Lov1 Kan inte sitta still"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "64z4huyo5fZHG7gD2g7GJA"
+    region: ["sweden"]
+  - id: tjuvjakt-tusen-spann
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Tusen spänn — Tjuvjakt"
+    correctYear: 2025
+    probability: 80
+    wikimediaSearchHints: ["Tjuvjakt Tusen spänn"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "01RdEXps15f3VmQMV6OuTM"
+    region: ["sweden"]
+  - id: tjuvjakt-bara-vi-bara-jag-bara-du
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bara vi, bara jag, bara du — Tjuvjakt"
+    correctYear: 2025
+    probability: 80
+    wikimediaSearchHints: ["Tjuvjakt Bara vi, bara jag, bara du"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1fncAFDynLDnSIPg7h2mp3"
+    region: ["sweden"]
+  - id: hov1-bla
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Blå — Hov1"
+    correctYear: 2021
+    probability: 80
+    wikimediaSearchHints: ["Hov1 Blå"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "0hel3UahHwK9SfUF85M1WK"
+    region: ["sweden"]

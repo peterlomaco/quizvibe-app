@@ -45,9 +45,10 @@ export interface LobbySettings {
   selectedExtraPackages: string[];
   // Paket-läge: host:s aggregat-toggles när ett Host-paket är valt. Source
   // Mixerboard kollapsar då till EN YT- + EN Hints-toggle (+ Spotify). Default
-  // true (paketets material spelas). Tolerant fallback via ?? true — ingen
-  // DB-migration krävs (skrivs INTE i settingsToRow, samma mönster som
-  // spotify_answer_*). Ignoreras när inget paket är aktivt.
+  // true (paketets material spelas). Synkas till non-host via en SEPARAT
+  // targeted UPDATE i setLobbySettings (kolumner via migration 0055) — INTE i
+  // settingsToRow, samma mönster som remote_assistance. Ej körd migration →
+  // console.warn + tolerant fallback ?? true. Ignoreras när inget paket aktivt.
   packageYoutubeEnabled: boolean;
   packageHintsEnabled: boolean;
   // Per-source profession-category-filter.
@@ -120,8 +121,9 @@ interface LobbySettingsRow {
   // Parent Control. Optional — kolumnen finns inte i DB (ingen migration).
   // Tolerant read via ?? false; skrivs INTE i settingsToRow.
   parent_control_enabled?: boolean;
-  // Paket-aggregat-toggles. Optional — kolumnerna finns inte i DB (ingen
-  // migration). Tolerant read via ?? true; skrivs INTE i settingsToRow.
+  // Paket-aggregat-toggles. Optional — kolumnerna läggs till av migration 0055.
+  // Skrivs via SEPARAT targeted UPDATE (INTE settingsToRow), samma mönster som
+  // remote_assistance; tolerant read via ?? true om migrationen ej körts.
   package_youtube_enabled?: boolean;
   package_hints_enabled?: boolean;
   // Optional tills migration 0033_lobby_settings_remote_assistance.sql körts
@@ -261,6 +263,26 @@ export async function setLobbySettings(code: string, settings: LobbySettings): P
   if (error) {
     console.warn('[lobbySettings] setLobbySettings upsert failed:', error.message);
     return;
+  }
+  // Paket-aggregat-toggles skrivs SEPARAT (se LobbySettings-kommentaren för
+  // varför de inte får ligga i settingsToRow). Bara när ett paket är aktivt —
+  // annars är värdena irrelevanta och non-host återställer dem lokalt till true.
+  // Saknas kolumnerna (migration 0055 ej körd) → console.warn och inget annat:
+  // huvudraden är redan committad och rowToSettings defaultar till true.
+  if (settings.selectedExtraPackages.length > 0) {
+    const { error: ptError } = await supabase
+      .from('lobby_settings')
+      .update({
+        package_youtube_enabled: settings.packageYoutubeEnabled,
+        package_hints_enabled: settings.packageHintsEnabled,
+      })
+      .eq('room_code', normalized);
+    if (ptError) {
+      console.warn(
+        '[lobbySettings] package toggles update failed (migration 0055 applied?):',
+        ptError.message,
+      );
+    }
   }
   // Remote 1v1: mutual-assistance-fälten skrivs SEPARAT (se settingsToRow för
   // varför). Bara i remote-lobbies — lokala lägen har per-spelare-assistance

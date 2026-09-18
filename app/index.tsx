@@ -167,7 +167,8 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
  * spel.
  */
 const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolean | string }[] = [
-  { label: 'Single & Multiplayer Game', user: true, guest: true },
+  { label: 'Host Single & PtP Multiplayer', user: true, guest: true },
+  { label: 'Host Individual device (Multiplayer)', user: true, guest: false },
   { label: 'Head-to-head matches', user: true, guest: false },
   { label: 'Saved results & player history', user: true, guest: false },
   { label: 'Skill & HCP progression', user: true, guest: false },

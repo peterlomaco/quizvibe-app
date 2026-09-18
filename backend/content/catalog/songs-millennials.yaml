@@ -838,6 +838,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Guns N Roses November Rain 1992"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3YRCqOhFifThpSRFJ1VWFM"
     genrePackages: ["Rock", "Soft & Love"]
     youtubeClips:
       - videoId: "y6lfK3bH4z8"
@@ -2588,6 +2589,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Bon Jovi Bed of Roses Keep the Faith"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0PDW69Vli91TKQwotAg3Wd"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "NvR60Wg9R7Q"
@@ -4215,3 +4217,535 @@ items:
       - videoId: "zNmO233OztQ"
         startSec: 12
         endSec: 27
+  # --- Spotify backlog import 2026-09 (sourced from Music.xlsx col H) ---
+  - id: gladys-knight-license-to-kill
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "License to Kill — Gladys Knight"
+    correctYear: 1989
+    probability: 80
+    wikimediaSearchHints: ["Gladys Knight License to Kill"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6H4KXG6ydKKcBfZhZ2bDUg"
+    region: ["global"]
+  - id: stefan-borsch-det-ar-ju-dig-jag-gar-och-vantar-pa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Det är ju dig jag går och väntar på — Stefan Borsch"
+    correctYear: 1984
+    probability: 80
+    wikimediaSearchHints: ["Stefan Borsch Det är ju dig jag går och väntar på"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4gW1x4M5WTs4mACvheyKgh"
+    region: ["sweden"]
+  - id: backstreet-boys-all-i-have-to-give
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "All I have to give — Backstreet Boys"
+    correctYear: 1996
+    probability: 80
+    wikimediaSearchHints: ["Backstreet Boys All I have to give"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3hlhefxgyp4MDnN6C2dQ5H"
+    region: ["global"]
+  - id: run-dmc-its-like-that
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Its like that — Run DMC"
+    correctYear: 1984
+    probability: 80
+    wikimediaSearchHints: ["Run DMC Its like that"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2J6QnTjHIWwXErNWyF0RUC"
+    region: ["global"]
+  - id: billy-ray-cyrus-achy-breaky-heart
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Achy Breaky Heart — Billy Ray Cyrus"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Billy Ray Cyrus Achy Breaky Heart"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2EoIt9vdgFRNW03u5IvFsQ"
+    region: ["global"]
+  - id: jimmy-nail-aint-no-doubt
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Aint No Doubt — Jimmy Nail"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Jimmy Nail Aint No Doubt"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5qbrpQ5ac44s48PU1ouUVC"
+    region: ["global"]
+  - id: undercover-baker-street
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Baker street — Undercover"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Undercover Baker street"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2DTQUOfYJAjdo7utgjnU4u"
+    region: ["global"]
+  - id: vanessa-paradis-be-my-baby
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Be my baby — Vanessa Paradis"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Vanessa Paradis Be my baby"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5UkoitnvaDUSsq7cVsOdOh"
+    region: ["global"]
+  - id: sophie-b-hawkins-damn-i-wish-i-was-your-lover
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Damn I wish i was your lover — Sophie B Hawkins"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Sophie B Hawkins Damn I wish i was your lover"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7kmfQ2QHwGqRCxVHDv5mzo"
+    region: ["global"]
+  - id: u96-das-boot
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Das Boot — U96"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["U96 Das Boot"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5A3IdgGphzKS2etiGFB73S"
+    region: ["global"]
+  - id: prince-diamonds-and-pearls
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Diamonds and Pearls — Prince"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Prince Diamonds and Pearls"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4mfyehYgUP2V8jsjW9UzYj"
+    region: ["global"]
+  - id: right-said-fred-dont-talk-just-kiss
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dont Talk Just Kiss — Right said fred"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Right said fred Dont Talk Just Kiss"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4mrbbOwCgfgxiYy8kaVyAO"
+    region: ["global"]
+  - id: felix-dont-you-want-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dont You Want Me — Felix"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Felix Dont You Want Me"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4xlHRxENDR0zODpmwmz6CL"
+    region: ["global"]
+  - id: the-shamen-ebeneezer-goode
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ebeneezer Goode — The Shamen"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["The Shamen Ebeneezer Goode"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3iGUZpRS1UGX39XBdNvSmU"
+    region: ["global"]
+  - id: en-vogue-free-your-mind
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Free Your Mind — En Vogue"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["En Vogue Free Your Mind"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2vG1yrWSMiL6egg6w4e9ma"
+    region: ["global"]
+  - id: the-cure-friday-im-in-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Friday Im in love — The cure"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["The cure Friday Im in love"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4QlzkaRHtU8gAdwqjWmO8n"
+    region: ["global"]
+  - id: wet-wet-wet-goodnight-girl
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Goodnight girl — Wet wet wet"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Wet wet wet Goodnight girl"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2TYcO8ZBV8oYGGjwRT9oBH"
+    region: ["global"]
+  - id: richard-marx-hazard
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Hazard — Richard Marx"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Richard Marx Hazard"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5FcGHLnw8ZPeM1LigWhj3k"
+    region: ["global"]
+  - id: michael-jackson-heal-the-world
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Heal the world — Michael Jackson"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Michael Jackson Heal the world"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7woW97CfcWaKtuC6W5BP2K"
+    region: ["global"]
+  - id: east-17-house-of-love
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "House of love — East 17"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["East 17 House of love"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "0HgDGw5QDBIfDCTIrdV1Tx"
+    region: ["global"]
+  - id: bruce-springsteen-human-touch
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Human Touch — Bruce Springsteen"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Bruce Springsteen Human Touch"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1o53HbxmOy5TzThJdBaDZb"
+    region: ["global"]
+  - id: genesis-i-cant-dance
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I Cant dance — Genesis"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Genesis I Cant dance"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5VwQYHpyQPhiToPKWJaHiO"
+    region: ["global"]
+  - id: shanice-i-love-your-smile
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I Love your smile — Shanice"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Shanice I Love your smile"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5BE3DOk0C26VCMxxT84bec"
+    region: ["global"]
+  - id: bob-marley-iron-lion-zion
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Iron Lion Zion — Bob Marley"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Bob Marley Iron Lion Zion"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4lMfYLOskpi3GxEXM0X92m"
+    region: ["global"]
+  - id: pearl-jam-jeremy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jeremy — Pearl Jam"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Pearl Jam Jeremy"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "62nQ8UZVqR2RMvkJHkcO2o"
+    region: ["global"]
+  - id: genesis-jesus-he-knows-me
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jesus He Knows Me — Genesis"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Genesis Jesus He Knows Me"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "43MwtiKUQj1GhQm2hC9Kn9"
+    region: ["global"]
+  - id: house-of-pain-jump-around
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jump Around — House of Pain"
+    correctYear: 1994
+    probability: 80
+    wikimediaSearchHints: ["House of Pain Jump Around"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3TZwjdclvWt7iPJUnMpgcs"
+    region: ["global"]
+  - id: the-klf-justified-and-ancient
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Justified and Ancient — The KLF"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["The KLF Justified and Ancient"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3hDtJQCP6ROvhWYTR4qdCD"
+    region: ["global"]
+  - id: bon-jovi-keep-the-faith
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Keep the Faith — Bon Jovi"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Bon Jovi Keep the Faith"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5EWtBjCLy21d1hY9zdaEe8"
+    region: ["global"]
+  - id: guns-n-roses-knockin-on-heavens-door
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Knockin on Heavens Door — Guns n Roses"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Guns n Roses Knockin on Heavens Door"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2C4aYxNpoPkmoZ3ZdPeuOB"
+    region: ["global"]
+  - id: tom-cochrane-life-is-a-highway
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Life is a highway — Tom Cochrane"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Tom Cochrane Life is a highway"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "0hKF8N8aflF1uDzEEnPr2j"
+    region: ["global"]
+  - id: shabba-ranks-mr-loverman
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mr Loverman — Shabba Ranks"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Shabba Ranks Mr Loverman"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "0OGmrTL8ILUFWNQZkgzgcJ"
+    region: ["global"]
+  - id: lionel-richie-my-destiny
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "My Destiny — Lionel Richie"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Lionel Richie My Destiny"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2c2QM7x721KtNva4g77PIT"
+    region: ["global"]
+  - id: metallica-nothing-else-matters
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Nothing Else Matters — Metallica"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Metallica Nothing Else Matters"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3ZFwuJwUpIl0GeXsvF1ELf"
+    region: ["global"]
+  - id: u2-one
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "One — U2"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["U2 One"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3G69vJMWsX6ZohTykad2AU"
+    region: ["global"]
+  - id: the-prodigy-out-of-space
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Out of Space — The Prodigy"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["The Prodigy Out of Space"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "37m2khXl5lnBzicq1mGoZG"
+    region: ["global"]
+  - id: tasmin-archer-sleeping-satellite
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sleeping Satellite — Tasmin Archer"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Tasmin Archer Sleeping Satellite"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3WSyYBhLZRLbQo2tJgFvSR"
+    region: ["global"]
+  - id: eric-clapton-tears-in-heaven
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Tears in Heaven — Eric Clapton"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Eric Clapton Tears in Heaven"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7utRJ4BeYx85khzP3lKoBX"
+    region: ["global"]
+  - id: elton-john-the-one
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The One — Elton John"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Elton John The One"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2bytByr4orvDCKkyLsJYKw"
+    region: ["global"]
+  - id: 2-unlimited-twilight-zone
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Twilight zone — 2 unlimited"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["2 unlimited Twilight zone"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "78ePMYOtObETLaxVEVizXl"
+    region: ["global"]
+  - id: crowded-house-weather-with-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Weather with you — Crowded House"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Crowded House Weather with you"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6tXnRSvuNgOq4QcxpIN54r"
+    region: ["global"]
+  - id: charles-and-eddie-would-i-lie-to-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Would I Lie to You — Charles & Eddie"
+    correctYear: 1992
+    probability: 80
+    wikimediaSearchHints: ["Charles & Eddie Would I Lie to You"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1A3iXoekVzV95cq89XiiuX"
+    region: ["global"]
+  - id: ten-sharp-you
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "You — Ten sharp"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Ten sharp You"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6lbme14HiDWYmGiw1I2Dv6"
+    region: ["global"]
+  - id: friday-i-know-something-going-on
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "I know something going on — Friday"
+    correctYear: 1982
+    probability: 80
+    wikimediaSearchHints: ["Friday I know something going on"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6CT0MVgHnoAUXrSrnlwfWx"
+    region: ["global"]
+  - id: rob-n-raz-take-a-ride
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Take a ride — Rob n raz"
+    correctYear: 1996
+    probability: 80
+    wikimediaSearchHints: ["Rob n raz Take a ride"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2SlGqfqrW8yfRldGtS4flf"
+    region: ["sweden"]
+  - id: army-of-lovers-crucified
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Crucified — Army of lovers"
+    correctYear: 1991
+    probability: 80
+    wikimediaSearchHints: ["Army of lovers Crucified"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6fXzdWgyZhDeLmlzC7Mvco"
+    region: ["sweden"]
+  - id: stakka-bo-here-we-go-again
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Here we go again — Stakka Bo"
+    correctYear: 1993
+    probability: 80
+    wikimediaSearchHints: ["Stakka Bo Here we go again"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "3gXRUe5Rgb7zPFY59i42OY"
+    region: ["global"]
+  - id: dr-alban-look-whos-talking-now
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Look whos talking now — Dr Alban"
+    correctYear: 1994
+    probability: 80
+    wikimediaSearchHints: ["Dr Alban Look whos talking now"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1BFJG9xkO8QCwGHL9pH9wt"
+    region: ["global"]
+  - id: faithless-insomnia
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Insomnia — Faithless"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["Faithless Insomnia"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "5cadBZgqus7zm7WxLBerOb"
+    region: ["global"]
+  - id: the-connels-74-75
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "74-75 — The connels"
+    correctYear: 1993
+    probability: 80
+    wikimediaSearchHints: ["The connels 74-75"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2MAVcVr2oylw2OZ3hojWYj"
+    region: ["global"]
+  - id: take-that-back-for-good
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Back for good — Take that"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["Take that Back for good"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "48e4AJwKOQCTK4Erzt31G1"
+    region: ["global"]
+  - id: the-outhere-brothers-boom-boom-boom
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Boom boom boom — The Outhere Brothers"
+    correctYear: 1994
+    probability: 80
+    wikimediaSearchHints: ["The Outhere Brothers Boom boom boom"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "25KdyGYYNeMJ0oPwVYPKZQ"
+    region: ["global"]
+  - id: shaggy-boombastic
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Boombastic — Shaggy"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["Shaggy Boombastic"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4fxF8ljwryMZX5c9EKrLFE"
+    region: ["global"]
+  - id: deep-blue-something-breakfast-at-tiffanys
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Breakfast at tiffanys — Deep Blue Something"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["Deep Blue Something Breakfast at tiffanys"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1uzWOoJdADfstQuFtQFTUn"
+    region: ["global"]
+  - id: the-smashing-pumpkins-bullet-with-butterfly-wings
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bullet with butterfly wings — The smashing pumpkins"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["The smashing pumpkins Bullet with butterfly wings"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1EzeXGaZdqsA4Nst1AIAL2"
+    region: ["global"]
+  - id: 2pac-dear-mama
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dear Mama — 2Pac"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["2Pac Dear Mama"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6tDxrq4FxEL2q15y37tXT9"
+    region: ["global"]
+  - id: alex-party-dont-give-me-your-life
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dont Give me Your life — Alex Party"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["Alex Party Dont Give me Your life"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6jdhk6q8N0uODYwpv96gd1"
+    region: ["europe"]
+  - id: livin-joy-dreamer
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dreamer — Livin Joy"
+    correctYear: 1994
+    probability: 80
+    wikimediaSearchHints: ["Livin Joy Dreamer"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "0r1veUx7ezhSwTZESVYEIt"
+    region: ["global"]
+  - id: mariah-carey-fantasy
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Fantasy — Mariah Carey"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["Mariah Carey Fantasy"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "6xkryXuiZU360Lngd4sx13"
+    region: ["global"]
