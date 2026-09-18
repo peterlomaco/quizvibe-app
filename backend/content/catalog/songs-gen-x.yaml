@@ -364,6 +364,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Led Zeppelin Stairway to Heaven IV"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0RO9W1xJoUEpq5MEelddFb"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "X791IzOwt3Q"
@@ -1950,3 +1951,22 @@ items:
       - videoId: "92cwKCU8Z5c"
         startSec: 35
         endSec: 50
+  # --- Spotify backlog import 2026-09 (sourced from Music.xlsx col H) ---
+  - id: queen-bohemian-rhapsody
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bohemian Rhapsody — Queen"
+    correctYear: 1975
+    probability: 80
+    wikimediaSearchHints: ["Queen Bohemian Rhapsody"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "1yslmgUcM2AOkOPS4sl3QV"
+    region: ["global"]
+  - id: secret-service-oh-susie
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Oh Susie — Secret service"
+    correctYear: 1979
+    probability: 80
+    wikimediaSearchHints: ["Secret service Oh Susie"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "7EFdBb3ao46AI9h9nhzLo1"
+    region: ["global"]

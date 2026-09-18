@@ -44,6 +44,7 @@ items:
     region: ["unknown-region"]
     wikimediaSearchHints: ["Fred Astaire Night and Day Cole Porter"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3XkZkqXOEZ00Y2RXsCFfDd"
     youtubeClips:
       - videoId: "h02OmcR-be4"
         startSec: 30
@@ -58,6 +59,7 @@ items:
     region: ["unknown-region"]
     wikimediaSearchHints: ["Ethel Waters Stormy Weather 1933"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7M7RMJZYmSgmLveGBgakne"
     youtubeClips:
       - videoId: "dyo77R5ShTM"
         startSec: 30
@@ -86,6 +88,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Fred Astaire Cheek to Cheek Top Hat"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5qWXXF3On2xUfVu1ND1NLN"
     genrePackages: ["Soft & Love"]
     region: ["unknown-region"]
   - id: bing-crosby-pennies-from-heaven
@@ -95,6 +98,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Bing Crosby Pennies from Heaven 1936"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4Du0wJYQDUt2bw1Bq2b4Qb"
     region: ["unknown-region"]
   - id: duke-ellington-caravan
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -103,6 +107,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Duke Ellington Caravan 1937"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6hiMQEHbd8z7gfJ64Fg0z5"
     region: ["unknown-region"]
   - id: ella-fitzgerald-a-tisket-a-tasket
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -121,6 +126,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Glenn Miller In the Mood 1940"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6dZKWYSx5YBIme4SfpIHJ0"
     youtubeClips:
       - videoId: "7vMTZBVBkPU"
         startSec: 5
@@ -135,6 +141,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Glenn Miller Chattanooga Choo Choo"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7a5VuzvBrtbqYT7kNlQlFd"
     region: ["unknown-region"]
   - id: bing-crosby-white-christmas
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -170,6 +177,7 @@ items:
     region: ["unknown-region"]
     wikimediaSearchHints: ["Bing Crosby Swinging on a Star Going My Way"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "450aHY6TKEFag2pe3KSvXW"
     youtubeClips:
       - videoId: "BEnBcm3QIfs"
         startSec: 30
@@ -184,6 +192,7 @@ items:
     region: ["unknown-region"]
     wikimediaSearchHints: ["Doris Day Sentimental Journey Les Brown"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5BqypiEMn72mnQogW8gIcu"
     youtubeClips:
       - videoId: "IpQCROAHoU4"
         startSec: 30
@@ -228,6 +237,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Nat King Cole Nature Boy 1948"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2pkUfD2lCmNOOMnzZoJQUl"
     youtubeClips:
       - videoId: "D6NOJZpYp8c"
         startSec: 30
@@ -243,6 +253,7 @@ items:
     region: ["unknown-region"]
     wikimediaSearchHints: ["Perry Como Some Enchanted Evening South Pacific"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0MVjP6RWqGXygcgxRYfP3V"
     youtubeClips:
       - videoId: "bltUKtRFdfY"
         startSec: 30
@@ -265,6 +276,7 @@ items:
     probability: 75
     wikimediaSearchHints: ["Johnnie Ray Cry 1951"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1rmDNc4M7r3dIYPRlScGAI"
     region: ["unknown-region"]
   - id: jo-stafford-you-belong-to-me
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -625,6 +637,7 @@ items:
     region: ["unknown-region"]
     wikimediaSearchHints: ["Edith Piaf La Vie en rose"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6RKuyWarJu8SMrflntmyXx"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "-0KvBnIvTFs"
