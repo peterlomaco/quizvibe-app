@@ -9373,7 +9373,19 @@ export default function QuizScreen() {
         if (payload.all_confirmed) {
           djAllConfirmedRef.current = true;
           if (typeof payload.freeze_used === 'number') djFreezeUsedRef.current = payload.freeze_used;
-          if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
+          const inAnswerPhase =
+            phaseRef.current === 'question' || phaseRef.current === 'awaiting';
+          // Snap:a klockan till sista-confirm-positionen. På DJ:ns EGEN enhet
+          // (spotifyDJOpenedAppRef) körs korrigeringen ÄVEN i reveal-fasen:
+          // host-är-DJ återvänder ofta från Spotify EFTER att wall-clock-
+          // fallbacken (syncDjWallClockReveal, ingen freeze_used känd än) redan
+          // avslöjat med ett för lågt timeLeft. Det gamla question/awaiting-
+          // gate:t hoppade då över korrigeringen → DJ:n fastnade på wall-clock-
+          // tiden (färre sekunder än sista gissaren såg — desynken Peter
+          // rapporterade på host-är-DJ-frågor, oberoende av Year/Name). Den sena
+          // all_confirmed-heartbeaten reparerar nu displayen oavsett fas;
+          // setPhase körs bara om vi fortfarande svarar. (Peter 2026-09-18.)
+          if (inAnswerPhase || spotifyDJOpenedAppRef.current) {
             if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
             if (djRevealTimeoutRef.current) {
               clearTimeout(djRevealTimeoutRef.current);
@@ -9388,7 +9400,7 @@ export default function QuizScreen() {
               // Visa återstående tid VID sista confirmen, inte wall-clock. (2026-09-17.)
               setTimeLeft(Math.max(0, Math.ceil(rs - djFreezeUsedRef.current)));
             }
-            setPhase('reveal');
+            if (inAnswerPhase) setPhase('reveal');
             return;
           }
         }
