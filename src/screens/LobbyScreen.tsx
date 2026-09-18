@@ -2527,12 +2527,6 @@ export default function LobbyScreen() {
    *  Deklareras direkt efter state:n så även effekter ovanför render
    *  (dep-arrayer evalueras under render) kan läsa den utan TDZ. */
   const isSingleLobby = resolveSeedSinglePlayer(lobbyType, singlePlayerDefault);
-  // Guest host i SINGLE PLAYER — den låsta trial-vyn (grön sektionsram +
-  // hänglås-badge, inga Customized Host packages, Parent Control forcerad på,
-  // dolda kort-detaljer). Multiplayer guest host behåller den vanliga lobbyn
-  // (Peter 2026-09-11). OBS: Game Sequence-döljning och "alltid Full"-assistance
-  // gäller BÅDA lägena och gatas därför fortsatt på isGuestHost, inte denna.
-  const isGuestHostSingle = isGuestHost && isSingleLobby;
 
   // Max antal spelare per spel — 4 = Basic (gratis), 12 = Premium.
   // Lobby-local state; speglar Profile:s host-default-toggle.
@@ -7470,13 +7464,13 @@ export default function LobbyScreen() {
             container. Ger semantiskt en "vad spelet ska spelas som"-sektion
             som visuellt skiljer sig från Players in Lobby nedanför. */}
         {gameSettingsExpanded && (
-        <View style={[styles.gameSettingsBorder, isGuestHostSingle && styles.gameSettingsBorderGuest]}>
-        {/* Guest host SINGLE PLAYER: HELA Game Settings-sektionen får den gröna
-            låsta ramen (i stället för per-sektion grön box på mixerboarden), och
-            "DEFINED BY HOST"-badgen ersätts av hänglås-badgen — samma stil som
-            single-player-rutans lockBadge (Peter 2026-09-11). Multiplayer guest
-            host behåller den vanliga "DEFINED BY HOST"-vyn. */}
-        {isGuestHostSingle ? (
+        <View style={[styles.gameSettingsBorder, isGuestHost && styles.gameSettingsBorderGuest]}>
+        {/* Guest host (BÅDE single OCH multiplayer): HELA Game Settings-sektionen
+            får den gröna låsta ramen (i stället för per-sektion grön box på
+            mixerboarden), och "DEFINED BY HOST"-badgen ersätts av hänglås-badgen
+            — samma stil som single-player-rutans lockBadge (Peter 2026-09-18,
+            utökat från single-only). */}
+        {isGuestHost ? (
         <View style={styles.guestLockBadge} pointerEvents="none">
           <Text style={styles.guestLockBadgeText}>🔒</Text>
         </View>
@@ -7875,10 +7869,10 @@ export default function LobbyScreen() {
                 YouTube → Hints), se mockup. Öppnas här, stängs efter paket-
                 boarden. Spotify-blockets egen bg är borttagen så ramen blir en
                 enda enhetlig box i stället för en nästlad ruta. */}
-            {/* Guest host SINGLE PLAYER: yttre grå boxen blir borderless — den
-                gröna låsta ramen sitter runt HELA Game Settings-sektionen. I
-                multiplayer guest host (och för alla andra) behålls den grå ramen. */}
-            <View style={[styles.mixerboardBox, isGuestHostSingle && styles.mixerboardBoxGuest]}>
+            {/* Guest host (single + multiplayer): yttre grå boxen blir borderless —
+                den gröna låsta ramen sitter runt HELA Game Settings-sektionen. För
+                alla andra behålls den grå ramen. */}
+            <View style={[styles.mixerboardBox, isGuestHost && styles.mixerboardBoxGuest]}>
             {gameMode !== 'remote-1v1' && !isSingleLobby && !isGuestHost && (
             <View style={{ marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
             {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
