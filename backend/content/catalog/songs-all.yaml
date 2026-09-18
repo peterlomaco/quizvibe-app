@@ -35,7 +35,7 @@ items:
     spotifyTrackId: "1zzJOF5gOMXzqoUCbOg4JE"
     answerMethods: ["timeline"]
     genrePackages: ["Film edition"]
-    region: ["global"]
+    region: ["unknown-region"]
     youtubeClips:
       - videoId: "oW2QZ7KuaxA"
         startSec: 52
@@ -47,6 +47,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Elvis Presley Heartbreak Hotel"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6xNwKNYZcvgV3XTIwsgNio"
     youtubeClips:
       - videoId: "LGwO2BaDJQc"
         startSec: 10
@@ -101,6 +102,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Michael Jackson Billie Jean"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7J1uxwnxfQLu4APicE5Rnj"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Kr4EQDVETuA"
@@ -115,6 +117,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Thriller Michael Jackson"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2LlQb7Uoj1kKyGhlkBf9aC"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "fK6tf6opIg0"
@@ -130,6 +133,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Smells Like Teen Spirit Nirvana"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4CeeEOM32jQcH3eN9Q2dGj"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "V7f03mfxN4I"
@@ -145,6 +149,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Whitney Houston I Will Always Love You Bodyguard"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4eHbdreAnSOrDDsFfc4Fpm"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "tP0zj220CbQ"
@@ -160,6 +165,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Celine Dion My Heart Will Go On Titanic"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "368tuOJxckGRWXcYXfJSxX"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "CUmOFqQRkco"
@@ -189,6 +195,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Adele Someone Like You 21"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1zwMYTA5nlNjZxYrvBB2pV"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "hLQl3WQQoQ0"
@@ -220,6 +227,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Shape of You Ed Sheeran"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7qiZfU4dY1lWllzX7mPBI3"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "JGwWNGJdvx8"

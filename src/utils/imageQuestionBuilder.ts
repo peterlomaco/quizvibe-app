@@ -356,8 +356,13 @@ export function buildImageVariant(
   distractorNames: readonly string[],
   totalOptions: number = DEFAULT_TOTAL_OPTIONS,
   rng: () => number = Math.random,
+  // Opt-in: tvinga prefix-läge med EXAKT denna längd, oavsett assistance —
+  // används ENBART av Spotify/Name (Full=3 / Standard=2 / Minimal=1) så de
+  // alltid är ett prefix-rutnät (Full ger inget full-names där). Utelämnad →
+  // oförändrat beteende (Hints-vägen), så Hints/Film påverkas inte.
+  forcePrefixLength?: number,
 ): ImageQuestionVariant {
-  if (assistance === 'full') {
+  if (forcePrefixLength === undefined && assistance === 'full') {
     const nameList = buildFullNamesList({
       correctItem,
       audienceSet,
@@ -369,7 +374,7 @@ export function buildImageVariant(
     return { mode: 'full-names', nameList };
   }
 
-  const prefixLength = assistance === 'minimal' ? 1 : 2;
+  const prefixLength = forcePrefixLength ?? (assistance === 'minimal' ? 1 : 2);
   const letterGrid = buildLetterGrid({
     correctItem,
     prefixLength,

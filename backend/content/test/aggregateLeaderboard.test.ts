@@ -301,14 +301,24 @@ describe('nextMarathonName', () => {
     expect(nextMarathonName([])).toBe('Marathon 1');
   });
 
-  it('befintlig Marathon 7 → Marathon 8', () => {
-    expect(nextMarathonName(['Marathon 7'])).toBe('Marathon 8');
+  it('sammanhängande serie → nästa nummer', () => {
+    expect(nextMarathonName(['Marathon 1', 'Marathon 2'])).toBe('Marathon 3');
   });
 
-  it('högsta numret vinner, custom-namn ignoreras', () => {
+  it('fyller lägsta lediga luckan i stället för att fortsätta uppåt', () => {
     expect(
-      nextMarathonName(['Marathon 3', 'Anna & Bo', 'Marathon 7']),
-    ).toBe('Marathon 8');
+      nextMarathonName(['Marathon 1', 'Marathon 2', 'Marathon 4']),
+    ).toBe('Marathon 3');
+  });
+
+  it('lucka i början fylls först', () => {
+    expect(nextMarathonName(['Marathon 2', 'Marathon 3'])).toBe('Marathon 1');
+  });
+
+  it('custom-namn ignoreras vid luck-fyllning', () => {
+    expect(
+      nextMarathonName(['Marathon 1', 'Anna & Bo', 'Marathon 3']),
+    ).toBe('Marathon 2');
   });
 
   it('bara custom-namn → Marathon 1', () => {
@@ -316,6 +326,6 @@ describe('nextMarathonName', () => {
   });
 
   it('matchar case-insensitivt och trimmar', () => {
-    expect(nextMarathonName(['  marathon 4  '])).toBe('Marathon 5');
+    expect(nextMarathonName(['  marathon 1  '])).toBe('Marathon 2');
   });
 });

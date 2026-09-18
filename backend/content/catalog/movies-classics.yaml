@@ -213,7 +213,7 @@ items:
     correctYear: 1981
     probability: 92
     wikimediaSearchHints: ["Raiders of the Lost Ark 1981 Indiana Jones"]
-    answerMethods: ["actor-select"]
+    answerMethods: ["timeline"]
     correctNames: ["Harrison Ford"]
     distractorNames: ["Tom Selleck", "Mel Gibson", "Bruce Willis", "Kurt Russell"]
     youtubeClips:
@@ -228,7 +228,7 @@ items:
     correctYear: 1982
     probability: 92
     wikimediaSearchHints: ["E.T. the Extra-Terrestrial 1982 Spielberg"]
-    answerMethods: ["actor-select"]
+    answerMethods: ["timeline"]
     correctNames: ["Henry Thomas", "Drew Barrymore"]
     distractorNames: ["Macaulay Culkin", "River Phoenix", "Elijah Wood", "Jake Gyllenhaal"]
     youtubeClips:
@@ -259,7 +259,7 @@ items:
     probability: 95
     region: ["global"]
     wikimediaSearchHints: ["Back to the Future 1985"]
-    answerMethods: ["actor-select"]
+    answerMethods: ["timeline"]
     correctNames: ["Michael J. Fox"]
     distractorNames: ["Rob Lowe", "Tom Hanks", "Emilio Estevez", "Patrick Swayze"]
     youtubeClips:
@@ -400,7 +400,7 @@ items:
     correctYear: 1997
     probability: 95
     wikimediaSearchHints: ["Titanic 1997 Cameron film"]
-    answerMethods: ["actor-select"]
+    answerMethods: ["timeline"]
     correctNames: ["Leonardo DiCaprio", "Kate Winslet"]
     distractorNames: ["Brad Pitt", "Matt Damon", "Julia Roberts", "Sandra Bullock"]
     youtubeClips:
@@ -634,7 +634,7 @@ items:
     probability: 84
     region: ["global"]
     wikimediaSearchHints: ["The Bodyguard 1992 film Kevin Costner Whitney Houston"]
-    answerMethods: ["actor-select"]
+    answerMethods: ["timeline"]
     correctNames: ["Kevin Costner", "Whitney Houston"]
     distractorNames: ["Tom Cruise", "Mel Gibson", "Julia Roberts", "Demi Moore"]
     youtubeClips:
@@ -643,10 +643,11 @@ items:
         endSec: 30
         notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'The Bodyguard - Theatrical Trailer' — avslojar varken skadespelare eller ar."
 
-  # === Tillägg 2026-09-11 (Peters Film.xlsx) ===
-  # actor-select (Name) — de fem klipp vars YouTube-titel innehaller filmens
-  # ARSTAL kordes medvetet som Name i stallet for Year, sa att det synliga aret
-  # inte langre ar svaret (samma spoiler-logik som the-karate-kid, fast omvant).
+  # === 2026-09-17 (Peters uppdaterade Film.xlsx) ===
+  # indiana-jones-raiders, e-t, back-to-the-future, titanic, the-bodyguard-1992
+  # aterstallda till timeline (Year). Peter har verifierat i appen att arstalet
+  # inte langre spoilar (YouTube kapar de langa titlarna). Detta reverserar
+  # 2026-09-11-passets Name-override for exakt dessa fem klipp.
 
   - id: ghostbusters-1984
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]

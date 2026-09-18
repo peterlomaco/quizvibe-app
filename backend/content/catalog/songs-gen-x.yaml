@@ -32,6 +32,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Beach Boys Good Vibrations 1966"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5t9KYe0Fhd5cW6UYT4qP8f"
     youtubeClips:
       - videoId: "mdt0SOqPJcg"
         startSec: 30
@@ -65,6 +66,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["The Beatles Hey Jude"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0aym2LBJBk9DAYuHHutrIl"
     youtubeClips:
       - videoId: "mQER0A0ej0M"
         startSec: 15
@@ -79,6 +81,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Elvis Presley Suspicious Minds 1969"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1H5IfYyIIAlgDX8zguUzns"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "xt8XQLvKBUs"
@@ -94,6 +97,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Simon Garfunkel Bridge Over Troubled Water"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6l8EbYRtQMgKOyc1gcDHF9"
     youtubeClips:
       - videoId: "nvF5imxSaLI"
         startSec: 60
@@ -108,7 +112,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Creedence Clearwater Revival Who'll Stop the Rain 1970"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "2aoo2jlRnM3A0NyLQqMN2f"
+    spotifyTrackId: "2ciMJGCDW70hqq18Vgui68"
     region: ["global"]
   - id: john-lennon-imagine
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -117,6 +121,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["John Lennon Imagine 1971"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0sKVgEEApbh4EmJJyoUmBB"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "zHxobd1WLno"
@@ -132,6 +137,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Bill Withers Lean on Me"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3M8FzayQWtkvOhqMn2V4T2"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Nx_D0VTHBag"
@@ -146,6 +152,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Roberta Flack Killing Me Softly"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6btetw0crEcjUKlQ4RO86f"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "3r3R0lmH7OE"
@@ -194,6 +201,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Chic Le Freak 1978"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7z3aH1QV2zwMKXxShBNOGe"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "aXgSHL7efKg"
@@ -233,6 +241,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["The Who My Generation 1965"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4u9f8hqstB7iITDJNzKhQx"
     youtubeClips:
       - videoId: "qIYuXJYaZWw"
         startSec: 30
@@ -263,6 +272,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Jimi Hendrix Purple Haze Are You Experienced"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6Thhmf7eaJ5AVZg9ptZ5Vb"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "cbG7HEEPE1o"
@@ -278,6 +288,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Aretha Franklin Respect 1967"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2i59vRli0cjYCaINsv52gI"
     youtubeClips:
       - videoId: "9iayJ8u4Qew"
         startSec: 30
@@ -292,6 +303,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Steppenwolf Born to Be Wild Easy Rider"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0bsoiyh1eNoWTN9qQVFnNz"
     youtubeClips:
       - videoId: "igvP806798U"
         startSec: 30
@@ -306,6 +318,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Simon Garfunkel Mrs Robinson Graduate"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3CJ60azPXtva8OdBsxSA7a"
     youtubeClips:
       - videoId: "zJ_C0hk_pkE"
         startSec: 30
@@ -320,6 +333,7 @@ items:
     probability: 75
     wikimediaSearchHints: ["The Archies Sugar Sugar 1969"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2k5UXFAAwSPotZUJqtEkCA"
     youtubeClips:
       - videoId: "C7T4aQMxTTM"
         startSec: 30
@@ -334,6 +348,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["The Beatles Let It Be 1970"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7iN1s7xHE4ifF5povM6A48"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "QDYfEBY9NM4"
@@ -379,6 +394,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Elton John Crocodile Rock 1973"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6WCeFNVAXUtNczb7lqLiZU"
     youtubeClips:
       - videoId: "75r0nQu-hMs"
         startSec: 30
@@ -393,6 +409,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Lynyrd Skynyrd Sweet Home Alabama 1974"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0IE26jk0uGSGWHWBM3IaUZ"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "iL-jC7XyLeo"
@@ -408,6 +425,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Bruce Springsteen Born to Run 1975"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6hTcuIQa0sxrrByu9wTD7s"
     youtubeClips:
       - videoId: "Wu4_zVxmufY"
         startSec: 30
@@ -439,6 +457,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["ABBA Gimme Gimme Gimme A Man After Midnight"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2PHcsDaj1v2YTVnGatoyxV"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "XEjLoHdbVeE"
@@ -454,6 +473,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["ABBA Take a Chance on Me The Album"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6vQN2a9QSgWcm74KEZYfDL"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "-crgQGdpZR0"
@@ -469,6 +489,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Queen We Will Rock You News of the World"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0a9sd6MEXZXIPHk0fAxpZ4"
     youtubeClips:
       - videoId: "-tJYN-eG1zk"
         startSec: 0
@@ -500,6 +521,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["The Doors Light My Fire 1967"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7KU0iqhqwdkqVfRIQ0b2Hr"
     youtubeClips:
       - videoId: "qoX6AKuYWL8"
         startSec: 0
@@ -514,6 +536,7 @@ items:
     probability: 83
     wikimediaSearchHints: ["Marvin Gaye What's Going On 1971"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4AZJ5WTioqdmLCK1F2IFeV"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "ApthDWoPMFQ"
@@ -529,6 +552,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Stevie Wonder Superstition 1972"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1TV9qMgIML1eyznrB1d4eB"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "7_tmeHCO1IM"
@@ -544,6 +568,7 @@ items:
     probability: 87
     wikimediaSearchHints: ["Deep Purple Smoke on the Water 1972"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5SAUIWdZ04OxYfJFDchC7S"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "qK7j_EERgT4"
@@ -559,6 +584,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Fleetwood Mac Go Your Own Way 1977"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "15rjQH7nTcTomKwfVMd4xl"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "oiosqtFLBBA"
@@ -574,6 +600,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Gloria Gaynor I Will Survive 1978"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7rIovIsXE6kMn629b7kDig"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "TPpfSp40qy0"
@@ -588,6 +615,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["The Beatles Yesterday 1965"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3BQHpFgAp4l80e1XslIjNI"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "NrgmdOz227I"
@@ -603,6 +631,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["The Beatles Come Together 1969"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2EqlS6tkEnglzr7tkKAAYD"
     youtubeClips:
       - videoId: "oolpPmuK2I8"
         startSec: 30
@@ -617,6 +646,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Led Zeppelin Whole Lotta Love 1969"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0hCB0YR03f6AmQaHbwWDe8"
     youtubeClips:
       - videoId: "oaSk5vnAVJ8"
         startSec: 30
@@ -631,6 +661,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Elton John Your Song 1970"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "38zsOOcu31XbbYj9BIPUF1"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "FT3D1Cu6g10"
@@ -676,6 +707,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Fleetwood Mac Dreams Rumours 1977"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "51LY0VVo4mu1Q8HpkAldQZ"
     youtubeClips:
       - videoId: "5oWyMakvQew"
         startSec: 30
@@ -694,6 +726,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Queen We Are the Champions 1977"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4kzvAGJirpZ9ethvKZdJtg"
     youtubeClips:
       - videoId: "04854XqcfCY"
         startSec: 30
@@ -710,6 +743,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Boney M Ma Baker 1977"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1BqnZOkYJbvYLOhN0qPJDm"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Czhn1ZuhsMg"
@@ -726,6 +760,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Earth Wind and Fire September 1978"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2grjqo0Frpf2okIBiifQKs"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "aqZxIL4YE2I"
@@ -740,6 +775,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["The Police Roxanne 1978"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0SYRVn2YF7HBscQEmlkpTI"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Cdu3a2arXdw"
@@ -772,6 +808,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Dolly Parton Jolene 1973"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0PYNG70wvQ3X3fCcfDWJG6"
     youtubeClips:
       - videoId: "SFTEfOIJkPg"
         startSec: 30
@@ -786,6 +823,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Bob Dylan Like a Rolling Stone 1965"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "35F8TRSHamjv86XEueHZ10"
     youtubeClips:
       - videoId: "ZAigkYd0ipE"
         startSec: 30
@@ -800,6 +838,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["The Beatles Help 1965"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7DD7eSuYSC5xk2ArU62esN"
     youtubeClips:
       - videoId: "MKUex3fci5c"
         startSec: 30
@@ -814,6 +853,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Simon and Garfunkel The Sound of Silence 1965"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7eQUgarLukHLkZaO1mxtab"
     youtubeClips:
       - videoId: "9O9DaZUS_EU"
         startSec: 30
@@ -844,6 +884,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Led Zeppelin Kashmir Physical Graffiti 1975"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6Vjk8MNXpQpi0F4BefdTyq"
     youtubeClips:
       - videoId: "QGIyFpFhFII"
         startSec: 30
@@ -893,6 +934,7 @@ items:
     probability: 64
     wikimediaSearchHints: ["Dana All Kinds of Everything Eurovision 1970 Ireland"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3SRvWfTizSiBwKidBDPBgL"
     genrePackages: ["Eurovision"]
     youtubeClips:
       - videoId: "sZ8W9oOgjM4"
@@ -909,6 +951,7 @@ items:
     probability: 62
     wikimediaSearchHints: ["Séverine Un banc un arbre une rue Eurovision 1971"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0OInqhDtfYPcSpEQNtJx3n"
     youtubeClips:
       - videoId: "JQUC9TycGWU"
         startSec: 5
@@ -925,6 +968,7 @@ items:
     probability: 64
     wikimediaSearchHints: ["Vicky Leandros Après toi Eurovision 1972"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "13tx9je0ftBgu6BKpsQDo4"
     youtubeClips:
       - videoId: "52W1665yI1Y"
         startSec: 5
@@ -941,6 +985,7 @@ items:
     probability: 62
     wikimediaSearchHints: ["Anne-Marie David Tu te reconnaîtras Eurovision 1973"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "35rWDtyBsiUbbwYkxMjSdg"
     youtubeClips:
       - videoId: "vfgR0sXxVWA"
         startSec: 5
@@ -957,6 +1002,7 @@ items:
     probability: 65
     wikimediaSearchHints: ["Teach-In Ding-a-dong Eurovision 1975 Netherlands"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3ML1JVicjXbdsyYrPdfr5E"
     youtubeClips:
       - videoId: "jqqJvMTNeq4"
         startSec: 5
@@ -972,6 +1018,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Brotherhood of Man Save Your Kisses for Me Eurovision 1976"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7EPCjGrDFizkZUkCgxZJPt"
     youtubeClips:
       - videoId: "5yJUi6ke71I"
         startSec: 5
@@ -988,6 +1035,7 @@ items:
     probability: 62
     wikimediaSearchHints: ["Marie Myriam L'Oiseau et l'Enfant Eurovision 1977 France"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2MZCRZdxceRSENgBDMIhWO"
     youtubeClips:
       - videoId: "bybdhTg_g20"
         startSec: 5
@@ -1004,7 +1052,7 @@ items:
     probability: 66
     wikimediaSearchHints: ["Izhar Cohen A-Ba-Ni-Bi Eurovision 1978 Israel"]
     answerMethods: ["timeline"]
-    spotifyTrackId: "7d7508DNeeg1xjFMoj8Ikm"
+    spotifyTrackId: "6iPPMcTdZF4GaCtxOP39p8"
     youtubeClips:
       - videoId: "uFd5nk2sXow"
         startSec: 5
@@ -1020,6 +1068,7 @@ items:
     probability: 68
     wikimediaSearchHints: ["Milk Honey Hallelujah Eurovision 1979 Israel"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5zFxBmlSLduUJbdGFVnZvz"
     youtubeClips:
       - videoId: "vvmHIhhlzOA"
         startSec: 5
@@ -1036,6 +1085,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Johnny Logan What's Another Year Eurovision 1980 Ireland"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "51hipIpHYmj2Qh2tyQ32h6"
     youtubeClips:
       - videoId: "R7k1DH71bO8"
         startSec: 5
@@ -1271,6 +1321,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Bette Midler The Rose 1979 soundtrack"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "23X72rSGy4hhU57QodGk2P"
     youtubeClips:
       - videoId: "jxvPjuREDpE"
         startSec: 0
@@ -1286,6 +1337,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Blondie Heart of Glass 1978 Parallel Lines"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1R3jOrEeHThzcuMBWVWxUc"
     youtubeClips:
       - videoId: "WGU_4-5RaxU"
         startSec: 0
@@ -1300,6 +1352,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["George Benson Give Me the Night 1980"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "62GYoGszQfROZswLee6W3O"
     youtubeClips:
       - videoId: "FIF7wKJb2iU"
         startSec: 0
@@ -1315,6 +1368,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Youre the One That I Want Grease 1978 Travolta Newton-John"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0B9x2BRHqj3Qer7biM3pU3"
     genrePackages: ["Film edition"]
     youtubeClips:
       - videoId: "vcseNcBgH5I"
@@ -1331,6 +1385,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["KC and the Sunshine Band Thats the Way I Like It 1975"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7dNVzdGL3ulYwuUrzxbn13"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "2UB8P0UImzw"
@@ -1387,6 +1442,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Nancy Sinatra These Boots Are Made for Walkin"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2nwCO1PqpvyoFIvq3Vrj8N"
     youtubeClips:
       - videoId: "9Qp_SrTgBBs"
         startSec: 0
@@ -1430,6 +1486,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Bob Marley Could You Be Loved 1980"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5O4erNlJ74PIF6kGol1ZrC"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "1ti2YCFgCoI"
@@ -1445,6 +1502,7 @@ items:
     wikimediaSearchHints: ["Rod Stewart Da Ya Think Im Sexy 1978"]
     answerMethods: ["timeline"]
     spotifyTrackId: "3wsPg2KrRYZFi0inIFa41x"
+    genrePackages: ["Disco & Pop"]
     notes: "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1363)."
     youtubeClips:
       - videoId: "Hphwfq1wLJs"
@@ -1473,6 +1531,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Billy Joel Piano Man 1973"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "70C4NyhjD5OZUMzvWZ3njJ"
     youtubeClips:
       - videoId: "gxEPV4kolz0"
         startSec: 30
@@ -1486,6 +1545,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Paul McCartney Wings Band on the Run 1973"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1H4idkmruFoJBg1DvUv2tY"
     youtubeClips:
       - videoId: "__t8wKdMmIw"
         startSec: 30
@@ -1499,6 +1559,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Simon and Garfunkel The Boxer 1969"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7AmpRvsnAAT27Qvdb5a47v"
     youtubeClips:
       - videoId: "l3LFML_pxlY"
         startSec: 5
@@ -1512,6 +1573,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Wild Cherry Play That Funky Music 1976"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5uuJruktM9fMdN9Va0DUMl"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "BHcYFxU4fMo"
@@ -1527,6 +1589,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["The Logical Song - Supertramp 1979"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2mJWtE3ViYUs8qalVAMveI"
     youtubeClips:
       - videoId: "kln_bIndDJg"
         startSec: 5
@@ -1553,6 +1616,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["If You Leave Me Now - Chicago 1976"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0KMGxYKeUzK9wc5DZCt3HT"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "1602T9ZVPjg"
@@ -1580,6 +1644,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["The Ballroom Blitz - Sweet 1973"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3Pu3IChaAoa5EjgUBv5F6x"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "co8uyTAJOew"
@@ -1608,6 +1673,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Don't Stop - Fleetwood Mac 1977"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4SXU3lUZ1eb4JWWbkQw43Y"
     youtubeClips:
       - videoId: "QV9JJmSCiI8"
         startSec: 10
@@ -1621,6 +1687,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["All Right Now - Free 1970"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5LhryRI5AIVKpYxLfXq4iP"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "5wiF6b4rxno"
@@ -1635,6 +1702,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Easy - Commodores 1977"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1DnSZ9M8uvX0UebR3dmBNI"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "3woUYuyLsaI"
@@ -1649,6 +1717,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Good Times - Chic 1979"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5k99OoVceoXDMbAU8HnPH7"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "8lCNzQ6sYxo"
@@ -1663,6 +1732,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Night Fever - Bee Gees 1977"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5KgbyD2lQQlIupAaPjgiXg"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "-ihs-vT9T3Q"
@@ -1785,6 +1855,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Heroes - David Bowie 1977"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0dnL9tw2iu5Aqt7mw6alif"
     youtubeClips:
       - videoId: "lXgkuM2NhYI"
         startSec: 20
@@ -1799,6 +1870,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Upside Down - Diana Ross 1980"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3pbtBomO4Zt5gGiqsYeiBH"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Po0BbGMSX4g"
@@ -1821,41 +1893,19 @@ items:
     probability: 80
     wikimediaSearchHints: ["The bellamy brothers Let Your Love flow"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "064SVQsmWl5EF0zahmzkQk"
     region: ["global"]
     youtubeClips:
       - videoId: "FQQj2rQBFvA"
         startSec: 13
         endSec: 28
-  - id: fleetwod-mac-dont-stop
-    displayName: "Dont stop — Fleetwod mac"
-    correctYear: 1977
-    probability: 80
-    wikimediaSearchHints: ["Fleetwod mac Dont stop"]
-    answerMethods: ["timeline"]
-    region: ["global"]
-    youtubeClips:
-      - videoId: "QV9JJmSCiI8"
-        startSec: 10
-        endSec: 25
-  - id: rod-stewart-do-ya-think-im-sexy
-    displayName: "Do Ya Think Im Sexy — Rod Stewart"
-    correctYear: 1978
-    probability: 80
-    wikimediaSearchHints: ["Rod Stewart Do Ya Think Im Sexy"]
-    answerMethods: ["timeline"]
-    spotifyTrackId: "3wsPg2KrRYZFi0inIFa41x"
-    genrePackages: ["Disco & Pop"]
-    region: ["global"]
-    youtubeClips:
-      - videoId: "Hphwfq1wLJs"
-        startSec: 1
-        endSec: 16
   - id: jackson-5-i-ll-be-there
     displayName: "I´ll be there — Jackson 5"
     correctYear: 1970
     probability: 80
     wikimediaSearchHints: ["Jackson 5 I´ll be there"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5RdhBLmB4DyFHLglRrfx63"
     genrePackages: ["Soft & Love"]
     region: ["global"]
     youtubeClips:
@@ -1868,6 +1918,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Bachman You Aint seen nothin yet"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0HOrDVS349XFcpCYsO2hAP"
     region: ["global"]
     youtubeClips:
       - videoId: "4cia_v4vxfE"
@@ -1879,6 +1930,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Harpo Moviestar"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2DtVkh5rLpwvoSqzWhTQYb"
     genrePackages: ["Disco & Pop"]
     region: ["global"]
     youtubeClips:
@@ -1891,6 +1943,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["ABBA The Winner Takes It All"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "52ltrLJeVq9W1ARm4Biept"
     genrePackages: ["sport"]
     region: ["global"]
     youtubeClips:

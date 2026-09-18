@@ -44,6 +44,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Nick Borgen Den glider in 1995"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1vbaVUGd4mAwJRYZZC5IPS"
     youtubeClips:
       - videoId: "QgppLdY0QjU"
         startSec: 30
@@ -75,6 +76,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Markoolio In med bollen EM 2004"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "08e3oeRV88CYNxDhwvH1lJ"
     youtubeClips:
       - videoId: "miPLp_U0sMU"
         startSec: 30
@@ -90,6 +92,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Tomas Ledin Vi är på gång 1983 Melodifestivalen"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0VTH9aztFu5fhpCgFY2YhK"
     youtubeClips:
       - videoId: "z-tEuBTbobc"
         startSec: 5
@@ -217,6 +220,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Håkan Södergren Nu tar vi dom hockey-VM 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4mkdS0Ff5EFJPn692PNuAt"
     youtubeClips:
       - videoId: "eToFpwpVJ1k"
         startSec: 30
@@ -232,6 +236,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["The Poodles En för alla för en hockey-VM 2013"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1gkzmB8NwKDFgKvZDSG6qU"
     genrePackages: ["sport"]
     youtubeClips:
       - videoId: "MxUhHQKZRGs"
@@ -248,6 +253,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Lightning Seeds Three Lions Football's Coming Home 1996"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2RxT8ynnf4CI6jvGh8jeo3"
     youtubeClips:
       - videoId: "xm7et8ecVjM"
         startSec: 30
@@ -263,6 +269,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["New Order World in Motion 1990 England World Cup"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "08po8QZK3tihnLBZWATAki"
     youtubeClips:
       - videoId: "T8T1a45HX4o"
         startSec: 30
@@ -280,6 +287,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["K'naan Wavin' Flag 2010 World Cup"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0zREtnLmVnt8KUJZZbSdla"
     youtubeClips:
       - videoId: "NENQMda7Mbs"
         startSec: 30
@@ -295,6 +303,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Whitney Houston One Moment in Time 1988 Olympics"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3S3dZXxNGghLtOqehzHtii"
     youtubeClips:
       - videoId: "4Yp2eZ-TMuI"
         startSec: 30
@@ -343,6 +352,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Blur Song 2 1997 British rock"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3GfOAdcoc3X5GPiiXmpBjK"
     genrePackages: ["sport", "football"]
     youtubeClips:
       - videoId: "SSbBvKaM6sk"
@@ -359,6 +369,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Zombie Nation Kernkraft 400 1999 techno dance"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6PUzxtIHkv346yP89NzP9X"
     genrePackages: ["Dance Music", "sport"]
     youtubeClips:
       - videoId: "SxhwbXYe1XE"
@@ -392,6 +403,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Planet Funk Chase the Sun 2001 dance electronic"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5uD0zfqIAd4ZUqa2l90rxi"
     genrePackages: ["sport", "football"]
     youtubeClips:
       - videoId: "2ZlJLzKzRGA"

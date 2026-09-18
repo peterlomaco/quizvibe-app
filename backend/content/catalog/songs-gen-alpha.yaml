@@ -67,6 +67,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Pharrell Williams Happy Despicable Me 2"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6NPVjNh8Jhru9xOmyQigds"
     genrePackages: ["RnB"]
     youtubeClips:
       - videoId: "ZbZSe6N_BXs"
@@ -82,6 +83,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Taylor Swift Shake It Off 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5xTtaWoae3wi06K5WfVUUH"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "nfWlot6h_JM"
@@ -97,6 +99,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Adele Hello 25"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1Yk0cQdMLx5RzzFTYwmuld"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "YQHsXMglC9A"
@@ -111,6 +114,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Wiz Khalifa See You Again Furious 7"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "66CFbqJScx6zRieGllITcs"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "RgKAFK5djSk"
@@ -126,6 +130,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Drake One Dance Views"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1zi7xx7UVEFkmKfv06H8x0"
     genrePackages: ["Hip Hop"]
     youtubeClips:
       - videoId: "ki0Ocze98U8"
@@ -140,6 +145,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["The Chainsmokers Closer Halsey"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7BKLCZ1jbUBVqRi2FVlTVw"
     youtubeClips:
       - videoId: "OGP499ko5EQ"
         startSec: 0
@@ -154,6 +160,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Luis Fonsi Despacito Daddy Yankee"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6habFhsOp2NvshLv26DqMb"
     youtubeClips:
       - videoId: "TfkP5ubz1z4"
         startSec: 0
@@ -167,6 +174,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Post Malone Rockstar 21 Savage"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "19bX4zmC2zDben2ldhoRB3"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "4GFAZBKZVJY"
@@ -182,6 +190,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Lady Gaga Bradley Cooper Shallow A Star Is Born"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2VxeLyX666F8uXCJ0dZF8B"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "7hiVIixor_Q"
@@ -202,6 +211,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Drake God's Plan Scorpion"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6DCZcSspjsKoFjzjrWoCdn"
     youtubeClips:
       - videoId: "xpVfcZ0ZcFM"
         startSec: 48
@@ -224,6 +234,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Lil Nas X Old Town Road Billy Ray Cyrus"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0F7FA14euOIX8KcbEturGH"
     genrePackages: ["Hip Hop"]
     notes: "Original-release dec 2018; mainstream-version med Cyrus-remix 2019."
     youtubeClips:
@@ -256,6 +267,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Harry Styles Watermelon Sugar Fine Line"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6UelLqGlWMcVH1E5c4H7lY"
     genrePackages: ["Disco & Pop"]
     notes: "Singel-release maj 2020 (album Fine Line låg ute redan dec 2019)."
     youtubeClips:
@@ -271,6 +283,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["BTS Dynamite 2020"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1hIuSG6xV4RDgD8bDVKP7N"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "kK29Q_LpVUw"
@@ -286,6 +299,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["The Kid LAROI Justin Bieber Stay"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5HCyWlXZPP0y6Gqq8TgA20"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "yWHrYNP6j4k"
@@ -300,6 +314,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Olivia Rodrigo Drivers License Sour"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7lPN2DXiMsVn7XUKtOW1CS"
     youtubeClips:
       - videoId: "ttRz03c208g"
         startSec: 0
@@ -347,6 +362,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Miley Cyrus Flowers Endless Summer Vacation"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7DSAEUvxU8FajXtRloy8M0"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "iawgB2CDCrw"
@@ -361,6 +377,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Doja Cat Paint the Town Red Scarlet"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2IGMVunIBsBLtEQyoI1Mu7"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "EiAMmYbr3vA"
@@ -376,6 +393,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Sabrina Carpenter Espresso Short n' Sweet"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2qSkIjg1o9h3YT9RAgYN75"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "YnguM4ED3bw"
@@ -390,6 +408,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Billie Eilish Birds of a Feather Hit Me Hard and Soft"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6dOtVTDdiauQNBQEDOtlAB"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "cz_lZAPlEAE"
@@ -439,6 +458,7 @@ items:
     probability: 89
     wikimediaSearchHints: ["Mark Ronson Uptown Funk Bruno Mars 2014"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "32OlwWuMpZ6b0aN2RZOeMS"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "fmsv4gPe9bg"
@@ -454,6 +474,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Ed Sheeran Thinking Out Loud 2014"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "34gCuhDGsG4bRPIf9bb02f"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "lp-EO5I60KA"
@@ -503,6 +524,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Tones and I Dance Monkey 2019"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2XU0oxnq2qxCpomAAuJY8K"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "q0hyYWKXF0Q"
@@ -518,6 +540,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Dua Lipa Levitating 2020"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "39LLxExYz6ewLAcYrzQQyP"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "TUVcZfQe-Kw"
@@ -533,6 +556,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Tove Lo Habits Stay High 2013"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "45bjfDupYDRGIAmZxPG5RL"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "fG-EIvEiSHs"
@@ -548,6 +572,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Zara Larsson Lush Life 2015"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1rIKgCH4H52lrvDcz50hS8"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "tD4HCZe-tew"
@@ -565,6 +590,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Måns Zelmerlöw Heroes Eurovision 2015"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "21BYhl07wWqGRQaj7sUxdV"
     genrePackages: ["Eurovision", "Melodifestivalen"]
     youtubeClips:
       - videoId: "oAQKr5aJJjQ"
@@ -578,6 +604,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["The Weeknd Starboy 2016"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7MXVkk9YMctZqd1Srtv4MB"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "3_g2un5M350"
@@ -610,6 +637,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Dua Lipa Don't Start Now 2019"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3PfIrDoz19wz7qK7tYeu62"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "oygrmJFKYZY"
@@ -625,6 +653,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Lewis Capaldi Someone You Loved 2019"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7qEHsqek33rTcFNT9PFqLf"
     youtubeClips:
       - videoId: "zABLecsR5UE"
         startSec: 2
@@ -662,6 +691,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Olivia Rodrigo Good 4 U 2021"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6P4d1NWBCNIYZjzF9k1mVN"
     youtubeClips:
       - videoId: "Bc9ijogGmtU"
         startSec: 30
@@ -692,6 +722,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Håkan Hellström Det kommer aldrig va över för mig 2013"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3SjXx3rbNGk8nCho8YEoz5"
     genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "z0hiC9rCG1c"
@@ -719,6 +750,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Robin Stjernberg You Melodifestivalen 2013"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4mm2fuo5UJNscczsxtAZvb"
     youtubeClips:
       - videoId: "vtjdTPnCcu0"
         startSec: 13
@@ -734,6 +766,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Sanna Nielsen Undo Eurovision 2014"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4VMa2QVWFDgJyh6rVA3reO"
     youtubeClips:
       - videoId: "N_hmzLU1_cc"
         startSec: 30
@@ -749,6 +782,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Frans If I Were Sorry Eurovision 2016"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6oDkCmfVcSd9NXAKk1b4Ll"
     genrePackages: ["Melodifestivalen"]
     youtubeClips:
       - videoId: "jLkHNqQS1fw"
@@ -764,6 +798,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Robin Bengtsson I Can't Go On Eurovision 2017"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "57Y51hxqMn2j3dosW75R6n"
     youtubeClips:
       - videoId: "1jSrBdN4b5c"
         startSec: 5
@@ -778,6 +813,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["John Lundvik Too Late For Love Eurovision 2019"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6kIdjk3D8XxA2UafE0THGK"
     inBaseCatalog: false
     youtubeClips:
       - videoId: "iEEuG5XML-A"
@@ -809,6 +845,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Tusse Voices Eurovision 2021"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5zxZ7M4RgWZUHlMEwac8vt"
     inBaseCatalog: false
     youtubeClips:
       - videoId: "5P1ueI9j6gk"
@@ -825,6 +862,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Cornelia Jakobs Hold Me Closer Eurovision 2022"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "697bFWgzBRm6bmnYWd8GyD"
     youtubeClips:
       - videoId: "wWDThAfryW4"
         startSec: 5
@@ -856,6 +894,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Marcus Martinus Unforgettable Eurovision 2024"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5L8C1PZGCpZf8STcN79H5j"
     youtubeClips:
       - videoId: "yekc8t0rJqA"
         startSec: 5
@@ -885,6 +924,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Felicia My System Eurovision 2026"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3AfX2EhXub2DqgqJABSIXL"
     youtubeClips:
       - videoId: "ibbfS8iG450"
         startSec: 5
@@ -901,6 +941,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Emmelie de Forest Only Teardrops Eurovision 2013 Denmark"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "269y1Vw3O0C9uI3drXpfo9"
     inBaseCatalog: false
     youtubeClips:
       - videoId: "k59E7T0H-Us"
@@ -917,6 +958,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Conchita Wurst Rise Like a Phoenix Eurovision 2014 Austria"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2KqrsypJqXIKDentWkQu0J"
     youtubeClips:
       - videoId: "ToqNa0rqUtY"
         startSec: 5
@@ -933,6 +975,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Jamala 1944 Eurovision 2016 Ukraine"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6KCAlbeqrJ3pOn6Z3OdHWY"
     youtubeClips:
       - videoId: "wNECV2h-y58"
         startSec: 30
@@ -949,6 +992,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Netta Toy Eurovision 2018 Israel"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6n2eIfLj0wOOUkUfNmYzlh"
     youtubeClips:
       - videoId: "CziHrYYSyPc"
         startSec: 5
@@ -982,6 +1026,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Måneskin Zitti e buoni Eurovision 2021 Italy"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "776AftMmFFAWUIEAb3lHhw"
     youtubeClips:
       - videoId: "RVH5dn1cxAQ"
         startSec: 5
@@ -998,6 +1043,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Kalush Orchestra Stefania Eurovision 2022 Ukraine"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2vHzOWRKYPLu8umRPIFuOq"
     youtubeClips:
       - videoId: "UiEGVYOruLk"
         startSec: 5
@@ -1014,6 +1060,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Nemo The Code Eurovision 2024 Switzerland"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1EjIXKhNHI00ZLMRpS8iz8"
     youtubeClips:
       - videoId: "kiGDvM14Kwg"
         startSec: 5
@@ -1030,6 +1077,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["JJ Wasted Love Eurovision 2025 Austria"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "321yySUTzRXUbzkRTeTzDB"
     youtubeClips:
       - videoId: "-ieSTNpxvio"
         startSec: 5
@@ -1275,6 +1323,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Alex Warren Ordinary"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6qqrTXSdwiJaq8SO0X2lSe"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "u2ah9tWTkmk"
@@ -1290,6 +1339,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Alex Warren Eternity"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6wHpLMmp98aHcV8L1JFrj8"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "jXqf3uqLkkU"
@@ -1317,6 +1367,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Taylor Swift Blank Space 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1p80LdxRV74UKvL8gnD7ky"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "e-ORhEE9VVg"
@@ -1332,6 +1383,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["One Direction Story of My Life Midnight Memories"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5kg9mgrVoxTCm4PK37xP1a"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "W-TE_Ys4iwM"
@@ -1347,6 +1399,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Major Lazer DJ Snake Lean On Peace Is the Mission"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4vS8VaBwJJV5Ry7UFIQuoo"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "YqeW9_5kURI"
@@ -1362,6 +1415,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Shawn Mendes Stitches Handwritten"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5jsw9uXEGuKyJzs0boZ1bT"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Lguev0C0F-g"
@@ -1377,6 +1431,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Shawn Mendes Camila Cabello I Know What You Did Last Summer"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2GyA33q5rti5IxkMQemRDH"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "kalsoK9K3mI"
@@ -1392,6 +1447,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Ariana Grande Side to Side Dangerous Woman"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4pLwZjInHj3SimIyN9SnOz"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "SXiSVQZLje8"
@@ -1407,6 +1463,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["DJ Snake Let Me Love You Justin Bieber Encore"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0lYBSQXN6rCTvUZvg9S0lU"
     genrePackages: ["RnB"]
     youtubeClips:
       - videoId: "euCqAq6BRa4"
@@ -1422,6 +1479,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Dua Lipa IDGAF debut album"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "76cy1WJvNGJTj78UqeA5zr"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Mgfe5tIwOj0"
@@ -1437,6 +1495,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Dua Lipa New Rules debut album"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2ekn2ttSfGqwhhate0LSR0"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "k2qgadSvNyU"
@@ -1452,6 +1511,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["ZAYN Dusk Till Dawn Sia"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2gVOhnMkK8XngKgf0YdlXQ"
     youtubeClips:
       - videoId: "tt2k8PGm-TI"
         startSec: 20
@@ -1467,6 +1527,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Shawn Mendes Camila Cabello Senorita"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0TK2YIli7K1leLovkQiNik"
     genrePackages: ["Soft & Love", "Disco & Pop"]
     youtubeClips:
       - videoId: "Pkh8UtuejGw"
@@ -1482,6 +1543,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Shawn Mendes There's Nothing Holdin' Me Back Illuminate"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7JJmb5XwzOO8jgpou264Ml"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "dT2owtxkU8k"
@@ -1497,6 +1559,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Justin Timberlake Can't Stop the Feeling Trolls"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5r14fWQezWLWqE1Pqg1Hd1"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "ru0K8uYEZWw"
@@ -1512,6 +1575,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Calvin Harris Rihanna This Is What You Came For"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0azC730Exh71aQlOt9Zj3y"
     genrePackages: ["Dance Music", "Disco & Pop"]
     youtubeClips:
       - videoId: "kOkQ4T5WO9E"
@@ -1527,6 +1591,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Ellie Goulding Love Me Like You Do Fifty Shades"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7y2YUIyCuVhBidENVT0068"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "AJtDXIazrMo"
@@ -1559,6 +1624,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Coldplay Hymn for the Weekend A Head Full of Dreams"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3RiPr603aXAoi4GHyXx0uy"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "YykjpeuMNEk"
@@ -1574,6 +1640,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Major Lazer Cold Water Justin Bieber MO"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6DNtNfH8hXkqOX1sjqmI7p"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "nBtDsQ4fhXY"
@@ -1588,6 +1655,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Zara Larsson Midnight Sun 2025"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1qRV1dKLOfH1s00b9J2LUQ"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "uvY8fdgezLQ"
@@ -1603,6 +1671,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["PinkPantheress Stateside Zara Larsson"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7tM3yPeSBxnIIQlkz22vId"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "lIxQe1R5hs0"
@@ -1618,6 +1687,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Alesso Words Zara Larsson"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1bgKMxPQU7JIZEhNsM1vFs"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "zIJEOEZdLzE"
@@ -1634,6 +1704,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Rag'n'Bone Man Human"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "58zsLZPvfflaiIbNWoA22O"
     youtubeClips:
       - videoId: "L3wKzyIN1yk"
         startSec: 0
@@ -1648,6 +1719,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Clean Bandit Solo Demi Lovato"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3NuK5xMlSlB6K2Qp16zf3h"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "8JnfIa84TnU"
@@ -1663,6 +1735,7 @@ items:
     region: ["nordic"]
     wikimediaSearchHints: ["Benjamin Ingrosso Kite"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0irVirJrUjHFk3ywECVsGT"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Fq1zL29jg9U"
@@ -1678,6 +1751,7 @@ items:
     region: ["nordic"]
     wikimediaSearchHints: ["Benjamin Ingrosso Look Who’s Laughing Now"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2qEQy3x9MQH7eTJU6LmEJx"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "I35BbuZgDb0"
@@ -1693,6 +1767,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Dua Lipa Love Again"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4rPkN1FMzQyFNP9cLUGIIB"
     youtubeClips:
       - videoId: "BC19kwABFwc"
         startSec: 30
@@ -1708,6 +1783,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Clean Bandit Symphony"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "72gv4zhNvRVdQA0eOenCal"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "aatr_2MstrI"
@@ -1739,6 +1815,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["OneRepublic I Ain’t Worried"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4h9wh7iOZ0GGn8QVp4RAOB"
     youtubeClips:
       - videoId: "mNEUkkoUoIA"
         startSec: 0
@@ -1754,6 +1831,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["DNCE Cake by the Ocean"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7L5jgZtAyfiU7elB8DIqCx"
     youtubeClips:
       - videoId: "vWaRiD5ym74"
         startSec: 37
@@ -1768,6 +1846,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Jason Derulo Take You Dancing"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3at4D3FZnJnYR0Mfcn6JSN"
     genrePackages: ["RnB"]
     youtubeClips:
       - videoId: "vC8qJfVYxZY"
@@ -1799,6 +1878,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["The Weeknd Take My Breath"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1Xg9k7OAyJryBXVx3KUklz"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "rhTl_OyehF8"
@@ -1814,6 +1894,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Pitbull Timber"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3cHyrEgdyYRjgJKSOiOtcS"
     youtubeClips:
       - videoId: "hHUbLv4ThOo"
         startSec: 1
@@ -1829,6 +1910,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Ava Max Kings & Queens"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7a53HqqArd4b9NF4XAmlbI"
     youtubeClips:
       - videoId: "jH1RNk8954Q"
         startSec: 0
@@ -1844,6 +1926,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Katy Perry This Is How We Do"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4ZxY5A1Bv27yu7RiT4RTOj"
     youtubeClips:
       - videoId: "7RMQksXpQSk"
         startSec: 0
@@ -1859,6 +1942,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Shakira Dai Dai"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0kosUz0jePvjiz4ctmR6wL"
     youtubeClips:
       - videoId: "fcnDmrtj6Sk"
         startSec: 0
@@ -1874,6 +1958,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Backstreet Boys Chances"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5J783SDlyitqvLFAzTm0jU"
     youtubeClips:
       - videoId: "W5kM5wAwRug"
         startSec: 18
@@ -1889,6 +1974,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Dua Lipa Break My Heart"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5YDD6DuZ04mKQtm0avJTJd"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Nj2U6rhnucI"
@@ -1904,6 +1990,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Dua Lipa Houdini"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4OMJGnvZfDvsePyCwRGO7X"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "suAR1PYFNYA"
@@ -1919,6 +2006,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Dua Lipa Illusion"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "59xD5osEFsaNt5PXfIKUnX"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "a9cyG_yfh1k"
@@ -1934,6 +2022,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Mabel Don't Call Me Up"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3BxKECJorB19BEQSPC9n7D"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "9TQKyDD9Yig"
@@ -1965,6 +2054,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Ariana Grande One Last Time"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1CAksvEO6oRHd9bBKWAfuY"
     genrePackages: ["Disco & Pop", "RnB"]
     youtubeClips:
       - videoId: "BPgEgaPk62M"
@@ -1980,6 +2070,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Clean Bandit Rockabye"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2hrUO4drrO63i7FYbCLBl2"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "papuvlVeZg8"
@@ -1995,6 +2086,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Sean Paul No Lie"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2BY0p8sKIMmRuVjUTasf9G"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "GzU8KqOY8YA"
@@ -2010,6 +2102,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Shawn Mendes If I Can't Have You"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6LsAAHotRLMOHfCsSfYCsz"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "oTJ-oqwxdZY"
@@ -2025,6 +2118,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["ZAYN Pillowtalk"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0RrMsZA9v8SuZk4npjTORp"
     youtubeClips:
       - videoId: "C_3d6GntKbk"
         startSec: 14
@@ -2041,6 +2135,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Taylor Swift The Fate of Ophelia"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "53iuhJlwXhSER5J2IYYv1W"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "ko70cExuzZM"
@@ -2056,6 +2151,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Hoffmaestro Highway Man 2014"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6jPggfBgf9SFe1Ae4HTBxA"
     youtubeClips:
       - videoId: "pHo97vRiS5w"
         startSec: 10
@@ -2128,6 +2224,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Blame It on the Disco - Alcazar 2014"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4IZy2nI5mAxLtlLPbcErqc"
     youtubeClips:
       - videoId: "AoB8UyLpBLo"
         startSec: 20
@@ -2143,6 +2240,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Norrsken - Jon Henrik Fjällgren 2019"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7v10xmPWDwFiQDJuAZClBs"
     youtubeClips:
       - videoId: "XLHuwcfO4fU"
         startSec: 20
@@ -2158,6 +2256,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Rollercoaster - Dolly Style 2016"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3JwXW8EXbX9mZy4B2CWDc9"
     youtubeClips:
       - videoId: "XlFypQLuWic"
         startSec: 20
@@ -2173,6 +2272,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Bröder - Linus Svenning 2014"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1TZtXdQwnbk1jOXnfyShRb"
     youtubeClips:
       - videoId: "iBExcsRFNOA"
         startSec: 20
@@ -2188,6 +2288,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Road Trip - De Vet Du 2017"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "53HCk0K40gzfdHnz0yMNE0"
     youtubeClips:
       - videoId: "gO8hkdxG11s"
         startSec: 20
@@ -2203,6 +2304,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Gotta Thing About You - FO&O 2017"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "126xXTTkEemrCAPt8Imzur"
     youtubeClips:
       - videoId: "5vZdiFnGHHA"
         startSec: 20
@@ -2233,6 +2335,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Ashes to Ashes - Anna Bergendahl 2019"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1iqxk51n6yyc6OIXu7dX8o"
     youtubeClips:
       - videoId: "uXg7HDjedlY"
         startSec: 20
@@ -2248,6 +2351,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Sting - Eric Saade 2015"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1bCrjqABEklwllefPAzWbZ"
     youtubeClips:
       - videoId: "wD4mwilTocw"
         startSec: 20
@@ -2278,6 +2382,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Efter solsken - Panetoz 2014"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2dh07zmyCMoY64rQdJrXLe"
     youtubeClips:
       - videoId: "UarrvvhOYek"
         startSec: 20
@@ -2293,6 +2398,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["On and On and On - Klara Hammarström 2025"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4jolrif0mBrRSqxWRsEWoP"
     youtubeClips:
       - videoId: "9dySigA-CqM"
         startSec: 20
@@ -2309,6 +2415,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Som du vill - Theoz 2022"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "78ayFK0aLwG6e0jxvQW3r6"
     youtubeClips:
       - videoId: "WAk--GrYtwg"
         startSec: 20
@@ -2324,6 +2431,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Jalla Dansa Sawa - Behrang Miri 2013"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6mn9gln5HdtYE11FOjQdxN"
     youtubeClips:
       - videoId: "n4a1gJMy7wo"
         startSec: 20
@@ -2339,6 +2447,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Unga & fria - Fröken Snusk 2024"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2ArX0SzCSHXytmAg36BIev"
     youtubeClips:
       - videoId: "0P6FA6qUqr8"
         startSec: 20
@@ -2354,6 +2463,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Yihaa - Dolly Style 2025"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2CMLgiwaTlemYqc7llxO6i"
     youtubeClips:
       - videoId: "mgIc0iHQTHA"
         startSec: 20
@@ -2381,6 +2491,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Ikväll igen - Bolaget 2023"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4o5Ob60pz8QHcFKcr4MWyf"
     genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "ASzgTmKlTRA"
@@ -2395,6 +2506,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Delulu — Lilla Al-Fadji 2026"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "30xAneAHxuzOE7MPZ1mssU"
     genrePackages: ["Melodifestivalen"]
     inBaseCatalog: false
     youtubeClips:
@@ -2410,6 +2522,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Vi mot världen — Veronica Maggio 2016"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6d5ynrHbFcS92R24BytGx7"
     genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "pGUbe0bhOys"
@@ -2434,6 +2547,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Happy That You Found Me — Danny Saucedo 2024"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2kwqblYAbloVXhyBVcxEw5"
     genrePackages: ["Melodifestivalen"]
     inBaseCatalog: false
     youtubeClips:
@@ -2491,6 +2605,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Copacabanana — Sean Banan 2013"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5cgISlMMIShxqkGhK9bTFY"
     genrePackages: ["Melodifestivalen"]
     inBaseCatalog: false
     youtubeClips:
@@ -2504,6 +2619,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Robin Bengtsson Constellaztion Prize"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1iDf4IMFtfMQOYNtiRzoJu"
     genrePackages: ["Melodifestivalen"]
     inBaseCatalog: false
     youtubeClips:
@@ -2516,25 +2632,13 @@ items:
     probability: 80
     wikimediaSearchHints: ["Markus och Martinus Elektrisk"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1jU7I17rDKUbnIAJJkNVAy"
     genrePackages: ["Disco & Pop"]
     region: ["nordic"]
     youtubeClips:
       - videoId: "ri5_fzndMBg"
         startSec: 13
         endSec: 28
-  - id: molly-utan-dig
-    displayName: "Utan dig — Molly"
-    correctYear: 2017
-    probability: 80
-    wikimediaSearchHints: ["Molly Utan dig"]
-    answerMethods: ["timeline"]
-    spotifyTrackId: "3fiKmyDr615KZDrL51VZDu"
-    genrePackages: ["100% in swedish", "Soft & Love"]
-    inBaseCatalog: false
-    youtubeClips:
-      - videoId: "FyO_4OOY8cA"
-        startSec: 0
-        endSec: 15
   - id: veronica-maggio-and-hakan-hellstrom-hela-huset
     displayName: "Hela huset — Veronica Maggio & Håkan Hellström"
     correctYear: 2013
@@ -2547,11 +2651,12 @@ items:
         startSec: 0
         endSec: 15
   - id: axel-f-crazy-frog
-    displayName: "Crazy Frog — Axel F."
+    displayName: "Axel F — Crazy Frog"
     correctYear: 2005
     probability: 80
     wikimediaSearchHints: ["Axel F. Crazy Frog"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0Bo5fjMtTfCD8vHGebivqc"
     genrePackages: ["Dance Music"]
     region: ["global"]
     youtubeClips:
@@ -2576,6 +2681,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Galantis No Money"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6M6Tk58pQvABy6ru66dY3d"
     genrePackages: ["Dance Music"]
     region: ["global"]
     youtubeClips:

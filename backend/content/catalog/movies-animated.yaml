@@ -115,8 +115,13 @@ items:
     displayName: "Finding Nemo"
     correctYear: 2003
     probability: 90
+    isAnimated: true
     wikimediaSearchHints: ["Finding Nemo 2003 Pixar animated clownfish Great Barrier Reef"]
-    answerMethods: ["timeline"]
+    answerMethods: ["actor-select"]
+    # Svaret ar en KARAKTAR — "Nemo" vore samma som titeln (spoiler), sa
+    # fragan efterlyser Dory. Distraktorer = karaktarer ur ANDRA filmer.
+    correctNames: ["Dory"]
+    distractorNames: ["Simba", "Shrek", "Mulan", "Elsa"]
     youtubeClips:
       - videoId: "6fHR58bSwpg"
         startSec: 20

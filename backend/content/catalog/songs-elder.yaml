@@ -18,6 +18,7 @@ items:
     probability: 75
     wikimediaSearchHints: ["Louis Armstrong Body and Soul"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3k3WlYkt3qYNtLFkT5yGox"
     region: ["unknown-region"]
   - id: cab-calloway-minnie-the-moocher
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -27,7 +28,7 @@ items:
     wikimediaSearchHints: ["Cab Calloway Minnie the Moocher"]
     answerMethods: ["timeline"]
     spotifyTrackId: "7GASUbWzEnJKfgg4lz65qY"
-    region: ["global"]
+    region: ["unknown-region"]
     youtubeClips:
       - videoId: "WtSLYrTKrEw"
         startSec: 48
@@ -40,7 +41,7 @@ items:
     displayName: "Night and Day — Fred Astaire"
     correctYear: 1932
     probability: 78
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Fred Astaire Night and Day Cole Porter"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -54,7 +55,7 @@ items:
     displayName: "Stormy Weather — Ethel Waters"
     correctYear: 1933
     probability: 78
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Ethel Waters Stormy Weather 1933"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -77,7 +78,7 @@ items:
         endSec: 45
         channelTitle: "Cole Porter - Topic"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (2)."
-    region: ["global"]
+    region: ["unknown-region"]
   - id: fred-astaire-cheek-to-cheek
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Cheek to Cheek — Fred Astaire"
@@ -110,6 +111,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ella Fitzgerald A-Tisket A-Tasket"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0nV1rouDdrSBNKCogIE6us"
     region: ["unknown-region"]
   # Over the Rainbow flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: glenn-miller-in-the-mood
@@ -125,7 +127,7 @@ items:
         endSec: 20
         channelTitle: "Glenn Miller Orchestra - Topic"
         notes: "Officiell album-audio via YouTube Topic. Iconic swing-intro."
-    region: ["global"]
+    region: ["unknown-region"]
   - id: glenn-miller-chattanooga-choo-choo
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Chattanooga Choo Choo — Glenn Miller"
@@ -141,6 +143,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Bing Crosby White Christmas"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4so0Wek9Ig1p6CRCHuINwW"
     inBaseCatalog: false
     genrePackages: ["Christmas edition"]
     youtubeClips:
@@ -149,7 +152,7 @@ items:
         endSec: 45
         channelTitle: "Bing Crosby - Topic"
         notes: "Officiell album-audio via YouTube Topic. Refrängområde."
-    region: ["global"]
+    region: ["unknown-region"]
   - id: dooley-wilson-as-time-goes-by
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "As Time Goes By — Dooley Wilson"
@@ -157,13 +160,14 @@ items:
     probability: 85
     wikimediaSearchHints: ["As Time Goes By Casablanca Dooley Wilson"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "65CTjOeuGBDfXZjsHMEK8d"
     region: ["unknown-region"]
   - id: bing-crosby-swinging-on-a-star
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Swinging on a Star — Bing Crosby"
     correctYear: 1944
     probability: 78
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Bing Crosby Swinging on a Star Going My Way"]
     answerMethods: ["timeline"]
     youtubeClips:
@@ -193,6 +197,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Nat King Cole Christmas Song chestnuts"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6NMz3Cjvod2qnJjakiRDA8"
     genrePackages: ["Christmas edition"]
     youtubeClips:
       - videoId: "1Jp3XIqTR2w"
@@ -200,13 +205,13 @@ items:
         endSec: 35
         channelTitle: "Nat King Cole - Topic"
         notes: "Officiell album-audio via YouTube Topic. 'Chestnuts roasting'-vers."
-    region: ["global"]
+    region: ["unknown-region"]
   - id: frank-sinatra-almost-like-being-in-love
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Almost Like Being in Love — Frank Sinatra"
     correctYear: 1947
     probability: 75
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Frank Sinatra Almost Like Being in Love Brigadoon"]
     answerMethods: ["timeline"]
     spotifyTrackId: "5pCVEMMt40ICn9HXZ5q85o"
@@ -229,7 +234,7 @@ items:
         endSec: 45
         channelTitle: "시공초월노래 번역자 기뮤"
         notes: "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (10)."
-    region: ["global"]
+    region: ["unknown-region"]
   - id: perry-como-some-enchanted-evening
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Some Enchanted Evening — Perry Como"
@@ -268,6 +273,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Jo Stafford You Belong to Me 1952"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7ad5naTPazXhbyY8SuWzKm"
     genrePackages: ["Soft & Love"]
     region: ["unknown-region"]
   - id: patti-page-doggie-in-the-window
@@ -277,6 +283,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Patti Page Doggie in the Window 1953"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1vqv2mq6XVBnL9tKOsMkFA"
     region: ["unknown-region"]
   - id: bill-haley-rock-around-the-clock
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -285,6 +292,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Bill Haley Rock Around the Clock"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "25mcxIHYdrvtMRMxxo89lA"
     youtubeClips:
       - videoId: "VsAlSuEG26A"
         startSec: 30
@@ -299,6 +307,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Chuck Berry Maybellene 1955"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5XrqcbaA2AE1IohXKko5WH"
     region: ["unknown-region"]
   # Heartbreak Hotel flyttad till songs-all.yaml (cross-gen-iconic) 2026-05-22.
   - id: elvis-presley-jailhouse-rock
@@ -308,6 +317,7 @@ items:
     probability: 95
     wikimediaSearchHints: ["Elvis Presley Jailhouse Rock"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4gphxUgq0JSFv2BCLhNDiE"
     youtubeClips:
       - videoId: "ppMZxuZ1lLg"
         startSec: 15
@@ -322,6 +332,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Chuck Berry Johnny B Goode"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2QfiRTz5Yc8DdShCxG1tB2"
     youtubeClips:
       - videoId: "aKCt8ssC7cs"
         startSec: 30
@@ -336,6 +347,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Ray Charles What'd I Say"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5yQ9iMZXGcr5rlO4hoLsP4"
     youtubeClips:
       - videoId: "EPLZL4s_jtI"
         startSec: 30
@@ -350,6 +362,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Everly Brothers Cathy's Clown"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "73u7MU2IWvV1zpdcUEIjtw"
     youtubeClips:
       - videoId: "K8fcGgmUv_w"
         startSec: 30
@@ -380,6 +393,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Beach Boys Surfin Safari 1962"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5N7xVk1pgfPs07bBUl8Bzr"
     youtubeClips:
       - videoId: "tMnqV26Njxo"
         startSec: 30
@@ -394,6 +408,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["The Beatles She Loves You"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5UK5Qm7khwpX3bMW8GiWda"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "nGbWU8S3vzs"
@@ -425,6 +440,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Little Richard Tutti Frutti 1955"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4eHGNIXeYaWx3V5dsaHg8c"
     youtubeClips:
       - videoId: "eQ-U2kGDHSI"
         startSec: 28
@@ -439,6 +455,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Buddy Holly That'll Be the Day 1957"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4UcHTV3TjlThmMlZgOG4Kr"
     youtubeClips:
       - videoId: "M4TfFTmITLo"
         startSec: 30
@@ -453,6 +470,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ritchie Valens La Bamba 1958"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2aEeghgUcnu75tzcolFMfs"
     genrePackages: ["Summer"]
     youtubeClips:
       - videoId: "BycLmWI97Nc"
@@ -499,6 +517,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ray Charles Georgia on My Mind 1960"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "47mA6f44zxLtdATOoY7GjN"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "JJoRBtz1fHg"
@@ -514,6 +533,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Roy Orbison Oh Pretty Woman 1964"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "48i055G1OT5KxGGftwFxWy"
     youtubeClips:
       - videoId: "3KFvoDDs0XM"
         startSec: 30
@@ -528,6 +548,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Frank Sinatra Fly Me to the Moon 1964"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7Ft4nK7wJdMEBrk3KChQsk"
     youtubeClips:
       - videoId: "ZEcqHA7dbwM"
         startSec: 30
@@ -601,7 +622,7 @@ items:
     displayName: "La Vie en rose — Édith Piaf"
     correctYear: 1947
     probability: 80
-    region: ["global"]
+    region: ["unknown-region"]
     wikimediaSearchHints: ["Edith Piaf La Vie en rose"]
     answerMethods: ["timeline"]
     genrePackages: ["Soft & Love"]

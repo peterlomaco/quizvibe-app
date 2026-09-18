@@ -75,6 +75,16 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 // "QuizVibe-frågesignal". Capad mot skärmbredd minus liten edge-gutter.
 const LOGO_SIZE = Math.min(360, SCREEN_WIDTH - 40);
 
+// MODUL-nivå (delas av ALLA CountdownIntro-instanser): wall-clock (ms) för det
+// senaste faktiskt spelade röstklippet. En komponent-ref räcker inte om
+// CountdownIntro re-mountas mitt i (ny instans = ny ref = ingen delad debounce)
+// och två instansers timer-kedjor stomp:ar → "3", "2" och "1" samtidigt. En
+// modul-global spärr spänner över instanser: två siffror inom 700 ms = stomp →
+// den andra hoppas över. Bara EN nedräkning körs åt gången, och en ny
+// nedräknings första siffra ligger alltid >700 ms efter den förras sista, så
+// legitima siffror blockeras aldrig. (Peter 2026-09-17.)
+let lastCountdownVoiceMs = 0;
+
 // Storlek på siffran och "?" — sätts så glyfen ryms innanför Q-ringens inre
 // diameter (Q-ring radius 13 i 80-viewBox, strokeWidth 3 → inre diameter
 // ~23 i viewBox-enheter ≈ 28.75 % av LOGO_SIZE). 0.28 ger en tight men
@@ -172,6 +182,13 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
   // Förinladdade expo-audio-players per token — ETT klipp per token så
   // uppspelningen har minimal latens under den tajta nedräkningen.
   const playersRef = useRef<Partial<Record<VoiceToken, AudioPlayer>>>({});
+  // Monoton "run id" för countdown-effekten. Varje omkörning ökar den; varje
+  // schemalagd timer no-op:ar om en NYARE run tagit över. Detta är rot-skyddet
+  // mot att flera överlappande timer-kedjor lever samtidigt (clearTimeout i
+  // cleanup räcker inte om en gammal callback redan börjat köra och hinner
+  // schemalägga en ny timer efter reset) → utan detta kunde "3", "2" och "1"
+  // från olika körningar landa på samma ögonblick. (Peter 2026-09-17.)
+  const runIdRef = useRef(0);
   // Media-raden: [Music/Film/Sport] [ikon-box] [Year/Name].
   // Boxens ram färgas av media-källan (röd/grön/blå) och ikonen visar samma
   // sak; sido-kolumnerna visar kategori resp. svarstyp med det aktuella
@@ -269,6 +286,11 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
     const VOICE_LEAD_MS = 120;
     const TICK_MS = 1300;
 
+    // Ny körning äger nu — alla ännu ej fyrade timers från en tidigare körning
+    // no-op:ar (se run-guarden i addTimerAt).
+    runIdRef.current += 1;
+    const myRun = runIdRef.current;
+
     setCount(null);
     tickTimers.current.forEach(clearTimeout);
     tickTimers.current = [];
@@ -307,8 +329,43 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
       }
     }
     const addTimerAt = (fn: () => void, offsetMs: number) => {
-      const id = setTimeout(fn, Math.max(0, offsetMs - (Date.now() - t0)));
+      const id = setTimeout(() => {
+        // En nyare effekt-omkörning har tagit över → denna (gamla) kedja är död.
+        if (runIdRef.current !== myRun) return;
+        fn();
+      }, Math.max(0, offsetMs - (Date.now() - t0)));
       tickTimers.current.push(id);
+    };
+
+    // Tala en siffra: röstpack → spela klippet, annars expo-speech.
+    // ⚠ HOPPA ÖVER rösten om steget fyras för sent. Varje steg schemaläggs mot
+    // ett absolut offset från t0; om t0 ligger i det förflutna (non-host som
+    // hinner ikapp host:s delade wall-clock efter broadcast-latens) fyrar de
+    // passerade stegen OMEDELBART och staplas på varandra → "3" och "2" hörs
+    // samtidigt (Peter 2026-09-17). Klippen (0,5–1,2 s) är kortare än TICK_MS
+    // (1300 ms), så i rätt takt överlappar de ALDRIG och behöver ingen paus —
+    // enda problemet är catch-up-stapling, och då är rätt beteende att hoppa
+    // över de passerade siffrorna (det visuella siffer-hoppet sköts ändå av
+    // setCount). `expectedAt` = stegets avsedda offset; för stort faktiskt
+    // förflutet ⇒ vi hinner ikapp ⇒ tyst.
+    const VOICE_LATE_SKIP_MS = 400;
+    const VOICE_MIN_GAP_MS = 700;
+    const speakToken = (value: number, expectedAt: number) => {
+      if (Date.now() - t0 - expectedAt > VOICE_LATE_SKIP_MS) return;
+      // Debounce mot stomp (MODUL-nivå så den spänner över re-mounts, inte bara
+      // effekt-omkörningar): två siffror inom 700 ms → hoppa över den andra.
+      const now = Date.now();
+      if (now - lastCountdownVoiceMs < VOICE_MIN_GAP_MS) return;
+      lastCountdownVoiceMs = now;
+      const token = String(value) as VoiceToken;
+      const player = pack ? playersRef.current[token] : undefined;
+      if (player) {
+        try { player.seekTo(0); player.play(); } catch (_) {}
+      } else {
+        try {
+          Speech.speak(String(value), { language: 'en-US', pitch: 0.01, rate: 0.42 });
+        } catch (_) {}
+      }
     };
 
     // Schemalägg nästa nedräkningssteg rekursivt. `voiceAt` = absolut offset
@@ -324,15 +381,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
         // (påverkar inte annat) men läses inte längre här.
         // Röstpack → spela klippet; Default/okänt pack → expo-speech.
         if (!audioSilent && next > 0 && next <= voiceFrom) {
-          const token = String(next) as VoiceToken;
-          const player = pack ? playersRef.current[token] : undefined;
-          if (player) {
-            try { player.seekTo(0); player.play(); } catch (_) {}
-          } else {
-            try {
-              Speech.speak(String(next), { language: 'en-US', pitch: 0.01, rate: 0.42 });
-            } catch (_) {}
-          }
+          speakToken(next, voiceAt);
         }
 
         // Visuell uppdatering efter röst-förspranget.
@@ -351,15 +400,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
     // in i initial-pausen) och visa det visuellt som vanligt vid 700 ms.
     if (!audioSilent && startFrom <= voiceFrom) {
       addTimerAt(() => {
-        const token = String(startFrom) as VoiceToken;
-        const player = pack ? playersRef.current[token] : undefined;
-        if (player) {
-          try { player.seekTo(0); player.play(); } catch (_) {}
-        } else {
-          try {
-            Speech.speak(String(startFrom), { language: 'en-US', pitch: 0.01, rate: 0.42 });
-          } catch (_) {}
-        }
+        speakToken(startFrom, 700 - VOICE_LEAD_MS);
       }, 700 - VOICE_LEAD_MS);
     }
     addTimerAt(() => {
@@ -371,7 +412,12 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
       tickTimers.current.forEach(clearTimeout);
       tickTimers.current = [];
     };
-  }, [startFrom, finalWord, voiceFrom, audioSilent, anchorT0, pack]);
+    // ⚠ `finalWord` MEDVETET borttaget ur deps: slut-ordet talas inte längre
+    // (Peter 2026-09-07), så det används inte i effekten — men det ÄNDRAS när
+    // Spotify-svarstypen (Year/Who) resolvar på en non-host, vilket förr körde
+    // om hela nedräkningen mitt i och lät gamla + nya timer-kedjor stomp:a
+    // varandra ("3"/"2"/"1" samtidigt). (Peter 2026-09-17.)
+  }, [startFrom, voiceFrom, audioSilent, anchorT0, pack]);
 
   // Pop-in per siffer-byte (3, 2, 1) + kontinuerlig zoom-puls (1 ↔ 1.18).
   useEffect(() => {

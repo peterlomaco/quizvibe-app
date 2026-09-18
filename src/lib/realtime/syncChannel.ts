@@ -202,6 +202,14 @@ export interface SpotifyDJTrackStartedPayload {
    *  inte kompenserar för stale tid från play_command (som skickades 20-60 s
    *  innan DJ tryckte "Activate Timer"). */
   timer_start_at?: number;
+  /** Alla förväntade gissare har bekräftat sitt svar. Timer-aktiveraren
+   *  (foregrounded non-DJ) piggybackar denna flagga på 5s-heartbeaten så en
+   *  backgroundad/återvändande DJ (som missat de enskilda player_answer_confirmed-
+   *  broadcasterna) avslöjar direkt i stället för att rulla ut hela wall-clocken. */
+  all_confirmed?: boolean;
+  /** Störst `time_used` bland bekräftade gissare (= sista/vänstraste bekräftade
+   *  avatar). Låter DJ:n frysa timer-baren exakt där i stället för på full. */
+  freeze_used?: number;
 }
 
 /**
@@ -674,6 +682,12 @@ function optTimerStart(v: unknown): number | undefined {
   const delta = v - Date.now();
   return delta >= -TIMER_WINDOW_MS && delta <= TIMER_WINDOW_MS ? v : undefined;
 }
+/** Valfri freeze_used (bekräftad svarstid i sekunder) → behåll om number i
+ *  0..MAX_TIME_USED_SEC, annars undefined. */
+function optFreeze(v: unknown): number | undefined {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return undefined;
+  return v >= 0 && v <= MAX_TIME_USED_SEC ? v : undefined;
+}
 
 function vPlayCommand(raw: unknown): PlayCommandPayload | null {
   if (!isObj(raw) || !index(raw.question_index) || !str(raw.question_id)) return null;
@@ -772,6 +786,8 @@ function vSpotifyDJTrackStarted(raw: unknown): SpotifyDJTrackStartedPayload | nu
     dj_player_id: raw.dj_player_id,
     spotify_track_id: raw.spotify_track_id,
     timer_start_at: optTimerStart(raw.timer_start_at),
+    all_confirmed: optBool(raw.all_confirmed),
+    freeze_used: optFreeze(raw.freeze_used),
   };
 }
 function vSpotifyDJHandover(raw: unknown): SpotifyDJHandoverPayload | null {

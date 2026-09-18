@@ -1562,20 +1562,14 @@ export default function LobbyScreen() {
           lobbyType,
           stored?.singlePlayerDefault ?? false,
         );
-        // Renodlad 1vs1-lobby: mode forceras av Home-valet — stored/default
-        // ignoreras. Single-lobby: PtP under huven (solo behöver inget
-        // IndDev-maskineri — det skulle bara öppna en onödig quiz_sync-kanal).
-        // Standard-lobby: stale 'remote-1v1' coercas till PtP (remote kan
-        // inte längre väljas inne i lobbyn).
-        setGameMode(
-          is1v1Lobby
-            ? 'remote-1v1'
-            : seedSinglePlayer
-              ? 'pass-the-phone'
-              : (stored?.gameMode ?? 'pass-the-phone') === 'remote-1v1'
-                ? 'pass-the-phone'
-                : stored?.gameMode ?? 'pass-the-phone',
-        );
+        // Guest host: mode LÅST till Pass-the-Phone (Peter 2026-09-18) —
+        // guest-host multiplayer är PtP-only (IndDev + Spotify DJ hör till
+        // den registrerade vägen; guest saknar dessutom "+ Add Player" i
+        // IndDev och Share invite, så IndDev-rekrytering är onödigt krånglig),
+        // och single forcerar redan PtP under huven. Guest host kan aldrig
+        // vara 1v1 (handleStartGameAsGuestHost blockar det → is1v1Lobby alltid
+        // false här), så en carry-overad 'individual-devices' coercas bort.
+        setGameMode('pass-the-phone');
         setSinglePlayerDefault(seedSinglePlayer);
         setMaxPlayers(is1v1Lobby ? 2 : 4);
         setRegion('Sweden');
@@ -1608,10 +1602,13 @@ export default function LobbyScreen() {
         );
         setSelectedExtraPackages([]);
         setSketchEnabled(false);
-        // Spotify-carry: attesten re-verifieras av "Spotify not confirmed"-
-        // guarden i handleStartGame — ingen egen koll behövs här.
-        // Single: alltid av (Spotify-kortet göms — DJ kräver en motspelare).
-        setSpotifyEnabled(seedSinglePlayer ? false : stored?.spotifyEnabled ?? false);
+        // Spotify: ALLTID av för guest host (Peter 2026-09-18). Guest-host
+        // multiplayer är PtP-only, single kräver en motspelare — Spotify-kortet
+        // göms i BÅDA fallen, så kontrollen är osynlig. Precis som de övriga
+        // seed-siterna där kontrollen är dold MÅSTE värdet forceras false,
+        // annars kan ett carry-over-värde smyga in och sedan blockera Start
+        // Game med "Spotify DJ not applicable" utan att host kan stänga av det.
+        setSpotifyEnabled(false);
         setEnabledHostPackages([]);
         // Parent Control — ALLTID på och icke-editerbar för guest host (single
         // OCH multiplayer, Peter 2026-09-11): en guest/trial-lobby är alltid
@@ -6793,17 +6790,12 @@ export default function LobbyScreen() {
       },
     };
 
-    // Remote 1v1: host spelar sin session self-paced inom 48h, precis som
-    // motståndaren — samma popup som non-host får när starten detekteras.
-    if (remoteMatchId) {
-      setRemoteStartPrompt({
-        message:
-          'The H2H match has been created. You have 48 hours to play your questions — now or later via "H2H" on the Home screen.',
-        playNow: () => router.push(quizNav),
-      });
-      return;
-    }
-
+    // Remote 1v1: host går alltid in i quiz-vyn. Mount-effekten där persisterar
+    // den auktoritativa frågesekvensen (set_remote_match_questions) — utan det
+    // fastnar en motståndare som väljer "Now" på "Preparing H2H match" tills
+    // host själv spelar. Vill host vänta spelar de "senare" via Save & Exit på
+    // Get Ready-skärmen (48h-fönstret gäller ändå). Non-host:s egen Now/Later-
+    // prompt (game-started-detection) är orörd — den saknar persist-beroendet.
     router.push(quizNav);
   };
 
@@ -7696,6 +7688,44 @@ export default function LobbyScreen() {
               Home.
             </Text>
           </View>
+        ) : isGuestHost ? (
+          /* Guest host MULTIPLAYER (Peter 2026-09-18): Pass-the-Phone only.
+             Individual device döljs för guest host — det är den minst
+             investerade (trial-)användaren, PtP/IndDev-nyansen är förvirrande,
+             och guest host saknar BÅDE "+ Add Player" i IndDev OCH Share
+             invite/friends, så IndDev-rekrytering (dictera rumkoden) är onödigt
+             krånglig. IndDev + Spotify DJ hör till den registrerade vägen. Ingen
+             Players-sektion — PtP är alltid Max 4. Statisk indikator + not, i
+             samma vokabulär som single/re-match-lobbyn ovan (men utan hänglås:
+             detta är en guest-begränsning, inte ett Home-lås). Seeden ovan
+             forcerar gameMode='pass-the-phone' så en carry-overad IndDev aldrig
+             läcker in. */
+          <View style={[styles.section, { marginTop: Spacing.xs }]}>
+            <Text style={styles.sectionLabel}>Game Mode</Text>
+            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+              <TouchableOpacity
+                style={[styles.modeOption, styles.modeOptionPassActive]}
+                onPress={() =>
+                  Alert.alert(
+                    'Pass-the-Phone',
+                    'Guest games are played Pass-the-Phone on one device. Individual device mode is available for registered QuizVibe users.',
+                  )
+                }
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
+                  Pass-the-Phone
+                </Text>
+                <View style={styles.freeBadge} pointerEvents="none">
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
+              </TouchableOpacity>
+              <View style={{ flex: 1 }} />
+            </View>
+            <Text style={styles.guestHostNote}>
+              Individual device mode is available for registered QuizVibe users.
+            </Text>
+          </View>
         ) : (
         <View style={[styles.section, { marginTop: Spacing.xs }]}>
           {/* Non-host: skriv "GAME MODE - MULTIPLAYER" inline istället för
@@ -7827,16 +7857,20 @@ export default function LobbyScreen() {
           <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
           <View style={styles.connectionsList}>
             {/* ── Spotify DJ-läge ─────────────────────────────────────────
-                Göms HELT (inkl. attest-raden) i två lobbytyper där Spotify
-                aldrig kan bli tillämpligt:
+                Göms HELT (inkl. attest-raden) i tre fall där Spotify aldrig
+                kan bli tillämpligt:
                   • renodlade 1vs1-lobbyn (asynkron duell)
                   • single player-lobbyn (Spotify DJ kräver minst en
                     motspelare — se handleStartGame:s DJ-guard)
-                Båda är LÅSTA vid skapandet, så läget kan inte bytas till ett
-                där Spotify blir relevant. I en multiplayer-lobby visas kortet
-                alltid; availability-pillen säger om DJ stöds i aktuellt läge
-                (IndDev = grön "Enabled", PtP = grå "Disabled" + toggle
-                utgråad) eftersom host fritt kan byta mellan dem. */}
+                  • guest host (Peter 2026-09-18): guest-host multiplayer är
+                    PtP-only och kan aldrig växlas till IndDev, så Spotify DJ
+                    är permanent otillämpligt — hela sektionen tas bort. IndDev
+                    + Spotify DJ hör till den registrerade vägen.
+                Alla tre är LÅSTA vid skapandet, så läget kan inte bytas till
+                ett där Spotify blir relevant. I en (registrerad) multiplayer-
+                lobby visas kortet alltid; availability-pillen säger om DJ stöds
+                i aktuellt läge (IndDev = grön "Enabled", PtP = grå "Disabled" +
+                toggle utgråad) eftersom host fritt kan byta mellan dem. */}
             {/* MUSIC-ONLY LAUNCH: EN grå ram runt hela mixerboarden (Spotify →
                 YouTube → Hints), se mockup. Öppnas här, stängs efter paket-
                 boarden. Spotify-blockets egen bg är borttagen så ramen blir en
@@ -7845,7 +7879,7 @@ export default function LobbyScreen() {
                 gröna låsta ramen sitter runt HELA Game Settings-sektionen. I
                 multiplayer guest host (och för alla andra) behålls den grå ramen. */}
             <View style={[styles.mixerboardBox, isGuestHostSingle && styles.mixerboardBoxGuest]}>
-            {gameMode !== 'remote-1v1' && !isSingleLobby && (
+            {gameMode !== 'remote-1v1' && !isSingleLobby && !isGuestHost && (
             <View style={{ marginBottom: Spacing.xs, paddingBottom: spotifyEnabled ? 6 : 0 }}>
             {/* Attest-kontroll ("I have Spotify app..." + switch) — egen rad
                 ÖVERST i boxen, ovanför ikon/rubrik-raden, synlig i BÅDA

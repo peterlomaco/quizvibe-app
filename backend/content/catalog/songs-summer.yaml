@@ -117,6 +117,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Bananarama Cruel Summer 1983"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2EGaDf0cPX789H3LNeB03D"
     genrePackages: ["Summer"]
     youtubeClips:
       - videoId: "l9ml3nyww80"

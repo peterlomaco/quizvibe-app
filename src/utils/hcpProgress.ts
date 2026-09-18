@@ -3,12 +3,14 @@ import type { AssistanceLevel } from './hcp';
 import {
   applyGameResult,
   applyInactivityDecay,
+  coerceContribution,
   displayHcp,
   emptyCategoryProgress,
   emptyHcpProgress,
   HCP_START,
   HCP_WINDOW_SIZE,
   totalHcp,
+  type HcpContribution,
   type HcpProgress,
 } from './hcpEngine';
 import type { MainCategory } from './mainCategory';
@@ -40,7 +42,9 @@ export interface HcpBundle {
 }
 
 // Svar bucketade per kategori (från quiz-slutet). Kategorier utan svar utelämnas.
-export type CategoryAnswers = Partial<Record<MainCategory, boolean[]>>;
+// Ett bidrag per svar: boolean (rätt/fel) ELLER ett tal (viktat, t.ex. 0.5 för en
+// lätt Spotify/Name-rätt = halv HCP-effekt). coercas till number i motorn.
+export type CategoryAnswers = Partial<Record<MainCategory, HcpContribution[]>>;
 
 // Guest / ingen sparad profil → sessions-lokal progress per region (som
 // epochLedger:s sessionDebt). Försvinner vid app-omstart; gäster persisteras aldrig.
@@ -64,8 +68,12 @@ async function resolveOwnKey(region: string): Promise<string | null> {
 // Fönstren trimmas till senaste HCP_WINDOW_SIZE vid läsning så befintliga
 // spelares gamla 20-långa fönster inte utvärderas mot de nya 10-fönster-
 // trösklarna på nästa spel (skulle avfyra ETT översstort delta). Självläkande.
-function trimWindow(w: unknown): boolean[] {
-  return Array.isArray(w) ? w.slice(-HCP_WINDOW_SIZE) : [];
+// Trimma + normalisera till number[]. Äldre boolean-fönster coercas här vid
+// läsning (true→1, false→0) så lagrad data konvergerar mot den nya vikt-modellen.
+function trimWindow(w: unknown): number[] {
+  return Array.isArray(w)
+    ? (w as HcpContribution[]).slice(-HCP_WINDOW_SIZE).map(coerceContribution)
+    : [];
 }
 function coerceCategory(raw: unknown) {
   const p = (raw ?? {}) as Partial<ReturnType<typeof emptyCategoryProgress>>;
