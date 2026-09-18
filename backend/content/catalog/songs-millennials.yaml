@@ -18,6 +18,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Kim Carnes Bette Davis Eyes"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0odIT9B9BvOCnXfS0e4lB5"
     youtubeClips:
       - videoId: "jIG9whz2oxY"
         startSec: 30
@@ -50,6 +51,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Survivor Eye of the Tiger Rocky"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2KH16WveTQWT6KOG9Rg6e2"
     genrePackages: ["sport"]
     youtubeClips:
       - videoId: "YKXTSOf5SA0"
@@ -66,6 +68,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["The Police Every Breath You Take"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1JSTJqkT5qHq8MDJnJbRE1"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "LPr3N4AMXNQ"
@@ -81,6 +84,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Irene Cara Flashdance What a Feeling"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5EkQYd9xvBrNchHDaDSKa5"
     genrePackages: ["Film edition"]
     youtubeClips:
       - videoId: "ILWSp0m9G2U"
@@ -97,6 +101,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Madonna Like a Virgin"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1ZPlNanZsJSPK5h9YZZFbZ"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "4u6UkngBufI"
@@ -113,6 +118,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Wham Wake Me Up Before You Go-Go"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0ikz6tENMONtK6qGkOrU3c"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Uj2K3rerzT4"
@@ -129,6 +135,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Van Halen Jump 1984 album"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6Fba9RZtC6vTY814JToDtP"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "SwYN7mTi6HM"
@@ -146,6 +153,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Billy Idol Rebel Yell 1983 album"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4TIJ7zSBNejpoIPaWpWRKc"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "zkTqiuNj6xI"
@@ -162,6 +170,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["a-ha Take on Me 1985"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2WfaOiMkCvy7F5fcp2zZ8L"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "djV11Xbc914"
@@ -178,6 +187,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Whitney Houston How Will I Know 1985"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5tdKaKLnC4SgtDZ6RlWeal"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "TO-Tk84ATjw"
@@ -210,6 +220,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Europe The Final Countdown"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3MrRksHupTVEQ7YbA0FsZK"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "9jK-NcRmVcw"
@@ -225,6 +236,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Bon Jovi Livin on a Prayer"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "37ZJ0p5Jm13JPevGcx4SkF"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "lDK9QqIzhwk"
@@ -241,6 +253,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Rick Astley Never Gonna Give You Up"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4PTG3Z6ehGkBFwjybzWkR8"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "dQw4w9WgXcQ"
@@ -271,6 +284,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Bobby McFerrin Don't Worry Be Happy"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4hObp5bmIJ3PP3cKA9K9GY"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "qTuntvl6oLQ"
@@ -286,6 +300,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Tracy Chapman Fast Car"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2M9ro2krNb7nr7HSprkEgo"
     youtubeClips:
       - videoId: "AIOAlaACuv4"
         startSec: 30
@@ -301,6 +316,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Madonna Like a Prayer"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0ECZ5rta27stj0q4SNuM0D"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "79fzeNUqQbQ"
@@ -332,6 +348,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Sinead O'Connor Nothing Compares 2 U"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3nvuPQTw2zuFAVuLsC9IYQ"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "Ouf9-bOqJVk"
@@ -349,6 +366,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["MC Hammer U Can't Touch This 1990"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1B75hgRqe7A4fwee3g3Wmu"
     genrePackages: ["Hip Hop"]
     parentControlled: true
     youtubeClips:
@@ -365,6 +383,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Madonna Vogue"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7j5TIXPi0cCbSSqItmbyZy"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "GuJQSAiODqI"
@@ -396,6 +415,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Michael Jackson Black or White"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5gu6nQpz5ELQpxt0QkvhUr"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "m-y_IxPcx8U"
@@ -411,6 +431,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Seal Crazy 1991"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4mFkf4tw0HzBRxY1bgdyZa"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "4Fc67yQsPqQ"
@@ -427,6 +448,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Snap Rhythm Is a Dancer"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5ljnDFmEKNfkkwUKEg2hxp"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "JYIaWeVL1JM"
@@ -442,6 +464,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Boyz II Men End of the Road"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3XcDCh0hHP9Q659pjjyK3Q"
     genrePackages: ["Soft & Love", "RnB"]
     youtubeClips:
       - videoId: "CmeriHkAF5c"
@@ -459,6 +482,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["4 Non Blondes What's Up"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0jWgAnTrNZmOGmqgvHhZEm"
     youtubeClips:
       - videoId: "B6GdsRIbTSk"
         startSec: 30
@@ -490,6 +514,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["The Cranberries Zombie"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2IZZqH4K02UIYg5EohpNHF"
     youtubeClips:
       - videoId: "lRrC_d6dRZw"
         startSec: 30
@@ -505,6 +530,7 @@ items:
     probability: 92
     wikimediaSearchHints: ["Oasis Wonderwall"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1qPbGZqppFwLwcBC1JQ6Vr"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "bx1Bh8ZvH84"
@@ -520,6 +546,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Coolio Gangsta's Paradise Dangerous Minds"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1DIXPcTDzTj8ZMHt3PDt8p"
     genrePackages: ["Hip Hop"]
     youtubeClips:
       - videoId: "7DXlY8LhWnI"
@@ -537,6 +564,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Spice Girls Wannabe"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1Je1IMUlBXcx1Fz0WE7oPT"
     genrePackages: ["Disco & Pop"]
     # Tidigare klipp tscL_I2v7pU (Spice Girls - Topic) togs bort 2026-08-10: blev
     # region-blockerad i 249 länder inkl. SE → "Video unavailable" i spelaren.
@@ -555,6 +583,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Los del Rio Macarena Bayside Boys"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "07DcH2UllHvVRKjD2HEJuC"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Z7EsuR5I8SE"
@@ -569,6 +598,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Drömhus Vill ha dig 1996 Swedish pop"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1zpr5MMuS4xrOllFKVe1Hs"
     genrePackages: ["100% in swedish", "Disco & Pop"]
     youtubeClips:
       - videoId: "S1GitKiAHNs"
@@ -584,6 +614,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Journey Don't Stop Believin 1981"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4bHsxqR3GMrXTxEPLuK5ue"
     youtubeClips:
       - videoId: "PIFUWHvSixw"
         startSec: 30
@@ -614,6 +645,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Cyndi Lauper Girls Just Want to Have Fun 1983"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4y1LsJpmMti1PfRQV9AWWe"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "jRr5EasAq84"
@@ -628,6 +660,7 @@ items:
     probability: 85
     wikimediaSearchHints: ["Eurythmics Sweet Dreams Are Made of This 1983"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7Bp898e0U9IReLs2oKC7G4"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "6KR52lEWLEM"
@@ -644,6 +677,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Whitney Houston I Wanna Dance with Somebody 1987"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5ifX6jfT33QWKP9DE0YRG8"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "2dzf4T3RbEc"
@@ -658,6 +692,7 @@ items:
     probability: 81
     wikimediaSearchHints: ["R.E.M. Losing My Religion 1991"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6bCPryuQjsts5cEybA3Nb5"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "xwtdhWltSIg"
@@ -673,6 +708,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Metallica Enter Sandman 1991"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5BIMPccDwShpXq784RJlJp"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "XZuM4zFg-60"
@@ -688,6 +724,7 @@ items:
     probability: 83
     wikimediaSearchHints: ["Scorpions Wind of Change 1991"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3ovjw5HZZv43SxTwApooCM"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "F_-ZuVy76yg"
@@ -734,6 +771,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Prince Purple Rain 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3FnP3j1TyiTwbJb5AR2ynT"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "TvnYmWpD_T8"
@@ -749,6 +787,7 @@ items:
     probability: 90
     wikimediaSearchHints: ["Wham Last Christmas 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2FRnf9qhLbvw8fu4IBXx78"
     inBaseCatalog: false
     genrePackages: ["Christmas edition"]
     youtubeClips:
@@ -770,6 +809,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Bruce Springsteen Dancing in the Dark 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7FwBtcecmlpc1sLySPXeGE"
     youtubeClips:
       - videoId: "nCFTL4IO6t4"
         startSec: 30
@@ -813,6 +853,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Nirvana Come as You Are 1992"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "27LuGw8pE0WSELYYuptRjK"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "f1IdyrhOrGs"
@@ -937,6 +978,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Marvin Gaye Sexual Healing 1982"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2KD51eSOPiXykunBhw5FZh"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "9LxPoJ4QoSk"
@@ -952,6 +994,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Bruce Springsteen Born in the USA 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0dOg1ySSI7NkpAe89Zo0b9"
     youtubeClips:
       - videoId: "tRx212PUa4g"
         startSec: 30
@@ -982,6 +1025,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["George Michael Careless Whisper 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4jDmJ51x1o9NZB5Nxxc7gY"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "gTwn_LoH7ig"
@@ -1026,6 +1070,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["U2 With or Without You 1987"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6ADSaE87h8Y3lccZlBJdXH"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "oNvWDP_GkiY"
@@ -1041,6 +1086,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Oasis Don't Look Back in Anger 1996"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7ppPZa3TRUSGKaks9wH7VT"
     youtubeClips:
       - videoId: "oplra1FJxWI"
         startSec: 30
@@ -1071,6 +1117,7 @@ items:
     probability: 68
     wikimediaSearchHints: ["Björn Skifs Fångad i en dröm Melodifestivalen 1981"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5Vu25xkAIliFJTMpkXHPGh"
     youtubeClips:
       - videoId: "LvbW7lWZbVo"
         startSec: 30
@@ -1085,6 +1132,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Chips Dag efter dag Eurovision 1982"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4aJ1AoiwjzsOxWqabRTJd3"
     genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "tUE0zbkmv0Q"
@@ -1099,6 +1147,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Herreys Diggi-Loo Diggi-Ley Eurovision 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4NzirQ4BrNkVaPEla2ipG4"
     youtubeClips:
       - videoId: "ySOCalwr6Yo"
         startSec: 20
@@ -1129,6 +1178,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Lotta Engberg Fyra bugg Coca Cola Melodifestivalen 1987"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4UuKT9xgMQQUPD3VWRGLJb"
     youtubeClips:
       - videoId: "U7hLR82zSE0"
         startSec: 5
@@ -1164,6 +1214,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Carola Fångad av en stormvind Eurovision 1991"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "06xX9E1BTTwyOwyaBuszSK"
     youtubeClips:
       - videoId: "4Ml6pJqc_bw"
         startSec: 5
@@ -1178,6 +1229,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Arvingarna Eloise Melodifestivalen 1993"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4QZ6hp2CKRaZG5RI9zXQqg"
     youtubeClips:
       - videoId: "a6MCRuE6tx8"
         startSec: 5
@@ -1194,6 +1246,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Bucks Fizz Making Your Mind Up Eurovision 1981 UK"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0ykwJ4eZV5BudRtBaM2CUG"
     youtubeClips:
       - videoId: "DszqGGSY4oo"
         startSec: 5
@@ -1208,6 +1261,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Nicole Ein bißchen Frieden Eurovision 1982 Germany"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "50Giaeo3ARSlfuDPpd49uR"
     youtubeClips:
       - videoId: "hp_b-095yPc"
         startSec: 5
@@ -1222,6 +1276,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Bobbysocks La det swinge Eurovision 1985 Norway"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3IgpWvgCqZjqhsiKwzw1Q7"
     genrePackages: ["Eurovision", "100% in swedish"]
     youtubeClips:
       - videoId: "U94_AErNBZU"
@@ -1237,6 +1292,7 @@ items:
     probability: 68
     wikimediaSearchHints: ["Sandra Kim J'aime la vie Eurovision 1986 Belgium"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5opXus6JIe9UD94Qk24RYB"
     youtubeClips:
       - videoId: "AT3c41gi3B4"
         startSec: 5
@@ -1253,6 +1309,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["Johnny Logan Hold Me Now Eurovision 1987 Ireland"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2eK478aJN3hUiJodJYCmbv"
     youtubeClips:
       - videoId: "gl2yKH5zbyo"
         startSec: 5
@@ -1269,6 +1326,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Céline Dion Ne partez pas sans moi Eurovision 1988"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "70Qp58JxQ2AoQlPStVBPcy"
     youtubeClips:
       - videoId: "VXLWfXmlXPc"
         startSec: 5
@@ -1285,6 +1343,7 @@ items:
     probability: 68
     wikimediaSearchHints: ["Riva Rock Me Eurovision 1989 Yugoslavia"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6t8m9JpxoBHrETKYjtrCY3"
     genrePackages: ["Eurovision"]
     youtubeClips:
       - videoId: "ZWwmCT7P3VE"
@@ -1301,6 +1360,7 @@ items:
     probability: 70
     wikimediaSearchHints: ["Toto Cutugno Insieme 1992 Eurovision 1990 Italy"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "44noNMO0iv87Tds7dwcpQU"
     youtubeClips:
       - videoId: "JiRppGSF-tI"
         startSec: 5
@@ -1317,6 +1377,7 @@ items:
     probability: 68
     wikimediaSearchHints: ["Linda Martin Why Me Eurovision 1992 Ireland"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5aVbngGqymHbbYgfKzBdTD"
     youtubeClips:
       - videoId: "DKd50924Qxs"
         startSec: 5
@@ -1333,6 +1394,7 @@ items:
     probability: 68
     wikimediaSearchHints: ["Niamh Kavanagh In Your Eyes Eurovision 1993 Ireland"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7LBBL20GLOtjBJwxgVmzPK"
     region: ["europe"]
     inBaseCatalog: false
     youtubeClips:
@@ -1349,6 +1411,7 @@ items:
     probability: 66
     wikimediaSearchHints: ["Paul Harrington Charlie McGettigan Rock n Roll Kids Eurovision 1994"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2wQoHnaJ1C4rPQPd72fNn3"
     youtubeClips:
       - videoId: "ohBO8OxQbv8"
         startSec: 5
@@ -1366,6 +1429,7 @@ items:
     region: ["nordic"]
     wikimediaSearchHints: ["Secret Garden Nocturne Eurovision 1995 Norway"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3pXPZ7dloJxTdBQmClNHiU"
     youtubeClips:
       - videoId: "u-gA0aU-d88"
         startSec: 5
@@ -1381,6 +1445,7 @@ items:
     probability: 66
     wikimediaSearchHints: ["Eimear Quinn The Voice Eurovision 1996 Ireland"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6SA7BxY6zh5SaxUBp3tCtb"
     youtubeClips:
       - videoId: "0KiE1byYXtA"
         startSec: 5
@@ -1477,6 +1542,7 @@ items:
     probability: 83
     wikimediaSearchHints: ["Elton John I'm Still Standing 1983 Too Low for Zero"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1jDJFeK9x3OZboIAHsY9k2"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "MJ_aPtt4U8M"
@@ -1492,6 +1558,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Thomas Di Leva Vi har bara varandra 1988 Swedish pop"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0umzToghfA6IPbRLY17ref"
     genrePackages: ["100% in swedish", "Soft & Love"]
     youtubeClips:
       - videoId: "KH_kDfdwf8A"
@@ -1521,6 +1588,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Scatman John Scatman 1994 Ski-Ba-Bop-Ba-Dop-Bop"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "623rRTKwGmgjH6sjE9uWLh"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "Hy8kmNEo1i8"
@@ -1581,6 +1649,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Cyndi Lauper True Colors 1986"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2A6yzRGMgSQCUapR2ptm6A"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "LPn0KFlbqX8"
@@ -1597,6 +1666,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Def Leppard Pour Some Sugar on Me Hysteria"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1bcklQyAGzDxQiNMczMLt6"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "0UIB9Y4OFPs"
@@ -1614,6 +1684,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Guns N Roses Sweet Child o Mine Appetite for Destruction"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7snQQk1zcKl8gZ92AnueZW"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "qoflJn7zkFM"
@@ -1653,6 +1724,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["Shakespears Sister Stay 1992 Hormonally Yours"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6Mcoqi1iK28djC2EClVwDj"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "YCYaALgW80c"
@@ -1684,6 +1756,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Phil Collins In the Air Tonight 1981 Face Value"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7Dbg5O9nNWu6SWxDjJ9qoq"
     youtubeClips:
       - videoId: "YkADj0TPrJA"
         startSec: 5
@@ -1698,6 +1771,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["The Human League Dont You Want Me 1981 Dare"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "59GNFIvgMlkidU3BuLVrni"
     youtubeClips:
       - videoId: "8fKR23rWI6g"
         startSec: 0
@@ -1729,6 +1803,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Prince Little Red Corvette 1982 1999 album"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3315t15Sw3QTL6TDWhSM4F"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "v0KpfrJE4zw"
@@ -1759,6 +1834,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Yes Owner of a Lonely Heart 1983 90125"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0GTK6TesV108Jj5D3MHsYb"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "SVOuYquXuuc"
@@ -1776,6 +1852,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["ZZ Top Gimme All Your Lovin 1983 Eliminator"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "29uKzagduhFDTWPCjqaGOg"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "Ae829mFAGGE"
@@ -1791,6 +1868,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Laura Branigan Self Control 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6JNJERZGJwDVgkmbohBw7u"
     youtubeClips:
       - videoId: "RP0_8J7uxhs"
         startSec: 30
@@ -1804,6 +1882,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Foreigner I Want to Know What Love Is 1984 Agent Provocateur"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3Y1F4btGQxxMZhlBYaLR4N"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "r3Pr1_v7hsw"
@@ -1819,6 +1898,7 @@ items:
     probability: 88
     wikimediaSearchHints: ["Queen I Want to Break Free 1984 The Works"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7iAqvWLgZzXvH38lA06QZg"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "f4Mc-NYPHaQ"
@@ -1834,6 +1914,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Talk Talk Its My Life 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6m7fhJkK6TbuGDFhBNpgyn"
     youtubeClips:
       - videoId: "cFH5JgyZK1I"
         startSec: 0
@@ -1848,6 +1929,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Prince When Doves Cry 1984 Purple Rain"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5aEfPt7OoJhpeeEj5MkXQ4"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "UG3VcCAlUgE"
@@ -1864,6 +1946,7 @@ items:
     probability: 86
     wikimediaSearchHints: ["Madonna Into the Groove 1985 Desperately Seeking Susan"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2m0M7YqCy4lXfedh18qd8N"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "52iW3lcpK5M"
@@ -1894,6 +1977,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Kate Bush Running Up That Hill 1985 Hounds of Love"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1PtQJZVZIdWIYdARpZRDFO"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "wp43OdtAAkM"
@@ -1909,6 +1993,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Eddie Murphy Party All the Time 1985 How Could It Be"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6N5DRCQUSXT1qQqmqsO92B"
     inBaseCatalog: false
     genrePackages: ["Disco & Pop"]
     youtubeClips:
@@ -1924,6 +2009,7 @@ items:
     probability: 72
     wikimediaSearchHints: ["David Lee Roth California Girls 1985 Crazy from the Heat"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4H3vuLX59XPqdtTpIesGyS"
     youtubeClips:
       - videoId: "53LZ0-m-8Vg"
         startSec: 100
@@ -1938,6 +2024,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Dire Straits Walk of Life 1985 Brothers in Arms"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "423o3ZHIaBtGXyhF1uH41a"
     youtubeClips:
       - videoId: "ekXJtcxsT20"
         startSec: 0
@@ -1952,6 +2039,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Pet Shop Boys West End Girls 1985"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5Dqik1P9toCJTLj5rEm78s"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "p3j2NYZ8FKs"
@@ -1968,6 +2056,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Madonna La Isla Bonita 1986 True Blue"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7Hh4CiqD2Qaj45Mxwm895H"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "zpzdgmqIHOQ"
@@ -1983,6 +2072,7 @@ items:
     probability: 76
     wikimediaSearchHints: ["Peter Cetera Glory of Love 1986 Karate Kid Part II"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1eyq8cjUQ2daFthW2PC2GM"
     youtubeClips:
       - videoId: "wktJg27TXx4"
         startSec: 0
@@ -2000,6 +2090,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Peter Gabriel Sledgehammer 1986 So"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0PMtPzsBWS5JNxUtYH13Ol"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "OJWJE0x7T4Q"
@@ -2017,6 +2108,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Prince Kiss 1986 Parade"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "62LJFaYihsdVrrkgUOJC05"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "H9tEvfIsDyo"
@@ -2032,6 +2124,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["Starship Nothings Gonna Stop Us Now 1987 Mannequin"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3X7uFMzJrEE0sxn62qd8Ch"
     youtubeClips:
       - videoId: "3wxyN3z9PL4"
         startSec: 0
@@ -2046,6 +2139,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Fleetwood Mac Everywhere 1987 Tango in the Night"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "254bXAqt3zP6P50BdQvEsq"
     youtubeClips:
       - videoId: "YF1R0hc5Q2I"
         startSec: 17
@@ -2060,6 +2154,7 @@ items:
     probability: 74
     wikimediaSearchHints: ["Fleetwood Mac Seven Wonders 1987 Tango in the Night"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3k2ImghAf2wffEKTMVvIkc"
     youtubeClips:
       - videoId: "9b4F_ppjnKU"
         startSec: 0
@@ -2074,6 +2169,7 @@ items:
     probability: 84
     wikimediaSearchHints: ["George Michael Faith 1987"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1eKhntRLUPDV7h6tATtzsv"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "i2hLL_UNUSo"
@@ -2089,6 +2185,7 @@ items:
     probability: 78
     wikimediaSearchHints: ["George Harrison Got My Mind Set on You 1987 Cloud Nine"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4wswaG5vmNINMZcVBsAyBP"
     youtubeClips:
       - videoId: "OnggBmaY4D4"
         startSec: 0
@@ -2103,6 +2200,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Whitesnake Here I Go Again 1987"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1Ll8UuomlZEhuZYLxUz09J"
     youtubeClips:
       - videoId: "WyF8RHM1OCg"
         startSec: 10
@@ -2118,6 +2216,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Kylie Minogue The Loco-Motion 1988"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2hBR3npBmnfr1VWB3O64Jt"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "POWsFzSFLCE"
@@ -2134,6 +2233,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["The B-52s Love Shack 1989 Cosmic Thing"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5HHVGPYZQe8eKT2OgV5EBf"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "9SOryJvTAGs"
@@ -2149,6 +2249,7 @@ items:
     probability: 82
     wikimediaSearchHints: ["Madonna Express Yourself 1989 Like a Prayer"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6ioBgySxoeQKALvAeLEmId"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "GsVcUzP_O_8"
@@ -2185,6 +2286,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban No Coke Hello Afrika"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "245oQnuxE6oX9B8B0t3SmU"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "4uPDfuC3Jck"
@@ -2201,6 +2303,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban Sing Hallelujah One Love"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1ohbjkuczl6hEoYEo931PH"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "pKxJca7LLNM"
@@ -2217,6 +2320,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban Let the Beat Go On Look Whos Talking"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0r2joAcaJghNmtRIBBIzu1"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "oKs25yuV3_A"
@@ -2233,6 +2337,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Dr Alban Look Whos Talking 1994"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1BFJG9xkO8QCwGHL9pH9wt"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "n1dk78L0XzI"
@@ -2249,6 +2354,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Snap The Power 1990 World Power"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0nQLxiNGbbUoSGrxksETLm"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "nm6DO_7px1I"
@@ -2265,6 +2371,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Modern Talking Youre My Heart Youre My Soul 1984"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0Zn63G0XTiqXwr1KSmARWz"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "4kHl4FoK1Ys"
@@ -2512,6 +2619,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Mark Morrison Return of the Mack"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3jDdpx9PMlfMBS5tOBHFm9"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "uB1D9wWxd2w"
@@ -2527,6 +2635,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Queen The Show Must Go On Innuendo"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3hU637WcAGM5ubSqeaTme5"
     genrePackages: ["sport"]
     youtubeClips:
       - videoId: "t99KH0TR-J4"
@@ -2542,6 +2651,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Roxette It Must Have Been Love Pretty Woman"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2julHzta3pq6E1ugxyvsbj"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "k2C5TjS2sh4"
@@ -2558,6 +2668,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Michael Jackson Remember the Time Dangerous"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4jnFqNWeJCeCRHc4HCdxfd"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "LeiFF0gvqcc"
@@ -2574,6 +2685,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Spin Doctors Two Princes Pocket Full of Kryptonite"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4ePP9So5xRzspjLFVVbj90"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "wsdy_rct6uo"
@@ -2590,6 +2702,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Snow Informer 12 Inches of Snow"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2uafQBQfX8f539k50pHDSF"
     genrePackages: ["Hip Hop"]
     youtubeClips:
       - videoId: "TSffz_bl6zo"
@@ -2605,6 +2718,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Cypress Hill Insane in the Brain Black Sunday"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4dTMU4O2DdyIlRlss7v9UP"
     genrePackages: ["Hip Hop"]
     parentControlled: true
     youtubeClips:
@@ -2621,6 +2735,7 @@ items:
     region: ["nordic"]
     wikimediaSearchHints: ["Robyn Show Me Love Robyn Is Here"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4cwKBnmJ1ziA23x3ySNNrQ"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "bhWEI6-_w9E"
@@ -2637,6 +2752,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Snoop Doggy Dogg Whats My Name Doggystyle"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0eO8MW9YSTK3CjdaTYKlhF"
     genrePackages: ["Hip Hop"]
     parentControlled: true
     youtubeClips:
@@ -2653,6 +2769,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["No Mercy Missing cover"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "04cwtOV3fK6jqv5SZ4z06C"
     youtubeClips:
       - videoId: "73NY_bSbgqE"
         startSec: 0
@@ -2667,6 +2784,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Everything but the Girl Missing Amplified Heart"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0mCRhbedh0rFSl6Hbvsjs1"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "U56Ns66Qrb8"
@@ -2682,6 +2800,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["No Mercy Where Do You Go"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "37tzoWY1ubBQKGXiWdO5Qv"
     genrePackages: ["Summer"]
     youtubeClips:
       - videoId: "ElAFJopotgw"
@@ -2697,6 +2816,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Jon Secada Just Another Day"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1TCVVSdQs4i5s38zK43B4f"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "G0pDyyooUJE"
@@ -2712,6 +2832,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Paula Abdul Straight Up Forever Your Girl"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6ECzWlULj7xJLm3XATrrJj"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "8yFwvifjuf4"
@@ -2727,6 +2848,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Mr President Coco Jamboo"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5fRvePkRGdpn2nKacG7I6d"
     genrePackages: ["Summer"]
     youtubeClips:
       - videoId: "EScLmWJs82I"
@@ -2742,6 +2864,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Milli Vanilli Girl You Know Its True"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0C7dYeCLF6ukChtW64UNge"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "0ZV9FyngchQ"
@@ -2757,6 +2880,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["REM Shiny Happy People Out of Time"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6YN6A8ppveObxb2usM3AQF"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "YYOKMUTTDdA"
@@ -2773,6 +2897,7 @@ items:
     region: ["europe"]
     wikimediaSearchHints: ["Haddaway What Is Love The Album"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "33iAwBBb962LFQei4J0b0b"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "HEXWRTEbj1I"
@@ -2789,6 +2914,7 @@ items:
     region: ["nordic"]
     wikimediaSearchHints: ["E-Type Set the World on Fire Made in Sweden"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "67rBycpa8FTFJkQwP5FzP1"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "K9Tw8baMPpM"
@@ -2805,6 +2931,7 @@ items:
     region: ["nordic"]
     wikimediaSearchHints: ["E-Type This Is the Way Made in Sweden"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1BBIW3lDfwK9PXOFOedZmo"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "7w1HeDqYCU4"
@@ -2821,6 +2948,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["No Doubt Don't Speak Tragic Kingdom"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6urCAbunOQI4bLhmGpX7iS"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "TR3Vdo5etCQ"
@@ -2836,6 +2964,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Fugees Killing Me Softly The Score"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1MAqR81Tz28IIqMJ2KUDAO"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "oKOtzIo-uYw"
@@ -2851,6 +2980,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Men at Work Down Under Business as Usual"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "46RVKt5Edm1zl0rXhPJZxz"
     youtubeClips:
       - videoId: "XfR9iY5y94s"
         startSec: 0
@@ -2865,6 +2995,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Toni Braxton Un-Break My Heart"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5Ihd9HrPvOADyVoonH9ZjB"
     youtubeClips:
       - videoId: "p2Rch6WvPJE"
         startSec: 0
@@ -2880,6 +3011,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Ted Gärdestad Låt kärleken slå rot"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2FuazTK4ewgx5QytkCjotZ"
     youtubeClips:
       - videoId: "u4ucz96rbMA"
         startSec: 55
@@ -2895,6 +3027,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["2 Unlimited No Limit"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5ylVTOQvjMyLTrvFpepXfP"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "7kmEEkECFQw"
@@ -2910,6 +3043,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Janet Jackson That's the Way Love Goes"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2iJMMzXN6YQsuoEjls4nni"
     youtubeClips:
       - videoId: "2b_KfAGiglc"
         startSec: 120
@@ -2940,6 +3074,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Céline Dion The Power of Love"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7wW5aYk098ICCaLqme13Vh"
     youtubeClips:
       - videoId: "Y8HOfcYWZoo"
         startSec: 0
@@ -2955,6 +3090,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Seal Kiss from a Rose"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3YKptz29AsOlm7WAVnztBh"
     youtubeClips:
       - videoId: "hDd2G_V1rzc"
         startSec: 6
@@ -2985,6 +3121,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Michael Jackson You Are Not Alone"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3AoeaZs8dFemFJr3JdzOL0"
     youtubeClips:
       - videoId: "pAyKJAtDNCw"
         startSec: 10
@@ -3000,6 +3137,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Bryan Adams Please Forgive Me"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3QuSg0pA9TDfJYUTHyjPgZ"
     youtubeClips:
       - videoId: "Qy4zFJmE-1E"
         startSec: 30
@@ -3015,6 +3153,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Radiohead Creep"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "70LcF31zb1H0PyJoS1Sx1r"
     youtubeClips:
       - videoId: "XFkzRNyygfk"
         startSec: 0
@@ -3031,6 +3170,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["All-4-One I Swear"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3V0PeMg2mhbYRtk9bioAwF"
     youtubeClips:
       - videoId: "cVpvlaKfLQc"
         startSec: 0
@@ -3047,6 +3187,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Alanis Morissette Ironic"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4oGTdOClZUxcM2H3UmXlwL"
     youtubeClips:
       - videoId: "Jne9t8sHpUc"
         startSec: 15
@@ -3061,6 +3202,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Red Hot Chili Peppers Under the Bridge"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4839xk58bxT0w7K0yiXYF8"
     youtubeClips:
       - videoId: "GLvohMXgcBo"
         startSec: 0
@@ -3110,6 +3252,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Fugees Ready or Not"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4LOoPg7TavHtNmCTOfd9XQ"
     youtubeClips:
       - videoId: "aIXyKmElvv8"
         startSec: 36
@@ -3125,6 +3268,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Corona The Rhythm of the Night"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5IPJsGFKtxKDPCkT8lhEjN"
     youtubeClips:
       - videoId: "OnT58cIJSpw"
         startSec: 0
@@ -3140,6 +3284,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Mariah Carey Hero"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5mgCMlxQW7fmHbrdJuowbB"
     youtubeClips:
       - videoId: "0IA3ZvCkRkQ"
         startSec: 10
@@ -3156,6 +3301,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Blackstreet No Diggity"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6MdqqkQ8sSC0WB4i8PyRuQ"
     youtubeClips:
       - videoId: "3KL9mRus19o"
         startSec: 0
@@ -3172,6 +3318,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Whitney Houston I Have Nothing"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "31er9IGsfFbwqy1pH4aiTP"
     youtubeClips:
       - videoId: "FxYw0XPEoKE"
         startSec: 0
@@ -3187,6 +3334,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["TLC Waterfalls"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6qspW4YKycviDFjHBOaqUY"
     youtubeClips:
       - videoId: "8WEtxJ4-sh4"
         startSec: 5
@@ -3202,6 +3350,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Robert Miles Children"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4wtR6HB3XekEengMX17cpc"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "DvyCbevQbtI"
@@ -3217,6 +3366,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Tomas Ledin Sommaren är kort"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7ky1pctLd0JGWaXjCIbbiN"
     youtubeClips:
       - videoId: "wlhY1WEAH8U"
         startSec: 3
@@ -3280,6 +3430,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Donna Summer She Works Hard for the Money 1983"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3FlOciKDqFlTMPeC7t92Qy"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "N8EkGUm9q_A"
@@ -3294,6 +3445,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Bob Marley Buffalo Soldier 1983"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7BfW1eoDh27W69nxsmRicb"
     genrePackages: ["sport"]
     youtubeClips:
       - videoId: "uMUQMSXLlHM"
@@ -3324,6 +3476,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Soul II Soul Back to Life 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7vvRkLPIvfjjmCIqNxBuEZ"
     genrePackages: ["RnB"]
     youtubeClips:
       - videoId: "LC3Zu4puC1w"
@@ -3352,6 +3505,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Madonna Cherish 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5OKScc0MSa9Wl8g2zrulLn"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "8q2WS6ahCnY"
@@ -3393,6 +3547,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Tom Petty Free Fallin 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5tVA6TkbaAH9QMITTQRrNv"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "1lWJXDG2i0A"
@@ -3407,6 +3562,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Fine Young Cannibals Good Thing 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6lRkdG1HurVS72F9GoBeWJ"
     youtubeClips:
       - videoId: "We_9MthGzwk"
         startSec: 20
@@ -3420,6 +3576,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Queen I Want It All 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1MX6kqZ8FOht5UnQuPl6Jj"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "hFDcoX7s6rE"
@@ -3434,6 +3591,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Cher If I Could Turn Back Time 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6mYrhCAGWzTdF8QnKuchXM"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "9n3A_-HRFfc"
@@ -3463,6 +3621,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Belinda Carlisle Leave a Light On 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7vJz53OhSGMIxLlwhfwqzu"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "pmZYE8j2ZNs"
@@ -3491,6 +3650,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Neneh Cherry Manchild 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0eFhD5O7tXDr7rww77xYUj"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "OJ9VBMBS3qE"
@@ -3505,6 +3665,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Natalie Cole Miss You Like Crazy 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6d1IYeSfyqOTW61rPgocGD"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "OD1jb7Hgwk8"
@@ -3520,6 +3681,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Guns N Roses Paradise City 1987"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6eN1f9KNmiWEhpE2RhQqB5"
     genrePackages: ["Rock"]
     youtubeClips:
       - videoId: "inoqFF-2t8I"
@@ -3534,6 +3696,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Depeche Mode Personal Jesus 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2wUlYDGGXlSvm2NkGj0Qio"
     youtubeClips:
       - videoId: "u1xrNaTO1bI"
         startSec: 20
@@ -3561,6 +3724,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Technotronic Pump Up the Jam 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "21qnJAMtzC6S5SESuqQLEK"
     genrePackages: ["Dance Music"]
     youtubeClips:
       - videoId: "9EcjWd-O4jI"
@@ -3588,6 +3752,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Richard Marx Right Here Waiting 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4LFwNJWoj74Yd71fIr1W8x"
     genrePackages: ["Soft & Love"]
     youtubeClips:
       - videoId: "S_E2EHVxNAE"
@@ -3602,6 +3767,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Fine Young Cannibals She Drives Me Crazy 1988"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2BPfKiV9U0CR1dpUgeUwuH"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "UtvmTu4zAMg"
@@ -3629,6 +3795,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Tears for Fears Sowing the Seeds of Love 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "2jzrHeWQYd8nPUqRFlEEnw"
     youtubeClips:
       - videoId: "VAtGOESO7W8"
         startSec: 20
@@ -3656,6 +3823,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Roy Orbison You Got It Mystery Girl 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0pRBGmicizlLmCnjWXbaqU"
     youtubeClips:
       - videoId: "uWGCMUcJNfw"
         startSec: 20
@@ -3671,6 +3839,7 @@ items:
     genrePackages: ["Melodifestivalen", "100% in swedish"]
     wikimediaSearchHints: ["Kärleken är evig - Lena Philipsson 1986"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "6O0DtbGGeDMBSGBDhFCxrG"
     youtubeClips:
       - videoId: "AAVd_ku3SO0"
         startSec: 5
@@ -3686,6 +3855,7 @@ items:
     inBaseCatalog: false
     wikimediaSearchHints: ["Se på mig - Jan Johansen 1995"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5E0DPn2m1oAigfof05lKmJ"
     youtubeClips:
       - videoId: "yiaPi7rvwQE"
         startSec: 20
@@ -3699,6 +3869,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Jag mår illa — Magnus Uggla 1989"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7C8NhwOrNbsqi9YcF2rstE"
     genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "m-VigThmLWg"
@@ -3713,6 +3884,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Kung för en dag — Magnus Uggla 1992"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "1teO1SPOqr2lRb49ayjy4e"
     genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "7aOc2fL2pRM"
@@ -3727,6 +3899,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["4 sekunder — Magnus Uggla 1993"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0AUiKbEc5DZKa9362LLyYj"
     genrePackages: ["100% in swedish"]
     youtubeClips:
       - videoId: "K4BVY6KAEQc"
@@ -3756,6 +3929,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Tro — Marie Fredriksson 1996"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5pkO17U6riaIaaTvT7GwCn"
     genrePackages: ["100% in swedish", "Soft & Love"]
     inBaseCatalog: false
     youtubeClips:
@@ -3771,6 +3945,7 @@ items:
     region: ["sweden"]
     wikimediaSearchHints: ["Rara söta Anna — Ronny & Ragge 1993"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "09o8YE3Ta7YRXh5NI9HPZQ"
     genrePackages: ["100% in swedish"]
     inBaseCatalog: false
     youtubeClips:
@@ -3856,6 +4031,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Neneh Cherry Buffalo Stands"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3XWgwgbWDI56mf1Wl3cLzb"
     genrePackages: ["Disco & Pop"]
     region: ["global"]
     youtubeClips:
@@ -3880,6 +4056,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Alice Cooper Posion"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "5XcZRgJv3zMhTqCyESjQrF"
     genrePackages: ["Rock"]
     region: ["global"]
     youtubeClips:
@@ -3892,6 +4069,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Back box Ride on time"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "3pgainA2dH9c7e8JVYGRCN"
     genrePackages: ["Dance Music"]
     region: ["global"]
     youtubeClips:
@@ -3899,11 +4077,12 @@ items:
         startSec: 0
         endSec: 15
   - id: rchard-marx-right-here-waiting-for-you
-    displayName: "Right Here Waiting for You — Rchard Marx"
+    displayName: "Right Here Waiting — Richard Marx"
     correctYear: 1989
     probability: 80
     wikimediaSearchHints: ["Rchard Marx Right Here Waiting for You"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4LFwNJWoj74Yd71fIr1W8x"
     genrePackages: ["Soft & Love"]
     region: ["global"]
     youtubeClips:
@@ -3916,6 +4095,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Marc Almond Something Gotten Hold of my heart"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "68O1r5xQADu0JjvBibg9zN"
     region: ["global"]
     youtubeClips:
       - videoId: "LZ8Yn9QJi_o"
@@ -3927,6 +4107,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["White liuon when the children cry"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "4ZCLM74MYhUy80TPiaAuee"
     genrePackages: ["Rock"]
     region: ["global"]
     youtubeClips:
@@ -3939,6 +4120,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Ewa Dahlgren Vem tänder stjärnorna"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "0ppqeIPZIcqu5uImAK425B"
     genrePackages: ["100% in swedish", "Soft & Love"]
     inBaseCatalog: false
     youtubeClips:
@@ -3965,6 +4147,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Sven‐Ingvars Sommar och sol"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "21Xskbq9DzT26y2oxvBumL"
     genrePackages: ["Summer"]
     inBaseCatalog: false
     youtubeClips:
@@ -4028,6 +4211,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Roxette Dangerous"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7LwsqxyIqOCF9vbdHmdIvT"
     genrePackages: ["Disco & Pop"]
     region: ["global"]
     youtubeClips:
@@ -4052,6 +4236,7 @@ items:
     probability: 80
     wikimediaSearchHints: ["Army of Lovers Obsession"]
     answerMethods: ["timeline"]
+    spotifyTrackId: "7kDOMFX3JNYIKvrQqftOwY"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
       - videoId: "zNmO233OztQ"
