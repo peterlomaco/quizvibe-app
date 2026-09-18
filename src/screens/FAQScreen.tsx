@@ -47,7 +47,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'Do I need an account to play?',
-        a: 'No. You can join a game as a guest by entering a Room Code + a Player Name. To host your own games, save game history, or buy Premium, you need to register an account.',
+        a: 'No. You can join a game as a guest with a Room Code + a Player Name, and you can even host a game as a guest — a trial version with default settings. To save game history, host with your own settings, play Remote 1vs1, or buy Premium, you need to register an account.',
       },
       {
         q: 'What is the age minimum?',
@@ -55,7 +55,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'How do I get started fastest?',
-        a: '(1) Tap Create Game on the Home screen, (2) share the Room Code with friends or invite them from the Lobby, (3) approve players who join, (4) tap Start Game. You get 4 Free Host Game Credits per day.',
+        a: '(1) Tap Create Game on the Home screen, (2) share the Room Code with friends or invite them from the Lobby, (3) approve players who join, (4) tap Start Game. As a registered user you get a set of free Host Game Credits that refresh every day.',
       },
       {
         q: 'Does QuizVibe work on Android?',
@@ -90,7 +90,8 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'Does Individual Devices require Premium?',
-        a: 'No — Individual Devices is free for all registered users. Premium unlocks extra capacity: up to 12 players per room and up to 20 rounds per game (instead of the free limit of 4 players and 4 rounds in Pass-the-Phone).',
+        a: 'No — Individual Devices is free for all registered users. Premium unlocks extra capacity: up to 12 players per room and up to 20 rounds per game (instead of the free limit of 4 players and 4 rounds in Pass-the-Phone). Here is everything Premium adds:',
+        membershipCard: true,
       },
     ],
   },
@@ -170,7 +171,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What are Host Game Credits?',
-        a: 'Each game you start as Host consumes 1 credit. You get 4 free credits per day — they refresh automatically every midnight CET. With a Premium subscription you have unlimited host games and no credits are consumed. Joining and playing in games hosted by others is always unlimited and free.',
+        a: 'Each game you start as Host consumes 1 credit. You get a set of free credits each day — they refresh automatically every midnight CET. With a Premium subscription you have unlimited host games and no credits are consumed. Joining and playing in games hosted by others is always unlimited and free.',
       },
       {
         q: 'When do I get my daily free credits?',

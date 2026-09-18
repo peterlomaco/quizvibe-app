@@ -2708,7 +2708,7 @@ export default function ProfileScreen() {
               FAQ is handled inside the app.
             </Text>
             <Text style={styles.legalDisclaimer}>
-              QuizVibe is an independent app and is not affiliated with, sponsored by, or officially endorsed by Spotify AB or Google LLC.
+              QuizVibe is an independent app and is not affiliated with, sponsored by, or officially endorsed by Spotify AB, YouTube, or Google LLC.
             </Text>
           </View>
         )}
