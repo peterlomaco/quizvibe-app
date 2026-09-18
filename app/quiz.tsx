@@ -4025,6 +4025,12 @@ export default function QuizScreen() {
       // Syntetiskt item, filtreras aldrig av HCP — 100 = neutral default.
       itemHcp: 100,
     };
+    // Spotify/Name är enklare än år-frågor → alltid ett prefix-rutnät, med
+    // KORTARE prefix per assistance (Full=3 / Standard=2 / Minimal=1). Detta
+    // gäller ENBART Spotify/Name via forcePrefixLength — Hints (som delar
+    // buildImageVariant) och Film (ActorSelectBlock) är oberörda.
+    const spotifyNamePrefixLength =
+      currentAssistance === 'full' ? 3 : currentAssistance === 'standard' ? 2 : 1;
     const variant = buildImageVariant(
       syntheticItem,
       currentAssistance,
@@ -4032,6 +4038,8 @@ export default function QuizScreen() {
       pool.map((c) => c.item),
       DISTRACTOR_POOL_NAMES['artists'] ?? [],
       5,
+      undefined, // rng — behåll Math.random (7:e arg, så 8:e kan skickas)
+      spotifyNamePrefixLength,
     );
     setSpotifyNameVariant(variant);
   }, [questionIndex, isSpotifyNameQuestion, currentAssistance, derivedArtistName, audienceSetForVariants]);
@@ -6636,15 +6644,22 @@ export default function QuizScreen() {
         // §1.3 — bucketa spelarens svar per kategori via den auktoritativa
         // index→kategori-mappen (effectiveCategoryByQuestion). En Music-fråga
         // föder Music-fönstret osv.; null-kategori (platser) föder ingen HCP.
+        // En rätt Spotify/Name-fråga är enklare än övriga → halv HCP-effekt
+        // (bidrag 0.5 i stället för 1). Join på questionIndex mot de auktoritativa
+        // per-fråge-mapparna (samma index-rymd som RoundScore.questionIndex).
+        const isSpotifyName = (qi: number): boolean =>
+          effectiveMediaSourceByQuestion[qi] === 'spotify' &&
+          effectiveAnswerTypeByQuestion[qi] === 'Name';
         const answersByCategoryFor = (pid: string): CategoryAnswers => {
           const out: CategoryAnswers = {};
           flat
             .filter((s) => s.playerId === pid)
             .sort((a, b) => (a.questionIndex ?? 0) - (b.questionIndex ?? 0))
             .forEach((s) => {
-              const cat = effectiveCategoryByQuestion[s.questionIndex ?? -1];
+              const qi = s.questionIndex ?? -1;
+              const cat = effectiveCategoryByQuestion[qi];
               if (!cat) return;
-              (out[cat] ??= []).push(s.correct);
+              (out[cat] ??= []).push(s.correct ? (isSpotifyName(qi) ? 0.5 : 1) : 0);
             });
           return out;
         };

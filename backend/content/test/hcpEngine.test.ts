@@ -4,6 +4,7 @@ import {
   applyInactivityDecay,
   ASSIST_DIRECTION_MULT,
   clampHcp,
+  coerceContribution,
   displayHcp,
   emptyCategoryProgress,
   emptyHcpProgress,
@@ -27,8 +28,9 @@ import {
 const ERA = 15;
 
 // Hjälpare: ett fönster med `nCorrect` rätt av `size` svar (resten fel).
+// Bidrag lagras som tal (1 = rätt, 0 = fel) sedan §2.2-viktningen infördes.
 function win(nCorrect: number, size = HCP_WINDOW_SIZE): HcpWindow {
-  return Array.from({ length: size }, (_, i) => i < nCorrect);
+  return Array.from({ length: size }, (_, i) => (i < nCorrect ? 1 : 0));
 }
 
 // Kategori-progress med explicit hcp + valfria fönster/klocka.
@@ -123,6 +125,41 @@ describe('evaluateWindow (§2.1 — råa signerade steg, okapat, 10-fönster)', 
     expect(evaluateWindow(win(5), 'minimal')).toBe(-1);
     expect(evaluateWindow(win(2), 'minimal')).toBe(1);
     expect(evaluateWindow(win(0), 'minimal')).toBe(3);
+  });
+});
+
+describe('§2.2 — viktat bidrag (0.5 för lätt Spotify/Name-rätt)', () => {
+  it('coerceContribution: boolean → 1/0, tal passeras rakt igenom', () => {
+    expect(coerceContribution(true)).toBe(1);
+    expect(coerceContribution(false)).toBe(0);
+    expect(coerceContribution(0.5)).toBe(0.5);
+    expect(coerceContribution(1)).toBe(1);
+  });
+
+  it('halv-viktade rätt når tröskeln LÅNGSAMMARE än fulla rätt', () => {
+    // Tio 0.5-rätt = summa 5.0 → under Fulls upper (7) → inget steg,
+    // medan tio fulla rätt (summa 10) ger −4.
+    expect(evaluateWindow(Array(10).fill(0.5), 'full')).toBe(0);
+    expect(evaluateWindow(win(10), 'full')).toBe(-4);
+  });
+
+  it('fraktionell fönstersumma → fraktionellt råsteg', () => {
+    // Sju fulla + tre halva = 8.5 → −(8.5 − 7 + 1) = −2.5 (mot −4 om alla vore fulla).
+    const w = [...Array(7).fill(1), ...Array(3).fill(0.5)];
+    expect(evaluateWindow(w, 'full')).toBeCloseTo(-2.5, 5);
+  });
+
+  it('applyGameResult: en 0.5-rätt ger halv earn-down mot en full rätt', () => {
+    // 9/9-fönster + en 0.5-rätt → summa 9.5 → −3.5 (era 1.0, tier high 1.0, full 1.0).
+    const p = progress(cat(99, { full: win(9, 9) }));
+    const next = applyGameResult(p, 'Music', 'full', [0.5], ERA, ISO);
+    expect(next.categories.Music.hcp).toBeCloseTo(95.5, 5); // mot 95.0 för en full rätt
+  });
+
+  it('boolean-svar (legacy-callers) fungerar oförändrat blandat med tal', () => {
+    // 9/9-fönster + en full boolean-rätt → 10/10 → −4 → 95.0 (samma som förr).
+    const p = progress(cat(99, { full: win(9, 9) }));
+    expect(applyGameResult(p, 'Music', 'full', [true], ERA, ISO).categories.Music.hcp).toBeCloseTo(95.0, 5);
   });
 });
 

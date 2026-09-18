@@ -42,9 +42,23 @@ import { MAIN_CATEGORIES, type MainCategory } from './mainCategory';
 // Kategorierna en spelares HCP delas upp i (= YouTube/Hints-huvudkategorierna).
 export const HCP_CATEGORIES = MAIN_CATEGORIES;
 
-// Sliding-window-state (§2.1): senaste svaren rätt/fel per assistance-nivå.
-// `true` = rätt, `false` = fel. Äldst först; trimmas till HCP_WINDOW_SIZE.
-export type HcpWindow = boolean[];
+// Sliding-window-state (§2.1): senaste svarens BIDRAG per assistance-nivå.
+// Ett tal per svar: 0 = fel, 1 = normalt rätt, 0.5 = rätt på en lätt fråga
+// (t.ex. Spotify/Name — halv HCP-effekt). Äldst först; trimmas till
+// HCP_WINDOW_SIZE. Lagras som number[]; äldre boolean-fönster coercas vid
+// läsning + när de passerar appendToWindow (true→1, false→0). Se
+// coerceContribution + §2.2 nedan.
+export type HcpContribution = boolean | number;
+export type HcpWindow = number[];
+
+/**
+ * §2.2 — normalisera ett svars-bidrag till ett tal. `true`/`false` (äldre
+ * fönster + boolean-callers) → 1/0; ett tal (viktat bidrag, t.ex. 0.5 för en
+ * lätt Spotify/Name-rätt) passeras rakt igenom.
+ */
+export function coerceContribution(v: HcpContribution): number {
+  return typeof v === 'boolean' ? (v ? 1 : 0) : v;
+}
 
 // Progress för EN kategori (Music/Film): float-HCP, fönster per nivå och
 // en egen decay-klocka. `hcp` lagras som flyttal (decay ger 0,25-steg);
@@ -159,10 +173,11 @@ export function emptyHcpProgress(): HcpProgress {
 }
 
 // §2.1 — lägg till svar i nivåns fönster (behåll senaste HCP_WINDOW_SIZE).
-// Bidrag just nu = 1 (rätt) / 0 (fel). §2.2-viktningen kopplas på här när
-// Item-HCP finns (varje rätt svar multipliceras då med sin impact-faktor).
-function appendToWindow(win: HcpWindow, answers: boolean[]): HcpWindow {
-  const next = [...win, ...answers];
+// Bidrag = 1 (rätt) / 0 (fel), eller ett viktat värde (0.5 för lätt Spotify/Name-
+// rätt, §2.2). Inkommande boolean-svar coercas till tal — det normaliserar även
+// äldre boolean-fönster till number[] i takt med att nya svar läggs på.
+function appendToWindow(win: HcpWindow, answers: readonly HcpContribution[]): HcpWindow {
+  const next = [...win, ...answers.map(coerceContribution)];
   return next.length > HCP_WINDOW_SIZE ? next.slice(next.length - HCP_WINDOW_SIZE) : next;
 }
 
@@ -177,9 +192,9 @@ function appendToWindow(win: HcpWindow, answers: boolean[]): HcpWindow {
  * "≤ lower" fyra direkt för en ny spelare (0 rätt ≤ lower). Ny spelares HCP
  * är därför stabilt tills nivån har 10 svar (~2–4 spel).
  */
-export function evaluateWindow(win: HcpWindow, level: AssistanceLevel): number {
+export function evaluateWindow(win: readonly HcpContribution[], level: AssistanceLevel): number {
   if (win.length < HCP_WINDOW_SIZE) return 0;
-  const sum = win.reduce((n, correct) => n + (correct ? 1 : 0), 0);
+  const sum = win.reduce<number>((n, w) => n + coerceContribution(w), 0);
   const { lower, upper } = WINDOW_THRESHOLDS[level];
   if (sum >= upper) return -(sum - upper + 1); // −1 vid upper, −N längre över
   if (sum <= lower) return lower - sum + 1;    // +1 vid lower, +N längre under
@@ -215,7 +230,7 @@ export function applyGameResult(
   progress: HcpProgress,
   category: MainCategory,
   level: AssistanceLevel,
-  answers: boolean[],
+  answers: readonly HcpContribution[],
   eraYears: number,
   nowISO: string,
 ): HcpProgress {
