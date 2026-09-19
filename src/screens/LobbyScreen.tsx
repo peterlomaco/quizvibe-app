@@ -3243,19 +3243,33 @@ export default function LobbyScreen() {
   );
 
   const handleToggleExtraPackage = (id: string) => {
+    const isActivating = !selectedExtraPackages.includes(id);
     // Aktivering av ett parent-restricted-paket är blockerad medan Parent
     // Control är på (avaktivering är alltid tillåten).
-    if (
-      !selectedExtraPackages.includes(id) &&
-      parentControlEnabled &&
-      isPackageParentRestricted(id)
-    ) {
+    if (isActivating && parentControlEnabled && isPackageParentRestricted(id)) {
       alertParentRestrictedPackage();
       return;
     }
-    setSelectedExtraPackages((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
-    );
+    if (isActivating) {
+      // Ett aktivt paket kollapsar/omformar Source Mixerboard (tema-only pool
+      // + coverage-graying + era-lås) → bekräfta med host innan valet appliceras.
+      Alert.alert(
+        'Extra package',
+        'Please be aware that this might affect your selection in Source mixerboard.',
+        [
+          { text: 'No', style: 'cancel' },
+          {
+            text: 'Yes',
+            onPress: () =>
+              setSelectedExtraPackages((prev) =>
+                prev.includes(id) ? prev : [...prev, id],
+              ),
+          },
+        ],
+      );
+      return;
+    }
+    setSelectedExtraPackages((prev) => prev.filter((p) => p !== id));
   };
   // "Select all"-toggle på rubrik-raden — låter host aktivera/avaktivera
   // alla synliga (profil-aktiverade) paket med ett enda klick.
@@ -3267,15 +3281,29 @@ export default function LobbyScreen() {
       setSelectedExtraPackages([]);
       return;
     }
-    // Select all: aktivera bara icke-restricted-paket när Parent Control är på;
-    // om något restricted-paket hoppas över, informera via block-alerten.
-    const activatable = availablePackages.filter(
-      (p) => !(parentControlEnabled && isPackageParentRestricted(p.id)),
+    // Aktivering av paket kollapsar/omformar Source Mixerboard → bekräfta först.
+    Alert.alert(
+      'Extra package',
+      'Please be aware that this might affect your selection in Source mixerboard.',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: () => {
+            // Select all: aktivera bara icke-restricted-paket när Parent Control
+            // är på; om något restricted-paket hoppas över, informera via block-
+            // alerten.
+            const activatable = availablePackages.filter(
+              (p) => !(parentControlEnabled && isPackageParentRestricted(p.id)),
+            );
+            if (activatable.length < availablePackages.length) {
+              alertParentRestrictedPackage();
+            }
+            setSelectedExtraPackages(activatable.map((p) => p.id));
+          },
+        },
+      ],
     );
-    if (activatable.length < availablePackages.length) {
-      alertParentRestrictedPackage();
-    }
-    setSelectedExtraPackages(activatable.map((p) => p.id));
   };
 
   // "+ Add package"-modal: host väljer paket direkt ur HELA katalogen
@@ -3295,8 +3323,21 @@ export default function LobbyScreen() {
         alertParentRestrictedPackage();
         return;
       }
-      setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
-      setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      // Aktivering kollapsar/omformar Source Mixerboard → bekräfta först.
+      Alert.alert(
+        'Extra package',
+        'Please be aware that this might affect your selection in Source mixerboard.',
+        [
+          { text: 'No', style: 'cancel' },
+          {
+            text: 'Yes',
+            onPress: () => {
+              setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+              setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+            },
+          },
+        ],
+      );
     }
   };
 

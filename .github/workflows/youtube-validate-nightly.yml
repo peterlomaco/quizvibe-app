@@ -73,7 +73,8 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 30 min: the embed-audit step loads ~1000 clips in a real headless browser.
+    timeout-minutes: 30
     # apply_fixes=true-körningen committar + push:ar patchade YAML-filer. Default
     # GITHUB_TOKEN är read-only i moderna repos → push:en 403:ar utan detta.
     # Ofarligt för den vanliga validerings-körningen (som inte skriver något).
@@ -173,6 +174,43 @@ jobs:
         with:
           name: spotify-track-identity
           path: backend/output/spotify-track-identity.md
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Install Playwright Chromium (för embed-audit)
+        # embed-audit.ts kör en riktig headless-webbläsare. Chromium-binären
+        # ingår inte i npm ci (bara playwright-paketet) → installera den här.
+        # --with-deps drar in OS-libs som Chromium behöver på ubuntu-runnern.
+        if: always()
+        working-directory: backend
+        run: npx playwright install --with-deps chromium
+
+      - name: Run youtube-embed-audit (spelar klippet i en RIKTIG embed?)
+        # Laddar varje klipp i en riktig headless IFrame-spelare på en icke-
+        # youtube-origin — enda sättet att fånga owner-embed-block, som BÅDE
+        # Data API:t (validate.ts, embeddable=true) och oEmbed (youtubeLiveness.ts)
+        # missar. Signalen "nådde uppspelning" är den enda pålitliga; error-KODER
+        # är opålitliga headless (se embed-audit.ts-headern).
+        #
+        # BEST-EFFORT — `|| true` så steget ALDRIG fäller jobbet. Två skäl att det
+        # inte är en hård signal:
+        #   (1) datacenter-IP:n (GH Actions) stryps hårdare än en residential-IP,
+        #       så körningen kan själv-inaktiveras via sin control-klipp-guard
+        #       (exit 0, flaggar inget) — säkert men ibland oinformativt.
+        #   (2) den auktoritativa raderad/embeddable-signalen är fortsatt
+        #       youtube-validate ovan.
+        # Kör MEST pålitligt LOKALT: `npm run youtube-embed-audit`. Granska
+        # DEAD-sektionen + den uppladdade youtube-embed-audit.json och byt klippen.
+        if: always()
+        working-directory: backend
+        run: npm run youtube-embed-audit || true
+
+      - name: Ladda upp embed-audit-rapporten som CI-artefakt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-embed-audit
+          path: backend/output/youtube-embed-audit.json
           if-no-files-found: ignore
           retention-days: 30
 

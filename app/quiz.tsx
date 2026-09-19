@@ -4286,19 +4286,28 @@ export default function QuizScreen() {
     if (spotifyTimerStartAtRef.current === 0) return;
     // En eventuell (stale) rullande nedräkning nollas — DJ:n ska aldrig ha en.
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    const elapsedSec = (Date.now() - spotifyTimerStartAtRef.current) / 1000;
-    if (elapsedSec >= responseSeconds) {
+    // ⚠ timer_start_at kan ligga i FRAMTIDEN: aktiveraren sätter det till
+    // Date.now() + 2000 (pre-roll före setTimerActive). Räknade vi då naivt
+    // responseSeconds − elapsedSec blev elapsedSec NEGATIV → remaining > 30 →
+    // DJ:n visade "32" för en 30 s-fråga och låg desynkad mot gissarna (som
+    // står kvar på 30 under pre-rollen tills deras timerActive fyrar). Räkna
+    // i stället mot den ABSOLUTA utgången (timer_start_at + responseSeconds)
+    // och klampa DISPLAYEN till responseSeconds, men arma reveal-timeouten mot
+    // den faktiska kvarvarande wall-clock-tiden så den fyrar vid rätt utgång
+    // även i framtids-fallet. (Peter 2026-09-19.)
+    const remainingMs =
+      spotifyTimerStartAtRef.current + responseSeconds * 1000 - Date.now();
+    if (remainingMs <= 0) {
       setTimeLeft(0);
       return;
     }
-    const remaining = responseSeconds - elapsedSec;
-    setTimeLeft(Math.ceil(remaining));
+    setTimeLeft(Math.min(responseSeconds, Math.ceil(remainingMs / 1000)));
     djRevealTimeoutRef.current = setTimeout(() => {
       djRevealTimeoutRef.current = null;
       if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
         setTimeLeft(0);
       }
-    }, remaining * 1000);
+    }, remainingMs);
   }, [isSpotifyQuestion, isCurrentPlayerDJ, responseSeconds]);
   // Håll ref-bryggan färsk så subscription-handlern (registreras en gång) alltid
   // anropar den senaste closuren.

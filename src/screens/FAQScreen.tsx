@@ -81,8 +81,12 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         a: 'A way to play on your own. Tap Start New Game on the Home screen and choose Single Game — the Lobby then opens locked to a single player, so you can start right away without approving anyone.',
       },
       {
-        q: 'What is the difference between Host and Guest?',
-        a: 'Host is the player who created the room and controls all settings: Game Mode, Era, Number of Rounds, which packages are used, which media sources the questions are drawn from (YouTube/Spotify clips and/or Hints), and the maximum answer response time. Guest joins via Room Code and sees the Host\'s settings read-only.',
+        q: 'What is the difference between Host and non-host?',
+        a: 'Host is the player who created the room and controls all settings: Game Mode, Era, Number of Rounds, which packages are used, which media sources the questions are drawn from (YouTube/Spotify clips and/or Hints), and the maximum answer response time. A non-host is any other player in the room — they join via Room Code and see the Host\'s settings read-only. A non-host can be a registered QuizVibe user or a Guest.',
+      },
+      {
+        q: 'What is a Guest?',
+        a: 'A Guest is a player who is not a registered QuizVibe user. You can join a game as a Guest with just a Player Name and Year of birth, or host a trial game as a Guest — but Guest games don\'t save any Player history or HCP, and some features (Remote 1vs1, Extra packages, unlimited rounds) require a registered account. A Guest can be either the Host or a non-host in a room.',
       },
       {
         q: 'How many players can be in one room?',
@@ -137,7 +141,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What are Extra packages?',
-        a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop & RnB). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. More themes are added over time.',
+        a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop & RnB). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. Themes might be changed over time.',
       },
     ],
   },
