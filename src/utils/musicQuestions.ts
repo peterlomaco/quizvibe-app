@@ -34797,6 +34797,51 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "hugel-movin-to-the-sun",
+    "displayName": "Movin' to the Sun — HUGEL",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Party & Dunk"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bJ7yyX4Qic4",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      },
+      {
+        "videoId": "jQWTeXopjeA",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      },
+      {
+        "videoId": "rR2gfIj9CG4",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "lilla-al-fadji-delulu",
     "displayName": "Delulu — Lilla Al-Fadji",
     "correctYear": 2026,

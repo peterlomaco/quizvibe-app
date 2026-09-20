@@ -1680,6 +1680,28 @@ items:
         channelTitle: "Pinkpantheress"
         notes: "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". startSec 8 angiven av Peter. Slappt jan 2026 - fars igenkanning ar annu oprovad."
     region: ["global"]
+  - id: hugel-movin-to-the-sun
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Movin' to the Sun — HUGEL"
+    correctYear: 2026
+    probability: 72
+    wikimediaSearchHints: ["HUGEL Movin to the Sun Ultra Nate"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music", "Party & Dunk"]
+    youtubeClips:
+      - videoId: "bJ7yyX4Qic4"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      - videoId: "jQWTeXopjeA"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      - videoId: "rR2gfIj9CG4"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+    region: ["global"]
   - id: alesso-words
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Words — Alesso feat. Zara Larsson"
