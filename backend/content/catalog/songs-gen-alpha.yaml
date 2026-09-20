@@ -1262,8 +1262,8 @@ items:
     answerMethods: ["timeline"]
     youtubeClips:
       - videoId: "XqZsoesa55w"
-        startSec: 0
-        endSec: 30
+        startSec: 20
+        endSec: 50
         channelTitle: "Baby Shark - Pinkfong Kids' Songs & Stories"
         notes: "Baby Shark Dance - Pinkfongs officiella klipp."
   # === Tillagg 2026-08-25 (Peters "YT och Spotify lista") ===

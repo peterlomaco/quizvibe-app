@@ -31069,8 +31069,8 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": [
       {
         "videoId": "XqZsoesa55w",
-        "startSec": 0,
-        "endSec": 30,
+        "startSec": 20,
+        "endSec": 50,
         "channelTitle": "Baby Shark - Pinkfong Kids' Songs & Stories",
         "license": "standard",
         "notes": "Baby Shark Dance - Pinkfongs officiella klipp."
