@@ -16632,7 +16632,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "3hlhefxgyp4MDnN6C2dQ5H",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "pj6FCKm8dhM",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "blackstreet-no-diggity",
@@ -17404,7 +17412,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "04RUPmi7ow2BS7OuxAC02K",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "onjPLuZp6hY",
+        "startSec": 40,
+        "endSec": 70,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "aqua-barbie-girl",
@@ -17455,7 +17471,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "7pwBWXciUDqOyIvtj82Wcn",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "-1jPUB7gRyg",
+        "startSec": 10,
+        "endSec": 40,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "backstreet-boys-everybody",
@@ -17645,7 +17669,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "1t6tQ0ETeOIDl5cscjEC55",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "5LBnMRWeV-E",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "daft-punk-around-the-world",
@@ -18360,7 +18392,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "0weAUscowxeqDtpCgtbpgp",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "3JcmQONgXJM",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      },
+      {
+        "videoId": "nSqAL95qhRM",
+        "startSec": 18,
+        "endSec": 48,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "will-smith-men-in-black",
@@ -18461,7 +18508,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "4AxVXHgv0clBuS4dl4S7Gw",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "sUt0ut92vek",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "aerosmith-i-dont-want-to-miss-a-thing",
@@ -18615,7 +18670,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "0SHmApKzT0EWhbFKBjsOex",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "UvjLgjtJKsc",
+        "startSec": 16,
+        "endSec": 46,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "cher-believe",
@@ -18833,7 +18896,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "2lhkUpzW04NeYEicwePekH",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "qZUn-KtTNmA",
+        "startSec": 50,
+        "endSec": 80,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "goo-goo-dolls-iris",
@@ -18925,7 +18996,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "6YXWauQKn5nQVhcC4KVplQ",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "EIhSnaqou0I",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "jessica-folcker-how-will-i-know-who-you-are",
@@ -19007,7 +19086,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "0uEp9E98JB5awlA084uaIg",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "T6QKqFPRZSA",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "lenny-kravitz-fly-away",
@@ -19251,7 +19338,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "31bf9SEOppLU6lQ85d8om6",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "Ro6q1SeYHTg",
+        "startSec": 16,
+        "endSec": 46,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "sash-mysterious-times",
@@ -19344,7 +19439,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "087OBLtoeS3Q6j0k6tMNAI",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "xGytDsqkQY8",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "southside-spinners-luvstruck",
@@ -30273,7 +30376,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "25V8NDi9if73rYvHwDKKw5",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "URbjo_9ABfs",
+        "startSec": 26,
+        "endSec": 56,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "shawn-mendes-i-know-what-you-did-last-summer",

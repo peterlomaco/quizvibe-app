@@ -3808,6 +3808,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "04RUPmi7ow2BS7OuxAC02K"
     region: ["global"]
+    youtubeClips:
+      - videoId: "onjPLuZp6hY"
+        startSec: 40
+        endSec: 70
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: cornershop-brimful-of-asha
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Brimful of Asha — Cornershop"
@@ -3817,6 +3822,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "1t6tQ0ETeOIDl5cscjEC55"
     region: ["global"]
+    youtubeClips:
+      - videoId: "5LBnMRWeV-E"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: bwitched-c-est-la-vie
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "C'est la Vie — Bwitched"
@@ -3826,6 +3836,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "0SHmApKzT0EWhbFKBjsOex"
     region: ["global"]
+    youtubeClips:
+      - videoId: "UvjLgjtJKsc"
+        startSec: 16
+        endSec: 46
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: semisonic-closing-time
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Closing time — Semisonic"
@@ -3835,6 +3850,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "087OBLtoeS3Q6j0k6tMNAI"
     region: ["global"]
+    youtubeClips:
+      - videoId: "xGytDsqkQY8"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: jennifer-paige-crush
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Crush — Jennifer Paige"
@@ -3844,6 +3864,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "6YXWauQKn5nQVhcC4KVplQ"
     region: ["global"]
+    youtubeClips:
+      - videoId: "EIhSnaqou0I"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: aqua-doctor-jones
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Doctor Jones — Aqua"
@@ -3853,6 +3878,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "7pwBWXciUDqOyIvtj82Wcn"
     region: ["global"]
+    youtubeClips:
+      - videoId: "-1jPUB7gRyg"
+        startSec: 10
+        endSec: 40
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: lauryn-hill-doo-wop
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Doo Wop — Lauryn Hill"
@@ -3862,6 +3892,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "0uEp9E98JB5awlA084uaIg"
     region: ["global"]
+    youtubeClips:
+      - videoId: "T6QKqFPRZSA"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: five-everybody-get-up
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Everybody Get Up — Five"
@@ -3871,6 +3906,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "2lhkUpzW04NeYEicwePekH"
     region: ["global"]
+    youtubeClips:
+      - videoId: "qZUn-KtTNmA"
+        startSec: 50
+        endSec: 80
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: will-smith-gettin-jiggy-with-it
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Gettin Jiggy With it — Will Smith"
@@ -3880,6 +3920,15 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "0weAUscowxeqDtpCgtbpgp"
     region: ["global"]
+    youtubeClips:
+      - videoId: "3JcmQONgXJM"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      - videoId: "nSqAL95qhRM"
+        startSec: 18
+        endSec: 48
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: pras-ghetto-superstar
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ghetto Superstar — Pras"
@@ -3889,6 +3938,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "31bf9SEOppLU6lQ85d8om6"
     region: ["global"]
+    youtubeClips:
+      - videoId: "Ro6q1SeYHTg"
+        startSec: 16
+        endSec: 46
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: green-day-good-riddance
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Good Riddance — Green Day"

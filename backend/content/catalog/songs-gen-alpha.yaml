@@ -2595,6 +2595,11 @@ items:
     genrePackages: ["100% in swedish"]
     inBaseCatalog: false
     spotifyTrackId: "25V8NDi9if73rYvHwDKKw5"
+    youtubeClips:
+      - videoId: "URbjo_9ABfs"
+        startSec: 26
+        endSec: 56
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: sean-banan-copacabanana
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Copacabanana — Sean Banan"

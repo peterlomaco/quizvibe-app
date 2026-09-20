@@ -4245,6 +4245,11 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "3hlhefxgyp4MDnN6C2dQ5H"
     region: ["global"]
+    youtubeClips:
+      - videoId: "pj6FCKm8dhM"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: run-dmc-its-like-that
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Its like that — Run DMC"

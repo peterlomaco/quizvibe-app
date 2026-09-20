@@ -41,7 +41,11 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["Summer"]
     spotifyTrackId: "4AxVXHgv0clBuS4dl4S7Gw"
-    youtubeClips: []
+    youtubeClips:
+      - videoId: "sUt0ut92vek"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: mungo-jerry-in-the-summertime
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "In the Summertime — Mungo Jerry"
