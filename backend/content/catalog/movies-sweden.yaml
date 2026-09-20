@@ -155,11 +155,10 @@ items:
     parentControlled: true
     wikimediaSearchHints: ["Strul 1988 svensk film Stefan Sauk"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "PhXR_cjRh7o"
-        startSec: 0
-        endSec: 30
-        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+    # DEAD CLIP borttagen 2026-09-20 — PhXR_cjRh7o: not embeddable (bekraftat av
+    # Data API + real-embed-audit). Ingen embeddable ersattning hittad (autofix gav
+    # "Trouble"/Netflix = fel film). Item behalls men serveras EJ (exporter skippar
+    # items utan youtubeClips/spotifyTrackId) tills ett spelbart klipp kurerats.
   - id: jalla-jalla-2000
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jalla! Jalla!"
@@ -168,11 +167,10 @@ items:
     parentControlled: true
     wikimediaSearchHints: ["Jalla Jalla 2000 svensk film Josef Fares"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "oV-KgVNO9C0"
-        startSec: 0
-        endSec: 30
-        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+    # DEAD CLIP borttagen 2026-09-20 — oV-KgVNO9C0: age-restricted (spelas inte i
+    # embed; bekraftat av Data API + real-embed-audit). Ingen embeddable ersattning
+    # hittad (autofix gav Eurovision-latfen "Jalla" = fel). Item behalls men serveras
+    # EJ tills ett spelbart klipp kurerats.
   - id: yrrol-1994
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Yrrol"
@@ -180,11 +178,9 @@ items:
     probability: 76
     wikimediaSearchHints: ["Yrrol 1994 svensk film Galenskaparna After Shave"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "GFgD4_6qJig"
-        startSec: 0
-        endSec: 30
-        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+    # DEAD CLIP borttagen 2026-09-20 — GFgD4_6qJig: not embeddable (bekraftat av
+    # Data API + real-embed-audit). Ingen embeddable ersattning hittad (autofix gav
+    # "LYRRO" = fel). Item behalls men serveras EJ tills ett spelbart klipp kurerats.
   - id: kopps-2003
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kopps"
@@ -192,11 +188,10 @@ items:
     probability: 80
     wikimediaSearchHints: ["Kopps 2003 svensk film Josef Fares"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "nFtXroFCiLE"
-        startSec: 15
-        endSec: 45
-        notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+    # DEAD CLIP borttagen 2026-09-20 — nFtXroFCiLE: not embeddable (bekraftat av
+    # Data API + real-embed-audit). Ingen embeddable ersattning hittad (autofix gav
+    # fan-kanal "Kopps The Movie"). Item behalls men serveras EJ tills ett spelbart
+    # klipp kurerats.
   - id: macken-1990
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Macken"

@@ -2352,11 +2352,9 @@ items:
     wikimediaSearchHints: ["Sting - Eric Saade 2015"]
     answerMethods: ["timeline"]
     spotifyTrackId: "1bCrjqABEklwllefPAzWbZ"
-    youtubeClips:
-      - videoId: "wD4mwilTocw"
-        startSec: 20
-        endSec: 50
-        notes: "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1391)."
+    # DEAD CLIP borttagen 2026-09-20 — wD4mwilTocw: privacy=unlisted (spelas inte i
+    # embed; bekraftat av Data API + real-embed-audit). Lever vidare som Spotify-only
+    # (spotifyTrackId ovan). Ersattningsklipp kravs for YouTube-uppspelning.
   - id: robin-bengtsson-constellation-prize
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Constellation Prize — Robin Bengtsson"
@@ -2608,11 +2606,9 @@ items:
     spotifyTrackId: "5cgISlMMIShxqkGhK9bTFY"
     genrePackages: ["Melodifestivalen"]
     inBaseCatalog: false
-    youtubeClips:
-      - videoId: "HPKBW_Bfqto"
-        startSec: 73
-        endSec: 103
-        notes: "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1430)."
+    # DEAD CLIP borttagen 2026-09-20 — HPKBW_Bfqto: video not found (raderad/privat;
+    # bekraftat av Data API + real-embed-audit). Lever vidare som Spotify-only
+    # (spotifyTrackId ovan). Ersattningsklipp kravs for YouTube-uppspelning.
   - id: robin-bengtsson-constellaztion-prize
     displayName: "Constellaztion Prize — Robin Bengtsson"
     correctYear: 2016

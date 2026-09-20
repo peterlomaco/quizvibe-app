@@ -361,7 +361,10 @@ items:
     youtubeClips:
       - videoId: "HuQ0ni6AlrU"
         startSec: 6
-        endSec: 273
+        # endSec kapad 273 → 265 den 2026-09-20: videon ar 267 s, sa 273 overskred
+        # langden och flaggades DEAD av youtube-validate. Runtime ignorerar endSec
+        # (klippet spelar anda klart), men vardet maste vara <= langden for att passera.
+        endSec: 265
         channelTitle: "Pillow"
     region: ["global"]
   - id: timbaland-onerepublic-apologize
@@ -1453,17 +1456,15 @@ items:
     genrePackages: ["Hip Hop"]
     parentControlled: true
     spotifyTrackId: "75IN3CtuZwTHTnZvYM4qnJ"
-    # youtubeClips borttagna 2026-08-10: EAKfXCRmhq8 (Eminem, officiell kanal) har
-    # embedding avstängd → "Video unavailable" i spelaren. Lever vidare som
-    # Spotify-only DJ-runda. Ersättningsklipp krävs.
+    # 2026-09-20: EAKfXCRmhq8 (Eminem officiell kanal) har embedding avstangd →
+    # "Video unavailable"; borttaget nedan. sNPnbI1arSE spelar, sa itemet ar fullt
+    # spelbart (dessutom Spotify-DJ via spotifyTrackId). OBS: 2026-08-10-noteringen
+    # om "Spotify-only" var inaktuell — ett fungerande YT-klipp hade aterinforts.
     region: ["global"]
     youtubeClips:
       - videoId: "sNPnbI1arSE"
         startSec: 10
         endSec: 25
-      - videoId: "EAKfXCRmhq8"
-        startSec: 0
-        endSec: 15
   - id: outkast-ms-jackson
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ms. Jackson — OutKast"

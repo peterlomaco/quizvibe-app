@@ -10138,34 +10138,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "strul-1988",
-    "displayName": "Strul",
-    "correctYear": 1988,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 78,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "parentControlled": true,
-    "youtubeClips": [
-      {
-        "videoId": "PhXR_cjRh7o",
-        "startSec": 0,
-        "endSec": 30,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
-      }
-    ]
-  },
-  {
     "id": "the-naked-gun-1988",
     "displayName": "The Naked Gun",
     "correctYear": 1988,
@@ -15978,33 +15950,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "yrrol-1994",
-    "displayName": "Yrrol",
-    "correctYear": 1994,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 76,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "GFgD4_6qJig",
-        "startSec": 0,
-        "endSec": 30,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
-      }
-    ]
-  },
-  {
     "id": "2pac-california-love",
     "displayName": "California Love — 2Pac feat. Dr. Dre",
     "correctYear": 1995,
@@ -20126,12 +20071,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 10,
         "endSec": 25,
         "license": "standard"
-      },
-      {
-        "videoId": "EAKfXCRmhq8",
-        "startSec": 0,
-        "endSec": 15,
-        "license": "standard"
       }
     ]
   },
@@ -21259,34 +21198,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Paramount Movies",
         "license": "standard",
         "notes": "Curerad 2026-05-29 — officiell Paramount-klipp 'My name is Maximus' (2000-filmen, ej Gladiator II)."
-      }
-    ]
-  },
-  {
-    "id": "jalla-jalla-2000",
-    "displayName": "Jalla! Jalla!",
-    "correctYear": 2000,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "parentControlled": true,
-    "youtubeClips": [
-      {
-        "videoId": "oV-KgVNO9C0",
-        "startSec": 0,
-        "endSec": 30,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -23425,33 +23336,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Saskia Rice",
         "license": "standard",
         "notes": "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
-      }
-    ]
-  },
-  {
-    "id": "kopps-2003",
-    "displayName": "Kopps",
-    "correctYear": 2003,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "nFtXroFCiLE",
-        "startSec": 15,
-        "endSec": 45,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -25633,7 +25517,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       {
         "videoId": "HuQ0ni6AlrU",
         "startSec": 6,
-        "endSec": 273,
+        "endSec": 265,
         "channelTitle": "Pillow",
         "license": "standard"
       }
@@ -29206,15 +29090,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "5cgISlMMIShxqkGhK9bTFY",
-    "youtubeClips": [
-      {
-        "videoId": "HPKBW_Bfqto",
-        "startSec": 73,
-        "endSec": 103,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1430)."
-      }
-    ]
+    "youtubeClips": []
   },
   {
     "id": "the-wolf-of-wall-street-2013",
@@ -30214,15 +30090,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "inBaseCatalog": false,
     "spotifyTrackId": "1bCrjqABEklwllefPAzWbZ",
-    "youtubeClips": [
-      {
-        "videoId": "wD4mwilTocw",
-        "startSec": 20,
-        "endSec": 50,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1391)."
-      }
-    ]
+    "youtubeClips": []
   },
   {
     "id": "hasse-andersson-guld-och-groena-skogar",
