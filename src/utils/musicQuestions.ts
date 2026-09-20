@@ -2659,7 +2659,22 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "global"
     ],
     "spotifyTrackId": "2ciMJGCDW70hqq18Vgui68",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "kmrwAW5-5rU",
+        "startSec": 10,
+        "endSec": 40,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      },
+      {
+        "videoId": "VMJFWiZ-bOc",
+        "startSec": 12,
+        "endSec": 42,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "curtis-mayfield-move-on-up",
@@ -9482,7 +9497,15 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "100% in swedish"
     ],
     "spotifyTrackId": "4N0NK4lCncys6hwWhtXRit",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "273doG7GYiA",
+        "startSec": 25,
+        "endSec": 55,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "lili-sussie-oh-mama",

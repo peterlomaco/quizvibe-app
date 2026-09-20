@@ -4027,6 +4027,11 @@ items:
     answerMethods: ["timeline"]
     genrePackages: ["100% in swedish"]
     spotifyTrackId: "4N0NK4lCncys6hwWhtXRit"
+    youtubeClips:
+      - videoId: "273doG7GYiA"
+        startSec: 25
+        endSec: 55
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: neneh-cherry-buffalo-stands
     displayName: "Buffalo Stands — Neneh Cherry"
     correctYear: 1988

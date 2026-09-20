@@ -114,6 +114,15 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "2ciMJGCDW70hqq18Vgui68"
     region: ["global"]
+    youtubeClips:
+      - videoId: "kmrwAW5-5rU"
+        startSec: 10
+        endSec: 40
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      - videoId: "VMJFWiZ-bOc"
+        startSec: 12
+        endSec: 42
+        notes: "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
   - id: john-lennon-imagine
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Imagine — John Lennon"
