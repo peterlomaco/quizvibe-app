@@ -2802,3 +2802,37 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "0hel3UahHwK9SfUF85M1WK"
     region: ["sweden"]
+  - id: calvin-harris-blessings
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Blessings — Calvin Harris & Clementine Douglas"
+    correctYear: 2025
+    probability: 72
+    wikimediaSearchHints: ["Calvin Harris Clementine Douglas Blessings"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "JEmbyx8NLxA"
+        startSec: 55
+        endSec: 85
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      - videoId: "gQA-pXJM0mQ"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: fred-again-marea
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Marea (We've Lost Dancing) — Fred again.."
+    correctYear: 2021
+    probability: 74
+    wikimediaSearchHints: ["Fred again Marea We've Lost Dancing"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "yMJswjcD8Fg"
+        startSec: 50
+        endSec: 80
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."

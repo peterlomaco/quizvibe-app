@@ -4040,8 +4040,14 @@ items:
     probability: 80
     wikimediaSearchHints: ["Stardust Music Sounds better with you"]
     answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
     spotifyTrackId: "303ccTay2FiDTZ9fZ2AdBt"
     region: ["global"]
+    youtubeClips:
+      - videoId: "FQlAEiCb8m0"
+        startSec: 40
+        endSec: 70
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
   - id: sash-mysterious-times
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Mysterious Times — Sash"
@@ -4472,8 +4478,14 @@ items:
     probability: 80
     wikimediaSearchHints: ["Modjo Lady"]
     answerMethods: ["timeline"]
+    genrePackages: ["Dance Music", "Disco & Pop"]
     spotifyTrackId: "49X0LAl6faAusYq02PRAY6"
     region: ["global"]
+    youtubeClips:
+      - videoId: "mMfxI3r_LyA"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
   - id: papa-roach-last-resort
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Last Resort — Papa Roach"
@@ -4816,3 +4828,136 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "7uuo02BIR76qZ6ZXQhz7Ys"
     region: ["global"]
+  - id: ultra-nate-free
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Free — Ultra Naté"
+    correctYear: 1997
+    probability: 80
+    wikimediaSearchHints: ["Ultra Naté Free"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music", "Disco & Pop"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "JgRBkjgXHro"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: alexandra-stan-mr-saxobeat
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Mr. Saxobeat — Alexandra Stan"
+    correctYear: 2010
+    probability: 80
+    wikimediaSearchHints: ["Alexandra Stan Mr Saxobeat"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music", "Disco & Pop", "Party & Dunk"]
+    inBaseCatalog: false
+    region: ["europe"]
+    youtubeClips:
+      - videoId: "nwsewSMWIas"
+        startSec: 25
+        endSec: 55
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: disclosure-latch
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Latch — Disclosure feat. Sam Smith"
+    correctYear: 2012
+    probability: 80
+    wikimediaSearchHints: ["Disclosure Sam Smith Latch"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "93ASUImTedo"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: otto-knows-million-voices
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Million Voices — Otto Knows"
+    correctYear: 2012
+    probability: 80
+    wikimediaSearchHints: ["Otto Knows Million Voices"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "S8jhXmfdRFY"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: shapeshifters-lolas-theme
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Lola's Theme — The Shapeshifters"
+    correctYear: 2004
+    probability: 80
+    wikimediaSearchHints: ["Shapeshifters Lola's Theme"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "kIC0aQ56ASE"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: junior-jack-e-samba
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "E Samba — Junior Jack"
+    correctYear: 2003
+    probability: 78
+    wikimediaSearchHints: ["Junior Jack E Samba"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "8vNN6PXm5q8"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: sash-ecuador
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ecuador — Sash!"
+    correctYear: 1997
+    probability: 80
+    wikimediaSearchHints: ["Sash Ecuador"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music", "Party & Dunk"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "9cQlVww0zKo"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: sash-adelante
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Adelante — Sash!"
+    correctYear: 1999
+    probability: 76
+    wikimediaSearchHints: ["Sash Adelante"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "gFQ01Fs952o"
+        startSec: 20
+        endSec: 50
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: sash-encore-une-fois
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Encore une fois — Sash!"
+    correctYear: 1997
+    probability: 80
+    wikimediaSearchHints: ["Sash Encore une fois"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "qz2bOXLEvuE"
+        startSec: 80
+        endSec: 110
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."

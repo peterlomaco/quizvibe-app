@@ -18173,6 +18173,68 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "sash-ecuador",
+    "displayName": "Ecuador — Sash!",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Party & Dunk"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "9cQlVww0zKo",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "sash-encore-une-fois",
+    "displayName": "Encore une fois — Sash!",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "qz2bOXLEvuE",
+        "startSec": 80,
+        "endSec": 110,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "savage-garden-truly-madly-deeply",
     "displayName": "Truly Madly Deeply — Savage Garden",
     "correctYear": 1997,
@@ -18394,6 +18456,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "20th Century Studios",
         "license": "standard",
         "notes": "Official 25th Anniversary trailer — Celine Dion theme + iconic scenes."
+      }
+    ]
+  },
+  {
+    "id": "ultra-nate-free",
+    "displayName": "Free — Ultra Naté",
+    "correctYear": 1997,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "JgRBkjgXHro",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
       }
     ]
   },
@@ -19522,8 +19615,19 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music"
+    ],
     "spotifyTrackId": "303ccTay2FiDTZ9fZ2AdBt",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "FQlAEiCb8m0",
+        "startSec": 40,
+        "endSec": 70,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "the-cardigans-my-favourite-game",
@@ -20584,6 +20688,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "sash-adelante",
+    "displayName": "Adelante — Sash!",
+    "correctYear": 1999,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "gFQ01Fs952o",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "savage-garden-crash-and-burn",
     "displayName": "Crash and Burn — Savage Garden",
     "correctYear": 1999,
@@ -21560,8 +21695,20 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "region": [
       "global"
     ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop"
+    ],
     "spotifyTrackId": "49X0LAl6faAusYq02PRAY6",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "mMfxI3r_LyA",
+        "startSec": 20,
+        "endSec": 50,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "nsync-bye-bye-bye",
@@ -23466,6 +23613,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "junior-jack-e-samba",
+    "displayName": "E Samba — Junior Jack",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "8vNN6PXm5q8",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "lost-in-translation-2003",
     "displayName": "Lost in Translation",
     "correctYear": 2003,
@@ -24257,6 +24435,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "NuovoCinemaGiornico",
         "license": "standard",
         "notes": "Originaltrailer. Oscar-nominerad svensk film. Mikael Nyqvist."
+      }
+    ]
+  },
+  {
+    "id": "shapeshifters-lolas-theme",
+    "displayName": "Lola's Theme — The Shapeshifters",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "kIC0aQ56ASE",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
       }
     ]
   },
@@ -26783,6 +26992,39 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "alexandra-stan-mr-saxobeat",
+    "displayName": "Mr. Saxobeat — Alexandra Stan",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop",
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "nwsewSMWIas",
+        "startSec": 25,
+        "endSec": 55,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "anna-bergendahl-this-is-my-life",
     "displayName": "This Is My Life — Anna Bergendahl",
     "correctYear": 2010,
@@ -28239,6 +28481,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "disclosure-latch",
+    "displayName": "Latch — Disclosure feat. Sam Smith",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "93ASUImTedo",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "first-aid-kit-emmylou",
     "displayName": "Emmylou — First Aid Kit",
     "correctYear": 2012,
@@ -28512,6 +28785,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "17qZsun9q3L8ceIa3kPz4A",
     "youtubeClips": []
+  },
+  {
+    "id": "otto-knows-million-voices",
+    "displayName": "Million Voices — Otto Knows",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "S8jhXmfdRFY",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "petra-marklund-handerna-mot-himlen",
@@ -33198,6 +33502,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "fred-again-marea",
+    "displayName": "Marea (We've Lost Dancing) — Fred again..",
+    "correctYear": 2021,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 74,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "yMJswjcD8Fg",
+        "startSec": 50,
+        "endSec": 80,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "hov1-bla",
     "displayName": "Blå — Hov1",
     "correctYear": 2021,
@@ -34363,6 +34698,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Alex Warren",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "calvin-harris-blessings",
+    "displayName": "Blessings — Calvin Harris & Clementine Douglas",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "JEmbyx8NLxA",
+        "startSec": 55,
+        "endSec": 85,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      },
+      {
+        "videoId": "gQA-pXJM0mQ",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
       }
     ]
   },
