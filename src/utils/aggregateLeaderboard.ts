@@ -40,6 +40,16 @@ const MAX_GAMES = 20;
 /** Ett spels bidrag till serien, per spelare. */
 export interface AggregateGamePlayer {
   playerId: string;
+  /**
+   * Stabilt konto-id (Supabase-uid), stämplat av quiz.tsx vid spelslut via
+   * getLobbyPlayerUserIds. Summeringen nycklas på DETTA när det finns —
+   * `playerId` är en efemär lobby-id (`joiner-<ts>` / `comp-<uid>`) som byter
+   * per spel/session, så utan userId splittas samma konto i en rad per spel.
+   * null/undefined = gäst eller lokalt spel utan konto → faller tillbaka på
+   * playerId (stabilt inom en session). Round-trippar verbatim genom
+   * server-`stats` (jsonb) — kräver ingen migration.
+   */
+  userId?: string | null;
   name: string;
   emoji: string;
   assistance?: AssistanceLevel;
@@ -284,13 +294,18 @@ export function buildAggregateStandings(
   // och står sist i "Last 5".
   series.games.forEach((game) => {
     game.players.forEach((p) => {
-      const prev = byId.get(p.playerId);
+      // Nyckla på det stabila konto-id:t när det finns, annars den efemära
+      // lobby-id:n (gäst/lokalt spel). Samma konto med olika playerId över
+      // spel (fresh join / marathon-rematch `comp-<uid>`) blir därmed EN rad.
+      const key = p.userId ?? p.playerId;
+      const prev = byId.get(key);
       const playedRounds = (prev?.playedRounds ?? 0) + p.playedRounds;
       const totalSeconds =
         (prev ? prev.avgResponseSeconds * prev.playedRounds : 0) +
         p.totalResponseSeconds;
-      byId.set(p.playerId, {
-        playerId: p.playerId,
+      byId.set(key, {
+        // Radens id = grupperingsnyckeln → unik per konto (React-key).
+        playerId: key,
         // Namn/avatar/meta tas alltid från det SENASTE spelet spelaren
         // deltog i — host kan ha döpt om dem mellan omgångarna.
         name: p.name,

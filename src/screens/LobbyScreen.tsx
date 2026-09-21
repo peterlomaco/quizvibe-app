@@ -5519,6 +5519,18 @@ export default function LobbyScreen() {
           const nextHcp = updated.hcp;
           const nextHcpMusic = updated.hcpMusic;
           const nextHcpFilm = updated.hcpFilm;
+          // age/assistance/hcpComplete/hcpOverride: pullas hit ENBART när host:s
+          // lokala värde saknas. En Competition-rematch pre-seedar de inbjudnas
+          // rader med age/assistance = null (host känner inte deras profil), och
+          // spelaren fyller dem själv via sin egen upsert vid join. Utan denna
+          // konvergering skriver host:s bulk-write (playerToRow inkluderar
+          // fälten) tillbaka null → non-host:s kort tappar sin "Details"-del +
+          // HCP-sköldar (hasDetails kräver age + assistance). Villkorlig så
+          // host:s egna player-edit (lokalt värde satt) ALDRIG överskrivs.
+          const nextAge = p.age ?? updated.age;
+          const nextAssistance = p.assistance ?? updated.assistance;
+          const nextHcpComplete = p.hcpComplete || !!updated.hcpComplete;
+          const nextHcpOverride = p.hcpOverride ?? updated.hcpOverride;
           if (
             !!p.hasLeft === nextHasLeft &&
             !!p.approved === nextApproved &&
@@ -5526,7 +5538,11 @@ export default function LobbyScreen() {
             p.accountPlayerName === nextAccountName &&
             p.hcp === nextHcp &&
             p.hcpMusic === nextHcpMusic &&
-            p.hcpFilm === nextHcpFilm
+            p.hcpFilm === nextHcpFilm &&
+            p.age === nextAge &&
+            p.assistance === nextAssistance &&
+            !!p.hcpComplete === nextHcpComplete &&
+            p.hcpOverride === nextHcpOverride
           )
             return p;
           changed = true;
@@ -5539,6 +5555,10 @@ export default function LobbyScreen() {
             hcp: nextHcp,
             hcpMusic: nextHcpMusic,
             hcpFilm: nextHcpFilm,
+            age: nextAge,
+            assistance: nextAssistance,
+            hcpComplete: nextHcpComplete,
+            hcpOverride: nextHcpOverride,
           };
         });
         // (2) Splice:a in genuint nya joiners. Dedup mot BÅDE id och namn

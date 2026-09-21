@@ -166,6 +166,52 @@ describe('summering', () => {
   });
 });
 
+describe('konto-id grupperar över spel (Marathon-fragmentering)', () => {
+  it('samma userId men olika playerId över spel summeras till EN rad', async () => {
+    // En non-host får en färsk lobby-id per spel (joiner-<ts> i vanlig join,
+    // comp-<uid> i en marathon-rematch), men kontot är detsamma → EN rad,
+    // inte en per spel. Detta är buggen: utan userId splittades kontot.
+    await recordGameInSeries('AB23XY', [
+      player('joiner-1', { userId: 'uid-bob', points: 3 }),
+    ]);
+    await markSeriesContinues('CD45ZW');
+    await recordGameInSeries('CD45ZW', [
+      player('comp-uid-bob', { userId: 'uid-bob', points: 4 }),
+    ]);
+    const agg = buildAggregateStandings(await loadAggregateSeries());
+    expect(agg.standings).toHaveLength(1);
+    expect(agg.standings[0].points).toBe(7);
+    expect(agg.standings[0].playedRounds).toBe(8);
+    // Radens id = grupperingsnyckeln (kontot), inte den efemära lobby-id:n.
+    expect(agg.standings[0].playerId).toBe('uid-bob');
+  });
+
+  it('utan userId grupperas fortfarande på playerId (gäst/lokalt spel)', async () => {
+    await recordGameInSeries('AB23XY', [player('joiner-1', { points: 3 })]);
+    await markSeriesContinues('CD45ZW');
+    // Färsk lobby-id, inget konto → NY rad (oförändrat gäst-beteende).
+    await recordGameInSeries('CD45ZW', [player('joiner-2', { points: 4 })]);
+    const agg = buildAggregateStandings(await loadAggregateSeries());
+    expect(agg.standings).toHaveLength(2);
+  });
+
+  it('flera konton med olika lobby-id i spel 2 summeras var för sig', async () => {
+    await recordGameInSeries('AB23XY', [
+      player('1', { userId: 'uid-host', points: 2 }),
+      player('joiner-1', { userId: 'uid-bob', points: 1 }),
+    ]);
+    await markSeriesContinues('CD45ZW');
+    await recordGameInSeries('CD45ZW', [
+      player('1', { userId: 'uid-host', points: 5 }),
+      player('comp-uid-bob', { userId: 'uid-bob', points: 6 }),
+    ]);
+    const agg = buildAggregateStandings(await loadAggregateSeries());
+    expect(agg.standings).toHaveLength(2);
+    expect(agg.standings.find((s) => s.playerId === 'uid-host')?.points).toBe(7);
+    expect(agg.standings.find((s) => s.playerId === 'uid-bob')?.points).toBe(7);
+  });
+});
+
 describe('aggregateLabel — solo heter Score, flerspelar table', () => {
   it('en deltagare ger "Marathon Score"', () => {
     expect(aggregateLabel(1)).toBe('Marathon Score');

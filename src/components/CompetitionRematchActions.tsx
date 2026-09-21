@@ -27,6 +27,10 @@ import {
 import { Pressable } from '@/src/components/haptic';
 
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import {
+  attachSeriesToLeaderboard,
+  markSeriesContinues,
+} from '../utils/aggregateLeaderboard';
 import type { SavedAggregate } from '../utils/aggregateLeaderboards';
 import { startCompetitionRematch } from '../utils/competitionRematch';
 import {
@@ -120,6 +124,12 @@ export function CompetitionRematchActions({
   useEffect(() => {
     if (isHost || !startedRequest?.roomCode || navigatedRef.current) return;
     navigatedRef.current = true;
+    // Stämpla rummet som seriens fortsättning (leaderboardId bevaras — det
+    // sattes av attach i handleAccept). Utan detta chainar inte spel 1 in i
+    // den seedade serien → recordGameInSeries startar en NY serie och
+    // Marathon-fliken saknas tills spel 2. Fire-and-forget: skrivningen
+    // (AsyncStorage) hinner klart långt före spelslutet som läser den.
+    void markSeriesContinues(startedRequest.roomCode);
     onClose();
     router.push({
       pathname: '/lobby',
@@ -134,9 +144,15 @@ export function CompetitionRematchActions({
         lobbyType: 'multiplayer',
         rematchLocked: 'true',
         competitionRematch: 'true',
+        // Claima den pre-seedade raden deterministiskt (samma mekanism som
+        // Final Leaderboards re-match). Host seedade `comp-${p.userId}`, så
+        // vi räknar fram VÅR egen rad ur vårt konto-uid — ingen namn-matchning
+        // som racear replikeringen. Utan detta dök den accepterande non-host:en
+        // inte upp i lobbyn (Peter 2026-09-21).
+        ...(myUserId ? { carryOverPlayerId: `comp-${myUserId}` } : {}),
       },
     });
-  }, [isHost, startedRequest, onClose]);
+  }, [isHost, startedRequest, onClose, myUserId]);
 
   // ── Credit-gate + lobby-skapande (host) ──
   const ensureCredits = useCallback(async () => {
@@ -259,6 +275,17 @@ export function CompetitionRematchActions({
       const ok = await acceptRematchRequest(activeRequest.id);
       if (!ok) {
         Alert.alert('Could not accept', 'The re-match may have expired. Try again.');
+      } else {
+        // Seeda den lokala Aggregate-serien från den sparade marathonen så
+        // slutskärmens Marathon-flik visas REDAN på spel 1 av en återupptagen
+        // serie (annars ser non-host bara det spel som just spelats tills
+        // serien chainat lokalt på spel 2). Host gör motsvarande i
+        // startCompetitionRematch. Rumkoden är inte känd än (host har inte
+        // startat) → bara attach här; nextRoomCode stämplas vid navigationen
+        // (Path A nedan / Path B i app/index.tsx). Att acceptera är
+        // OBLIGATORISKT innan host kan starta, så varje deltagare passerar hit
+        // oavsett om de sedan når lobbyn via auto-nav eller Home-inbjudan.
+        await attachSeriesToLeaderboard(saved.id, saved.games);
       }
       await reload();
     });

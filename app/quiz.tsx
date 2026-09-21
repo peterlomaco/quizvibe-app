@@ -7056,12 +7056,26 @@ export default function QuizScreen() {
     // re-match skriver över den via `markSeriesContinues`.
     if (gamePlayers.some((p) => p.hasLeft)) return;
     const roomCode = params.roomCode as string;
-    const contribution: AggregateGamePlayer[] = buildGamePlayerStats();
     let cancelled = false;
-    // Skrivningen är idempotent per rumkod (ERSÄTTER spelets snapshot), så
-    // sena peer-scores i Individual Devices uppdaterar serien i stället för
-    // att dubbelräkna spelet — därför står allRoundScoresHistory i deps.
-    void recordGameInSeries(roomCode, contribution).then((series) => {
+    // Stämpla varje rad med stabilt konto-id (Supabase-uid) FÖRST, så
+    // Marathon-tabellen summerar per KONTO och inte per efemär lobby-id
+    // (`joiner-<ts>` / `comp-<uid>` byter per spel/session → annars en rad per
+    // spel för samma spelare). Läses via membership-scoped SELECT så det
+    // funkar på ALLA enheter (medlem i rummet) — inte bara host — så den
+    // lokala page-2-vyn och den sparade server-vyn nycklar likadant.
+    // Guest/lokalt spel utan konto → userId null → buildAggregateStandings
+    // faller tillbaka på playerId (stabilt inom sessionen). Skrivningen är
+    // idempotent per rumkod (ERSÄTTER spelets snapshot), så sena peer-scores i
+    // Individual Devices uppdaterar serien i stället för att dubbelräkna.
+    void (async () => {
+      const uidRows = await getLobbyPlayerUserIds(roomCode);
+      if (cancelled) return;
+      const uidByPlayerId = new Map(uidRows.map((r) => [r.playerId, r.userId]));
+      const contribution: AggregateGamePlayer[] = buildGamePlayerStats().map((c) => ({
+        ...c,
+        userId: uidByPlayerId.get(c.playerId) ?? null,
+      }));
+      const series = await recordGameInSeries(roomCode, contribution);
       if (cancelled) return;
       setAggregate(buildAggregateStandings(series));
       // Spegla spelet till den sparade serien på kontot.
@@ -7086,26 +7100,25 @@ export default function QuizScreen() {
       // gör bara en UPDATE, så spelraden måste finnas först. parentControl +
       // paket tas från quiz-params (AUKTORITATIVT — de speglar host:s val;
       // parentControl persisteras inte ens i lobby_settings).
-      void recordAggregateGame(leaderboardId, roomCode, contribution).then(() => {
-        void saveAggregateGameSettings(leaderboardId, roomCode, {
-          eraFrom,
-          eraTo,
-          roundsCount: totalRounds,
-          answerResponseSeconds: responseSeconds,
-          youtubeEnabledCategories,
-          imagesEnabledCategories,
-          selectedExtraPackages,
-          parentControlEnabled,
-          spotifyEnabled,
-          // ⚠ ENBART för spelform-grupperingen i Marathon-listan. Läses aldrig
-          // av buildRematchSettings (den härleder gameMode av lobbytypen).
-          // Denna gren är host-only + aldrig remote → single player fångas av
-          // turnOrder.length <= 1.
-          gameMode,
-          singlePlayerDefault: turnOrder.length <= 1,
-        });
+      await recordAggregateGame(leaderboardId, roomCode, contribution);
+      void saveAggregateGameSettings(leaderboardId, roomCode, {
+        eraFrom,
+        eraTo,
+        roundsCount: totalRounds,
+        answerResponseSeconds: responseSeconds,
+        youtubeEnabledCategories,
+        imagesEnabledCategories,
+        selectedExtraPackages,
+        parentControlEnabled,
+        spotifyEnabled,
+        // ⚠ ENBART för spelform-grupperingen i Marathon-listan. Läses aldrig
+        // av buildRematchSettings (den härleder gameMode av lobbytypen).
+        // Denna gren är host-only + aldrig remote → single player fångas av
+        // turnOrder.length <= 1.
+        gameMode,
+        singlePlayerDefault: turnOrder.length <= 1,
       });
-    });
+    })();
     return () => {
       cancelled = true;
     };

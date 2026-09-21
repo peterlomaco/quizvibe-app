@@ -7,6 +7,7 @@ import { WaveDots } from '@/src/components/WaveDots';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { HostTypeOptions, type HostLobbyType } from '@/src/components/HostTypeOptions';
 import { Colors, Radius, Spacing } from '@/src/theme';
+import { markSeriesContinues } from '@/src/utils/aggregateLeaderboard';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
@@ -706,9 +707,18 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // single. Inviten ligger KVAR i listan (som capacity-fallet) — host kan
     // byta tillbaka, och då ska den fortfarande gå att tacka ja till.
     if (await checkSinglePlayerLobby(invite.roomCode)) { setJoiningLobby(false); return; }
-    // Host kan ha startat en re-match efter att inbjudan skickades — då är
-    // uppsättningen låst och bara förra spelets spelare kommer in.
-    if (await checkRematchLockedLobby(invite.roomCode, currentPlayerName)) { setJoiningLobby(false); return; }
+    // En competition-rematch skickar sin inbjudan till en LÅST re-match-lobby
+    // (rooms.rematch_locked). Inbjudan i sig är admissions-bevis — host seedade
+    // just den här deltagaren — så vi kör INTE checkRematchLockedLobby:s
+    // namn-grind här (den läser getLobbyPlayers och kan racea replikeringen →
+    // felaktigt blocka en giltig invitee). Vi bär i stället med lås-params +
+    // claimar den pre-seedade raden deterministiskt via carryOverPlayerId
+    // (`comp-${uid}`, exakt id:t host seedade i startCompetitionRematch). Se
+    // även Path A i CompetitionRematchActions. Namn-grinden är kvar för RÅ
+    // kod-entry-join (handleJoinWithCode/handleJoinAsGuest) där den behövs.
+    const inviteRoomMeta = await getRoomMeta(invite.roomCode);
+    const inviteIsRematchLocked = !!inviteRoomMeta?.rematchLocked;
+    const inviteRematchUid = inviteIsRematchLocked ? await getOwnUserId() : null;
     // Capacity-check FÖRE removeInvite: om lobby:n är full ska usern få
     // popup och inviten ligga kvar i listan, så de kan försöka igen om
     // någon lämnar. Speglar samma check som handleJoinWithCode kör.
@@ -726,13 +736,35 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     acceptInFlightRef.current = true;
     await addFriend(invite.fromPlayerName, invite.fromAvatarId);
     await removeInvite(invite.id);
+    // Competition-rematch: stämpla rummet som seriens fortsättning så spel 1
+    // chainar in i den lokalt seedade serien (leaderboardId + de sparade
+    // spelen sattes av attach i CompetitionRematchActions handleAccept — att
+    // acceptera är obligatoriskt före host:s start). Utan detta ser non-host
+    // bara det spel som just spelats i Final leaderboard tills serien chainat
+    // på spel 2. leaderboardId utelämnas (undefined = behåll det attach satte).
+    if (inviteIsRematchLocked) void markSeriesContinues(invite.roomCode);
     // Navigera FÖRST — den transparenta modalen ligger ovanför nav-stacken (iOS)
     // så /lobby-pushen körs bakom den. Stäng modalen EFTER att pushen hunnit
     // landa (MODAL_SWAP_DELAY_MS) så den fadar direkt mot lobbyn istället för
     // att blotta Home-skärmen under slide-in-transitionen.
     router.push({
       pathname: '/lobby',
-      params: { code: invite.roomCode, isHost: 'false' },
+      params: {
+        code: invite.roomCode,
+        isHost: 'false',
+        // Låst competition-rematch: spegla host:s lås-params (annars renderas
+        // lobbyn som vanlig multiplayer) + claima den pre-seedade raden.
+        ...(inviteIsRematchLocked
+          ? {
+              lobbyType: 'multiplayer',
+              rematchLocked: 'true',
+              competitionRematch: 'true',
+              ...(inviteRematchUid
+                ? { carryOverPlayerId: `comp-${inviteRematchUid}` }
+                : {}),
+            }
+          : {}),
+      },
     });
     setTimeout(() => onClose(), MODAL_SWAP_DELAY_MS);
   };

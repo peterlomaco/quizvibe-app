@@ -99,11 +99,14 @@ export async function startCompetitionRematch(
 
   const code = generateRoomCode();
 
-  // player_id per inbjuden — deterministiskt inom lobbyn. code-only-joinen
-  // matchar på NAMN och ärver id:t, så själva värdet är godtyckligt (bara
-  // unikt inom rummet krävs).
-  const seeded = invitees.map((p, i) => ({
-    playerId: `comp-${i}`,
+  // player_id per inbjuden — härleds ur deltagarens KONTO-uid, inte ur
+  // array-index. Då kan den accepterande non-host:en räkna fram EXAKT samma
+  // id på sin egen enhet (`comp-${myUserId}`) och claima sin pre-seedade rad
+  // via carryOverPlayerId — deterministiskt, utan den ordnings-/namn-matchning
+  // som annars racear Supabase-replikeringen. Deltagarna i en sparad serie är
+  // alltid registrerade (userId finns), så detta är säkert.
+  const seeded = invitees.map((p) => ({
+    playerId: `comp-${p.userId}`,
     playerName: p.playerName,
   }));
   const rematchPlayerIds = isMulti
