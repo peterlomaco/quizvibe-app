@@ -601,6 +601,14 @@ function calculatePoints(
 // inte skriker. Quiz-vyn vill däremot ha en distinkt urgency-röd.
 const QUIZ_ERROR_RED = '#FF3B30';
 
+// Efter att DJ:n återvänt från Spotify: håll DJ-timer-tickern från att måla en
+// (potentiellt inaktuell) LEVANDE tid under detta fönster, så att den omedelbara
+// all_confirmed-heartbeaten (som aktiveraren återsänder när DJ:n hälsar via
+// player_rejoined) hinner frysa baren vid sista avataren INNAN en levande tid
+// visas — annars blinkar DJ:n till en levande tid och hoppar sedan till frystiden
+// när sista spelaren redan svarat. En round-trip är typiskt < 300 ms. (2026-09-21.)
+const DJ_RETURN_GRACE_MS = 700;
+
 // ─── Spotify-instruktionsguide (DJ / timer-aktiverare / gissare) ──────────────
 // V1-flöde: DJ stannar i Spotify hela rundan. Host (eller reserv) aktiverar
 // timern. Vanliga gissare lyssnar och svarar.
@@ -3058,6 +3066,9 @@ export default function QuizScreen() {
   // AppState-återkomsten anländer. Nollställs per fråga. (Peter 2026-09-17.)
   const djAllConfirmedRef = useRef(false);
   const djFreezeUsedRef = useRef<number | null>(null);
+  // Tidsstämpel tills vilken DJ-timer-tickern håller (målar inte levande tid)
+  // efter en Spotify-retur — se DJ_RETURN_GRACE_MS. Nollställs per fråga.
+  const djReturnGraceUntilRef = useRef<number>(0);
   // Ref-brygga så subscription-handlern (registreras en gång) kan anropa den
   // senaste render:ens syncDjWallClockReveal-closure.
   const syncDjWallClockRevealRef = useRef<() => void>(() => {});
@@ -4283,31 +4294,13 @@ export default function QuizScreen() {
       setPhase('reveal');
       return;
     }
-    if (spotifyTimerStartAtRef.current === 0) return;
-    // En eventuell (stale) rullande nedräkning nollas — DJ:n ska aldrig ha en.
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    // ⚠ timer_start_at kan ligga i FRAMTIDEN: aktiveraren sätter det till
-    // Date.now() + 2000 (pre-roll före setTimerActive). Räknade vi då naivt
-    // responseSeconds − elapsedSec blev elapsedSec NEGATIV → remaining > 30 →
-    // DJ:n visade "32" för en 30 s-fråga och låg desynkad mot gissarna (som
-    // står kvar på 30 under pre-rollen tills deras timerActive fyrar). Räkna
-    // i stället mot den ABSOLUTA utgången (timer_start_at + responseSeconds)
-    // och klampa DISPLAYEN till responseSeconds, men arma reveal-timeouten mot
-    // den faktiska kvarvarande wall-clock-tiden så den fyrar vid rätt utgång
-    // även i framtids-fallet. (Peter 2026-09-19.)
-    const remainingMs =
-      spotifyTimerStartAtRef.current + responseSeconds * 1000 - Date.now();
-    if (remainingMs <= 0) {
-      setTimeLeft(0);
-      return;
-    }
-    setTimeLeft(Math.min(responseSeconds, Math.ceil(remainingMs / 1000)));
-    djRevealTimeoutRef.current = setTimeout(() => {
-      djRevealTimeoutRef.current = null;
-      if (phaseRef.current === 'question' || phaseRef.current === 'awaiting') {
-        setTimeLeft(0);
-      }
-    }, remainingMs);
+    // Live-nedräkning + naturlig utgång ägs numera av DJ-wall-clock-tickern
+    // (useEffect längre ned) som räknar om återstående tid från
+    // spotifyTimerStartAtRef var 100 ms. Denna funktion behåller bara den snabba
+    // all-confirmed-reveal-grenen ovan — så en DJ som återvänder EFTER att alla
+    // gissare svarat avslöjar DIREKT i stället för att vänta på nästa tick.
+    // Inget mer att göra här; tickern visar rätt levande tid inom en tick vid
+    // återkomst utan hopp (recompute-baserad, inte dekrement). (Peter 2026-09-21.)
   }, [isSpotifyQuestion, isCurrentPlayerDJ, responseSeconds]);
   // Håll ref-bryggan färsk så subscription-handlern (registreras en gång) alltid
   // anropar den senaste closuren.
@@ -4393,19 +4386,28 @@ export default function QuizScreen() {
     return { allConfirmed: true, freezeUsed: Math.max(...(used as number[])) };
   };
 
-  const revealNow = useCallback(() => {
+  const revealNow = useCallback((freezeUsedOverride?: number) => {
     if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
     timerProgressAnim.stopAnimation();
-    // Frys fyllningen EXAKT vid sista bekräftade avataren i stället för vid
+    // Frys fyllningen EXAKT vid SISTA svararens avatar i stället för vid
     // animationens ögonblicksposition (som ligger några frames/latens förbi
-    // den → "fylld färg ovanför avataren"). Faller tillbaka på nuvarande
-    // position om ingen bekräftat (bör inte hända när reveal triggas av
-    // all-confirmed).
-    const freeze = computeLastConfirmedProgressRef.current();
+    // den → "fylld färg ovanför avataren").
+    // ⚠ `freezeUsedOverride` (störst bekräftad svarstid) är AUKTORITATIVT och
+    // används när det finns — det är immunt mot att lokal `playerConfirms` ännu
+    // saknar den SISTA svararens confirm. Två fall där lokal beräkning annars ger
+    // en FÖR BRED bar (upp till en tidigare avatar): (a) synkront anrop från
+    // confirm-handlern innan setPlayerConfirms committat den egna confirmen,
+    // (b) en mottagen reveal_now som anlände FÖRE den sista player_answer_confirmed.
+    // Faller tillbaka på lokal beräkning när override saknas. (Peter 2026-09-21.)
+    const rs = responseSecondsRef.current;
+    const freeze =
+      typeof freezeUsedOverride === 'number'
+        ? Math.max(0, Math.min(1, (rs - freezeUsedOverride) / rs))
+        : computeLastConfirmedProgressRef.current();
     if (freeze !== null) {
       timerProgressAnim.setValue(freeze);
       // DJ:n har ingen egen rullande nedräkning → dess timeLeft är wall-clock-
@@ -4428,7 +4430,7 @@ export default function QuizScreen() {
   const revealNowBroadcastedForRef = useRef<number>(-1);
   // Handler för inkommande reveal_now (auktoritativ "alla har svarat"-signal
   // från en enhet som såg alla confirms). Assignas i subscription-effekten.
-  const revealNowHandlerRef = useRef<(qIndex: number) => void>(() => {});
+  const revealNowHandlerRef = useRef<(qIndex: number, freezeUsed?: number) => void>(() => {});
 
   // Belt-and-suspenders: avslöja SYNKRONT direkt i confirm-handlern om denna
   // confirm var den sista förväntade svararen (IndDev). maybeRevealEarly-effekten
@@ -4439,7 +4441,7 @@ export default function QuizScreen() {
   // latchas per fråga och revealNow är phase-guardad. `justConfirmedId` täcker att
   // playerConfirms-state:t (läst ur render-closuren) ännu inte hunnit inkludera
   // den egna confirmen. (Peter 2026-09-17.)
-  const revealIfLastConfirm = (justConfirmedId: string) => {
+  const revealIfLastConfirm = (justConfirmedId: string, justConfirmedUsed?: number) => {
     if (gameMode !== 'individual-devices' || !justConfirmedId) return;
     const expected = turnOrder
       .map((p) => p.id)
@@ -4451,11 +4453,23 @@ export default function QuizScreen() {
       (id) => id === justConfirmedId || playerConfirms[id] !== undefined,
     );
     if (!allConfirmed) return;
+    // Störst bekräftad svarstid = frys-position (sista svararens avatar). ⚠ Väv in
+    // justConfirmedUsed EXPLICIT — `playerConfirms` (render-closure) saknar ännu
+    // den egna just-bekräftade confirmen, så utan detta blir maxUsed = näst-sista
+    // svararen → baren fryser för brett (upp till en tidigare avatar). Skickas som
+    // auktoritativt freeze_used i reveal_now så peers slipper egen (ev. ofullständig)
+    // beräkning. (Peter 2026-09-21.)
+    const usedTimes = expected
+      .map((id) => (id === justConfirmedId ? justConfirmedUsed : playerConfirms[id]))
+      .filter((u): u is number => typeof u === 'number');
+    const freezeUsed = usedTimes.length > 0 ? Math.max(...usedTimes) : undefined;
     if (syncChannelRef.current && revealNowBroadcastedForRef.current !== questionIndex) {
       revealNowBroadcastedForRef.current = questionIndex;
-      syncChannelRef.current.broadcastRevealNow({ question_index: questionIndex }).catch(() => {});
+      syncChannelRef.current
+        .broadcastRevealNow({ question_index: questionIndex, freeze_used: freezeUsed })
+        .catch(() => {});
     }
-    revealNow();
+    revealNow(freezeUsed);
   };
 
   useEffect(() => {
@@ -4557,16 +4571,21 @@ export default function QuizScreen() {
         // så de avslöjar direkt i stället för att rulla ut hela timern. En
         // gång per fråga (latch på questionIndex). revealNow() nedan är
         // idempotent (phase-guard) så en egen mottagen reveal_now skadar inte.
+        // Denna effekt kör EFTER render → playerConfirms är komplett här, så
+        // freezeUsed (störst svarstid = sista svararens avatar) är korrekt. Skicka
+        // det med reveal_now så peers fryser vid rätt avatar oavsett i vilken
+        // ordning deras egna confirms/reveal_now anlände. (Peter 2026-09-21.)
+        const freezeUsed = computeAllConfirmedInfoRef.current().freezeUsed;
         if (
           syncChannelRef.current &&
           revealNowBroadcastedForRef.current !== questionIndex
         ) {
           revealNowBroadcastedForRef.current = questionIndex;
           syncChannelRef.current
-            .broadcastRevealNow({ question_index: questionIndex })
+            .broadcastRevealNow({ question_index: questionIndex, freeze_used: freezeUsed })
             .catch(() => {});
         }
-        revealNow();
+        revealNow(freezeUsed);
       }
     } else if (phase === 'awaiting') {
       // Single player / Pass-the-Phone / remote-1v1: en svarare per fråga på
@@ -4576,27 +4595,73 @@ export default function QuizScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, playerConfirms, questionIndex, turnOrder, leftPlayerIds, isSpotifyQuestion, effectiveDJId, gameMode]);
 
-  // DJ:ns timer-fyllning speglar gissarnas confirms (Peter 2026-09-09).
-  // DJ:n kör ingen egen nedräkning (startTimer-effekten skippar DJ:n), så utan
-  // detta satt fyllningen kvar på FULL (frusen vid track-start) och "sköt över"
-  // förbi gissarnas avatarer. Här sätts fyllningen i stället till den
-  // vänstraste bekräftade avataren (störst `used`), eller full om ingen
-  // bekräftat än — så baren alltid stannar exakt vid sista spelarens avatar.
-  // Vid reveal returnerar effekten tidigt → fyllningen fryses där den står.
+  // DJ:ns timer (badge + bar) körs som en LEVANDE wall-clock-nedräkning så den
+  // matchar gissarnas timer exakt (Peter 2026-09-21). Ersätter den gamla
+  // "pinna baren vid confirmade avatarer"-effekten som lät baren stå FULL tills
+  // någon svarade och badge:n bara uppdaterades vid diskreta ögonblick
+  // (Spotify-återkomst/heartbeat) → DJ-klockan hoppade i steg (t.ex. 23→18 efter
+  // ett Spotify-besök) och matchade aldrig gissarnas levande nedräkning.
+  //
+  // DJ:n kör MEDVETET ingen rullande setInterval-DEKREMENT (den skulle tappa
+  // ticks när JS frusits i bakgrunden under Spotify-besöket och hoppa vid
+  // återkomst). I stället RÄKNAR VI OM återstående tid från den absoluta
+  // stämpeln spotifyTimerStartAtRef varje tick — bakgrundsfrys ger då inget
+  // hopp: intervallet pausas i bakgrunden och nästa tick vid återkomst visar
+  // direkt den sanna kvarvarande tiden och fortsätter ticka, samma klockslag
+  // som gissarna. Naturlig utgång: setTimeLeft(0) → useEffect([timeLeft]) →
+  // reveal. Freeze-vid-sista-avatar bevaras av all-confirmed-grenen nedan +
+  // revealNow (som fryser baren exakt vid den vänstraste bekräftade avataren).
   useEffect(() => {
     if (!(isSpotifyQuestion && isCurrentPlayerDJ)) return;
     if (phase !== 'question' && phase !== 'awaiting') return;
-    const p = computeLastConfirmedProgress();
-    timerProgressAnim.stopAnimation();
-    timerProgressAnim.setValue(p !== null ? p : 1);
-  }, [
-    isSpotifyQuestion,
-    isCurrentPlayerDJ,
-    phase,
-    playerConfirms,
-    computeLastConfirmedProgress,
-    timerProgressAnim,
-  ]);
+    const tick = () => {
+      // Timern inte aktiverad än (ingen aktiverare har broadcastat) → rör inget;
+      // phase-entry-reset håller baren FULL + badge=responseSeconds, som gissarna
+      // står på under pre-aktiveringen.
+      if (spotifyTimerStartAtRef.current === 0) return;
+      // Grace efter Spotify-retur: måla INTE en (ev. inaktuell) levande tid förrän
+      // den omedelbara all_confirmed-heartbeaten hunnit fram (och ev. fryst baren
+      // via Part B). Är alla redan bekräftade hoppar vi grace:n och fryser nedan.
+      // Utan detta blinkade en återvändande non-host-DJ till en levande tid och
+      // hoppade sedan till frystiden. (Peter 2026-09-21.)
+      if (
+        djReturnGraceUntilRef.current > Date.now() &&
+        !djAllConfirmedRef.current &&
+        !computeAllConfirmedInfoRef.current().allConfirmed
+      ) {
+        return;
+      }
+      // Alla gissare har svarat → frys baren vid den vänstraste (sista)
+      // bekräftade avataren och visa tiden VID den confirmen (= freeze ×
+      // responseSeconds), sluta räkna ner. Reveal-transitionen sköts av
+      // maybeRevealEarly / all_confirmed-heartbeaten / syncDjWallClockReveal.
+      if (djAllConfirmedRef.current || computeAllConfirmedInfoRef.current().allConfirmed) {
+        const freeze = computeLastConfirmedProgressRef.current();
+        if (freeze !== null) {
+          timerProgressAnim.setValue(freeze);
+          setTimeLeft(Math.max(0, Math.ceil(freeze * responseSeconds)));
+        }
+        return;
+      }
+      const remainingMs = spotifyTimerStartAtRef.current + responseSeconds * 1000 - Date.now();
+      if (remainingMs <= 0) {
+        timerProgressAnim.setValue(0);
+        setTimeLeft(0);
+        return;
+      }
+      // ⚠ Framtids-stämpel: aktiveraren sätter timer_start_at = Date.now()+2000
+      // (pre-roll före setTimerActive). remainingMs kan då vara > responseSeconds
+      // × 1000 → klampa DISPLAYEN till responseSeconds så DJ:n står på t.ex. 30
+      // under pre-rollen precis som gissarna, i stället för att visa "32". (Samma
+      // resonemang som syncDjWallClockReveal, Peter 2026-09-19.)
+      const clampedMs = Math.min(responseSeconds * 1000, remainingMs);
+      timerProgressAnim.setValue(clampedMs / (responseSeconds * 1000));
+      setTimeLeft(Math.min(responseSeconds, Math.ceil(remainingMs / 1000)));
+    };
+    tick();
+    const id = setInterval(tick, 100);
+    return () => clearInterval(id);
+  }, [isSpotifyQuestion, isCurrentPlayerDJ, phase, responseSeconds, timerProgressAnim]);
 
   // Spegla Spotify DJ-state till refs så AppState-listener aldrig läser stale closures.
   useEffect(() => { spotifyDJOpenedAppRef.current = spotifyDJOpenedApp; }, [spotifyDJOpenedApp]);
@@ -4686,6 +4751,20 @@ export default function QuizScreen() {
       // Scenario 2: timern gick ut medan DJ var i Spotify → phase='reveal'
       //   på icke-DJ-enheter men DJ:ns phase är fortfarande 'question' →
       //   DJ ser timer börja om från början när de återvänder.
+      if (spotifyDJOpenedAppRef.current) {
+        // DJ:n återvänder från Spotify och kan ha missat BÅDE enskilda
+        // player_answer_confirmed OCH all_confirmed-heartbeaten medan appen var
+        // bakgrundad (Realtime replayar inte). Hälsa så aktiveraren OMEDELBART
+        // återsänder heartbeaten (all_confirmed/freeze_used) i stället för att
+        // DJ:n väntar upp till 5 s på nästa tick — annars visar tickern en
+        // levande tid och hoppar sedan till frystiden när sista spelaren redan
+        // svarat (Peter-rapport 2026-09-21, non-host-DJ). Håll tickern under ett
+        // kort grace-fönster tills heartbeaten hunnit fram. Broadcastas oavsett
+        // spotifyTimerStartAtRef (timern kan ha aktiverats medan DJ:n var borta →
+        // lokalt ref fortfarande 0).
+        syncChannelRef.current?.broadcastPlayerRejoined({ sender_id: selfPlayerId }).catch(() => {});
+        djReturnGraceUntilRef.current = Date.now() + DJ_RETURN_GRACE_MS;
+      }
       if (spotifyDJOpenedAppRef.current && spotifyTimerStartAtRef.current > 0) {
         // DJ:n återvänder från Spotify. Synka mot wall-clock UTAN att starta en
         // rullande nedräkning (se syncDjWallClockReveal): tiden ute → avslöja,
@@ -5246,6 +5325,7 @@ export default function QuizScreen() {
     setSpotifyDJStarted(false);
     djAllConfirmedRef.current = false;
     djFreezeUsedRef.current = null;
+    djReturnGraceUntilRef.current = 0;
     setDjHandedOver(false);
     setDjHandoverStuck(false);
     setDjDismissedOverlay(false);
@@ -5510,7 +5590,7 @@ export default function QuizScreen() {
     // responseSeconds → useEffect([timeLeft]) fyrar aldrig reveal → Next-knappen
     // visas aldrig. Starta timern här så nedräkningen ändå löper till 0.
     if (timerNotStarted) startTimer();
-    revealIfLastConfirm(selfPlayerId);
+    revealIfLastConfirm(selfPlayerId, exactElapsedSec);
   };
 
   // YouTube-felhantering: kallas när MediaPlayer rapporterar embed-fel.
@@ -5606,7 +5686,7 @@ export default function QuizScreen() {
     setPhase('awaiting');
     // Se handleConfirm: starta timern om confirm skedde innan den hann starta.
     if (timerNotStarted) startTimer();
-    revealIfLastConfirm(selfPlayerId);
+    revealIfLastConfirm(selfPlayerId, exactElapsedSec);
   };
 
   // Actor-select-Confirm: speglar handleConfirmName men för filmfrågor.
@@ -5659,7 +5739,7 @@ export default function QuizScreen() {
     setPhase('awaiting');
     // Se handleConfirm: starta timern om confirm skedde innan den hann starta.
     if (timerNotStarted) startTimer();
-    revealIfLastConfirm(selfPlayerId);
+    revealIfLastConfirm(selfPlayerId, exactElapsedSec);
   };
 
   // ── Navigations-handlers ────────────────────────────────────────────────
@@ -6448,10 +6528,13 @@ export default function QuizScreen() {
     // var i Spotify-appen), så vi litar på aggregat-signalen — men bara för
     // rätt fråga och bara medan vi fortfarande svarar (revealNow är annars en
     // no-op via sin phase-guard).
-    revealNowHandlerRef.current = (qIndex: number) => {
+    revealNowHandlerRef.current = (qIndex: number, freezeUsed?: number) => {
       if (qIndex !== questionIndexRef.current) return;
       if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
-      revealNow();
+      // Använd avsändarens auktoritativa freeze_used (störst svarstid) så baren
+      // fryser vid SISTA svararens avatar även om vår egen playerConfirms ännu
+      // saknar den sista confirmen (reveal_now kan anlända före den). (2026-09-21.)
+      revealNow(freezeUsed);
     };
     // Mottagare av response_seconds_changed: host ändrade Answer response
     // time i GetReady mellan ronder. Non-host:s read-only-display + timer-
@@ -9279,7 +9362,8 @@ export default function QuizScreen() {
         playerLeftHandlerRef.current(payload.player_id, payload.player_name),
       onPlayerAnswerConfirmed: (payload) =>
         playerAnswerConfirmedHandlerRef.current(payload.player_id, payload.time_used),
-      onRevealNow: (payload) => revealNowHandlerRef.current(payload.question_index),
+      onRevealNow: (payload) =>
+        revealNowHandlerRef.current(payload.question_index, payload.freeze_used),
       onResponseSecondsChanged: (payload) =>
         responseSecondsChangedHandlerRef.current(payload.seconds),
       onPlayAgainInitiated: () => playAgainInitiatedHandlerRef.current(),
@@ -9395,9 +9479,45 @@ export default function QuizScreen() {
         // (Realtime replayar inte). Åter-sänd så de avslutar timern i stället
         // för att rulla ut den.
         if (isHost && syncChannelRef.current && phaseRef.current === 'reveal') {
+          // Bär med freeze_used (störst svarstid) så en återvändande peer fryser
+          // baren vid SISTA svararens avatar i stället för att räkna om ur sin egen
+          // (ev. ofullständiga) playerConfirms. (Peter 2026-09-21.)
           syncChannelRef.current
-            .broadcastRevealNow({ question_index: questionIndexRef.current })
+            .broadcastRevealNow({
+              question_index: questionIndexRef.current,
+              freeze_used: computeAllConfirmedInfoRef.current().freezeUsed || undefined,
+            })
             .catch(() => {});
+        }
+        // Spotify: en återvändande DJ kan ha missat både enskilda confirms OCH
+        // all_confirmed-heartbeaten medan den var i Spotify-appen. reveal_now
+        // ovan räcker inte för DJ:n — den saknar playerConfirms och kan därför
+        // inte frysa baren vid rätt position. Aktiveraren (en non-DJ i en aktiv
+        // Spotify-fråga) återsänder därför HEARTBEATEN omedelbart vid rejoin,
+        // som bär freeze_used → DJ:ns Part B fryser baren vid sista avataren
+        // direkt i stället för att vänta på nästa 5 s-tick (Peter 2026-09-21).
+        // Idempotent hos mottagaren; duplicerade sändningar från flera gissare
+        // är ofarliga.
+        if (
+          gameMode === 'individual-devices' &&
+          syncChannelRef.current &&
+          !isCurrentPlayerDJRef.current &&
+          spotifyTimerStartAtRef.current > 0 &&
+          currentSpotifyTrackIdRef.current
+        ) {
+          const djId = effectiveDJIdRef.current ?? selfPlayerId ?? '';
+          if (djId) {
+            const info = computeAllConfirmedInfoRef.current();
+            syncChannelRef.current
+              .broadcastSpotifyDJTrackStarted({
+                dj_player_id: djId,
+                spotify_track_id: currentSpotifyTrackIdRef.current,
+                timer_start_at: spotifyTimerStartAtRef.current,
+                all_confirmed: info.allConfirmed || undefined,
+                freeze_used: info.allConfirmed ? info.freezeUsed : undefined,
+              })
+              .catch(() => {});
+          }
         }
       },
       onHostRejoined: () => hostRejoinedHandlerRef.current(),

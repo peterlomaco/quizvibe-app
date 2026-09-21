@@ -92,6 +92,17 @@ export interface PlayerAnswerConfirmedPayload {
 export interface RevealNowPayload {
   /** Frågan avslöjandet gäller — mottagaren ignorerar stale signaler. */
   question_index: number;
+  /**
+   * Störst bekräftad svarstid (sekunder) bland alla förväntade svarare = var
+   * timer-baren ska frysas (vid SISTA svararens avatar). Avsändaren såg ALLA
+   * bekräfta och känner därför det auktoritativa värdet. Mottagaren använder det
+   * i stället för att räkna om ur sin egen `playerConfirms` — som kan sakna den
+   * sista svararens confirm (reveal_now kan anlända före dess
+   * player_answer_confirmed) och då ge en FÖR BRED bar upp till en TIDIGARE
+   * avatar. Utelämnad (äldre avsändare) → mottagaren faller tillbaka på lokal
+   * beräkning. (Peter 2026-09-21.)
+   */
+  freeze_used?: number;
 }
 
 export interface ResponseSecondsChangedPayload {
@@ -723,7 +734,7 @@ function vPlayerAnswerConfirmed(raw: unknown): PlayerAnswerConfirmedPayload | nu
 }
 function vRevealNow(raw: unknown): RevealNowPayload | null {
   if (!isObj(raw) || !index(raw.question_index)) return null;
-  return { question_index: raw.question_index };
+  return { question_index: raw.question_index, freeze_used: optFreeze(raw.freeze_used) };
 }
 function vResponseSecondsChanged(raw: unknown): ResponseSecondsChangedPayload | null {
   if (!isObj(raw)) return null;
