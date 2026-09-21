@@ -101,9 +101,22 @@ import { loadOwnHcpBundle, refreshOwnHcpDecay } from '../utils/hcpProgress';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-type AvatarCategory = 'All' | 'Basic' | 'Retro' | 'Music' | 'Tech' | 'Fun';
+type AvatarCategory =
+  | 'All'
+  | 'Basic'
+  | 'Retro'
+  | 'Music'
+  | 'Film'
+  | 'Sports'
+  | 'Tech'
+  | 'Animals'
+  | 'Food'
+  | 'Nature'
+  | 'Fun';
 
-const CATEGORIES: AvatarCategory[] = ['All', 'Basic', 'Retro', 'Music', 'Tech', 'Fun'];
+const CATEGORIES: AvatarCategory[] = [
+  'All', 'Basic', 'Retro', 'Music', 'Film', 'Sports', 'Tech', 'Animals', 'Food', 'Nature', 'Fun',
+];
 
 // ─── Birth year options (descending, newest first) ────────────────────────────
 const CURRENT_YEAR = new Date().getFullYear();
