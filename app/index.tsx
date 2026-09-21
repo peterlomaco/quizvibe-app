@@ -3,6 +3,7 @@ import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
+import { WaveDots } from '@/src/components/WaveDots';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { HostTypeOptions, type HostLobbyType } from '@/src/components/HostTypeOptions';
 import { Colors, Radius, Spacing } from '@/src/theme';
@@ -412,6 +413,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // setInvites([]) och blanka den fortfarande öppna modalen till "No invites
   // yet" innan den hinner stänga. Guarden fryser listan tills modalen är borta.
   const acceptInFlightRef = useRef(false);
+  // Part B: true medan invite-accept-guardsen körs (~2-3 s serial Supabase-
+  // läsningar). Visar en full-skärms "Waiting for Lobby access…"-cover INUTI
+  // JoinModal:s befintliga <Modal> (inte en andra Modal — iOS sväljer den
+  // andra tyst, se MODAL_SWAP_DELAY_MS) så listan lämnas direkt och usern ser
+  // en tydlig väntevy tills lobbyn öppnas. Rensas vid varje guard-failure.
+  const [joiningLobby, setJoiningLobby] = useState(false);
   // Index på den code-cell som har fokus — driver vilken `mode` (letter/digit)
   // CodeKeyboard renderar samt vilken cell tap-knapparna skriver in i. null =
   // ingen code-cell fokuserad → custom keyboard döljs (system keyboard kan
@@ -561,6 +568,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   useEffect(() => {
     if (visible) {
       acceptInFlightRef.current = false;
+      setJoiningLobby(false);
       loadInvites().then(setInvites);
     } else {
       // Töm spelläge-cachen vid stängning så nästa open resolvar färskt ur
@@ -660,6 +668,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // ut ur handleAcceptInvite (2026-08-27) så både "redan friend"-fallet och
   // consent-popupens OK-knapp kan dela EXAKT samma logik.
   const proceedAcceptInvite = async (invite: WaitingInvite) => {
+    // Part B: visa väntevyn direkt så listan lämnas medan guardsen (~2-3 s
+    // serial Supabase-läsningar) körs. Rensas vid varje guard-failure nedan.
+    setJoiningLobby(true);
     // Active-room-check: host kan ha raderat lobby:n mellan att invite
     // skickades och usern hann confirma. Visa tydlig "Lobby no longer
     // available"-popup och rensa bort den stale inviten ur listan så user
@@ -667,6 +678,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // listan ska vara aktuell direkt vid OK — annars hänger den döda
     // posten kvar tills nästa modal-open.
     if (!(await isActiveRoom(invite.roomCode))) {
+      setJoiningLobby(false);
       const updated = await removeInvite(invite.id);
       setInvites(updated);
       // Race-fallet: host deletar lobby:n i exakt samma stund som mottagaren
@@ -684,6 +696,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // (du är host). Städa bort den stale inviten och stanna kvar. Speglar
     // isOwnLobby-checken i handleJoinWithCode; invite-accept-vägen saknade den.
     if (await isOwnLobby(invite.roomCode, currentPlayerName)) {
+      setJoiningLobby(false);
       const updated = await removeInvite(invite.id);
       setInvites(updated);
       Alert.alert('Already in lobby', 'This is your own lobby.');
@@ -692,16 +705,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Single-player-lobby: host kan ha skickat inbjudan och sedan bytt till
     // single. Inviten ligger KVAR i listan (som capacity-fallet) — host kan
     // byta tillbaka, och då ska den fortfarande gå att tacka ja till.
-    if (await checkSinglePlayerLobby(invite.roomCode)) return;
+    if (await checkSinglePlayerLobby(invite.roomCode)) { setJoiningLobby(false); return; }
     // Host kan ha startat en re-match efter att inbjudan skickades — då är
     // uppsättningen låst och bara förra spelets spelare kommer in.
-    if (await checkRematchLockedLobby(invite.roomCode, currentPlayerName)) return;
+    if (await checkRematchLockedLobby(invite.roomCode, currentPlayerName)) { setJoiningLobby(false); return; }
     // Capacity-check FÖRE removeInvite: om lobby:n är full ska usern få
     // popup och inviten ligga kvar i listan, så de kan försöka igen om
     // någon lämnar. Speglar samma check som handleJoinWithCode kör.
-    if (await checkLobbyCapacity(invite.roomCode)) return;
+    if (await checkLobbyCapacity(invite.roomCode)) { setJoiningLobby(false); return; }
     // Two-device-guard: blockera om kontot redan är aktivt i en annan lobby.
-    if (await checkActiveElsewhere(invite.roomCode)) return;
+    if (await checkActiveElsewhere(invite.roomCode)) { setJoiningLobby(false); return; }
     // Ömsesidig friend-add (Peter 2026-08-27): att acceptera lägger till
     // HOST:en på RECIPIENT:ens egna friends-lista också — host-sidans add
     // sker separat via LobbyScreen:s pending→confirmed-watcher när den här
@@ -1837,6 +1850,43 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           </View>
         )}
       </KeyboardAvoidingView>
+      {/* Part B: "Waiting for Lobby access…"-cover. En vanlig absolut-
+          positionerad View INUTI JoinModal:s <Modal> (INTE en andra Modal —
+          iOS sväljer den andra tyst). Renderas sist så den målas ovanpå
+          KeyboardAvoidingView och täcker invites-listan under väntetiden.
+          Speglar GlobalOverlay:s card-look (WaveDots + "Please Wait"). */}
+      {joiningLobby && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.65)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: Colors.card,
+              paddingHorizontal: Spacing.xl,
+              paddingVertical: Spacing.lg,
+              borderRadius: Radius.md,
+              borderWidth: 1,
+              borderColor: Colors.border,
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+              <Text style={{ fontSize: 16, fontWeight: '500', color: Colors.textPrimary }}>
+                Waiting for Lobby access…
+              </Text>
+              <WaveDots />
+            </View>
+          </View>
+        </View>
+      )}
     </Modal>
   );
 }

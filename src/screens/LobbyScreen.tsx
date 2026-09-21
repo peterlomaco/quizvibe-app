@@ -440,6 +440,15 @@ const JOIN_GRACE_NON_HOST_MS = 5000;
 // oavsett orsak — signalen visas bara när den är stabil. 1200 ms = en hel
 // BlinkingLabel-cykel, så en blink som visas hinner alltid läsas som avsedd.
 const WAITING_LABEL_DEBOUNCE_MS = 1200;
+// Debounce för host:s players-bulk-write (A1a). Coalescar en burst av
+// players-ändringar (samtidiga joiners, auto-approve, field-sync) till EN
+// UPSERT så host:s egen Realtime-lyssnare inte trigg:as N gånger per skrivning
+// → bryter O(N)-stormen som frös JS-tråden vid flera samtidiga joiners.
+const HOST_BULK_WRITE_DEBOUNCE_MS = 400;
+// Debounce för host:s Realtime-driven roster-reconcile (A1b). En burst av
+// INSERT/UPDATE-event (varje joiner ger ~4 skrivningar) kollapsar till EN
+// get_lobby_roster-läsning + ETT setPlayers per tyst fönster.
+const HOST_ROSTER_RECONCILE_DEBOUNCE_MS = 500;
 // Låst-grå för Start Game-knappen medan seed-effekten ännu inte applicerat
 // carry-over-settings. Samma vokabulär som GetReadyIntro:s PLAY_LOCKED_COLOR.
 const START_LOCKED_GREY = '#6B7280';
@@ -1801,13 +1810,48 @@ export default function LobbyScreen() {
         if (hostInCarry) ownPlayerIdRef.current = hostInCarry.id;
         return;
       }
+      // A2/A3 — idempotent joiner-id. Återanvänd en befintlig same-name-rad:s
+      // id i stället för att mynta ett nytt vid re-entry/remount (annars två
+      // DB-rader med samma namn, båda approved:false → host approvar fel rad
+      // och joinern fastnar som "not approved"). Myntade id:n får per-device-
+      // entropi (Date.now() ensamt kolliderade för två joiners i samma ms).
+      // På read-FAILURE (getLobbyPlayers → null) myntas inget nytt id på
+      // första försöket — ETT retry ges först (A1:s avlastning gör läsningen
+      // pålitlig). Tom roster (undefined/[]) = genuint ingen rad än → mynta.
+      const resolveJoinerId = async (
+        myName: string,
+        mintId: () => string,
+      ): Promise<{ id: string; existing?: LobbyPlayer }> => {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          const roster = await withTimeout(
+            getLobbyPlayers(roomCode),
+            SYNC_TIMEOUT_MS,
+            null,
+            'getLobbyPlayers(joiner)',
+          );
+          if (roster === null) {
+            if (attempt === 0) continue; // read failade/timeout → ETT retry
+            break; // envis failure → mynta (entropi hindrar kollision)
+          }
+          const existing = roster?.find(
+            (p) => !p.isHost && p.name.trim().toLowerCase() === myName.toLowerCase(),
+          );
+          return existing ? { id: existing.id, existing } : { id: mintId() };
+        }
+        return { id: mintId() };
+      };
       if (guestMode && guestName) {
         const currentYear = new Date().getFullYear();
         const age = guestBirthYear ? currentYear - parseInt(guestBirthYear, 10) : undefined;
         const assistance = (guestAssistance === 'minimal' || guestAssistance === 'standard' || guestAssistance === 'full')
           ? guestAssistance
           : 'standard';
-        const guestPlayerId = `guest-${Date.now()}`;
+        const guestResolved = await resolveJoinerId(
+          guestName,
+          () => `guest-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        );
+        if (cancelled) return;
+        const guestPlayerId = guestResolved.id;
         ownPlayerIdRef.current = guestPlayerId;
         const guestPlayer: LobbyPlayer = {
           id: guestPlayerId,
@@ -1819,8 +1863,9 @@ export default function LobbyScreen() {
           assistance,
           hcpComplete: true,
           // Ny joiner landar UNAPPROVED — host får join-approval-popupen
-          // (eller auto-approvar via friends-listan för registrerade).
-          approved: false,
+          // (eller auto-approvar via friends-listan för registrerade). Vid
+          // adopterad rad (re-entry) bevaras host:s ev. tidigare approval.
+          approved: guestResolved.existing?.approved ?? false,
         };
         // Spara payloaden för self-heal om upsert:en nedan tyst misslyckas.
         ownPlayerRef.current = guestPlayer;
@@ -1905,13 +1950,13 @@ export default function LobbyScreen() {
         if (carryOverPlayerId?.trim()) {
           joinerId = carryOverPlayerId.trim();
         } else {
-          const existingPlayers = await withTimeout(getLobbyPlayers(roomCode), SYNC_TIMEOUT_MS, undefined, 'getLobbyPlayers(joiner)');
-          existingMatch = existingPlayers?.find(
-            (p) =>
-              !p.isHost &&
-              p.name.trim().toLowerCase() === myPlayerName.toLowerCase(),
+          const resolved = await resolveJoinerId(
+            myPlayerName,
+            () => `joiner-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           );
-          joinerId = existingMatch?.id ?? `joiner-${Date.now()}`;
+          if (cancelled) return;
+          existingMatch = resolved.existing;
+          joinerId = resolved.id;
         }
         ownPlayerIdRef.current = joinerId;
         // Approved-policy: carry-over (Play Again) är pre-approvad av host:s
@@ -2381,6 +2426,10 @@ export default function LobbyScreen() {
   // One-shot-guard: host publicerar sitt Guest alias en gång per lobby
   // (players-sync-effekten körs vid varje ändring).
   const hostAliasPublishedRef = useRef(false);
+  // Debounce-handle för host:s players-bulk-write (A1a) — hoistad till en ref
+  // så handleStartGame kan avbryta en väntande skrivning före sin egen
+  // explicita setLobbyPlayers (undviker en stale trailing-write efteråt).
+  const hostBulkWriteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // True enbart när LobbyScreen är aktiv — stänger av MorseAmbientSound
   // (WebView-baserat ljud) när Stack-navigatorn trycker Quiz ovanpå.
   const [screenFocused, setScreenFocused] = useState(true);
@@ -3826,10 +3875,20 @@ export default function LobbyScreen() {
   // friends-lista eller watcher, och `hostFriendsLoaded` är där permanent
   // false — utan hostMode-gaten hade varje icke-godkänd spelare dolts för
   // alltid på non-host-enheten.
+  // ⚠ A4 (Peter 2026-09-21): hiding är nu ENBART tidsbundet — grace-fönstret
+  // (3 s host / 5 s non-host) + det engångsvis snabba friends-load-fönstret.
+  // Den tidigare `willAutoApproveOnJoin(p)`-termen var VILLKORS-baserad, inte
+  // tidsbunden: om en auto-approve inte "fastnade" (pendingApprovalRef prunad
+  // + en sync skrev approved=false tillbaka) doldes raden FÖR ALLTID — utan
+  // ApproveToggle och utan trash, så host kunde varken godkänna eller ta bort
+  // spelaren (exakt den rapporterade "not approved men kan inte godkännas"-
+  // buggen). Auto-approve-watchern (nedan) godkänner ändå genuina friends inom
+  // grace-fönstret, så de blinkar aldrig rött; men efter grace hamnar en
+  // fortfarande icke-godkänd rad ALLTID i waitingForApproval med toggle + trash
+  // → host kan aldrig låsas ute. `willAutoApproveOnJoin` används fortsatt av
+  // watchern; den styr bara inte längre synligheten.
   const isJoinDecisionPending = (p: LobbyPlayer) =>
-    !p.isHost &&
-    (joinGraceIds.has(p.id) ||
-      (hostMode && (!hostFriendsLoaded || willAutoApproveOnJoin(p))));
+    !p.isHost && (joinGraceIds.has(p.id) || (hostMode && !hostFriendsLoaded));
   const waitingForApproval = players.filter(
     (p) => !isPlayerApproved(p) && !p.hasLeft && !isJoinDecisionPending(p),
   );
@@ -3971,9 +4030,13 @@ export default function LobbyScreen() {
         // bulk-write-effekt på [players] (setLobbyPlayers).
         promptedIdsRef.current.add(p.id);
         pendingApprovalRef.current.set(p.id, true);
-        setPlayers((prev) =>
-          prev.map((x) => (x.id === p.id ? { ...x, approved: true } : x)),
-        );
+        // No-op-guard (A1c): returnera prev om raden redan är approved, annars
+        // allokerar .map en ny array på en logisk no-op → re-arm:ar host:s
+        // debounce:ade bulk-write i onödan (var en del av O(N)-stormen).
+        setPlayers((prev) => {
+          if (!prev.some((x) => x.id === p.id && !x.approved)) return prev;
+          return prev.map((x) => (x.id === p.id ? { ...x, approved: true } : x));
+        });
         return;
       }
       if (promptedIdsRef.current.has(p.id)) return;
@@ -4171,10 +4234,13 @@ export default function LobbyScreen() {
       // så fort peerHealth blir stable.
       hostUnapprovedIdsRef.current.add(playerId);
       pendingApprovalRef.current.set(playerId, false);
-      // Idempotent: setPlayers no-op:ar när raden redan är unapproved.
-      setPlayers((prev) =>
-        prev.map((p) => (p.id === playerId ? { ...p, approved: false } : p)),
-      );
+      // Idempotent (A1c): returnera prev när raden redan är unapproved —
+      // annars allokerar .map en ny array på en no-op och re-arm:ar host:s
+      // debounce:ade bulk-write.
+      setPlayers((prev) => {
+        if (!prev.some((p) => p.id === playerId && p.approved)) return prev;
+        return prev.map((p) => (p.id === playerId ? { ...p, approved: false } : p));
+      });
     });
   }, [lobbyPeerHealth, hostMode, gameMode, players]);
 
@@ -4278,9 +4344,19 @@ export default function LobbyScreen() {
       }
     }
     players.forEach((p) => {
-      if (p.hcpComplete && !p.isHost) pendingApprovalRef.current.set(p.id, true);
+      if (p.hcpComplete && !p.isHost) {
+        pendingApprovalRef.current.set(p.id, true);
+        // Rensa host-intent (A4) så friend-auto-approve-watchern inte tyst
+        // re-hidear en friend host tidigare togglat till waiting. Speglar
+        // handleSetApproved:s hostUnapprovedIdsRef.delete vid approve.
+        hostUnapprovedIdsRef.current.delete(p.id);
+      }
     });
-    setPlayers((prev) => prev.map((p) => p.hcpComplete ? { ...p, approved: true } : p));
+    // No-op-guard (A1c): returnera prev om ingen rad faktiskt ändras.
+    setPlayers((prev) => {
+      if (!prev.some((p) => p.hcpComplete && !p.approved)) return prev;
+      return prev.map((p) => (p.hcpComplete ? { ...p, approved: true } : p));
+    });
   };
 
   // ── Player-edit modal (host-only) ────────────────────────────────
@@ -5136,20 +5212,32 @@ export default function LobbyScreen() {
   // över host:s snapshot. Fire-and-forget — UI:t väntar inte på roundtrip.
   useEffect(() => {
     if (!hostMode) return;
-    setLobbyPlayers(roomCode, players)
-      .then(() => {
-        // Guest alias för host: en INLOGGAD user som hostar som Guest
-        // publicerar sitt kontonamn så joiners ser vem värden är. En gång
-        // per lobby — effekten körs vid varje players-ändring, och
-        // kolumnen ändras aldrig under lobbyns livstid.
-        if (hostAliasPublishedRef.current) return;
-        const hostId = players.find((p) => p.isHost)?.id;
-        if (!hostId) return;
-        hostAliasPublishedRef.current = true;
-        publishOwnAccountAlias(roomCode, hostId);
-        publishOwnHcpToLobby(roomCode, hostId);
-      })
-      .catch(() => { /* loggas i mockLobbyPlayers */ });
+    // Debounce (A1a): en burst av players-ändringar (samtidiga joiners,
+    // auto-approve, field-sync) kollapsar till EN skrivning ~400 ms efter
+    // sista ändringen. Utan detta ekar varje full-array-UPSERT tillbaka som
+    // en UPDATE-per-rad på host:s egen Realtime-lyssnare → re-sync → ny
+    // skrivning = O(N)-storm som fryser JS-tråden vid flera joiners. Mönstret
+    // speglar settings-write-effekten nedan.
+    hostBulkWriteTimerRef.current = setTimeout(() => {
+      hostBulkWriteTimerRef.current = null;
+      setLobbyPlayers(roomCode, players)
+        .then(() => {
+          // Guest alias för host: en INLOGGAD user som hostar som Guest
+          // publicerar sitt kontonamn så joiners ser vem värden är. En gång
+          // per lobby — effekten körs vid varje players-ändring, och
+          // kolumnen ändras aldrig under lobbyns livstid.
+          if (hostAliasPublishedRef.current) return;
+          const hostId = players.find((p) => p.isHost)?.id;
+          if (!hostId) return;
+          hostAliasPublishedRef.current = true;
+          publishOwnAccountAlias(roomCode, hostId);
+          publishOwnHcpToLobby(roomCode, hostId);
+        })
+        .catch(() => { /* loggas i mockLobbyPlayers */ });
+    }, HOST_BULK_WRITE_DEBOUNCE_MS);
+    return () => {
+      if (hostBulkWriteTimerRef.current) clearTimeout(hostBulkWriteTimerRef.current);
+    };
   }, [hostMode, roomCode, players]);
 
   // Host: skriv host-settings (gameMode, region, era, rounds, response time,
@@ -5391,66 +5479,31 @@ export default function LobbyScreen() {
   useEffect(() => {
     if (!hostMode || !roomCode) return;
     let cancelled = false;
-    const fetchNewJoiners = async () => {
+    // A1b — EN samlad roster-reconcile för BÅDE nya joiners OCH field-sync.
+    // Tidigare fanns två separata funktioner (fetchNewJoiners på INSERT,
+    // syncNonHostFields på UPDATE) som var för sig gjorde en get_lobby_roster-
+    // RPC + setPlayers. Host:s egen bulk-write ekar tillbaka som en UPDATE per
+    // rad → N joiners × ~4 skrivningar gav en O(N)-storm av RPC:er + setPlayers
+    // som frös JS-tråden. Nu: ETT roster-read + ETT setPlayers per debounce-
+    // fönster, som i en enda pass (1) field-syncar befintliga rader och (2)
+    // splice:ar in genuint nya joiners.
+    const reconcileRoster = async () => {
       const stored = await getLobbyPlayers(roomCode);
+      // stored === null → read failade/tom (getLobbyPlayers-kontrakt): behåll
+      // lokal state, clobba inget. undefined/[] hanteras av filtren nedan.
       if (cancelled || !stored) return;
       setPlayers((prev) => {
-        const localIds = new Set(prev.map((p) => p.id));
-        // Namn-dedup mot lokala state: Play Again carry-over kan ge en race
-        // där non-host:s code-only-join inte hittade carry-over-raden i DB
-        // (Supabase-propagering hann inte) → non-host insertade en ny rad
-        // med nytt id. DB har då två rader: carry-over-id + ny-id. Utan
-        // namnfilter läser fetchNewJoiners in ny-id-raden som "ny joiner"
-        // (carry-over-id finns i localIds men inte ny-id) → host ser 2 kort.
-        const localNames = new Set(
-          prev.filter((p) => !p.isHost).map((p) => p.name.trim().toLowerCase()),
-        );
-        // Hoppa över rader som är host-typade (host:s eget kort hanteras
-        // separat via mergeProfileIntoHost) — vi vill bara plocka in nya
-        // joiners (registered/guest/manual som ännu inte är i lokal state).
-        const newJoiners = stored.filter(
-          (p) => !p.isHost && !localIds.has(p.id) && !localNames.has(p.name.trim().toLowerCase()),
-        );
-        if (newJoiners.length === 0) return prev;
-        const hostIdx = prev.findIndex((p) => p.isHost);
-        const insertAt = hostIdx === -1 ? prev.length : hostIdx + 1;
-        const next = [...prev];
-        next.splice(insertAt, 0, ...newJoiners);
-        return next;
-      });
-    };
-    // Syncar non-host-fält som non-host:en själv kan skriva till DB:n:
-    // `hasLeft` (markOwnPlayerLeft + reset vid re-join). `approved` läses
-    // hit-vägen — carry-over-join rör INTE approved i DB, så host:s eventuella
-    // approval (approved=true) syns hit via denna sync (fetchNewJoiners).
-    //
-    // Utan approved-sync skulle host:s useEffect [players]-trigger (från
-    // hasLeft-ändringen) köra setLobbyPlayers som bulk-UPSERT:ar lokala
-    // state — och eftersom host:s lokala `approved` ligger kvar som true
-    // från en tidigare approval skulle bulk-UPSERT:en clobba DB:s freshly-
-    // set approved=false tillbaka till true. Resultatet: non-host som
-    // re-joinar via Share invite eller code skulle auto-approvas av host
-    // utan att host gjort något — fel beteende.
-    //
-    // Genom att pulla approved från DB:n in i lokala state INNAN useEffect
-    // fyrar, blir bulk-UPSERT:ens payload `approved=false` (i sync med DB)
-    // och ingen clobber sker.
-    const syncNonHostFields = async () => {
-      const stored = await getLobbyPlayers(roomCode);
-      if (cancelled || !stored) return;
-      setPlayers((prev) => {
+        // (1) Field-sync befintliga non-host-rader. `approved` pullas hit så
+        // host:s bulk-write inte clobbar DB:s freshly-set värde tillbaka;
+        // pendingApprovalRef-overriden låter host:s ännu obekräftade beslut
+        // vinna tills DB rapporterar samma värde (annars flimrar kortet).
         let changed = false;
-        const next = prev.map((p) => {
+        const synced = prev.map((p) => {
           if (p.isHost) return p; // host:s fält ägs lokalt (mergeProfileIntoHost)
           const updated = stored.find((s) => s.id === p.id);
           if (!updated) return p;
           const nextHasLeft = !!updated.hasLeft;
           const dbApproved = !!updated.approved;
-          // Host:s egna, ännu obekräftade approve-beslut vinner över DB:n.
-          // När DB rapporterar samma värde är skrivningen bekräftad →
-          // släpp posten så normal sync (t.ex. re-join → approved=false)
-          // fungerar igen. Utan detta flimrar kortet mellan "Approved" och
-          // "To be Approved" medan bulk-write:en är i flykt.
           const pending = pendingApprovalRef.current.get(p.id);
           if (pending !== undefined && dbApproved === pending) {
             pendingApprovalRef.current.delete(p.id);
@@ -5458,13 +5511,11 @@ export default function LobbyScreen() {
           const nextApproved =
             pending !== undefined && dbApproved !== pending ? pending : dbApproved;
           const nextSpotifyConnected = !!updated.spotifyConnected;
-          // Guest alias publiceras av spelaren själv en kort stund EFTER
-          // deras upsert, så fetchNewJoiners hinner ofta läsa raden innan
-          // kolumnen är satt (och plockar sedan aldrig upp den igen —
-          // spelaren är då redan i localIds). Konvergera den här istället.
+          // Guest alias + HCP publiceras av spelaren själv strax EFTER deras
+          // upsert, så en tidig reconcile hinner läsa raden innan kolumnerna
+          // är satta (och plockar sedan aldrig upp den igen — spelaren är då
+          // redan i lokala state). Konvergera dem här.
           const nextAccountName = updated.accountPlayerName;
-          // HCP publiceras av spelaren själv strax efter deras upsert (samma
-          // konvergens-fönster som guest alias) → syncas här (Total + kategorier).
           const nextHcp = updated.hcp;
           const nextHcpMusic = updated.hcpMusic;
           const nextHcpFilm = updated.hcpFilm;
@@ -5490,14 +5541,41 @@ export default function LobbyScreen() {
             hcpFilm: nextHcpFilm,
           };
         });
-        return changed ? next : prev;
+        // (2) Splice:a in genuint nya joiners. Dedup mot BÅDE id och namn
+        // (case-insensitive): Play Again carry-over kan ge en race där non-
+        // host:s code-only-join inte hittade carry-over-raden i DB → en ny-id-
+        // rad skapas parallellt med carry-over-id → utan namnfilter hade båda
+        // renderats som två kort. Hoppa host-typade rader (eget kort ägs
+        // lokalt via mergeProfileIntoHost).
+        const localIds = new Set(prev.map((p) => p.id));
+        const localNames = new Set(
+          prev.filter((p) => !p.isHost).map((p) => p.name.trim().toLowerCase()),
+        );
+        const newJoiners = stored.filter(
+          (p) => !p.isHost && !localIds.has(p.id) && !localNames.has(p.name.trim().toLowerCase()),
+        );
+        if (newJoiners.length === 0) return changed ? synced : prev;
+        const base = changed ? synced : [...prev];
+        const hostIdx = base.findIndex((p) => p.isHost);
+        const insertAt = hostIdx === -1 ? base.length : hostIdx + 1;
+        base.splice(insertAt, 0, ...newJoiners);
+        return base;
       });
     };
-    // Bakåtkompat-alias för call-sites nedan som fortsatt heter syncHasLeft.
-    const syncHasLeft = syncNonHostFields;
-    // Initial check direkt vid mount så ev. joiners som hunnit INSERT:a
-    // innan host:s subscription var aktiv kommer in i listan.
-    fetchNewJoiners();
+    // Debounce-scheduler: en burst av INSERT/UPDATE-event kollapsar till EN
+    // reconcile per tyst fönster (~500 ms). Timer lokal till effekten (som
+    // settings-write:ens `handle`); rensas i cleanup.
+    let reconcileTimer: ReturnType<typeof setTimeout> | null = null;
+    const scheduleRosterReconcile = () => {
+      if (reconcileTimer) clearTimeout(reconcileTimer);
+      reconcileTimer = setTimeout(() => {
+        reconcileTimer = null;
+        void reconcileRoster();
+      }, HOST_ROSTER_RECONCILE_DEBOUNCE_MS);
+    };
+    // Initial reconcile direkt vid mount (ingen debounce) så joiners som hann
+    // INSERT:a innan subscription var aktiv kommer in i listan snabbt.
+    void reconcileRoster();
     // Defensiv channel-cleanup (samma som non-host channel:n ovan) —
     // supabase.channel(name) återanvänder existerande topic, så stale
     // subscribed channels från remount måste rensas innan vi addar .on().
@@ -5510,16 +5588,17 @@ export default function LobbyScreen() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'lobby_players', filter: `room_code=eq.${roomCode}` },
-        () => fetchNewJoiners(),
+        () => scheduleRosterReconcile(),
       )
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'lobby_players', filter: `room_code=eq.${roomCode}` },
-        () => syncHasLeft(),
+        () => scheduleRosterReconcile(),
       )
       .subscribe();
     return () => {
       cancelled = true;
+      if (reconcileTimer) clearTimeout(reconcileTimer);
       supabase.removeChannel(channel);
     };
   }, [hostMode, roomCode]);
@@ -6600,6 +6679,12 @@ export default function LobbyScreen() {
     // läser approved=false → "started without me"-popup trots att host
     // faktiskt approvade spelaren. Explicit await här garanterar att
     // approved:true är i DB innan game_started=true sätts.
+    // A1d: avbryt en väntande debounce:ad bulk-write (A1a) så den inte kan
+    // fyra EFTER denna auktoritativa skrivning med en äldre snapshot.
+    if (hostBulkWriteTimerRef.current) {
+      clearTimeout(hostBulkWriteTimerRef.current);
+      hostBulkWriteTimerRef.current = null;
+    }
     await setLobbyPlayers(roomCode, players);
 
     // Remote 1v1: skapa den server-side matchen (remote_matches + 2 spelar-
