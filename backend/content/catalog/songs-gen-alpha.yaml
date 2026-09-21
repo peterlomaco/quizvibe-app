@@ -2836,3 +2836,264 @@ items:
         startSec: 50
         endSec: 80
         notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: fjellrev-jeg-vil-ha
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jeg vil ha — Fjellrev"
+    correctYear: 2024
+    probability: 55
+    wikimediaSearchHints: ["Fjellrev Jeg vil ha"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "qjVD3sg5cxM"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: fjellrev-birra
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Birra — Fjellrev"
+    correctYear: 2025
+    probability: 55
+    wikimediaSearchHints: ["Fjellrev Birra"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "TJCSpbsGYAA"
+        startSec: 8
+        endSec: 38
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: sote-rare-gutter-baerum-bitches
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bærum Bitches — Søte & rare gutter"
+    correctYear: 2024
+    probability: 55
+    wikimediaSearchHints: ["Søte og rare gutter Bærum Bitches"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "l1ggWzqo1K8"
+        startSec: 6
+        endSec: 36
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: sote-rare-gutter-bender
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bender — Søte & rare gutter"
+    correctYear: 2025
+    probability: 55
+    wikimediaSearchHints: ["Søte og rare gutter Bender"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "GOE9VfKAaeI"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: soppgirobygget-afterski
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Afterski — Soppgirobygget"
+    correctYear: 2021
+    probability: 55
+    wikimediaSearchHints: ["Soppgirobygget Afterski"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "YDz2fzsHobk"
+        startSec: 3
+        endSec: 33
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: soppgirobygget-cream
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "CREAM — Soppgirobygget"
+    correctYear: 2022
+    probability: 55
+    wikimediaSearchHints: ["Soppgirobygget CREAM"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "o5_DlLi6wqs"
+        startSec: 18
+        endSec: 48
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: soppgirobygget-bassiaini
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bassiaini — Soppgirobygget"
+    correctYear: 2025
+    probability: 55
+    wikimediaSearchHints: ["Soppgirobygget Bassiaini"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "IxTq6J056aE"
+        startSec: 25
+        endSec: 55
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: soppgirobygget-ompa
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ompa — Soppgirobygget"
+    correctYear: 2023
+    probability: 55
+    wikimediaSearchHints: ["Soppgirobygget Ompa"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "CSnoXrCYGSU"
+        startSec: 4
+        endSec: 34
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: soppgirobygget-rikerud
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rikerud — Soppgirobygget"
+    correctYear: 2024
+    probability: 55
+    wikimediaSearchHints: ["Soppgirobygget Rikerud"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "m7jCbk54iNI"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: soppgirobygget-kjope-hele-sverige
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kjøpe hele Sverige — Soppgirobygget"
+    correctYear: 2022
+    probability: 55
+    wikimediaSearchHints: ["Soppgirobygget Kjøpe hele Sverige"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "9hSO7x8oLnI"
+        startSec: 8
+        endSec: 38
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: soppgirobygget-norge-ska-til-vm
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Norge ska til VM — Soppgirobygget"
+    correctYear: 2026
+    probability: 55
+    wikimediaSearchHints: ["Soppgirobygget Norge skal til VM"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Sports edition"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "66x_D-urY8g"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      - videoId: "fboVs6a8qpk"
+        startSec: 0
+        endSec: 30
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: soppgirobygget-nachpit
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Nachpit — Soppgirobygget"
+    correctYear: 2024
+    probability: 55
+    wikimediaSearchHints: ["Soppgirobygget Nachpit"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "jAhhNX8xUfk"
+        startSec: 5
+        endSec: 35
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: soppgirobygget-viva-la-vida
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Viva La Vida — Soppgirobygget"
+    correctYear: 2024
+    probability: 55
+    wikimediaSearchHints: ["Soppgirobygget Viva La Vida"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "U7wGh-rHjTQ"
+        startSec: 30
+        endSec: 60
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: albatraoz-raggarbil
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Raggarbil — Albatraoz"
+    correctYear: 2020
+    probability: 60
+    wikimediaSearchHints: ["Albatraoz Raggarbil"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Party & Dunk"]
+    inBaseCatalog: false
+    parentControlled: true
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "g2IMHyHHJbw"
+        startSec: 8
+        endSec: 38
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: golf-ekko
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ekko — Golf & Olivia Lobato"
+    correctYear: 2025
+    probability: 60
+    wikimediaSearchHints: ["Golf Olivia Lobato Ekko"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Disco & Pop"]
+    inBaseCatalog: false
+    region: ["nordic"]
+    youtubeClips:
+      - videoId: "15yQazGEMEw"
+        startSec: 12
+        endSec: 42
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: sombr-undressed
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Undressed — Sombr"
+    correctYear: 2025
+    probability: 65
+    wikimediaSearchHints: ["Sombr Undressed"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Disco & Pop"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "z0wT6CrEGYg"
+        startSec: 15
+        endSec: 45
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      - videoId: "CtRn6eqVnvY"
+        startSec: 16
+        endSec: 46
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."

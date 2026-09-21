@@ -16984,6 +16984,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "just-d-tre-gringos",
+    "displayName": "Tre gringos — Just D",
+    "correctYear": 1996,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% swedish"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ABae3mpdPPA",
+        "startSec": 13,
+        "endSec": 43,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "lightning-seeds-three-lions",
     "displayName": "Three Lions — Baddiel, Skinner & The Lightning Seeds",
     "correctYear": 1996,
@@ -33085,6 +33115,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "albatraoz-raggarbil",
+    "displayName": "Raggarbil — Albatraoz",
+    "correctYear": 2020,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 60,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "g2IMHyHHJbw",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "ava-max-kings-and-queens",
     "displayName": "Kings & Queens — Ava Max",
     "correctYear": 2020,
@@ -33674,6 +33736,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "soppgirobygget-afterski",
+    "displayName": "Afterski — Soppgirobygget",
+    "correctYear": 2021,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "YDz2fzsHobk",
+        "startSec": 3,
+        "endSec": 33,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "swedish-house-mafia-moth-to-flame",
     "displayName": "Moth to Flame — Swedish House Mafia",
     "correctYear": 2021,
@@ -33985,6 +34079,70 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "soppgirobygget-cream",
+    "displayName": "CREAM — Soppgirobygget",
+    "correctYear": 2022,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "o5_DlLi6wqs",
+        "startSec": 18,
+        "endSec": 48,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "soppgirobygget-kjope-hele-sverige",
+    "displayName": "Kjøpe hele Sverige — Soppgirobygget",
+    "correctYear": 2022,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "9hSO7x8oLnI",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "taylor-swift-anti-hero",
     "displayName": "Anti-Hero — Taylor Swift",
     "correctYear": 2022,
@@ -34229,6 +34387,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "soppgirobygget-ompa",
+    "displayName": "Ompa — Soppgirobygget",
+    "correctYear": 2023,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "CSnoXrCYGSU",
+        "startSec": 4,
+        "endSec": 34,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "benjamin-ingrosso-kite",
     "displayName": "Kite — Benjamin Ingrosso",
     "correctYear": 2024,
@@ -34411,6 +34601,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "inBaseCatalog": false,
     "spotifyTrackId": "0uHrMbMv3c78398pIANDqR",
     "youtubeClips": []
+  },
+  {
+    "id": "fjellrev-jeg-vil-ha",
+    "displayName": "Jeg vil ha — Fjellrev",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "qjVD3sg5cxM",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
   },
   {
     "id": "froken-snusk-unga-och-fria",
@@ -34638,6 +34860,134 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "soppgirobygget-nachpit",
+    "displayName": "Nachpit — Soppgirobygget",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "jAhhNX8xUfk",
+        "startSec": 5,
+        "endSec": 35,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "soppgirobygget-rikerud",
+    "displayName": "Rikerud — Soppgirobygget",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "m7jCbk54iNI",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "soppgirobygget-viva-la-vida",
+    "displayName": "Viva La Vida — Soppgirobygget",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "U7wGh-rHjTQ",
+        "startSec": 30,
+        "endSec": 60,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "sote-rare-gutter-baerum-bitches",
+    "displayName": "Bærum Bitches — Søte & rare gutter",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "l1ggWzqo1K8",
+        "startSec": 6,
+        "endSec": 36,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "alex-warren-eternity",
     "displayName": "Eternity — Alex Warren",
     "correctYear": 2025,
@@ -34772,6 +35122,69 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "fjellrev-birra",
+    "displayName": "Birra — Fjellrev",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "TJCSpbsGYAA",
+        "startSec": 8,
+        "endSec": 38,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "golf-ekko",
+    "displayName": "Ekko — Golf & Olivia Lobato",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 60,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "15yQazGEMEw",
+        "startSec": 12,
+        "endSec": 42,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
     "id": "jj-wasted-love",
     "displayName": "Wasted Love — JJ",
     "correctYear": 2025,
@@ -34898,6 +35311,107 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "sombr",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "sombr-undressed",
+    "displayName": "Undressed — Sombr",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 65,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "z0wT6CrEGYg",
+        "startSec": 15,
+        "endSec": 45,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      },
+      {
+        "videoId": "CtRn6eqVnvY",
+        "startSec": 16,
+        "endSec": 46,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "soppgirobygget-bassiaini",
+    "displayName": "Bassiaini — Soppgirobygget",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "IxTq6J056aE",
+        "startSec": 25,
+        "endSec": 55,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "sote-rare-gutter-bender",
+    "displayName": "Bender — Søte & rare gutter",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "GOE9VfKAaeI",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
       }
     ]
   },
@@ -35307,6 +35821,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "shakiraVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "soppgirobygget-norge-ska-til-vm",
+    "displayName": "Norge ska til VM — Soppgirobygget",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 55,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "genrePackages": [
+      "Sports edition"
+    ],
+    "inBaseCatalog": false,
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "66x_D-urY8g",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      },
+      {
+        "videoId": "fboVs6a8qpk",
+        "startSec": 0,
+        "endSec": 30,
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
       }
     ]
   }

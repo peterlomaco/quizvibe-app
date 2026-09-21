@@ -4759,3 +4759,17 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "6xkryXuiZU360Lngd4sx13"
     region: ["global"]
+  - id: just-d-tre-gringos
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Tre gringos — Just D"
+    correctYear: 1996
+    probability: 75
+    wikimediaSearchHints: ["Just D Tre gringos"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% swedish"]
+    region: ["sweden"]
+    youtubeClips:
+      - videoId: "ABae3mpdPPA"
+        startSec: 13
+        endSec: 43
+        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
