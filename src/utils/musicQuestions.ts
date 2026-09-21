@@ -17196,12 +17196,11 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "5fRvePkRGdpn2nKacG7I6d",
     "youtubeClips": [
       {
-        "videoId": "EScLmWJs82I",
+        "videoId": "cOrc37wNUqU",
         "startSec": 0,
         "endSec": 30,
-        "channelTitle": "MELOMAN DANCE",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+        "notes": "Peter-kurerad 2026-09-21. Ersatte EScLmWJs82I (MELOMAN DANCE). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
