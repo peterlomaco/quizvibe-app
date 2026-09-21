@@ -226,3 +226,66 @@ items:
         endSec: 51
         channelTitle: "Bella Y Bestia Son"
         notes: "Peter-kurerad 2026-09-11 (Film.xlsx). VARNING: titeln 'Skönheten och odjuret: Trailer (2010)' visar '2010' (svensk aterutgivning) men RATT SVAR ar 1991 (originalfilmen, animerad) per ar-policy — en spelare som laser titeln kan svara fel. VERIFIERA i spelaren; byt klipp om '2010' syns."
+
+  # === Tillagg 2026-09-21 (Peters Film.xlsx rad 372-375) — globala animerade ===
+  # region: ["global"] item-override (fil-headern ar sweden). Year/timeline.
+  # YouTube-titlar hamtade via oembed 2026-09-21 (ingen ar-spoiler i titeln).
+  # (Rad 370 'Arthur' = Russell Brand-komedin 2011, live-action -> ligger i
+  # movies-classics.yaml, inte har.)
+
+  - id: kung-fu-panda-2008
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Kung Fu Panda"
+    correctYear: 2008
+    probability: 90
+    region: ["global"]
+    wikimediaSearchHints: ["Kung Fu Panda 2008 DreamWorks animated Po"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "NRc-ze7Wrxw"
+        startSec: 8
+        endSec: 38
+        channelTitle: "Universal Kids"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 372). startSec 8 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: ice-age-2002
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ice Age"
+    correctYear: 2002
+    probability: 90
+    region: ["global"]
+    wikimediaSearchHints: ["Ice Age 2002 Blue Sky animated Manny Sid Diego"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "wjdqn9r4thg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "TrailersPlaygroundHD"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 373). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: trolls-2016
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Trolls"
+    correctYear: 2016
+    probability: 85
+    region: ["global"]
+    wikimediaSearchHints: ["Trolls 2016 DreamWorks animated Poppy Branch"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "xyjm5VQ11TQ"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Universal Kids"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 374). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: sing-2016
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sing"
+    correctYear: 2016
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["Sing 2016 Illumination animated Buster Moon"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "SH5N44b5Rrw"
+        startSec: 5
+        endSec: 35
+        channelTitle: "Universal Pictures At Home"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 375). startSec 5 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."

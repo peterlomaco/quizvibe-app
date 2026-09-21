@@ -16984,6 +16984,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "jagarna-1996",
+    "displayName": "Jägarna",
+    "correctYear": 1996,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "9mNIz1qHJ3Y",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "peek646",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 362). Kjell Sundvall-originalet 1996 (inte Jagarna 2, 2011). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "just-d-tre-gringos",
     "displayName": "Tre gringos — Just D",
     "correctYear": 1996,
@@ -22847,6 +22876,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "oceans-eleven-2001",
+    "displayName": "Ocean's Eleven",
+    "correctYear": 2001,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "George Clooney",
+      "Brad Pitt"
+    ],
+    "distractorNames": [
+      "Tom Cruise",
+      "Leonardo DiCaprio",
+      "Denzel Washington",
+      "Will Smith"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "imm6OR605UI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "MovieStation",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 376). Name/actor-select (svar = Clooney/Pitt). Titeln visar '2001' men det ar en Name-fraga sa aret spoilar inte. VERIFIERA i spelaren att titeln inte visar skadespelarnamnet."
+      }
+    ]
+  },
+  {
     "id": "planet-funk-chase-the-sun",
     "displayName": "Chase the Sun — Planet Funk",
     "correctYear": 2001,
@@ -23233,6 +23301,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ice-age-2002",
+    "displayName": "Ice Age",
+    "correctYear": 2002,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "wjdqn9r4thg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "TrailersPlaygroundHD",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 373). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "justin-timberlake-like-i-love-you",
     "displayName": "Like I Love You — Justin Timberlake",
     "correctYear": 2002,
@@ -23488,6 +23584,44 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-bourne-identity-2002",
+    "displayName": "The Bourne Identity",
+    "correctYear": 2002,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this film?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Matt Damon"
+    ],
+    "distractorNames": [
+      "Tom Cruise",
+      "Leonardo DiCaprio",
+      "Brad Pitt",
+      "Ben Affleck"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xDn0Wno3Lss",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "4K Cinema Trailer",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 377). Name/actor-select (svar = Matt Damon). Titeln visar '2002' men det ar en Name-fraga sa aret spoilar inte. VERIFIERA i spelaren att titeln inte visar skadespelarnamnet."
+      }
+    ]
+  },
+  {
     "id": "50-cent-in-da-club",
     "displayName": "In da Club — 50 Cent",
     "correctYear": 2003,
@@ -23639,6 +23773,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Saskia Rice",
         "license": "standard",
         "notes": "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
+      }
+    ]
+  },
+  {
+    "id": "johnny-english-2003",
+    "displayName": "Johnny English",
+    "correctYear": 2003,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 82,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "UzqDydQlR0E",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "YouTube Movies",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 371). Year/timeline. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -26309,6 +26471,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "kung-fu-panda-2008",
+    "displayName": "Kung Fu Panda",
+    "correctYear": 2008,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NRc-ze7Wrxw",
+        "startSec": 8,
+        "endSec": 38,
+        "channelTitle": "Universal Kids",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 372). startSec 8 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "lady-gaga-just-dance",
     "displayName": "Just Dance — Lady Gaga",
     "correctYear": 2008,
@@ -26923,6 +27113,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sommaren-med-goran-2009",
+    "displayName": "Sommaren med Göran",
+    "correctYear": 2009,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "iwVdSPFliBw",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Nordisk Film Sverige",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 367). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "the-hangover-2009",
     "displayName": "The Hangover",
     "correctYear": 2009,
@@ -27149,6 +27367,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Bruno Mars",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". correctYear = albumet Doo-Wops & Hooligans (okt 2010), inte singeln feb 2011."
+      }
+    ]
+  },
+  {
+    "id": "cornelis-2010",
+    "displayName": "Cornelis",
+    "correctYear": 2010,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 72,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "GpxDrF2Nlmg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "sockerdricka",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 360). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -27769,6 +28016,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Adele",
         "license": "standard",
         "notes": "Official Music Video — signature ballad. Chorus area."
+      }
+    ]
+  },
+  {
+    "id": "arthur-2011",
+    "displayName": "Arthur",
+    "correctYear": 2011,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 74,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "Xb2HkBZ9shQ",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "MultiMoviesmedia",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 370). Russell Brand-komedin 2011 (remake av 1981-filmen), bekraftad av Peter. startSec 5 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -28542,6 +28817,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "en-gang-i-phuket-2012",
+    "displayName": "En gång i Phuket",
+    "correctYear": 2012,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "bC28yZZqX48",
+        "startSec": 2,
+        "endSec": 32,
+        "channelTitle": "Nordisk Film Sverige",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 366). startSec 2 fran xlsx. correctYear = svensk biopremiar 2012 (produktion 2011). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "first-aid-kit-emmylou",
     "displayName": "Emmylou — First Aid Kit",
     "correctYear": 2012,
@@ -28997,6 +29300,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sune-i-grekland-2012",
+    "displayName": "Sune i Grekland — All Inclusive",
+    "correctYear": 2012,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TWTUV4i32m4",
+        "startSec": 2,
+        "endSec": 32,
+        "channelTitle": "Nordisk Film Sverige",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 364). startSec 2 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "swedish-house-mafia-dont-you-worry-child",
     "displayName": "Don't You Worry Child — Swedish House Mafia",
     "correctYear": 2012,
@@ -29309,6 +29640,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "5TbzAWWc5eJaANpA9kfGCd",
     "youtubeClips": []
+  },
+  {
+    "id": "kann-ingen-sorg-2013",
+    "displayName": "Känn ingen sorg",
+    "correctYear": 2013,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "5FqkRSAbkFQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "SF Studios",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 359). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
   },
   {
     "id": "katy-perry-this-is-how-we-do",
@@ -29853,6 +30213,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bamse-och-tjuvstaden-2014",
+    "displayName": "Bamse och tjuvstaden",
+    "correctYear": 2014,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 78,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "lMbcy7NirqA",
+        "startSec": 4,
+        "endSec": 34,
+        "channelTitle": "Nordisk Film Sverige",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 363). startSec 4 fran xlsx. Animerad. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "calvin-harris-summer",
     "displayName": "Summer — Calvin Harris",
     "correctYear": 2014,
@@ -30221,6 +30609,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Sanna Nielsen",
         "license": "standard",
         "notes": "Melodifestivalen 2014 vinnare. Officiell music video."
+      }
+    ]
+  },
+  {
+    "id": "sune-i-fjallen-2014",
+    "displayName": "Sune i Fjällen",
+    "correctYear": 2014,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Winter"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "dKEobCuR6Ho",
+        "startSec": 3,
+        "endSec": 33,
+        "channelTitle": "Nordisk Film Sverige",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 365). startSec 3 fran xlsx. genrePackages:['Winter'] (Paket 1 i xlsx; paketet saljs inte an). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },
@@ -31535,6 +31954,62 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sing-2016",
+    "displayName": "Sing",
+    "correctYear": 2016,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 86,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "SH5N44b5Rrw",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "Universal Pictures At Home",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 375). startSec 5 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
+    "id": "trolls-2016",
+    "displayName": "Trolls",
+    "correctYear": 2016,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xyjm5VQ11TQ",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Universal Kids",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 374). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "veronica-maggio-vi-mot-varlden",
     "displayName": "Vi mot världen — Veronica Maggio",
     "correctYear": 2016,
@@ -32396,6 +32871,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "inBaseCatalog": false,
     "spotifyTrackId": "22ppznuzVF9LKamaaqMMqu",
     "youtubeClips": []
+  },
+  {
+    "id": "grans-2018",
+    "displayName": "Gräns",
+    "correctYear": 2018,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 76,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "y6NljX3X3XQ",
+        "startSec": 5,
+        "endSec": 35,
+        "channelTitle": "TriArt Film",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 361). startSec 5 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
   },
   {
     "id": "lady-gaga-bradley-cooper-shallow",
@@ -33615,6 +34119,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "jag-ar-zlatan-2021",
+    "displayName": "Jag är Zlatan",
+    "correctYear": 2021,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 88,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "MYXNGINlpVU",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Nordisk Film Sverige",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 368). genrePackages:['sport'] (Sport Edition i xlsx) -> surfar aven under Sport-filtret. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "kid-laroi-justin-bieber-stay",
     "displayName": "Stay — The Kid LAROI & Justin Bieber",
     "correctYear": 2021,
@@ -34419,6 +34954,34 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "avicii-im-tim-2024",
+    "displayName": "Avicii – I'm Tim",
+    "correctYear": 2024,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "X8LHNaCHYsg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Netflix",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 369). 'sport'-taggen borttagen av Peter 2026-09-21 (Avicii ar musiker). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
     "id": "benjamin-ingrosso-kite",
     "displayName": "Kite — Benjamin Ingrosso",
     "correctYear": 2024,
@@ -34543,6 +35106,35 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 44,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-14 ur Music.xlsx (rad 1422)."
+      }
+    ]
+  },
+  {
+    "id": "den-sista-resan-2024",
+    "displayName": "Den sista resan",
+    "correctYear": 2024,
+    "contentSubject": "movie",
+    "questionText": "Which Year was this Movie launched?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "parentControlled": true,
+    "youtubeClips": [
+      {
+        "videoId": "AA_3Bn_AECk",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Nordisk Film Sverige",
+        "license": "standard",
+        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 358). Filip & Fredriks dokumentar. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },

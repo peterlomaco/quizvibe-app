@@ -1138,3 +1138,69 @@ items:
         startSec: 5
         endSec: 35
         notes: "Peter-kurerad 2026-09-15 (Film.xlsx). Name/actor-select (svar = Sacha Baron Cohen). VERIFIERA i spelaren att titeln inte visar skadespelarnamnet."
+
+  # === Tillagg 2026-09-21 (Peters Film.xlsx rad 370-371, 376-377) — globala filmer ===
+
+  - id: arthur-2011
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Arthur"
+    correctYear: 2011
+    probability: 74
+    region: ["global"]
+    wikimediaSearchHints: ["Arthur 2011 film Russell Brand Helen Mirren"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "Xb2HkBZ9shQ"
+        startSec: 5
+        endSec: 35
+        channelTitle: "MultiMoviesmedia"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 370). Russell Brand-komedin 2011 (remake av 1981-filmen), bekraftad av Peter. startSec 5 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: johnny-english-2003
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Johnny English"
+    correctYear: 2003
+    probability: 82
+    region: ["global"]
+    wikimediaSearchHints: ["Johnny English 2003 film Rowan Atkinson"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "UzqDydQlR0E"
+        startSec: 0
+        endSec: 30
+        channelTitle: "YouTube Movies"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 371). Year/timeline. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: oceans-eleven-2001
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Ocean's Eleven"
+    correctYear: 2001
+    probability: 88
+    region: ["global"]
+    wikimediaSearchHints: ["Ocean's Eleven 2001 film George Clooney Brad Pitt"]
+    answerMethods: ["actor-select"]
+    correctNames: ["George Clooney", "Brad Pitt"]
+    # Distraktorer ar skadespelare som INTE ar med i Ocean's Eleven (Matt Damon,
+    # Julia Roberts, Andy Garcia, Don Cheadle AR med — anvand ej som distraktor).
+    distractorNames: ["Tom Cruise", "Leonardo DiCaprio", "Denzel Washington", "Will Smith"]
+    youtubeClips:
+      - videoId: "imm6OR605UI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "MovieStation"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 376). Name/actor-select (svar = Clooney/Pitt). Titeln visar '2001' men det ar en Name-fraga sa aret spoilar inte. VERIFIERA i spelaren att titeln inte visar skadespelarnamnet."
+  - id: the-bourne-identity-2002
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Bourne Identity"
+    correctYear: 2002
+    probability: 86
+    region: ["global"]
+    wikimediaSearchHints: ["The Bourne Identity 2002 film Matt Damon"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Matt Damon"]
+    # Distraktorer ar skadespelare som INTE ar med i The Bourne Identity.
+    distractorNames: ["Tom Cruise", "Leonardo DiCaprio", "Brad Pitt", "Ben Affleck"]
+    youtubeClips:
+      - videoId: "xDn0Wno3Lss"
+        startSec: 0
+        endSec: 30
+        channelTitle: "4K Cinema Trailer"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 377). Name/actor-select (svar = Matt Damon). Titeln visar '2002' men det ar en Name-fraga sa aret spoilar inte. VERIFIERA i spelaren att titeln inte visar skadespelarnamnet."

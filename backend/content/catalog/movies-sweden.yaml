@@ -216,3 +216,171 @@ items:
         startSec: 0
         endSec: 30
         notes: "Peter-kurerad 2026-09-15 (Film.xlsx). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+
+  # === Tillagg 2026-09-21 (Peters Film.xlsx rad 358-369) — svenska filmer ===
+  # Year/timeline. region arvs sweden fran fil-headern. YouTube-titlar hamtade
+  # via oembed 2026-09-21 (ingen ar-spoiler i titeln). VERIFIERA i spelaren.
+
+  - id: den-sista-resan-2024
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Den sista resan"
+    correctYear: 2024
+    probability: 85
+    parentControlled: true
+    wikimediaSearchHints: ["Den sista resan 2024 Filip Hammar Fredrik Wikingsson dokumentar"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "AA_3Bn_AECk"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Nordisk Film Sverige"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 358). Filip & Fredriks dokumentar. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: kann-ingen-sorg-2013
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Känn ingen sorg"
+    correctYear: 2013
+    probability: 78
+    parentControlled: true
+    wikimediaSearchHints: ["Kann ingen sorg 2013 svensk film Hakan Hellstrom"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "5FqkRSAbkFQ"
+        startSec: 0
+        endSec: 30
+        channelTitle: "SF Studios"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 359). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: cornelis-2010
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Cornelis"
+    correctYear: 2010
+    probability: 72
+    parentControlled: true
+    wikimediaSearchHints: ["Cornelis 2010 svensk film Cornelis Vreeswijk biopic"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "GpxDrF2Nlmg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "sockerdricka"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 360). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: grans-2018
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Gräns"
+    correctYear: 2018
+    probability: 76
+    parentControlled: true
+    wikimediaSearchHints: ["Grans 2018 svensk film Ali Abbasi"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "y6NljX3X3XQ"
+        startSec: 5
+        endSec: 35
+        channelTitle: "TriArt Film"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 361). startSec 5 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: jagarna-1996
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jägarna"
+    correctYear: 1996
+    probability: 82
+    parentControlled: true
+    wikimediaSearchHints: ["Jagarna 1996 svensk film Kjell Sundvall Rolf Lassgard"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "9mNIz1qHJ3Y"
+        startSec: 0
+        endSec: 30
+        channelTitle: "peek646"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 362). Kjell Sundvall-originalet 1996 (inte Jagarna 2, 2011). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: bamse-och-tjuvstaden-2014
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Bamse och tjuvstaden"
+    correctYear: 2014
+    probability: 78
+    wikimediaSearchHints: ["Bamse och tjuvstaden 2014 svensk animerad film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "lMbcy7NirqA"
+        startSec: 4
+        endSec: 34
+        channelTitle: "Nordisk Film Sverige"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 363). startSec 4 fran xlsx. Animerad. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: sune-i-grekland-2012
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sune i Grekland — All Inclusive"
+    correctYear: 2012
+    probability: 80
+    wikimediaSearchHints: ["Sune i Grekland All Inclusive 2012 svensk film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "TWTUV4i32m4"
+        startSec: 2
+        endSec: 32
+        channelTitle: "Nordisk Film Sverige"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 364). startSec 2 fran xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: sune-i-fjallen-2014
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sune i Fjällen"
+    correctYear: 2014
+    probability: 80
+    genrePackages: ["Winter"]
+    wikimediaSearchHints: ["Sune i Fjallen 2014 svensk film"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "dKEobCuR6Ho"
+        startSec: 3
+        endSec: 33
+        channelTitle: "Nordisk Film Sverige"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 365). startSec 3 fran xlsx. genrePackages:['Winter'] (Paket 1 i xlsx; paketet saljs inte an). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: en-gang-i-phuket-2012
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "En gång i Phuket"
+    correctYear: 2012
+    probability: 78
+    wikimediaSearchHints: ["En gang i Phuket 2012 svensk film Peter Magnusson"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "bC28yZZqX48"
+        startSec: 2
+        endSec: 32
+        channelTitle: "Nordisk Film Sverige"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 366). startSec 2 fran xlsx. correctYear = svensk biopremiar 2012 (produktion 2011). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: sommaren-med-goran-2009
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Sommaren med Göran"
+    correctYear: 2009
+    probability: 78
+    wikimediaSearchHints: ["Sommaren med Goran 2009 svensk film Peter Magnusson"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "iwVdSPFliBw"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Nordisk Film Sverige"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 367). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: jag-ar-zlatan-2021
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Jag är Zlatan"
+    correctYear: 2021
+    probability: 88
+    genrePackages: ["sport"]
+    wikimediaSearchHints: ["Jag ar Zlatan 2021 svensk film Zlatan Ibrahimovic"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "MYXNGINlpVU"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Nordisk Film Sverige"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 368). genrePackages:['sport'] (Sport Edition i xlsx) -> surfar aven under Sport-filtret. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+  - id: avicii-im-tim-2024
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Avicii – I'm Tim"
+    correctYear: 2024
+    probability: 85
+    wikimediaSearchHints: ["Avicii I'm Tim 2024 Netflix dokumentar Tim Bergling"]
+    answerMethods: ["timeline"]
+    youtubeClips:
+      - videoId: "X8LHNaCHYsg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Netflix"
+        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 369). 'sport'-taggen borttagen av Peter 2026-09-21 (Avicii ar musiker). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
