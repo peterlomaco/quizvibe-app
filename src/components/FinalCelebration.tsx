@@ -4,7 +4,6 @@ import {
   Animated,
   Dimensions,
   Easing,
-  InteractionManager,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
@@ -57,6 +56,11 @@ import { mainCategoryDisplay } from '../utils/mainCategory';
  */
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+
+// Paus efter att slutskärmen är uppe innan prisutdelningen (Q-ritning + fyrverkeri)
+// startar — så fyrverkeriet inte fyrar i själva landningsögonblicket utan en tydlig
+// beat EFTER att spelaren nått slutskärmen. Se `ready`-effekten nedan. (Peter 2026-09-22.)
+const CELEBRATION_START_DELAY_MS = 550;
 
 // Speglar BG_Q_SIZE / BG_TROPHY_SIZE i RoundLeaderboard.tsx.
 const Q_SIZE = Math.round(SCREEN_W * 0.9);
@@ -179,22 +183,29 @@ export default function FinalCelebration({
   // ögonblick som Q-ritningen, inte mount.
   const startedAtRef = useRef(0);
 
-  // ⚠ Starta HELA prisutdelningen först när slutskärmen har lagt sig + målats,
-  // inte vid mount. Q:t ritas av SparkleDrawQ mot wall-clock (Date.now()), och
-  // det tunga arbetet vid phase==='leaderboard' (saveFinalGame, finalizePlayer,
-  // matchHighlights, RoundLeaderboard-mount) blockar JS-tråden precis efter mount.
-  // Startade ritningen vid mount hann wall-clock rusa iväg under blocket, så Q:t
-  // tonade in redan ~70 % ritat ("fires too early"). Genom att ankra sekvensen till
-  // runAfterInteractions (efter den tunga batchen) ritas Q:t från 0 när spelaren
-  // faktiskt landar. Slöjan är opak från mount (se veil), så inget läckage syns
-  // under väntan. Fallback-timern garanterar att spelaren aldrig fastnar bakom
-  // slöjan om runAfterInteractions skulle utebli. (Peter 2026-09-22.)
+  // ⚠ Starta HELA prisutdelningen först en TYDLIG BEAT efter att slutskärmen lagt
+  // sig — inte vid mount. Två skäl:
+  //  1) Q:t ritas av SparkleDrawQ mot wall-clock (Date.now()). Startade ritningen
+  //     vid mount hann det tunga phase==='leaderboard'-arbetet (saveFinalGame,
+  //     finalizePlayer, matchHighlights, RoundLeaderboard-mount) blocka JS-tråden,
+  //     och Q:t tonade in redan ~70 % ritat.
+  //  2) Även efter att blocket lagt sig fyrade fyrverkeriet nästan i landnings-
+  //     ögonblicket — det kändes igång INNAN spelaren hunnit uppfatta att de nått
+  //     slutskärmen ("still a little bit too early").
+  // FinalCelebration monteras exakt när phase→'leaderboard' (samma commit som
+  // slutskärmen), så en setTimeout härifrån mäter från "slutskärmen är uppe". En
+  // setTimeout-callback kan dessutom inte köra medan tråden är blockerad → den
+  // fyrar ALLTID efter det tunga arbetet + beaten, och Q:t ritas då från 0. Slöjan
+  // är opak (Colors.background) från mount, så spelaren ser en ren mörk "resultat
+  // laddas"-beat, inget läckage. Fallback:en garanterar att ingen fastnar bakom
+  // slöjan. Justera CELEBRATION_START_DELAY_MS om beaten känns för kort/lång.
+  // (Peter 2026-09-22.)
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    const task = InteractionManager.runAfterInteractions(() => setReady(true));
-    const fallback = setTimeout(() => setReady(true), 800);
+    const beat = setTimeout(() => setReady(true), CELEBRATION_START_DELAY_MS);
+    const fallback = setTimeout(() => setReady(true), CELEBRATION_START_DELAY_MS + 1500);
     return () => {
-      task.cancel();
+      clearTimeout(beat);
       clearTimeout(fallback);
     };
   }, []);
