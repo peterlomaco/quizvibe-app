@@ -4768,6 +4768,22 @@ export default function LobbyScreen() {
     [friends, pendingFriends],
   );
 
+  // Namn (lowercase, trim) på spelare som redan är i DENNA lobby (approved
+  // eller väntar, EJ lämnade) — driver gråtoning + låsning av friends som
+  // redan är med, så host inte råkar bjuda in någon som redan finns i rummet
+  // (Peter 2026-09-22). Friends bär inget user_id, så matchning sker på
+  // playerName case-insensitivt mot spelarnas namn (samma nyckel som övrig
+  // lobby-dedupe).
+  const lobbyPlayerNames = useMemo(
+    () =>
+      new Set(
+        players
+          .filter((p) => !p.hasLeft)
+          .map((p) => p.name.trim().toLowerCase()),
+      ),
+    [players],
+  );
+
   // "Cancel" på CodeKeyboard:et (2026-08-27) — Share invite:s "Done"-knapp
   // ersattes tidigare med "Send invite" (disabled tills minst en friend är
   // ibockad), vilket lämnade Add-by-Player-Name-fältet utan något sätt att
@@ -4789,7 +4805,10 @@ export default function LobbyScreen() {
   // efteråt (ersätter f.d. "Done"-knappen).
   const handleSendInvites = async () => {
     const toSend = displayFriends.filter(
-      (f) => selectedFriendIds.has(f.id) && !invitedFriendIds.has(f.id),
+      (f) =>
+        selectedFriendIds.has(f.id) &&
+        !invitedFriendIds.has(f.id) &&
+        !lobbyPlayerNames.has(f.playerName.trim().toLowerCase()),
     );
     if (toSend.length === 0) {
       setShareModalOpen(false);
@@ -9744,7 +9763,12 @@ export default function LobbyScreen() {
               >
                 {displayFriends.map((friend, i) => {
                   const invited = invitedFriendIds.has(friend.id);
-                  const checked = invited || selectedFriendIds.has(friend.id);
+                  // Redan i lobbyn (Peter 2026-09-22) — gråtonas + låst så host
+                  // inte kan bjuda in någon som redan är med i rummet.
+                  const inLobby = lobbyPlayerNames.has(
+                    friend.playerName.trim().toLowerCase(),
+                  );
+                  const checked = !inLobby && (invited || selectedFriendIds.has(friend.id));
                   // Pending (2026-08-27): visas ENBART när inviten faktiskt
                   // skickats (en levande waiting_invites-rad finns, spårad i
                   // sentPendingIds) — INTE redan när host tryckt Add. En
@@ -9761,19 +9785,42 @@ export default function LobbyScreen() {
                               login-pill (avatar + Player Name, primaryMuted
                               bg + primaryBorder + primary text) — Peter
                               2026-08-27: "skrivs så som de syns när de är
-                              inloggade". */}
-                          <View style={shareSheet.friendNamePill}>
-                            <Text style={shareSheet.friendPillIcon}>
+                              inloggade". Gråtonas när personen redan är i
+                              lobbyn (Peter 2026-09-22). */}
+                          <View
+                            style={[
+                              shareSheet.friendNamePill,
+                              inLobby && shareSheet.friendNamePillInLobby,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                shareSheet.friendPillIcon,
+                                inLobby && shareSheet.dimmed,
+                              ]}
+                            >
                               {getAvatarEmojiById(friend.avatarId)}
                             </Text>
-                            <Text style={shareSheet.friendPillText} numberOfLines={1}>
+                            <Text
+                              style={[
+                                shareSheet.friendPillText,
+                                inLobby && shareSheet.friendPillTextInLobby,
+                              ]}
+                              numberOfLines={1}
+                            >
                               {friend.playerName}
                             </Text>
                           </View>
-                          {isPending && (
-                            <View style={shareSheet.pendingBadge}>
-                              <Text style={shareSheet.pendingBadgeText}>Pending</Text>
+                          {inLobby ? (
+                            <View style={shareSheet.inLobbyBadge}>
+                              <Text style={shareSheet.inLobbyBadgeText}>In lobby</Text>
                             </View>
+                          ) : (
+                            isPending && (
+                              <View style={shareSheet.pendingBadge}>
+                                <Text style={shareSheet.pendingBadgeText}>Pending</Text>
+                              </View>
+                            )
                           )}
                         </View>
                         {/* Kryssruta ersätter den tidigare per-rad "Invite"-
@@ -9783,7 +9830,7 @@ export default function LobbyScreen() {
                             grön+låst så host inte råkar dubbel-skicka. */}
                         <Pressable
                           onPress={() => {
-                            if (invited) return;
+                            if (invited || inLobby) return;
                             setSelectedFriendIds((prev) => {
                               // Remote 1v1 har bara EN motståndarplats —
                               // radio-button-beteende: att bocka för en ny
@@ -9800,14 +9847,15 @@ export default function LobbyScreen() {
                               return next;
                             });
                           }}
-                          disabled={invited}
+                          disabled={invited || inLobby}
                           hitSlop={8}
                           style={[
                             shareSheet.checkbox,
                             checked && shareSheet.checkboxChecked,
+                            inLobby && shareSheet.checkboxInLobby,
                           ]}
                           accessibilityRole="checkbox"
-                          accessibilityState={{ checked }}
+                          accessibilityState={{ checked, disabled: invited || inLobby }}
                           accessibilityLabel={`Invite ${friend.playerName}`}
                         >
                           {checked && <Text style={shareSheet.checkmark}>✓</Text>}
@@ -13225,6 +13273,25 @@ const shareSheet = StyleSheet.create({
     letterSpacing: 0.3,
     textTransform: 'uppercase',
   },
+  // "In lobby"-badge + gråtoning för friends som redan är med i rummet
+  // (Peter 2026-09-22) — neutral grå så den läses som "ej valbar", till
+  // skillnad från den gula Pending-badgen.
+  inLobbyBadge: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    backgroundColor: 'rgba(107,114,128,0.12)',
+    borderColor: '#6B7280',
+  },
+  inLobbyBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#6B7280',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  dimmed: { opacity: 0.45 },
   // Namn-pill — speglar TopUserBanner:s inloggade login-pill (avatar +
   // Player Name) 1:1 (samma bg/border/text-färg, rounded-full), Peter
   // 2026-08-27: "skrivs så som de syns när de är inloggade". Hugger sitt
@@ -13246,6 +13313,17 @@ const shareSheet = StyleSheet.create({
   },
   friendPillIcon: { fontSize: 14 },
   friendPillText: { fontSize: 12, fontWeight: '600', color: Colors.primary, flexShrink: 1 },
+  // Gråtonad pill när personen redan är i lobbyn (Peter 2026-09-22).
+  friendNamePillInLobby: {
+    backgroundColor: 'rgba(107,114,128,0.10)',
+    borderColor: '#6B7280',
+  },
+  friendPillTextInLobby: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    flexShrink: 1,
+  },
   // Kryssruta (2026-08-27, ersatte per-rad "Invite"-knappen) — tom ruta
   // omarkerad, grön ruta + vit ✓ markerad. Samma geometri som Lobby:s
   // singlePlayerCheckbox men grön istället för grå (Peter bad om "green
@@ -13265,6 +13343,12 @@ const shareSheet = StyleSheet.create({
   checkboxChecked: {
     backgroundColor: Colors.success,
     borderColor: Colors.success,
+  },
+  // Låst kryssruta för friends som redan är i lobbyn (Peter 2026-09-22) —
+  // dämpad så den inte ser tappbar ut.
+  checkboxInLobby: {
+    opacity: 0.35,
+    borderColor: '#6B7280',
   },
   checkmark: {
     color: '#fff',
