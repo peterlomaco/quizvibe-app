@@ -11853,16 +11853,34 @@ export default function QuizScreen() {
                  "Activate Timer"-CTA. Reguljära gissare filtrerades bort av
                  outer gate ovan och når aldrig denna gren. */
               isTimerActivator && spotifyDJOpenedAppBroadcast && spotifyWaitPhase !== 'skipped' && phase === 'question' ? (
-                <Animated.View style={{ transform: [{ scale: activateTimerPulse }], width: '100%' }}>
-                  {/* TouchableOpacity (inte Pressable) — activeOpacity finns bara här. */}
-                  <TouchableOpacity
-                    style={styles.spotifyActivateTimerBtnLarge}
-                    onPress={handleActivateTimer}
-                    activeOpacity={0.85}
-                  >
-                    <Text style={styles.spotifyActivateTimerBtnLargeText}>Activate Timer</Text>
-                  </TouchableOpacity>
-                </Animated.View>
+                <>
+                  {/* "DJ will play Track x of y" — album-positionen så aktiveraren
+                      kan bekräfta att DJ:n spelar rätt spår innan timern startas.
+                      Ligger i samma !spotifyDJStarted-block som knappen, så både
+                      text och knapp försvinner i samma ögonblick timern aktiveras.
+                      Ingen spoiler (bara position). Utelämnas om album-kontext
+                      saknas (graceful degradation, samma data som DJ:ns kort). */}
+                  {(() => {
+                    const ctx = currentSpotifyTrackId
+                      ? SPOTIFY_ALBUM_CONTEXT[currentSpotifyTrackId]
+                      : undefined;
+                    return ctx ? (
+                      <Text style={styles.spotifyActivatePositionText}>
+                        DJ will play Track {ctx.position} of {ctx.total}
+                      </Text>
+                    ) : null;
+                  })()}
+                  <Animated.View style={{ transform: [{ scale: activateTimerPulse }], width: '100%' }}>
+                    {/* TouchableOpacity (inte Pressable) — activeOpacity finns bara här. */}
+                    <TouchableOpacity
+                      style={styles.spotifyActivateTimerBtnLarge}
+                      onPress={handleActivateTimer}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.spotifyActivateTimerBtnLargeText}>Activate Timer</Text>
+                    </TouchableOpacity>
+                  </Animated.View>
+                </>
               ) : null
             ) : (
             <>
@@ -12833,6 +12851,16 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     fontWeight: '700',
     letterSpacing: 0.4,
+  },
+  // "DJ will play Track x of y" ovanför den stora Activate Timer-knappen
+  // (timer-aktiverarens sticky-bar). Speglar DJ-kortets gröna position-text;
+  // marginBottom ger luft mot knappen (sticky-baren har ingen gap).
+  spotifyActivatePositionText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: '#1DB954',
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
   },
   // Visas när YouTubeMediaPlayer rapporterar embed-fel — ersätter spelaren
   // med en diskret felindikator i samma höjd som mediarutan.
