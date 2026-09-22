@@ -499,6 +499,7 @@ const h = (
 // ── Hints-bibliotek: 10 Musikartister + 10 Skådespelare + 10 Idrottare ───
 
 import { HINTS_LIBRARY_GENERATED } from './hintsDataGenerated';
+import { HINTS_SONG_CANDIDATES } from './hintsSongsGenerated';
 
 // Manuellt kuraterade hints — åsidosätter auto-genererade vid merge.
 const HINTS_LIBRARY_MANUAL: Record<string, HintLibrary> = {
@@ -8951,14 +8952,67 @@ const NATIONALITY_OVERRIDES: Record<string, string> = {
   'wings': 'uk',
 };
 
+// Återanvända musik-pool-tracks som EXTRA `song`-hints för TUNNA artist/band-
+// entries (Peter 2026-09-22). Källa: src/utils/hintsSongsGenerated.ts (genereras
+// via `cd backend && npm run generate-song-hints`). Vi appendar bara när entryt
+// ligger under gaten och toppar upp till en marginal — rikt kuraterade entries
+// (Michael Jackson, ABBA, …) lämnas orörda.
+//
+// SONG_HINT_MIN speglar MIN_RAW_HINTS i hintsText.ts (den auktoritativa gaten).
+// Importeras INTE därifrån — hintsText importerar redan hintsData, så en import
+// tillbaka skapar en cykel. Håll dem i synk manuellt.
+const SONG_HINT_MIN = 8;
+const SONG_HINT_TARGET = 10;
+
+/** Plockar den citerade titeln ur ett hint-värde som `"Beat It" (1982)` → `beat it`. */
+function quotedTitleKey(value: string): string | null {
+  const m = value.match(/^"([^"]+)"/);
+  return m ? m[1].toLowerCase().trim() : null;
+}
+
+/** Appendar återanvända song-hints till ett tunt entry, deduplicerat på titel. */
+function withSongHints(id: string, lib: HintLibrary): HintLibrary {
+  if (lib.hints.length >= SONG_HINT_MIN) return lib; // redan tillräckligt
+  const candidates = HINTS_SONG_CANDIDATES[id];
+  if (!candidates || candidates.length === 0) return lib;
+
+  // Befintliga titlar (song/album/movie) — undvik dubbletter som annars skulle
+  // blåsa upp den råa hint-räkningen som gaten läser.
+  const existingTitles = new Set<string>();
+  for (const hnt of lib.hints) {
+    if (hnt.type === 'song' || hnt.type === 'album' || hnt.type === 'movie') {
+      const key = quotedTitleKey(hnt.value);
+      if (key) existingTitles.add(key);
+    }
+  }
+
+  const added: HintItem[] = [];
+  for (const cand of candidates) {
+    if (lib.hints.length + added.length >= SONG_HINT_TARGET) break;
+    const key = quotedTitleKey(cand.value);
+    if (key && existingTitles.has(key)) continue;
+    if (key) existingTitles.add(key);
+    added.push(cand);
+  }
+  if (added.length === 0) return lib;
+  return { ...lib, hints: [...lib.hints, ...added] };
+}
+
 // HINTS_LIBRARY: auto-genererade hints + manuellt kuraterade (manuella åsidosätter).
-// Nationality-overrides appliceras sist för att täcka 'unknown'-fall i generated-filen.
+// Tunna entries toppas upp med återanvända song-hints, sedan appliceras
+// nationality-overrides sist för att täcka 'unknown'-fall i generated-filen.
 export const HINTS_LIBRARY: Record<string, HintLibrary> = Object.fromEntries(
   Object.entries({
     ...HINTS_LIBRARY_GENERATED,
     ...HINTS_LIBRARY_MANUAL,
   }).map(([id, lib]) => {
+    const enriched = withSongHints(id, lib);
     const override = NATIONALITY_OVERRIDES[id];
-    return [id, override && lib.nationality === 'unknown' ? { ...lib, nationality: override } : lib];
+    return [
+      id,
+      override && enriched.nationality === 'unknown'
+        ? { ...enriched, nationality: override }
+        : enriched,
+    ];
   }),
 );

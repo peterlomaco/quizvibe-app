@@ -19,6 +19,7 @@
     "spotify-album-audit": "tsx scripts/audit-spotify-album-context.ts",
     "export-music-questions": "tsx scripts/export-music-questions.ts",
     "export-image-questions": "tsx scripts/export-image-questions.ts",
+    "generate-song-hints": "tsx scripts/generate-song-hints.ts",
     "fetch-hints-data": "tsx scripts/fetch-hints-data.ts",
     "fetch-hints-data-dry": "tsx scripts/fetch-hints-data.ts --dry",
     "fetch-hints-data-resume": "tsx scripts/fetch-hints-data.ts --resume",

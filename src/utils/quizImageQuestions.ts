@@ -379,6 +379,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 84
   },
   {
+    "id": "alex-warren",
+    "displayName": "Alex Warren",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 2000,
+    "peakFrom": 2018,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-z"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
     "id": "alexander-skarsgard",
     "displayName": "Alexander Skarsgård",
     "category": "actors",
@@ -401,6 +425,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this actor?",
     "itemHcp": 86
+  },
+  {
+    "id": "alexia",
+    "displayName": "Alexia",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1967,
+    "peakFrom": 1985,
+    "peakTo": 2025,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-x"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "alice-cooper",
@@ -561,6 +609,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 74
   },
   {
+    "id": "anne-marie-david",
+    "displayName": "Anne-Marie David",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1952,
+    "peakFrom": 1970,
+    "peakTo": 2010,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
     "id": "annie-lennox",
     "displayName": "Annie Lennox",
     "category": "artists",
@@ -583,6 +655,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 80
+  },
+  {
+    "id": "antique",
+    "displayName": "Antique",
+    "category": "artists",
+    "contentSubject": "band",
+    "correctYear": 1999,
+    "peakFrom": 1999,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 65
   },
   {
     "id": "aqua",
@@ -1685,6 +1778,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 80
   },
   {
+    "id": "busta-rhymes",
+    "displayName": "Busta Rhymes",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1972,
+    "peakFrom": 1990,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
     "id": "cab-calloway",
     "displayName": "Cab Calloway",
     "category": "artists",
@@ -1704,6 +1818,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "region": [
       "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
+    "id": "cajsa-stina-akerstrom",
+    "displayName": "Cajsa Stina Åkerström",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1967,
+    "peakFrom": 1985,
+    "peakTo": 2025,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 65
@@ -2329,6 +2464,51 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 90
   },
   {
+    "id": "danny-saucedo",
+    "displayName": "Danny Saucedo",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1986,
+    "peakFrom": 2004,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "millennials"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
+  },
+  {
+    "id": "darude",
+    "displayName": "Darude",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1975,
+    "peakFrom": 1993,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
     "id": "david-bowie",
     "displayName": "David Bowie",
     "category": "artists",
@@ -2351,6 +2531,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 90
+  },
+  {
+    "id": "david-gray",
+    "displayName": "David Gray",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1968,
+    "peakFrom": 1986,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
   },
   {
     "id": "debbie-reynolds",
@@ -3070,6 +3271,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 65
   },
   {
+    "id": "eimear-quinn",
+    "displayName": "Eimear Quinn",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1972,
+    "peakFrom": 1990,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-x"
+    ],
+    "region": [
+      "europe"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
     "id": "elijah-wood",
     "displayName": "Elijah Wood",
     "category": "actors",
@@ -3235,6 +3460,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 50
   },
   {
+    "id": "enrique-iglesias",
+    "displayName": "Enrique Iglesias",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1975,
+    "peakFrom": 1995,
+    "peakTo": 2024,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "millennials"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
+  },
+  {
     "id": "eric-clapton",
     "displayName": "Eric Clapton",
     "category": "artists",
@@ -3281,6 +3530,54 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 82
+  },
+  {
+    "id": "eros-ramazzotti",
+    "displayName": "Eros Ramazzotti",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1963,
+    "peakFrom": 1981,
+    "peakTo": 2021,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
+    "id": "ethel-waters",
+    "displayName": "Ethel Waters",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1896,
+    "peakFrom": 1914,
+    "peakTo": 1954,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "etta-james",
@@ -3443,6 +3740,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this actor?",
     "itemHcp": 88
+  },
+  {
+    "id": "faith-hill",
+    "displayName": "Faith Hill",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1967,
+    "peakFrom": 1985,
+    "peakTo": 2025,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
   },
   {
     "id": "felix-herngren",
@@ -4208,6 +4526,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 78
   },
   {
+    "id": "harry-chapin",
+    "displayName": "Harry Chapin",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1942,
+    "peakFrom": 1960,
+    "peakTo": 2000,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
     "id": "harry-styles",
     "displayName": "Harry Styles",
     "category": "artists",
@@ -4779,6 +5118,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 88
   },
   {
+    "id": "jennifer-lopez",
+    "displayName": "Jennifer Lopez",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1969,
+    "peakFrom": 1999,
+    "peakTo": 2024,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "millennials"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 92
+  },
+  {
     "id": "jennifer-rush",
     "displayName": "Jennifer Rush",
     "category": "artists",
@@ -4827,6 +5190,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 78
   },
   {
+    "id": "jessie-j",
+    "displayName": "Jessie J",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1988,
+    "peakFrom": 2006,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "millennials"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
     "id": "jimi-hendrix",
     "displayName": "Jimi Hendrix",
     "category": "artists",
@@ -4843,6 +5230,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "originGenerations": [
       "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
+    "id": "jj",
+    "displayName": "JJ",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 2001,
+    "peakFrom": 2019,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-z"
     ],
     "region": [
       "global"
@@ -5088,6 +5499,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 65
   },
   {
+    "id": "johnny-logan",
+    "displayName": "Johnny Logan",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1954,
+    "peakFrom": 1972,
+    "peakTo": 2012,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
     "id": "jon-henrik-fjallgren",
     "displayName": "Jon Henrik Fjällgren",
     "category": "artists",
@@ -5296,6 +5731,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 80
+  },
+  {
+    "id": "kate-ryan",
+    "displayName": "Kate Ryan",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1980,
+    "peakFrom": 1998,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-x"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "katy-perry",
@@ -5673,6 +6132,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 78
   },
   {
+    "id": "leann-rimes",
+    "displayName": "LeAnn Rimes",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1982,
+    "peakFrom": 2000,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
     "id": "led-zeppelin",
     "displayName": "Led Zeppelin",
     "category": "artists",
@@ -5692,6 +6172,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this band?",
     "itemHcp": 85
+  },
+  {
+    "id": "lena-philipsson",
+    "displayName": "Lena Philipsson",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1966,
+    "peakFrom": 1984,
+    "peakTo": 2024,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-x"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 78
   },
   {
     "id": "lene-marlin",
@@ -5905,6 +6409,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this actor?",
     "itemHcp": 78
+  },
+  {
+    "id": "linda-martin",
+    "displayName": "Linda Martin",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1952,
+    "peakFrom": 1970,
+    "peakTo": 2010,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
   },
   {
     "id": "lionel-richie",
@@ -6731,6 +7259,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 65
   },
   {
+    "id": "melanie-c",
+    "displayName": "Melanie C",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1974,
+    "peakFrom": 1992,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
     "id": "meryl-streep",
     "displayName": "Meryl Streep",
     "category": "actors",
@@ -7052,6 +7601,54 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 65
   },
   {
+    "id": "muddy-waters",
+    "displayName": "Muddy Waters",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1913,
+    "peakFrom": 1931,
+    "peakTo": 1971,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
+    "id": "nancy-sinatra",
+    "displayName": "Nancy Sinatra",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1940,
+    "peakFrom": 1958,
+    "peakTo": 1998,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "elder"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
     "id": "nat-king-cole",
     "displayName": "Nat King Cole",
     "category": "artists",
@@ -7235,6 +7832,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
       "europe"
     ],
     "questionText": "What is the Name of this band?",
+    "itemHcp": 65
+  },
+  {
+    "id": "niamh-kavanagh",
+    "displayName": "Niamh Kavanagh",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1968,
+    "peakFrom": 1986,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-x"
+    ],
+    "region": [
+      "europe"
+    ],
+    "questionText": "What is the Name of this Artist?",
     "itemHcp": 65
   },
   {
@@ -8278,6 +8899,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 78
   },
   {
+    "id": "richard-marx",
+    "displayName": "Richard Marx",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1963,
+    "peakFrom": 1981,
+    "peakTo": 2021,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
     "id": "rick-astley",
     "displayName": "Rick Astley",
     "category": "artists",
@@ -8300,6 +8942,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 82
+  },
+  {
+    "id": "ricky-martin",
+    "displayName": "Ricky Martin",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1971,
+    "peakFrom": 1991,
+    "peakTo": 2024,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-x"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 85
   },
   {
     "id": "rihanna",
@@ -8348,6 +9014,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 65
+  },
+  {
+    "id": "robbie-williams",
+    "displayName": "Robbie Williams",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1974,
+    "peakFrom": 1995,
+    "peakTo": 2024,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "millennials"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 88
   },
   {
     "id": "robert-miles",
@@ -8444,6 +9134,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 85
+  },
+  {
+    "id": "ronan-keating",
+    "displayName": "Ronan Keating",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1977,
+    "peakFrom": 1995,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
   },
   {
     "id": "rowan-atkinson",
@@ -8707,6 +9418,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 76
   },
   {
+    "id": "samantha-mumba",
+    "displayName": "Samantha Mumba",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1983,
+    "peakFrom": 2001,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
     "id": "sammy-davis-jr",
     "displayName": "Sammy Davis Jr.",
     "category": "artists",
@@ -8755,6 +9487,30 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 90
   },
   {
+    "id": "sandra-kim",
+    "displayName": "Sandra Kim",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1972,
+    "peakFrom": 1990,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-x"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
     "id": "scorpions",
     "displayName": "Scorpions",
     "category": "artists",
@@ -8798,6 +9554,48 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 82
+  },
+  {
+    "id": "sean-banan",
+    "displayName": "Sean banan",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1985,
+    "peakFrom": 2003,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
+    "id": "sean-paul",
+    "displayName": "Sean Paul",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1973,
+    "peakFrom": 1991,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
   },
   {
     "id": "seinabo-sey",
@@ -8889,6 +9687,54 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 65
   },
   {
+    "id": "severine",
+    "displayName": "Séverine",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1948,
+    "peakFrom": 1966,
+    "peakTo": 2006,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "elder"
+    ],
+    "region": [
+      "unknown-region"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
+    "id": "shakira",
+    "displayName": "Shakira",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1977,
+    "peakFrom": 1995,
+    "peakTo": 2024,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "millennials"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 90
+  },
+  {
     "id": "shania-twain",
     "displayName": "Shania Twain",
     "category": "artists",
@@ -8911,6 +9757,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 65
+  },
+  {
+    "id": "shanice",
+    "displayName": "Shanice",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1973,
+    "peakFrom": 1991,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
   },
   {
     "id": "shawn-mendes",
@@ -9033,6 +9900,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 65
   },
   {
+    "id": "sisqo",
+    "displayName": "Sisqo",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1978,
+    "peakFrom": 1996,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
     "id": "smash-mouth",
     "displayName": "Smash Mouth",
     "category": "artists",
@@ -9121,6 +10009,72 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 65
+  },
+  {
+    "id": "sombr",
+    "displayName": "sombr",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 2005,
+    "peakFrom": 2023,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "gen-z"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
+    "id": "sonique",
+    "displayName": "Sonique",
+    "category": "artists",
+    "contentSubject": "band",
+    "correctYear": 1968,
+    "peakFrom": 1968,
+    "peakTo": 2008,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 50
+  },
+  {
+    "id": "sophie-b-hawkins",
+    "displayName": "Sophie B Hawkins",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1964,
+    "peakFrom": 1982,
+    "peakTo": 2022,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
   },
   {
     "id": "soul-ii-soul",
@@ -10088,6 +11042,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 65
   },
   {
+    "id": "timbaland",
+    "displayName": "Timbaland",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1972,
+    "peakFrom": 1990,
+    "peakTo": 2026,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 50
+  },
+  {
     "id": "timbuktu",
     "displayName": "Timbuktu",
     "category": "artists",
@@ -10322,6 +11297,27 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     "itemHcp": 80
   },
   {
+    "id": "tommy-nilsson",
+    "displayName": "Tommy Nilsson",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1960,
+    "peakFrom": 1978,
+    "peakTo": 2018,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "nordic"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 65
+  },
+  {
     "id": "toto",
     "displayName": "Toto",
     "category": "artists",
@@ -10389,6 +11385,51 @@ export const IMAGE_QUIZ_QUESTIONS: ImageQuizQuestion[] = [
     ],
     "questionText": "What is the Name of this Artist?",
     "itemHcp": 82
+  },
+  {
+    "id": "tracy-chapman",
+    "displayName": "Tracy Chapman",
+    "category": "artists",
+    "contentSubject": "artist",
+    "correctYear": 1964,
+    "peakFrom": 1988,
+    "peakTo": 2024,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "originGenerations": [
+      "millennials"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this Artist?",
+    "itemHcp": 82
+  },
+  {
+    "id": "u2",
+    "displayName": "U2",
+    "category": "artists",
+    "contentSubject": "band",
+    "correctYear": 1976,
+    "peakFrom": 1976,
+    "peakTo": 2016,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "questionText": "What is the Name of this band?",
+    "itemHcp": 88
   },
   {
     "id": "ulf-lundell",
