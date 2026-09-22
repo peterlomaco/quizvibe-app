@@ -4,6 +4,7 @@ import {
   Animated,
   Dimensions,
   Easing,
+  InteractionManager,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
@@ -173,9 +174,30 @@ export default function FinalCelebration({
   // Ljudet monteras först när vi VET att ritningen ska köras — annars hade
   // WebView:n monterats och rivits direkt för Reduce Motion-användare.
   const [playSound, setPlaySound] = useState(false);
-  // Mount-tid = ungefär när SparkleDrawQ:s rit-effekt startar. Ljudet
-  // använder den för att kompensera för WebView:ns laddningstid.
-  const startedAtRef = useRef(Date.now());
+  // Sätts när sekvensen faktiskt STARTAR (se `ready` nedan). Ljudet använder den
+  // för att kompensera för WebView:ns laddningstid — måste därför spegla samma
+  // ögonblick som Q-ritningen, inte mount.
+  const startedAtRef = useRef(0);
+
+  // ⚠ Starta HELA prisutdelningen först när slutskärmen har lagt sig + målats,
+  // inte vid mount. Q:t ritas av SparkleDrawQ mot wall-clock (Date.now()), och
+  // det tunga arbetet vid phase==='leaderboard' (saveFinalGame, finalizePlayer,
+  // matchHighlights, RoundLeaderboard-mount) blockar JS-tråden precis efter mount.
+  // Startade ritningen vid mount hann wall-clock rusa iväg under blocket, så Q:t
+  // tonade in redan ~70 % ritat ("fires too early"). Genom att ankra sekvensen till
+  // runAfterInteractions (efter den tunga batchen) ritas Q:t från 0 när spelaren
+  // faktiskt landar. Slöjan är opak från mount (se veil), så inget läckage syns
+  // under väntan. Fallback-timern garanterar att spelaren aldrig fastnar bakom
+  // slöjan om runAfterInteractions skulle utebli. (Peter 2026-09-22.)
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => setReady(true));
+    const fallback = setTimeout(() => setReady(true), 800);
+    return () => {
+      task.cancel();
+      clearTimeout(fallback);
+    };
+  }, []);
 
   const fireDone = useCallback(() => {
     if (doneFiredRef.current) return;
@@ -184,7 +206,11 @@ export default function FinalCelebration({
   }, [onDone]);
 
   // ── Celebration-fasen ──────────────────────────────────────────────────
+  // Startar först när `ready` (post-settle, se ovan). Q-ritning, pokal, konfetti
+  // och ljud ankras alla till detta ögonblick → de förblir i synk.
   useEffect(() => {
+    if (!ready) return;
+    startedAtRef.current = Date.now();
     let cancelled = false;
     let anim: Animated.CompositeAnimation | null = null;
     let halo: Animated.CompositeAnimation | null = null;
@@ -337,9 +363,9 @@ export default function FinalCelebration({
       if (confetti) clearTimeout(confetti);
       if (watchdog) clearTimeout(watchdog);
     };
-    // Körs en gång vid mount — sekvensen äger sin egen livscykel.
+    // Startar när `ready` blir true (post-settle); sekvensen äger sin livscykel.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ready]);
 
   // ── Highlights-fasen: kort-slidern tonas in ────────────────────────────
   useEffect(() => {
@@ -496,7 +522,7 @@ export default function FinalCelebration({
         <Animated.View
           style={[styles.halo, { opacity: stage === 'celebration' ? haloOpacity : 0 }]}
         />
-        <SparkleDrawQ size={Q_SIZE} active sparkle={sparkle} compact={COMPACT} />
+        <SparkleDrawQ size={Q_SIZE} active={ready} sparkle={sparkle} compact={COMPACT} />
         <Animated.Text
           style={[
             styles.trophy,

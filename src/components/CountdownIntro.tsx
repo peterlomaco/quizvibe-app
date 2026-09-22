@@ -13,7 +13,7 @@ import {
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '../theme';
 import { type MainCategory, mainCategoryDisplay } from '../utils/mainCategory';
-import { DEFAULT_VOICE_ID, resolveVoicePack, SILENT_VOICE_ID, VOICE_TOKENS, type VoiceToken } from '../utils/voicePacks';
+import { DEFAULT_VOICE_ID, resolveVoicePack, SILENT_VOICE_ID, type VoiceToken } from '../utils/voicePacks';
 import { ensureVoiceAudioMode } from '../utils/voicePlayback';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
@@ -251,59 +251,32 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
     return () => { try { Speech.stop(); } catch (_) {} };
   }, [audioSilent, pack]);
 
-  // Förinladda röstpackets klipp (motsvarigheten till TTS-pre-warm för audio):
-  // en player per token skapas vid mount så första klippet spelar utan
-  // ladd-latens. Bara host (silent=false) och bara för ett riktigt pack —
-  // Default-rösten har inga klipp. ensureVoiceAudioMode() sätter audio-mode
-  // (spelas i tyst läge + mixar med WebView-ljuden). Players tas bort vid
+  // Förinladda "Get Ready"-klippet — nedräkningen spelar ETT klipp EN gång i
+  // stället för det talade 3-2-1 (Peter 2026-09-22). Bara host (silent=false)
+  // och bara för ett riktigt pack. ensureVoiceAudioMode() sätter audio-mode
+  // (spelas i tyst läge + mixar med WebView-ljuden). SESSIONS-uppvärmningen (det
+  // som tog ~1 s) sker via warmVoiceSession() (voicePlayback.ts) redan i intro-
+  // fasen, så inga siffer-priming-hack behövs här längre. Player tas bort vid
   // unmount / röstbyte.
+  //
+  // ⚠ Ingen snabb per-siffer-sekvens + ingen muted-priming (pause/seek) längre —
+  // just den maskinen betedde sig olika i release-builds än i dev och gav klippt
+  // "3"/"2" + knäppningar MELLAN siffrorna i TestFlight. Ett enda klipp har
+  // inget "mellan siffror" att knäppa i.
   useEffect(() => {
     if (audioSilent || !pack) return;
     void ensureVoiceAudioMode();
-    const players: Partial<Record<VoiceToken, AudioPlayer>> = {};
-    for (const token of VOICE_TOKENS) {
-      try {
-        const p = createAudioPlayer(pack.clips[token]);
-        p.volume = 1;
-        players[token] = p;
-      } catch (_) {}
+    let player: AudioPlayer | null = null;
+    try {
+      player = createAudioPlayer(pack.clips.getready);
+      player.volume = 1;
+    } catch (_) {
+      player = null;
     }
-    playersRef.current = players;
-    // ⚠ SESSIONS-uppvärmningen (det som tog ~1 s) sker INTE här utan hela quiz-
-    // skärmen via warmVoiceSession() (voicePlayback.ts), redan i intro-fasen.
-    //
-    // HÄR gör vi en KORT per-player-priming: varje siffer-player betalar en liten
-    // FÖRSTA-play-latens (~några 100 ms) första gången den spelas, även med varm
-    // session. Det räckte för att "3" (som spelas bara ~580 ms efter mount) skulle
-    // starta lite sent och få en kort svans-överlapp mot "2". Vi spelar därför
-    // klippen TYST (muted) direkt vid mount — nu går det snabbt eftersom sessionen
-    // redan är varm — och pausar + spolar tillbaka innan den riktiga "3":an. Då är
-    // varje player redan "varm" och spelar OMEDELBART. Rör INGET i schema/timer.
-    // (Peter 2026-09-22.)
-    const WARM_TOKENS: VoiceToken[] = ['1', '2', '3', '4', '5'];
-    for (const token of WARM_TOKENS) {
-      const p = players[token];
-      if (p) {
-        try { p.muted = true; p.play(); } catch (_) {}
-      }
-    }
-    // Stoppa priming-uppspelningen väl före nedräkningens första riktiga "3"
-    // (580 ms). Pausa FÖRST (annars hörs klippet när vi av-mutar), spola sedan
-    // tillbaka och av-muta så det riktiga play() startar rent från position 0.
-    const warmTimer = setTimeout(() => {
-      for (const token of WARM_TOKENS) {
-        const p = players[token];
-        if (p) {
-          try { p.pause(); p.seekTo(0); p.muted = false; } catch (_) {}
-        }
-      }
-    }, 350);
+    playersRef.current = player ? { getready: player } : {};
     return () => {
-      clearTimeout(warmTimer);
       playersRef.current = {};
-      for (const token of VOICE_TOKENS) {
-        try { players[token]?.remove(); } catch (_) {}
-      }
+      try { player?.remove(); } catch (_) {}
     };
   }, [pack, audioSilent]);
 
@@ -367,48 +340,25 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
       tickTimers.current.push(id);
     };
 
-    // Tala en siffra: röstpack → spela klippet, annars expo-speech.
-    // ⚠ HOPPA ÖVER rösten om steget fyras för sent. Varje steg schemaläggs mot
-    // ett absolut offset från t0; om t0 ligger i det förflutna (non-host som
-    // hinner ikapp host:s delade wall-clock efter broadcast-latens) fyrar de
-    // passerade stegen OMEDELBART och staplas på varandra → "3" och "2" hörs
-    // samtidigt (Peter 2026-09-17). Klippen (0,5–1,2 s) är kortare än TICK_MS
-    // (1300 ms), så i rätt takt överlappar de ALDRIG och behöver ingen paus —
-    // enda problemet är catch-up-stapling, och då är rätt beteende att hoppa
-    // över de passerade siffrorna (det visuella siffer-hoppet sköts ändå av
-    // setCount). `expectedAt` = stegets avsedda offset; för stort faktiskt
-    // förflutet ⇒ vi hinner ikapp ⇒ tyst.
-    const VOICE_LATE_SKIP_MS = 400;
-    // Legitima siffror ligger TICK_MS (1300 ms) isär. Marginalen sätts nära det
-    // (men med headroom för jitter) så en siffra som fyras för TÄTT — pga catch-up-
-    // stapling när tråden blockerats — HOPPAS ÖVER i stället för att spelas ovanpå
-    // (överlappa) den föregående. Följd: föregående siffra hinner höras klart innan
-    // nästa. 1100 < 1300 så den normala kadensen alltid släpps igenom. Den
-    // huvudsakliga fixen mot "3 & 2 samtidigt" är dock warmVoiceSession()
-    // (voicePlayback.ts) som håller iOS-sessionen varm så klippen spelar i tid,
-    // inte ~1 s sent. (Peter 2026-09-22.)
-    const VOICE_MIN_GAP_MS = 1100;
-    const speakToken = (value: number, expectedAt: number) => {
-      if (Date.now() - t0 - expectedAt > VOICE_LATE_SKIP_MS) return;
-      // Debounce mot stomp (MODUL-nivå så den spänner över re-mounts, inte bara
-      // effekt-omkörningar): två siffror inom VOICE_MIN_GAP_MS → hoppa över den andra.
+    // Spela "Get Ready" EN gång vid nedräkningens start (bara host). Ersätter det
+    // talade 3-2-1: ETT klipp, inga snabba siffer-sekvenser + ingen priming som
+    // klippte/knäppte i release-builds. Det VISUELLA 3-2-1 nedan (setCount) är
+    // OFÖRÄNDRAT. Modul-guarden hindrar dubbel-uppspelning om effekten skulle
+    // köra om mitt i en nedräkning (t.ex. röst-hydrering) — riktiga nedräkningar
+    // ligger sekunder isär (reveal + intro + Play-tap emellan), så en NY
+    // nedräkning blockeras aldrig. TTS-fallback om klipp saknas (defensivt —
+    // resolveVoicePack ger alltid ett pack). Rör INGET i schema/timer/klock-synk.
+    // (Peter 2026-09-22.)
+    const GET_READY_MIN_GAP_MS = 2500;
+    const playGetReady = () => {
       const now = Date.now();
-      if (now - lastCountdownVoiceMs < VOICE_MIN_GAP_MS) return;
+      if (now - lastCountdownVoiceMs < GET_READY_MIN_GAP_MS) return;
       lastCountdownVoiceMs = now;
-      const token = String(value) as VoiceToken;
-      const player = pack ? playersRef.current[token] : undefined;
+      const player = pack ? playersRef.current.getready : undefined;
       if (player) {
-        // Klippen är warma (varm session + per-player-priming, se preload) →
-        // spelar OMEDELBART, så "3" hinner sägas HELT innan "2" fyras 1300 ms
-        // senare. Vi pausar INTE föregående klipp (det klippte förr "3" till "th"),
-        // och kör INGEN seekTo(0) här: playern är fräsch + primad (redan spolad
-        // till 0) och spelas bara EN gång per nedräkning, så en extra async-seek
-        // före play() bara la till latens och sen-start. (Peter 2026-09-22.)
         try { player.play(); } catch (_) {}
       } else {
-        try {
-          Speech.speak(String(value), { language: 'en-US', pitch: 0.01, rate: 0.42 });
-        } catch (_) {}
+        try { Speech.speak('Get ready', { language: 'en-US', rate: 0.9 }); } catch (_) {}
       }
     };
 
@@ -418,15 +368,10 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
       addTimerAt(() => {
         const next = current <= 1 ? 0 : current - 1;
 
-        // Tala numret VOICE_LEAD_MS ms INNAN det visuella uppdateras (bara host).
-        // Slut-ordet (When/Who) talas INTE — nedräkningen är "3, 2, 1" och sedan
-        // visas "?" TYST (Peter 2026-09-07). `finalWord` styr fortfarande
-        // CountdownIntro:s nedräknings-ord i talet var borttaget; propen behålls
-        // (påverkar inte annat) men läses inte längre här.
-        // Röstpack → spela klippet; Default/okänt pack → expo-speech.
-        if (!audioSilent && next > 0 && next <= voiceFrom) {
-          speakToken(next, voiceAt);
-        }
+        // Ingen per-siffer-röst längre — "Get Ready" spelas EN gång vid starten
+        // (se kickoff nedan). Siffrorna 3-2-1 räknas fortfarande VISUELLT via
+        // setCount här, oförändrat. `finalWord` läses inte (slut-ordet borttaget
+        // 2026-09-07); propen behålls.
 
         // Visuell uppdatering efter röst-förspranget.
         addTimerAt(() => {
@@ -440,11 +385,11 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
       }, voiceAt);
     };
 
-    // Starta: om startFrom självt ska talas, tala det 120 ms tidigt (580 ms
-    // in i initial-pausen) och visa det visuellt som vanligt vid 700 ms.
-    if (!audioSilent && startFrom <= voiceFrom) {
+    // Starta: spela "Get Ready" EN gång strax innan första siffran visas (580 ms
+    // in i initial-pausen). Det VISUELLA 3-2-1 startar som vanligt vid 700 ms.
+    if (!audioSilent) {
       addTimerAt(() => {
-        speakToken(startFrom, 700 - VOICE_LEAD_MS);
+        playGetReady();
       }, 700 - VOICE_LEAD_MS);
     }
     addTimerAt(() => {

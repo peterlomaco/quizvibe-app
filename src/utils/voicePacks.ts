@@ -7,10 +7,13 @@
  * annat i Profile → "Countdown voice".
  *
  * Varje pack är en handfull förinspelade mp3-klipp. Tokens:
- *  - '1'..'3' talas i nedräkningen (+ '4'/'5' som reserv om voiceFrom höjs)
+ *  - 'getready' talas i nedräkningen ("Get Ready" — ersatte det talade 3-2-1
+ *    2026-09-22; ETT klipp spelas en gång, inga snabba siffer-sekvenser som
+ *    klippte/knäppte i release-builds. Det VISUELLA 3-2-1 är kvar.)
+ *  - '1'..'5' är KVAR som klipp men talas inte längre i nedräkningen (behålls
+ *    för enkel återaktivering / om voiceFrom-modellen återinförs)
  *  - 'quizvibe' talas i lobbyn (ersätter den gamla expo-speech-välkomsten)
- *  - 'when'/'who' är KVAR som klipp men talas inte längre (slut-ordet är borttaget
- *    ur nedräkningen 2026-09-07) — behålls för enkel återaktivering.
+ *  - 'when'/'who' är KVAR som klipp men talas inte (slut-ordet borttaget 2026-09-07)
  *
  * ⚠ Klippen genereras via `backend/scripts/generate-voice-packs.ts` (OpenAI TTS,
  * hype→shimmer/kvinnlig, coach→ash/manlig). Samma filnamn = inga kodändringar
@@ -18,10 +21,10 @@
  * + en post i `VOICE_PACKS`; Profile-pickern + VOICE_OPTIONS följer med.
  */
 
-export type VoiceToken = '1' | '2' | '3' | '4' | '5' | 'when' | 'who' | 'quizvibe';
+export type VoiceToken = '1' | '2' | '3' | '4' | '5' | 'when' | 'who' | 'quizvibe' | 'getready';
 
 /** Alla token i kanonisk ordning — driver preload i CountdownIntro. */
-export const VOICE_TOKENS: readonly VoiceToken[] = ['1', '2', '3', '4', '5', 'when', 'who', 'quizvibe'];
+export const VOICE_TOKENS: readonly VoiceToken[] = ['1', '2', '3', '4', '5', 'when', 'who', 'quizvibe', 'getready'];
 
 export interface VoicePack {
   id: string;
@@ -52,6 +55,7 @@ export const VOICE_PACKS: VoicePack[] = [
       when: require('../../assets/voice-packs/hype/when.mp3'),
       who: require('../../assets/voice-packs/hype/who.mp3'),
       quizvibe: require('../../assets/voice-packs/hype/quizvibe.mp3'),
+      getready: require('../../assets/voice-packs/hype/getready.mp3'),
     },
   },
   {
@@ -66,6 +70,7 @@ export const VOICE_PACKS: VoicePack[] = [
       when: require('../../assets/voice-packs/coach/when.mp3'),
       who: require('../../assets/voice-packs/coach/who.mp3'),
       quizvibe: require('../../assets/voice-packs/coach/quizvibe.mp3'),
+      getready: require('../../assets/voice-packs/coach/getready.mp3'),
     },
   },
 ];

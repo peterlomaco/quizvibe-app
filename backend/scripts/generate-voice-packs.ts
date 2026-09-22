@@ -38,6 +38,8 @@ const TOKENS: Record<string, string> = {
   // ETT ord, gemener 'v' — camelCase 'QuizVibe' fick TTS att pausa mellan
   // "Quiz" och "Vibe" (Peter 2026-09-08).
   quizvibe: 'Quizvibe',
+  // Talas i nedräkningen (ETT klipp, en gång) i stället för 3-2-1 (Peter 2026-09-22).
+  getready: 'Get ready',
 };
 
 interface PackConfig {
