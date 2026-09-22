@@ -435,46 +435,49 @@ export default function MyMatchesScreen() {
     }
 
     const isFlash = flashIds.has(match.id);
+    // Flash-guide: den utpekade raden får en BLINKANDE guldkant. Kanten
+    // animeras på en WRAPPER-Animated.View (en riktig bordered box med kända
+    // mått) i stället för ett absolut overlay — ett overlay kunde kollapsa och
+    // renderas som en prick. Icke-flashande rader bär en genomskinlig
+    // 2.5px-kant så layouten är identisk oavsett flash.
     return (
-      <TouchableOpacity
+      <Animated.View
         key={match.id}
-        style={[styles.row, myTurn && styles.rowYourTurn]}
-        activeOpacity={0.7}
-        onPress={() => {
-          // Sluta blinka raden när spelaren agerat på den (guiden är klar).
-          if (isFlash) {
-            setFlashIds((prev) => {
-              const next = new Set(prev);
-              next.delete(match.id);
-              return next;
-            });
-          }
-          if (myTurn) router.push({ pathname: '/quiz', params: buildRemoteQuizParams(m) });
-          else setResultMatchId(match.id);
-        }}
+        style={[styles.rowFlashWrap, isFlash && { borderColor: flashBorderColor }]}
       >
-        {isFlash && (
-          <Animated.View
-            pointerEvents="none"
-            style={[styles.flashBorderOverlay, { borderColor: flashBorderColor }]}
-          />
-        )}
-        <View style={styles.rowText}>
-          <Text style={styles.opponentName} numberOfLines={1}>
-            {/* I historiken står motståndaren redan i underrubriken —
-                raden visar då när matchen skapades istället. */}
-            {section === 'history'
-              ? `Game created: ${formatDate(match.startedAt)}`
-              : `Game against: ${oppName}`}
+        <TouchableOpacity
+          style={[styles.row, myTurn && styles.rowYourTurn]}
+          activeOpacity={0.7}
+          onPress={() => {
+            // Sluta blinka raden när spelaren agerat på den (guiden är klar).
+            if (isFlash) {
+              setFlashIds((prev) => {
+                const next = new Set(prev);
+                next.delete(match.id);
+                return next;
+              });
+            }
+            if (myTurn) router.push({ pathname: '/quiz', params: buildRemoteQuizParams(m) });
+            else setResultMatchId(match.id);
+          }}
+        >
+          <View style={styles.rowText}>
+            <Text style={styles.opponentName} numberOfLines={1}>
+              {/* I historiken står motståndaren redan i underrubriken —
+                  raden visar då när matchen skapades istället. */}
+              {section === 'history'
+                ? `Game created: ${formatDate(match.startedAt)}`
+                : `Game against: ${oppName}`}
+            </Text>
+            <Text style={[styles.statusText, { color: statusColor }]} numberOfLines={1}>
+              {statusText}
+            </Text>
+          </View>
+          <Text style={[styles.chevron, myTurn && { color: Colors.warning }]}>
+            {myTurn ? '▶' : '›'}
           </Text>
-          <Text style={[styles.statusText, { color: statusColor }]} numberOfLines={1}>
-            {statusText}
-          </Text>
-        </View>
-        <Text style={[styles.chevron, myTurn && { color: Colors.warning }]}>
-          {myTurn ? '▶' : '›'}
-        </Text>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </Animated.View>
     );
   };
 
@@ -877,12 +880,14 @@ const styles = StyleSheet.create({
   rowYourTurn: {
     borderColor: Colors.warning,
   },
-  // Flash-guide: den utpekade "New update"-raden markeras med en BLINKANDE
-  // guldkant via ett icke-interaktivt overlay (ingen pill längre).
-  flashBorderOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    borderWidth: 1,
-    borderRadius: Radius.md,
+  // Flash-guide: wrapper runt varje rad. Bär ALLTID en 2.5px-kant (transparent
+  // som standard) så layouten är identisk för alla rader; den utpekade radens
+  // kant animeras till pulserande guld. En riktig bordered box, inte ett
+  // absolut overlay — kan aldrig kollapsa till en prick.
+  rowFlashWrap: {
+    borderWidth: 2.5,
+    borderColor: 'transparent',
+    borderRadius: Radius.md + 2,
   },
   // "New update"-signal intill en sektions-/motståndar-rubrik (inline guldtext).
   headerFlashBadge: {

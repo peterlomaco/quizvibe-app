@@ -341,39 +341,39 @@ export function SavedAggregatesCard({
     const players = item.participants.length;
     const lastPlayed = formatLastPlayed(item.updatedAt ?? item.createdAt);
     const isFlash = flashIds.has(item.id);
+    // Flash-guide: den utpekade raden får en BLINKANDE guldkant. Kanten
+    // animeras på en WRAPPER-Animated.View (en riktig bordered box med kända
+    // mått) i stället för ett absolut overlay — ett overlay kunde kollapsa och
+    // renderas som en prick i stället för en ram. Icke-flashande rader bär en
+    // genomskinlig 2.5px-kant så layouten är identisk oavsett flash.
     return (
-      <Pressable
+      <Animated.View
         key={item.id}
-        onPress={() => setOpenId(item.id)}
-        style={({ pressed }) => [
-          styles.row,
-          pressed && { opacity: 0.8 },
-        ]}
+        style={[styles.rowFlashWrap, isFlash && { borderColor: flashBorderColor }]}
       >
-        {isFlash && (
-          <Animated.View
-            pointerEvents="none"
-            style={[styles.flashBorderOverlay, { borderColor: flashBorderColor }]}
-          />
-        )}
-        <View style={styles.rowText}>
-          <Text style={styles.rowName} numberOfLines={1}>
-            {item.name}
-          </Text>
-          <Text style={styles.rowMeta} numberOfLines={1}>
-            {games} {games === 1 ? 'game' : 'games'}
-            {players > 1 ? ` · ${players} players` : ''}
-          </Text>
-        </View>
-        <View style={styles.rowRight}>
-          {lastPlayed ? (
-            <Text style={styles.rowDate} numberOfLines={1}>
-              Last update: {lastPlayed}
+        <Pressable
+          onPress={() => setOpenId(item.id)}
+          style={({ pressed }) => [styles.row, pressed && { opacity: 0.8 }]}
+        >
+          <View style={styles.rowText}>
+            <Text style={styles.rowName} numberOfLines={1}>
+              {item.name}
             </Text>
-          ) : null}
-          <Text style={styles.chevron}>›</Text>
-        </View>
-      </Pressable>
+            <Text style={styles.rowMeta} numberOfLines={1}>
+              {games} {games === 1 ? 'game' : 'games'}
+              {players > 1 ? ` · ${players} players` : ''}
+            </Text>
+          </View>
+          <View style={styles.rowRight}>
+            {lastPlayed ? (
+              <Text style={styles.rowDate} numberOfLines={1}>
+                Last update: {lastPlayed}
+              </Text>
+            ) : null}
+            <Text style={styles.chevron}>›</Text>
+          </View>
+        </Pressable>
+      </Animated.View>
     );
   };
 
@@ -663,12 +663,14 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
   rowText: { flex: 1 },
-  // Flash-guide: den utpekade raden får en BLINKANDE guldkant via ett
-  // icke-interaktivt overlay som täcker radens kant (ingen pill längre).
-  flashBorderOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    borderWidth: 1,
-    borderRadius: Radius.md,
+  // Flash-guide: wrapper runt varje rad. Bär ALLTID en 2.5px-kant (transparent
+  // som standard) så layouten är identisk för alla rader; den utpekade radens
+  // kant animeras till pulserande guld. En riktig bordered box, inte ett
+  // absolut overlay — kan aldrig kollapsa till en prick.
+  rowFlashWrap: {
+    borderWidth: 2.5,
+    borderColor: 'transparent',
+    borderRadius: Radius.md + 2,
   },
   modalFlashBadge: {
     alignSelf: 'center',
