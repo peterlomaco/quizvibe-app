@@ -202,9 +202,27 @@ export default function FinalCelebration({
   // (Peter 2026-09-22.)
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    const beat = setTimeout(() => setReady(true), CELEBRATION_START_DELAY_MS);
-    const fallback = setTimeout(() => setReady(true), CELEBRATION_START_DELAY_MS + 1500);
+    let cancelled = false;
+    // Resolvera Reduce Motion HÄR, under beaten — så sekvens-effekten kan läsa
+    // reduceMotionRef SYNKRONT och slippa await:a mitt i timingen. Den await:en
+    // låg tidigare inuti sekvensen och sköt konfetti/pokal/mark-fade en variabel
+    // stund EFTER att SparkleDrawQ:s wall-clock-ritning redan startat → de gled
+    // ur synk med Q:ts avslut. Beaten är ~550 ms, gott om tid för kollen.
+    const beat = setTimeout(() => {
+      void (async () => {
+        try {
+          reduceMotionRef.current = await AccessibilityInfo.isReduceMotionEnabled();
+        } catch {
+          // full animation = säkert default
+        }
+        if (!cancelled) setReady(true);
+      })();
+    }, CELEBRATION_START_DELAY_MS);
+    const fallback = setTimeout(() => {
+      if (!cancelled) setReady(true);
+    }, CELEBRATION_START_DELAY_MS + 1500);
     return () => {
+      cancelled = true;
       clearTimeout(beat);
       clearTimeout(fallback);
     };
@@ -228,16 +246,12 @@ export default function FinalCelebration({
     let confetti: ReturnType<typeof setTimeout> | null = null;
     let watchdog: ReturnType<typeof setTimeout> | null = null;
 
-    (async () => {
-      let reduce = false;
-      try {
-        reduce = await AccessibilityInfo.isReduceMotionEnabled();
-      } catch {
-        // Kan kasta på vissa plattformar/versioner — full animation är
-        // säkert default (samma beteende som före denna feature).
-      }
-      if (cancelled) return;
-      reduceMotionRef.current = reduce;
+    // Reduce Motion är redan resolverad under beaten (se `ready`-effekten), så
+    // vi läser den SYNKRONT här — ingen await mellan Q-ritningens start och
+    // konfetti/pokal-schemat. Allt nedan ankras därmed till exakt samma
+    // ögonblick som SparkleDrawQ:s draw-start och håller synk med Q:ts avslut.
+    {
+      const reduce = reduceMotionRef.current;
       const t = reduce ? REDUCED_TIMING : FULL_TIMING;
       timingRef.current = t;
 
@@ -365,7 +379,7 @@ export default function FinalCelebration({
         contentScale.setValue(1);
         setStage('highlights');
       }, total);
-    })();
+    }
 
     return () => {
       cancelled = true;
