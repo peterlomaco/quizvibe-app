@@ -443,20 +443,31 @@ export default function SparkleDrawQ({
     }
 
     let raf = 0;
-    const startedAt = Date.now();
-
-    // Gnistorna går på native-drivaren (som konfettin) med samma duration
-    // och easing som bågen nedan — samma bana, olika mekanism.
+    // ⚠ Ankra ritningens klocka till FÖRSTA rAF-framen, INTE till effektens
+    // körning. Celebrationens egen mount (SparkLayer:s ~100 skugg-tunga vyer +
+    // ljud-WebView) kan blocka JS-tråden ~1 s PRECIS här; hade startedAt satts
+    // synkront skulle wall-clock hunnit rusa iväg under blocket och bågen
+    // "hoppat" in nästan färdig (spelaren såg aldrig elden rita Q:t). En rAF
+    // fyrar först när tråden är fri och en frame faktiskt målas — då sätts
+    // startedAt OCH den native-drivna gnistanimationen startar, så BÅDE bågen
+    // och gnistorna börjar på första målade framen → hela ritningen syns, 0→100 %.
+    let startedAt = 0;
+    let anim: Animated.CompositeAnimation | null = null;
     sparkProgress.setValue(0);
-    const anim = Animated.timing(sparkProgress, {
-      toValue: 1,
-      duration: DRAW_MS,
-      easing: ease,
-      useNativeDriver: true,
-    });
-    anim.start();
 
     const step = () => {
+      if (startedAt === 0) {
+        startedAt = Date.now();
+        // Gnistorna går på native-drivaren (som konfettin) med samma duration
+        // och easing som bågen nedan — samma bana, olika mekanism.
+        anim = Animated.timing(sparkProgress, {
+          toValue: 1,
+          duration: DRAW_MS,
+          easing: ease,
+          useNativeDriver: true,
+        });
+        anim.start();
+      }
       const t = Math.min(1, (Date.now() - startedAt) / DRAW_MS);
       setProgress(ease(t));
       if (t < 1) raf = requestAnimationFrame(step);
@@ -465,7 +476,7 @@ export default function SparkleDrawQ({
 
     return () => {
       cancelAnimationFrame(raf);
-      anim.stop();
+      anim?.stop();
     };
   }, [active, sparkle, ease, sparkProgress]);
 

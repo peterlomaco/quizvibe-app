@@ -239,12 +239,12 @@ export default function FinalCelebration({
   // och ljud ankras alla till detta ögonblick → de förblir i synk.
   useEffect(() => {
     if (!ready) return;
-    startedAtRef.current = Date.now();
     let cancelled = false;
     let anim: Animated.CompositeAnimation | null = null;
     let halo: Animated.CompositeAnimation | null = null;
     let confetti: ReturnType<typeof setTimeout> | null = null;
     let watchdog: ReturnType<typeof setTimeout> | null = null;
+    let startRaf: number | null = null;
 
     // Reduce Motion är redan resolverad under beaten (se `ready`-effekten), så
     // vi läser den SYNKRONT här — ingen await mellan Q-ritningens start och
@@ -257,9 +257,9 @@ export default function FinalCelebration({
 
       // Reduce Motion: ingen ritning och inga gnistor — Q:t står färdigt
       // från första framen och tonar bara in med resten av märket. Då
-      // finns inget att sprakande ljudsätta heller.
+      // finns inget att sprakande ljudsätta heller. (Ljudet monteras i rAF:en
+      // nedan så SparklerSound får samma post-jank startedAt som ritningen.)
       if (reduce) setSparkle(false);
-      else if (!muted) setPlaySound(true);
 
       if (!reduce) {
         halo = Animated.sequence([
@@ -287,7 +287,6 @@ export default function FinalCelebration({
             ]),
           ),
         ]);
-        halo.start();
       }
 
       anim = Animated.sequence([
@@ -310,10 +309,10 @@ export default function FinalCelebration({
         // ritningen som ett steg i kedjan, och när dess callback uteblev
         // stannade allt i 'celebration': ingen pokal, ingen summary, ingen
         // väg ut ur den touch-blockerande slöjan.
-        // ⚠ DRAW_MS räknas från MOUNT, inte härifrån: SparkleDrawQ startar
-        // sin ritning i sin egen mount-effekt, parallellt med markIn ovan.
-        // Utan avdraget landar pokalen 220 ms efter att Q:t blivit klart —
-        // och efter fyrverkerismällen, som också ligger på mount+DRAW_MS.
+        // ⚠ markIn OCH SparkleDrawQ:s ritning startar på SAMMA första rAF-frame
+        // (se startRaf nedan resp. SparkleDrawQ). markIn löper t.markIn ms; sedan
+        // väntar vi DRAW_MS − markIn så pokalen landar exakt vid draw-start +
+        // DRAW_MS = Q:ts avslut. Utan avdraget landade pokalen markIn ms för sent.
         Animated.delay(reduce ? 0 : Math.max(0, DRAW_MS - t.markIn)),
         // Pokalen + ordmärket landar i det färdigritade Q:t.
         Animated.parallel([
@@ -346,43 +345,58 @@ export default function FinalCelebration({
         }),
       ]);
 
-      anim.start(({ finished }) => {
-        if (!finished || cancelled) return;
-        halo?.stop();
-        setStage('highlights');
+      // ⚠ Starta HELA sekvensen (mark-fade, glöd, pokal, konfetti) på FÖRSTA
+      // rAF-framen, inte synkront här. Celebrationens mount (SparkLayer:s ~100
+      // skugg-tunga gnist-vyer + ljud-WebView) blockar JS-tråden ~1 s precis nu.
+      // SparkleDrawQ ankrar sin ritning till SIN första rAF av samma skäl;
+      // genom att ankra markIn + pokal + konfetti hit delar de EN post-jank-
+      // anchor → elden ritar Q:t synligt 0→100 % och pokal/konfetti landar på
+      // Q:ts avslut, i synk. startedAtRef speglar samma ögonblick (för ljudet).
+      startRaf = requestAnimationFrame(() => {
+        if (cancelled || !anim) return;
+        startedAtRef.current = Date.now();
+        // Ljud-WebView:n monteras HÄR (efter startedAtRef) så SparklerSound får
+        // samma post-jank-anchor som ritningen och kan hoppa förbi sin egen
+        // laddningstid via startedAt.
+        if (!reduce && !muted) setPlaySound(true);
+        halo?.start();
+        anim.start(({ finished }) => {
+          if (!finished || cancelled) return;
+          halo?.stop();
+          setStage('highlights');
+        });
+        if (!reduce) {
+          // Konfettin fyras av när pennan når slutet av svansen — alltså i
+          // samma ögonblick som pokalen landar.
+          confetti = setTimeout(() => {
+            if (!cancelled) setConfettiOn(true);
+          }, Math.max(0, DRAW_MS - 60));
+        }
+
+        // Skyddsnät. Att bli kvar i 'celebration' betyder att spelaren är
+        // INLÅST bakom slöjan — ingen summary, ingen "Go to Final leaderboard",
+        // inga knappar som går att träffa. Skulle sekvensen mot förmodan inte
+        // rapportera klart tar den här timern över. Schemaläggs HÄR (inte
+        // synkront) så den mäter från sekvensens verkliga start — annars kunde
+        // ett långt mount-block skjuta starten förbi marginalen och watchdogen
+        // fyra i förtid. 900 ms åt pokalens fjädring (ingen fast duration) +
+        // 1200 ms marginal.
+        const total = (reduce ? t.markIn : DRAW_MS) + 900 + t.hold + t.settle + 1200;
+        watchdog = setTimeout(() => {
+          if (cancelled || stageRef.current !== 'celebration') return;
+          anim?.stop();
+          halo?.stop();
+          markOpacity.setValue(WATERMARK_OPACITY);
+          contentOpacity.setValue(1);
+          contentScale.setValue(1);
+          setStage('highlights');
+        }, total);
       });
-
-      if (!reduce) {
-        // Konfettin fyras av när pennan når slutet av svansen — alltså i
-        // samma ögonblick som pokalen landar. Startar den tidigare tävlar
-        // den om blicken med ritningen.
-        confetti = setTimeout(() => {
-          if (!cancelled) setConfettiOn(true);
-        }, Math.max(0, DRAW_MS - 60));
-      }
-
-      // Skyddsnät. Att bli kvar i 'celebration' betyder att spelaren är
-      // INLÅST bakom slöjan — ingen summary, ingen "Go to Final leaderboard", inga
-      // knappar som går att träffa. Skulle sekvensen mot förmodan inte
-      // rapportera klart tar den här timern över.
-      // 900 ms åt pokalens fjädring (den har ingen fast duration) och 1200
-      // ms marginal ovanpå, så skyddsnätet aldrig hinner före ett normalt
-      // avslut.
-      const total =
-        (reduce ? t.markIn : DRAW_MS) + 900 + t.hold + t.settle + 1200;
-      watchdog = setTimeout(() => {
-        if (cancelled || stageRef.current !== 'celebration') return;
-        anim?.stop();
-        halo?.stop();
-        markOpacity.setValue(WATERMARK_OPACITY);
-        contentOpacity.setValue(1);
-        contentScale.setValue(1);
-        setStage('highlights');
-      }, total);
     }
 
     return () => {
       cancelled = true;
+      if (startRaf != null) cancelAnimationFrame(startRaf);
       anim?.stop();
       halo?.stop();
       if (confetti) clearTimeout(confetti);
