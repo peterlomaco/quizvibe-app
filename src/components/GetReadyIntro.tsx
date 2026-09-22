@@ -17,7 +17,7 @@ import {
 import { CappedText as Text } from './CappedText';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
-import { MainCategory } from '../utils/mainCategory';
+import { MainCategory, mainCategoryDisplay } from '../utils/mainCategory';
 import type { PlayedMediaSource } from '../utils/mediaSource';
 import Svg, { Path } from 'react-native-svg';
 import { MediaSourceIcon } from './MediaSourceIcon';
@@ -701,7 +701,7 @@ export function GetReadyIntro({
             )}
             {!questionDataPending && currentCategory && (
               <View style={styles.categoryBadge} pointerEvents="none">
-                <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
+                <Text style={styles.categoryBadgeText}>{mainCategoryDisplay(currentCategory)}</Text>
               </View>
             )}
           </View>
@@ -1551,7 +1551,7 @@ export function GetReadyIntro({
                   )}
                   {!questionDataPending && currentCategory && (
                     <View style={styles.categoryBadge} pointerEvents="none">
-                      <Text style={styles.categoryBadgeText}>{currentCategory}</Text>
+                      <Text style={styles.categoryBadgeText}>{mainCategoryDisplay(currentCategory)}</Text>
                     </View>
                   )}
                 </View>

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '../theme';
-import { type MainCategory } from '../utils/mainCategory';
+import { type MainCategory, mainCategoryDisplay } from '../utils/mainCategory';
 import { DEFAULT_VOICE_ID, resolveVoicePack, SILENT_VOICE_ID, VOICE_TOKENS, type VoiceToken } from '../utils/voicePacks';
 import { ensureVoiceAudioMode } from '../utils/voicePlayback';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
@@ -201,7 +201,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
         {/* MUSIC + FILM: Music- och Film-taggarna visas (Sport fortfarande parkerat).
             Lägg till 'Sport' här när Sport-innehållet av-parkeras. */}
         {(['Music', 'Film'] as const).map((c) => (
-          <SideTag key={c} label={c} active={category === c} accent={CATEGORY_ACCENT} />
+          <SideTag key={c} label={mainCategoryDisplay(c)} active={category === c} accent={CATEGORY_ACCENT} />
         ))}
       </View>
 

@@ -264,7 +264,7 @@ export function HCPShieldCluster({
       {expanded ? (
         <View style={cardStyles.clusterRow}>
           <HCPShieldCard hcp={bundle.music} size={subSize} label="Music" notDefined={notDefined} badgeColor={Colors.warning} badgeTextColor="#000" />
-          <HCPShieldCard hcp={bundle.film} size={subSize} label="Film" notDefined={notDefined} badgeColor={Colors.warning} badgeTextColor="#000" />
+          <HCPShieldCard hcp={bundle.film} size={subSize} label="Film/TV" notDefined={notDefined} badgeColor={Colors.warning} badgeTextColor="#000" />
         </View>
       ) : null}
     </View>

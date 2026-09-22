@@ -432,7 +432,7 @@ describe('solo och personal-läge', () => {
       ]),
     );
     const film = cards.find((c) => c.id === 'best-film')!;
-    expect(film.title).toBe('Best on Film');
+    expect(film.title).toBe('Best on Film/TV');
     expect(film.rows![0].place).toBe(1);
     expect(film.rows![0].name).toBe('Anna');
     expect(film.rows![0].emoji).toBe('🦊');

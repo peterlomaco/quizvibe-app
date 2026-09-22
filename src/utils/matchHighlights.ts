@@ -448,7 +448,7 @@ export function buildMatchHighlights(
     },
     {
       id: 'best-film',
-      title: personal ? 'Film' : 'Best on Film',
+      title: personal ? 'Film/TV' : 'Best on Film/TV',
       match: (i) => srcOf(i) === 'youtube' && catOf(i) === 'Film',
       visual: { category: 'Film', icon: '🎬' },
     },
@@ -460,7 +460,7 @@ export function buildMatchHighlights(
     },
     {
       id: 'best-hints-film',
-      title: personal ? 'Hints · Film' : 'Best on Hints - Film',
+      title: personal ? 'Hints · Film/TV' : 'Best on Hints - Film/TV',
       match: (i) => srcOf(i) === 'image' && catOf(i) === 'Film',
       visual: { source: 'image', category: 'Film' },
     },

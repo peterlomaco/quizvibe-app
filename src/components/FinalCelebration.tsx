@@ -19,6 +19,7 @@ import SparkleDrawQ, { DRAW_MS } from './SparkleDrawQ';
 import SparklerSound from './SparklerSound';
 import { MediaSourceIcon } from './MediaSourceIcon';
 import type { HighlightCard } from '../utils/matchHighlights';
+import { mainCategoryDisplay } from '../utils/mainCategory';
 
 /**
  * Prisutdelnings-sekvensen mellan sista frågans reveal och Final Leaderboard.
@@ -552,7 +553,7 @@ export default function FinalCelebration({
                         kategorier delar MEDVETET en enda guldfärg. */}
                     {card.category && (
                       <View style={styles.categoryBadge} pointerEvents="none">
-                        <Text style={styles.categoryBadgeText}>{card.category}</Text>
+                        <Text style={styles.categoryBadgeText}>{mainCategoryDisplay(card.category)}</Text>
                       </View>
                     )}
                     {/* Källa → appens OFFICIELLA brand-ikon (YouTubes röda

@@ -52,6 +52,22 @@ export const MAIN_CATEGORY_LABELS: Record<MainCategory, string> = {
 };
 
 /**
+ * User-facing display-etikett för huvudkategorin i badges/rubriker/kort.
+ * Film visas som "Film/TV" (Peter 2026-09-22) — Film-poolen innehåller numera
+ * även TV/serie-klipp. Det INTERNA MainCategory-värdet är oförändrat ('Film');
+ * detta är enbart en display-sträng. Uppercase-kontexter (badges med
+ * textTransform: 'uppercase') renderar automatiskt "FILM/TV".
+ */
+export const MAIN_CATEGORY_DISPLAY: Record<MainCategory, string> = {
+  Music: 'Music',
+  Film: 'Film/TV',
+};
+
+export function mainCategoryDisplay(cat: MainCategory): string {
+  return MAIN_CATEGORY_DISPLAY[cat];
+}
+
+/**
  * Mappar backend-subject → V1-huvudkategori. null när subjectet inte tillhör
  * någon av Music/Film/Sport (t.ex. capital, country, place — geografi-items
  * som curators valt att inte gruppera under huvudkategorierna).

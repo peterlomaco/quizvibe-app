@@ -2002,7 +2002,7 @@ function ChoiceRow({
 const TAGLINES = [
   'Challenge yourself. Play together.',
   'Invite Friends. Socialize.',
-  'Music. Film. Play.',
+  'Music. Film/TV. Play.',
 ];
 
 export default function HomeScreen() {

@@ -152,7 +152,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What is HCP?',
-        a: 'HCP (handicap) is your skill rating in QuizVibe, on a scale from 99 (beginner) down to 1 (elite) — the lower the number, the better. Every registered player starts at 99 and earns their way down by playing. You have a separate HCP for Music and for Film, plus a Total (the average of the two), each shown as a coloured shield on your Profile, on the Lobby player cards, and after each game on the leaderboard.',
+        a: 'HCP (handicap) is your skill rating in QuizVibe, on a scale from 99 (beginner) down to 1 (elite) — the lower the number, the better. Every registered player starts at 99 and earns their way down by playing. You have a separate HCP for Music and for Film/TV, plus a Total (the average of the two), each shown as a coloured shield on your Profile, on the Lobby player cards, and after each game on the leaderboard.',
       },
       {
         q: 'How does my HCP change?',

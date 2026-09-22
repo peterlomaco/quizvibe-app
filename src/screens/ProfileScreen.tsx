@@ -1676,7 +1676,7 @@ export default function ProfileScreen() {
             {hcpCategoriesExpanded && (
               <View style={styles.hcpSubRow}>
                 <HCPShieldCard hcp={hcpShieldBundle.music} size={56} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" />
-                <HCPShieldCard hcp={hcpShieldBundle.film} size={56} label="Film" badgeColor={Colors.warning} badgeTextColor="#000" />
+                <HCPShieldCard hcp={hcpShieldBundle.film} size={56} label="Film/TV" badgeColor={Colors.warning} badgeTextColor="#000" />
               </View>
             )}
 
@@ -2055,7 +2055,7 @@ export default function ProfileScreen() {
               {/* Film (Actors) kolumn */}
               <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
                 <View style={styles.smHeaderCell}>
-                  <Text style={styles.sourceMatrixHeaderText}>Film</Text>
+                  <Text style={styles.sourceMatrixHeaderText} numberOfLines={1}>Film/TV</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, styles.smSwitchNudge, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
                   <Switch value={actorsAllOn} onValueChange={handleToggleActorsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />

@@ -363,7 +363,7 @@ export function LeaderboardTable({
                 <View style={styles.lbHcpModalRow}>
                   <HCPShieldCard hcp={expandedCat.total.after} size={48} label="Total" deltaBadge={expandedCat.total.delta} />
                   <HCPShieldCard hcp={expandedCat.music.after} size={48} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.music.delta} />
-                  <HCPShieldCard hcp={expandedCat.film.after} size={48} label="Film" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.film.delta} />
+                  <HCPShieldCard hcp={expandedCat.film.after} size={48} label="Film/TV" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.film.delta} />
                 </View>
                 <Pressable style={styles.lbHcpModalClose} onPress={() => setExpandedId(null)}>
                   <Text style={styles.lbHcpModalCloseText}>Close</Text>

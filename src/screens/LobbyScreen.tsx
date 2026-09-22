@@ -521,8 +521,8 @@ const isOnlyYtFilm = (
 
 const ytFilmAloneAlert = () =>
   Alert.alert(
-    "YouTube Film can't be alone",
-    "YouTube Film content is limited and can't be played on its own. Keep or add another source to play.",
+    "YouTube Film/TV can't be alone",
+    "YouTube Film/TV content is limited and can't be played on its own. Keep or add another source to play.",
   );
 
 // ─── Add Player Modal ─────────────────────────────────────────────────────────
@@ -7175,7 +7175,7 @@ export default function LobbyScreen() {
               utrymmet är fritt). Host visar den ovanför room code-kortet. */}
           {!hostMode && (
             <Text style={styles.headerTagline} numberOfLines={1}>
-              Music. Film. Play.
+              Music. Film/TV. Play.
             </Text>
           )}
         </View>
@@ -7184,7 +7184,7 @@ export default function LobbyScreen() {
             room code-kortet; non-host visar den i headern (se ovan). */}
         {hostMode && (
           <Text style={styles.roomTagline}>
-            Music. Film. Play.
+            Music. Film/TV. Play.
           </Text>
         )}
 
@@ -8324,7 +8324,7 @@ export default function LobbyScreen() {
               {/* ── Film (Actors) kolumn-stack ── */}
               <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
                 <View style={styles.smHeaderCell}>
-                  <Text style={styles.sourceMatrixHeaderText}>Film</Text>
+                  <Text style={styles.sourceMatrixHeaderText} numberOfLines={1}>Film/TV</Text>
                 </View>
                 <View style={[styles.smAllToggleCell, styles.smSwitchNudge, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
                   <Switch value={smColValue('Film', actorsAllOn)} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smColValue('Film', actorsAllOn) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Film')) && { opacity: 0.45 }]} />
