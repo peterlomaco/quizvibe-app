@@ -90,6 +90,22 @@ function FullNamesView({
   // Pre-confirm: pendingName styr highlight. Post-confirm: confirmedName.
   const selectedName = confirmedName ?? pendingName;
 
+  // Blink-animation för namn-kort som ännu inte valts — speglar PrefixView:s
+  // prefix-knapp-blink så full-names-läget (Hints / Spotify Name) lockar
+  // spelaren att inse att alternativen är tappbara. Gemensam Animated.Value —
+  // alla kort blinkar synkroniserat, och slutar när spelaren gjort ett val.
+  const blinkAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnim, { toValue: 0.35, duration: 750, useNativeDriver: true }),
+        Animated.timing(blinkAnim, { toValue: 1,    duration: 750, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [blinkAnim]);
+
   function handleNamePress(name: ImageNameOption): void {
     if (confirmedName || isTimedOut || phase !== 'question') return;
     onNameSelect(name);
@@ -174,43 +190,52 @@ function FullNamesView({
           const isDimmed =
             isRevealing && !isPlayerRow && !isCorrectRevealRow && !isWrongRevealRow;
 
+          // Namn-korten blinkar (opacity) tills spelaren tryckt på ett — samma
+          // affordance som prefix-knapparna i PrefixView. Slutar för det valda
+          // kortet så snart spelaren tappar det; övriga fortsätter tills låst.
+          const shouldBlink = !isPlayerRow && !isLocked && phase === 'question';
+
           return (
-            <Pressable
+            <Animated.View
               key={name.itemId}
-              onPress={() => handleNamePress(name)}
-              disabled={isLocked || isTimedOut}
-              style={({ pressed }) => [
-                styles.fullNameCard,
-                cardStyle,
-                pressed && !isLocked && styles.fullNameCardPressed,
-              ]}
+              style={shouldBlink ? { opacity: blinkAnim } : undefined}
             >
-              <Text
-                style={[
-                  styles.fullNameText,
-                  textStyle,
-                  isDimmed && styles.fullNameTextDimmed,
+              <Pressable
+                onPress={() => handleNamePress(name)}
+                disabled={isLocked || isTimedOut}
+                style={({ pressed }) => [
+                  styles.fullNameCard,
+                  cardStyle,
+                  pressed && !isLocked && styles.fullNameCardPressed,
                 ]}
-                numberOfLines={1}
               >
-                {name.displayName}
-              </Text>
-              {badgeType === 'correct' && (
-                <Text style={[styles.revealBadge, styles.revealBadgeCorrect]}>
-                  Correct
+                <Text
+                  style={[
+                    styles.fullNameText,
+                    textStyle,
+                    isDimmed && styles.fullNameTextDimmed,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {name.displayName}
                 </Text>
-              )}
-              {badgeType === 'wrong' && (
-                <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
-                  Wrong
-                </Text>
-              )}
-              {badgeType === 'wrongReveal' && (
-                <Text style={[styles.wrongIconBadge, styles.wrongIconBadgeFullName]}>
-                  ×
-                </Text>
-              )}
-            </Pressable>
+                {badgeType === 'correct' && (
+                  <Text style={[styles.revealBadge, styles.revealBadgeCorrect]}>
+                    Correct
+                  </Text>
+                )}
+                {badgeType === 'wrong' && (
+                  <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
+                    Wrong
+                  </Text>
+                )}
+                {badgeType === 'wrongReveal' && (
+                  <Text style={[styles.wrongIconBadge, styles.wrongIconBadgeFullName]}>
+                    ×
+                  </Text>
+                )}
+              </Pressable>
+            </Animated.View>
           );
         })}
       </View>
@@ -245,8 +270,8 @@ function PrefixView({
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(blinkAnim, { toValue: 0.35, duration: 480, useNativeDriver: true }),
-        Animated.timing(blinkAnim, { toValue: 1,    duration: 480, useNativeDriver: true }),
+        Animated.timing(blinkAnim, { toValue: 0.35, duration: 750, useNativeDriver: true }),
+        Animated.timing(blinkAnim, { toValue: 1,    duration: 750, useNativeDriver: true }),
       ]),
     );
     loop.start();
