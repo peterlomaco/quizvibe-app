@@ -104,7 +104,7 @@ import {
   type DJRotationPlan,
   type SpotifyDJPlayer,
 } from '@/src/utils/spotifyDJ';
-import { ensureVoiceAudioMode } from '@/src/utils/voicePlayback';
+import { ensureVoiceAudioMode, warmVoiceSession, releaseVoiceSession } from '@/src/utils/voicePlayback';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';
 import { getSpotifyArtistMeta, type SpotifyArtistMeta } from '@/src/utils/spotifyArtistMeta';
@@ -4178,6 +4178,20 @@ export default function QuizScreen() {
     }
     return !isHost;
   }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn, isLocalSoloGame]);
+
+  // Håll iOS-audiosessionen VARM från quiz-skärmens start (intro-fasen) så
+  // nedräkningens röstklipp hörs I TID. iOS aktiverar sessionen ~1 s vid första
+  // play(), och CountdownIntro monterar bara ~580 ms innan sin första siffra —
+  // för kort, så "3" startade ~1 s sent (bara "th" hördes innan "2"). Genom att
+  // aktivera + hålla sessionen redan här (sekunder innan någon nedräkning, och
+  // kvar mellan frågorna tills skärmen unmountar) spelar varje siffra direkt.
+  // Bara enheter som faktiskt spelar countdown-ljud (host / ej mutad); rör
+  // INGET i schemat/timern/klock-synken (ren ljud-uppvärmning). (Peter 2026-09-22.)
+  useEffect(() => {
+    if (isAudioMutedForSelf) return;
+    warmVoiceSession(getCachedProfile()?.voice ?? DEFAULT_VOICE_ID);
+    return () => { releaseVoiceSession(); };
+  }, [isAudioMutedForSelf]);
   // Aktuell spelares namn i Pass-the-Phone-rotationen — visas subtilt i fråge-
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
   // spelare är på sin egen enhet och vet redan vem de är).

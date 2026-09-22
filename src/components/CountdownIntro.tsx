@@ -79,10 +79,10 @@ const LOGO_SIZE = Math.min(360, SCREEN_WIDTH - 40);
 // senaste faktiskt spelade röstklippet. En komponent-ref räcker inte om
 // CountdownIntro re-mountas mitt i (ny instans = ny ref = ingen delad debounce)
 // och två instansers timer-kedjor stomp:ar → "3", "2" och "1" samtidigt. En
-// modul-global spärr spänner över instanser: två siffror inom 700 ms = stomp →
-// den andra hoppas över. Bara EN nedräkning körs åt gången, och en ny
-// nedräknings första siffra ligger alltid >700 ms efter den förras sista, så
-// legitima siffror blockeras aldrig. (Peter 2026-09-17.)
+// modul-global spärr spänner över instanser: två siffror inom VOICE_MIN_GAP_MS
+// = stomp → den andra hoppas över. Bara EN nedräkning körs åt gången, och en ny
+// nedräknings första siffra ligger alltid långt (sekunder) efter den förras
+// sista, så legitima siffror blockeras aldrig. (Peter 2026-09-17.)
 let lastCountdownVoiceMs = 0;
 
 // Storlek på siffran och "?" — sätts så glyfen ryms innanför Q-ringens inre
@@ -269,7 +269,37 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
       } catch (_) {}
     }
     playersRef.current = players;
+    // ⚠ SESSIONS-uppvärmningen (det som tog ~1 s) sker INTE här utan hela quiz-
+    // skärmen via warmVoiceSession() (voicePlayback.ts), redan i intro-fasen.
+    //
+    // HÄR gör vi en KORT per-player-priming: varje siffer-player betalar en liten
+    // FÖRSTA-play-latens (~några 100 ms) första gången den spelas, även med varm
+    // session. Det räckte för att "3" (som spelas bara ~580 ms efter mount) skulle
+    // starta lite sent och få en kort svans-överlapp mot "2". Vi spelar därför
+    // klippen TYST (muted) direkt vid mount — nu går det snabbt eftersom sessionen
+    // redan är varm — och pausar + spolar tillbaka innan den riktiga "3":an. Då är
+    // varje player redan "varm" och spelar OMEDELBART. Rör INGET i schema/timer.
+    // (Peter 2026-09-22.)
+    const WARM_TOKENS: VoiceToken[] = ['1', '2', '3', '4', '5'];
+    for (const token of WARM_TOKENS) {
+      const p = players[token];
+      if (p) {
+        try { p.muted = true; p.play(); } catch (_) {}
+      }
+    }
+    // Stoppa priming-uppspelningen väl före nedräkningens första riktiga "3"
+    // (580 ms). Pausa FÖRST (annars hörs klippet när vi av-mutar), spola sedan
+    // tillbaka och av-muta så det riktiga play() startar rent från position 0.
+    const warmTimer = setTimeout(() => {
+      for (const token of WARM_TOKENS) {
+        const p = players[token];
+        if (p) {
+          try { p.pause(); p.seekTo(0); p.muted = false; } catch (_) {}
+        }
+      }
+    }, 350);
     return () => {
+      clearTimeout(warmTimer);
       playersRef.current = {};
       for (const token of VOICE_TOKENS) {
         try { players[token]?.remove(); } catch (_) {}
@@ -349,18 +379,32 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
     // setCount). `expectedAt` = stegets avsedda offset; för stort faktiskt
     // förflutet ⇒ vi hinner ikapp ⇒ tyst.
     const VOICE_LATE_SKIP_MS = 400;
-    const VOICE_MIN_GAP_MS = 700;
+    // Legitima siffror ligger TICK_MS (1300 ms) isär. Marginalen sätts nära det
+    // (men med headroom för jitter) så en siffra som fyras för TÄTT — pga catch-up-
+    // stapling när tråden blockerats — HOPPAS ÖVER i stället för att spelas ovanpå
+    // (överlappa) den föregående. Följd: föregående siffra hinner höras klart innan
+    // nästa. 1100 < 1300 så den normala kadensen alltid släpps igenom. Den
+    // huvudsakliga fixen mot "3 & 2 samtidigt" är dock warmVoiceSession()
+    // (voicePlayback.ts) som håller iOS-sessionen varm så klippen spelar i tid,
+    // inte ~1 s sent. (Peter 2026-09-22.)
+    const VOICE_MIN_GAP_MS = 1100;
     const speakToken = (value: number, expectedAt: number) => {
       if (Date.now() - t0 - expectedAt > VOICE_LATE_SKIP_MS) return;
       // Debounce mot stomp (MODUL-nivå så den spänner över re-mounts, inte bara
-      // effekt-omkörningar): två siffror inom 700 ms → hoppa över den andra.
+      // effekt-omkörningar): två siffror inom VOICE_MIN_GAP_MS → hoppa över den andra.
       const now = Date.now();
       if (now - lastCountdownVoiceMs < VOICE_MIN_GAP_MS) return;
       lastCountdownVoiceMs = now;
       const token = String(value) as VoiceToken;
       const player = pack ? playersRef.current[token] : undefined;
       if (player) {
-        try { player.seekTo(0); player.play(); } catch (_) {}
+        // Klippen är warma (varm session + per-player-priming, se preload) →
+        // spelar OMEDELBART, så "3" hinner sägas HELT innan "2" fyras 1300 ms
+        // senare. Vi pausar INTE föregående klipp (det klippte förr "3" till "th"),
+        // och kör INGEN seekTo(0) här: playern är fräsch + primad (redan spolad
+        // till 0) och spelas bara EN gång per nedräkning, så en extra async-seek
+        // före play() bara la till latens och sen-start. (Peter 2026-09-22.)
+        try { player.play(); } catch (_) {}
       } else {
         try {
           Speech.speak(String(value), { language: 'en-US', pitch: 0.01, rate: 0.42 });

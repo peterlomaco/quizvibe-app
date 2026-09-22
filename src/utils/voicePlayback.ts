@@ -10,7 +10,7 @@
  * configen. Allt är best-effort: native-modulen saknas i Expo Go, så varje
  * anrop är try/catch:at och no-op:ar tyst där.
  */
-import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
 import * as Speech from 'expo-speech';
 import { resolveVoicePack, SILENT_VOICE_ID, type VoiceToken } from './voicePacks';
 
@@ -42,6 +42,47 @@ export async function ensureVoiceAudioMode(force = false): Promise<void> {
   } catch (_) {
     audioModeConfigured = false; // tillåt nytt försök
   }
+}
+
+// ─── Sessions-uppvärmning (keep-alive) ──────────────────────────────────────
+// iOS aktiverar audiosessionen ~1 s vid FÖRSTA play(). CountdownIntro monterar
+// bara ~580 ms innan sin första siffra ("3") ska höras — för kort för att hinna
+// aktivera, så "3" startade ~1 s sent och bara "th" hördes innan "2" fyrades
+// (1300 ms senare) → de överlappade. Fixen: håll sessionen VARM redan från quiz-
+// skärmens intro-fas (sekunder innan någon nedräkning) via en muted, loopande
+// keep-alive-player. När nedräkningen sedan spelar sina klipp är sessionen redan
+// aktiv → varje siffra hörs OMEDELBART. muted + volume 0 + mixWithOthers → helt
+// tyst och stör inte YouTube/Spotify/Morse-ambient. (Peter 2026-09-22.)
+let warmPlayer: AudioPlayer | null = null;
+
+/**
+ * Aktiverar + håller iOS-audiosessionen varm (idempotent — no-op om redan varm
+ * eller om rösten är "No voice"). Anropas när quiz-skärmen mountar för en enhet
+ * som faktiskt spelar countdown-ljud (host / ej mutad). Vilket KLIPP som loopas
+ * spelar ingen roll — det är muted och finns bara för att hålla sessionen igång.
+ */
+export function warmVoiceSession(voiceId: string | null | undefined): void {
+  if (voiceId === SILENT_VOICE_ID) return;
+  if (warmPlayer) return;
+  const pack = resolveVoicePack(voiceId);
+  void ensureVoiceAudioMode();
+  try {
+    const p = createAudioPlayer(pack.clips['3']);
+    p.muted = true;
+    p.volume = 0;
+    p.loop = true;
+    p.play();
+    warmPlayer = p;
+  } catch (_) {
+    warmPlayer = null; // tillåt nytt försök
+  }
+}
+
+/** Släpper keep-alive-playern (anropas när quiz-skärmen unmountar). */
+export function releaseVoiceSession(): void {
+  if (!warmPlayer) return;
+  try { warmPlayer.pause(); warmPlayer.remove(); } catch (_) {}
+  warmPlayer = null;
 }
 
 /**
