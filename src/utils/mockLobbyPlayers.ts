@@ -22,6 +22,11 @@
 
 import { ensureAuthSession, getCurrentUserId, isAnonymousSession } from './auth';
 import { deactivateRoom, roomExists } from './mockActiveRooms';
+import {
+  clearOwnMemberships,
+  forgetOwnMembership,
+  recordOwnMembership,
+} from './ownLobbyLedger';
 import { supabase } from './supabase';
 import type { LobbyPlayer } from '../screens/LobbyScreen';
 
@@ -251,7 +256,12 @@ export async function upsertOwnLobbyPlayer(code: string, player: LobbyPlayer): P
     .upsert(row, { onConflict: 'room_code,player_id' });
   if (error) {
     console.warn('[lobbyPlayers] upsertOwnLobbyPlayer failed:', error.message);
+    return;
   }
+  // Registrera att DENNA enhet gick in i lobbyn (non-host-rad) så two-device-
+  // guarden känner igen ett eget övergivet deltagande (force-quit / stängd
+  // quiz-vy → has_left ligger kvar false) som eget och städar det tyst.
+  await recordOwnMembership(normalized, player.id);
 }
 
 /**
@@ -367,6 +377,9 @@ export async function seedRematchInviteePlayers(
 export async function markOwnPlayerLeft(code: string, playerId: string): Promise<void> {
   if (!code || !playerId) return;
   const normalized = normalizeCode(code);
+  // Graceful leave → släpp denna enhets ledger-claim för deltagandet. Görs
+  // först och oberoende av DB-utfallet: lokalt äger enheten inte längre raden.
+  await forgetOwnMembership(normalized, playerId);
   await ensureAuthSession();
   const { data: userResp } = await supabase.auth.getUser();
   const userId = userResp.user?.id;
@@ -553,6 +566,9 @@ export async function leaveOtherActiveMemberships(
 export async function leaveAllActiveMembershipsForUser(): Promise<void> {
   const memberships = await findOtherActiveMembershipsForUser();
   await leaveOtherActiveMemberships(memberships);
+  // Logout: töm denna enhets ledger så ett ANNAT konto som loggar in på samma
+  // enhet börjar rent (device-scoped ledger, se ownLobbyLedger.ts).
+  await clearOwnMemberships();
 }
 
 /**

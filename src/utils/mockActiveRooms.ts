@@ -19,6 +19,7 @@
 // Test-seeds finns kvar som in-memory fallback för dev/QA — joinar du med
 // dessa funkar det alltid, även utan att skapa rum mot DB:n.
 
+import { forgetRoomMemberships, recordOwnMembership } from './ownLobbyLedger';
 import { supabase } from './supabase';
 
 export interface RoomMeta {
@@ -152,7 +153,13 @@ export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<
     rematch_locked: meta.rematchLocked ?? false,
     rematch_player_ids: meta.rematchPlayerIds ?? [],
   });
-  if (!error) return true;
+  if (!error) {
+    // Registrera att DENNA enhet blev host (host-radens player_id är alltid
+    // '1') så two-device-guarden känner igen ett eget övergivet rum som eget
+    // och städar det tyst i stället för att fyra "Still active"-popupen.
+    await recordOwnMembership(normalized, '1');
+    return true;
+  }
   // ⚠ En upsert som NÄMNER en okörd kolumn failar HELA skrivningen — utan
   // fallbacken hade en oapplicerad 0037 gjort det omöjligt att skapa rum
   // överhuvudtaget. Skriv om raden utan 0037-fälten och fortsätt: allt utom
@@ -167,6 +174,7 @@ export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<
       console.warn('[activeRooms] registerActiveRoom failed:', retry.error.message);
       return false;
     }
+    await recordOwnMembership(normalized, '1');
     return true;
   }
   console.warn('[activeRooms] registerActiveRoom failed:', error.message);
@@ -255,6 +263,9 @@ export async function deactivateRoom(code: string): Promise<void> {
   if (error) {
     console.warn('[activeRooms] deactivateRoom failed:', error.message);
   }
+  // Rummet är borta — släpp denna enhets ledger-entries för koden (host + ev.
+  // egna rader) så guarden inte försöker "återta" ett rum som inte finns.
+  await forgetRoomMemberships(normalized);
 }
 
 /**

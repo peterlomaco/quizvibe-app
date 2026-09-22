@@ -4,6 +4,7 @@ import {
   findOtherActiveMembershipsForUser,
   leaveOtherActiveMemberships,
 } from './mockLobbyPlayers';
+import { getOwnMembershipKeys } from './ownLobbyLedger';
 
 /**
  * Blockerar att samma REGISTRERADE konto är aktiv deltagare i mer än en
@@ -19,13 +20,16 @@ import {
  *
  * ⚠ `has_left = false` är en KLIBBIG markör: den nollställs bara vid graceful
  * Leave/logout, aldrig vid force-quit eller när en non-host lämnar quiz-vyn.
- * Så det vanligaste utfallet är att kontots EGNA övergivna rum (samma enhet,
- * ingen "annan enhet") räknas som "aktiv login" i upp till 24h. Därför är
- * remedyn inte längre en återvändsgränd ("logga ut på andra enheten") utan en
- * ett-tapps "Continue here" som river ned de andra deltagandena
- * (leaveOtherActiveMemberships) och släpper igenom den här enheten — vilket
- * också är rätt beteende om man FAKTISKT är på en annan enhet (sessionen
- * flyttas hit; den andra enheten får "lobby deleted"/ejectas).
+ * Utan mer info skulle kontots EGNA övergivna rum (samma enhet, ingen "annan
+ * enhet") räknas som "aktiv login" i upp till 24h och felaktigt fyra popupen.
+ *
+ * Därför delar vi upp de aktiva deltagandena mot ownLobbyLedger (denna enhets
+ * lokala minne av vilka rader den SJÄLV skapade):
+ *   • EGNA (i ledgern) → tyst reclaim (leaveOtherActiveMemberships), INGEN
+ *     popup. Fångar force-quit / stängd quiz-vy / avslutat spel på samma enhet.
+ *   • FRÄMMANDE (ej i ledgern → skapade av en ANNAN enhet) → popupen fyrar.
+ *     "Continue here" river de främmande deltagandena och flyttar sessionen hit
+ *     (den andra enheten får "lobby deleted"/ejectas).
  *
  * Fail-open: anonyma/gäst-sessioner och alla DB-fel ger tom lista →
  * inte blockerad, så en misslyckad uppslagning aldrig låser ute en spelare.
@@ -36,6 +40,27 @@ import {
 export async function checkActiveElsewhere(excludeCode?: string): Promise<boolean> {
   const memberships = await findOtherActiveMembershipsForUser(excludeCode);
   if (memberships.length === 0) return false; // fritt fram
+
+  // Dela upp mot ownLobbyLedger: EGNA (skapade av denna enhet) vs FRÄMMANDE
+  // (en annan enhet med samma konto). Nyckelformatet matchar ledgern exakt —
+  // `m.roomCode` är redan normaliserad (toUpperCase) av finder:n.
+  const ledger = await getOwnMembershipKeys();
+  const own = memberships.filter((m) => ledger.has(`${m.roomCode}:${m.playerId}`));
+  const foreign = memberships.filter((m) => !ledger.has(`${m.roomCode}:${m.playerId}`));
+
+  if (own.length > 0) {
+    // Tyst reclaim av egna övergivna deltaganden — river host-rum
+    // (deactivateRoom prunar även ledgern) resp. flaggar non-host has_left=true.
+    // Best-effort, fail-open: en misslyckad städning ska aldrig låsa ute.
+    try {
+      await leaveOtherActiveMemberships(own);
+    } catch {
+      // helpers loggar sina egna fel och kastar aldrig — släpp igenom ändå.
+    }
+  }
+
+  // Bara egna stale rader (inget FRÄMMANDE deltagande) → fritt fram, ingen popup.
+  if (foreign.length === 0) return false;
 
   return new Promise<boolean>((resolve) => {
     // Resolve-exactly-once: både onPress och onDismiss kan fyra (Android
@@ -58,7 +83,7 @@ export async function checkActiveElsewhere(excludeCode?: string): Promise<boolea
           text: 'Continue here',
           onPress: async () => {
             try {
-              await leaveOtherActiveMemberships(memberships);
+              await leaveOtherActiveMemberships(foreign);
             } catch {
               // Best-effort — helpers loggar sina egna fel och kastar aldrig.
               // Släpp ändå igenom: en misslyckad städning ska inte låsa ute
