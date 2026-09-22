@@ -156,11 +156,15 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'How does my HCP change?',
-        a: 'It follows your recent form. The game looks at your last 10 answers on each assistance level, per category: consistently strong games lower your HCP (you improve), weaker games raise it. A new player\'s HCP holds steady until they\'ve played a few games, then it moves continuously. A single game can never move it by more than 10 points, and it drifts very slightly back toward beginner if you stop playing for several weeks.',
+        a: 'It follows your recent form. The game looks at your last 10 answers on each assistance level, per category: consistently strong games lower your HCP (you improve), weaker games raise it. A new player\'s HCP holds steady until they\'ve played a few games, then it moves continuously. A single game can never move it by more than 10 points. Your HCP also rises on its own if you stop playing — see below.',
       },
       {
         q: 'How do I earn HCP faster?',
         a: 'Challenge yourself — the less help you use and the wider the era you play, the more each good game counts:\n• Assistance level: Minimal earns the most, then Standard, then Full. With less help a strong result moves your HCP more (and a weak result costs you less).\n• Game Era: a wider year range is harder to place, so a wide era earns more than a narrow one.\nSo a great game on Minimal assistance across a wide Game Era moves your HCP the most.',
+      },
+      {
+        q: 'What happens to my HCP if I stop playing?',
+        a: 'It rises automatically — HCP is a rating of current form, so it drifts back toward beginner while you are away. For every full week without a game your HCP goes up by 0.5 points (about 2 points a month), until it reaches 99.\nThis happens per category, each on its own clock: if you keep playing Music but not Film/TV, only your Film/TV HCP rises — which still pulls your Total down, since the Total is the average of the two. Playing a single game in a category resets that category\'s clock. Nothing you have earned is wiped; you just need to keep playing to hold your level.',
       },
       {
         q: 'Do guests earn HCP?',

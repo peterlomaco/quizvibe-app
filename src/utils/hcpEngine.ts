@@ -26,7 +26,7 @@
  *          worsen ×1.0/0.8/0.6). Slutdeltan klampas symmetriskt till
  *          ±MAX_GAME_DELTA (10) så ett enskilt spel aldrig rör HCP mer än 10
  *          poäng. Kontinuerligt glidande (INGEN reset).
- *  • §2.4  Inaktivitets-decay: +0.25 per hel 7-dagarsperiod utan spel,
+ *  • §2.4  Inaktivitets-decay: +0.5 per hel 7-dagarsperiod utan spel,
  *          per kategori (var kategori har sin egen lastPlayedISO-klocka).
  *
  * ⚠ EJ IMPLEMENTERAT ÄNNU (kräver Item-HCP = probability-bootstrap, egen fas):
@@ -61,7 +61,7 @@ export function coerceContribution(v: HcpContribution): number {
 }
 
 // Progress för EN kategori (Music/Film): float-HCP, fönster per nivå och
-// en egen decay-klocka. `hcp` lagras som flyttal (decay ger 0,25-steg);
+// en egen decay-klocka. `hcp` lagras som flyttal (decay ger 0,5-steg);
 // visningen avrundas uppåt (displayHcp).
 export interface CategoryProgress {
   hcp: number;
@@ -139,6 +139,11 @@ export const ERA_MULT_MAX = 3.0;
 export const MAX_GAME_DELTA = 10.0;
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+// §2.4 — hur mycket HCP stiger (= blir sämre) per HEL vecka utan spel.
+// Höjd 0.25 → 0.5 av Peter 2026-09-22: en månads uppehåll kostar nu ~2 HCP
+// i stället för ~1, så inaktivitet faktiskt märks utan att radera intjäning.
+export const WEEKLY_DECAY = 0.5;
 
 /** Klampar ett HCP-värde till [1, 99]. */
 export function clampHcp(value: number): number {
@@ -263,13 +268,13 @@ function decayCategory(cat: CategoryProgress, now: Date): CategoryProgress {
   if (periods < 1) return cat;
   return {
     ...cat,
-    hcp: clampHcp(cat.hcp + 0.25 * periods),
+    hcp: clampHcp(cat.hcp + WEEKLY_DECAY * periods),
     lastPlayedISO: new Date(last + periods * WEEK_MS).toISOString(),
   };
 }
 
 /**
- * §2.4 — inaktivitets-decay: +0.25 per HEL 7-dagarsperiod sedan senaste spel,
+ * §2.4 — inaktivitets-decay: +WEEKLY_DECAY (0.5) per HEL 7-dagarsperiod sedan senaste spel,
  * OBEROENDE per kategori (varje kategori har sin egen lastPlayedISO). En
  * kategori-klocka flyttas fram med periods×7d (INTE till `now`) så vecko-resten
  * bevaras och samma period aldrig räknas två gånger vid nästa load. No-op för

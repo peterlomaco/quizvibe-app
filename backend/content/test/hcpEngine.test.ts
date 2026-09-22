@@ -283,7 +283,7 @@ describe('applyGameResult (§2.1 — stackad delta, per kategori)', () => {
   });
 });
 
-describe('applyInactivityDecay (§2.4 — +0.25 per hel vecka, oberoende per kategori)', () => {
+describe('applyInactivityDecay (§2.4 — +0.5 per hel vecka, oberoende per kategori)', () => {
   const start = new Date('2026-01-01T00:00:00.000Z');
   const base = () => progress(cat(40, undefined, start.toISOString()));
 
@@ -297,10 +297,10 @@ describe('applyInactivityDecay (§2.4 — +0.25 per hel vecka, oberoende per kat
     expect(applyInactivityDecay(base(), now).categories.Music.hcp).toBe(40);
   });
 
-  it('+0.25 per hel 7-dagarsperiod på DEN spelade kategorin, inte de andra', () => {
+  it('+0.5 per hel 7-dagarsperiod på DEN spelade kategorin, inte de andra', () => {
     const now = new Date('2026-01-22T00:00:00.000Z'); // 21 dygn = 3 veckor
     const out = applyInactivityDecay(base(), now);
-    expect(out.categories.Music.hcp).toBeCloseTo(40.75, 5);
+    expect(out.categories.Music.hcp).toBeCloseTo(41.5, 5);
     // Film har lastPlayedISO=null → orörd.
     expect(out.categories.Film.hcp).toBe(99);
   });
@@ -312,16 +312,16 @@ describe('applyInactivityDecay (§2.4 — +0.25 per hel vecka, oberoende per kat
     );
     const now = new Date('2026-01-22T00:00:00.000Z');
     const out = applyInactivityDecay(p, now);
-    expect(out.categories.Music.hcp).toBeCloseTo(40.75, 5); // 3 veckor
-    expect(out.categories.Film.hcp).toBeCloseTo(50.25, 5); // 1 vecka
+    expect(out.categories.Music.hcp).toBeCloseTo(41.5, 5); // 3 veckor
+    expect(out.categories.Film.hcp).toBeCloseTo(50.5, 5); // 1 vecka
   });
 
   it('flyttar kategorins lastPlayedISO framåt med hela perioder (ej till now)', () => {
     const now = new Date('2026-01-10T00:00:00.000Z'); // 9 dygn = 1 vecka + 2 dygn
     const out = applyInactivityDecay(base(), now);
-    expect(out.categories.Music.hcp).toBeCloseTo(40.25, 5);
+    expect(out.categories.Music.hcp).toBeCloseTo(40.5, 5);
     expect(out.categories.Music.lastPlayedISO).toBe('2026-01-08T00:00:00.000Z');
-    expect(applyInactivityDecay(out, now).categories.Music.hcp).toBeCloseTo(40.25, 5);
+    expect(applyInactivityDecay(out, now).categories.Music.hcp).toBeCloseTo(40.5, 5);
   });
 
   it('klampar vid 99', () => {
