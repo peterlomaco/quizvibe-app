@@ -143,6 +143,10 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         q: 'What are Extra packages?',
         a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop & RnB). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. Themes might be changed over time.',
       },
+      {
+        q: 'Why did a clip not play, or look different than before?',
+        a: 'Please be aware that we don\'t own the external material (YouTube and Spotify). Clips can be changed, removed or blocked in your region over time, so some may not work as expected. If a clip can\'t be played, QuizVibe picks another question for you. We appreciate your understanding — enjoy, it\'s just a game! If you find anything that doesn\'t work as it should, please contact info@quizvibe.se and attach screenshots.',
+      },
     ],
   },
   {
