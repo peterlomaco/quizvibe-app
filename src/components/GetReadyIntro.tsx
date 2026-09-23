@@ -30,6 +30,8 @@ import { useConnectionStatus } from '../lib/network/connectionMonitor';
 import { WifiFanIcon } from './WifiFanIcon';
 import { WifiOffIcon } from './WifiOffIcon';
 import { HeartbeatSound } from './HeartbeatSound';
+import { DEFAULT_VOICE_ID, SILENT_VOICE_ID, VOICE_OPTIONS } from '../utils/voicePacks';
+import { playVoiceClip } from '../utils/voicePlayback';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
  *  Speglar TurnOrderPlayer i quiz.tsx. */
@@ -171,6 +173,12 @@ interface Props {
    *  öppna alternativen. Sätts av parent när vi är mitt i en runda i Pass-
    *  the-Phone (alla spelare har inte svarat lika många gånger ännu). */
   responseSecondsLocked?: boolean;
+  /** Countdown-röst (voice pack-id) — visas som "Voice type:"-rad i Game
+   *  settings. Raden renderas när onVoiceChange är satt — alla enheter utom
+   *  PtP-åskådaren (IndDev non-host kan slå på sitt ljud via "Audio this
+   *  device" och hör då nedräkningen i sin valda röst). */
+  voiceId?: string;
+  onVoiceChange?: (voiceId: string) => void;
   /** Live-leaderboard-data, sorterad. När utelämnad eller tom array
    *  renderas inte leaderboard-blocket. */
   leaderboard?: LeaderboardLiveEntry[];
@@ -358,6 +366,8 @@ export function GetReadyIntro({
   answerResponseSeconds,
   onAnswerResponseSecondsChange,
   responseSecondsLocked = false,
+  voiceId,
+  onVoiceChange,
   leaderboard,
   onReady,
   selfPlayerName,
@@ -580,6 +590,12 @@ export function GetReadyIntro({
   };
   // Dropdown för Answer response time. Stängs efter val eller tap utanför.
   const [responseDropdownOpen, setResponseDropdownOpen] = useState(false);
+  // Dropdown för Voice type (countdown-röst). Samma mönster som response-time.
+  const [voiceDropdownOpen, setVoiceDropdownOpen] = useState(false);
+  const voiceLabel =
+    VOICE_OPTIONS.find((v) => v.id === voiceId)?.label ??
+    VOICE_OPTIONS.find((v) => v.id === DEFAULT_VOICE_ID)?.label ??
+    'Female voice';
   // Utfällbar leaderboard — default COLLAPSED vid första entry från Lobby
   // (= game start). User kan expandera via header-tap. Vid pass-the-phone-
   // mellan-ronder spawnar vi nya GetReadyIntro-instanser så state nollställs
@@ -1012,6 +1028,23 @@ export function GetReadyIntro({
                   </TouchableOpacity>
                 )}
               </View>
+              {/* Voice type — countdown-rösten för DENNA enhet (samma
+                  device-lokala preferens som Profile → "Countdown voice").
+                  Syns för host, remote och IndDev non-host (vars ljud styrs
+                  av "Audio this device"-raden nedan). */}
+              {onVoiceChange && (
+                <View style={styles.responseDropdownRow}>
+                  <Text style={styles.settingsRow}>Voice type:</Text>
+                  <TouchableOpacity
+                    style={styles.responseDropdownTrigger}
+                    onPress={() => setVoiceDropdownOpen(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.responseDropdownTriggerText}>{voiceLabel}</Text>
+                    <Text style={styles.responseDropdownChevron}>▼</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
               {/* Ljudet styrs per ENHET — raden togglar bara MIN uppspelning,
                   aldrig någon annans. Tap växlar direkt (ingen modal).
                   IndDev host: default PÅ. IndDev non-host: default AV, men
@@ -1315,6 +1348,66 @@ export function GetReadyIntro({
           })()}
         </View>
       )}
+
+      {/* Dropdown-modal för Voice type. ▶ förhandslyssnar utan att välja. */}
+      <Modal
+        visible={voiceDropdownOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setVoiceDropdownOpen(false)}
+      >
+        <Pressable
+          style={styles.dropdownBackdrop}
+          onPress={() => setVoiceDropdownOpen(false)}
+        >
+          <Pressable
+            style={styles.dropdownPanel}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text style={styles.dropdownTitle}>Voice type</Text>
+            {VOICE_OPTIONS.map((opt) => {
+              const isActive = opt.id === (voiceId ?? DEFAULT_VOICE_ID);
+              return (
+                <TouchableOpacity
+                  key={opt.id}
+                  style={[
+                    styles.dropdownOption,
+                    isActive && styles.dropdownOptionActive,
+                  ]}
+                  onPress={() => {
+                    onVoiceChange?.(opt.id);
+                    setVoiceDropdownOpen(false);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.voiceOptionLeft}>
+                    {opt.id !== SILENT_VOICE_ID ? (
+                      <Pressable
+                        onPress={() => playVoiceClip(opt.id, 'quizvibe', 'QuizVibe')}
+                        hitSlop={10}
+                        style={({ pressed }) => [styles.voicePreviewBtn, pressed && { opacity: 0.6 }]}
+                      >
+                        <Text style={styles.voicePreviewIcon}>▶</Text>
+                      </Pressable>
+                    ) : (
+                      <View style={styles.voicePreviewBtn} />
+                    )}
+                    <Text
+                      style={[
+                        styles.dropdownOptionText,
+                        isActive && styles.dropdownOptionTextActive,
+                      ]}
+                    >
+                      {opt.label}
+                    </Text>
+                  </View>
+                  {isActive && <Text style={styles.dropdownOptionCheck}>✓</Text>}
+                </TouchableOpacity>
+              );
+            })}
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       {/* Dropdown-modal för Answer response time-val. Tap utanför listan
           (semi-transparent backdrop) stänger; varje option-rad anropar
@@ -2351,6 +2444,22 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   dropdownOptionTextActive: {
+    color: Colors.primary,
+  },
+  voiceOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  voicePreviewBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  voicePreviewIcon: {
+    fontSize: FontSize.md,
     color: Colors.primary,
   },
   dropdownOptionCheck: {

@@ -115,6 +115,7 @@ import { generatePlayerName } from '@/src/utils/playerName';
 import {
   getCachedProfile,
   loadProfile,
+  saveProfile,
   type ProfileData,
 } from '@/src/utils/profileStorage';
 import { recordQuestionAnswer } from '@/src/utils/questionStats';
@@ -4222,6 +4223,23 @@ export default function QuizScreen() {
     return !isHost;
   }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn, isLocalSoloGame]);
 
+  // Countdown-röst för DENNA enhet. Seedas ur profil-spegeln; enheten kan
+  // byta den i GetReady → Game settings → "Voice type" (persisteras till profilen
+  // när en finns, annars bara för sessionen — t.ex. utloggad guest host).
+  const [countdownVoiceId, setCountdownVoiceId] = useState<string>(
+    () => getCachedProfile()?.voice ?? DEFAULT_VOICE_ID,
+  );
+  const handleVoiceChange = useCallback((voiceId: string) => {
+    setCountdownVoiceId(voiceId);
+    void (async () => {
+      try {
+        const p = await loadProfile();
+        if (p) await saveProfile({ ...p, voice: voiceId });
+      } catch {
+        // Best-effort — sessionsvärdet gäller ändå för detta spel.
+      }
+    })();
+  }, []);
   // Håll iOS-audiosessionen VARM från quiz-skärmens start (intro-fasen) så
   // nedräkningens röstklipp hörs I TID. iOS aktiverar sessionen ~1 s vid första
   // play(), och CountdownIntro monterar bara ~580 ms innan sin första siffra —
@@ -4232,9 +4250,9 @@ export default function QuizScreen() {
   // INGET i schemat/timern/klock-synken (ren ljud-uppvärmning). (Peter 2026-09-22.)
   useEffect(() => {
     if (isAudioMutedForSelf) return;
-    warmVoiceSession(getCachedProfile()?.voice ?? DEFAULT_VOICE_ID);
+    warmVoiceSession(countdownVoiceId);
     return () => { releaseVoiceSession(); };
-  }, [isAudioMutedForSelf]);
+  }, [isAudioMutedForSelf, countdownVoiceId]);
   // Aktuell spelares namn i Pass-the-Phone-rotationen — visas subtilt i fråge-
   // kortet ("Answering: {namn}"). Skip:as för Individual Devices (varje
   // spelare är på sin egen enhet och vet redan vem de är).
@@ -10345,6 +10363,8 @@ export default function QuizScreen() {
         nextDJName={nextDJName}
         eraFrom={eraFrom}
         eraTo={eraTo}
+        voiceId={countdownVoiceId}
+        onVoiceChange={handleVoiceChange}
         answerResponseSeconds={responseSeconds}
         onAnswerResponseSecondsChange={(seconds) => {
           setResponseSeconds(seconds);
@@ -10467,7 +10487,7 @@ export default function QuizScreen() {
     // Countdown-röst: device-lokal preferens ur profil-spegeln (som "Audio this
     // device"). Bara den talande enheten läser den — non-hosts är silent ändå.
     // Gäst/ohydrerad → Default (system-TTS).
-    const countdownVoice = getCachedProfile()?.voice ?? DEFAULT_VOICE_ID;
+    const countdownVoice = countdownVoiceId;
     return (
       <View style={styles.touchWrap} onTouchStart={signalHostActivity}>
       <CountdownIntro
