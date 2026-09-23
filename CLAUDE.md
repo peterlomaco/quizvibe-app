@@ -118,7 +118,19 @@ Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-on
 - [x] **Edge Function `check-clips` deployad på PROD** med `YOUTUBE_API_KEY`-secret + **Verify JWT OFF**; en invocation, inga fel.
 - [x] PROD-secrets `WELCOME_HOOK_SECRET` + `RESEND_API_KEY` finns (email-/välkomstflödet).
 - [ ] **POST-LAUNCH, inte v1.0**: aktivera server-side premium ovanpå `0046` — RC `Purchases.logIn(uid)` → deploya `revenuecat-webhook` + secret → peka RC-webhooken dit → verifiera köp/förnyelse/utgång i staging → FÖRST DÅ cutover `hasPremiumSubscription()` (dual-read en release). Ordningen står sist i migrationsfilen.
-- [ ] Vid prod-cutover: peka om `.env` till PROD + nytt bygge (backend-URL:en bakas in vid byggtid — submitta aldrig ett staging-pekat bygge). Full lista: `project_pre_launch_checklist.md`.
+- [x] **PROD-bygget finns: build #36** (`121e2899…`, profil `production`, channel `production`, byggt från master `4e08cf2`, runtime `700d1ff…`), auto-submittat till TestFlight 2026-09-23. EAS-miljön `production` pekar på PROD-Supabase (`.env`-flip behövs INTE — EAS-env vinner). ⚠ Alla tidigare TestFlight-byggen (#33–#35, `staging-testflight`) pratar med STAGING och får ALDRIG väljas i App Store Connect.
+- [x] **Innehåll via OTA ovanpå #36** (production + preview, 2026-09-23): 20 TV-serier (`series.yaml`, `mediaType: series`, Name-only) + tie-noten på Correct answers-kortet + clip-swap-fixen.
+
+**Kvar före "Submit for Review"** (i ordning):
+- [ ] Verifiera i #36:s bygglogg att env-variablerna laddades från **production**.
+- [ ] Rök-testa #36 mot PROD som `Apple-1`: skapa lobby → join från andra telefon → approve → spela → Re-match → Store visar Free-månaden. Spela minst ett helt spel som `Apple-1` så leaderboard/historik inte är tomma.
+- [ ] Serie-klippen: kontrollera i spelaren att intro-eftertexterna inte visar svaret (Dallas, Dynasty, A-Team, Knight Rider m.fl.) — justera `startSec`/byt klipp + OTA vid behov. Beslut: `parentControlled: true` på Squid Game?
+- [ ] App Store Connect, version 1.0: 6.9"-screenshots, välj build **#36**, App Review Information (kontakt + `Apple-1`/`Apple-1` + noter), **inga IAP bifogade** (`pkg_sub_monthly` utanför v1.0), bekräfta Pricing (Free, alla territorier).
+- [ ] Add for Review → Submit (Peters klick).
+- [ ] **Lanseringsdagen**: sätt `app_config.free_premium_promo.until` i PROD = go-live + 1 månad (placeholder 2026-12-31 nu).
+- [ ] Post-launch: byt `ota-on-clip-fix-merge.yml` från `preview` till `production`.
+
+Full lista: `project_pre_launch_checklist.md`.
 
 ## Routing
 
