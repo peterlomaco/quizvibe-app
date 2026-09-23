@@ -108,6 +108,18 @@ Två script ÖVERLEVDE medvetet:
 
 Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog → Pre-launch → Launch).
 
+### Pre-launch — Supabase PROD-status (verifierad 2026-09-23)
+
+Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-only, en rad per migration, ❌ MISSING först) i SQL Editor på BÅDA projekten före varje launch-/cutover-steg. Projekt: `QuizVibe` = **PROD** (`pyndqehlebtxochwpwex`), `quizvibe-staging` = **TEST** (`tottbiuikbdarsjlpxwn`) — namnen är bakvända mot känslan.
+
+- [x] **Migrationer 0001–0057 applicerade på PROD** — inkl. `0046` (applicerad 2026-09-23 för paritet; INERT tills RC-webhook + server-premium-cutover, som är post-launch) och `0056`/`0057` (krävs av clip-swap-fixen `6f77a0c`, som redan är OTA:ad till production).
+- [x] **Medvetet UTE ur PROD** (visas som MISSING, är rätt): `0013` sketch_enabled (död), `0016` game_sessions (security-review Finding 3 — öppen `with check(true)`, applicera ALDRIG som den ser ut), `0017` user_friends (oanvänd). ⚠ De tre FINNS i staging — bygg aldrig en feature på dem utan att först lösa dem för PROD.
+- [x] **Staging vid paritet** — `0046` applicerad även där 2026-09-23.
+- [x] **Edge Function `check-clips` deployad på PROD** med `YOUTUBE_API_KEY`-secret + **Verify JWT OFF**; en invocation, inga fel.
+- [x] PROD-secrets `WELCOME_HOOK_SECRET` + `RESEND_API_KEY` finns (email-/välkomstflödet).
+- [ ] **POST-LAUNCH, inte v1.0**: aktivera server-side premium ovanpå `0046` — RC `Purchases.logIn(uid)` → deploya `revenuecat-webhook` + secret → peka RC-webhooken dit → verifiera köp/förnyelse/utgång i staging → FÖRST DÅ cutover `hasPremiumSubscription()` (dual-read en release). Ordningen står sist i migrationsfilen.
+- [ ] Vid prod-cutover: peka om `.env` till PROD + nytt bygge (backend-URL:en bakas in vid byggtid — submitta aldrig ett staging-pekat bygge). Full lista: `project_pre_launch_checklist.md`.
+
 ## Routing
 
 `"main": "expo-router/entry"` — file-based routes in `app/`.
@@ -881,7 +893,7 @@ Snapshot-baserad jämförelse (`savedSnapshotRef` = JSON vid load/save). `hasUns
 
 ## Email verification + resend (registration confirmation)
 
-New registrations require email confirmation before login. **LIVE + verified end-to-end on STAGING (`tottbiuikbdarsjlpxwn`); PROD (`pyndqehlebtxochwpwex`) still pending — a launch-cutover blocker (see `project_pre_launch_checklist` + `project_email_verification` memories).**
+New registrations require email confirmation before login. **LIVE + verified end-to-end on STAGING (`tottbiuikbdarsjlpxwn`) and on PROD (`pyndqehlebtxochwpwex`, Peter verified 2026-09-15).** Migration parity: see "Pre-launch — Supabase PROD-status".
 
 **Client flow**: `handleRegisterSubmit` ([app/index.tsx](app/index.tsx)) `signUp`s (no auto-login, no local profile seeded), shows a "Check your email" popup, and switches to the login step. `handleLogin` detects `email_not_confirmed` in BOTH modes and offers a **"Resend link"** button: Email mode via `supabase.auth.resend({ type: 'signup' })` (client-side), PlayerName mode via `resendActivationByName()` ([src/utils/auth.ts](src/utils/auth.ts)) → Edge Function `resend-by-name`. PlayerName login runs through Edge Function `login-by-name` (returns `{ error: 'email_not_confirmed' }` at **HTTP 200** so `functions.invoke` surfaces it via `data.error` instead of swallowing a 4xx body).
 
