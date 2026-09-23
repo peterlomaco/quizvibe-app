@@ -248,9 +248,10 @@ export const PAID_MOVIES_CHANNEL_ID = 'UCRsn5u5ssrVbfMdzqs0F8OA';
 /**
  * Ett quiz-klipp är en trailer/scen/musikvideo — ett par minuter. En video
  * längre än så är nästan alltid en hel film/match/konsert, vilket ofta är
- * köpinnehåll. Mjuk flagga: kuratorn får titta, men nattliga cronen fälls inte.
+ * köpinnehåll. HÅRD flagga (Peter 2026-09-23): fäller nattliga cronen så
+ * klippet byts, i stället för att tyst ligga kvar som en anmärkning.
  */
-export const MAX_CLIP_SOURCE_DURATION_SEC = 20 * 60;
+export const MAX_CLIP_SOURCE_DURATION_SEC = 10 * 60;
 
 /**
  * 'hard' = klippet går INTE att spela för våra spelare (spelaren visar
@@ -323,9 +324,9 @@ export function getClipIssues(details: YoutubeVideoDetails): ClipIssue[] {
   // 'unknown' flaggas INTE — vi vill inte regressa existerande klipp om
   // API-svaret saknar fältet (defensiv).
   if (details.definition === 'sd') soft('SD resolution');
-  // Över 20 min = sannolikt hel film/match (ofta köpinnehåll).
+  // Över 10 min = sannolikt hel film/match (ofta köpinnehåll) — hårt.
   if (details.durationSec > MAX_CLIP_SOURCE_DURATION_SEC) {
-    soft(`long video (${Math.round(details.durationSec / 60)} min) — likely full film/paid content`);
+    hard(`long video (${Math.round(details.durationSec / 60)} min) — likely full film/paid content`);
   }
 
   return issues;

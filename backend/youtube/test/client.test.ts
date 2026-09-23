@@ -446,11 +446,11 @@ describe('getClipBlockReasons', () => {
     });
   });
 
-  it('soft-flags videos longer than 20 minutes', () => {
+  it('hard-flags videos longer than 10 minutes', () => {
     const issues = getClipIssues(baseDetails({ durationSec: 5247 }));
-    expect(issues.map((i) => i.severity)).toEqual(['soft']);
+    expect(issues.map((i) => i.severity)).toEqual(['hard']);
     expect(issues[0].reason).toMatch(/^long video \(87 min\)/);
-    expect(getClipIssues(baseDetails({ durationSec: 20 * 60 }))).toEqual([]);
+    expect(getClipIssues(baseDetails({ durationSec: 10 * 60 }))).toEqual([]);
   });
 
   it('does not flag unknown definition (defensive — no API field)', () => {
