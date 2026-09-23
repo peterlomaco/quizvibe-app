@@ -313,9 +313,13 @@ export const ContentItemSchema = z.object({
   // Krävs när answerMethods inkluderar 'actor-select'.
   // correctNames = 1-2 rätta svar (räcker att svara ett).
   // distractorNames = 4-5 fel-svar (andra skådespelare/karaktärer).
-  // isAnimated = true → frågetext "What is the name of the main character?"
-  //              false/undefined → "Select one of the main actors in this film?"
+  // isAnimated = true → frågetext "What is the name of the main character in this film/series?"
+  //              false/undefined → "Select one of the main actors in this film/series?"
   isAnimated: z.boolean().optional(),
+  // Film eller TV-serie. Styr bara ordet i actor-select-frågetexten
+  // ("…in this film?" / "…in this series?"). Serier är Name-only (se refine
+  // nedan) — de får aldrig Year-frågan "Which Year was this Movie launched?".
+  mediaType: z.enum(['film', 'series']).default('film'),
   correctNames: z.array(z.string().min(1)).optional(),
   distractorNames: z.array(z.string().min(1)).optional(),
   notes: z.string().optional(),
@@ -326,6 +330,13 @@ export const ContentItemSchema = z.object({
       message:
         'item cannot have both `media` and `youtubeClips` (legacy). Migrate the YAML to `media`.',
     },
+  )
+  .refine(
+    (item) =>
+      item.mediaType !== 'series' ||
+      (item.answerMethods.includes('actor-select') &&
+        !item.answerMethods.includes('timeline')),
+    { message: 'series items must be actor-select only (no Year question)' },
   )
   .refine(
     (item) =>

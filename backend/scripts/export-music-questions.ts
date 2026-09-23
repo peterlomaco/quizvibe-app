@@ -59,6 +59,8 @@ interface ExportedMusicQuestion {
   correctNames?: string[];
   /** actor-select: felaktiga svarsalternativ som visas i namnlistan. */
   distractorNames?: string[];
+  /** 'series' = TV-serie (Name-only). Emittas bara för serier; utelämnat = film. */
+  mediaType?: 'series';
 }
 
 function renderTsModule(questions: ExportedMusicQuestion[]): string {
@@ -110,6 +112,8 @@ export interface MusicQuestion {
   correctNames?: string[];
   /** actor-select: felaktiga svarsalternativ. */
   distractorNames?: string[];
+  /** 'series' = TV-serie (Name-only). Utelämnat = film. */
+  mediaType?: 'series';
 }
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = ${JSON.stringify(questions, null, 2)};
@@ -150,11 +154,12 @@ async function main(): Promise<void> {
       // Type-cast pga TS-narrowing — schema garanterar att youtube-form
       // bara har 'song' | 'movie' | 'sport-event'.
       const subject = file.contentSubject as 'song' | 'movie' | 'sport-event';
-      // actor-select: frågetext beror på om filmen är animerad.
+      // actor-select: frågetext beror på om det är animerat + film vs serie.
+      const noun = item.mediaType === 'series' ? 'series' : 'film';
       const questionText = isActorSelect
         ? (item.isAnimated
-            ? 'What is the name of the main character in this film?'
-            : 'Select one of the main actors in this film?')
+            ? `What is the name of the main character in this ${noun}?`
+            : `Select one of the main actors in this ${noun}?`)
         : FIXED_QUESTION_TEXT[subject];
       songs.push({
         id: item.id,
@@ -184,6 +189,7 @@ async function main(): Promise<void> {
           correctNames: item.correctNames ?? [],
           distractorNames: item.distractorNames ?? [],
         } : {}),
+        ...(item.mediaType === 'series' ? { mediaType: 'series' as const } : {}),
         // Tom array för Spotify-only items — quiz.tsx renderar Spotify DJ-vyn
         // när youtubeClips är tom och spotifyTrackId finns.
         youtubeClips: hasYoutube ? item.youtubeClips!.map((c) => ({

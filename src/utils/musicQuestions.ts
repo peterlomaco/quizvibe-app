@@ -46,6 +46,8 @@ export interface MusicQuestion {
   correctNames?: string[];
   /** actor-select: felaktiga svarsalternativ. */
   distractorNames?: string[];
+  /** 'series' = TV-serie (Name-only). Utelämnat = film. */
+  mediaType?: 'series';
 }
 
 export const MUSIC_QUESTIONS: MusicQuestion[] = [
