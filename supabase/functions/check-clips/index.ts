@@ -63,6 +63,7 @@ const apiCache = new Map<string, { dead: boolean; at: number }>();
 
 interface YtItem {
   id: string;
+  snippet?: { channelId?: string; channelTitle?: string };
   status?: { privacyStatus?: string; embeddable?: boolean; uploadStatus?: string };
   contentDetails?: {
     regionRestriction?: { allowed?: string[]; blocked?: string[] };
@@ -70,7 +71,14 @@ interface YtItem {
   };
 }
 
+// YouTubes hyr-/köpfilms-kanal: hela filmer som kräver köp. API:t säger
+// public + embeddable + tillåten i SE, men embed-spelaren vägrar spela dem.
+// Samma regel som backend/youtube/client.ts (PAID_MOVIES_CHANNEL_ID).
+const PAID_MOVIES_CHANNEL_ID = 'UCRsn5u5ssrVbfMdzqs0F8OA';
+
 function isDeadByApi(item: YtItem): boolean {
+  const sn = item.snippet ?? {};
+  if (sn.channelId === PAID_MOVIES_CHANNEL_ID || sn.channelTitle === 'YouTube Movies') return true;
   const s = item.status ?? {};
   if (s.privacyStatus && s.privacyStatus !== 'public' && s.privacyStatus !== 'unlisted') return true;
   if (s.uploadStatus && s.uploadStatus !== 'processed' && s.uploadStatus !== 'uploaded') return true;
@@ -102,7 +110,7 @@ async function checkViaApi(ids: string[]): Promise<{ dead: Set<string>; ok: bool
   for (let i = 0; i < toFetch.length; i += 50) {
     const chunk = toFetch.slice(i, i + 50);
     const url =
-      'https://www.googleapis.com/youtube/v3/videos?part=status,contentDetails' +
+      'https://www.googleapis.com/youtube/v3/videos?part=snippet,status,contentDetails' +
       `&id=${chunk.join(',')}&key=${YOUTUBE_API_KEY}`;
     try {
       const res = await fetch(url);

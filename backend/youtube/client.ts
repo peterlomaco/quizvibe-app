@@ -238,6 +238,21 @@ export function parseIsoDuration(iso: string): number {
 export const SERVED_REGIONS: readonly string[] = ['SE'];
 
 /**
+ * YouTubes egen hyr-/köpfilms-kanal ("YouTube Movies"). Videorna där är HELA
+ * filmer som kräver köp — Data API rapporterar dem ändå som public +
+ * embeddable + tillåtna i SE, men den inbäddade spelaren vägrar spela dem.
+ * Upptäckt 2026-09-23 via johnny-english-2003 (UzqDydQlR0E, 1 h 27 min).
+ */
+export const PAID_MOVIES_CHANNEL_ID = 'UCRsn5u5ssrVbfMdzqs0F8OA';
+
+/**
+ * Ett quiz-klipp är en trailer/scen/musikvideo — ett par minuter. En video
+ * längre än så är nästan alltid en hel film/match/konsert, vilket ofta är
+ * köpinnehåll. Mjuk flagga: kuratorn får titta, men nattliga cronen fälls inte.
+ */
+export const MAX_CLIP_SOURCE_DURATION_SEC = 20 * 60;
+
+/**
  * 'hard' = klippet går INTE att spela för våra spelare (spelaren visar
  * "Video unavailable"). 'soft' = spelas fint men är sämre kvalitet eller
  * begränsat på en marknad vi inte levererar till.
@@ -293,6 +308,14 @@ export function getClipIssues(details: YoutubeVideoDetails): ClipIssue[] {
     }
   }
 
+  // Köpfilm: spelas aldrig i embeds trots att API:t säger embeddable.
+  if (
+    details.channelId === PAID_MOVIES_CHANNEL_ID ||
+    details.channelTitle === 'YouTube Movies'
+  ) {
+    hard('paid movie (YouTube Movies channel)');
+  }
+
   // Mjuka: spelas, men sämre. made-for-kids begränsar YouTube-funktioner
   // (kommentarer, personaliserade annonser) men blockerar inte embeds.
   if (details.madeForKids) soft('made for kids');
@@ -300,6 +323,10 @@ export function getClipIssues(details: YoutubeVideoDetails): ClipIssue[] {
   // 'unknown' flaggas INTE — vi vill inte regressa existerande klipp om
   // API-svaret saknar fältet (defensiv).
   if (details.definition === 'sd') soft('SD resolution');
+  // Över 20 min = sannolikt hel film/match (ofta köpinnehåll).
+  if (details.durationSec > MAX_CLIP_SOURCE_DURATION_SEC) {
+    soft(`long video (${Math.round(details.durationSec / 60)} min) — likely full film/paid content`);
+  }
 
   return issues;
 }

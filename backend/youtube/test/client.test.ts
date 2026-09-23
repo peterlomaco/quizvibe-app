@@ -436,6 +436,23 @@ describe('getClipBlockReasons', () => {
     );
   });
 
+  it('hard-flags paid movies from the YouTube Movies channel', () => {
+    const issues = getClipIssues(
+      baseDetails({ channelId: 'UCRsn5u5ssrVbfMdzqs0F8OA', channelTitle: 'YouTube Movies' }),
+    );
+    expect(issues).toContainEqual({
+      reason: 'paid movie (YouTube Movies channel)',
+      severity: 'hard',
+    });
+  });
+
+  it('soft-flags videos longer than 20 minutes', () => {
+    const issues = getClipIssues(baseDetails({ durationSec: 5247 }));
+    expect(issues.map((i) => i.severity)).toEqual(['soft']);
+    expect(issues[0].reason).toMatch(/^long video \(87 min\)/);
+    expect(getClipIssues(baseDetails({ durationSec: 20 * 60 }))).toEqual([]);
+  });
+
   it('does not flag unknown definition (defensive — no API field)', () => {
     expect(
       getClipBlockReasons(baseDetails({ definition: 'unknown' })),
