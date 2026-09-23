@@ -148,8 +148,13 @@ items:
     displayName: "Mulan"
     correctYear: 1998
     probability: 84
+    isAnimated: true
     wikimediaSearchHints: ["Mulan 1998 Disney animated film China warrior"]
-    answerMethods: ["timeline"]
+    # Name (inte Year): YT-titeln röjer året. "Mulan" = titeln (spoiler), sa
+    # fragan efterlyser Mushu. Distraktorer = karaktarer ur ANDRA filmer.
+    answerMethods: ["actor-select"]
+    correctNames: ["Mushu"]
+    distractorNames: ["Simba", "Shrek", "Dory", "Elsa"]
     youtubeClips:
       - videoId: "sRtZaSkBp58"
         startSec: 10

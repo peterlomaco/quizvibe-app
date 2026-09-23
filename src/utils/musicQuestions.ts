@@ -20127,7 +20127,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "displayName": "Mulan",
     "correctYear": 1998,
     "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
+    "questionText": "What is the name of the main character in this film?",
     "itemHcp": 84,
     "audiences": [
       "elder",
@@ -20138,6 +20138,16 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "region": [
       "sweden"
+    ],
+    "isAnimated": true,
+    "correctNames": [
+      "Mushu"
+    ],
+    "distractorNames": [
+      "Simba",
+      "Shrek",
+      "Dory",
+      "Elsa"
     ],
     "youtubeClips": [
       {
