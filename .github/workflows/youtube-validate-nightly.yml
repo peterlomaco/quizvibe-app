@@ -73,8 +73,9 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    # 30 min: the embed-audit step loads ~1000 clips in a real headless browser.
-    timeout-minutes: 30
+    # 45 min: the embed-audit step loads ~1000 clips in a real headless browser.
+    # Runs take ~24 min; 30 min cancelled two nights in Sep 2026.
+    timeout-minutes: 45
     # apply_fixes=true-körningen committar + push:ar patchade YAML-filer. Default
     # GITHUB_TOKEN är read-only i moderna repos → push:en 403:ar utan detta.
     # Ofarligt för den vanliga validerings-körningen (som inte skriver något).
@@ -225,3 +226,66 @@ jobs:
           path: backend/output/youtube-autofix-report.json
           if-no-files-found: ignore
           retention-days: 30
+
+  # ── Auto-PR när ett klipp dött (2026-09-23) ─────────────────────────────
+  # Kör ENBART när validate-jobbet gick rött på den schemalagda körningen.
+  # Söker ersättning för döda klipp (autofix --apply), regenererar klientens
+  # frågefil och öppnar/uppdaterar en PR med review-request till Peter →
+  # GitHub-mejl + GitHub Mobile-push. PR-beskrivningen har klickbara YouTube-
+  # länkar att validera på telefonen (= riktig uppspelning från Sverige).
+  # Merge → .github/workflows/ota-on-clip-fix-merge.yml publicerar OTA.
+  # Ingen PR skapas om inget klipp gick att byta (t.ex. när rött bara berodde
+  # på Spotify-identitetskollen).
+  autofix-pr:
+    needs: validate
+    if: ${{ failure() && github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Search + apply replacements for dead clips
+        working-directory: backend
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: npx tsx youtube/autofix.ts --all --apply --threshold 5 || true
+
+      - name: Regenerate client question file
+        working-directory: backend
+        run: npm run export-music-questions
+
+      - name: Build PR description
+        id: body
+        working-directory: backend
+        run: |
+          npx tsx scripts/clip-fix-pr-body.ts
+          cat output/clip-fix-pr.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open / update clip-fix PR
+        if: ${{ steps.body.outputs.applied != '0' }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bot/clip-fix
+          delete-branch: true
+          commit-message: 'chore(content): replace dead YouTube clips (nightly auto-fix)'
+          title: '🎬 Clip fix: ${{ steps.body.outputs.applied }} dead clip(s) replaced'
+          body-path: backend/output/clip-fix-pr.md
+          add-paths: |
+            backend/content/catalog/**
+            src/utils/musicQuestions.ts
+          reviewers: peterlomaco
+          assignees: peterlomaco
+          labels: clip-fix

@@ -105,4 +105,55 @@ describe('checkYoutubeClipsAlive', () => {
     expect(Date.now() - start).toBeLessThan(500);
     expect(dead.size).toBe(0); // fail-open
   });
+  it('serverCheck: unions server-dead ids even when oEmbed says alive', async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () => res(200));
+    const serverCheck = vi.fn(async () => ['blocked']);
+    const dead = await checkYoutubeClipsAlive(['blocked', 'fine'], {
+      fetchFn,
+      serverCheck,
+      cache: freshCache(),
+    });
+    expect([...dead]).toEqual(['blocked']);
+    expect(serverCheck).toHaveBeenCalledWith(['blocked', 'fine']);
+  });
+
+  it('serverCheck: still applied when every id is an oEmbed cache hit', async () => {
+    const cache = freshCache();
+    cache.set('a', true);
+    const fetchFn = vi.fn<typeof fetch>(async () => res(200));
+    const dead = await checkYoutubeClipsAlive(['a'], {
+      fetchFn,
+      cache,
+      serverCheck: async () => ['a'],
+    });
+    expect(dead.has('a')).toBe(true);
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it('serverCheck: failure / null / ids outside the input are ignored (fail-open)', async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () => res(200));
+    const d1 = await checkYoutubeClipsAlive(['x'], {
+      fetchFn, cache: freshCache(), serverCheck: async () => { throw new Error('boom'); },
+    });
+    const d2 = await checkYoutubeClipsAlive(['x'], {
+      fetchFn, cache: freshCache(), serverCheck: async () => null,
+    });
+    const d3 = await checkYoutubeClipsAlive(['x'], {
+      fetchFn, cache: freshCache(), serverCheck: async () => ['someoneElse'],
+    });
+    expect(d1.size + d2.size + d3.size).toBe(0);
+  });
+
+  it('serverCheck: a hanging server call cannot exceed the overall timeout', async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () => res(200));
+    const start = Date.now();
+    const dead = await checkYoutubeClipsAlive(['x'], {
+      fetchFn,
+      overallTimeoutMs: 40,
+      cache: freshCache(),
+      serverCheck: () => new Promise<string[] | null>(() => {}),
+    });
+    expect(Date.now() - start).toBeLessThan(500);
+    expect(dead.size).toBe(0);
+  });
 });

@@ -3801,7 +3801,7 @@ items:
     region: ["sweden"]
   - id: ameno-era
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
-    displayName: "Era — Ameno"
+    displayName: "Ameno — Era"
     correctYear: 1997
     probability: 80
     wikimediaSearchHints: ["Ameno Era"]

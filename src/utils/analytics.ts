@@ -26,6 +26,8 @@ export type AnalyticsEventName =
   | 'room_code_created'
   | 'game_started'
   | 'game_completed'
+  // YouTube-klipp gick inte att spela mitt i en fråga (popup + frågebyte).
+  | 'youtube_playback_error'
 
   // Monetization
   | 'purchase_completed'

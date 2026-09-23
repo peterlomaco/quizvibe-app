@@ -7921,7 +7921,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
   },
   {
     "id": "run-dmc-its-like-that",
-    "displayName": "Its like that — Run DMC",
+    "displayName": "It's Like That — Run-D.M.C.",
     "correctYear": 1984,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
@@ -9499,11 +9499,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "4N0NK4lCncys6hwWhtXRit",
     "youtubeClips": [
       {
-        "videoId": "273doG7GYiA",
-        "startSec": 25,
-        "endSec": 55,
+        "videoId": "-whylI5YukA",
+        "startSec": 10,
+        "endSec": 40,
+        "channelTitle": "Lena Philipsson - Topic",
         "license": "standard",
-        "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+        "notes": "2026-09-23: ersatte raderade 273doG7GYiA med officiell Topic-uppladdning."
       }
     ]
   },
@@ -17477,7 +17478,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
   },
   {
     "id": "ameno-era",
-    "displayName": "Era — Ameno",
+    "displayName": "Ameno — Era",
     "correctYear": 1997,
     "contentSubject": "song",
     "questionText": "Which Year was this song released?",
@@ -31568,11 +31569,12 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "1zi7xx7UVEFkmKfv06H8x0",
     "youtubeClips": [
       {
-        "videoId": "ki0Ocze98U8",
+        "videoId": "4IbRT6Vfl_U",
         "startSec": 0,
         "endSec": 175,
-        "channelTitle": "Billion Stars",
-        "license": "standard"
+        "channelTitle": "Drake - Topic",
+        "license": "standard",
+        "notes": "2026-09-23: ersatte re-upload ki0Ocze98U8 (Billion Stars) som gav Video unavailable i TestFlight (SE)."
       }
     ]
   },

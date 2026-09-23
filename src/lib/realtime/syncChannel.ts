@@ -60,6 +60,22 @@ export interface QuestionAdvancePayload {
   /** Host:s Spotify-svarstyps-inställningar — synkas vid varje advance för reconnect-fall. */
   spotify_answer_year?: boolean;
   spotify_answer_name?: boolean;
+  /** Satt när host BYTT frågan på SAMMA index (klippet gick inte att spela).
+   *  Id:t på den nya frågan — ingår i dedupe-nyckeln så advancen inte
+   *  droppas trots att next_question_index är oförändrat, och mottagaren
+   *  roterar INTE PtP-spelaren. */
+  swap_question_id?: string;
+}
+
+/**
+ * Ett YouTube-klipp gick inte att spela (borttaget / blockerat i regionen /
+ * embed-fel). Skickas av den enhet där felet inträffade. Host byter frågan
+ * och broadcastar question_advance med swap_question_id; övriga enheter
+ * visar popupen och väntar på den advancen.
+ */
+export interface ClipUnavailablePayload {
+  question_index: number;
+  video_id: string;
 }
 
 export interface PlayerLeftPayload {
@@ -449,6 +465,7 @@ export type PlayerConnectionStatus = 'connected' | 'disconnected';
 export interface SyncChannelHandlers {
   onPlayCommand?: (payload: PlayCommandPayload) => void;
   onQuestionAdvance?: (payload: QuestionAdvancePayload) => void;
+  onClipUnavailable?: (payload: ClipUnavailablePayload) => void;
   onPlayerLeft?: (payload: PlayerLeftPayload) => void;
   onPlayerAnswerConfirmed?: (payload: PlayerAnswerConfirmedPayload) => void;
   onRevealNow?: (payload: RevealNowPayload) => void;
@@ -557,6 +574,7 @@ export interface SyncChannel {
   channel: RealtimeChannel;
   broadcastPlayCommand: (payload: PlayCommandPayload) => Promise<void>;
   broadcastQuestionAdvance: (payload: QuestionAdvancePayload) => Promise<void>;
+  broadcastClipUnavailable: (payload: ClipUnavailablePayload) => Promise<void>;
   broadcastPlayerLeft: (payload: PlayerLeftPayload) => Promise<void>;
   broadcastPlayerAnswerConfirmed: (
     payload: PlayerAnswerConfirmedPayload,
@@ -721,7 +739,12 @@ function vQuestionAdvance(raw: unknown): QuestionAdvancePayload | null {
     all_question_ids: optIds(raw.all_question_ids),
     spotify_answer_year: optBool(raw.spotify_answer_year),
     spotify_answer_name: optBool(raw.spotify_answer_name),
+    swap_question_id: optStr(raw.swap_question_id),
   };
+}
+function vClipUnavailable(raw: unknown): ClipUnavailablePayload | null {
+  if (!isObj(raw) || !index(raw.question_index) || !str(raw.video_id)) return null;
+  return { question_index: raw.question_index, video_id: raw.video_id };
 }
 function vPlayerLeft(raw: unknown): PlayerLeftPayload | null {
   if (!isObj(raw) || !str(raw.player_id)) return null;
@@ -985,6 +1008,8 @@ export function subscribeSyncChannel(
   if (handlers.onPlayCommand) onEvent('play_command', vPlayCommand, handlers.onPlayCommand);
   if (handlers.onQuestionAdvance)
     onEvent('question_advance', vQuestionAdvance, handlers.onQuestionAdvance);
+  if (handlers.onClipUnavailable)
+    onEvent('clip_unavailable', vClipUnavailable, handlers.onClipUnavailable);
   if (handlers.onPlayerLeft)
     onEvent('player_left', vPlayerLeft, (p) => {
       if (known(p.player_id, 'player_left')) handlers.onPlayerLeft!(p);
@@ -1143,6 +1168,9 @@ export function subscribeSyncChannel(
     },
     broadcastQuestionAdvance: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'question_advance', payload });
+    },
+    broadcastClipUnavailable: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'clip_unavailable', payload });
     },
     broadcastPlayerLeft: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'player_left', payload });

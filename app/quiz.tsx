@@ -26,6 +26,7 @@ import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
 import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
 import { checkYoutubeClipsAlive } from '@/src/utils/youtubeLiveness';
+import { checkClipsOnServer, reportClipError } from '@/src/utils/clipErrorReport';
 import {
   aggregateLabel,
   attachSeriesToLeaderboard,
@@ -916,6 +917,43 @@ function isDeadYtItem(q: QuizQuestion, dead: Set<string>): boolean {
   const ids = clipVideoIdsOf(q);
   return ids.length > 0 && ids.every((id) => dead.has(id));
 }
+// In-game replacement for the question at `idx` whose clip turned out to be
+// unplayable (see handleClipUnavailable). Picks from the unplayed reserve
+// [windowLen, …): never an id already in the played window, never an item whose
+// every clip is known dead, and never a Spotify item when Spotify DJ is on
+// (that would silently turn the slot into a DJ question and break the rotation).
+// Preference: same question type with a live clip → same type → any.
+function pickReplacementQuestion(
+  seq: QuizQuestion[],
+  idx: number,
+  windowLen: number,
+  dead: Set<string>,
+  spotifyEnabled: boolean,
+): QuizQuestion | null {
+  const failed = seq[idx];
+  if (!failed) return null;
+  const usedIds = new Set(seq.slice(0, windowLen).map((q) => q.id));
+  const hasLiveClip = (q: QuizQuestion) => {
+    const ids = clipVideoIdsOf(q);
+    return ids.length > 0 && ids.some((id) => !dead.has(id));
+  };
+  const candidates = seq.slice(windowLen).filter((q) => {
+    if (usedIds.has(q.id)) return false;
+    const ids = clipVideoIdsOf(q);
+    if (ids.length > 0 && ids.every((id) => dead.has(id))) return false;
+    if (spotifyEnabled && (q as { spotifyTrackId?: string }).spotifyTrackId) return false;
+    return true;
+  });
+  if (candidates.length === 0) return null;
+  const sameCat = (q: QuizQuestion) =>
+    (q as { mainCategory?: unknown }).mainCategory ===
+    (failed as { mainCategory?: unknown }).mainCategory;
+  const score = (q: QuizQuestion) =>
+    (q.type === failed.type ? 4 : 0) + (hasLiveClip(q) ? 2 : 0) + (sameCat(q) ? 1 : 0);
+  let best = candidates[0];
+  for (const q of candidates) if (score(q) > score(best)) best = q;
+  return best;
+}
 function swapDeadYtItems(
   seq: QuizQuestion[],
   windowLen: number,
@@ -957,6 +995,9 @@ async function validateSequenceClips(
   const dead = await checkYoutubeClipsAlive(ids, {
     overallTimeoutMs: 4000,
     perRequestTimeoutMs: 2500,
+    // Data API (embed/region/age) + blocklist of clips that already failed on a
+    // real player's device — oEmbed alone can't see those (Drake 2026-09-23).
+    serverCheck: checkClipsOnServer,
   });
   if (dead.size === 0) return { next: fullSeq, dead };
   return { next: swapDeadYtItems(fullSeq, windowLen, reserveEnd, dead), dead };
@@ -2800,6 +2841,8 @@ export default function QuizScreen() {
         const seedRounds: RoundResult[] = [];
         for (let i = 0; i < firstUnanswered; i++) {
           const a = byIndex.get(i)!;
+          // Överhoppad fråga (klippet gick inte att spela) — inget svar att seeda.
+          if (a.skipped) continue;
           const q = ALL_QUESTIONS_MAP.get(a.questionId);
           seedScores.push([{
             playerId: selfPlayerId || 'you',
@@ -4980,7 +5023,9 @@ export default function QuizScreen() {
   // Ref till handleAdvanceToNextRound för att undvika stale closure i
   // timeout-useEffect:en (funktionen ändras per render men ref:en är alltid
   // färsk).
-  const handleAdvanceToNextRoundRef = useRef<((i?: number) => void) | null>(null);
+  const handleAdvanceToNextRoundRef = useRef<
+    ((i?: number, opts?: { keepPlayer?: boolean }) => void) | null
+  >(null);
 
   // Host broadcastar vem som är DJ för Spotify-frågan när question-fasen startar.
   // Non-host:s onSpotifyQuestionReady-handler sparar dj_player_id → isCurrentPlayerDJ.
@@ -5325,10 +5370,6 @@ export default function QuizScreen() {
     setScrolledToBottom(false);
     setYoutubeError(false);
     setFailedClipVideoIds([]);
-    if (youtubeErrorTimerRef.current) {
-      clearTimeout(youtubeErrorTimerRef.current);
-      youtubeErrorTimerRef.current = null;
-    }
     // Spotify: nollställ DJ-state + timeout per fråga.
     if (djRevealTimeoutRef.current) {
       clearTimeout(djRevealTimeoutRef.current);
@@ -5607,45 +5648,177 @@ export default function QuizScreen() {
     revealIfLastConfirm(selfPlayerId, exactElapsedSec);
   };
 
-  // YouTube-felhantering: kallas när MediaPlayer rapporterar embed-fel.
-  // Räknas som missad fråga (0 pts) — spelaren kunde inte se videon.
-  // Övergår till reveal-fas efter 2.5 s så rätt svar visas ändå.
-  // Gated på 'question'-fas: om felet fyrar under awaiting/reveal har
-  // score:n redan registrerats och vi ska inte dubbel-räkna.
-  // recordRoundScore är en vanlig funktion (inte useCallback) — referensen
-  // är stabil per render, ref-pattern undviker stale-closure utan dep-array.
-  const recordRoundScoreRef = useRef(recordRoundScore);
-  recordRoundScoreRef.current = recordRoundScore;
-  // A4-fix: spåra reveal-skip-timern så den kan cleanas vid unmount/frågebyte
-  // istället för att fyra setPhase på en avmonterad/ny fråga.
-  const youtubeErrorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const handleYoutubeError = useCallback(() => {
-    if (phase !== 'question') return;
-    if (youtubeError) return;
-    // C1-fix: prova nästa curerade klipp på itemet innan vi 0-poängar frågan.
-    // Ett item med flera klipp (officiell video + lyrics) ska överleva ett
-    // borttaget/region-blockerat klipp — MediaPlayer remountar på videoId-byte.
-    if (
-      effectiveMediaSource.kind === 'youtube' &&
-      currentQuestionClips &&
-      currentQuestionClips.length > 1
-    ) {
-      const failedId = effectiveMediaSource.clip.videoId;
-      const nextFailed = failedClipVideoIds.includes(failedId)
-        ? failedClipVideoIds
-        : [...failedClipVideoIds, failedId];
-      const hasAlternate = currentQuestionClips.some((c) => !nextFailed.includes(c.videoId));
-      if (hasAlternate) {
-        setFailedClipVideoIds(nextFailed);
-        return; // stanna i question-fas; nytt klipp spelas
-      }
-    }
-    // Inga fler klipp att prova — ge upp: 0 poäng + hoppa till reveal.
+  // ── Klipp går inte att spela (2026-09-23, Peter) ─────────────────────────
+  // Ersätter den gamla vägen (tyst byte till nästa klipp, sedan "Video
+  // unavailable" + 0 poäng). Nu: popup "Sorry but this clip has been removed
+  // for your region" → tillbaka till Get Ready med en NY fråga på samma plats.
+  // Den trasiga frågan får ingen poängrad alls.
+  //
+  // Primärt försvar är pre-game-kollen (validateSequenceClips + check-clips),
+  // som byter ut kända trasiga klipp INNAN Play. Den här vägen är skyddsnätet
+  // för claim-baserade embed-block som bara syns vid riktig uppspelning — och
+  // rapporten (reportClipError) gör att nästa spels pre-game-koll fångar dem.
+  //
+  // Vem gör vad:
+  //   • Host / single / PtP-host: byter frågan i den låsta sekvensen (samma
+  //     mekanism som pre-game-bytet) och broadcastar question_advance med
+  //     SAMMA index + swap_question_id → alla enheter till Get Ready.
+  //   • IndDev non-host: rapporterar till host (clip_unavailable) och väntar
+  //     på host:s swap-advance.
+  //   • Remote 1v1: sekvensen är server-låst → frågan HOPPAS ÖVER (skipped-rad
+  //     så resume inte landar där igen) och spelet går vidare till nästa fråga.
+  //     Motståndaren möter samma klipp → samma popup + skip = rättvist.
+  // Klipp som failat under det här spelet — väljs aldrig som ersättning.
+  const sessionDeadVideoIdsRef = useRef<Set<string>>(new Set());
+  // Non-host: popupen redan visad för den trasiga frågan (egen spelare failade)
+  // → visa den inte igen när host:s swap-advance kommer.
+  const clipPopupShownRef = useRef(false);
+
+  const showClipUnavailablePopup = () => {
+    Alert.alert(
+      'Clip unavailable',
+      'Sorry but this clip has been removed for your region',
+      [{ text: 'OK' }],
+      { cancelable: false },
+    );
+  };
+
+  // Host-sidan: byt frågan på index qIdx. Returnerar ny frågas id, eller null
+  // om ingen reserv finns.
+  const swapQuestionAtIndex = (qIdx: number): string | null => {
+    const seq = gameQuestionsRef.current;
+    const windowLen = Math.min(totalQuestions, seq.length);
+    const failed = seq[qIdx];
+    if (!failed) return null;
+    const dead = new Set([...sessionDeadVideoIdsRef.current, ...failedClipVideoIds]);
+    const sub = pickReplacementQuestion(seq, qIdx, windowLen, dead, spotifyEnabled);
+    if (!sub) return null;
+    const next = seq.slice();
+    const subPos = next.findIndex((q, i) => i >= windowLen && q.id === sub.id);
+    // Flytta den trasiga frågan till reservens plats (utanför spelfönstret) så
+    // sekvensens längd är oförändrad; dess klipp ligger i sessionDead och väljs
+    // aldrig igen.
+    if (subPos >= 0) next[subPos] = failed;
+    next[qIdx] = sub;
+    lockedSequenceRef.current = next;
+    gameQuestionsRef.current = next;
+    setSequenceRevision((n) => n + 1);
+    return sub.id;
+  };
+
+  // Stoppa frågan direkt: timer + scoring-latch, så en timeout under popupen
+  // aldrig hinner registrera 0 poäng.
+  const freezeCurrentQuestion = () => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    hasRecordedScoreForCurrentQuestionRef.current = true;
+    setTimerActive(false);
     setYoutubeError(true);
-    recordRoundScoreRef.current(0, false, responseSeconds);
-    if (youtubeErrorTimerRef.current) clearTimeout(youtubeErrorTimerRef.current);
-    youtubeErrorTimerRef.current = setTimeout(() => setPhase('reveal'), 2500);
-  }, [phase, youtubeError, responseSeconds, effectiveMediaSource, currentQuestionClips, failedClipVideoIds]);
+  };
+
+  // Host-auktoritativ upplösning: byt frågan (eller hoppa vidare om ingen
+  // reserv finns) och ta alla enheter tillbaka till Get Ready.
+  const resolveClipUnavailableAsHost = (qIdx: number) => {
+    const swappedId = swapQuestionAtIndex(qIdx);
+    if (swappedId) {
+      broadcastQuestionAdvanceWithRetries({
+        next_question_index: qIdx,
+        all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+        spotify_answer_year: spotifyAnswerYear,
+        spotify_answer_name: spotifyAnswerName,
+        swap_question_id: swappedId,
+      });
+      handleAdvanceToNextRoundRef.current?.(qIdx, { keepPlayer: true });
+      return;
+    }
+    // Ingen reserv: hoppa över platsen utan poäng (kortare spel hellre än en 0:a).
+    const isLast = qIdx >= totalQuestions - 1;
+    broadcastQuestionAdvanceWithRetries({
+      next_question_index: isLast ? null : qIdx + 1,
+      all_question_ids: gameQuestionsRef.current.map((q) => q.id),
+      spotify_answer_year: spotifyAnswerYear,
+      spotify_answer_name: spotifyAnswerName,
+    });
+    if (isLast) setPhase('leaderboard');
+    else handleAdvanceToNextRoundRef.current?.(qIdx + 1);
+  };
+
+  const handleClipUnavailable = (videoId: string, errorCode: string) => {
+    const qIdx = questionIndexRef.current;
+    // Dubbelfyrning (WebView kan rapportera flera fel för samma klipp).
+    if (sessionDeadVideoIdsRef.current.has(videoId)) return;
+    sessionDeadVideoIdsRef.current.add(videoId);
+    reportClipError({
+      videoId,
+      itemId: currentQ?.id ?? null,
+      errorCode,
+      gameMode,
+    });
+    freezeCurrentQuestion();
+    showClipUnavailablePopup();
+
+    if (isRemote && remoteMatchId) {
+      // Server-låst sekvens → hoppa över frågan.
+      if (currentQ) {
+        void upsertAnswer(remoteMatchId, {
+          questionIndex: qIdx,
+          questionId: currentQ.id,
+          correct: false,
+          points: 0,
+          timeUsedSeconds: 0,
+          skipped: true,
+        });
+      }
+      if (qIdx >= totalQuestions - 1) setPhase('leaderboard');
+      else handleAdvanceToNextRoundRef.current?.(qIdx + 1);
+      return;
+    }
+
+    if (gameMode === 'individual-devices' && !isHost) {
+      // Host äger sekvensen — be host byta. Popupen är redan visad här.
+      clipPopupShownRef.current = true;
+      if (syncChannelRef.current) {
+        const payload = { question_index: qIdx, video_id: videoId };
+        const send = () => {
+          syncChannelRef.current?.broadcastClipUnavailable(payload).catch(() => {});
+        };
+        send();
+        setTimeout(send, 600);
+        setTimeout(send, 1800);
+      }
+      return;
+    }
+
+    resolveClipUnavailableAsHost(qIdx);
+  };
+
+  // Host tar emot en non-hosts rapport. Ignorera stale rapporter (fel index,
+  // eller frågan redan bytt → klippet hör inte längre till aktuell fråga).
+  const clipUnavailableReportHandlerRef = useRef<(qIdx: number, videoId: string) => void>(() => {});
+  clipUnavailableReportHandlerRef.current = (qIdx, videoId) => {
+    if (!isHost) return;
+    if (qIdx !== questionIndexRef.current) return;
+    const q = gameQuestionsRef.current[qIdx];
+    const clipIds = q ? clipVideoIdsOf(q) : [];
+    if (!clipIds.includes(videoId)) return;
+    if (sessionDeadVideoIdsRef.current.has(videoId)) return;
+    sessionDeadVideoIdsRef.current.add(videoId);
+    freezeCurrentQuestion();
+    showClipUnavailablePopup();
+    resolveClipUnavailableAsHost(qIdx);
+  };
+
+  const handleClipUnavailableRef = useRef(handleClipUnavailable);
+  handleClipUnavailableRef.current = handleClipUnavailable;
+  const effectiveMediaSourceRef = useRef(effectiveMediaSource);
+  effectiveMediaSourceRef.current = effectiveMediaSource;
+  const handleYoutubeError = useCallback((err?: Error) => {
+    if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
+    const src = effectiveMediaSourceRef.current;
+    const videoId = src?.kind === 'youtube' ? src.clip.videoId : '';
+    if (!videoId) return;
+    const code = (err?.message ?? '').replace(/^YouTube embed error:\s*/, '') || 'unknown';
+    handleClipUnavailableRef.current(videoId, code);
+  }, []);
 
   // Image-fråge-Confirm: speglar handleConfirm men för name-svar.
   // correct = opt.isCorrect (pre-baked från distractor-builderns rätt-flagga).
@@ -5820,7 +5993,12 @@ export default function QuizScreen() {
   // question_advance medan offline skulle +1 ge stale index. Host:s
   // lokala Next-tap kallar utan arg → faller tillbaka till +1 (host är
   // alltid canonical så drift kan inte uppstå).
-  const handleAdvanceToNextRound = (explicitNextIndex?: number) => {
+  // opts.keepPlayer: frågan BYTTES på samma index (klippet gick inte att spela)
+  // — samma spelare ska svara på ersättningsfrågan, så PtP-turen roterar inte.
+  const handleAdvanceToNextRound = (
+    explicitNextIndex?: number,
+    opts?: { keepPlayer?: boolean },
+  ) => {
     // Stäng av eventuellt kvarvarande timer-intervall från föregående fråga.
     // startTimer() clearklar normalt det gamla intervallet, men om spelaren
     // tryckte Next innan timer nådde 0 kan intervallet fortfarande vara aktivt.
@@ -5851,13 +6029,15 @@ export default function QuizScreen() {
     // Reset per-spelare-confirm-mappen så nästa frågas avatar-markörer
     // börjar från höger kant igen. hasLeft-flag:n påverkas inte.
     setPlayerConfirms({});
+    // Klipp-popup-state gäller bara frågan som just lämnades.
+    setYoutubeError(false);
     // Båda lägen återgår till GetReady (intro-fasen) mellan frågor:
     // - Pass-the-Phone: telefonen lämnas över till nästa spelare;
     //   currentPlayerIndex roterar.
     // - Individual Devices: host kontrollerar speltempot — Play-tap i
     //   GetReady startar nästa fråga och broadcastar till non-host:s
     //   enheter. Ingen player-rotation (alla på egna devices).
-    if (gameMode === 'pass-the-phone' && turnOrder.length > 0) {
+    if (gameMode === 'pass-the-phone' && turnOrder.length > 0 && !opts?.keepPlayer) {
       setCurrentPlayerIndex((prev) => (prev + 1) % turnOrder.length);
     }
     setPhase('intro');
@@ -6405,6 +6585,7 @@ export default function QuizScreen() {
         all_question_ids: allIds,
         spotify_answer_year: say,
         spotify_answer_name: san,
+        swap_question_id: swapId,
       } = payload;
       // ⚠ DEDUPE — KRÄVS av trippelsändningen (0/600/1800 ms) och måste ligga
       // FÖRST. Till skillnad från play_command är den här handlern INTE
@@ -6420,7 +6601,10 @@ export default function QuizScreen() {
       // Nyckeln sätts SYNKRONT här, inte via questionIndexRef (som är en
       // render-spegel och kan vara stale om två sändningar hinner ankomma
       // före nästa render).
-      const advanceKey = nextIdx === null ? 'end' : nextIdx;
+      // swap_question_id ingår i nyckeln: ett klipp-byte behåller SAMMA index
+      // men är en ny advance som måste gå igenom.
+      const advanceKey =
+        nextIdx === null ? 'end' : swapId ? `${nextIdx}:${swapId}` : String(nextIdx);
       if (lastHandledAdvanceRef.current === advanceKey) return;
       lastHandledAdvanceRef.current = advanceKey;
       // Uppdatera auktoritativ frågesekvens om host skickade med den.
@@ -6436,6 +6620,13 @@ export default function QuizScreen() {
         // och utan flaggan renderas Final Leaderboard som en INTERIM-vy.
         if (isPtPSpectator) setSpectatorGameOver(true);
         handleShowLeaderboard();
+      } else if (swapId) {
+        // Host bytte frågan (klippet gick inte att spela). Samma index, ny
+        // fråga → pinna den direkt och gå till Get Ready utan PtP-rotation.
+        setBroadcastQuestionId(swapId);
+        if (!isPtPSpectator && !clipPopupShownRef.current) showClipUnavailablePopup();
+        clipPopupShownRef.current = false;
+        handleAdvanceToNextRound(nextIdx, { keepPlayer: true });
       } else {
         // Passa canonical-indexet från broadcast så B alignar även när
         // tidigare advances missats (offline-fönster). Utan denna sync
@@ -9174,7 +9365,7 @@ export default function QuizScreen() {
   // Senast processade advance på MOTTAGAR-sidan ('end' = spelet slut).
   // Nollställs aldrig manuellt: ett spel per quiz.tsx-mount, och Play Again
   // går via ny lobby → ny mount → ny ref.
-  const lastHandledAdvanceRef = useRef<number | 'end' | null>(null);
+  const lastHandledAdvanceRef = useRef<string | null>(null);
   useEffect(
     () => () => {
       playCommandRetryTimersRef.current.forEach(clearTimeout);
@@ -9186,10 +9377,6 @@ export default function QuizScreen() {
       if (djHandoverStuckTimerRef.current) {
         clearTimeout(djHandoverStuckTimerRef.current);
         djHandoverStuckTimerRef.current = null;
-      }
-      if (youtubeErrorTimerRef.current) {
-        clearTimeout(youtubeErrorTimerRef.current);
-        youtubeErrorTimerRef.current = null;
       }
     },
     [],
@@ -9385,6 +9572,8 @@ export default function QuizScreen() {
         playCommandHandlerRef.current(payload.question_index, payload.question_id, payload.all_question_ids, payload.timer_start_at);
       },
       onQuestionAdvance: (payload) => questionAdvanceHandlerRef.current(payload),
+      onClipUnavailable: (payload) =>
+        clipUnavailableReportHandlerRef.current(payload.question_index, payload.video_id),
       onPlayerLeft: (payload) =>
         playerLeftHandlerRef.current(payload.player_id, payload.player_name),
       onPlayerAnswerConfirmed: (payload) =>
@@ -11131,8 +11320,8 @@ export default function QuizScreen() {
             ) : youtubeError ? (
               <View style={styles.youtubeErrorCard}>
                 <Text style={styles.youtubeErrorIcon}>⚠</Text>
-                <Text style={styles.youtubeErrorTitle}>Video unavailable</Text>
-                <Text style={styles.youtubeErrorSub}>Skipping to result…</Text>
+                <Text style={styles.youtubeErrorTitle}>Clip unavailable</Text>
+                <Text style={styles.youtubeErrorSub}>Picking another question…</Text>
               </View>
             ) : (
               <MediaPlayer

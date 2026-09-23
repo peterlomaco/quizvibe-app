@@ -132,6 +132,10 @@ export interface RemoteAnswer {
   correct: boolean;
   points: number;
   timeUsedSeconds: number;
+  /** Klippet gick inte att spela → frågan hoppades över (migration 0057).
+   *  Räknas INTE som svar i poäng/snittid; finns bara så resume inte landar
+   *  på frågan igen. */
+  skipped?: boolean;
 }
 
 // ── Row-adapters ──────────────────────────────────────────────────────
@@ -353,6 +357,9 @@ export async function upsertAnswer(matchId: string, answer: RemoteAnswer): Promi
       correct: answer.correct,
       points: answer.points,
       time_used_seconds: answer.timeUsedSeconds,
+      // Bara när satt: en upsert som nämner en okörd kolumn (0057) failar
+      // HELA raden, så vanliga svar får aldrig bära fältet.
+      ...(answer.skipped ? { skipped: true } : {}),
     },
     { onConflict: 'match_id,user_id,question_index' },
   );
@@ -506,7 +513,9 @@ export async function getMyAnswers(matchId: string): Promise<RemoteAnswer[]> {
   if (!userId) return [];
   const { data, error } = await supabase
     .from('remote_match_answers')
-    .select('question_index, question_id, correct, points, time_used_seconds')
+    // select('*') (inte en kolumnlista) så läsningen tål att 0057:s
+    // `skipped`-kolumn saknas.
+    .select('*')
     .eq('match_id', matchId)
     .eq('user_id', userId)
     .order('question_index', { ascending: true });
@@ -520,12 +529,14 @@ export async function getMyAnswers(matchId: string): Promise<RemoteAnswer[]> {
     correct: boolean;
     points: number;
     time_used_seconds: number;
+    skipped?: boolean | null;
   }[]) ?? []).map((r) => ({
     questionIndex: r.question_index,
     questionId: r.question_id,
     correct: r.correct,
     points: r.points,
     timeUsedSeconds: Number(r.time_used_seconds),
+    skipped: r.skipped === true,
   }));
 }
 

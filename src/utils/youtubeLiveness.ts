@@ -12,6 +12,13 @@
 //
 // Pure module — no React Native imports — so it is unit-testable under vitest with an
 // injected fetch.
+//
+// SERVER CHECK (2026-09-23): oEmbed only sees deleted/private videos. When the caller
+// passes `serverCheck` (quiz.tsx wires it to the `check-clips` Edge Function) it runs in
+// PARALLEL with oEmbed and its dead ids are unioned in. That adds YouTube Data API
+// verdicts (embeddable=false, age-restricted, region-blocked for SE) plus the shared
+// blocklist of clips that failed on real players' devices (clip_playback_errors). Same
+// fail-open contract: a server error/timeout just means "no extra dead ids".
 
 export interface CheckYoutubeOptions {
   /** Injectable fetch for tests. Defaults to the global fetch. */
@@ -24,6 +31,12 @@ export interface CheckYoutubeOptions {
   overallTimeoutMs?: number;
   /** Override the session cache (tests). Omit to use the shared module-level cache. */
   cache?: Map<string, boolean>;
+  /**
+   * Optional server-side verdict (Data API + real-device blocklist). Resolves to the
+   * dead ids, or null on failure. Bounded by overallTimeoutMs; never trusted to say
+   * "alive" — it can only ADD dead ids.
+   */
+  serverCheck?: (videoIds: string[]) => Promise<string[] | null>;
 }
 
 const DEFAULT_CONCURRENCY = 6;
@@ -85,6 +98,23 @@ export async function checkYoutubeClipsAlive(
     const perRequestTimeoutMs = opts.perRequestTimeoutMs ?? DEFAULT_PER_REQUEST_TIMEOUT_MS;
     const overallTimeoutMs = opts.overallTimeoutMs ?? DEFAULT_OVERALL_TIMEOUT_MS;
 
+    const allIds = Array.from(
+      new Set(videoIds.map((v) => (v ?? '').trim()).filter((v) => v.length > 0)),
+    );
+    // Kick off the server check first so it overlaps the oEmbed probes. Its result is
+    // applied at the end regardless of the oEmbed cache (a cached "alive" from oEmbed
+    // says nothing about embed/region blocks).
+    const serverPromise: Promise<string[] | null> = opts.serverCheck && allIds.length > 0
+      ? opts.serverCheck(allIds).catch(() => null)
+      : Promise.resolve(null);
+    const applyServer = async (): Promise<void> => {
+      const res = await Promise.race([
+        serverPromise,
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), overallTimeoutMs)),
+      ]);
+      if (res) for (const id of res) if (allIds.includes(id)) dead.add(id);
+    };
+
     // Dedupe, drop cache hits, seed dead from cache.
     const seen = new Set<string>();
     const toCheck: string[] = [];
@@ -100,7 +130,10 @@ export async function checkYoutubeClipsAlive(
       if (cached === true) continue; // known alive
       toCheck.push(id);
     }
-    if (toCheck.length === 0) return dead;
+    if (toCheck.length === 0) {
+      await applyServer();
+      return dead;
+    }
 
     let index = 0;
     const worker = async (): Promise<void> => {
@@ -121,9 +154,12 @@ export async function checkYoutubeClipsAlive(
       Array.from({ length: Math.min(concurrency, toCheck.length) }, () => worker()),
     );
     // Whole-batch escape: whatever resolved into `dead` so far is safe to return.
-    await Promise.race([
-      pool,
-      new Promise<void>((resolve) => setTimeout(resolve, overallTimeoutMs)),
+    await Promise.all([
+      Promise.race([
+        pool,
+        new Promise<void>((resolve) => setTimeout(resolve, overallTimeoutMs)),
+      ]),
+      applyServer(),
     ]);
     return dead;
   } catch {
