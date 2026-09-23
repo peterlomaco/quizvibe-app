@@ -1,0 +1,373 @@
+# TV-serier (Peter 2026-09-23, Film.xlsx rad 378-397). Film-kategorin (contentSubject: movie)
+# men mediaType: series -> Name-only, fragetext "...in this series?". Klippen ar mestadels
+# intro/vinjett-uppladdningar fran fan-kanaler (ej rattighetshavaren) och kan tas ner —
+# nightly-cronen + pre-game-kollen fangar det. OBS: flera intros visar skadespelarnamn i
+# eftertexterna — kontrollera i spelaren att svaret inte syns under svarstiden.
+audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+region: ["global"]
+category: songs
+contentForm: youtube
+contentSubject: movie
+items:
+  - id: the-simpsons-1989
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The Simpsons"
+    correctYear: 1989
+    probability: 90
+    region: ["global"]
+    mediaType: series
+    isAnimated: true
+    wikimediaSearchHints: ["The Simpsons TV series 1989"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Homer Simpson", "Bart Simpson"]
+    distractorNames: ["Peter Griffin", "Fred Flintstone", "Hank Hill", "Stan Smith"]
+    youtubeClips:
+      - videoId: "X7qu-JZxwBo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "PCCRAFT"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: rederiet-1992
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Rederiet"
+    correctYear: 1992
+    probability: 80
+    region: ["sweden"]
+    mediaType: series
+    wikimediaSearchHints: ["Rederiet TV series 1992"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Johannes Brost", "Gösta Prüzelius"]
+    distractorNames: ["Rolf Lassgård", "Peter Haber", "Björn Kjellman", "Sven Wollter"]
+    youtubeClips:
+      - videoId: "zTfKcRcibyg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Hattemakeren"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: la-casa-de-papel-2017
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "La Casa de Papel"
+    correctYear: 2017
+    probability: 80
+    region: ["europe"]
+    mediaType: series
+    parentControlled: true
+    wikimediaSearchHints: ["La Casa de Papel TV series 2017"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Álvaro Morte", "Pedro Alonso"]
+    distractorNames: ["Javier Bardem", "Mario Casas", "Álex González", "Luis Tosar"]
+    youtubeClips:
+      - videoId: "_InqQJRqGW4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Netflix"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: dallas-1978
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dallas"
+    correctYear: 1978
+    probability: 80
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Dallas TV series 1978"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Larry Hagman", "Patrick Duffy"]
+    distractorNames: ["Tom Selleck", "William Shatner", "Burt Reynolds", "James Garner"]
+    youtubeClips:
+      - videoId: "8sKX3tWaOew"
+        startSec: 0
+        endSec: 30
+        channelTitle: "TeeVees Greatest"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: the-a-team-1983
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "The A-Team"
+    correctYear: 1983
+    probability: 80
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["The A-Team TV series 1983"]
+    answerMethods: ["actor-select"]
+    correctNames: ["George Peppard", "Mr. T"]
+    distractorNames: ["Lee Majors", "Tom Selleck", "Don Johnson", "Erik Estrada"]
+    youtubeClips:
+      - videoId: "Cn6kEsloMdE"
+        startSec: 0
+        endSec: 30
+        channelTitle: "romleydavies"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: dynasty-1981
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Dynasty"
+    correctYear: 1981
+    probability: 75
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Dynasty TV series 1981"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Joan Collins", "Linda Evans"]
+    distractorNames: ["Jane Seymour", "Jaclyn Smith", "Farrah Fawcett", "Cybill Shepherd"]
+    youtubeClips:
+      - videoId: "MijaRcVaRK0"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Canuck21"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: falcon-crest-1981
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Falcon Crest"
+    correctYear: 1981
+    probability: 65
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Falcon Crest TV series 1981"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Jane Wyman"]
+    distractorNames: ["Barbara Stanwyck", "Angela Lansbury", "Bette Davis", "Lauren Bacall"]
+    youtubeClips:
+      - videoId: "ypZT4lQHoK8"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Tito Teixeira"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: beverly-hills-90210-1990
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Beverly Hills, 90210"
+    correctYear: 1990
+    probability: 80
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Beverly Hills, 90210 TV series 1990"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Jason Priestley", "Luke Perry"]
+    distractorNames: ["Rob Lowe", "Andrew McCarthy", "Johnny Depp", "Kirk Cameron"]
+    youtubeClips:
+      - videoId: "JDOrOMuo-9o"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Jan Schmelter"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: squid-game-2021
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Squid Game"
+    correctYear: 2021
+    probability: 85
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Squid Game TV series 2021"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Lee Jung-jae"]
+    distractorNames: ["Song Kang-ho", "Ma Dong-seok", "Hyun Bin", "Lee Min-ho"]
+    youtubeClips:
+      - videoId: "5fIeqH_wizI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "BrosShowsTV"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: seinfeld-1989
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Seinfeld"
+    correctYear: 1989
+    probability: 75
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Seinfeld TV series 1989"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Jason Alexander", "Michael Richards"]
+    distractorNames: ["Matthew Perry", "Ray Romano", "Kelsey Grammer", "Tim Allen"]
+    youtubeClips:
+      - videoId: "YlFA-36f4CI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "TVTunes Quiz"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: friends-1994
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Friends"
+    correctYear: 1994
+    probability: 95
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Friends TV series 1994"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Jennifer Aniston", "Courteney Cox"]
+    distractorNames: ["Sarah Jessica Parker", "Calista Flockhart", "Helen Hunt", "Alyssa Milano"]
+    youtubeClips:
+      - videoId: "s2TyVQGoCYo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Friends"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: tre-kronor-1994
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Tre Kronor"
+    correctYear: 1994
+    probability: 70
+    region: ["sweden"]
+    mediaType: series
+    wikimediaSearchHints: ["Tre Kronor TV series 1994"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Ulf Brunnberg"]
+    distractorNames: ["Peter Haber", "Rolf Lassgård", "Björn Kjellman", "Jonas Karlsson"]
+    youtubeClips:
+      - videoId: "aFxYhFzoDbo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Jimbop Camouflage"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: svenska-hjartan-1987
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Svenska hjärtan"
+    correctYear: 1987
+    probability: 70
+    region: ["sweden"]
+    mediaType: series
+    wikimediaSearchHints: ["Svenska hjärtan TV series 1987"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Ulf Qvarsebo", "Sten Ljunggren"]
+    distractorNames: ["Sven Wollter", "Gösta Ekman", "Allan Edwall", "Tomas von Brömssen"]
+    youtubeClips:
+      - videoId: "c46TRYVBGkg"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Weliketvthemes"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: varuhuset-1987
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Varuhuset"
+    correctYear: 1987
+    probability: 65
+    region: ["sweden"]
+    mediaType: series
+    wikimediaSearchHints: ["Varuhuset TV series 1987"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Christina Schollin", "Marika Lindström"]
+    distractorNames: ["Pernilla August", "Lena Nyman", "Marie Göranzon", "Gunilla Nyroos"]
+    youtubeClips:
+      - videoId: "v8gWLC9C_8k"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Weliketvthemes"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: melrose-place-1992
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Melrose Place"
+    correctYear: 1992
+    probability: 70
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Melrose Place TV series 1992"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Heather Locklear", "Josie Bissett"]
+    distractorNames: ["Jennie Garth", "Alyssa Milano", "Jaclyn Smith", "Teri Hatcher"]
+    youtubeClips:
+      - videoId: "-VQEyu96s0Y"
+        startSec: 0
+        endSec: 30
+        channelTitle: "ShowPony"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: baywatch-1989
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Baywatch"
+    correctYear: 1989
+    probability: 85
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Baywatch TV series 1989"]
+    answerMethods: ["actor-select"]
+    correctNames: ["David Hasselhoff"]
+    distractorNames: ["Don Johnson", "Lee Majors", "Tom Selleck", "Patrick Duffy"]
+    youtubeClips:
+      - videoId: "O0nqwgu_Us4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Baywatch"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: miami-vice-1984
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Miami Vice"
+    correctYear: 1984
+    probability: 80
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Miami Vice TV series 1984"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Don Johnson", "Philip Michael Thomas"]
+    distractorNames: ["David Hasselhoff", "Tom Selleck", "Bruce Willis", "Kurt Russell"]
+    youtubeClips:
+      - videoId: "PJu07uYJWx4"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Miami Vice"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: knight-rider-1982
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Knight Rider"
+    correctYear: 1982
+    probability: 85
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["Knight Rider TV series 1982"]
+    answerMethods: ["actor-select"]
+    correctNames: ["David Hasselhoff"]
+    distractorNames: ["Don Johnson", "Richard Dean Anderson", "Lee Majors", "Erik Estrada"]
+    youtubeClips:
+      - videoId: "nBOh9HH1ocs"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Classic TV Zone"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: macgyver-1985
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "MacGyver"
+    correctYear: 1985
+    probability: 80
+    region: ["global"]
+    mediaType: series
+    wikimediaSearchHints: ["MacGyver TV series 1985"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Richard Dean Anderson"]
+    distractorNames: ["David Hasselhoff", "Tom Selleck", "Lee Majors", "Don Johnson"]
+    youtubeClips:
+      - videoId: "yOEe1uzurKo"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Jan Schmelter"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+
+  - id: teenage-mutant-ninja-turtles-1987
+    audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
+    displayName: "Teenage Mutant Ninja Turtles"
+    correctYear: 1987
+    probability: 80
+    region: ["global"]
+    mediaType: series
+    isAnimated: true
+    wikimediaSearchHints: ["Teenage Mutant Ninja Turtles TV series 1987"]
+    answerMethods: ["actor-select"]
+    correctNames: ["Leonardo", "Michelangelo"]
+    distractorNames: ["Garfield", "Snoopy", "Popeye", "He-Man"]
+    youtubeClips:
+      - videoId: "MapBJJvjhoI"
+        startSec: 0
+        endSec: 30
+        channelTitle: "Dalton Barron"
+        notes: "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."

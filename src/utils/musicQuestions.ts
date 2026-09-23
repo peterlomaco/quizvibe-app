@@ -5252,6 +5252,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dallas-1978",
+    "displayName": "Dallas",
+    "correctYear": 1978,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Larry Hagman",
+      "Patrick Duffy"
+    ],
+    "distractorNames": [
+      "Tom Selleck",
+      "William Shatner",
+      "Burt Reynolds",
+      "James Garner"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "8sKX3tWaOew",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "TeeVees Greatest",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
     "id": "earth-wind-and-fire-september",
     "displayName": "September — Earth, Wind & Fire",
     "correctYear": 1978,
@@ -6284,6 +6324,85 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dynasty-1981",
+    "displayName": "Dynasty",
+    "correctYear": 1981,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Joan Collins",
+      "Linda Evans"
+    ],
+    "distractorNames": [
+      "Jane Seymour",
+      "Jaclyn Smith",
+      "Farrah Fawcett",
+      "Cybill Shepherd"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "MijaRcVaRK0",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Canuck21",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
+    "id": "falcon-crest-1981",
+    "displayName": "Falcon Crest",
+    "correctYear": 1981,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 65,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Jane Wyman"
+    ],
+    "distractorNames": [
+      "Barbara Stanwyck",
+      "Angela Lansbury",
+      "Bette Davis",
+      "Lauren Bacall"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "ypZT4lQHoK8",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Tito Teixeira",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
     "id": "gota-kanal",
     "displayName": "Göta kanal — eller vem drog ur proppen?",
     "correctYear": 1981,
@@ -6631,6 +6750,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "spotifyTrackId": "6CT0MVgHnoAUXrSrnlwfWx",
     "youtubeClips": []
+  },
+  {
+    "id": "knight-rider-1982",
+    "displayName": "Knight Rider",
+    "correctYear": 1982,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "David Hasselhoff"
+    ],
+    "distractorNames": [
+      "Don Johnson",
+      "Richard Dean Anderson",
+      "Lee Majors",
+      "Erik Estrada"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "nBOh9HH1ocs",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Classic TV Zone",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
   },
   {
     "id": "marvin-gaye-sexual-healing",
@@ -7379,6 +7537,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "the-a-team-1983",
+    "displayName": "The A-Team",
+    "correctYear": 1983,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "George Peppard",
+      "Mr. T"
+    ],
+    "distractorNames": [
+      "Lee Majors",
+      "Tom Selleck",
+      "Don Johnson",
+      "Erik Estrada"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "Cn6kEsloMdE",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "romleydavies",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
     "id": "tomas-ledin-vi-ar-pa-gang",
     "displayName": "Vi är på gång — Tomas Ledin",
     "correctYear": 1983,
@@ -7792,6 +7990,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Enhanced Music Videos",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-26 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "miami-vice-1984",
+    "displayName": "Miami Vice",
+    "correctYear": 1984,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Don Johnson",
+      "Philip Michael Thomas"
+    ],
+    "distractorNames": [
+      "David Hasselhoff",
+      "Tom Selleck",
+      "Bruce Willis",
+      "Kurt Russell"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "PJu07uYJWx4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Miami Vice",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
       }
     ]
   },
@@ -8586,6 +8824,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 1985 vinnare. ESC 1985 performance."
+      }
+    ]
+  },
+  {
+    "id": "macgyver-1985",
+    "displayName": "MacGyver",
+    "correctYear": 1985,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Richard Dean Anderson"
+    ],
+    "distractorNames": [
+      "David Hasselhoff",
+      "Tom Selleck",
+      "Lee Majors",
+      "Don Johnson"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "yOEe1uzurKo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Jan Schmelter",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
       }
     ]
   },
@@ -9667,6 +9944,86 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "svenska-hjartan-1987",
+    "displayName": "Svenska hjärtan",
+    "correctYear": 1987,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Ulf Qvarsebo",
+      "Sten Ljunggren"
+    ],
+    "distractorNames": [
+      "Sven Wollter",
+      "Gösta Ekman",
+      "Allan Edwall",
+      "Tomas von Brömssen"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "c46TRYVBGkg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Weliketvthemes",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
+    "id": "teenage-mutant-ninja-turtles-1987",
+    "displayName": "Teenage Mutant Ninja Turtles",
+    "correctYear": 1987,
+    "contentSubject": "movie",
+    "questionText": "What is the name of the main character in this series?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": true,
+    "correctNames": [
+      "Leonardo",
+      "Michelangelo"
+    ],
+    "distractorNames": [
+      "Garfield",
+      "Snoopy",
+      "Popeye",
+      "He-Man"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "MapBJJvjhoI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Dalton Barron",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
     "id": "u2-with-or-without-you",
     "displayName": "With or Without You — U2",
     "correctYear": 1987,
@@ -9695,6 +10052,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "U2 - Topic",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
+      }
+    ]
+  },
+  {
+    "id": "varuhuset-1987",
+    "displayName": "Varuhuset",
+    "correctYear": 1987,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 65,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Christina Schollin",
+      "Marika Lindström"
+    ],
+    "distractorNames": [
+      "Pernilla August",
+      "Lena Nyman",
+      "Marie Göranzon",
+      "Gunilla Nyroos"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "v8gWLC9C_8k",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Weliketvthemes",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
       }
     ]
   },
@@ -10445,6 +10842,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 0,
         "endSec": 15,
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "baywatch-1989",
+    "displayName": "Baywatch",
+    "correctYear": 1989,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "David Hasselhoff"
+    ],
+    "distractorNames": [
+      "Don Johnson",
+      "Lee Majors",
+      "Tom Selleck",
+      "Patrick Duffy"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "O0nqwgu_Us4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Baywatch",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
       }
     ]
   },
@@ -11325,6 +11761,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "seinfeld-1989",
+    "displayName": "Seinfeld",
+    "correctYear": 1989,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 75,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Jason Alexander",
+      "Michael Richards"
+    ],
+    "distractorNames": [
+      "Matthew Perry",
+      "Ray Romano",
+      "Kelsey Grammer",
+      "Tim Allen"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "YlFA-36f4CI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "TVTunes Quiz",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
     "id": "simply-red-if-you-dont-know-me-by-now",
     "displayName": "If You Don't Know Me by Now — Simply Red",
     "correctYear": 1989,
@@ -11469,6 +11945,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1311)."
+      }
+    ]
+  },
+  {
+    "id": "the-simpsons-1989",
+    "displayName": "The Simpsons",
+    "correctYear": 1989,
+    "contentSubject": "movie",
+    "questionText": "What is the name of the main character in this series?",
+    "itemHcp": 90,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": true,
+    "correctNames": [
+      "Homer Simpson",
+      "Bart Simpson"
+    ],
+    "distractorNames": [
+      "Peter Griffin",
+      "Fred Flintstone",
+      "Hank Hill",
+      "Stan Smith"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "X7qu-JZxwBo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "PCCRAFT",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
       }
     ]
   },
@@ -11620,6 +12136,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 0,
         "endSec": 15,
         "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "beverly-hills-90210-1990",
+    "displayName": "Beverly Hills, 90210",
+    "correctYear": 1990,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Jason Priestley",
+      "Luke Perry"
+    ],
+    "distractorNames": [
+      "Rob Lowe",
+      "Andrew McCarthy",
+      "Johnny Depp",
+      "Kirk Cameron"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "JDOrOMuo-9o",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Jan Schmelter",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
       }
     ]
   },
@@ -13777,6 +14333,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "melrose-place-1992",
+    "displayName": "Melrose Place",
+    "correctYear": 1992,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Heather Locklear",
+      "Josie Bissett"
+    ],
+    "distractorNames": [
+      "Jennie Garth",
+      "Alyssa Milano",
+      "Jaclyn Smith",
+      "Teri Hatcher"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "-VQEyu96s0Y",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "ShowPony",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
     "id": "niklas-stromstedt-oslagbara",
     "displayName": "Oslagbara — Niklas Strömstedt",
     "correctYear": 1992,
@@ -13863,6 +14459,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Radiohead",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx). correctYear 1992 = singeln (21 sep 1992); albumet Pablo Honey kom 1993."
+      }
+    ]
+  },
+  {
+    "id": "rederiet-1992",
+    "displayName": "Rederiet",
+    "correctYear": 1992,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Johannes Brost",
+      "Gösta Prüzelius"
+    ],
+    "distractorNames": [
+      "Rolf Lassgård",
+      "Peter Haber",
+      "Björn Kjellman",
+      "Sven Wollter"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "zTfKcRcibyg",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Hattemakeren",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
       }
     ]
   },
@@ -15493,6 +16129,46 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "friends-1994",
+    "displayName": "Friends",
+    "correctYear": 1994,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 95,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Jennifer Aniston",
+      "Courteney Cox"
+    ],
+    "distractorNames": [
+      "Sarah Jessica Parker",
+      "Calista Flockhart",
+      "Helen Hunt",
+      "Alyssa Milano"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "s2TyVQGoCYo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Friends",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
     "id": "ges-graver-guld-usa",
     "displayName": "När vi gräver guld i USA — GES",
     "correctYear": 1994,
@@ -15972,6 +16648,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "TLCVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "tre-kronor-1994",
+    "displayName": "Tre Kronor",
+    "correctYear": 1994,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 70,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Ulf Brunnberg"
+    ],
+    "distractorNames": [
+      "Peter Haber",
+      "Rolf Lassgård",
+      "Björn Kjellman",
+      "Jonas Karlsson"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "aFxYhFzoDbo",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Jimbop Camouflage",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
       }
     ]
   },
@@ -32494,6 +33209,47 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "la-casa-de-papel-2017",
+    "displayName": "La Casa de Papel",
+    "correctYear": 2017,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "europe"
+    ],
+    "parentControlled": true,
+    "isAnimated": false,
+    "correctNames": [
+      "Álvaro Morte",
+      "Pedro Alonso"
+    ],
+    "distractorNames": [
+      "Javier Bardem",
+      "Mario Casas",
+      "Álex González",
+      "Luis Tosar"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "_InqQJRqGW4",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "Netflix",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
+      }
+    ]
+  },
+  {
     "id": "luis-fonsi-despacito",
     "displayName": "Despacito — Luis Fonsi & Daddy Yankee",
     "correctYear": 2017,
@@ -34302,6 +35058,45 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 33,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "squid-game-2021",
+    "displayName": "Squid Game",
+    "correctYear": 2021,
+    "contentSubject": "movie",
+    "questionText": "Select one of the main actors in this series?",
+    "itemHcp": 85,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "isAnimated": false,
+    "correctNames": [
+      "Lee Jung-jae"
+    ],
+    "distractorNames": [
+      "Song Kang-ho",
+      "Ma Dong-seok",
+      "Hyun Bin",
+      "Lee Min-ho"
+    ],
+    "mediaType": "series",
+    "youtubeClips": [
+      {
+        "videoId": "5fIeqH_wizI",
+        "startSec": 0,
+        "endSec": 30,
+        "channelTitle": "BrosShowsTV",
+        "license": "standard",
+        "notes": "Film.xlsx 2026-09-23 (serie-intro/trailer). Titeln avslojar ingen skadespelare."
       }
     ]
   },
