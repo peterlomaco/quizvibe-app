@@ -325,6 +325,10 @@ export function buildMatchHighlights(
   // Delad placering på ANTAL RÄTT — "3/4" och "3/3" delar plats, eftersom
   // regeln är formulerad på antalet rätt, inte på träffprocent.
   if (ranked) {
+    // Noten visas bara när minst två aktiva spelare har samma antal rätt —
+    // då är det snittsvarstiden som skiljer dem åt på Final Leaderboard.
+    const correctCounts = aggs.map((a) => a.correct);
+    const hasCorrectTie = new Set(correctCounts).size < correctCounts.length;
     cards.push({
       id: 'most-correct',
       kind: 'most-correct',
@@ -341,7 +345,7 @@ export function buildMatchHighlights(
         ),
         departed,
       ),
-      detail: 'If tied on correct answers, fastest fingers decides',
+      detail: hasCorrectTie ? 'Fastest fingers will define the winner' : undefined,
       icon: '🎯',
     });
   } else {

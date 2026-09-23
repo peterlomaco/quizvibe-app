@@ -613,3 +613,21 @@ describe('spelare som lämnat mitt i matchen', () => {
     expect(places(mostCorrect)).toEqual(['1:Ben', '2:Anna']);
   });
 });
+
+describe('Correct answers-kortets tie-not', () => {
+  const card = (cards: HighlightCard[]) => cards.find((c) => c.kind === 'most-correct');
+
+  it('visar noten när två spelare har samma antal rätt', () => {
+    const cards = build({
+      scores: [[score('p1', 0, true, 5)], [score('p2', 0, true, 7)]],
+    });
+    expect(card(cards)?.detail).toBe('Fastest fingers will define the winner');
+  });
+
+  it('utelämnar noten när alla har olika antal rätt', () => {
+    const cards = build({
+      scores: [[score('p1', 0, true, 5)], [score('p2', 0, false, 7)]],
+    });
+    expect(card(cards)?.detail).toBeUndefined();
+  });
+});
