@@ -2304,6 +2304,17 @@ export default function LobbyScreen() {
   // öppnar Share invite-modalen igen inom samma lobby-session; den lever
   // och dör med LobbyScreen-mountet (ingen persistens över app-omstart).
   const [pendingFriends, setPendingFriends] = useState<Friend[]>([]);
+  // Namn (lowercase) som host bjudit in till DENNA lobby. Auto-approve-
+  // källa bredvid friends/pendingFriends — men till skillnad från
+  // pendingFriends prunas den ALDRIG när waiting_invites-raden försvinner.
+  // Accept raderar raden, och resyncen släppte då pending-posten innan
+  // joiner-raden hunnit in i players[] → en inbjuden spelare hos en host med
+  // tom friends-lista (nytt konto) fastnade i "To be Approved" (Peter
+  // 2026-09-23). Seedas från servern vid mount så även remount täcks.
+  const [invitedNames, setInvitedNames] = useState<Set<string>>(() => new Set());
+  // Synkron spegel av aktiva lobby-namn för resyncPendingFromInvites
+  // (useCallback med []-deps kan inte läsa players direkt).
+  const lobbyNamesRef = useRef<Set<string>>(new Set());
   // Ids (pending-<lower>) för de pending-poster som FAKTISKT har en utestående
   // waiting_invites-rad — dvs. host har bockat för dem och tryckt "Send
   // invite" (eller en invite skickad i en tidigare lobby lever kvar).
@@ -3831,7 +3842,10 @@ export default function LobbyScreen() {
         // sparad friend, varpå auto-approven slår till och stänger popupen
         // (Peter 2026-08-27). Matcha mot pendingFriends så beslutet är rätt
         // redan på FÖRSTA watcher-varvet efter join.
-        pendingFriends.some((pf) => pf.playerName.toLowerCase() === nameLower)) &&
+        pendingFriends.some((pf) => pf.playerName.toLowerCase() === nameLower) ||
+        // Inbjuden till DENNA lobby — överlever att invite-raden raderas vid
+        // accept (se invitedNames-deklarationen).
+        invitedNames.has(nameLower)) &&
       passesSilentApproveGuards(p) &&
       // Host:s explicita un-approve vinner alltid — en friend host flyttat
       // till waiting ska synas där direkt.
@@ -4054,7 +4068,7 @@ export default function LobbyScreen() {
     // willAutoApproveOnJoin) — utan den i deps kan en pending post som
     // hamnat i listan efter senaste players-ändring missas.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends, pendingFriends]);
+  }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends, pendingFriends, invitedNames]);
 
   // ── Pending friends → bekräftade friends (host) ───────────────────────
   // Peter 2026-08-27: en Player Name som "Add" verifierat finns men som
@@ -4538,6 +4552,9 @@ export default function LobbyScreen() {
         const lower = pf.playerName.toLowerCase();
         if (friendLower.has(lower)) return false; // blivit sparad friend
         if (outstandingLower.has(lower)) return true; // fortfarande utestående
+        // Redan i lobbyn (accept raderade raden) → behåll så pending→confirmed-
+        // watchern hinner göra personen till sparad friend.
+        if (lobbyNamesRef.current.has(lower)) return true;
         return !prevSent.has(pf.id); // aldrig skickad → behåll; skickad-men-borta → släpp
       });
       const keptLower = new Set(kept.map((p) => p.playerName.toLowerCase()));
@@ -4783,6 +4800,7 @@ export default function LobbyScreen() {
       ),
     [players],
   );
+  lobbyNamesRef.current = lobbyPlayerNames;
 
   // "Cancel" på CodeKeyboard:et (2026-08-27) — Share invite:s "Done"-knapp
   // ersattes tidigare med "Send invite" (disabled tills minst en friend är
@@ -5484,6 +5502,37 @@ export default function LobbyScreen() {
       cancelled = true;
     };
   }, [hostMode]);
+
+  // Host: seeda invitedNames från utestående waiting_invites för DETTA rum så
+  // en remount (eller invites skickade innan) fortfarande auto-approvar den
+  // inbjudna. Nollställs per roomCode (Play Again kan återanvända instansen).
+  // Unionas in — en invite skickad medan queryn pågår får inte skrivas över.
+  // Fail-open: fel → bara lokalt skickade invites räknas.
+  useEffect(() => {
+    setInvitedNames(new Set());
+    if (!hostMode || !roomCode) return;
+    let cancelled = false;
+    (async () => {
+      const hostUserId = await getOwnUserId();
+      if (!hostUserId || cancelled) return;
+      const { data, error } = await supabase
+        .from('waiting_invites')
+        .select('to_player_name')
+        .eq('from_user_id', hostUserId)
+        .eq('room_code', roomCode);
+      if (cancelled || error || !data || data.length === 0) return;
+      setInvitedNames((prev) => {
+        const next = new Set(prev);
+        for (const row of data) {
+          if (row.to_player_name) next.add(String(row.to_player_name).trim().toLowerCase());
+        }
+        return next;
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hostMode, roomCode]);
 
   // Realtime-channel (host): detekterar nya joiners via INSERT-event på
   // lobby_players. När en joiner INSERT:ar sin rad fyrar Realtime → host
@@ -6262,6 +6311,13 @@ export default function LobbyScreen() {
       fromPlayerName,
       fromAvatarId: profile?.selectedAvatarId,
       alreadyFriend: !friend.id.startsWith('pending-'),
+    });
+    const invitedLower = friend.playerName.trim().toLowerCase();
+    setInvitedNames((prev) => {
+      if (prev.has(invitedLower)) return prev;
+      const next = new Set(prev);
+      next.add(invitedLower);
+      return next;
     });
     setInvitedFriendIds((prev) => {
       const next = new Set(prev);
