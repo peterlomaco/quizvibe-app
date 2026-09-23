@@ -6880,12 +6880,15 @@ export default function QuizScreen() {
       selfScores !== null
         ? selfScores.reduce((sum, sc) => sum + sc.points, 0)
         : totalPoints;
-    // Spectatorns egen assistance ligger per spelare i turnOrder — params
-    // hårdkodar 'standard'/'32' på non-host-vägen från Lobby.
+    // Enhetens egen assistance ligger per spelare i turnOrder — params
+    // hårdkodar 'standard' på BÅDE host- och non-host-vägen från Lobby, så
+    // fallbackAssistance är fel för historiken. Host = turnOrder[0] (id '1',
+    // selfPlayerId kan vara tomt i PtP/single); övriga via selfPlayerId.
+    const selfAssistanceRow =
+      (selfPlayerId ? turnOrder.find((pl) => pl.id === selfPlayerId) : undefined) ??
+      (isHost ? turnOrder[0] : undefined);
     const effectiveAssistance: AssistanceLevel =
-      (isPtPSpectator
-        ? turnOrder.find((pl) => pl.id === selfPlayerId)?.assistance
-        : undefined) ?? fallbackAssistance;
+      selfAssistanceRow?.assistance ?? fallbackAssistance;
 
     // TODO (Fas 6): beräkna riktig HCP-förändring från totalPoints + assistance + ålder
     const hcpBefore = 99;
