@@ -82,6 +82,7 @@ export function SavedAggregatesCard({
   showRematch = false,
   focusIds,
   collapsible = false,
+  onLoaded,
 }: {
   showRematch?: boolean;
   /** Flash-guide: leaderboard-id:n (= SavedAggregate.id) som ska blinka "New
@@ -93,7 +94,12 @@ export function SavedAggregatesCard({
    *  hopfällt. Sätts av Profile → Player history; /competitions utelämnar den
    *  (kortet ÄR skärmen där, inget att fälla ihop). */
   collapsible?: boolean;
+  /** Anropas när första laddningen är klar (även tom/anon/fel) — låter
+   *  Player history visa detta kort och "Games played" samtidigt. */
+  onLoaded?: () => void;
 } = {}) {
+  const onLoadedRef = useRef(onLoaded);
+  onLoadedRef.current = onLoaded;
   const [items, setItems] = useState<SavedAggregate[]>([]);
   // Kort-kollaps (bara i collapsible-läge). Default hopfällt, som Profiles
   // övriga sektioner.
@@ -147,28 +153,32 @@ export function SavedAggregatesCard({
     useCallback(() => {
       let cancelled = false;
       void (async () => {
-        // Anon-sessioner har per definition inga sparade serier — men gör
-        // gaten explicit, samma mönster som MyMatchesSection.
-        if (await isAnonymousSession()) {
-          if (!cancelled) setItems([]);
-          return;
-        }
-        const [saved, uid, fr] = await Promise.all([
-          listMyAggregateLeaderboards(),
-          getCurrentUserId(),
-          loadFriends(),
-        ]);
-        if (!cancelled) {
-          // Dölj serier JAG raderat ur min historik (0052) — övriga deltagare
-          // behåller dem. Matchas på min egen deltagar-rads `dismissed`.
-          setItems(
-            saved.filter(
-              (a) =>
-                !a.participants.find((p) => p.userId === uid)?.dismissed,
-            ),
-          );
-          setSelfHostId(uid);
-          setFriends(fr);
+        try {
+          // Anon-sessioner har per definition inga sparade serier — men gör
+          // gaten explicit, samma mönster som MyMatchesSection.
+          if (await isAnonymousSession()) {
+            if (!cancelled) setItems([]);
+            return;
+          }
+          const [saved, uid, fr] = await Promise.all([
+            listMyAggregateLeaderboards(),
+            getCurrentUserId(),
+            loadFriends(),
+          ]);
+          if (!cancelled) {
+            // Dölj serier JAG raderat ur min historik (0052) — övriga deltagare
+            // behåller dem. Matchas på min egen deltagar-rads `dismissed`.
+            setItems(
+              saved.filter(
+                (a) =>
+                  !a.participants.find((p) => p.userId === uid)?.dismissed,
+              ),
+            );
+            setSelfHostId(uid);
+            setFriends(fr);
+          }
+        } finally {
+          if (!cancelled) onLoadedRef.current?.();
         }
       })();
       return () => {

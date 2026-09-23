@@ -11,6 +11,7 @@ import {
   type HistoryEntry,
 } from '../utils/gameResults';
 import { loadFriends, type Friend } from '../utils/friendsStorage';
+import { PURCHASED_PACKAGES } from '../utils/mockPurchasedPackages';
 import {
   groupHistory,
   groupHistoryByMonthDateForm,
@@ -85,6 +86,13 @@ export function PlayerHistorySection() {
   // Kort-kollaps för "Games played" — default hopfällt (bara rubriken syns).
   const [gamesOpen, setGamesOpen] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  // Båda korten (Marathon tables + Games played) visas först när BÅDA har
+  // laddat klart — annars visades "Games played: 0" en stund och korten dök
+  // upp var för sig. Tills dess syns bara sektionsrubriken.
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [aggregatesLoaded, setAggregatesLoaded] = useState(false);
+  const handleAggregatesLoaded = useCallback(() => setAggregatesLoaded(true), []);
+  const cardsReady = historyLoaded && aggregatesLoaded;
   const [sortMode, setSortMode] = useState<SortMode>('date');
   const [expandedL1, setExpandedL1] = useState<Set<string>>(new Set());
   // Date-lägets mellannivå (månad::datum). Oanvänd i host-läget.
@@ -104,12 +112,16 @@ export function PlayerHistorySection() {
     useCallback(() => {
       let active = true;
       void (async () => {
-        const [list, fr] = await Promise.all([loadGameHistory(), loadFriends()]);
-        if (!active) return;
-        // Sortera desc by date så leaf-ordningen blir nyast först oavsett
-        // grupperings-läge.
-        setHistory([...list].sort((a, b) => b.date.localeCompare(a.date)));
-        setFriends(fr);
+        try {
+          const [list, fr] = await Promise.all([loadGameHistory(), loadFriends()]);
+          if (!active) return;
+          // Sortera desc by date så leaf-ordningen blir nyast först oavsett
+          // grupperings-läge.
+          setHistory([...list].sort((a, b) => b.date.localeCompare(a.date)));
+          setFriends(fr);
+        } finally {
+          if (active) setHistoryLoaded(true);
+        }
       })();
       return () => {
         active = false;
@@ -249,14 +261,19 @@ export function PlayerHistorySection() {
       </Pressable>
       {!expanded && <View style={styles.sectionDivider} />}
 
-      {expanded && (
-        <>
+      {/* Innehållet är ALLTID monterat (dolt via display:none) så Marathon-
+          kortet förladdar redan vid fokus i stället för först vid expand. */}
+      <View style={[styles.contentWrap, !(expanded && cardsReady) && styles.hidden]}>
           {/* Sparade Aggregate Leaderboards/Scores (0037). Självgatande —
               inget sparat eller anonym session → renderar null.
               showRematch → detalj-modalen kör den två-fas re-match-flödet
               (CompetitionRematchActions: "Send Re-match invitation" → vänta på
               accept → "Yes – start re-match"), samma som /competitions. */}
-          <SavedAggregatesCard showRematch collapsible />
+          <SavedAggregatesCard
+            showRematch
+            collapsible
+            onLoaded={handleAggregatesLoaded}
+          />
           <View style={styles.card}>
             <Pressable
               onPress={() => setGamesOpen((o) => !o)}
@@ -418,8 +435,7 @@ export function PlayerHistorySection() {
           <View style={{ marginTop: Spacing.md }}>
             <MyMatchesSection full />
           </View>
-        </>
-      )}
+      </View>
 
       {/* ── Detalj: ett spels final leaderboard + local delete ───────────── */}
       <Modal
@@ -488,7 +504,9 @@ function GameCard({
   const packages =
     !entry.selectedExtraPackages || entry.selectedExtraPackages.length === 0
       ? 'Generic'
-      : entry.selectedExtraPackages.join(', ');
+      : entry.selectedExtraPackages
+          .map((id) => PURCHASED_PACKAGES.find((p) => p.id === id)?.name ?? id)
+          .join(', ');
   // Källor i appens kanoniska ordning Spotify → YouTube → Hints.
   const sourceKeys = PLAYED_MEDIA_SOURCE_ORDER.filter((s) =>
     entry.sources?.includes(s),
@@ -525,6 +543,8 @@ function GameCard({
 
 const styles = StyleSheet.create({
   container: { gap: Spacing.md },
+  contentWrap: { gap: Spacing.md },
+  hidden: { display: 'none' },
 
   headerRow: {
     flexDirection: 'row',
