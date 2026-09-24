@@ -6529,6 +6529,33 @@ export default function LobbyScreen() {
       }
     }
 
+    // Spotify som ENDA källa: quiz.tsx fyller då alla rundor med Spotify, och
+    // DJ-rollen roterar round-robin. Är rundorna inte en multipel av antalet
+    // spelare DJ:ar någon oftare — och svarar därmed på färre frågor (DJ:n
+    // svarar aldrig på sin egen). Blockera i stället för att acceptera ojämna
+    // turer (Peter 2026-09-24). Ligger före credit-blocket så inget dras.
+    const spotifyOnlyGame = anyPackageActive
+      ? pkgSpotifyActive && !pkgYtActive && !pkgHintsActive
+      : spotifyEnabled && youtubeEnabledCategories.length === 0 && imagesEnabledCategories.length === 0;
+    if (spotifyOnlyGame && roundsCount % turnOrder.length !== 0) {
+      const n = turnOrder.length;
+      const validRounds: number[] = [];
+      for (let r = ROUNDS_MIN; r <= stepperMax; r += ROUNDS_STEP) {
+        if (r % n === 0) validRounds.push(r);
+      }
+      const list =
+        validRounds.length > 1
+          ? `${validRounds.slice(0, -1).join(', ')} or ${validRounds[validRounds.length - 1]}`
+          : String(validRounds[0]);
+      Alert.alert(
+        'Uneven Spotify DJ turns',
+        validRounds.length > 0
+          ? `With only Spotify as source, every player must DJ equally often. With ${n} players, choose ${list} rounds, or enable YouTube or Hints.`
+          : `With only Spotify as source, every player must DJ equally often. That's not possible with ${n} players — enable YouTube or Hints.`,
+      );
+      return;
+    }
+
     if (!singlePlayerDefault && approvedNonHosts.length === 0) {
       setNoApprovedModalVisible(true);
       return;

@@ -2495,8 +2495,10 @@ export default function QuizScreen() {
     // Degenererade lägen: en otillgänglig källas block går till de andra så
     // spelet aldrig blir kortare än begärt antal rundor. Hints går FÖRE Spotify
     // i turordningen — annars skulle utfyllnaden lägga till lösa Spotify-frågor
-    // och bryta DJ-varvet. Spotify tar resten bara när ingen annan källa finns,
-    // och då är ojämna DJ-turer det enda alternativet till ett tomt spel.
+    // och bryta DJ-varvet. Spotify tar resten bara när ingen annan källa finns.
+    // Spotify-only med rundor som inte är en multipel av spelarantalet blockeras
+    // redan vid Start Game i LobbyScreen (Peter 2026-09-24) — grenen här är bara
+    // ett skyddsnät (carry-over/legacy) och kan då ge ojämna DJ-turer.
     const unallocated = totalRounds - spotifyBlockCount - ytBlockCount - imageBlockCount;
     if (unallocated > 0) {
       if (hasPureYoutube) ytBlockCount += unallocated;
