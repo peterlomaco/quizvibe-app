@@ -62,6 +62,7 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   View,
@@ -345,46 +346,16 @@ async function checkSinglePlayerLobby(code: string): Promise<boolean> {
 // Spotify-lobby (Peter 2026-09-24): host har Spotify DJ påslaget men joinern
 // har inte "Spotify user"-attesten → host:s auto-approve-guard
 // (passesSilentApproveGuards i LobbyScreen) hade blockerat även en friend.
-// Vi frågar därför redan vid join-försöket. Yes → install-verifiera + skriv
-// spotifyAppConfirmed till profilen; lobbyns code-only-join läser sedan
-// profilen och publicerar spotifyConnected=true → host auto-approvar.
-// Samma kontrakt som checkSinglePlayerLobby: true = abortera (No → kvar i
-// Join-formuläret). Fail-open när settings saknas; anon-sessioner (ingen
-// profil) berörs inte.
-function askYesNo(title: string, message: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    Alert.alert(
-      title,
-      message,
-      [
-        { text: 'No', style: 'cancel', onPress: () => resolve(false) },
-        { text: 'Yes', onPress: () => resolve(true) },
-      ],
-      { cancelable: true, onDismiss: () => resolve(false) },
-    );
-  });
-}
-
-async function checkSpotifyLobbyGate(code: string): Promise<boolean> {
+// Vi frågar därför redan vid join-försöket via en overlay i JoinModal med
+// samma "I have Spotify App on this device"-switch som lobbyn. Returnerar
+// profilen när frågan behövs, annars null (fail-open när settings saknas;
+// anon-sessioner utan profil berörs inte).
+async function profileNeedingSpotifyAttest(code: string): Promise<ProfileData | null> {
   const settings = await getLobbySettings(code);
-  if (!settings?.spotifyEnabled) return false;
+  if (!settings?.spotifyEnabled) return null;
   const profile = await loadProfile();
-  if (!profile || profile.spotifyAppConfirmed) return false;
-  const yes = await askYesNo(
-    'This lobby uses Spotify',
-    'To access this lobby you need to confirm you have the Spotify App installed on this device.',
-  );
-  if (!yes) return true;
-  if ((await checkSpotifyInstalled()) === 'not-found') {
-    Alert.alert(
-      'Spotify app not found',
-      'Spotify app not found on this device. Install Spotify and try again.',
-    );
-    return true;
-  }
-  // Await:a så lobbyns loadProfile garanterat ser attesten.
-  await saveProfile({ ...profile, spotifyAppConfirmed: true }).catch(() => {});
-  return false;
+  if (!profile || profile.spotifyAppConfirmed) return null;
+  return profile;
 }
 
 // Re-match-lobby: uppsättningen är låst till spelarna från föregående spel,
@@ -466,6 +437,58 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // andra tyst, se MODAL_SWAP_DELAY_MS) så listan lämnas direkt och usern ser
   // en tydlig väntevy tills lobbyn öppnas. Rensas vid varje guard-failure.
   const [joiningLobby, setJoiningLobby] = useState(false);
+  // Spotify-attest-overlay (se profileNeedingSpotifyAttest). En vanlig View
+  // inuti JoinModal:s <Modal> — en andra Modal hade svalts tyst av iOS.
+  const [spotifyGate, setSpotifyGate] = useState<{ playerName: string; profile: ProfileData } | null>(null);
+  const [spotifyGateOn, setSpotifyGateOn] = useState(false);
+  const spotifyGateResolveRef = useRef<((abort: boolean) => void) | null>(null);
+
+  // Samma kontrakt som checkSinglePlayerLobby: true = abortera (kvar i
+  // Join-formuläret), false = fortsätt joinen.
+  const checkSpotifyLobbyGate = async (code: string): Promise<boolean> => {
+    const profile = await profileNeedingSpotifyAttest(code);
+    if (!profile) return false;
+    return new Promise<boolean>((resolve) => {
+      spotifyGateResolveRef.current = resolve;
+      setSpotifyGateOn(false);
+      setSpotifyGate({ playerName: profile.playerName ?? '', profile });
+    });
+  };
+
+  const closeSpotifyGate = (abort: boolean) => {
+    setSpotifyGate(null);
+    setSpotifyGateOn(false);
+    const resolve = spotifyGateResolveRef.current;
+    spotifyGateResolveRef.current = null;
+    resolve?.(abort);
+  };
+
+  // Switchen ON → bekräfta profil-ändringen (samma copy som lobbyns
+  // attest-toggle). Cancel lämnar switchen av; spelaren kan då trycka Cancel
+  // i overlayen för att gå tillbaka till Join-formuläret.
+  const handleSpotifyGateToggle = (v: boolean) => {
+    if (!v || !spotifyGate) return;
+    const { profile } = spotifyGate;
+    Alert.alert('Update your profile?', 'Your Profile will be changed to Spotify ON.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'OK',
+        onPress: async () => {
+          if ((await checkSpotifyInstalled()) === 'not-found') {
+            Alert.alert(
+              'Spotify app not found',
+              'Spotify app not found on this device. Install Spotify and try again.',
+            );
+            return;
+          }
+          setSpotifyGateOn(true);
+          // Await:a så lobbyns loadProfile garanterat ser attesten.
+          await saveProfile({ ...profile, spotifyAppConfirmed: true }).catch(() => {});
+          closeSpotifyGate(false);
+        },
+      },
+    ]);
+  };
   // Index på den code-cell som har fokus — driver vilken `mode` (letter/digit)
   // CodeKeyboard renderar samt vilken cell tap-knapparna skriver in i. null =
   // ingen code-cell fokuserad → custom keyboard döljs (system keyboard kan
@@ -1965,6 +1988,91 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
               </Text>
               <WaveDots />
             </View>
+          </View>
+        </View>
+      )}
+      {spotifyGate && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.75)',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: Spacing.lg,
+          }}
+        >
+          <View
+            style={{
+              alignSelf: 'stretch',
+              backgroundColor: Colors.card,
+              padding: Spacing.lg,
+              borderRadius: Radius.md,
+              borderWidth: 1,
+              borderColor: Colors.border,
+              gap: Spacing.md,
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: '700', color: Colors.textPrimary }}>
+              This lobby uses Spotify
+            </Text>
+            <Text style={{ fontSize: 15, color: Colors.textSecondary, lineHeight: 20 }}>
+              To access this lobby you need to confirm you have the Spotify App installed on this device.
+            </Text>
+            {/* Speglar lobbyns attest-rad 1:1: ram grön/röd efter läget,
+                kant-skärande namn-badge, samma Switch-färger. */}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+                marginTop: 6,
+                borderWidth: 1,
+                borderColor: spotifyGateOn ? Colors.success : Colors.error,
+                borderRadius: Radius.sm,
+                paddingLeft: Spacing.sm,
+                paddingRight: Spacing.sm,
+                paddingVertical: 6,
+              }}
+            >
+              {spotifyGate.playerName !== '' && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -8,
+                    left: Spacing.sm,
+                    paddingHorizontal: 8,
+                    paddingVertical: 2,
+                    borderRadius: 4,
+                    maxWidth: 240,
+                    zIndex: 2,
+                    backgroundColor: spotifyGateOn ? Colors.success : Colors.error,
+                  }}
+                  pointerEvents="none"
+                >
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#FFF', letterSpacing: 0.3 }} numberOfLines={1}>
+                    {spotifyGate.playerName}
+                  </Text>
+                </View>
+              )}
+              <Text style={{ flex: 1, fontSize: 13, color: Colors.textPrimary }}>
+                I have Spotify App on this device
+              </Text>
+              <Switch
+                value={spotifyGateOn}
+                onValueChange={handleSpotifyGateToggle}
+                trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
+                thumbColor="#FFF"
+                ios_backgroundColor={spotifyGateOn ? '#1DB954' : '#3C3C3C'}
+                style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+              />
+            </View>
+            <TouchableOpacity onPress={() => closeSpotifyGate(true)} style={modal.cancelBtn}>
+              <Text style={modal.cancelText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
