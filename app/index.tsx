@@ -40,7 +40,8 @@ import {
 } from '@/src/utils/playerName';
 import { ensureAuthSession, resendActivationByName, signInWithPlayerName } from '@/src/utils/auth';
 import { containsProfanity } from '@/src/utils/profanity';
-import { clearProfile, emailExists, getCachedProfile, loadProfile, playerNameExists, type ProfileData } from '@/src/utils/profileStorage';
+import { clearProfile, emailExists, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
+import { checkSpotifyInstalled } from '@/src/utils/spotifyDJ';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
@@ -339,6 +340,51 @@ async function checkSinglePlayerLobby(code: string): Promise<boolean> {
     'This Room Code belongs to a single player lobby. Ask the Host to switch to a Multiplayer mode, then try again.',
   );
   return true;
+}
+
+// Spotify-lobby (Peter 2026-09-24): host har Spotify DJ påslaget men joinern
+// har inte "Spotify user"-attesten → host:s auto-approve-guard
+// (passesSilentApproveGuards i LobbyScreen) hade blockerat även en friend.
+// Vi frågar därför redan vid join-försöket. Yes → install-verifiera + skriv
+// spotifyAppConfirmed till profilen; lobbyns code-only-join läser sedan
+// profilen och publicerar spotifyConnected=true → host auto-approvar.
+// Samma kontrakt som checkSinglePlayerLobby: true = abortera (No → kvar i
+// Join-formuläret). Fail-open när settings saknas; anon-sessioner (ingen
+// profil) berörs inte.
+function askYesNo(title: string, message: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    Alert.alert(
+      title,
+      message,
+      [
+        { text: 'No', style: 'cancel', onPress: () => resolve(false) },
+        { text: 'Yes', onPress: () => resolve(true) },
+      ],
+      { cancelable: true, onDismiss: () => resolve(false) },
+    );
+  });
+}
+
+async function checkSpotifyLobbyGate(code: string): Promise<boolean> {
+  const settings = await getLobbySettings(code);
+  if (!settings?.spotifyEnabled) return false;
+  const profile = await loadProfile();
+  if (!profile || profile.spotifyAppConfirmed) return false;
+  const yes = await askYesNo(
+    'This lobby uses Spotify',
+    'To access this lobby you need to confirm you have the Spotify App installed on this device.',
+  );
+  if (!yes) return true;
+  if ((await checkSpotifyInstalled()) === 'not-found') {
+    Alert.alert(
+      'Spotify app not found',
+      'Spotify app not found on this device. Install Spotify and try again.',
+    );
+    return true;
+  }
+  // Await:a så lobbyns loadProfile garanterat ser attesten.
+  await saveProfile({ ...profile, spotifyAppConfirmed: true }).catch(() => {});
+  return false;
 }
 
 // Re-match-lobby: uppsättningen är låst till spelarna från föregående spel,
@@ -725,6 +771,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     if (await checkLobbyCapacity(invite.roomCode)) { setJoiningLobby(false); return; }
     // Two-device-guard: blockera om kontot redan är aktivt i en annan lobby.
     if (await checkActiveElsewhere(invite.roomCode)) { setJoiningLobby(false); return; }
+    // Spotify-lobby: bekräfta Spotify-appen innan vi joinar. No lämnar
+    // inviten orörd (körs FÖRE addFriend/removeInvite).
+    if (await checkSpotifyLobbyGate(invite.roomCode)) { setJoiningLobby(false); return; }
     // Ömsesidig friend-add (Peter 2026-08-27): att acceptera lägger till
     // HOST:en på RECIPIENT:ens egna friends-lista också — host-sidans add
     // sker separat via LobbyScreen:s pending→confirmed-watcher när den här
@@ -847,9 +896,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Capacity-check: om host:s lobby redan är full visar vi popup med text
     // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
     if (await checkLobbyCapacity(code)) return;
-    // Spotify pre-join-gate borttagen (Plan B 2026-07-22): ingen OAuth att
-    // verifiera — spelaren self-attestar Spotify i lobbyn, och host:s
-    // approve-guards blockerar oattesterade spelare i Spotify-spel.
+    // Spotify-lobby: self-attest-fråga redan här (Plan B — ingen OAuth), så
+    // host:s auto-approve inte blockeras av en saknad attest.
+    if (await checkSpotifyLobbyGate(code)) return;
     onClose();
     router.push({ pathname: '/lobby', params: { code, isHost: 'false' } });
   };
