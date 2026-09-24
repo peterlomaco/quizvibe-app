@@ -21020,7 +21020,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "4LwU4Vp6od3Sb08CsP99GC",
     "youtubeClips": [
       {
-        "videoId": "f0dkQGfha3A",
+        "videoId": "vZv9-TWdBJM",
         "startSec": 0,
         "endSec": 30,
         "channelTitle": "Dr. Dre",
@@ -24522,7 +24522,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "UzqDydQlR0E",
+        "videoId": "-Qv6p6pTz5I",
         "startSec": 0,
         "endSec": 30,
         "channelTitle": "YouTube Movies",
