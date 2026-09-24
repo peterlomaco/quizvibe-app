@@ -2270,6 +2270,10 @@ export default function LobbyScreen() {
   // rejoin får ett nytt fönster.
   const joinGraceSeenRef = useRef<Set<string>>(new Set());
   const joinGraceTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // Ids inne i sitt grace-fönster. Skrivs SYNKRONT av grace-effekten så
+  // join-popup-watchern (deklarerad senare, körs i samma commit) ser dem —
+  // joinGraceIds-state hade inte hunnit uppdateras där.
+  const joinGraceActiveRef = useRef<Set<string>>(new Set());
   const [invitedFriendIds, setInvitedFriendIds] = useState<Set<string>>(new Set());
   // Checkbox-urval i Share invite (2026-08-27, ersatte per-rad "Invite"-
   // knappen) — host bockar för flera friends och skickar dem alla på en gång
@@ -3829,6 +3833,17 @@ export default function LobbyScreen() {
     !singlePlayerDefault &&
     lobbyPeerHealth[p.id] !== 'unstable' &&
     (!spotifyEnabled || !!p.spotifyConnected);
+  // Namn-matchningen (friend / pending friend / inbjuden) — MEDVETET utan
+  // type-check, eftersom type kan vara okonvergerad vid första render. Används
+  // av join-popup-watchern för att hålla popupen tillbaka under grace-fönstret.
+  const isAutoApproveCandidate = (p: LobbyPlayer) => {
+    const nameLower = p.name.trim().toLowerCase();
+    return (
+      (hostFriendsRef.current ?? []).some((fr) => fr.playerName.toLowerCase() === nameLower) ||
+      pendingFriends.some((pf) => pf.playerName.toLowerCase() === nameLower) ||
+      invitedNames.has(nameLower)
+    );
+  };
   const willAutoApproveOnJoin = (p: LobbyPlayer) => {
     const nameLower = p.name.trim().toLowerCase();
     return (
@@ -3933,6 +3948,9 @@ export default function LobbyScreen() {
     joinGraceSeenRef.current.forEach((id) => {
       if (!active.has(id)) joinGraceSeenRef.current.delete(id);
     });
+    joinGraceActiveRef.current.forEach((id) => {
+      if (!active.has(id)) joinGraceActiveRef.current.delete(id);
+    });
     const fresh = players
       .filter(
         (p) =>
@@ -3944,19 +3962,24 @@ export default function LobbyScreen() {
       .map((p) => p.id);
     if (fresh.length === 0) return;
     fresh.forEach((id) => joinGraceSeenRef.current.add(id));
+    const graceMs = hostMode ? JOIN_GRACE_MS : JOIN_GRACE_NON_HOST_MS;
+    fresh.forEach((id) => joinGraceActiveRef.current.add(id));
     setJoinGraceIds((prev) => {
       const next = new Set(prev);
       fresh.forEach((id) => next.add(id));
       return next;
     });
     const timer = setTimeout(() => {
+      // Ref:en släpps FÖRE state-uppdateringen så watcher-omkörningen som
+      // setJoinGraceIds triggar ser att fönstret är slut.
+      fresh.forEach((id) => joinGraceActiveRef.current.delete(id));
       setJoinGraceIds((prev) => {
         if (!fresh.some((id) => prev.has(id))) return prev;
         const next = new Set(prev);
         fresh.forEach((id) => next.delete(id));
         return next;
       });
-    }, hostMode ? JOIN_GRACE_MS : JOIN_GRACE_NON_HOST_MS);
+    }, graceMs);
     joinGraceTimersRef.current.push(timer);
   }, [players, hostMode]);
 
@@ -4053,6 +4076,17 @@ export default function LobbyScreen() {
         });
         return;
       }
+      // En inbjuden/friend som ännu inte uppfyller auto-approve är oftast bara
+      // okonvergerad (type/spotifyConnected syncas i flera steg) — popupen
+      // flashade då till och försvann när auto-approven landade (Peter
+      // 2026-09-24). Håll tillbaka popupen under grace-fönstret; watchern körs
+      // om när joinGraceIds släpper id:t, och först då köas popupen om
+      // spelaren fortfarande inte kan auto-approvas (t.ex. utan Spotify).
+      // Främlingar (ingen namn-match) får popupen direkt som förut.
+      if (
+        isAutoApproveCandidate(p) &&
+        joinGraceActiveRef.current.has(p.id)
+      ) return;
       if (promptedIdsRef.current.has(p.id)) return;
       promptedIdsRef.current.add(p.id);
       setJoinPopupQueue((prev) => (prev.includes(p.id) ? prev : [...prev, p.id]));
@@ -4068,7 +4102,7 @@ export default function LobbyScreen() {
     // willAutoApproveOnJoin) — utan den i deps kan en pending post som
     // hamnat i listan efter senaste players-ändring missas.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends, pendingFriends, invitedNames]);
+  }, [players, hostMode, spotifyEnabled, singlePlayerDefault, lobbyPeerHealth, friends, pendingFriends, invitedNames, joinGraceIds]);
 
   // ── Pending friends → bekräftade friends (host) ───────────────────────
   // Peter 2026-08-27: en Player Name som "Add" verifierat finns men som
