@@ -570,8 +570,9 @@ function CountdownQLogo({ size }: { size: number }) {
     <Svg width={size} height={size} viewBox="0 0 80 80">
       <Rect
         x="18" y="18" width="44" height="44" rx="12"
-        fill={Colors.primaryMuted}
-        stroke={Colors.primaryBorder}
+        fill={Colors.cardElevated}
+        stroke={Colors.primary}
+        strokeOpacity={0.5}
         strokeWidth="1.5"
         transform="rotate(12 40 40)"
       />

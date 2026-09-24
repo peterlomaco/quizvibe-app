@@ -20,21 +20,21 @@ interface Props {
  *
  * `color`-propen styr alla brand-färgade element (squares-kanter, Q-ring,
  * svans, play-triangel) så loggan kan göras helt gold genom att passera in
- * Colors.warning. Bakre kvadratens muted-fyllning härleds som hex+alpha
- * (`color + '30'` ≈ 19 % opacity) så den blir tonad mot loggans color istället
- * för att fastna på primaryMuted-blått.
+ * Colors.warning. Bakre kvadraten är solid cardElevated (matchar app-ikonen);
+ * bara dess kant tonas mot loggans color (`color + '80'` ≈ 50 % opacity).
  */
 export function QuizVibePlayLogo({ size = 80, color = Colors.primary }: Props) {
   // Härled muted/border-toner från color så bakre kvadraten matchar
   // huvudfärgen även när color override:as till t.ex. warning.
-  const mutedFill = color + '30';   // ~19 % opacity
-  const borderTone = color + '60';  // ~38 % opacity
+  // Bakre kvadraten är solid (cardElevated) sedan app-ikonen 2026-09-24 —
+  // bara kanten tonas mot color så gold-varianten behåller sin kant.
+  const borderTone = color + '80';  // ~50 % opacity
   return (
     <Svg width={size} height={size} viewBox="0 0 80 80">
       {/* Bakre kvadrat */}
       <Rect
         x="18" y="18" width="44" height="44" rx="12"
-        fill={mutedFill}
+        fill={Colors.cardElevated}
         stroke={borderTone}
         strokeWidth="1.5"
         transform="rotate(12 40 40)"
