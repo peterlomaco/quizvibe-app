@@ -21018,15 +21018,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "parentControlled": true,
     "spotifyTrackId": "4LwU4Vp6od3Sb08CsP99GC",
-    "youtubeClips": [
-      {
-        "videoId": "f0dkQGfha3A",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "Dr. Dre",
-        "license": "standard"
-      }
-    ]
+    "youtubeClips": []
   },
   {
     "id": "eiffel-65-blue",
@@ -24500,34 +24492,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Saskia Rice",
         "license": "standard",
         "notes": "Teatral 2003-trailer — Nemo + Marlin + undervattensvärlden etableras."
-      }
-    ]
-  },
-  {
-    "id": "johnny-english-2003",
-    "displayName": "Johnny English",
-    "correctYear": 2003,
-    "contentSubject": "movie",
-    "questionText": "Which Year was this Movie launched?",
-    "itemHcp": 82,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "UzqDydQlR0E",
-        "startSec": 0,
-        "endSec": 30,
-        "channelTitle": "YouTube Movies",
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 371). Year/timeline. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
       }
     ]
   },

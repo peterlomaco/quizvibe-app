@@ -1163,12 +1163,7 @@ items:
     region: ["global"]
     wikimediaSearchHints: ["Johnny English 2003 film Rowan Atkinson"]
     answerMethods: ["timeline"]
-    youtubeClips:
-      - videoId: "UzqDydQlR0E"
-        startSec: 0
-        endSec: 30
-        channelTitle: "YouTube Movies"
-        notes: "Peter-kurerad 2026-09-21 (Film.xlsx rad 371). Year/timeline. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+    # 2026-09-24: klipp UzqDydQlR0E borttaget (YouTube Movies, 87 min = betald fullfilm). Behöver nytt officiellt 2003-trailer-klipp.
   - id: oceans-eleven-2001
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Ocean's Eleven"
