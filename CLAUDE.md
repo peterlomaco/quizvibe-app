@@ -124,9 +124,9 @@ Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-on
 **Kvar före "Submit for Review"** (i ordning):
 - [ ] Verifiera i #36:s bygglogg att env-variablerna laddades från **production**.
 - [ ] Rök-testa #36 mot PROD som `Apple-1`: skapa lobby → join från andra telefon → approve → spela → Re-match → Store visar Free-månaden. Spela minst ett helt spel som `Apple-1` så leaderboard/historik inte är tomma.
-- [ ] Serie-klippen: kontrollera i spelaren att intro-eftertexterna inte visar svaret (Dallas, Dynasty, A-Team, Knight Rider m.fl.) — justera `startSec`/byt klipp + OTA vid behov. Beslut: `parentControlled: true` på Squid Game?
+- [x] Serie-klippen: BESLUTAT lämnas som de är (Peter 2026-09-24) — skådespelarnamn i intro-eftertexter är en godtagbar ledtråd, del av spelet; justera INTE `startSec` för det. Squid Game får INTE `parentControlled` (mer musik än vuxeninnehåll).
 - [ ] App Store Connect, version 1.0: 6.9"-screenshots, välj build **#36**, App Review Information (kontakt + `Apple-1`/`Apple-1` + noter), **inga IAP bifogade** (`pkg_sub_monthly` utanför v1.0), bekräfta Pricing (Free, alla territorier).
-- [ ] Add for Review → Submit (Peters klick).
+- [x] Add for Review → Submit — SUBMITTED 2026-09-24 23:41, build **#38** (ersatte #36/#37 pga Expo-template-ikon), submission `709a5a00-769d-441a-b3e5-9cf5bbd005c9`, auto-release.
 - [ ] **Lanseringsdagen**: sätt `app_config.free_premium_promo.until` i PROD = go-live + 1 månad (placeholder 2026-12-31 nu).
 - [ ] Post-launch: byt `ota-on-clip-fix-merge.yml` från `preview` till `production`.
 
