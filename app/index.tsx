@@ -953,7 +953,16 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const isGuestHostFormValid =
     playerNameStatus === 'available' && parsedBirthYear !== null;
 
-  const handleCheckPlayerName = () => {
+  // Synkron spegel av guestName så ett sent RPC-svar kan avgöra om fältet
+  // ändrats medan uniqueness-checken var i luften.
+  const guestNameRef = useRef(guestName);
+  guestNameRef.current = guestName;
+
+  // Delas av guest-JOIN- och guest-HOST-formen. Speglar Register-formens
+  // handleRegCheckPlayerName: lokal validering först, sedan riktig
+  // uniqueness-check mot Supabase (player_name_exists) så en guest inte kan
+  // ta ett registrerat PlayerName.
+  const handleCheckPlayerName = async () => {
     const trimmed = guestName.trim();
     if (!trimmed) return;
     // Auto-inserta dash om användaren bara typat letters innan Check —
@@ -961,12 +970,24 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // tänka på den manuellt.
     const normalized = normalizePlayerName(trimmed);
     if (normalized !== guestName) setGuestName(normalized);
+    guestNameRef.current = normalized;
     Keyboard.dismiss();
     setPlayerNameStatus('checking');
-    // Mock-latens — byt mot riktigt API-anrop när backend finns.
-    setTimeout(() => {
-      setPlayerNameStatus(validatePlayerName(normalized));
-    }, 600);
+    const localResult = validatePlayerName(normalized);
+    if (localResult !== 'available') {
+      setPlayerNameStatus(localResult);
+      return;
+    }
+    let result: 'available' | 'taken' = 'available';
+    try {
+      result = (await playerNameExists(normalized)) ? 'taken' : 'available';
+    } catch {
+      // Nätverksfel: fail-open som Register-formen.
+    }
+    // Användaren har skrivit om namnet under checken → släng svaret
+    // (tangenttryck har redan satt status 'idle').
+    if (guestNameRef.current !== normalized) return;
+    setPlayerNameStatus(result);
   };
 
   // Rensa namnet och låt användaren skriva eget. Status faller till 'idle'
@@ -1101,9 +1122,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
 
   const handleJoinAsGuest = async () => {
     if (!isGuestFormValid || parsedBirthYear === null || guestAssistance === null) return;
-    // Existence-check mot Supabase rooms-tabellen. PlayerName-uniqueness är
-    // fortsatt mockad mot TAKEN_PLAYER_NAMES via validatePlayerName (separat
-    // store, ej i scope för Slice 3A).
+    // Existence-check mot Supabase rooms-tabellen. PlayerName-uniqueness
+    // kollas redan vid Check (handleCheckPlayerName → player_name_exists).
     if (!(await isActiveRoom(code))) {
       Alert.alert(
         'Room not found',
