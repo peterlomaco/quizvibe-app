@@ -408,7 +408,12 @@ Helpers exporteras: `appendPlayerNameLetter`, `appendPlayerNameDigit`, `backspac
 
 **`validatePlayerName(name)` / `validateAddPlayerName(name, existingNames?)`** kontrollerar i ordning: (1) `isPlayerNameFormatValid`, (2) `hasBlockedLetterLead`, (3) `containsProfanity`, (4) uniqueness mot mock taken-lista, (5) `existingNames`-Set (AddPlayerModal: befintliga lobbyspelare inkl. host). Returnerar `'available' | 'taken' | 'invalid'`. UI status-type: `PlayerNameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'`.
 
-**Async Supabase uniqueness-check** (2026-06-22): både Register-formens `handleRegCheckPlayerName` och AddPlayerModal:s `handleCheckPlayerName` är async. Efter att lokal validering godkänt anropas `lookupEmailByPlayerName(normalized)` (Supabase RPC) — returnerar email om namnet är registrerat → `'taken'`. Vid nätverksfel faller det tillbaka till `'available'`. Detta förhindrar att man registrerar eller lägger till en guest med ett redan taget PlayerName.
+**Async Supabase uniqueness-check** (2026-06-22, utökad 2026-09-25): ALLA tre PlayerName-Check-knappar är async och kör samma kedja — lokal `validatePlayerName` först, sedan `playerNameExists(normalized)` (RPC `player_name_exists`, 0022, grantad till `anon` + `authenticated` så den fungerar även utloggat) → `'taken'` = "✗ Player Name already taken — try another". Vid nätverksfel fail-open till `'available'`. Call-sites:
+- **Register** — `handleRegCheckPlayerName` ([app/index.tsx](app/index.tsx)).
+- **Guest JOIN + Start Game as Guest (guest-HOST)** — delad `handleCheckPlayerName` i JoinModal ([app/index.tsx](app/index.tsx)). Körde t.o.m. 2026-09-25 bara mock-validatorn bakom en fejk-`setTimeout`, så ett registrerat namn gick igenom som ledigt. En inloggad user som hostar som Guest och skriver sitt EGET kontonamn får nu också "taken" (medvetet — guest-identiteten får inte utge sig för ett konto). `guestNameRef` kastar ett sent RPC-svar om fältet ändrats under checken.
+- **Lobby Add Player** — `handleCheckPlayerName` i AddPlayerModal ([LobbyScreen.tsx](src/screens/LobbyScreen.tsx)).
+
+Auto-genererade namn (auto-fill + Auto-generate, `GuestX-1234567`) markeras fortfarande `'available'` direkt utan RPC — kollisionsrisken är ~1 på 260M. `lookupEmailByPlayerName` är borttagen (ersatt av `playerNameExists`, se "Security hardening").
 
 **Field-labels** (Register + JoinModal guest): "Player Name - Letter-digit format". **Format-hint under fältet** (alla tre forms): "Format: 1-{PLAYER_NAME_MAX_LETTERS} letters, 0-{PLAYER_NAME_MAX_DIGITS} digits" — deriveras från konstanterna så framtida ändringar slår igenom automatiskt.
 
