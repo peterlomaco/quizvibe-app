@@ -128,6 +128,12 @@ Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-on
 - [ ] App Store Connect, version 1.0: 6.9"-screenshots, välj build **#36**, App Review Information (kontakt + `Apple-1`/`Apple-1` + noter), **inga IAP bifogade** (`pkg_sub_monthly` utanför v1.0), bekräfta Pricing (Free, alla territorier).
 - [x] Add for Review → Submit — SUBMITTED 2026-09-24 23:41, build **#38** (ersatte #36/#37 pga Expo-template-ikon), submission `709a5a00-769d-441a-b3e5-9cf5bbd005c9`. **Bytt till MANUELL release 2026-09-26** (under Waiting for Review) — efter godkännande står den i "Pending Developer Release" tills Peter trycker Release. JS-/innehållsfixar före release går via `npx eas update --branch production --platform ios`; nytt binärbygge för 1.0 kräver Developer Reject (= ny review).
 - [ ] **Lanseringsdagen**: sätt `app_config.free_premium_promo.until` i PROD = go-live + 1 månad (placeholder 2026-12-31 nu).
+- [ ] **Betald prenumeration efter kampanjen** (planera ~1 mån efter lansering). Kampanjslut styrs av `free_premium_promo.until` — förläng med SQL om 1.0.1 dröjer (tak: `OFFER_BACKSTOP_UNTIL` 2026-12-31, senare kräver OTA). Förslag: kampanjslut = lansering + 5–6 v, submit 1.0.1 vecka 3–4. Ordning:
+  1. **Starta NU**: LoMaCo AB-konverteringen + Paid Applications Agreement + bank/skatt i ASC (långsammast, styrs ej av oss).
+  2. Skapa `pkg_sub_monthly` (+ ev. rabatterad första månad via Offer Code) i ASC och koppla till RevenueCat-offeringen.
+  3. Demo-konto i PROD med förbrukad gratismånad (`premium_grants`-insert, se `project_appstore_submit_subscription.md`) — annars ser granskaren inget köp → avslag.
+  4. Submit **1.0.1** (nytt build-nummer, koden kan vara oförändrad) med prenumerationen BIFOGAD — Apples första prenumeration måste granskas med en app-version, OTA räcker inte.
+  5. Efter approval: `paid_subscription.enabled = true` i PROD (remote config, ingen OTA) + stäng/låt kampanjfönstret löpa ut + släpp 1.0.1.
 - [ ] Post-launch: byt `ota-on-clip-fix-merge.yml` från `preview` till `production`.
 
 Full lista: `project_pre_launch_checklist.md`.
