@@ -243,6 +243,9 @@ items:
         startSec: 0
         endSec: 155
         channelTitle: "Golden Network"
+      - videoId: "r7qovpFAGrQ"
+        startSec: 0
+        endSec: 15
   # 2019
     region: ["global"]
   - id: billie-eilish-bad-guy
@@ -2794,6 +2797,10 @@ items:
     answerMethods: ["timeline"]
     spotifyTrackId: "1fncAFDynLDnSIPg7h2mp3"
     region: ["sweden"]
+    youtubeClips:
+      - videoId: "dVMg2vYe1p4"
+        startSec: 0
+        endSec: 15
   - id: hov1-bla
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Blå — Hov1"
@@ -3098,3 +3105,343 @@ items:
         startSec: 16
         endSec: 46
         notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: lady-gaga-abracadabra
+    displayName: "Abracadabra — Lady Gaga"
+    correctYear: 2025
+    probability: 80
+    wikimediaSearchHints: ["Lady Gaga Abracadabra"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Disco & Pop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "bL8eGhCWBXY"
+        startSec: 25
+        endSec: 40
+  - id: onerepublic-counting-stars
+    displayName: "Counting Stars — OneRepublic"
+    correctYear: 2013
+    probability: 80
+    wikimediaSearchHints: ["OneRepublic Counting Stars"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "mgT0N3tMP74"
+        startSec: 0
+        endSec: 15
+  - id: joel-corry-head-and-heart
+    displayName: "Head & Heart — Joel Corry x MNEK"
+    correctYear: 2020
+    probability: 80
+    wikimediaSearchHints: ["Joel Corry x MNEK Head & Heart"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "NLSq2PV2WNg"
+        startSec: 0
+        endSec: 15
+  - id: gracie-abrams-that-s-so-true
+    displayName: "That's So True — Gracie Abrams"
+    correctYear: 2024
+    probability: 80
+    wikimediaSearchHints: ["Gracie Abrams That's So True"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "W_YOJWZIjxo"
+        startSec: 0
+        endSec: 15
+  - id: dasha-austin
+    displayName: "Austin — Dasha"
+    correctYear: 2024
+    probability: 80
+    wikimediaSearchHints: ["Dasha Austin"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "qx7gZxLCs1c"
+        startSec: 15
+        endSec: 30
+  - id: naughty-boy-la-la-la
+    displayName: "La La La — Naughty Boy ft. Sam Smith"
+    correctYear: 2013
+    probability: 80
+    wikimediaSearchHints: ["Naughty Boy ft. Sam Smith La La La"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "3O1_3zBUKM8"
+        startSec: 28
+        endSec: 43
+  - id: charlie-puth-we-don-t-talk-anymore
+    displayName: "We Don't Talk Anymore — Charlie Puth ft. Selena Gomez"
+    correctYear: 2016
+    probability: 80
+    wikimediaSearchHints: ["Charlie Puth ft. Selena Gomez We Don't Talk Anymore"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "3AtDnEC4zak"
+        startSec: 3
+        endSec: 18
+  - id: ed-sheeran-i-don-t-care
+    displayName: "I Don't Care — Ed Sheeran & Justin Bieber"
+    correctYear: 2019
+    probability: 80
+    wikimediaSearchHints: ["Ed Sheeran & Justin Bieber I Don't Care"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "y83x7MgzWOA"
+        startSec: 0
+        endSec: 15
+  - id: marshmello-happier
+    displayName: "Happier — Marshmello & Bastille"
+    correctYear: 2018
+    probability: 80
+    wikimediaSearchHints: ["Marshmello & Bastille Happier"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "m7Bc3pLyij0"
+        startSec: 37
+        endSec: 52
+  - id: ava-max-sweet-but-psycho
+    displayName: "Sweet but Psycho — Ava Max"
+    correctYear: 2018
+    probability: 80
+    wikimediaSearchHints: ["Ava Max Sweet but Psycho"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "WXBHCQYxwr0"
+        startSec: 40
+        endSec: 55
+  - id: cardi-b-i-like-it
+    displayName: "I Like It — Cardi B, Bad Bunny & J Balvin"
+    correctYear: 2018
+    probability: 80
+    wikimediaSearchHints: ["Cardi B, Bad Bunny & J Balvin I Like It"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "xTlNMmZKwpA"
+        startSec: 50
+        endSec: 65
+  - id: imagine-dragons-thunder
+    displayName: "Thunder — Imagine Dragons"
+    correctYear: 2017
+    probability: 80
+    wikimediaSearchHints: ["Imagine Dragons Thunder"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "fKopy74weus"
+        startSec: 30
+        endSec: 45
+  - id: dj-khaled-i-m-the-one
+    displayName: "I'm the One — DJ Khaled"
+    correctYear: 2017
+    probability: 80
+    wikimediaSearchHints: ["DJ Khaled I'm the One"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop", "RnB"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "weeI1G46q0o"
+        startSec: 39
+        endSec: 54
+  - id: justin-bieber-love-yourself
+    displayName: "Love Yourself — Justin Bieber"
+    correctYear: 2015
+    probability: 80
+    wikimediaSearchHints: ["Justin Bieber Love Yourself"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "oyEuk8j8imI"
+        startSec: 48
+        endSec: 63
+  - id: selena-gomez-same-old-love
+    displayName: "Same Old Love — Selena Gomez"
+    correctYear: 2015
+    probability: 80
+    wikimediaSearchHints: ["Selena Gomez Same Old Love"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Soft & Love"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "9h30Bx4Klxg"
+        startSec: 62
+        endSec: 77
+  - id: jessie-j-bang-bang
+    displayName: "Bang Bang — Jessie J, Ariana Grande & Nicki Minaj"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Jessie J, Ariana Grande & Nicki Minaj Bang Bang"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Disco & Pop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "0HDdjwpPM3Y"
+        startSec: 50
+        endSec: 65
+  - id: jason-derulo-wiggle
+    displayName: "Wiggle — Jason Derulo ft. Snoop Dogg"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Jason Derulo ft. Snoop Dogg Wiggle"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop", "RnB"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "hiP14ED28CA"
+        startSec: 53
+        endSec: 68
+  - id: sam-smith-stay-with-me
+    displayName: "Stay With Me — Sam Smith"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Sam Smith Stay With Me"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "pB-5XG-DbAA"
+        startSec: 40
+        endSec: 55
+  - id: iggy-azalea-fancy
+    displayName: "Fancy — Iggy Azalea ft. Charli XCX"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Iggy Azalea ft. Charli XCX Fancy"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "O-zpOMYRi0w"
+        startSec: 49
+        endSec: 64
+  - id: panic-at-the-disco-high-hopes
+    displayName: "High Hopes — Panic! at the Disco"
+    correctYear: 2018
+    probability: 80
+    wikimediaSearchHints: ["Panic! at the Disco High Hopes"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Disco & Pop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "IPXIgEAGe4U"
+        startSec: 15
+        endSec: 30
+  - id: calvin-harris-one-kiss
+    displayName: "One Kiss — Calvin Harris & Dua Lipa"
+    correctYear: 2018
+    probability: 80
+    wikimediaSearchHints: ["Calvin Harris & Dua Lipa One Kiss"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Disco & Pop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "DkeiKbqa02g"
+        startSec: 45
+        endSec: 60
+  - id: bruno-mars-24k-magic
+    displayName: "24K Magic — Bruno Mars"
+    correctYear: 2016
+    probability: 80
+    wikimediaSearchHints: ["Bruno Mars 24K Magic"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Disco & Pop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "UqyT8IEBkvY"
+        startSec: 23
+        endSec: 38
+  - id: taylor-swift-bad-blood
+    displayName: "Bad Blood — Taylor Swift"
+    correctYear: 2014
+    probability: 80
+    wikimediaSearchHints: ["Taylor Swift Bad Blood"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "QcIy9NiNbmo"
+        startSec: 71
+        endSec: 86
+  - id: tjuvjakt-tandtrad
+    displayName: "Tandtråd — Tjuvjakt"
+    correctYear: 2013
+    probability: 80
+    wikimediaSearchHints: ["Tjuvjakt Tandtråd"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Disco & Pop"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "ooKmEPXaEFs"
+        startSec: 16
+        endSec: 31
+  - id: tjuvjakt-nar-vi-graver-guld-i-usa
+    displayName: "När vi gräver guld i USA — Tjuvjakt"
+    correctYear: 2026
+    probability: 80
+    wikimediaSearchHints: ["Tjuvjakt När vi gräver guld i USA"]
+    answerMethods: ["timeline"]
+    genrePackages: ["sport"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "O4BGzrPYgIw"
+        startSec: 15
+        endSec: 30
+  - id: tjuvjakt-vart-ar
+    displayName: "Vårt år — Tjuvjakt"
+    correctYear: 2019
+    probability: 80
+    wikimediaSearchHints: ["Tjuvjakt Vårt år"]
+    answerMethods: ["timeline"]
+    genrePackages: ["100% in swedish"]
+    inBaseCatalog: false
+    youtubeClips:
+      - videoId: "Ehmd71OS8Q0"
+        startSec: 16
+        endSec: 31
+  - id: armin-van-buuren-this-is-what-it-feels-like
+    displayName: "This Is What It Feels Like — Armin van Buuren ft. Trevor Guthrie"
+    correctYear: 2013
+    probability: 80
+    wikimediaSearchHints: ["Armin van Buuren ft. Trevor Guthrie This Is What It Feels Like"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "BR_DFMUzX4E"
+        startSec: 75
+        endSec: 90
+  - id: armin-van-buuren-blah-blah-blah
+    displayName: "Blah Blah Blah — Armin van Buuren"
+    correctYear: 2018
+    probability: 80
+    wikimediaSearchHints: ["Armin van Buuren Blah Blah Blah"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "mfJhMfOPWdE"
+        startSec: 15
+        endSec: 30
+  - id: tiesto-lay-low
+    displayName: "Lay Low — Tiësto"
+    correctYear: 2023
+    probability: 80
+    wikimediaSearchHints: ["Tiësto Lay Low"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "EfWmWlW2PvM"
+        startSec: 35
+        endSec: 50

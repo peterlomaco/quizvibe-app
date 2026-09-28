@@ -4957,3 +4957,51 @@ items:
         startSec: 80
         endSec: 110
         notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: taio-cruz-dynamite
+    displayName: "Dynamite — Taio Cruz"
+    correctYear: 2010
+    probability: 80
+    wikimediaSearchHints: ["Taio Cruz Dynamite"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music", "Disco & Pop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "VUjdiDeJ0xg"
+        startSec: 38
+        endSec: 53
+  - id: armin-van-buuren-in-and-out-of-love
+    displayName: "In and Out of Love — Armin van Buuren ft. Sharon den Adel"
+    correctYear: 2008
+    probability: 80
+    wikimediaSearchHints: ["Armin van Buuren ft. Sharon den Adel In and Out of Love"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "TxvpctgU_s8"
+        startSec: 60
+        endSec: 75
+  - id: tiesto-just-be
+    displayName: "Just Be — Tiësto"
+    correctYear: 2004
+    probability: 80
+    wikimediaSearchHints: ["Tiësto Just Be"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "qEYueRVuqmg"
+        startSec: 0
+        endSec: 15
+  - id: tiesto-adagio-for-strings
+    displayName: "Adagio for Strings — Tiësto"
+    correctYear: 2004
+    probability: 80
+    wikimediaSearchHints: ["Tiësto Adagio for Strings"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "2EaE0_gQLw0"
+        startSec: 35
+        endSec: 50

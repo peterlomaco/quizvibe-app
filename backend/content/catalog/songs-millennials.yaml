@@ -4773,3 +4773,16 @@ items:
         startSec: 13
         endSec: 43
         notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+  - id: paul-van-dyk-for-an-angel
+    displayName: "For an Angel — Paul van Dyk"
+    correctYear: 1994
+    probability: 80
+    wikimediaSearchHints: ["Paul van Dyk For an Angel"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "sRvEwXDxz_I"
+        startSec: 0
+        endSec: 15

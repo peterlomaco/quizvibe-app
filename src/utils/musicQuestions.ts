@@ -16338,6 +16338,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "paul-van-dyk-for-an-angel",
+    "displayName": "For an Angel — Paul van Dyk",
+    "correctYear": 1994,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "sRvEwXDxz_I",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "pulp-fiction",
     "displayName": "Pulp Fiction",
     "correctYear": 1994,
@@ -25402,6 +25432,62 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "tiesto-adagio-for-strings",
+    "displayName": "Adagio for Strings — Tiësto",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "2EaE0_gQLw0",
+        "startSec": 35,
+        "endSec": 50,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "tiesto-just-be",
+    "displayName": "Just Be — Tiësto",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "qEYueRVuqmg",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "usher-yeah",
     "displayName": "Yeah! — Usher",
     "correctYear": 2004,
@@ -26959,6 +27045,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "videoId": "keYXzDh5JEQ",
         "startSec": 0,
         "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "armin-van-buuren-in-and-out-of-love",
+    "displayName": "In and Out of Love — Armin van Buuren ft. Sharon den Adel",
+    "correctYear": 2008,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "TxvpctgU_s8",
+        "startSec": 60,
+        "endSec": 75,
         "license": "standard"
       }
     ]
@@ -28608,6 +28720,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "taio-cruz-dynamite",
+    "displayName": "Dynamite — Taio Cruz",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "VUjdiDeJ0xg",
+        "startSec": 38,
+        "endSec": 53,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "the-social-network-2010",
     "displayName": "The Social Network",
     "correctYear": 2010,
@@ -30080,6 +30223,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "armin-van-buuren-this-is-what-it-feels-like",
+    "displayName": "This Is What It Feels Like — Armin van Buuren ft. Trevor Guthrie",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "BR_DFMUzX4E",
+        "startSec": 75,
+        "endSec": 90,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "avicii-hey-brother",
     "displayName": "Hey Brother — Avicii",
     "correctYear": 2013,
@@ -30421,6 +30590,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "naughty-boy-la-la-la",
+    "displayName": "La La La — Naughty Boy ft. Sam Smith",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3O1_3zBUKM8",
+        "startSec": 28,
+        "endSec": 43,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "one-direction-story-of-my-life",
     "displayName": "Story of My Life — One Direction",
     "correctYear": 2013,
@@ -30449,6 +30644,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "OneDirectionVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\". Peters ID Fe39sYmOxzk var SD-reupload; bytt till officiella Vevo-klippet (HD)."
+      }
+    ]
+  },
+  {
+    "id": "onerepublic-counting-stars",
+    "displayName": "Counting Stars — OneRepublic",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "mgT0N3tMP74",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -30628,6 +30849,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 38,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-15 (Film.xlsx). parentControlled=true per Film.xlsx. VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
+    "id": "tjuvjakt-tandtrad",
+    "displayName": "Tandtråd — Tjuvjakt",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "ooKmEPXaEFs",
+        "startSec": 16,
+        "endSec": 31,
+        "license": "standard"
       }
     ]
   },
@@ -31045,6 +31296,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "iggy-azalea-fancy",
+    "displayName": "Fancy — Iggy Azalea ft. Charli XCX",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "O-zpOMYRi0w",
+        "startSec": 49,
+        "endSec": 64,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "j-cole-no-role-modelz",
     "displayName": "No Role Modelz — J. Cole",
     "correctYear": 2014,
@@ -31079,6 +31356,67 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "videoId": "nSERqaFagJc",
         "startSec": 0,
         "endSec": 30,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "jason-derulo-wiggle",
+    "displayName": "Wiggle — Jason Derulo ft. Snoop Dogg",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop",
+      "RnB"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "hiP14ED28CA",
+        "startSec": 53,
+        "endSec": 68,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "jessie-j-bang-bang",
+    "displayName": "Bang Bang — Jessie J, Ariana Grande & Nicki Minaj",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "0HDdjwpPM3Y",
+        "startSec": 50,
+        "endSec": 65,
         "license": "standard"
       }
     ]
@@ -31272,6 +31610,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "sam-smith-stay-with-me",
+    "displayName": "Stay With Me — Sam Smith",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "pB-5XG-DbAA",
+        "startSec": 40,
+        "endSec": 55,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "sanna-nielsen-undo",
     "displayName": "Undo — Sanna Nielsen",
     "correctYear": 2014,
@@ -31331,6 +31695,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Nordisk Film Sverige",
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-21 (Film.xlsx rad 365). startSec 3 fran xlsx. genrePackages:['Winter'] (Paket 1 i xlsx; paketet saljs inte an). VERIFIERA i spelaren att titeln inte visar aret (Year-fraga)."
+      }
+    ]
+  },
+  {
+    "id": "taylor-swift-bad-blood",
+    "displayName": "Bad Blood — Taylor Swift",
+    "correctYear": 2014,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "QcIy9NiNbmo",
+        "startSec": 71,
+        "endSec": 86,
+        "license": "standard"
       }
     ]
   },
@@ -31700,6 +32090,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "justin-bieber-love-yourself",
+    "displayName": "Love Yourself — Justin Bieber",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "oyEuk8j8imI",
+        "startSec": 48,
+        "endSec": 63,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "major-lazer-lean-on",
     "displayName": "Lean On — Major Lazer & DJ Snake feat. MØ",
     "correctYear": 2015,
@@ -31850,6 +32270,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 56,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-20 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "selena-gomez-same-old-love",
+    "displayName": "Same Old Love — Selena Gomez",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Soft & Love"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "9h30Bx4Klxg",
+        "startSec": 62,
+        "endSec": 77,
+        "license": "standard"
       }
     ]
   },
@@ -32081,6 +32531,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "bruno-mars-24k-magic",
+    "displayName": "24K Magic — Bruno Mars",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "UqyT8IEBkvY",
+        "startSec": 23,
+        "endSec": 38,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "calvin-harris-this-is-what-you-came-for",
     "displayName": "This Is What You Came For — Calvin Harris & Rihanna",
     "correctYear": 2016,
@@ -32137,6 +32617,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 0,
         "endSec": 244,
         "channelTitle": "7clouds Rock",
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "charlie-puth-we-don-t-talk-anymore",
+    "displayName": "We Don't Talk Anymore — Charlie Puth ft. Selena Gomez",
+    "correctYear": 2016,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "3AtDnEC4zak",
+        "startSec": 3,
+        "endSec": 18,
         "license": "standard"
       }
     ]
@@ -32975,6 +33481,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dj-khaled-i-m-the-one",
+    "displayName": "I'm the One — DJ Khaled",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop",
+      "RnB"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "weeI1G46q0o",
+        "startSec": 39,
+        "endSec": 54,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "dua-lipa-idgaf",
     "displayName": "IDGAF — Dua Lipa",
     "correctYear": 2017,
@@ -33126,6 +33663,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "videoId": "7wtfhZwyrcc",
         "startSec": 0,
         "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "imagine-dragons-thunder",
+    "displayName": "Thunder — Imagine Dragons",
+    "correctYear": 2017,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "fKopy74weus",
+        "startSec": 30,
+        "endSec": 45,
         "license": "standard"
       }
     ]
@@ -33445,6 +34008,58 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "armin-van-buuren-blah-blah-blah",
+    "displayName": "Blah Blah Blah — Armin van Buuren",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "mfJhMfOPWdE",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "ava-max-sweet-but-psycho",
+    "displayName": "Sweet but Psycho — Ava Max",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "WXBHCQYxwr0",
+        "startSec": 40,
+        "endSec": 55,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "backstreet-boys-chances",
     "displayName": "Chances — Backstreet Boys",
     "correctYear": 2018,
@@ -33503,6 +34118,62 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "videoId": "U2UmYBkszOA",
         "startSec": 5,
         "endSec": 20,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "calvin-harris-one-kiss",
+    "displayName": "One Kiss — Calvin Harris & Dua Lipa",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "DkeiKbqa02g",
+        "startSec": 45,
+        "endSec": 60,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "cardi-b-i-like-it",
+    "displayName": "I Like It — Cardi B, Bad Bunny & J Balvin",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "xTlNMmZKwpA",
+        "startSec": 50,
+        "endSec": 65,
         "license": "standard"
       }
     ]
@@ -33743,6 +34414,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 155,
         "channelTitle": "Golden Network",
         "license": "standard"
+      },
+      {
+        "videoId": "r7qovpFAGrQ",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "marshmello-happier",
+    "displayName": "Happier — Marshmello & Bastille",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "m7Bc3pLyij0",
+        "startSec": 37,
+        "endSec": 52,
+        "license": "standard"
       }
     ]
   },
@@ -33808,6 +34511,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2018 vinnare — Israel. Officiell music video."
+      }
+    ]
+  },
+  {
+    "id": "panic-at-the-disco-high-hopes",
+    "displayName": "High Hopes — Panic! at the Disco",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "IPXIgEAGe4U",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
       }
     ]
   },
@@ -34001,6 +34734,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "ESC 2019 vinnare — Nederländerna. Officiell music video."
+      }
+    ]
+  },
+  {
+    "id": "ed-sheeran-i-don-t-care",
+    "displayName": "I Don't Care — Ed Sheeran & Justin Bieber",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "y83x7MgzWOA",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -34284,6 +35043,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "KEiiNO",
         "license": "standard",
         "notes": "Official music video. ESC 2019 Norway entry."
+      }
+    ]
+  },
+  {
+    "id": "tjuvjakt-vart-ar",
+    "displayName": "Vårt år — Tjuvjakt",
+    "correctYear": 2019,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "Ehmd71OS8Q0",
+        "startSec": 16,
+        "endSec": 31,
+        "license": "standard"
       }
     ]
   },
@@ -34666,6 +35455,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Jason Derulo",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "joel-corry-head-and-heart",
+    "displayName": "Head & Heart — Joel Corry x MNEK",
+    "correctYear": 2020,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "NLSq2PV2WNg",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -35726,6 +36541,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "tiesto-lay-low",
+    "displayName": "Lay Low — Tiësto",
+    "correctYear": 2023,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "EfWmWlW2PvM",
+        "startSec": 35,
+        "endSec": 50,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "avicii-im-tim-2024",
     "displayName": "Avicii – I'm Tim",
     "correctYear": 2024,
@@ -35882,6 +36723,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "dasha-austin",
+    "displayName": "Austin — Dasha",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "qx7gZxLCs1c",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "den-sista-resan-2024",
     "displayName": "Den sista resan",
     "correctYear": 2024,
@@ -36028,6 +36895,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1399)."
+      }
+    ]
+  },
+  {
+    "id": "gracie-abrams-that-s-so-true",
+    "displayName": "That's So True — Gracie Abrams",
+    "correctYear": 2024,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "W_YOJWZIjxo",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -36647,6 +37540,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "lady-gaga-abracadabra",
+    "displayName": "Abracadabra — Lady Gaga",
+    "correctYear": 2025,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Disco & Pop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "bL8eGhCWBXY",
+        "startSec": 25,
+        "endSec": 40,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "sombr-12-to-12",
     "displayName": "12 to 12 — sombr",
     "correctYear": 2025,
@@ -36829,7 +37752,14 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
       "sweden"
     ],
     "spotifyTrackId": "1fncAFDynLDnSIPg7h2mp3",
-    "youtubeClips": []
+    "youtubeClips": [
+      {
+        "videoId": "dVMg2vYe1p4",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
   },
   {
     "id": "tjuvjakt-tusen-spann",
@@ -37224,6 +38154,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 30,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "tjuvjakt-nar-vi-graver-guld-i-usa",
+    "displayName": "När vi gräver guld i USA — Tjuvjakt",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "sport"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "O4BGzrPYgIw",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
       }
     ]
   }
