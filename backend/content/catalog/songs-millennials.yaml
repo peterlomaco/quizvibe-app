@@ -4465,12 +4465,18 @@ items:
   - id: house-of-pain-jump-around
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Jump Around — House of Pain"
-    correctYear: 1994
+    correctYear: 1992
     probability: 80
     wikimediaSearchHints: ["House of Pain Jump Around"]
     answerMethods: ["timeline"]
     spotifyTrackId: "3TZwjdclvWt7iPJUnMpgcs"
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
     region: ["global"]
+    youtubeClips:
+      - videoId: "jrL_LzX5wv4"
+        startSec: 0
+        endSec: 15
   - id: the-klf-justified-and-ancient
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Justified and Ancient — The KLF"
@@ -4784,5 +4790,31 @@ items:
     region: ["global"]
     youtubeClips:
       - videoId: "sRvEwXDxz_I"
+        startSec: 0
+        endSec: 15
+  - id: run-dmc-it-s-tricky
+    displayName: "It's Tricky — Run-DMC"
+    correctYear: 1986
+    probability: 80
+    wikimediaSearchHints: ["Run-DMC It's Tricky"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "l-O5IHVhWj0"
+        startSec: 75
+        endSec: 90
+  - id: luniz-i-got-5-on-it
+    displayName: "I Got 5 on It — Luniz"
+    correctYear: 1995
+    probability: 80
+    wikimediaSearchHints: ["Luniz I Got 5 on It"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "me3CPl_i4C4"
         startSec: 0
         endSec: 15

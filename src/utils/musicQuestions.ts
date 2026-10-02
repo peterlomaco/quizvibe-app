@@ -9378,6 +9378,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "run-dmc-it-s-tricky",
+    "displayName": "It's Tricky — Run-DMC",
+    "correctYear": 1986,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "l-O5IHVhWj0",
+        "startSec": 75,
+        "endSec": 90,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "sandra-kim-jaime-la-vie",
     "displayName": "J'aime la vie — Sandra Kim",
     "correctYear": 1986,
@@ -14149,6 +14179,37 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "house-of-pain-jump-around",
+    "displayName": "Jump Around — House of Pain",
+    "correctYear": 1992,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "3TZwjdclvWt7iPJUnMpgcs",
+    "youtubeClips": [
+      {
+        "videoId": "jrL_LzX5wv4",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "inner-circle-sweat",
     "displayName": "Sweat (A La La La Long) — Inner Circle",
     "correctYear": 1992,
@@ -16234,26 +16295,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "house-of-pain-jump-around",
-    "displayName": "Jump Around — House of Pain",
-    "correctYear": 1994,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 80,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "global"
-    ],
-    "spotifyTrackId": "3TZwjdclvWt7iPJUnMpgcs",
-    "youtubeClips": []
-  },
-  {
     "id": "la-bouche-be-my-lover",
     "displayName": "Be My Lover — La Bouche",
     "correctYear": 1994,
@@ -16985,6 +17026,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 50,
         "license": "standard",
         "notes": "Peter-kurerad 2026-09-09 ur Music.xlsx (rad 1389)."
+      }
+    ]
+  },
+  {
+    "id": "luniz-i-got-5-on-it",
+    "displayName": "I Got 5 on It — Luniz",
+    "correctYear": 1995,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "me3CPl_i4C4",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -22519,6 +22590,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "nelly-ride-wit-me",
+    "displayName": "Ride wit Me — Nelly ft. City Spud",
+    "correctYear": 2000,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "RtSDWq6HsJE",
+        "startSec": 33,
+        "endSec": 48,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "nsync-bye-bye-bye",
     "displayName": "Bye bye bye — Nsync",
     "correctYear": 2000,
@@ -23332,6 +23433,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "fat-joe-what-s-luv",
+    "displayName": "What's Luv? — Fat Joe ft. Ashanti",
+    "correctYear": 2001,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "VpvyG2NrS1Y",
+        "startSec": 3,
+        "endSec": 18,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "friends-lyssna-till-ditt-hjarta",
     "displayName": "Lyssna till ditt hjärta — Friends",
     "correctYear": 2001,
@@ -23948,6 +24079,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "christina-aguilera-can-t-hold-us-down",
+    "displayName": "Can't Hold Us Down — Christina Aguilera ft. Lil' Kim",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "dg8QgUIKXHw",
+        "startSec": 38,
+        "endSec": 53,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "coldplay-the-scientist",
     "displayName": "The Scientist — Coldplay",
     "correctYear": 2002,
@@ -24295,6 +24456,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "nelly-hot-in-herre",
+    "displayName": "Hot in Herre — Nelly",
+    "correctYear": 2002,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "GeZZr_p6vB8",
+        "startSec": 12,
+        "endSec": 27,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "spider-man-2002",
     "displayName": "Spider-Man",
     "correctYear": 2002,
@@ -24452,6 +24643,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "BeyoncéVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-25 ur \"YT och Spotify lista\"."
+      }
+    ]
+  },
+  {
+    "id": "blu-cantrell-breathe",
+    "displayName": "Breathe — Blu Cantrell ft. Sean Paul",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "wfTC2o05OEw",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -24659,6 +24880,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "MASTER RJ",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-28 via batch-pick-clips. Top-scored kandidat (18)."
+      }
+    ]
+  },
+  {
+    "id": "outkast-roses",
+    "displayName": "Roses — OutKast",
+    "correctYear": 2003,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "gWju37TZfo0",
+        "startSec": 78,
+        "endSec": 93,
+        "license": "standard"
       }
     ]
   },
@@ -25383,6 +25634,59 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "snook-mister-cool",
+    "displayName": "Mister Cool — Snook",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "spotifyTrackId": "1AfdWCYXaJHzHWsgGVkjhe",
+    "youtubeClips": []
+  },
+  {
+    "id": "snoop-dogg-drop-it-like-it-s-hot",
+    "displayName": "Drop It Like It's Hot — Snoop Dogg ft. Pharrell",
+    "correctYear": 2004,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "GtUVQei3nX4",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "snoop-dogg-signs",
     "displayName": "Signs — Snoop Dogg",
     "correctYear": 2004,
@@ -25671,6 +25975,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "fort-minor-remember-the-name",
+    "displayName": "Remember the Name — Fort Minor",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Rock"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "VDvr08sCPOc",
+        "startSec": 20,
+        "endSec": 35,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "gorillaz-feel-good-inc",
     "displayName": "Feel Good Inc. — Gorillaz",
     "correctYear": 2005,
@@ -25735,6 +26069,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "kanye-west-gold-digger",
+    "displayName": "Gold Digger — Kanye West ft. Jamie Foxx",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "6vwNcNOTVzY",
+        "startSec": 20,
+        "endSec": 35,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "madonna-hung-up",
     "displayName": "Hung Up — Madonna",
     "correctYear": 2005,
@@ -25794,6 +26158,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2005 vinnare. ESC 2005 performance."
+      }
+    ]
+  },
+  {
+    "id": "missy-elliott-lose-control",
+    "displayName": "Lose Control — Missy Elliott ft. Ciara & Fat Man Scoop",
+    "correctYear": 2005,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "na7lIb09898",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
       }
     ]
   },
@@ -26188,6 +26582,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "fergie-glamorous",
+    "displayName": "Glamorous — Fergie ft. Ludacris",
+    "correctYear": 2006,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "RnB"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "q0SyUgw98tE",
+        "startSec": 17,
+        "endSec": 32,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "gnarls-barkley-crazy",
     "displayName": "Crazy — Gnarls Barkley",
     "correctYear": 2006,
@@ -26277,6 +26701,31 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "ESC 2006 vinnare — Finland."
       }
     ]
+  },
+  {
+    "id": "mange-schmidt-glassigt",
+    "displayName": "Glassigt — Mange Schmidt",
+    "correctYear": 2006,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish",
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "7APCZKToklXyRgdt7CccgP",
+    "youtubeClips": []
   },
   {
     "id": "nelly-furtado-maneater",
@@ -26577,6 +27026,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "videoId": "Gz3yCrMJXpk",
         "startSec": 26,
         "endSec": 41,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "flo-rida-low",
+    "displayName": "Low — Flo Rida ft. T-Pain",
+    "correctYear": 2007,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "U2waT9TxPU0",
+        "startSec": 15,
+        "endSec": 30,
         "license": "standard"
       }
     ]
@@ -27757,6 +28236,38 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "ison-fille-jag-skrattar-idag",
+    "displayName": "Jag skrattar idag — Ison & Fille",
+    "correctYear": 2009,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish",
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "67RSowqrFwTBrZn9reMmDa",
+    "youtubeClips": [
+      {
+        "videoId": "mCQjx_JrG9k",
+        "startSec": 16,
+        "endSec": 31,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "jay-z-empire-state-of-mind",
     "displayName": "Empire State of Mind — Jay-Z ft. Alicia Keys",
     "correctYear": 2009,
@@ -28110,6 +28621,32 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "b-o-b-airplanes",
+    "displayName": "Airplanes — B.o.B ft. Hayley Williams",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "kn6-c223DUU",
+        "startSec": 15,
+        "endSec": 30,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "bruno-mars-just-the-way-you-are",
     "displayName": "Just the Way You Are — Bruno Mars",
     "correctYear": 2010,
@@ -28203,6 +28740,54 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "daniel-adams-ray-dum-av-dig",
+    "displayName": "Dum av dig — Daniel Adams-Ray",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "29bOAzAR0Ev2UVSa9rkyts",
+    "youtubeClips": []
+  },
+  {
+    "id": "daniel-adams-ray-gubben-i-ladan",
+    "displayName": "Gubben i lådan — Daniel Adams-Ray",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "08bjJuoHJwfTnjNcuENOFz",
+    "youtubeClips": []
+  },
+  {
     "id": "david-guetta-gettin-over-you",
     "displayName": "Gettin' Over You — David Guetta & Chris Willis feat. Fergie & LMFAO",
     "correctYear": 2010,
@@ -28289,6 +28874,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "startSec": 0,
         "endSec": 264,
         "channelTitle": "Eminem - Topic",
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "flo-rida-club-can-t-handle-me",
+    "displayName": "Club Can't Handle Me — Flo Rida ft. David Guetta",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "SgM3r8xKfGE",
+        "startSec": 40,
+        "endSec": 55,
         "license": "standard"
       }
     ]
@@ -28487,6 +29102,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-09-08 ur Music.xlsx (rad 1347)."
       }
     ]
+  },
+  {
+    "id": "oskar-linnros-fran-och-med-du",
+    "displayName": "Från och med du — Oskar Linnros",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "100% in swedish"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "6sjGsKuInpaK3uoaWGe22W",
+    "youtubeClips": []
   },
   {
     "id": "rihanna-only-girl",
@@ -28822,6 +29461,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "wiz-khalifa-black-and-yellow",
+    "displayName": "Black and Yellow — Wiz Khalifa",
+    "correctYear": 2010,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "UePtoxDhJSw",
+        "startSec": 12,
+        "endSec": 27,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "adele-someone-like-you",
     "displayName": "Someone Like You — Adele",
     "correctYear": 2011,
@@ -28852,6 +29521,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Official Music Video — signature ballad. Chorus area."
       }
     ]
+  },
+  {
+    "id": "afasi-filthy-1990-nanting",
+    "displayName": "1990-nånting — Afasi & Filthy ft. Snook",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "sweden"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "2Dsiv7ihj8PuiMkQ7bKpVW",
+    "youtubeClips": []
   },
   {
     "id": "arthur-2011",
@@ -28996,6 +29689,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "david-guetta-where-them-girls-at",
+    "displayName": "Where Them Girls At — David Guetta ft. Flo Rida & Nicki Minaj",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "p4kVWCSzfK4",
+        "startSec": 45,
+        "endSec": 60,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "den-svenska-bjornstammen-vart-jag-mig",
     "displayName": "Vart jag mig i världen vänder — Den Svenska Björnstammen",
     "correctYear": 2011,
@@ -29090,6 +29813,67 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eric Saade",
         "license": "standard",
         "notes": "Melodifestivalen 2011 vinnare. Officiell music video (Director's Cut)."
+      }
+    ]
+  },
+  {
+    "id": "flo-rida-good-feeling",
+    "displayName": "Good Feeling — Flo Rida",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "3OnnDqH6Wj8",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "flo-rida-wild-ones",
+    "displayName": "Wild Ones — Flo Rida ft. Sia",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music",
+      "Party & Dunk"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "bpOR_HuHRNs",
+        "startSec": 30,
+        "endSec": 45,
+        "license": "standard"
       }
     ]
   },
@@ -29419,6 +30203,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "SelenaGomezVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-26 ur \"YT och Spotify lista\" (xlsx)."
+      }
+    ]
+  },
+  {
+    "id": "snoop-dogg-young-wild-and-free",
+    "displayName": "Young, Wild & Free — Snoop Dogg & Wiz Khalifa ft. Bruno Mars",
+    "correctYear": 2011,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "Wa5B22KAkEk",
+        "startSec": 48,
+        "endSec": 63,
+        "license": "standard"
       }
     ]
   },
@@ -29903,6 +30717,62 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "videoId": "TLD74qRkhs8",
         "startSec": 55,
         "endSec": 70,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "nicki-minaj-pound-the-alarm",
+    "displayName": "Pound the Alarm — Nicki Minaj",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "vdrqA93sW-8",
+        "startSec": 25,
+        "endSec": 40,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "nicki-minaj-starships",
+    "displayName": "Starships — Nicki Minaj",
+    "correctYear": 2012,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "SeIJmciN8mo",
+        "startSec": 40,
+        "endSec": 55,
         "license": "standard"
       }
     ]
@@ -30797,6 +31667,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "Eurovision Song Contest",
         "license": "standard",
         "notes": "Melodifestivalen 2013 vinnare. ESC 2013 performance."
+      }
+    ]
+  },
+  {
+    "id": "robin-thicke-blurred-lines",
+    "displayName": "Blurred Lines — Robin Thicke ft. T.I. & Pharrell",
+    "correctYear": 2013,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "yyDUC1LUXSU",
+        "startSec": 20,
+        "endSec": 35,
+        "license": "standard"
       }
     ]
   },
@@ -32053,6 +32953,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "youtubeClips": []
   },
   {
+    "id": "flo-rida-my-house",
+    "displayName": "My House — Flo Rida",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "uo35R9zQsAI",
+        "startSec": 35,
+        "endSec": 50,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "hasse-andersson-guld-och-groena-skogar",
     "displayName": "Guld och gröna skogar — Hasse Andersson",
     "correctYear": 2015,
@@ -32118,6 +33048,30 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "license": "standard"
       }
     ]
+  },
+  {
+    "id": "kygo-stole-the-show",
+    "displayName": "Stole the Show — Kygo ft. Parson James",
+    "correctYear": 2015,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Dance Music"
+    ],
+    "inBaseCatalog": false,
+    "spotifyTrackId": "4iZPNYqzI2L0uwuUKun7Aa",
+    "youtubeClips": []
   },
   {
     "id": "major-lazer-lean-on",
@@ -34545,6 +35499,62 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
+    "id": "post-malone-sunflower",
+    "displayName": "Sunflower — Post Malone & Swae Lee",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "youtubeClips": [
+      {
+        "videoId": "ApXoWvfEYVU",
+        "startSec": 27,
+        "endSec": 42,
+        "license": "standard"
+      }
+    ]
+  },
+  {
+    "id": "tyga-taste",
+    "displayName": "Taste — Tyga ft. Offset",
+    "correctYear": 2018,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "LjxulQ1bEWg",
+        "startSec": 0,
+        "endSec": 15,
+        "license": "standard"
+      }
+    ]
+  },
+  {
     "id": "anna-bergendahl-ashes-to-ashes",
     "displayName": "Ashes to Ashes — Anna Bergendahl",
     "correctYear": 2019,
@@ -35137,6 +36147,36 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "channelTitle": "TheWeekndVEVO",
         "license": "standard",
         "notes": "Officiell VEVO-musikvideo. Neon retro 80s-känsla."
+      }
+    ]
+  },
+  {
+    "id": "24kgoldn-mood",
+    "displayName": "Mood — 24kGoldn ft. Iann Dior",
+    "correctYear": 2020,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "genrePackages": [
+      "Hip Hop"
+    ],
+    "inBaseCatalog": false,
+    "youtubeClips": [
+      {
+        "videoId": "GrAchTdepsU",
+        "startSec": 7,
+        "endSec": 22,
+        "license": "standard"
       }
     ]
   },
@@ -38156,6 +39196,26 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
       }
     ]
+  },
+  {
+    "id": "teddy-swims-mr-know-it-all",
+    "displayName": "Mr. Know It All — Teddy Swims",
+    "correctYear": 2026,
+    "contentSubject": "song",
+    "questionText": "Which Year was this song released?",
+    "itemHcp": 80,
+    "audiences": [
+      "elder",
+      "gen-x",
+      "millennials",
+      "gen-z",
+      "gen-alpha"
+    ],
+    "region": [
+      "global"
+    ],
+    "spotifyTrackId": "2g5kPQh1EexoG8kGZH2nOZ",
+    "youtubeClips": []
   },
   {
     "id": "tjuvjakt-nar-vi-graver-guld-i-usa",

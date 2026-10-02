@@ -3445,3 +3445,84 @@ items:
       - videoId: "EfWmWlW2PvM"
         startSec: 35
         endSec: 50
+  - id: teddy-swims-mr-know-it-all
+    displayName: "Mr. Know It All — Teddy Swims"
+    correctYear: 2026
+    probability: 80
+    wikimediaSearchHints: ["Teddy Swims Mr. Know It All"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "2g5kPQh1EexoG8kGZH2nOZ"
+    region: ["global"]
+  - id: kygo-stole-the-show
+    displayName: "Stole the Show — Kygo ft. Parson James"
+    correctYear: 2015
+    probability: 80
+    wikimediaSearchHints: ["Kygo ft. Parson James Stole the Show"]
+    answerMethods: ["timeline"]
+    spotifyTrackId: "4iZPNYqzI2L0uwuUKun7Aa"
+    genrePackages: ["Dance Music"]
+    inBaseCatalog: false
+    region: ["global"]
+  - id: robin-thicke-blurred-lines
+    displayName: "Blurred Lines — Robin Thicke ft. T.I. & Pharrell"
+    correctYear: 2013
+    probability: 80
+    wikimediaSearchHints: ["Robin Thicke ft. T.I. & Pharrell Blurred Lines"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "yyDUC1LUXSU"
+        startSec: 20
+        endSec: 35
+  - id: flo-rida-my-house
+    displayName: "My House — Flo Rida"
+    correctYear: 2015
+    probability: 80
+    wikimediaSearchHints: ["Flo Rida My House"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "uo35R9zQsAI"
+        startSec: 35
+        endSec: 50
+  - id: post-malone-sunflower
+    displayName: "Sunflower — Post Malone & Swae Lee"
+    correctYear: 2018
+    probability: 80
+    wikimediaSearchHints: ["Post Malone & Swae Lee Sunflower"]
+    answerMethods: ["timeline"]
+    region: ["global"]
+    youtubeClips:
+      - videoId: "ApXoWvfEYVU"
+        startSec: 27
+        endSec: 42
+  - id: 24kgoldn-mood
+    displayName: "Mood — 24kGoldn ft. Iann Dior"
+    correctYear: 2020
+    probability: 80
+    wikimediaSearchHints: ["24kGoldn ft. Iann Dior Mood"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "GrAchTdepsU"
+        startSec: 7
+        endSec: 22
+  - id: tyga-taste
+    displayName: "Taste — Tyga ft. Offset"
+    correctYear: 2018
+    probability: 80
+    wikimediaSearchHints: ["Tyga ft. Offset Taste"]
+    answerMethods: ["timeline"]
+    genrePackages: ["Hip Hop"]
+    inBaseCatalog: false
+    region: ["global"]
+    youtubeClips:
+      - videoId: "LjxulQ1bEWg"
+        startSec: 0
+        endSec: 15
