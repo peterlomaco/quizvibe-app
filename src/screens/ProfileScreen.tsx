@@ -2726,6 +2726,29 @@ export default function ProfileScreen() {
           </View>
         )}
 
+        {/* ── Account — alltid synlig Delete Account (App Review 5.1.1(v),
+            avslag 2026-10-14: granskaren hittade inte knappen i login-pill-
+            sheet:en). Samma två-stegs-confirm som sheet-varianten. */}
+        <View style={styles.accountSection}>
+          <Text style={styles.accountSectionLabel}>Account</Text>
+          <Pressable
+            style={({ pressed }) => [
+              styles.deleteAccountBtn,
+              pressed && { opacity: 0.85 },
+              deletingAccount && { opacity: 0.5 },
+            ]}
+            onPress={handleRequestDeleteAccount}
+            disabled={deletingAccount}
+          >
+            <Text style={styles.deleteAccountBtnText}>
+              {deletingAccount ? 'Deleting…' : 'Delete Account'}
+            </Text>
+          </Pressable>
+          <Text style={styles.accountSectionNote}>
+            Permanently deletes your QuizVibe account and all associated data.
+          </Text>
+        </View>
+
         <View style={styles.bottomPad} />
       </ScrollView>
 
@@ -3748,6 +3771,22 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: Colors.error,
+  },
+  accountSection: {
+    marginTop: Spacing.xl,
+    gap: Spacing.sm,
+  },
+  accountSectionLabel: {
+    fontSize: FontSize.xs,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+  },
+  accountSectionNote: {
+    fontSize: FontSize.xs,
+    color: Colors.textSecondary,
+    textAlign: 'center',
   },
 
   safe: { flex: 1, backgroundColor: Colors.background },

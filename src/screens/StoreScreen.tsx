@@ -46,6 +46,9 @@ import {
 // tvinga onödig scroll.
 const KEYBOARD_MARGIN = 48;
 
+// Egna voucher-koder avstängda — se showVoucher (Guideline 3.1.1).
+const VOUCHER_ENABLED = false;
+
 // ─── Tier-data ────────────────────────────────────────────────────────────────
 // Tier-konstanter mappar mot App Store Connect-products via `productId`.
 // Vid mount laddar vi RC-offering:n och letar upp varje tier:s package via
@@ -690,7 +693,11 @@ export default function StoreScreen() {
   // Voucher-fältet: free använt ELLER free ej claimbart (kampanj stängd),
   // aldrig medan premium är aktivt (Peters kant-beslut). Under kampanjen med
   // free fortfarande valbar ⇒ dolt tills free använts.
-  const showVoucher = !premiumActive && (freeMonthUsed || !offerOpen);
+  // ⚠ VOUCHER_ENABLED=false (App Review 2026-10-14): egna koder som låser upp
+  // Premium utanför IAP bryter Guideline 3.1.1. Rabatter ska gå via Apple
+  // Offer Codes (presentCodeRedemptionSheet) när pkg_sub_monthly släpps.
+  const showVoucher =
+    VOUCHER_ENABLED && !premiumActive && (freeMonthUsed || !offerOpen);
 
   const subscriptionSection = (
     <View style={styles.section}>
