@@ -5,6 +5,7 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Modal,
+  ActivityIndicator,
   Platform,
   ScrollView,
   StyleSheet,
@@ -515,6 +516,7 @@ export function RoundLeaderboard({
   onStartNewGamePress,
   startNewGameExpanded: startNewGameExpandedProp,
   hideRemotePlay = false,
+  creatingLobby = null,
   onReplayYes,
   onReplayNo,
   replayTitle = 'Re-match with Marathon table?',
@@ -626,6 +628,14 @@ export function RoundLeaderboard({
    * skickar in `onStartNewGame` i stället och blocket försvinner.
    */
   onReplayYes?: () => void;
+  /**
+   * En ny lobby håller på att skapas (Peter 2026-10-15). `'replay'` = Yes
+   * tryckt, annars lobbytypen som valdes under Start New Game. Ger spinner
+   * i den tryckta knappen/raden och gör ALLA lobby-skapande knappar
+   * otappbara, så ett andra tryck under nätverks-gapet inte syns som dött
+   * och inte kan starta en andra lobby.
+   */
+  creatingLobby?: HostLobbyType | 'replay' | null;
   onReplayNo?: () => void;
   /** Rubriken över Yes/No. Single player aggregerar en SCORE (en spelare),
    *  flerspelar en LEADERBOARD — call-siten äger ordvalet så komponenten
@@ -1039,6 +1049,7 @@ export function RoundLeaderboard({
               style={{ flex: 1, transform: [{ scale: replayPulse }] }}
             >
               <Pressable
+                disabled={creatingLobby !== null}
                 onPress={() => {
                   if (replayLocked) {
                     onReplayLockedPress?.();
@@ -1052,20 +1063,25 @@ export function RoundLeaderboard({
                   pressed && { opacity: 0.85 },
                 ]}
               >
-                <Text
-                  style={[
-                    styles.replayYesBtnText,
-                    replayLocked && styles.startNewGameBtnTextLocked,
-                  ]}
-                >
-                  Yes
-                </Text>
+                {creatingLobby === 'replay' ? (
+                  <ActivityIndicator color="#000" />
+                ) : (
+                  <Text
+                    style={[
+                      styles.replayYesBtnText,
+                      replayLocked && styles.startNewGameBtnTextLocked,
+                    ]}
+                  >
+                    Yes
+                  </Text>
+                )}
               </Pressable>
             </Animated.View>
             {/* No göms sa fort host svarat Yes — inbjudan ar redan utskickad
                 till non-hosts, sa det finns inget att angra (Peters val). */}
             {!replayAnswered && (
               <Pressable
+                disabled={creatingLobby !== null}
                 onPress={onReplayNo}
                 style={({ pressed }) => [
                   styles.replayNoBtn,
@@ -1095,6 +1111,7 @@ export function RoundLeaderboard({
               i stället för att vara en död yta. */}
           <Animated.View style={{ transform: [{ scale: startNewGamePulse }] }}>
           <Pressable
+            disabled={creatingLobby !== null}
             onPress={() => {
               if (startNewGameLocked) {
                 onStartNewGameLockedPress?.();
@@ -1130,10 +1147,12 @@ export function RoundLeaderboard({
             <HostTypeOptions
                 accentColor={Colors.warning}
                 remoteMode={hideRemotePlay ? 'hidden' : 'available'}
+                busyType={creatingLobby === 'replay' ? null : creatingLobby}
                 onSelect={(lobbyType) => {
-                  if (!isStartNewGameControlled) {
-                    setInternalStartNewGameExpanded(false);
-                  }
+                  // Panelen står kvar utfälld under nätverks-gapet så den
+                  // tryckta raden kan visa spinnern (creatingLobby). Call-
+                  // siten navigerar bort vid lyckat flöde; vid avbrott
+                  // (credit-Alert) kan host välja igen.
                   onStartNewGame(lobbyType);
                 }}
             />

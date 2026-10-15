@@ -79,6 +79,7 @@ import {
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — self-attest via
 // ProfileData.spotifyAppConfirmed ersätter connectSpotify/getSpotifyConnectionStatus.
 import { getCachedPremium, hasPremiumSubscription } from '../utils/subscriptionStorage';
+import { useSingleFlight } from '../utils/useSingleFlight';
 import {
     defaultEnabledMainCategories,
     type MainCategory,
@@ -1367,7 +1368,8 @@ export default function ProfileScreen() {
   // rensa stale mock-stores, tracka event och navigera till /lobby.
   // Inlinad här istället för delad utility tills en tredje call-site
   // dyker upp (då lyfter vi till en delad helper i src/utils/).
-  const handleCreateGame = async (lobbyType: HostLobbyType = 'multiplayer') => {
+  const createGameFlight = useSingleFlight();
+  const handleCreateGame = async (lobbyType: HostLobbyType = 'multiplayer'): Promise<boolean> => {
     const [freshProfile, freshHasPremium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
@@ -1383,12 +1385,12 @@ export default function ProfileScreen() {
             { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
           ],
         );
-        return;
+        return false;
       }
     }
     // Two-device-guard: kan inte hosta ett nytt spel medan kontot redan är
     // aktivt i en annan lobby på en annan enhet.
-    if (await checkActiveElsewhere()) return;
+    if (await checkActiveElsewhere()) return false;
     const code = generateRoomCode();
     // Remote 1vs1 är alltid exakt 2 spelare. Sätts redan här (i stället för
     // att vänta på LobbyScreen:s setRoomMaxPlayers-effekt) så kapacitets-
@@ -1410,7 +1412,7 @@ export default function ProfileScreen() {
         'Could not create game lobby',
         'The room could not be registered. Check your connection and that you are signed in, then try again.',
       );
-      return;
+      return false;
     }
     clearLeftPlayers(code);
     clearLobbyPlayers(code);
@@ -1423,6 +1425,7 @@ export default function ProfileScreen() {
     // lobbyType styr lobbyns förvalda läge ('single'/'multiplayer') resp.
     // remote-läget ('1v1') — samma param som Home skickar.
     router.push({ pathname: '/lobby', params: { code, isHost: 'true', lobbyType } });
+    return true;
   };
 
   return (
@@ -3341,8 +3344,13 @@ export default function ProfileScreen() {
                   // rums-registrering) körs. handleCreateGame stänger själv
                   // sheet:en + panelen precis före router.push, och lämnar
                   // panelen utfälld om credit-gaten avbryter.
-                  guardedNavigate(() => handleCreateGame(lobbyType));
+                  // useSingleFlight: ett andra tryck under nätverks-gapet
+                  // kan inte skapa en andra lobby (Peter 2026-10-15).
+                  guardedNavigate(() => {
+                    void createGameFlight.run(() => handleCreateGame(lobbyType), { key: lobbyType });
+                  });
                 }}
+                busyType={(createGameFlight.busyKey as HostLobbyType | null) ?? null}
               />
             )}
 

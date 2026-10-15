@@ -153,7 +153,8 @@ import { allocateCategoryBlocks, buildActiveCategories, buildEpochPhase, emptyCa
 import { loadEpochLedger, saveEpochLedger } from '@/src/utils/epochLedger';
 import { loadCategoryLedger, saveCategoryLedger } from '@/src/utils/categoryLedger';
 import { getGenerationKeyFromBirthYear, GenerationKey } from '@/src/utils/mockPurchasedPackages';
-import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
+import { getCachedPremium, hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
+import { useSingleFlight } from '@/src/utils/useSingleFlight';
 import { supabase } from '@/src/utils/supabase';
 // ── FUTURE VERSION 2 — Automated API Flow (archived imports) ─────────────────────
 // import { fetchSpotifyTrackInfo, getLastKnownSpotifyProgressMs, pauseSpotifyPlayback, resumeSpotifyPlayback, type SpotifyTrackInfo } from '@/src/lib/spotify';
@@ -7339,7 +7340,7 @@ export default function QuizScreen() {
   // - Övriga registrerade: defaults till standard/30 så Lobby:s profile-merge
   //   senare kan fylla i deras profil-värden vid mount.
   // - Guests: defaults till standard/30 så host får redigera om i Lobby.
-  const goToNewLobby = async (
+  const goToNewLobbyInner = async (
     reusePlayers: boolean,
     keepSettings: boolean = true,
     guestOverride?: { guestName: string; guestBirthYear: number },
@@ -7352,7 +7353,7 @@ export default function QuizScreen() {
     // user-lobby: credit dras, profilens namn/avatar används, Game History
     // skrivs och Remote Play är tillgängligt.
     leaveGuestMode: boolean = false,
-  ) => {
+  ): Promise<boolean> => {
     // `guestOverride` (credit-gate:ns "Restart as Guest"): tvingar NYA
     // lobbyn till guest-host-läge även när DETTA spel hostades av en
     // registrerad user. Den skapar numera en FRÄSCH lobby (reusePlayers
@@ -7381,7 +7382,7 @@ export default function QuizScreen() {
         newLobbyIsGuestHosted: false,
       }))
     )
-      return;
+      return false;
     // Ladda host-profilen FÖRE players-listan byggs så host:s riktiga
     // playerName + avatar bär in i carry-over (annars hade host:s rad i
     // nya lobby:n stått som 'You'/🎮 tills mergeProfileIntoHost hann fyra).
@@ -7523,7 +7524,7 @@ export default function QuizScreen() {
         'Could not create game lobby',
         'The new room could not be registered. Check your connection and try again.',
       );
-      return;
+      return false;
     }
     // Färsk leftPlayers-store + lobbyPlayers-store + ejected-store för nya
     // koden — undviker stale test-data och garanterar att non-host:s polling
@@ -7547,8 +7548,12 @@ export default function QuizScreen() {
     // Re-match: stämpla nya rumkoden som seriens fortsättning så nästa
     // slutskärm kan visa Aggregate Leaderboard. Görs bara när spelarna bärs
     // över — "Start New Game" är per definition en NY serie.
+    // AWAIT (Peter 2026-10-15): stämpeln är en read-modify-write mot
+    // AsyncStorage. Med `void` kunde nästa quiz-session läsa den innan den
+    // skrivits, och vid dubbeltryck skrev två parallella anrop över varandra
+    // → nästa spel räknades som fristående och Marathon-kedjan bröts.
     if (reusePlayers) {
-      void markSeriesContinues(newCode);
+      await markSeriesContinues(newCode);
     }
     if (reusePlayers && params.roomCode && carryOverPlayers.length > 0) {
       // Re-mappa id:t med rumkoden i prefixet så lobby_players-rader inte
@@ -7672,7 +7677,7 @@ export default function QuizScreen() {
             : {}),
         },
       });
-      return;
+      return true;
     }
     router.replace({
       pathname: '/lobby',
@@ -7701,6 +7706,31 @@ export default function QuizScreen() {
           : {}),
       },
     });
+    return true;
+  };
+  // Re-entry-spärr (belt-and-suspenders, Peter 2026-10-15). goToNewLobby är
+  // den ENDA vägen som skapar rum + broadcastar play_again_lobby_ready från
+  // slutskärmen. Två parallella körningar skapade två lobbys: non-host följde
+  // den första broadcasten, host landade i den andra. Anroparna har redan
+  // `newLobbyFlight`, men varje väg in hit ska vara skyddad även om en ny
+  // anropare glömmer den. Släpps bara om flödet avbryts (false/throw).
+  const goToNewLobbyInFlightRef = useRef(false);
+  // Delad single-flight för ALLA lobby-skapande knappar på slutskärmen
+  // (Yes / Start New Game-raderna / H2H). busyKey driver spinnern.
+  const newLobbyFlight = useSingleFlight();
+  const goToNewLobby = async (
+    ...args: Parameters<typeof goToNewLobbyInner>
+  ): Promise<boolean> => {
+    if (goToNewLobbyInFlightRef.current) return false;
+    goToNewLobbyInFlightRef.current = true;
+    try {
+      const ok = await goToNewLobbyInner(...args);
+      if (!ok) goToNewLobbyInFlightRef.current = false;
+      return ok;
+    } catch (e) {
+      goToNewLobbyInFlightRef.current = false;
+      throw e;
+    }
   };
 
   // Sekventiell Alert-flow: först fråga om spelarna ska följa med, sedan
@@ -8003,7 +8033,7 @@ export default function QuizScreen() {
   // OBS: den PÅGÅENDE matchens rum lämnas orört (samma resonemang som i
   // handleGoHome ovan) — motståndaren har 48h på sig och rooms-raden
   // städas av 24h-expiry, så vi får inte deactivate:a den här.
-  const handleStartNewGameFromFinal = async (lobbyType: HostLobbyType) => {
+  const handleStartNewGameFromFinal = async (lobbyType: HostLobbyType): Promise<boolean> => {
     const [freshProfile, premium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
@@ -8019,7 +8049,7 @@ export default function QuizScreen() {
           { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/') },
         ],
       );
-      return;
+      return false;
     }
     const code = generateRoomCode();
     const newIsRemote1v1 = lobbyType === '1v1';
@@ -8040,7 +8070,7 @@ export default function QuizScreen() {
         'Could not create game lobby',
         'The room could not be registered. Check your connection and that you are signed in, then try again.',
       );
-      return;
+      return false;
     }
     // Fresh slate för den nya koden så ingen stale per-rum-data smyger in.
     clearLeftPlayers(code);
@@ -8061,6 +8091,7 @@ export default function QuizScreen() {
         lobbyType,
       },
     });
+    return true;
   };
 
   // ── Non-host Play Again-flöde ───────────────────────────────────────────
@@ -8282,6 +8313,17 @@ export default function QuizScreen() {
       setStartNewGameExpanded(false);
       return;
     }
+    // Snabbväg (Peter 2026-10-15): öppna direkt när de synkrona speglarna
+    // säger att host kan starta — annars kändes första trycket dött under
+    // två rundresor. goToNewLobby kör den auktoritativa gaten ändå.
+    if (
+      getCachedPremium() === true ||
+      (getCachedProfile()?.freeGameCredits ?? 0) > 0 ||
+      (isGuestHostGame && !startNewGameLeavesGuestMode)
+    ) {
+      setStartNewGameExpanded(true);
+      return;
+    }
     // Credit-gaten först — meningslöst att öppna ett val host inte kan
     // fullfölja. Nya lobbyn är guest-hostad bara om vi INTE lämnar
     // guest-läget; annars ska saldot belastas som för vilken user som helst.
@@ -8304,26 +8346,28 @@ export default function QuizScreen() {
    *  låst och inte kan rättas. I PtP-riktningen försvann dessutom hela
    *  åskådar-flödet, eftersom LobbyScreens "följ leaderboarden?"-prompt bara
    *  fyrar när läget faktiskt är Pass-the-Phone. */
-  const proceedWithRematch = (lobbyType: LocalLobbyType) => {
-    void goToNewLobby(true, true, undefined, lobbyType);
-  };
+  const proceedWithRematch = (lobbyType: LocalLobbyType): Promise<boolean> =>
+    goToNewLobby(true, true, undefined, lobbyType);
 
   /** "Start New Game": host valde ett läge. Alltid en FÄRSK lobby — inga
    *  spelare, inga carry-over-settings (keepSettings=false → LobbyScreen
    *  seedar från host-profilen, precis som Home:s clearLobbySettings). */
-  const handleLocalStartNewGameSelect = (lobbyType: HostLobbyType) => {
-    setStartNewGameExpanded(false);
-    if (lobbyType === '1v1') {
-      void handleStartNewGameFromFinal('1v1');
-      return;
-    }
-    void goToNewLobby(
-      false,
-      false,
-      undefined,
-      lobbyType,
-      startNewGameLeavesGuestMode,
-    );
+  // Panelen står kvar utfälld under nätverks-gapet så den valda raden kan
+  // visa spinnern (newLobbyFlight.busyKey); den kollapsas bara om flödet
+  // avbryts. Vid lyckat flöde navigerar vi bort ändå.
+  const handleLocalStartNewGameSelect = async (lobbyType: HostLobbyType): Promise<boolean> => {
+    const ok =
+      lobbyType === '1v1'
+        ? await handleStartNewGameFromFinal('1v1')
+        : await goToNewLobby(
+            false,
+            false,
+            undefined,
+            lobbyType,
+            startNewGameLeavesGuestMode,
+          );
+    if (!ok) setStartNewGameExpanded(false);
+    return ok;
   };
 
   /**
@@ -8509,27 +8553,26 @@ export default function QuizScreen() {
   /** Host svarade **Yes** på re-match-frågan — eller tappade Yes igen när
    *  den tänts efter att alla non-hosts godkänt. Läget är alltid
    *  `previousLocalMode`; en re-match byter aldrig läge. */
-  const handleReplayYes = async () => {
+  const handleReplayYes = async (): Promise<boolean> => {
     // Guest host har varken re-match eller replay (Peter 2026-08-26) —
     // blocket renderas inte alls för dem; belt-and-suspenders mot
     // oväntade call-paths.
-    if (isGuestHostGame) return;
+    if (isGuestHostGame) return false;
     // Andra tappet: inbjudan är redan utfärdad och godkänd (knappen är grå
     // och otappbar medan väntan pågår) → NU (efter att alla accepterat) ställs
     // "Add to existing?"/namn-frågan, sedan skapas lobbyn. Cancel i namn-
     // prompten returnerar false → host stannar kvar med den upplysta Yes:en
     // och kan tappa igen.
     if (rematchInvite) {
-      if (!(await ensureAggregateLeaderboardAttached())) return;
-      proceedWithRematch(previousLocalMode);
-      return;
+      if (!(await ensureAggregateLeaderboardAttached())) return false;
+      return proceedWithRematch(previousLocalMode);
     }
     // ⚠ Ingen "Restart as Guest" här: en guest-hostad re-match-lobby får
     //   inte existera, och att mitt i en re-match erbjuda en knapp som tyst
     //   kastar bort både uppställningen och Competition-kedjan vore
     //   vilseledande. Host får samma Store-fråga som på Home i stället.
     if (!(await ensureHostCreditsForNewGame({ allowGuestRestart: false })))
-      return;
+      return false;
     // Varje förväntad approver måste godkänna på sin egen enhet. Yes gråas
     // ut med väntestatusen under sig och host tappar den igen när alla
     // godkänt. `rematchInvite` sätts BARA här — det är den enda vägen som
@@ -8544,14 +8587,16 @@ export default function QuizScreen() {
       syncChannelRef.current
         .broadcastPlayAgainInitiated({ sender_id: selfPlayerId })
         .catch(() => {});
-      return;
+      // Ingen lobby skapad ännu — släpp spärren. Yes är nu grå/låst
+      // (replayLocked) tills alla accepterat; nästa tryck går vidare ovan.
+      return false;
     }
     // Ingen att vänta in → koppla/namnge serien och gå direkt vidare: single
     // player, IndDev utan kvarvarande non-hosts, eller PtP där ingen följer
     // leaderboarden på en egen enhet. Sätter MEDVETET inte rematchInvite, så
     // No fortfarande går att välja om host backar ur i namn-prompten.
-    if (!(await ensureAggregateLeaderboardAttached())) return;
-    proceedWithRematch(previousLocalMode);
+    if (!(await ensureAggregateLeaderboardAttached())) return false;
+    return proceedWithRematch(previousLocalMode);
   };
 
   /** Host svarade **No** — re-match-frågan försvinner och "Start New Game"
@@ -10682,11 +10727,16 @@ export default function QuizScreen() {
           // knappen. Remote har ingen re-match och får den direkt.
           onStartNewGame={
             isRemote && isLastQuestion && !isGuestHostGame
-              ? handleStartNewGameFromFinal
+              ? (lobbyType) => {
+                  void newLobbyFlight.run(() => handleStartNewGameFromFinal(lobbyType), { key: lobbyType });
+                }
               : localStartNewGameReady
-                ? handleLocalStartNewGameSelect
+                ? (lobbyType) => {
+                    void newLobbyFlight.run(() => handleLocalStartNewGameSelect(lobbyType), { key: lobbyType });
+                  }
                 : undefined
           }
+          creatingLobby={(newLobbyFlight.busyKey as HostLobbyType | 'replay' | null) ?? null}
           // Lokalt flöde: tappet kör credit-gaten och öppnar lägesvalet;
           // invite-frågan ställs först EFTER valet, så panelens öppet-läge
           // ägs här.
@@ -10702,7 +10752,9 @@ export default function QuizScreen() {
           // med minst en gäst i uppställningen (ptpRematchBlocked).
           onReplayYes={
             rematchQuestionEnabled && replayChoice === 'ask'
-              ? handleReplayYes
+              ? () => {
+                  void newLobbyFlight.run(handleReplayYes, { key: 'replay' });
+                }
               : undefined
           }
           replayTitle={replayTitle}

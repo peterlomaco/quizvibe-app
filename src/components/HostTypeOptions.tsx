@@ -1,6 +1,6 @@
 import { Colors, Radius, Spacing } from '@/src/theme';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from '@/src/components/haptic';
 import Svg, { Circle, Rect as SvgRect, Text as SvgText } from 'react-native-svg';
 import { VersusIcon } from '@/src/components/VersusIcon';
@@ -89,9 +89,16 @@ function SoloIcon({ height = 50 }: { height?: number }) {
  *  den). `accentColor` ärvs från knappen ovanför (guld för inloggad,
  *  grå för guest) så panelen läses som knappens förlängning. */
 export function HostTypeOptions({
-  accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge,
+  accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge, busyType = null,
 }: {
   accentColor: string;
+  /**
+   * Lobbytypen vars lobby håller på att skapas (Peter 2026-10-15). Den
+   * raden visar en spinner i stället för pilen och ALLA rader blir
+   * otappbara — så första trycket ger synlig respons direkt och ett andra
+   * tryck under nätverks-gapet inte kan skapa en andra lobby.
+   */
+  busyType?: HostLobbyType | null;
   onSelect: (lobbyType: HostLobbyType) => void;
   /**
    * Remote 1vs1 spelas ENBART av QuizVibe-users mot varandra (Peter
@@ -138,6 +145,8 @@ export function HostTypeOptions({
         subtitle="Play solo on this device"
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
+        busy={busyType === 'single'}
+        disabled={busyType !== null}
         onPress={() => onSelect('single')}
       />
       <HostTypeOptionRow
@@ -147,6 +156,8 @@ export function HostTypeOptions({
         subtitle="Pass-the-Phone or Individual devices"
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
+        busy={busyType === 'multiplayer'}
+        disabled={busyType !== null}
         onPress={() => onSelect('multiplayer')}
       />
       {remoteMode !== 'hidden' && (
@@ -159,6 +170,8 @@ export function HostTypeOptions({
           subtitle="H2H — challenge friends remotely"
           locked={remoteMode === 'locked'}
           badgeText={remoteMode === 'locked' ? 'QuizVibe user' : undefined}
+          busy={busyType === '1v1'}
+          disabled={busyType !== null}
           onPress={() => {
             if (remoteMode === 'locked') {
               onRemoteLockedPress?.();
@@ -174,7 +187,12 @@ export function HostTypeOptions({
 
 function HostTypeOptionRow({
   accentColor, icon, label, subtitle, onPress, locked = false, badgeText, badgeMuted = false,
+  busy = false, disabled = false,
 }: {
+  /** Raden vars flöde pågår — spinner i stället för pilen. */
+  busy?: boolean;
+  /** Någon rad i panelen är busy → hela panelen otappbar. */
+  disabled?: boolean;
   accentColor: string;
   icon: React.ReactNode;
   label: string;
@@ -201,6 +219,7 @@ function HostTypeOptionRow({
         locked && hostTypeStyles.rowLocked,
       ]}
       onPress={onPress}
+      disabled={disabled}
       activeOpacity={0.7}
     >
       {/* Dimningen ligger på INNEHÅLLET, inte på raden — badgen ska förbli
@@ -210,15 +229,19 @@ function HostTypeOptionRow({
         <Text style={hostTypeStyles.label}>{label}</Text>
         <Text style={hostTypeStyles.subtitle}>{subtitle}</Text>
       </View>
-      <Text
-        style={[
-          hostTypeStyles.arrow,
-          { color: locked ? Colors.borderStrong : accentColor },
-          locked && hostTypeStyles.lockedDim,
-        ]}
-      >
-        ›
-      </Text>
+      {busy ? (
+        <ActivityIndicator color={accentColor} />
+      ) : (
+        <Text
+          style={[
+            hostTypeStyles.arrow,
+            { color: locked ? Colors.borderStrong : accentColor },
+            (locked || disabled) && hostTypeStyles.lockedDim,
+          ]}
+        >
+          ›
+        </Text>
+      )}
       {!!badgeText && (
         <View
           style={[hostTypeStyles.rowBadge, badgeMuted && hostTypeStyles.rowBadgeMuted]}

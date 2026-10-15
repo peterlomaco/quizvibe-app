@@ -17,6 +17,7 @@
 
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSingleFlight } from '@/src/utils/useSingleFlight';
 import {
   ActivityIndicator,
   Alert,
@@ -57,7 +58,8 @@ export function CompetitionRematchActions({
 }) {
   const [myUserId, setMyUserId] = useState<string | null>(null);
   const [request, setRequest] = useState<CompetitionRematchRequest | null>(null);
-  const [busy, setBusy] = useState(false);
+  const busyFlight = useSingleFlight();
+  const busy = busyFlight.busy;
   const [, forceTick] = useState(0);
   const navigatedRef = useRef(false);
 
@@ -239,14 +241,16 @@ export function CompetitionRematchActions({
   );
 
   // ── Handlers ──
-  const runBusy = useCallback(async (fn: () => Promise<void>) => {
-    setBusy(true);
-    try {
-      await fn();
-    } finally {
-      setBusy(false);
-    }
-  }, []);
+  // useSingleFlight stänger samma-frame-hålet: två tryck i samma frame läste
+  // båda `busy === false` (state hinner inte committas) och startade två
+  // lobbys/requests (Peter 2026-10-15). Släpps när flödet settlat.
+  const runFlight = busyFlight.run;
+  const runBusy = useCallback(
+    async (fn: () => Promise<void>) => {
+      await runFlight(fn, { holdAfterSuccess: false });
+    },
+    [runFlight],
+  );
 
   const handleInitiate = () =>
     runBusy(async () => {

@@ -42,7 +42,8 @@ import { ensureAuthSession, resendActivationByName, signInWithPlayerName } from 
 import { containsProfanity } from '@/src/utils/profanity';
 import { clearProfile, emailExists, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { checkSpotifyInstalled } from '@/src/utils/spotifyDJ';
-import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
+import { getCachedPremium, hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
+import { useSingleFlight } from '@/src/utils/useSingleFlight';
 import { supabase } from '@/src/utils/supabase';
 import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
@@ -51,6 +52,7 @@ import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from 
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Animated,
   Dimensions,
@@ -437,6 +439,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // andra tyst, se MODAL_SWAP_DELAY_MS) så listan lämnas direkt och usern ser
   // en tydlig väntevy tills lobbyn öppnas. Rensas vid varje guard-failure.
   const [joiningLobby, setJoiningLobby] = useState(false);
+  // Single-flight för alla join-/host-knappar i modalen (Peter 2026-10-15):
+  // Join with Room Code, Join as Guest, Start Game as Guest och invite-
+  // Accept gör flera nätverkskollar innan något syns — ett andra tryck
+  // startade tidigare en andra join/lobby. Spärren hålls efter lyckad
+  // navigering och släpps vid avbrott (handlern returnerar false).
+  const joinFlight = useSingleFlight();
   // Spotify-attest-overlay (se profileNeedingSpotifyAttest). En vanlig View
   // inuti JoinModal:s <Modal> — en andra Modal hade svalts tyst av iOS.
   const [spotifyGate, setSpotifyGate] = useState<{ playerName: string; profile: ProfileData } | null>(null);
@@ -737,7 +745,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // Faktiskt utför accept-flödet — guards + navigation oförändrade. Bruten
   // ut ur handleAcceptInvite (2026-08-27) så både "redan friend"-fallet och
   // consent-popupens OK-knapp kan dela EXAKT samma logik.
-  const proceedAcceptInvite = async (invite: WaitingInvite) => {
+  const proceedAcceptInvite = async (invite: WaitingInvite): Promise<boolean> => {
     // Part B: visa väntevyn direkt så listan lämnas medan guardsen (~2-3 s
     // serial Supabase-läsningar) körs. Rensas vid varje guard-failure nedan.
     setJoiningLobby(true);
@@ -760,7 +768,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         'Game Lobby deleted',
         'This Game Lobby has been deleted by Host.',
       );
-      return;
+      return false;
     }
     // Own-lobby-guard (self-invite Layer 3): inbjudan pekar på din EGEN lobby
     // (du är host). Städa bort den stale inviten och stanna kvar. Speglar
@@ -770,12 +778,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       const updated = await removeInvite(invite.id);
       setInvites(updated);
       Alert.alert('Already in lobby', 'This is your own lobby.');
-      return;
+      return false;
     }
     // Single-player-lobby: host kan ha skickat inbjudan och sedan bytt till
     // single. Inviten ligger KVAR i listan (som capacity-fallet) — host kan
     // byta tillbaka, och då ska den fortfarande gå att tacka ja till.
-    if (await checkSinglePlayerLobby(invite.roomCode)) { setJoiningLobby(false); return; }
+    if (await checkSinglePlayerLobby(invite.roomCode)) { setJoiningLobby(false); return false; }
     // En competition-rematch skickar sin inbjudan till en LÅST re-match-lobby
     // (rooms.rematch_locked). Inbjudan i sig är admissions-bevis — host seedade
     // just den här deltagaren — så vi kör INTE checkRematchLockedLobby:s
@@ -791,12 +799,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Capacity-check FÖRE removeInvite: om lobby:n är full ska usern få
     // popup och inviten ligga kvar i listan, så de kan försöka igen om
     // någon lämnar. Speglar samma check som handleJoinWithCode kör.
-    if (await checkLobbyCapacity(invite.roomCode)) { setJoiningLobby(false); return; }
+    if (await checkLobbyCapacity(invite.roomCode)) { setJoiningLobby(false); return false; }
     // Two-device-guard: blockera om kontot redan är aktivt i en annan lobby.
-    if (await checkActiveElsewhere(invite.roomCode)) { setJoiningLobby(false); return; }
+    if (await checkActiveElsewhere(invite.roomCode)) { setJoiningLobby(false); return false; }
     // Spotify-lobby: bekräfta Spotify-appen innan vi joinar. No lämnar
     // inviten orörd (körs FÖRE addFriend/removeInvite).
-    if (await checkSpotifyLobbyGate(invite.roomCode)) { setJoiningLobby(false); return; }
+    if (await checkSpotifyLobbyGate(invite.roomCode)) { setJoiningLobby(false); return false; }
     // Ömsesidig friend-add (Peter 2026-08-27): att acceptera lägger till
     // HOST:en på RECIPIENT:ens egna friends-lista också — host-sidans add
     // sker separat via LobbyScreen:s pending→confirmed-watcher när den här
@@ -839,6 +847,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       },
     });
     setTimeout(() => onClose(), MODAL_SWAP_DELAY_MS);
+    return true;
   };
 
   // "Deny" (Peter 2026-08-27) — tyst avböjning, ingen host-notifiering.
@@ -854,22 +863,22 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // accepterandet lägger till en NY, ömsesidig friend-relation.
   const handleAcceptInvite = async (invite: WaitingInvite) => {
     if (invite.alreadyFriend) {
-      await proceedAcceptInvite(invite);
+      await joinFlight.run(() => proceedAcceptInvite(invite));
       return;
     }
     Alert.alert(
       'Accept invitation?',
       'By accepting this invitation you will both 1. join the lobby and 2. accept that both of you will be added to each others QuizVibe friend list.',
       [
-        { text: 'OK', onPress: () => proceedAcceptInvite(invite) },
+        { text: 'OK', onPress: () => { void joinFlight.run(() => proceedAcceptInvite(invite)); } },
         { text: 'Deny', style: 'destructive', onPress: () => handleDenyInvite(invite) },
         { text: 'Cancel', style: 'cancel' },
       ],
     );
   };
 
-  const handleJoinWithCode = async () => {
-    if (code.length < ROOM_CODE_LENGTH) return;
+  const handleJoinWithCode = async (): Promise<boolean> => {
+    if (code.length < ROOM_CODE_LENGTH) return false;
     // Existence-check mot Supabase rooms-tabellen. Saknas koden (eller är
     // den expired/game-started) visar vi Alert och stannar i formuläret
     // istället för att navigera.
@@ -889,41 +898,42 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
               'Already played',
               'You have already played your questions in this H2H match. Check "H2H" on the Home screen for the result.',
             );
-            return;
+            return false;
           }
           onClose();
           router.push({ pathname: '/quiz', params: buildRemoteQuizParams(my) });
-          return;
+          return true;
         }
       }
       Alert.alert(
         'Room not found',
         'There is no Room code activated with this combination',
       );
-      return;
+      return false;
     }
     // Own-lobby-check: samma user inloggad på två enheter och försöker joina
     // sin egen lobby från device B. Måste komma före capacity-checken så
     // användaren får det mer specifika felmeddelandet.
     if (await isOwnLobby(code, currentPlayerName)) {
       Alert.alert('Already in lobby', 'User already exists in the lobby');
-      return;
+      return false;
     }
     // Two-device-guard: blockera om kontot redan är aktivt i en ANNAN lobby
     // (excludeCode=code → rejoin av samma lobby är tillåtet).
-    if (await checkActiveElsewhere(code)) return;
+    if (await checkActiveElsewhere(code)) return false;
     // Single-player-lobby: ingen plats att joina förrän host byter läge.
-    if (await checkSinglePlayerLobby(code)) return;
+    if (await checkSinglePlayerLobby(code)) return false;
     // Re-match-lobby: låst uppsättning — bara förra spelets spelare släpps in.
-    if (await checkRematchLockedLobby(code, currentPlayerName)) return;
+    if (await checkRematchLockedLobby(code, currentPlayerName)) return false;
     // Capacity-check: om host:s lobby redan är full visar vi popup med text
     // som beror på Free vs Premium-host. Användaren stannar i join-formuläret.
-    if (await checkLobbyCapacity(code)) return;
+    if (await checkLobbyCapacity(code)) return false;
     // Spotify-lobby: self-attest-fråga redan här (Plan B — ingen OAuth), så
     // host:s auto-approve inte blockeras av en saknad attest.
-    if (await checkSpotifyLobbyGate(code)) return;
+    if (await checkSpotifyLobbyGate(code)) return false;
     onClose();
     router.push({ pathname: '/lobby', params: { code, isHost: 'false' } });
+    return true;
   };
 
   // Parsea och validera birth year. Returnerar null om input inte är ett
@@ -1120,8 +1130,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     }
   }, [step, guestName, code]);
 
-  const handleJoinAsGuest = async () => {
-    if (!isGuestFormValid || parsedBirthYear === null || guestAssistance === null) return;
+  const handleJoinAsGuest = async (): Promise<boolean> => {
+    if (!isGuestFormValid || parsedBirthYear === null || guestAssistance === null) return false;
     // Existence-check mot Supabase rooms-tabellen. PlayerName-uniqueness
     // kollas redan vid Check (handleCheckPlayerName → player_name_exists).
     if (!(await isActiveRoom(code))) {
@@ -1129,7 +1139,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         'Room not found',
         'There is no Room code activated with this combination',
       );
-      return;
+      return false;
     }
     // IndDev-blocket för självanslutna guests borttaget (policy 2026-08-06):
     // guests med egen enhet får joina IndDev-lobbies. Endast host-TILLAGDA
@@ -1159,7 +1169,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         guestBirthYearText,
         guestAssistance,
       });
-      return;
+      return false;
     }
     // Spotify pre-join-gate borttagen (Plan B 2026-07-22): inget konto krävs —
     // guests kan self-attesta Spotify i lobbyn. (Spotify DJ är dessutom
@@ -1173,21 +1183,21 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     const ownByGuest = guestIdentity ? await isOwnLobby(code, guestIdentity) : false;
     if (ownByLogin || ownByGuest) {
       Alert.alert('Already in lobby', 'User already exists in the lobby');
-      return;
+      return false;
     }
     // Two-device-guard: en inloggad user som joinar via guest-formen har ändå
     // sitt riktiga (icke-anon) konto → blockera om det redan är aktivt i en
     // annan lobby. Rena gäster (anon) resolvar till [] och släpps igenom.
-    if (await checkActiveElsewhere(code)) return;
+    if (await checkActiveElsewhere(code)) return false;
     // Single-player-lobby: speglar handleJoinWithCode.
-    if (await checkSinglePlayerLobby(code)) return;
+    if (await checkSinglePlayerLobby(code)) return false;
     // Re-match-lobby: speglar handleJoinWithCode. En gäst som VAR med i
     // förra spelet har en pre-seedad rad och matchar på sitt guest-namn.
-    if (await checkRematchLockedLobby(code, guestIdentity || currentPlayerName)) return;
+    if (await checkRematchLockedLobby(code, guestIdentity || currentPlayerName)) return false;
     // Capacity-check: speglar handleJoinWithCode — full lobby visar popup
     // istället för att skicka in gästen som ändå skulle få "lobby is full"
     // när de hamnade i Lobby-vyn.
-    if (await checkLobbyCapacity(code)) return;
+    if (await checkLobbyCapacity(code)) return false;
     // Auto-fill-detektion: format `GuestA-1234567` — "Guest"-prefix + 1
     // versal random + dash + 7 digits. Om användaren ändrat namnet
     // manuellt blir flaggan false.
@@ -1207,6 +1217,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         guestAssistance: guestAssistance,
       },
     });
+    return true;
   };
 
   // "Start Game as Guest" — guest-HOST-flödet. Speglar HomeScreen:s
@@ -1215,8 +1226,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // Again saknas — nytt spel kräver att hela proceduren görs om).
   // Fungerar för både utloggade och inloggade users — en inloggad user
   // som väljer denna väg spelar under Guest-identiteten, inte sin profil.
-  const handleStartGameAsGuestHost = async () => {
-    if (!isGuestHostFormValid || parsedBirthYear === null) return;
+  const handleStartGameAsGuestHost = async (): Promise<boolean> => {
+    if (!isGuestHostFormValid || parsedBirthYear === null) return false;
     // Belt-and-suspenders: Remote 1vs1 spelas enbart av QuizVibe-users mot
     // varandra, så guest-hosting når det ALDRIG — oavsett om enheten har en
     // inloggad profil. Panelens Remote-rad är redan låst (utloggad) eller
@@ -1224,7 +1235,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // stale '1v1' får inte slinka igenom hit.
     if (guestHostLobbyType === '1v1') {
       onRemoteAccountRequired?.('host');
-      return;
+      return false;
     }
     // Anon-session KRÄVS före registerActiveRoom — utan Supabase-session
     // no-op:ar room-INSERT:en tyst (mockActiveRooms varnar bara) och
@@ -1237,7 +1248,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         'Could not start',
         'Please check your connection and try again.',
       );
-      return;
+      return false;
     }
     const hostName = normalizePlayerName(guestName.trim());
     const newCode = generateRoomCode();
@@ -1260,7 +1271,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         'Could not create game lobby',
         'The room could not be registered. Check your connection and try again.',
       );
-      return;
+      return false;
     }
     // Samma fresh-slate-cleanup som handleCreateGame — se kommentaren där.
     clearLeftPlayers(newCode);
@@ -1289,6 +1300,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         lobbyType: guestHostLobbyType,
       },
     });
+    return true;
   };
 
   return (
@@ -1423,10 +1435,14 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   modal.joinBtn,
                   code.length < ROOM_CODE_LENGTH && modal.joinBtnDisabled,
                 ]}
-                onPress={handleJoinWithCode}
-                disabled={code.length < ROOM_CODE_LENGTH}
+                onPress={() => { void joinFlight.run(handleJoinWithCode); }}
+                disabled={code.length < ROOM_CODE_LENGTH || joinFlight.busy}
               >
-                <Text style={modal.joinBtnText}>Join Game Lobby</Text>
+                {joinFlight.busy ? (
+                  <ActivityIndicator color={Colors.textPrimary} />
+                ) : (
+                  <Text style={modal.joinBtnText}>Join Game Lobby</Text>
+                )}
               </TouchableOpacity>
             </>
           )}
@@ -1901,10 +1917,14 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     modal.joinBtn,
                     !isGuestFormValid && modal.joinBtnDisabled,
                   ]}
-                  onPress={handleJoinAsGuest}
-                  disabled={!isGuestFormValid}
+                  onPress={() => { void joinFlight.run(handleJoinAsGuest); }}
+                  disabled={!isGuestFormValid || joinFlight.busy}
                 >
-                  <Text style={modal.joinBtnText}>Join as Guest</Text>
+                  {joinFlight.busy ? (
+                    <ActivityIndicator color={Colors.textPrimary} />
+                  ) : (
+                    <Text style={modal.joinBtnText}>Join as Guest</Text>
+                  )}
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
@@ -1912,10 +1932,14 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     modal.joinBtn,
                     !isGuestHostFormValid && modal.joinBtnDisabled,
                   ]}
-                  onPress={handleStartGameAsGuestHost}
-                  disabled={!isGuestHostFormValid}
+                  onPress={() => { void joinFlight.run(handleStartGameAsGuestHost); }}
+                  disabled={!isGuestHostFormValid || joinFlight.busy}
                 >
-                  <Text style={modal.joinBtnText}>Start Game - Guest login</Text>
+                  {joinFlight.busy ? (
+                    <ActivityIndicator color={Colors.textPrimary} />
+                  ) : (
+                    <Text style={modal.joinBtnText}>Start Game - Guest login</Text>
+                  )}
                 </TouchableOpacity>
               )}
             </>
@@ -2191,12 +2215,17 @@ export default function HomeScreen() {
   // handleCreateGame (registrerad) resp. guest-host-formen med
   // guestLobbyType satt (konsumeras av handleStartGameAsGuestHost via prop).
   const [hostTypeExpanded, setHostTypeExpanded] = useState<'none' | 'registered' | 'guest'>('none');
-  // In-flight-guard för registered "Start New Game"-flödet. Panelen kollapsas
-  // INTE längre synkront vid valet (det gav ett synligt layout-hopp innan
-  // /lobby pushats — se onSelect nedan), så den står kvar interaktiv under
-  // handleCreateGame:s async-gap. Ref:en stoppar en andra rad-tap från att
-  // fyra en andra handleCreateGame (dubbel registerActiveRoom + dubbel push).
-  const creatingGameRef = useRef(false);
+  // In-flight-spärr för registered "Start New Game"-flödet. Panelen kollapsas
+  // INTE synkront vid valet (det gav ett synligt layout-hopp innan /lobby
+  // pushats — se onSelect nedan), så den står kvar under handleCreateGame:s
+  // async-gap. useSingleFlight stoppar en andra rad-tap från att skapa en
+  // andra lobby, och HÅLLER spärren efter lyckad push (släpptes tidigare i
+  // .finally direkt efter push → tryck under slide-out skapade lobby nr 2,
+  // Peter 2026-10-15). busyKey driver radens spinner.
+  const createGameFlight = useSingleFlight();
+  // Samma spärr för Register Confirm + Login — signUp/signIn är nätverks-
+  // anrop utan synlig respons, och varje extra tryck gav en egen Alert.
+  const authFlight = useSingleFlight();
   const [guestLobbyType, setGuestLobbyType] = useState<HostLobbyType>('multiplayer');
   // Guest-sektionens fold-state — bara relevant för inloggade users (Peter
   // 2026-08-27). Default false (ihopfälld) så "Start New Game"-guest-
@@ -2694,15 +2723,17 @@ export default function HomeScreen() {
     return { freshProfile, hasPremium };
   };
 
-  const handleCreateGame = async (lobbyType: HostLobbyType = 'multiplayer') => {
+  // Returnerar true när /lobby pushats, false när flödet avbröts — styr
+  // useSingleFlight-spärren (släpps bara vid avbrott).
+  const handleCreateGame = async (lobbyType: HostLobbyType = 'multiplayer'): Promise<boolean> => {
     const credits = await checkHostCredits();
-    if (!credits) return;
+    if (!credits) return false;
     const { freshProfile, hasPremium } = credits;
 
     // Two-device-guard: kan inte hosta ett nytt spel medan kontot redan är
     // aktivt i en annan lobby på en annan enhet (excludeCode saknas — detta
     // är ett fräscht rum).
-    if (await checkActiveElsewhere()) return;
+    if (await checkActiveElsewhere()) return false;
 
     const code = generateRoomCode();
     // Registrera koden i Supabase rooms-tabellen + lagra host:s metadata så
@@ -2732,7 +2763,7 @@ export default function HomeScreen() {
         'Could not create game lobby',
         'The room could not be registered. Check your connection and that you are signed in, then try again.',
       );
-      return;
+      return false;
     }
     // Säkerställ att leftPlayers-storen är tom för den nya koden så
     // ingen stale test-data smyger in i den färska lobby:n och felaktigt
@@ -2755,6 +2786,7 @@ export default function HomeScreen() {
         lobbyType,
       },
     });
+    return true;
   };
 
   // Mock-login: sparar en minimal profil med användarens playerName.
@@ -3379,6 +3411,15 @@ export default function HomeScreen() {
                       setHostTypeExpanded('none');
                       return;
                     }
+                    // Snabbväg (Peter 2026-10-15): de synkrona speglarna
+                    // säger att host kan starta → fäll ut DIREKT. Tidigare
+                    // väntade utfällningen på två rundresor och första
+                    // trycket kändes dött. Säkert: handleCreateGame kör
+                    // den auktoritativa checkHostCredits före rummet skapas.
+                    if (getCachedPremium() === true || (getCachedProfile()?.freeGameCredits ?? 0) > 0) {
+                      setHostTypeExpanded('registered');
+                      return;
+                    }
                     void checkHostCredits().then((credits) => {
                       if (credits) setHostTypeExpanded('registered');
                     });
@@ -3408,15 +3449,11 @@ export default function HomeScreen() {
                     // registerActiveRoom först). Låt panelen stå kvar frusen
                     // under async-gapet + push-slide-outen; den nollställs
                     // off-screen i blur-cleanup:en (useFocusEffect nedan).
-                    if (creatingGameRef.current) return;
-                    creatingGameRef.current = true;
-                    void handleCreateGame(lobbyType).finally(() => {
-                      // Släpp guarden när flödet settlar — täcker både
-                      // success-pushen och credit-/registrerings-abort:en
-                      // (Alert + return utan navigation).
-                      creatingGameRef.current = false;
-                    });
+                    // Spärren släpps bara vid avbrott (credit-Alert,
+                    // registrerings-fel) — se useSingleFlight.
+                    void createGameFlight.run(() => handleCreateGame(lobbyType), { key: lobbyType });
                   }}
+                  busyType={(createGameFlight.busyKey as HostLobbyType | null) ?? null}
                 />
               )}
             </View>
@@ -4019,7 +4056,7 @@ export default function HomeScreen() {
                         onChangeText={setLoginPassword}
                         secureTextEntry
                         returnKeyType="done"
-                        onSubmitEditing={handleLogin}
+                        onSubmitEditing={() => { void authFlight.run(handleLogin, { holdAfterSuccess: false }); }}
                       />
                     </View>
                   );
@@ -4045,10 +4082,14 @@ export default function HomeScreen() {
                         profileMenu.primaryBtn,
                         !canSubmit && profileMenu.primaryBtnDisabled,
                       ]}
-                      onPress={handleLogin}
-                      disabled={!canSubmit}
+                      onPress={() => { void authFlight.run(handleLogin, { holdAfterSuccess: false }); }}
+                      disabled={!canSubmit || authFlight.busy}
                     >
-                      <Text style={profileMenu.primaryBtnText}>Log in</Text>
+                      {authFlight.busy ? (
+                        <ActivityIndicator color={Colors.textPrimary} />
+                      ) : (
+                        <Text style={profileMenu.primaryBtnText}>Log in</Text>
+                      )}
                     </TouchableOpacity>
                   );
                 })()}
@@ -4569,10 +4610,14 @@ export default function HomeScreen() {
                     profileMenu.primaryBtn,
                     !isRegisterFormValid && profileMenu.primaryBtnDisabled,
                   ]}
-                  onPress={handleRegisterSubmit}
-                  disabled={!isRegisterFormValid}
+                  onPress={() => { void authFlight.run(handleRegisterSubmit, { holdAfterSuccess: false }); }}
+                  disabled={!isRegisterFormValid || authFlight.busy}
                 >
-                  <Text style={profileMenu.primaryBtnText}>Register</Text>
+                  {authFlight.busy ? (
+                    <ActivityIndicator color={Colors.textPrimary} />
+                  ) : (
+                    <Text style={profileMenu.primaryBtnText}>Register</Text>
+                  )}
                 </TouchableOpacity>
               </>
             )}

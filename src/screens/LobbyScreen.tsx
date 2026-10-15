@@ -111,6 +111,7 @@ import {
 import { containsProfanity } from '../utils/profanity';
 import { getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData, type Region as ProfileRegion } from '../utils/profileStorage';
 import { getCachedPremium, hasPremiumSubscription } from '../utils/subscriptionStorage';
+import { useSingleFlight } from '../utils/useSingleFlight';
 import { ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, generateRoomCode } from '../utils/roomCode';
 import { checkSpotifyInstalled } from '../utils/spotifyDJ';
 import { addInvite, clearWaitingInvitesForRoom } from '../utils/waitingInvites';
@@ -6374,7 +6375,22 @@ export default function LobbyScreen() {
     }
   };
 
-  const handleStartGame = async (ptpConfirmed = false) => {
+  // Single-flight runt Start Game (Peter 2026-10-15): handleStartGame gör
+  // credit-deduktion, createRemoteMatch och flera DB-skrivningar innan
+  // /quiz pushas — ett andra tryck under gapet kunde dra TVÅ credits och
+  // pusha quiz två gånger. Spärren hålls efter lyckad push (flaggan nedan
+  // sätts precis före router.push) och släpps vid varje avbrott (Alert,
+  // guard). Bekräftelse-Alerts som anropar handleStartGame(true) går via
+  // wrappern igen — första körningen har då redan returnerat och släppt.
+  const startGameFlight = useSingleFlight();
+  const startGameNavigatedRef = useRef(false);
+  const handleStartGame = (ptpConfirmed = false) =>
+    startGameFlight.run(async () => {
+      startGameNavigatedRef.current = false;
+      await startGameInner(ptpConfirmed);
+      return startGameNavigatedRef.current;
+    });
+  const startGameInner = async (ptpConfirmed = false) => {
     // Seed-guard: en snabb replay-tap kan hinna fyra Start Game INNAN
     // seed-effekten (Promise.all → getLobbySettings) applicerat carry-over-
     // settings. Läser då de OSEEDADE default-kategorierna (all-3 källor) och
@@ -7068,6 +7084,7 @@ export default function LobbyScreen() {
     // host själv spelar. Vill host vänta spelar de "senare" via Save & Exit på
     // Get Ready-skärmen (48h-fönstret gäller ändå). Non-host:s egen Now/Later-
     // prompt (game-started-detection) är orörd — den saknar persist-beroendet.
+    startGameNavigatedRef.current = true;
     router.push(quizNav);
   };
 
@@ -9465,8 +9482,9 @@ export default function LobbyScreen() {
           >
             <TouchableOpacity
               activeOpacity={0.85}
-              onPress={() => handleStartGame()}
-              style={styles.startGameCompactRow}
+              onPress={() => { void handleStartGame(); }}
+              disabled={startGameFlight.busy}
+              style={[styles.startGameCompactRow, startGameFlight.busy && { opacity: 0.5 }]}
             >
               <BlinkingLabel
                 style={styles.startGameCompactLabelTwoLine}
