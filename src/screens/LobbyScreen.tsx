@@ -8589,7 +8589,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Customized Host packages',
-                      'Generic - Generic portfolio includes the full music quiz (YouTube + Hints).\n\nExtra Host Packages - specific themes for a customized game experience\n\nActivating an Extra package might affect your selection in Source mixerboard.',
+                      'Generic - Generic portfolio includes the full music and film quiz.\n\nExtra Host Packages - specific themes for a customized game experience\n\nActivating an Extra package might affect your selection in Source mixerboard.',
                     )
                   }
                   hitSlop={8}
