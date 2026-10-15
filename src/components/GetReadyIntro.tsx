@@ -22,7 +22,7 @@ import type { PlayedMediaSource } from '../utils/mediaSource';
 import Svg, { Path } from 'react-native-svg';
 import { MediaSourceIcon } from './MediaSourceIcon';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
-import { QuizVibeLogo } from './QuizVibeLogo';
+import { QuizVibeGoldMark } from './QuizVibeGoldMark';
 import { QuizVibePlayLogo } from './QuizVibePlayLogo';
 import { SequentialDots } from './SequentialDots';
 import { ConnectionUnstableOverlay } from './ConnectionUnstableOverlay';
@@ -968,7 +968,13 @@ export function GetReadyIntro({
           knapparna). Layouten är en row som alignSelf:'center' så hela
           gruppen sitter i mitten av skärmen. */}
       <View style={styles.settingsBlock}>
-        <QuizVibeLogo size={LOGO_SIZE} />
+        {/* Guld-Q:t (2026-10-15). PNG:en är tight beskuren, medan den gamla
+            SVG:n hade luft runt kvadraterna — 0.8 ger ungefär samma synliga
+            storlek. Wrappern behåller LOGO_SIZE så settings-texten bredvid
+            inte flyttar sig. */}
+        <View style={styles.logoSlot}>
+          <QuizVibeGoldMark size={Math.round(LOGO_SIZE * 0.8)} />
+        </View>
         <View style={styles.settingsTextWrap}>
           <TouchableOpacity
             style={styles.settingsTitleRow}
@@ -1964,6 +1970,12 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
+  },
+  logoSlot: {
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   settingsTextWrap: {
     gap: 2,
