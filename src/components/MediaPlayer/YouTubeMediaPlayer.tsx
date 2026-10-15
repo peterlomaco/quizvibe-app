@@ -33,11 +33,10 @@
 // (starta efter intro-titelkort), välja klipp/segment utan inbränd
 // avslöjande text, och välja videor vars titel inte avslöjar svaret.
 
-import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
+import { QuizVibeGoldMark, QuizVibeGoldWordmark } from '@/src/components/QuizVibeGoldMark';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import type { YoutubeClip } from '@/src/utils/mediaSource';
 import { QUIZ_MEDIA_H, QUIZ_MEDIA_W } from '@/src/utils/quizLayout';
@@ -65,6 +64,11 @@ interface Props {
 // Ha ALDRIG en lokal kopia av formeln här.
 const PLAYER_W = QUIZ_MEDIA_W;
 const PLAYER_H = QUIZ_MEDIA_H;
+// End-of-clip-brandingen (guld-Q + guld-ordmärke, 2026-10-15) skalas mot
+// spelarhöjden så den ryms även i den minsta 16:9-rutan (~180 pt):
+// Q 50 % av höjden + ordmärket (~0.24 × bredd hög) + gap.
+const ENDED_MARK_H = Math.round(PLAYER_H * 0.5);
+const ENDED_WORDMARK_W = Math.round(PLAYER_H * 0.8);
 
 /**
  * Stänger av YouTubes textning i spelaren.
@@ -148,13 +152,6 @@ export function YouTubeMediaPlayer({
   // Visar "Video ej tillgänglig"-overlay i spelaren och signalerar
   // uppåt via onError-prop så quiz.tsx kan skippa frågan.
   const [hasError, setHasError] = useState(false);
-
-  // Nunito_700Bold-fonten — matchar startskärmens appName-styling så
-  // "QuizVibe"-texten under end-of-clip-loggan ser identisk ut med
-  // brand-marken på Home. Fallback till systemfont under load (kort
-  // flicker första gången fonten cachas).
-  const [fontsLoaded] = useFonts({ Nunito_700Bold });
-  const brandFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -283,10 +280,10 @@ export function YouTubeMediaPlayer({
           QuizVibe-loggan här matchar startskärmens brand-mark exakt. */}
       {hasEnded && (
         <View style={styles.endedOverlay} pointerEvents="none">
-          <QuizVibeLogo size={140} />
-          <Text style={[styles.endedBrandName, { fontFamily: brandFont }]}>
-            QuizVibe
-          </Text>
+          <QuizVibeGoldMark size={ENDED_MARK_H} />
+          <View style={styles.endedWordmarkWrap}>
+            <QuizVibeGoldWordmark width={ENDED_WORDMARK_W} />
+          </View>
         </View>
       )}
       {/* Error-overlay — täcker spelaren vid YouTube-fel (felkod 2/5/100/101/150).
@@ -342,19 +339,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // Identisk styling med startskärmens `appName` (app/index.tsx) så
-  // brand-marken läses likadant överallt. Nunito_700Bold via brandFont-
-  // prop:en på Text-elementet. marginTop är NEGATIV här (vs +8 på Home)
-  // — QuizVibeLogo:s SVG har naturlig tom-yta i botten av viewBox:n som
-  // vid size=140 motsvarar ~28 px, så +8 hade gett ~36 px synligt gap.
-  // -16 drar texten tillbaka över viewBox-bottnen så visuell distans
-  // till logga blir ~12 px. Tweaka empiriskt om annan storlek på loggan.
-  endedBrandName: {
-    fontSize: 38,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    letterSpacing: -0.5,
-    marginTop: -Spacing.lg,
+  // Samma guld-ordmärke som på Home. PNG:erna är tight beskurna, så ett
+  // litet positivt gap räcker (den gamla SVG:n behövde negativ marginal).
+  endedWordmarkWrap: {
+    marginTop: Spacing.sm,
   },
   // Bara visuell hint — pointerEvents="none" så taps når iframen under.
   // Lägg ej position absolute som täcker hela frame:n för att inte skymma
