@@ -10,12 +10,12 @@ import {
   Text,
   View,
 } from 'react-native';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '../theme';
 import { type MainCategory, mainCategoryDisplay } from '../utils/mainCategory';
 import { DEFAULT_VOICE_ID, resolveVoicePack, SILENT_VOICE_ID, type VoiceToken } from '../utils/voicePacks';
 import { ensureVoiceAudioMode } from '../utils/voicePlayback';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
+import { QuizVibeGoldQCentered } from './QuizVibeGoldMark';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
 
 interface Props {
@@ -507,23 +507,17 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
           </View>
         ) : null}
         <View style={styles.logoStack}>
-          {/* Q-loggan shift:as RIGHT med 3.75 % av LOGO_SIZE så Q-ringens
-              center (SVG-koord (37, 37) = 46.25 % från vänster) hamnar på
-              50 % horisontellt — exakt under/i mitten av glyph-overlay:s
-              centrerade siffra/?. Glyph-overlay:n flyttas INTE eftersom dess
-              flex-centrering redan ankrar mot logoStack-mitten. */}
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              transform: [{ translateX: LOGO_SIZE * 0.0375 }],
-            }}
-            pointerEvents="none"
-          >
-            <CountdownQLogo size={LOGO_SIZE} />
+          {/* Guld-Q:t utan wifi-bågar (2026-10-15). Positioneras så
+              ringhålets mitt hamnar i logoStack-mitten — exakt där glyph-
+              overlay:ns flex-centrerade siffra/? landar. */}
+          <View style={styles.qFill} pointerEvents="none">
+            {/* offsetY flyttar Q:t lite uppåt så siffran/? hamnar något
+                lägre i ringen (Peter 2026-10-15, empiriskt). */}
+            <QuizVibeGoldQCentered
+              box={LOGO_SIZE}
+              width={Math.round(LOGO_SIZE * 0.62)}
+              offsetY={-Math.round(LOGO_SIZE * 0.035)}
+            />
           </View>
           {/* Glyph-overlay centrerad i logoStack — samverkar med ovanstående
               Q-shift så siffran/? landar exakt i Q-ringens visuella center. */}
@@ -557,45 +551,6 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
         </View>
       </View>
     </SafeAreaView>
-  );
-}
-
-/**
- * Inline Q-logga utan inre symbol — siffran/"?" ritas ovanpå via
- * absolute-positionerad Animated.Text. Annars samma squares + Q-ring +
- * Q-svans som QuizVibeLogo.
- */
-function CountdownQLogo({ size }: { size: number }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 80 80">
-      <Rect
-        x="18" y="18" width="44" height="44" rx="12"
-        fill={Colors.cardElevated}
-        stroke={Colors.primary}
-        strokeOpacity={0.5}
-        strokeWidth="1.5"
-        transform="rotate(12 40 40)"
-      />
-      <Rect
-        x="16" y="16" width="44" height="44" rx="12"
-        fill={Colors.card}
-        stroke={Colors.primary}
-        strokeWidth="1.5"
-        transform="rotate(-6 40 40)"
-      />
-      <Circle
-        cx="37" cy="37" r="13"
-        fill="none"
-        stroke={Colors.primary}
-        strokeWidth="3"
-      />
-      <Path
-        d="M46 46 L52 52"
-        stroke={Colors.primary}
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-    </Svg>
   );
 }
 
@@ -743,6 +698,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  qFill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   // ⚠ Explicit position:absolute + top/left/right/bottom, INTE
   // `...StyleSheet.absoluteFillObject`-spread. På nya arkitekturen (dev-build)
   // applicerades spreaden inte som absolut → overlayn hamnade i normalt flöde
@@ -761,7 +723,8 @@ const styles = StyleSheet.create({
     fontSize: GLYPH_FONT_SIZE,
     lineHeight: GLYPH_FONT_SIZE,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    // Guld — matchar guld-Q:t runt siffran (2026-10-15).
+    color: Colors.warning,
     letterSpacing: -2,
     fontVariant: ['tabular-nums'],
     textShadowColor: Colors.background,
