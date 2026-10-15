@@ -33,7 +33,7 @@ import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
-import { QuizVibeLogo } from '../components/QuizVibeLogo';
+import { QuizVibeGoldMark } from '../components/QuizVibeGoldMark';
 import { QuizVibePlayLogo } from '../components/QuizVibePlayLogo';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
@@ -7333,8 +7333,10 @@ export default function LobbyScreen() {
               en liten inset från kantlinjen. Card är default position:
               relative i RN så absolute children pinnas mot Card:s padding-
               edge. */}
-          <View style={styles.roomCodeLogoWrap}>
-            <QuizVibeLogo size={ROOM_LOGO_SIZE} />
+          <View style={[styles.roomCodeLogoWrap, { width: ROOM_LOGO_SIZE, height: ROOM_LOGO_SIZE }]}>
+            {/* Guld-Q:t (2026-10-15) — 0.8 av slotten ger samma synliga
+                storlek som den gamla SVG:n (som hade luft runt kvadraterna). */}
+            <QuizVibeGoldMark size={Math.round(ROOM_LOGO_SIZE * 0.8)} />
           </View>
           {/* För guest renderas labeln absolut i Card:s övre del med
               vertikal mitt direkt på loggans visuella mitt — ger ett
@@ -10990,6 +10992,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -Spacing.sm,
     left: -Spacing.sm,
+    // Bredd/höjd sätts inline (ROOM_LOGO_SIZE) — fast slot = den gamla
+    // loggans storlek, så guest-labelns position inte flyttar sig.
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   roomCodeStack: { alignItems: 'center' },
   roomLabel: { ...Typography.overline, color: Colors.textSecondary, marginBottom: Spacing.sm },
