@@ -29,12 +29,18 @@ export const DEFAULT_TOTAL_OPTIONS = 10;
  * `backend/content/distractors.ts:getPrefixForItem` — multi-name-regel,
  * diakriter bevarade, uppercase. Splittar på whitespace, tar första `length`
  * bokstäver av varje del, joinas med space.
+ *
+ * MAX TVÅ ORD (Peter 2026-10-15): "Swedish House Mafia" → "SWE HOU", inte
+ * "SWE HOU MAF". Prefixet ska rymmas på EN rad i prefix-knappen, och
+ * ord-klassen blir därmed 1 eller 2 — så ord-count-filtren nedan och i
+ * ImageAnswerBlock betyder "1-ordssvar ↔ 1-ordsalternativ, 2+ ↔ 2+".
  */
 export function getPrefixForItem(displayName: string, length: number): string {
   return displayName
     .split(/\s+/)
     .map((part) => part.replace(/[^\p{L}]/gu, '').slice(0, length).toUpperCase())
     .filter((p) => p.length > 0)
+    .slice(0, 2)
     .join(' ');
 }
 

@@ -108,7 +108,13 @@ import {
 import { ensureVoiceAudioMode, warmVoiceSession, releaseVoiceSession } from '@/src/utils/voicePlayback';
 import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
 import { SpotifyBrandIcon } from '@/src/components/SpotifyBrandIcon';
-import { getSpotifyArtistMeta, type SpotifyArtistMeta } from '@/src/utils/spotifyArtistMeta';
+import { getSpotifyArtistMeta } from '@/src/utils/spotifyArtistMeta';
+import {
+  SPOTIFY_ARTIST_CANDIDATES,
+  getArtistPackages,
+  pickSpotifyNamePool,
+  type SpotifyNameCandidate,
+} from '@/src/utils/spotifyNameDistractors';
 import { SPOTIFY_ALBUM_CONTEXT } from '@/src/utils/spotifyAlbumContext';
 import { savePendingLobbyPlayers } from '@/src/utils/pendingLobby';
 import { generatePlayerName } from '@/src/utils/playerName';
@@ -473,32 +479,8 @@ function filterImagePoolByGeneration<
   return out;
 }
 
-/** Distraktor-kandidater för Spotify/Name-frågor: alla artister ur musik-
- *  katalogen med spotifyTrackId som har kuraterad meta (typ/kön/land) i
- *  SPOTIFY_ARTIST_META. Kompletterar bild-poolens artist/band-items så
- *  relevans-filtreringen har tillräckligt med t.ex. svenska kvinnliga
- *  soloartister eller amerikanska band att välja bland. Dedup på lowercase-
- *  namn; canonical casing tas från katalogens displayName ("Title — Artist"). */
-const SPOTIFY_ARTIST_CANDIDATES: { name: string; meta: SpotifyArtistMeta }[] = (() => {
-  const seen = new Set<string>();
-  const out: { name: string; meta: SpotifyArtistMeta }[] = [];
-  for (const q of MUSIC_QUESTIONS) {
-    if (!q.spotifyTrackId) continue;
-    const artist = q.displayName?.split(' — ').pop()?.trim();
-    if (!artist) continue;
-    // Meta slås upp på FULLA strängen (tabellen nycklar collabs på full form),
-    // men kandidat-NAMNET strippas på featured-delen — "Jay-Z ft. Alicia Keys"
-    // blir distraktorn "Jay-Z" (ett ft.-namn som svarsalternativ läser konstigt).
-    const meta = getSpotifyArtistMeta(artist);
-    if (!meta) continue;
-    const candName = artist.split(/\s+(?:ft\.?|feat\.?)\s+/i)[0]?.trim() || artist;
-    const key = candName.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push({ name: candName, meta });
-  }
-  return out;
-})();
+// Spotify/Name-distraktorernas kandidatlista + paket-relevans bor i
+// src/utils/spotifyNameDistractors.ts (ren modul, enhetstestad).
 
 // Fisher-Yates-shuffle — slumpar ordningen i en ny kopia utan att muttera originalet.
 function shuffleArray<T>(arr: T[]): T[] {
@@ -4002,7 +3984,9 @@ export default function QuizScreen() {
   // Kör som useEffect (inte useMemo) eftersom derivedArtistName är en string
   // som inte är ett stabilt dep för useMemo-chaining.
   //
-  // Relevans-filtrering (2026-07-03): distraktorerna lager-filtreras mot den
+  // Relevans (2026-10-15): SAMMA PAKET först (genrePackages på artistens låtar,
+  // sällsyntast tagg först), se spotifyNameDistractors.ts. Saknas paket gäller
+  // lagren nedan. Relevans-filtrering (2026-07-03): distraktorerna lager-filtreras mot den
   // kuraterade SPOTIFY_ARTIST_META-tabellen så alternativen matchar rätt svar
   // i typ (band vs solo), land och kön — en svensk kvinnlig soloartist får
   // andra svenska kvinnliga soloartister, ett amerikanskt band andra
@@ -4023,14 +4007,8 @@ export default function QuizScreen() {
     const correctKey = derivedArtistName.trim().toLowerCase();
     const correctMeta = getSpotifyArtistMeta(derivedArtistName);
 
-    type SpotifyNameCandidate = {
-      item: ImageQuizQuestion;
-      type: 'artist' | 'band';
-      country: string | null;
-      gender: 'male' | 'female' | 'mixed' | null;
-    };
-    const seenNames = new Set<string>([correctKey]);
     const candidates: SpotifyNameCandidate[] = [];
+    const seenNames = new Set<string>([correctKey]);
 
     for (const q of IMAGE_SEED_QUESTIONS) {
       const src = q.source;
@@ -4045,6 +4023,7 @@ export default function QuizScreen() {
         type: src.contentSubject,
         country: meta?.country ?? (lib ? inferNationality(lib) : null),
         gender: meta?.gender ?? null,
+        packages: getArtistPackages(src.displayName),
       });
     }
     for (const cand of SPOTIFY_ARTIST_CANDIDATES) {
@@ -4056,7 +4035,7 @@ export default function QuizScreen() {
           id: `spotify-cand-${nameKey.replace(/[^a-z0-9åäö]+/g, '-')}`,
           displayName: cand.name,
           category: 'artists',
-          contentSubject: cand.meta.type,
+          contentSubject: cand.meta?.type ?? 'artist',
           audiences: ['all' as ImageQuestionAudience],
           // Syntetiskt distraktor-item — når aldrig region-filtret, men
           // ImageQuizQuestion kräver fältet. 'global' = neutralt/bredast.
@@ -4065,38 +4044,11 @@ export default function QuizScreen() {
           // Distraktor-källa, filtreras aldrig av HCP — 100 = neutral default.
           itemHcp: 100,
         },
-        type: cand.meta.type,
-        country: cand.meta.country,
-        gender: cand.meta.gender,
+        type: cand.meta?.type ?? null,
+        country: cand.meta?.country ?? null,
+        gender: cand.meta?.gender ?? null,
+        packages: getArtistPackages(cand.name),
       });
-    }
-
-    // Lager-filter, striktast → lösast. Kön jämförs bara när BÅDA sidor har
-    // värde ('mixed' matchar 'mixed'). För ICKE-svenska artister skjuts två
-    // "internationellt"-lager in före den fria typ-mixen — annars får t.ex.
-    // Eagles (USA-band) svenska dansband som alternativ när USA-poolen är
-    // för tunn (utländskt band → andra utländska band är mer trovärdigt).
-    const MIN_DISTRACTORS = 4;
-    let pool: SpotifyNameCandidate[] = candidates;
-    if (correctMeta) {
-      const genderMatch = (g: SpotifyNameCandidate['gender']) =>
-        correctMeta.gender !== null && g === correctMeta.gender;
-      const isIntl = (c: SpotifyNameCandidate) => c.country !== null && c.country !== 'sweden';
-      const layers = [
-        candidates.filter(
-          (c) => c.type === correctMeta.type && c.country === correctMeta.country && genderMatch(c.gender),
-        ),
-        candidates.filter((c) => c.type === correctMeta.type && c.country === correctMeta.country),
-        ...(correctMeta.country !== 'sweden'
-          ? [
-              candidates.filter((c) => c.type === correctMeta.type && isIntl(c) && genderMatch(c.gender)),
-              candidates.filter((c) => c.type === correctMeta.type && isIntl(c)),
-            ]
-          : []),
-        candidates.filter((c) => c.type === correctMeta.type && genderMatch(c.gender)),
-        candidates.filter((c) => c.type === correctMeta.type),
-      ];
-      pool = layers.find((l) => l.length >= MIN_DISTRACTORS) ?? candidates;
     }
 
     const syntheticItem: ImageQuizQuestion = {
@@ -4118,6 +4070,14 @@ export default function QuizScreen() {
     // buildImageVariant) och Film (ActorSelectBlock) är oberörda.
     const spotifyNamePrefixLength =
       currentAssistance === 'full' ? 3 : currentAssistance === 'standard' ? 2 : 1;
+    // Paket-relevans (Peter 2026-10-15): samma paket först, annars valfritt
+    // via typ/land/kön-lagren — se spotifyNameDistractors.ts.
+    const pool = pickSpotifyNamePool({
+      correctName: derivedArtistName,
+      correctMeta,
+      candidates,
+      prefixLength: spotifyNamePrefixLength,
+    });
     // Individual Devices (Spotify DJ är IndDev-only): gissarnas enheter bygger
     // var sitt svarsblock lokalt. Seeda på samma synk-nyckel som Hints/Film
     // (roomCode:question.id) → alla gissare får identiska Name-alternativ i
@@ -11859,11 +11819,18 @@ export default function QuizScreen() {
                       { transform: [{ scale: revealScale }], opacity: revealOpacity },
                     ]}
                   >
-                    <Text style={rv.feedbackCorrectYear}>
-                      {'Correct Name: '}
-                      <Text style={rv.feedbackCorrectYearBold}>{artistName}</Text>
+                    {/* Rubriken på egen rad, artisten på raden under — EN rad,
+                        kapas med "…" om den är för lång. Hela svaret står
+                        alltid i den grå raden nedanför (Peter 2026-10-15). */}
+                    <Text style={rv.feedbackCorrectYear}>Correct Name:</Text>
+                    <Text
+                      style={[rv.feedbackCorrectYear, rv.feedbackCorrectYearBold]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {artistName}
                     </Text>
-                    <Text style={rv.feedbackSongMeta} numberOfLines={1} ellipsizeMode="tail">
+                    <Text style={rv.feedbackSongMeta}>
                       {`${question.correctYear} · ${hintTitle}`}
                     </Text>
                   </Animated.View>

@@ -1591,7 +1591,7 @@ Edge cases:
 | Inget svar: rätta raden | grön | blå | grön "✓ Correct" |
 | Inget svar: övriga rader | röd | grå | röd ✗ |
 
-Film behåller grå `movieMeta`-undertext (titel · år) under skådespelaren. Bullet-listan nedan är historik där den motsäger matrisen (t.ex. "Texten konstant blå"). Blink-animationen (svarsalternativen pulserar före svar) MÅSTE återställas till `opacity: 1` när den stoppar — annars fastnar en rad på blinkens momentana opacitet och facit-raden kan bli utgråad.
+Film behåller grå `movieMeta`-undertext (titel · år) under skådespelaren. Bullet-listan nedan är historik där den motsäger matrisen (t.ex. "Texten konstant blå"). Blink-animationen (svarsalternativen pulserar före svar) MÅSTE återställas till `opacity: 1` när den stoppar — annars fastnar en rad på blinkens momentana opacitet och facit-raden kan bli utgråad. ⚠ Blinken kör med `useNativeDriver: false` med flit: med native driver behöll vyn sin senaste blink-opacitet trots `opacity: 1` i JS, så spelarens valda rad kunde fastna halvgrå vid reveal. Byt inte tillbaka till native driver.
 
 **Reveal-fas-beteende** (redesign 2026-05-21):
 - Alla prefix-knappar förblir synliga genom hela faskedjan (`question → awaiting → reveal`). Tidigare retur:ade ImageAnswerBlock `null` vid reveal; den early-returnen är borttagen.

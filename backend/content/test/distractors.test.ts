@@ -35,7 +35,7 @@ describe('getPrefixForItem', () => {
 
   it('treats hyphens within a part as a single word, keeps initials as own part', () => {
     expect(getPrefixForItem('Spider-Man', 3)).toBe('SPI');
-    expect(getPrefixForItem('John F. Kennedy', 3)).toBe('JOH F KEN');
+    expect(getPrefixForItem('John F. Kennedy', 3)).toBe('JOH F');
     expect(getPrefixForItem('Washington, D.C.', 4)).toBe('WASH DC');
   });
 
@@ -44,6 +44,11 @@ describe('getPrefixForItem', () => {
     expect(getPrefixForItem('Carola Häggkvist', 3)).toBe('CAR HÄG');
     expect(getPrefixForItem('Lasse Åberg', 3)).toBe('LAS ÅBE');
     expect(getPrefixForItem('Zlatan Ibrahimović', 2)).toBe('ZL IB');
+  });
+
+  it('caps the prefix at the first two words', () => {
+    expect(getPrefixForItem('Swedish House Mafia', 3)).toBe('SWE HOU');
+    expect(getPrefixForItem('Lana Del Rey', 2)).toBe('LA DE');
   });
 
   it('returns full available letters when length exceeds name', () => {

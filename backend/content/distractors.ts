@@ -54,6 +54,8 @@ export function getPrefixForItem(displayName: string, length: number): string {
       part.replace(/[^\p{L}]/gu, '').slice(0, length).toUpperCase(),
     )
     .filter((p) => p.length > 0)
+    // Max två ord — speglar src/utils/imageQuestionBuilder.ts (Peter 2026-10-15).
+    .slice(0, 2)
     .join(' ');
 }
 
