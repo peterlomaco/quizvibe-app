@@ -209,7 +209,7 @@ Host Game Credits, package unlocks, and subscription benefits are **virtual item
 
 ### 8.6 Daily free credits
 
-Registered users receive a daily allowance of free Host Game Credits (currently 4, refreshing at midnight Central European Time). This allowance may change over time at our discretion. We will give reasonable notice before reducing it.
+Registered users receive a one-time welcome allowance of free Host Game Credits on registration (currently 10), and thereafter a daily allowance (currently topped up to 4 at midnight Central European Time; unused credits above that level are kept). This allowance may change over time at our discretion. We will give reasonable notice before reducing it.
 
 ---
 

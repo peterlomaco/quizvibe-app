@@ -155,6 +155,12 @@ const LEGACY_SKILL_TO_ASSISTANCE: Record<string, AssistanceLevel> = {
 // Höjt 2 → 4 (Peter 2026-08-07) — Store visar "Basic: 4 games per day".
 export const FREE_CREDITS_DAILY_CAP = 4;
 
+// Välkomst-saldo vid registrering (Peter 2026-10-15). Ges EN gång — vid
+// kontots allra första refresh (lastFreeCreditsRefreshDate saknas). Därefter
+// gäller den vanliga top-up:en till FREE_CREDITS_DAILY_CAP: 10 → spelar 2 →
+// 8 dag 2 (ingen påfyllning, 8 ≥ 4) → spelar 6 → 2 → toppas till 4 dag 3.
+export const REGISTRATION_FREE_CREDITS = 10;
+
 /**
  * Returnerar dagens datum i Europe/Stockholm-tidszon som "YYYY-MM-DD".
  * `sv-SE`-locale ger redan ISO-likt format ("2026-05-06") så ingen
@@ -183,7 +189,7 @@ function todayCETDate(): string {
  * på legacy-profil men saldo råkar redan vara på cap).
  *
  * Edge case: helt nya profiler (utan lastFreeCreditsRefreshDate) räknas som
- * "ny dag" → får cap direkt vid första load.
+ * "ny dag" → får REGISTRATION_FREE_CREDITS (10) vid första load.
  */
 function refreshFreeCreditsIfNeeded(data: ProfileData): { data: ProfileData; changed: boolean } {
   const today = todayCETDate();
@@ -191,7 +197,13 @@ function refreshFreeCreditsIfNeeded(data: ProfileData): { data: ProfileData; cha
     return { data, changed: false };
   }
   const currentFree = data.freeGameCredits ?? 0;
-  const nextFree = Math.max(currentFree, FREE_CREDITS_DAILY_CAP);
+  // Saknat refresh-datum = kontots första load någonsin (nyregistrerad;
+  // DB-raden från handle_new_user har datum null) → välkomst-saldot.
+  const isFirstRefresh = !data.lastFreeCreditsRefreshDate;
+  const nextFree = Math.max(
+    currentFree,
+    isFirstRefresh ? REGISTRATION_FREE_CREDITS : FREE_CREDITS_DAILY_CAP,
+  );
   return {
     data: {
       ...data,

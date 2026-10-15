@@ -167,9 +167,9 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
  *
  * Källor för värdena: Remote 1vs1 är users-only; guest-hostade spel skriver
  * ingen Player history; guest host kan välja Game era (sedan 2026-09-02) men
- * har inga Extra packages / max 1 Play Again; free host = FREE_CREDITS_DAILY_CAP (4) —
- * både grant vid registrering och daglig top-up-cap, samma siffra som
- * Store:s "Basic: 4 games per day". Guest = ogated men trial-begränsat
+ * har inga Extra packages / max 1 Play Again; free host = REGISTRATION_FREE_CREDITS
+ * (10) vid registrering, sedan daglig top-up till FREE_CREDITS_DAILY_CAP (4) —
+ * samma siffror som Store:s Basic-rad. Guest = ogated men trial-begränsat
  * spel.
  */
 const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolean | string }[] = [
@@ -182,7 +182,7 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
   { label: 'Custom Game era', user: true, guest: true },
   { label: 'Select categories and source (Source mixerboard)', user: true, guest: false },
   { label: 'Spotify, YouTube and Hints', user: true, guest: true },
-  { label: 'Host games per day', user: '4 free', guest: 'Trial' },
+  { label: 'Host games per first time&day', user: '10&4', guest: 'Trial' },
   { label: 'Replay & Marathon table', user: true, guest: false },
   { label: 'Premium option', user: true, guest: false },
 ];
@@ -197,7 +197,7 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
  * 2026-08-12: sektionen ska se ut som i Store). Ändra ALLTID båda.
  */
 const PREMIUM_FEATURES: { premium: string; basic: string }[] = [
-  { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
+  { premium: 'Host Game Credits Unlimited', basic: 'First time 10, then 4 games per day' },
   { premium: '20 rounds per game (Individual device)', basic: 'Max 4 rounds per game' },
   { premium: 'Invite 12 players per game (Individual device)', basic: 'Max 4 players' },
   { premium: 'All Extra Host packages included', basic: 'Generic content only' },

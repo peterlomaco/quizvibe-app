@@ -126,7 +126,7 @@ interface SubscriptionFeature {
  * samma kort-layout). Ändra ALLTID båda.
  */
 export const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
-  { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
+  { premium: 'Host Game Credits Unlimited', basic: 'First time 10, then 4 games per day' },
   { premium: '20 rounds per game (Individual device)', basic: 'Max 4 rounds per game' },
   { premium: 'Invite 12 players per game (Individual device)', basic: 'Max 4 players' },
   { premium: 'All Extra Host packages included', basic: 'Generic content only' },
