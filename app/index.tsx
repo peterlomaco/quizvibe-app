@@ -1,5 +1,5 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
-import { QuizVibeLogo } from '@/src/components/QuizVibeLogo';
+import { QuizVibeGoldMark, QuizVibeGoldWordmark } from '@/src/components/QuizVibeGoldMark';
 import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
@@ -3263,10 +3263,10 @@ export default function HomeScreen() {
 
         {/* ── Brand ──────────────────────────────────────────── */}
         <View style={styles.brandSection}>
-          <QuizVibeLogo size={SCREEN_HEIGHT < 600 ? 100 : 140} />
-          <Text style={[styles.appName, { fontFamily: appNameFont }]}>
-            QuizVibe
-          </Text>
+          <QuizVibeGoldMark size={SCREEN_HEIGHT < 600 ? 83 : 116} />
+          <View style={styles.appNameWrap}>
+            <QuizVibeGoldWordmark width={SCREEN_HEIGHT < 600 ? 170 : 220} />
+          </View>
           {/* Cross-fade tagline-wrap. Första texten i flow definierar
               höjden; index 1+ är absolut-positionerade ovanpå och fadar
               i/ur via egna taglineOpacities[i]. `alignSelf: stretch` så
@@ -4744,11 +4744,9 @@ const styles = StyleSheet.create({
   },
 
   brandSection: { alignItems: 'center', gap: SCREEN_HEIGHT < 600 ? 2 : Spacing.sm },
-  appName: {
-    fontSize: SCREEN_HEIGHT < 600 ? 30 : 38,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    letterSpacing: -0.5,
+  // Ordmärket är en PNG (metallguld) sedan 2026-10-15 — bara spacingen
+  // från den tidigare Text-stylen behålls.
+  appNameWrap: {
     marginTop: SCREEN_HEIGHT < 600 ? 2 : Spacing.sm,
   },
   tagline: {
