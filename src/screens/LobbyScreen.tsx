@@ -34,7 +34,7 @@ import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeGoldMark } from '../components/QuizVibeGoldMark';
-import { QuizVibePlayLogo } from '../components/QuizVibePlayLogo';
+import { GoldCtaButton } from '../components/GoldCtaButton';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — handleConnectSpotify/
@@ -449,9 +449,6 @@ const HOST_BULK_WRITE_DEBOUNCE_MS = 400;
 // INSERT/UPDATE-event (varje joiner ger ~4 skrivningar) kollapsar till EN
 // get_lobby_roster-läsning + ETT setPlayers per tyst fönster.
 const HOST_ROSTER_RECONCILE_DEBOUNCE_MS = 500;
-// Låst-grå för Start Game-knappen medan seed-effekten ännu inte applicerat
-// carry-over-settings. Samma vokabulär som GetReadyIntro:s PLAY_LOCKED_COLOR.
-const START_LOCKED_GREY = '#6B7280';
 
 // Delad copy för single-player-approve-spärren så ALLA approve-vägar
 // (ApproveToggle, "Approve All"-mastern, join-popupens Approve och
@@ -1431,14 +1428,6 @@ export default function LobbyScreen() {
   // denna ref skulle vi anropa router.push flera gånger innan unmount.
   const navigatedToQuizRef = useRef(false);
 
-  // Gold-glow-animation för host:s Start Game-knapp. Två native-driver-loops
-  // som "andas" tillsammans: halo-opacity (0.4 ↔ 0.85) + subtil scale-pulse
-  // (1 ↔ 1.03). Subtil pulse — knappen är CTA, inte distraherande hopp-effekt.
-  // Loopen startas/stoppas via useEffect-deps på hostMode så non-host:s aldrig
-  // kör onödig animation.
-  const startGlow = useRef(new Animated.Value(0.4)).current;
-  const startPulse = useRef(new Animated.Value(1)).current;
-
   // Cross-fade host-badge: "You are the host" → "Invite friends" → "Single
   // or multiplayer game". I 1vs1-lobbyn hoppas den tredje frasen över —
   // varken single player eller fler än 2 spelare finns där (Peter 2026-08-07).
@@ -1446,31 +1435,6 @@ export default function LobbyScreen() {
   const hostBadgeOp1 = useRef(new Animated.Value(0)).current;
   const hostBadgeOp2 = useRef(new Animated.Value(0)).current;
   const hostBadgeIdxRef = useRef(0);
-
-  useEffect(() => {
-    // Animationen körs för båda host (Start Game-knappen) och non-host
-    // (Waiting for Host-statusrutan) — båda har gold-glowing pulse-effekt
-    // i samma layout-position. Värdena delas via samma Animated.Value-pair
-    // eftersom bara en av rutorna renderas åt gången per role.
-    const glowLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(startGlow, { toValue: 0.85, duration: 1100, useNativeDriver: true }),
-        Animated.timing(startGlow, { toValue: 0.4, duration: 1100, useNativeDriver: true }),
-      ]),
-    );
-    const pulseLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(startPulse, { toValue: 1.03, duration: 1100, useNativeDriver: true }),
-        Animated.timing(startPulse, { toValue: 1, duration: 1100, useNativeDriver: true }),
-      ]),
-    );
-    glowLoop.start();
-    pulseLoop.start();
-    return () => {
-      glowLoop.stop();
-      pulseLoop.stop();
-    };
-  }, [startGlow, startPulse]);
 
   // Vid mount OCH vid URL-params-ändring (när lobby-tabben återanvänds över
   // host→guest-transitions inom samma tab-instans, t.ex. host som går home
@@ -9403,112 +9367,51 @@ export default function LobbyScreen() {
           Host: tappbar → handleStartGame. Non-host: passiv väntetext med
           samma gold-glowing visuella språk. */}
       <View style={styles.startStickyBar}>
-        {/* Gul glödande yta som fyller hela baren runt Start Game-pillen.
-            Opaciteten pulsar via samma startGlow-loop som logo-halon så
-            hela bottenzonen andas i takt med CTA:n. */}
-        <Animated.View
-          style={[styles.startStickyBarGlow, { opacity: startGlow }]}
-          pointerEvents="none"
-        />
-        {hostMode && !lobbySeeded ? (
-          /* Seed-lås: carry-over-settings (t.ex. Music-only) appliceras av en
-             async seed-effekt (Promise.all → getLobbySettings). Håll Start
-             Game LÅST tills dess så en snabb replay-tap inte startar spelet
-             med de OSEDDA default-källorna (all-3) → "helt slumpmässigt" media.
-             Passiv, grå, ingen puls — läses som ett kort "förbereder", inte
-             en knapp. Fönstret är normalt sub-sekund. */
-          <View style={styles.startGameCompactWrap}>
-            <View style={styles.startGameCompactRow} pointerEvents="none">
-              <View style={styles.startGameWaitTextWrap}>
-                <Text style={styles.startGameWaitText}>Preparing lobby…</Text>
-                <SequentialDots color={Colors.textSecondary} />
-              </View>
-              <View style={styles.startGameCompactLogoWrap}>
-                <QuizVibePlayLogo size={64} color={START_LOCKED_GREY} />
-              </View>
-            </View>
-          </View>
-        ) : hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
-         approvedPlayers.filter((p) => !p.isHost).length === 0 ? (
-          /* Remote 1vs1 utan approved motståndare: Start Game ersätts av en
-             HELT PASSIV väntetext (Peter 2026-08-07) — samma vokabulär som
-             non-host:s "Waiting for Host to Start Game". Host delar koden
-             via Share invite eller rumkoden i kortet ovan; baren byter till
-             Start Game så fort motståndaren joinat och godkänts. */
-          <Animated.View
-            style={[styles.startGameCompactWrap, { transform: [{ scale: startPulse }] }]}
-          >
-            <View style={styles.startGameCompactRow} pointerEvents="none">
-              <View style={styles.startGameWaitTextWrap}>
-                <Text
-                  style={styles.startGameWaitTextLarge}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.75}
-                >
-                  Wait for friend to join
-                </Text>
-                {/* Grå prickar — samma dämpade färg som texten så hela
-                    väntestatusen läses som en enhet. */}
-                <SequentialDots color={Colors.textSecondary} />
-              </View>
-              <View style={styles.startGameCompactLogoWrap}>
-                <Animated.View
-                  style={[styles.startGameCompactHalo, { opacity: startGlow }]}
-                  pointerEvents="none"
-                />
-                <QuizVibePlayLogo size={64} color={Colors.warning} />
-              </View>
-            </View>
-          </Animated.View>
-        ) : hostMode ? (
-          <Animated.View
-            style={[styles.startGameCompactWrap, { transform: [{ scale: startPulse }] }]}
-          >
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={() => handleStartGame()}
-              style={styles.startGameCompactRow}
-            >
-              <BlinkingLabel
-                style={styles.startGameCompactLabelTwoLine}
-                numberOfLines={2}
-              >
-                {isRematchLobby
+        {/* Guldknapp i samma stil som Home:s "Start New Game" (Peter
+            2026-10-15) — ersatte Q-play-loggan + den pulserande guld-glöden
+            över hela baren. Vänte-lägena är samma knappform, grå och låst. */}
+        <View style={styles.startCtaSlot}>
+          {hostMode && !lobbySeeded ? (
+            /* Seed-lås: carry-over-settings (t.ex. Music-only) appliceras av en
+               async seed-effekt (Promise.all → getLobbySettings). Håll Start
+               Game LÅST tills dess så en snabb replay-tap inte startar spelet
+               med de OSEDDA default-källorna (all-3) → "helt slumpmässigt" media.
+               Fönstret är normalt sub-sekund. */
+            <GoldCtaButton
+              locked
+              label="Preparing lobby"
+              trailing={<SequentialDots color={Colors.textSecondary} />}
+            />
+          ) : hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
+           approvedPlayers.filter((p) => !p.isHost).length === 0 ? (
+            /* Remote 1vs1 utan approved motståndare: Start Game ersätts av en
+               HELT PASSIV väntetext (Peter 2026-08-07). Host delar koden via
+               Share invite eller rumkoden i kortet ovan; baren byter till
+               Start Game så fort motståndaren joinat och godkänts. */
+            <GoldCtaButton
+              locked
+              label="Wait for friend to join"
+              trailing={<SequentialDots color={Colors.textSecondary} />}
+            />
+          ) : hostMode ? (
+            <GoldCtaButton
+              label={
+                isRematchLobby
                   ? singlePlayerDefault
-                    ? 'Start\nReplay'
-                    : 'Start\nRe-match'
-                  : 'Start\nGame'}
-              </BlinkingLabel>
-              <View style={styles.startGameCompactLogoWrap}>
-                <Animated.View
-                  style={[styles.startGameCompactHalo, { opacity: startGlow }]}
-                  pointerEvents="none"
-                />
-                <QuizVibePlayLogo size={64} color={Colors.warning} />
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
-        ) : (
-          <Animated.View
-            style={[styles.startGameCompactWrap, { transform: [{ scale: startPulse }] }]}
-          >
-            <View style={styles.startGameCompactRow} pointerEvents="none">
-              <View style={styles.startGameWaitTextWrap}>
-                <Text style={styles.startGameWaitText}>Waiting for Host to Start Game</Text>
-                {/* Grå prickar — samma dämpade färg som texten. */}
-                <SequentialDots color={Colors.textSecondary} />
-              </View>
-              <View style={styles.startGameCompactLogoWrap}>
-                <Animated.View
-                  style={[styles.startGameCompactHalo, { opacity: startGlow }]}
-                  pointerEvents="none"
-                />
-                <QuizVibePlayLogo size={64} color={Colors.warning} />
-              </View>
-            </View>
-          </Animated.View>
-        )}
+                    ? 'Start Replay'
+                    : 'Start Re-match'
+                  : 'Start Game'
+              }
+              onPress={() => handleStartGame()}
+            />
+          ) : (
+            <GoldCtaButton
+              locked
+              label="Waiting for Host to Start Game"
+              trailing={<SequentialDots color={Colors.textSecondary} />}
+            />
+          )}
+        </View>
       </View>
 
       {/* Scroll-hint-pil — guidar ner i lobby-innehållet. Samma som
@@ -12727,16 +12630,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
     alignItems: 'center',
-    // Gold-glow uppåt så baren "lyser" mot scroll-innehållet ovanför.
-    shadowColor: Colors.warning,
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 10,
+    // Ingen guld-skugga längre (Peter 2026-10-15): den spillde även NEDÅT
+    // in i safe-area-zonen under knappen och gav en ljusare rand där. Allt
+    // under Start Game ska ha samma mörka appbakgrund.
   },
   // Gul yta som täcker hela baren (bakom pillen). Animated opacity
   // (startGlow 0.4 ↔ 0.85) ger pulserande glöd; pillen har egen mörk
   // bg + guld-border så den förblir läsbar ovanpå.
+  startCtaSlot: {
+    alignSelf: 'stretch',
+  },
   startStickyBarGlow: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: Colors.warning,

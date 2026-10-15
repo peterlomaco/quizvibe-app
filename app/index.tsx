@@ -1,5 +1,6 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
 import { QuizVibeGoldMark, QuizVibeGoldWordmark } from '@/src/components/QuizVibeGoldMark';
+import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicGoldFill';
 import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
@@ -3369,7 +3370,7 @@ export default function HomeScreen() {
                   valet står ensamt (Peter 2026-08-07). */}
               <Animated.View style={{ transform: [{ scale: hostTypeExpanded === 'registered' ? 1 : pulse }] }}>
                 <TouchableOpacity
-                  style={[styles.gameBtn, styles.gameBtnUser]}
+                  style={[styles.gameBtn, styles.gameBtnUser, styles.gameBtnMetallic]}
                   activeOpacity={0.85}
                   onPress={() => {
                     // Collapse behöver ingen check. Vid expand körs credit-
@@ -3384,11 +3385,16 @@ export default function HomeScreen() {
                     });
                   }}
                 >
+                  {/* Metallisk guld-bakgrund — samma som Lobby/Get Ready-
+                      knapparna och guld-Q-loggan (2026-10-15). */}
+                  <MetallicGoldFill />
                   <Text
                     style={[
                       styles.gameBtnText,
                       styles.gameBtnUserText,
-                      { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                      // Fetstil (Peter 2026-10-15) — samma som guldknapparna
+                      // i Lobby (Start Game) och Get Ready (Press Play).
+                      { fontFamily: fontsLoaded ? 'Nunito_700Bold' : undefined, fontWeight: '700' },
                     ]}
                   >
                     Start New Game
@@ -4813,6 +4819,12 @@ const styles = StyleSheet.create({
   },
   gameBtnUserText: {
     color: '#000000',
+  },
+  // Start New Game: metallisk gradient (MetallicGoldFill) klipps till
+  // knappens rundade hörn; mörkare guldkant som på Lobby/Get Ready.
+  gameBtnMetallic: {
+    overflow: 'hidden',
+    borderColor: METALLIC_GOLD_EDGE,
   },
   // "Join with Room Code — user" (Peter 2026-09-02): mörk bakgrund + tunn
   // guld-linje + guld text — särskiljs från den gold-FYLLDA "Start New

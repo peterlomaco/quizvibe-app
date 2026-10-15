@@ -19,11 +19,10 @@ import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { MainCategory, mainCategoryDisplay } from '../utils/mainCategory';
 import type { PlayedMediaSource } from '../utils/mediaSource';
-import Svg, { Path } from 'react-native-svg';
 import { MediaSourceIcon } from './MediaSourceIcon';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { QuizVibeGoldMark } from './QuizVibeGoldMark';
-import { QuizVibePlayLogo } from './QuizVibePlayLogo';
+import { GoldCtaButton } from './GoldCtaButton';
 import { SequentialDots } from './SequentialDots';
 import { ConnectionUnstableOverlay } from './ConnectionUnstableOverlay';
 import { useConnectionStatus } from '../lib/network/connectionMonitor';
@@ -623,10 +622,7 @@ export function GetReadyIntro({
     onAnswerResponseSecondsChange(seconds);
     setResponseDropdownOpen(false);
   };
-  // Två separata loops på native-driver: scale på hela knappen + halo, och
-  // opacity på halo:n så det "andas" tillsammans med skalningen.
-  const playPulse = useRef(new Animated.Value(1)).current;
-  const playGlow = useRef(new Animated.Value(0.35)).current;
+  // (Play-knappens egen puls bor sedan 2026-10-15 i GoldCtaButton.)
   // Opacity-pulse på "nästa fråga"-rutan (currentPlayerBox i PtP/Single,
   // currentMediaBox i IndDev). Signalerar visuellt vilken ruta som är näst
   // på tur att besvaras. Native driver så bar:en aldrig laggar trots övrig
@@ -634,33 +630,17 @@ export function GetReadyIntro({
   const nextBlink = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    const scaleLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(playPulse, { toValue: 1.06, duration: 800, useNativeDriver: true }),
-        Animated.timing(playPulse, { toValue: 1, duration: 800, useNativeDriver: true }),
-      ]),
-    );
-    const glowLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(playGlow, { toValue: 0.8, duration: 800, useNativeDriver: true }),
-        Animated.timing(playGlow, { toValue: 0.35, duration: 800, useNativeDriver: true }),
-      ]),
-    );
     const blinkLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(nextBlink, { toValue: 0.4, duration: 700, useNativeDriver: true }),
         Animated.timing(nextBlink, { toValue: 1, duration: 700, useNativeDriver: true }),
       ]),
     );
-    scaleLoop.start();
-    glowLoop.start();
     blinkLoop.start();
     return () => {
-      scaleLoop.stop();
-      glowLoop.stop();
       blinkLoop.stop();
     };
-  }, [playPulse, playGlow, nextBlink]);
+  }, [nextBlink]);
 
   // ── Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö ──────────
   // R- och Q-kolumnerna är borttagna; progress visas i stället som två
@@ -1469,108 +1449,35 @@ export function GetReadyIntro({
             passiv "Waiting for Host to start quiz"-ruta i samma position;
             samma halo + scale-pulse så den visuella rytmen behålls. ── */}
         <View style={styles.playBlock}>
-          {canStartGame ? (
-            <>
-              {/* Yttre wrapper omfamnar text + logo — ringar sitter här
-                  så de aldrig skär in i "Press Play"-texten ovanför.
-                  Pulsen PAUSAS medan startLocked är satt: en pulserande knapp
-                  läses som "tryck här", och det är precis vad den inte går att
-                  göra då. Samma regel som Next-tabbens 5-sekunderslås. */}
-              <Animated.View
-                style={[
-                  styles.playOuterWrap,
-                  !startLocked && { transform: [{ scale: playPulse }] },
-                ]}
-              >
-                <View
-                  style={[styles.playRingOuter, startLocked && styles.playRingLocked]}
-                  pointerEvents="none"
+          {/* Guldknapp i samma stil som Home:s "Start New Game" (Peter
+              2026-10-15) — ersatte Q-play-loggan med ringar + halo. Låst
+              läge (peers ansluter ännu) och non-host:s vänteläge är samma
+              knappform, grå och utan puls: en pulserande knapp läses som
+              "tryck här", och det går inte då. */}
+          <View style={styles.playCtaSlot}>
+            {canStartGame ? (
+              startLocked ? (
+                <GoldCtaButton
+                  locked
+                  label="Connecting players"
+                  trailing={<SequentialDots color={Colors.textSecondary} />}
+                  accessibilityLabel="Waiting for all players to connect"
                 />
-                <View
-                  style={[styles.playRingInner, startLocked && styles.playRingLocked]}
-                  pointerEvents="none"
+              ) : (
+                <GoldCtaButton
+                  label="Press Play"
+                  onPress={handlePlayPress}
+                  accessibilityLabel={`${playerName} press to start your turn`}
                 />
-                <View style={styles.tapHereRow}>
-                  <Text
-                    style={[styles.tapHereText, startLocked && styles.tapHereTextLocked]}
-                  >
-                    {startLocked ? 'Get ready' : 'Press Play'}
-                  </Text>
-                  <Svg width={18} height={18} viewBox="0 0 18 18">
-                    <Path
-                      d="M4 2 L16 9 L4 16 Z"
-                      fill={startLocked ? PLAY_LOCKED_COLOR : Colors.warning}
-                    />
-                  </Svg>
-                </View>
-                <View style={[styles.playLogoWrap, startLocked && styles.playLogoWrapLocked]}>
-                  {/* Halo:n unmountas helt i låst läge — en grå logga med gold
-                      glow bakom ser ut som en renderingsbugg. */}
-                  {!startLocked && (
-                    <Animated.View
-                      style={[styles.playLogoHalo, { opacity: playGlow }]}
-                      pointerEvents="none"
-                    />
-                  )}
-                  <TouchableOpacity
-                    activeOpacity={0.85}
-                    onPress={handlePlayPress}
-                    disabled={startLocked}
-                    accessibilityState={{ disabled: startLocked }}
-                    accessibilityLabel={
-                      startLocked
-                        ? 'Waiting for all players to connect'
-                        : `${playerName} press to start your turn`
-                    }
-                    style={styles.playLogoTouchable}
-                  >
-                    <QuizVibePlayLogo
-                      size={PLAY_BUTTON_SIZE}
-                      color={startLocked ? PLAY_LOCKED_COLOR : Colors.warning}
-                    />
-                  </TouchableOpacity>
-                </View>
-                {/* Etiketten renderas ALLTID och döljs med opacity 0 i stället
-                    för att unmountas — annars krymper playOuterWrap i samma
-                    sekund som knappen blir guld och hela GetReady-layouten
-                    hoppar. Ingen sifferräknare (till skillnad från Next-tabben):
-                    väntan är peer-beroende, och en räknare som ibland hoppar
-                    till guld på 3 och ibland på 1 är värre än prickar. */}
-                <View
-                  style={[
-                    styles.startLockedLabel,
-                    !startLocked && styles.startLockedLabelHidden,
-                  ]}
-                  pointerEvents="none"
-                >
-                  <Text style={styles.startLockedText}>Connecting</Text>
-                  {startLocked && <SequentialDots color={Colors.textSecondary} />}
-                </View>
-              </Animated.View>
-            </>
-          ) : (
-            // Same gold-halo Q-play-logo som host, men non-tappable + text
-            // under loggan. Inget tap-target — host kontrollerar speltempot.
-            <View style={styles.waitingForHostBlock}>
-              <Animated.View
-                style={[styles.playLogoWrap, { transform: [{ scale: playPulse }] }]}
-              >
-                <Animated.View
-                  style={[styles.playLogoHalo, { opacity: playGlow }]}
-                  pointerEvents="none"
-                />
-                <View style={styles.playLogoTouchable} pointerEvents="none">
-                  <QuizVibePlayLogo size={PLAY_BUTTON_SIZE} color={Colors.warning} />
-                </View>
-              </Animated.View>
-              <View style={styles.waitingForHostLabel}>
-                <Text style={styles.waitingForHostText}>
-                  Waiting - Host will start quiz
-                </Text>
-                <SequentialDots color={Colors.warning} />
-              </View>
-            </View>
-          )}
+              )
+            ) : (
+              <GoldCtaButton
+                locked
+                label="Waiting - Host will start quiz"
+                trailing={<SequentialDots color={Colors.textSecondary} />}
+              />
+            )}
+          </View>
         </View>
 
         {isIndDev || isSinglePlayer ? (
@@ -2919,8 +2826,18 @@ const styles = StyleSheet.create({
   // visas runt själva loggan istället för långt utanför den. Gold glow
   // (Colors.warning #F5A623) speglar Lobby:s Start Game-CTA-mönster — samma
   // visuella vokabulär signalerar "premium action moment".
+  // Dubbel bredd mot knappens naturliga ~130 pt (Peter 2026-10-15),
+  // klampad så den aldrig går utanför skärmens sidomarginaler.
+  playCtaSlot: {
+    width: Math.min(260, SCREEN_WIDTH - Spacing.lg * 2),
+  },
   playBlock: {
     alignItems: 'center',
+    // Dubbelt utrymme ovanför och under (Peter 2026-10-15): marginalerna
+    // läggs OVANPÅ containerns paddingTop (ovanför) resp. gap (under), så
+    // båda avstånden dubblas och knappen ligger kvar i mitten mellan dem.
+    marginTop: COMPACT ? 20 : 40,
+    marginBottom: COMPACT ? Spacing.lg : Spacing.xxl,
     // gap: Spacing.sm (var Spacing.lg) — tightare spacing mellan "Tap Here"-
     // texten och Play-loggan. Påverkar bara host-branchen; non-host:s
     // waitingForHostBlock är en enskild child så gap:n har ingen effekt där.
