@@ -1110,14 +1110,23 @@ function confirmAsync(
   });
 }
 
-// Blockar aktivering av ett parent-restricted-paket (Hip Hop) medan Parent
-// Control är på i lobbyn. Delas av alla fyra aktiverings-paths.
-function alertParentRestrictedPackage(): void {
-  Alert.alert(
-    'Parent Control',
-    "You're trying to activate a package that is restricted with Parent control. Please switch Parent control off before activating this package.",
-  );
+// Paket som är spärrat av Parent Control: erbjud att stänga av Parent Control
+// direkt i samma popup i stället för att kräva ett separat steg (Peter
+// 2026-10-15). Yes → onConfirm stänger av PC OCH aktiverar paketet/paketen.
+// onDecline används av bulk-vägarna (aktivera bara de tillåtna paketen).
+function confirmDeactivateParentControlForPackage(
+  onConfirm: () => void,
+  onDecline?: () => void,
+  message = 'This package needs Parent control deactivated. Do you want to deactivate Parent control?',
+): void {
+  Alert.alert('Parent Control', message, [
+    { text: 'No', style: 'cancel', onPress: onDecline },
+    { text: 'Yes', onPress: onConfirm },
+  ]);
 }
+
+const BULK_PARENT_CONTROL_MESSAGE =
+  'Some packages need Parent control deactivated. Do you want to deactivate Parent control?';
 
 // SequentialDots flyttat till src/components/SequentialDots.tsx för delning
 // med GetReadyIntro (icke-host:s "Waiting for Host to start quiz"-ruta).
@@ -3309,32 +3318,43 @@ export default function LobbyScreen() {
 
   const handleToggleExtraPackage = (id: string) => {
     const isActivating = !selectedExtraPackages.includes(id);
-    // Aktivering av ett parent-restricted-paket är blockerad medan Parent
-    // Control är på (avaktivering är alltid tillåten).
+    // Parent-restricted-paket medan Parent Control är på: erbjud att stänga av
+    // PC direkt — Yes stänger av PC och aktiverar paketet i ett steg.
     if (isActivating && parentControlEnabled && isPackageParentRestricted(id)) {
-      alertParentRestrictedPackage();
+      confirmDeactivateParentControlForPackage(() => {
+        setParentControlEnabled(false);
+        setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      });
       return;
     }
+    // Ingen "Source mixerboard"-bekräftelse längre (Peter 2026-10-15) — den
+    // informationen ligger nu i info-ikonen vid "Customized Host packages".
     if (isActivating) {
-      // Ett aktivt paket kollapsar/omformar Source Mixerboard (tema-only pool
-      // + coverage-graying + era-lås) → bekräfta med host innan valet appliceras.
-      Alert.alert(
-        'Extra package',
-        'Please be aware that this might affect your selection in Source mixerboard.',
-        [
-          { text: 'No', style: 'cancel' },
-          {
-            text: 'Yes',
-            onPress: () =>
-              setSelectedExtraPackages((prev) =>
-                prev.includes(id) ? prev : [...prev, id],
-              ),
-          },
-        ],
-      );
+      setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
       return;
     }
     setSelectedExtraPackages((prev) => prev.filter((p) => p !== id));
+  };
+  // Bulk-aktivering (Select all + "Activate Extra package"): finns spärrade
+  // paket medan Parent Control är på → fråga om PC ska stängas av.
+  // Yes = PC av + alla paket aktiva; No = bara de tillåtna paketen aktiva.
+  const activateAllPackages = () => {
+    const allIds = availablePackages.map((p) => p.id);
+    const allowedIds = availablePackages
+      .filter((p) => !(parentControlEnabled && isPackageParentRestricted(p.id)))
+      .map((p) => p.id);
+    if (allowedIds.length === allIds.length) {
+      setSelectedExtraPackages(allIds);
+      return;
+    }
+    confirmDeactivateParentControlForPackage(
+      () => {
+        setParentControlEnabled(false);
+        setSelectedExtraPackages(allIds);
+      },
+      () => setSelectedExtraPackages(allowedIds),
+      BULK_PARENT_CONTROL_MESSAGE,
+    );
   };
   // "Select all"-toggle på rubrik-raden — låter host aktivera/avaktivera
   // alla synliga (profil-aktiverade) paket med ett enda klick.
@@ -3346,29 +3366,7 @@ export default function LobbyScreen() {
       setSelectedExtraPackages([]);
       return;
     }
-    // Aktivering av paket kollapsar/omformar Source Mixerboard → bekräfta först.
-    Alert.alert(
-      'Extra package',
-      'Please be aware that this might affect your selection in Source mixerboard.',
-      [
-        { text: 'No', style: 'cancel' },
-        {
-          text: 'Yes',
-          onPress: () => {
-            // Select all: aktivera bara icke-restricted-paket när Parent Control
-            // är på; om något restricted-paket hoppas över, informera via block-
-            // alerten.
-            const activatable = availablePackages.filter(
-              (p) => !(parentControlEnabled && isPackageParentRestricted(p.id)),
-            );
-            if (activatable.length < availablePackages.length) {
-              alertParentRestrictedPackage();
-            }
-            setSelectedExtraPackages(activatable.map((p) => p.id));
-          },
-        },
-      ],
-    );
+    activateAllPackages();
   };
 
   // "+ Add package"-modal: host väljer paket direkt ur HELA katalogen
@@ -3382,27 +3380,19 @@ export default function LobbyScreen() {
       setEnabledHostPackages((prev) => prev.filter((p) => p !== id));
       setSelectedExtraPackages((prev) => prev.filter((p) => p !== id));
     } else {
-      // "+ Add package" aktiverar paketet direkt i lobbyn → blockeras för
-      // parent-restricted-paket medan Parent Control är på.
+      // "+ Add package" aktiverar paketet direkt i lobbyn → för parent-
+      // restricted-paket medan Parent Control är på: erbjud att stänga av PC
+      // och aktivera paketet i ett steg.
       if (parentControlEnabled && isPackageParentRestricted(id)) {
-        alertParentRestrictedPackage();
+        confirmDeactivateParentControlForPackage(() => {
+          setParentControlEnabled(false);
+          setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+          setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+        });
         return;
       }
-      // Aktivering kollapsar/omformar Source Mixerboard → bekräfta först.
-      Alert.alert(
-        'Extra package',
-        'Please be aware that this might affect your selection in Source mixerboard.',
-        [
-          { text: 'No', style: 'cancel' },
-          {
-            text: 'Yes',
-            onPress: () => {
-              setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
-              setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
-            },
-          },
-        ],
-      );
+      setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
     }
   };
 
@@ -8599,7 +8589,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     Alert.alert(
                       'Customized Host packages',
-                      'Generic - Generic portfolio includes the full music quiz (YouTube + Hints).\n\nExtra Host Packages - specific themes for a customized game experience',
+                      'Generic - Generic portfolio includes the full music quiz (YouTube + Hints).\n\nExtra Host Packages - specific themes for a customized game experience\n\nActivating an Extra package might affect your selection in Source mixerboard.',
                     )
                   }
                   hitSlop={8}
@@ -8686,15 +8676,7 @@ export default function LobbyScreen() {
                     setAddPackageModalVisible(true);
                     return;
                   }
-                  // Aktivera bara icke-restricted-paket medan Parent Control är
-                  // på; om något restricted-paket hoppas över, informera.
-                  const activatable = availablePackages.filter(
-                    (p) => !(parentControlEnabled && isPackageParentRestricted(p.id)),
-                  );
-                  if (activatable.length < availablePackages.length) {
-                    alertParentRestrictedPackage();
-                  }
-                  setSelectedExtraPackages(activatable.map((p) => p.id));
+                  activateAllPackages();
                 };
                 const activateIsActive = hasPremium && isPackagesActive;
                 return (
