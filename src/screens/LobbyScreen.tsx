@@ -8525,11 +8525,8 @@ export default function LobbyScreen() {
                   />
                 </View>
                 <Text style={styles.guestHostNote}>
-                  {/* Single- och 1vs1-lobbyn döljer Spotify helt → ingen Spotify-mening där. */}
                   {hostMode
-                    ? isSingleLobby || gameMode === 'remote-1v1'
-                      ? 'Package sources — each toggle controls all of the package’s categories.'
-                      : 'Package sources — each toggle controls all of the package’s categories. Spotify (above) is optional and can never be the only source.'
+                    ? 'Package sources — each toggle controls all of the package’s categories.'
                     : 'Package sources — selected by the Host'}
                 </Text>
               </View>
