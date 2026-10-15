@@ -1585,13 +1585,13 @@ Edge cases:
 
 | Rad | Kant | Text | Badge |
 |---|---|---|---|
-| Mitt svar, rätt | guld | **vit** | grön "Correct" |
-| Mitt svar, fel | guld (Spotify/Hints) / **röd** (Film) | blå | röd "Wrong" |
-| Rätta svaret (facit, när jag svarat fel) | grön | blå | grön "Correct" |
-| Inget svar: rätta raden | grön | blå | grön "Correct" |
+| Mitt svar, rätt | guld | **vit** | grön "✓ Correct Answer" |
+| Mitt svar, fel | guld (Spotify/Hints) / **röd** (Film) | blå | röd "✗ Wrong Answer" |
+| Rätta svaret (facit, när jag svarat fel) | grön | blå | grön "✓ Correct" |
+| Inget svar: rätta raden | grön | blå | grön "✓ Correct" |
 | Inget svar: övriga rader | röd | grå | röd ✗ |
 
-Film behåller grå `movieMeta`-undertext (titel · år) under skådespelaren. Bullet-listan nedan är historik där den motsäger matrisen (t.ex. "Texten konstant blå").
+Film behåller grå `movieMeta`-undertext (titel · år) under skådespelaren. Bullet-listan nedan är historik där den motsäger matrisen (t.ex. "Texten konstant blå"). Blink-animationen (svarsalternativen pulserar före svar) MÅSTE återställas till `opacity: 1` när den stoppar — annars fastnar en rad på blinkens momentana opacitet och facit-raden kan bli utgråad.
 
 **Reveal-fas-beteende** (redesign 2026-05-21):
 - Alla prefix-knappar förblir synliga genom hela faskedjan (`question → awaiting → reveal`). Tidigare retur:ade ImageAnswerBlock `null` vid reveal; den early-returnen är borttagen.

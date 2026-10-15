@@ -202,7 +202,7 @@ function FullNamesView({
           return (
             <Animated.View
               key={name.itemId}
-              style={shouldBlink ? { opacity: blinkAnim } : undefined}
+              style={{ opacity: shouldBlink ? blinkAnim : 1 }}
             >
               <Pressable
                 onPress={() => handleNamePress(name)}
@@ -225,12 +225,12 @@ function FullNamesView({
                 </Text>
                 {badgeType === 'correct' && (
                   <Text style={[styles.revealBadge, styles.revealBadgeCorrect]}>
-                    Correct
+                    {isPlayerRow ? '✓ Correct Answer' : '✓ Correct'}
                   </Text>
                 )}
                 {badgeType === 'wrong' && (
                   <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
-                    Wrong
+                    ✗ Wrong Answer
                   </Text>
                 )}
                 {badgeType === 'wrongReveal' && (
@@ -471,7 +471,7 @@ function PrefixView({
 
           return (
             <View key={opt.prefix} style={styles.prefixRow}>
-              <Animated.View style={shouldBlink ? { opacity: blinkAnim } : undefined}>
+              <Animated.View style={{ opacity: shouldBlink ? blinkAnim : 1 }}>
                 <Pressable
                   onPress={() => handlePrefixPress(opt.prefix)}
                   disabled={isPrefixLocked}
@@ -514,12 +514,12 @@ function PrefixView({
                   </Text>
                   {badgeType === 'correct' && (
                     <Text style={[styles.revealBadge, styles.revealBadgeCorrect]}>
-                      Correct
+                      {isPlayerRow ? '✓ Correct Answer' : '✓ Correct'}
                     </Text>
                   )}
                   {badgeType === 'wrong' && (
                     <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
-                      Wrong
+                      ✗ Wrong Answer
                     </Text>
                   )}
                 </View>

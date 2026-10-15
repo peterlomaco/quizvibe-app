@@ -166,12 +166,12 @@ export function ActorSelectBlock({
               </View>
               {showCorrectBadge && (
                 <View style={styles.correctBadge}>
-                  <Text style={styles.correctBadgeText}>Correct</Text>
+                  <Text style={styles.correctBadgeText}>{isPlayerRow ? '✓ Correct Answer' : '✓ Correct'}</Text>
                 </View>
               )}
               {showWrongPill && (
                 <View style={styles.wrongBadge}>
-                  <Text style={styles.wrongBadgeText}>Wrong</Text>
+                  <Text style={styles.wrongBadgeText}>✗ Wrong Answer</Text>
                 </View>
               )}
               {showWrongIcon && (
@@ -233,12 +233,12 @@ export function ActorSelectBlock({
                 )}
                 {showCorrectBadge && (
                   <View style={styles.correctBadge}>
-                    <Text style={styles.correctBadgeText}>Correct</Text>
+                    <Text style={styles.correctBadgeText}>{isPlayerRow ? '✓ Correct Answer' : '✓ Correct'}</Text>
                   </View>
                 )}
                 {showWrongPill && (
                   <View style={styles.wrongBadge}>
-                    <Text style={styles.wrongBadgeText}>Wrong</Text>
+                    <Text style={styles.wrongBadgeText}>✗ Wrong Answer</Text>
                   </View>
                 )}
                 {showWrongIcon && (
