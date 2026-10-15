@@ -8545,7 +8545,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "0ikz6tENMONtK6qGkOrU3c",
     "youtubeClips": [
       {
-        "videoId": "Uj2K3rerzT4",
+        "videoId": "YfAF92Z3iFw",
         "startSec": 0,
         "endSec": 30,
         "channelTitle": "Bad Boy Edd",
@@ -13234,7 +13234,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "27LuGw8pE0WSELYYuptRjK",
     "youtubeClips": [
       {
-        "videoId": "f1IdyrhOrGs",
+        "videoId": "0oi1fGhaJl8",
         "startSec": 30,
         "endSec": 45,
         "channelTitle": "Nirvana - Topic",
