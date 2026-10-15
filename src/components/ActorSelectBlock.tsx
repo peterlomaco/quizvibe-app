@@ -8,7 +8,8 @@
 // Reveal-vokabulär identisk med ImageAnswerBlock:
 //   • question  → vald rad blå border (pending)
 //   • awaiting  → vald rad gold border (confirmed, låst)
-//   • reveal    → correct grön, spelarens fel röd, timeout alla röda
+//   • reveal    → se reveal-matrisen vid borderColor nedan (rätt = guld/vit,
+//                 fel = röd/blå, facit = grön/blå, time-out-fel = röd/grå)
 
 import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -112,23 +113,29 @@ export function ActorSelectBlock({
         const isConfirmedRow = isLocked && confirmedName === name;
         const isSelected = isPending || isConfirmedRow;
 
-        // Kantlinje-färg (delas av prefix-knapp och namnkort). Spelarens EGEN
-        // låsta rad färgas grön/röd redan vid 'awaiting' så rätt/fel syns direkt
-        // — facit-raderna (separat correct + time-out-röd) hålls till 'reveal'.
+        // Reveal-matris (Peter 2026-10-15) — gemensam för alla Name-svar,
+        // enda Film-avvikelsen är RÖD kant på mitt fel svar (Spotify/Hints:
+        // guld). Spelarens EGEN låsta rad graderas redan vid 'awaiting';
+        // facit-raderna (separat correct + time-out-röd) hålls till 'reveal'.
+        //   • mitt rätta svar     → guld kant, vit text, grön "Correct"
+        //   • mitt fel svar       → röd kant,  blå text, röd "Wrong"
+        //   • rätta svaret (facit)→ grön kant, blå text, grön "Correct"
+        //   • time-out, fel rader → röd kant,  grå text, röd ✗
+        const isCorrectFacitRow = isCorrectRevealRow && !isPlayerRow;
         let borderColor: string = Colors.border;
         if (isPending) borderColor = Colors.primary;
-        else if (isConfirmedRow) borderColor = wasPlayerCorrect ? Colors.success : QUIZ_ERROR_RED;
+        else if (isConfirmedRow) borderColor = wasPlayerCorrect ? Colors.warning : QUIZ_ERROR_RED;
         else if (isCorrectRevealRow) borderColor = Colors.success;
         else if (showWrongTimeout) borderColor = QUIZ_ERROR_RED;
 
-        const textColor = isDimmed ? Colors.textDisabled : Colors.textPrimary;
-        // Spelarens egen ✓ visas vid lås (awaiting); time-out-facitets ✓ på
-        // rätta raden hålls kvar till reveal. showWrongBadge läser det nu
-        // isLocked-gatade showWrongForPlayer + reveal-only showWrongTimeout.
+        let textColor: string = Colors.textPrimary;
+        if (isConfirmedRow) textColor = wasPlayerCorrect ? Colors.textPrimary : Colors.primary;
+        else if (isCorrectFacitRow) textColor = Colors.primary;
+        else if (showWrongTimeout || isDimmed) textColor = Colors.textDisabled;
         const showCorrectBadge =
-          (isPlayerRow && wasPlayerCorrect && isLocked) ||
-          (isRevealing && isCorrectRevealRow && isTimedOut);
-        const showWrongBadge = showWrongForPlayer || showWrongTimeout;
+          (isPlayerRow && wasPlayerCorrect && isLocked) || isCorrectFacitRow;
+        const showWrongPill = showWrongForPlayer;
+        const showWrongIcon = showWrongTimeout;
 
         const onPress = () => {
           if (isLocked) return;
@@ -137,7 +144,7 @@ export function ActorSelectBlock({
 
         // ── Full mode ──────────────────────────────────────────────────
         if (isFullMode) {
-          const bg = isSelected || isCorrectRevealRow
+          const bg = isSelected || isCorrectRevealRow || showWrongTimeout
             ? Colors.primaryMuted
             : Colors.cardElevated;
           const showMovieMeta = isCorrectRevealRow && movieTitle;
@@ -159,10 +166,15 @@ export function ActorSelectBlock({
               </View>
               {showCorrectBadge && (
                 <View style={styles.correctBadge}>
-                  <Text style={styles.correctBadgeText}>✓ Correct</Text>
+                  <Text style={styles.correctBadgeText}>Correct</Text>
                 </View>
               )}
-              {showWrongBadge && (
+              {showWrongPill && (
+                <View style={styles.wrongBadge}>
+                  <Text style={styles.wrongBadgeText}>Wrong</Text>
+                </View>
+              )}
+              {showWrongIcon && (
                 <View style={styles.wrongBadge}>
                   <Text style={styles.wrongBadgeText}>✗</Text>
                 </View>
@@ -175,7 +187,12 @@ export function ActorSelectBlock({
         // Namnkortet visas när raden är vald ELLER i reveal-fas.
         const showNameCard = isSelected || isRevealing;
         const prefix = prefixOf(name, prefixLen);
-        const prefixColor = isDimmed ? Colors.textDisabled : Colors.primary;
+        // Prefix-texten följer namnkortets färg på graderade rader (mitt svar,
+        // facit, time-out-fel); övriga rader behåller blå/dämpad grå.
+        const prefixColor =
+          isConfirmedRow || isCorrectFacitRow || showWrongTimeout
+            ? textColor
+            : isDimmed ? Colors.textDisabled : Colors.primary;
 
         return (
           <Pressable key={name} onPress={onPress} style={styles.prefixRow}>
@@ -216,10 +233,15 @@ export function ActorSelectBlock({
                 )}
                 {showCorrectBadge && (
                   <View style={styles.correctBadge}>
-                    <Text style={styles.correctBadgeText}>✓ Correct</Text>
+                    <Text style={styles.correctBadgeText}>Correct</Text>
                   </View>
                 )}
-                {showWrongBadge && (
+                {showWrongPill && (
+                  <View style={styles.wrongBadge}>
+                    <Text style={styles.wrongBadgeText}>Wrong</Text>
+                  </View>
+                )}
+                {showWrongIcon && (
                   <View style={styles.wrongBadge}>
                     <Text style={styles.wrongBadgeText}>✗</Text>
                   </View>
@@ -310,7 +332,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   correctBadgeText: {
-    color: Colors.background,
+    color: '#fff',
     fontSize: FontSize.xs,
     fontWeight: FontWeight.bold,
   },

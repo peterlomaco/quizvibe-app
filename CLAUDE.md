@@ -1581,6 +1581,18 @@ Edge cases:
 
 **Full-names-mode** (klient, Full assistance): ImageAnswerBlock dispatch:ar på `variant.mode` — när `'full-names'` renderas en vertikal lista med ~10 fullnamn-kort under varandra (`fullNameCard`-style). Spelaren tappar direkt på rätt namn — ingen prefix-pussel. Default-stilen (oselected) är `cardElevated`-bg + `primaryBorder` (samma vokabulär som prefix-knappens default). Selected-state delar exakt samma blå pending / gold confirmed / grön correct-vokabulär som prefix-mode:s `nameCard` (bara kantlinjen byter färg över faser; bg konstant `primaryMuted`). Correct/Wrong-badges, dimning av irrelevanta rader och separate-correct-rendering vid fel/time-out funkar identiskt som i prefix-mode. Två interna komponenter (`FullNamesView`, `PrefixView`) delar gemensamt styles-objekt — ImageAnswerBlock-toppen är bara en dispatcher.
 
+**Reveal-färgmatris för ALLA Name-svar (Peter 2026-10-15)** — gäller Spotify/Name + Hints (`ImageAnswerBlock`) och Film/YT (`ActorSelectBlock`). Badge-text alltid vit.
+
+| Rad | Kant | Text | Badge |
+|---|---|---|---|
+| Mitt svar, rätt | guld | **vit** | grön "Correct" |
+| Mitt svar, fel | guld (Spotify/Hints) / **röd** (Film) | blå | röd "Wrong" |
+| Rätta svaret (facit, när jag svarat fel) | grön | blå | grön "Correct" |
+| Inget svar: rätta raden | grön | blå | grön "Correct" |
+| Inget svar: övriga rader | röd | grå | röd ✗ |
+
+Film behåller grå `movieMeta`-undertext (titel · år) under skådespelaren. Bullet-listan nedan är historik där den motsäger matrisen (t.ex. "Texten konstant blå").
+
 **Reveal-fas-beteende** (redesign 2026-05-21):
 - Alla prefix-knappar förblir synliga genom hela faskedjan (`question → awaiting → reveal`). Tidigare retur:ade ImageAnswerBlock `null` vid reveal; den early-returnen är borttagen.
 - **Spelarens confirmed prefix**: gold border (`Colors.warning`) på både prefix-knapp och namn-kort. Samma blå (`Colors.primaryMuted`) bg som under question-fasen — bara kantlinjen byter färg. Texten konstant blå (`Colors.primary`) över alla state.

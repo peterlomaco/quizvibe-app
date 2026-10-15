@@ -149,7 +149,11 @@ function FullNamesView({
             textStyle = styles.fullNameTextActive;
           } else if (isPlayerRow && isLocked) {
             cardStyle = styles.nameCardConfirmed;
-            textStyle = styles.fullNameTextActive;
+            // Reveal-matris (Peter 2026-10-15): mitt rätta svar = vit text,
+            // mitt fel svar = blå text. Kantlinjen är guld i båda fallen.
+            textStyle = confirmedName && wasPlayerCorrect
+              ? styles.fullNameTextWhite
+              : styles.fullNameTextActive;
           } else if (isCorrectRevealRow) {
             cardStyle = styles.nameCardCorrect;
             textStyle = styles.fullNameTextActive;
@@ -410,9 +414,14 @@ function PrefixView({
           //   • correctReveal (reveal, separate correct) → grön border
           let nameCardStyle: ViewStyle = styles.nameCardPending;
           let nameTextStyle: TextStyle = styles.nameTextPending;
+          // Reveal-matris (Peter 2026-10-15): mitt rätta svar = vit text.
+          const isPlayerCorrectLocked =
+            isPlayerRow && isLocked && !!confirmedName && wasPlayerCorrect;
           if (isPlayerRow && isLocked) {
             nameCardStyle = styles.nameCardConfirmed;
-            nameTextStyle = styles.nameTextConfirmed;
+            nameTextStyle = isPlayerCorrectLocked
+              ? styles.nameTextWhite
+              : styles.nameTextConfirmed;
           } else if (isCorrectRevealRow) {
             nameCardStyle = styles.nameCardCorrect;
             nameTextStyle = styles.nameTextCorrect;
@@ -480,6 +489,7 @@ function PrefixView({
                       styles.prefixText,
                       isPrefixSelected && !isLocked && styles.prefixTextActive,
                       isPrefixSelected && isLocked && styles.prefixTextLocked,
+                      isPlayerCorrectLocked && styles.prefixTextWhite,
                       isPrefixCorrectReveal && styles.prefixTextCorrectReveal,
                       isWrongRevealRow && styles.prefixTextWrongReveal,
                       isPrefixDimmed && styles.prefixTextDimmed,
@@ -615,6 +625,10 @@ const styles = StyleSheet.create({
   prefixTextCorrectReveal: {
     color: Colors.primary,
   },
+  // Spelarens låsta RÄTTA svar — vit text (reveal-matris 2026-10-15).
+  prefixTextWhite: {
+    color: Colors.textPrimary,
+  },
   // Wrong-reveal-text vid time-out — dämpad grå (textDisabled), samma färg
   // som irrelevanta rader får vid rätt-svar-fallet (`prefixTextDimmed`).
   // Röd border + ✗-badge bär status:en visuellt; text:en behöver inte
@@ -676,6 +690,10 @@ const styles = StyleSheet.create({
   nameTextPending: {},
   nameTextConfirmed: {},
   nameTextCorrect: {},
+  // Spelarens låsta RÄTTA svar — vit text (reveal-matris 2026-10-15).
+  nameTextWhite: {
+    color: Colors.textPrimary,
+  },
   // Border-cutting badge — sitter på namn-kortets övre kantlinje (top: -10)
   // istället för inuti kortet. Solid bg matchar borderColor så taggen
   // visuellt "är en del av" ramen. Speglar HOST/GUEST-taggen på PlayerRow
@@ -770,6 +788,10 @@ const styles = StyleSheet.create({
   },
   fullNameTextDimmed: {
     color: Colors.textDisabled,
+  },
+  // Spelarens låsta RÄTTA svar — vit text (reveal-matris 2026-10-15).
+  fullNameTextWhite: {
+    color: Colors.textPrimary,
   },
 
   // "click"-etikett till höger om prefix-knapper som ännu inte valts.
