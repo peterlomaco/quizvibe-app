@@ -2215,6 +2215,7 @@ export default function HomeScreen() {
   const loginPlayerNameDigitsRef = useRef<TextInput>(null);
   const [loginPlayerNameKbMode, setLoginPlayerNameKbMode] = useState<'letter' | 'digit'>('letter');
   const [loginPlayerNameFocused, setLoginPlayerNameFocused] = useState(false);
+  const loginScrollRef = useRef<ScrollView>(null);
   // UI-only (Home v2-login, 2026-10-16): fokus-state för blå ram, visa/dölj
   // lösenord, och inline-fel ovanför CTA:n i stället för en Alert.
   const [loginEmailFocused, setLoginEmailFocused] = useState(false);
@@ -3806,6 +3807,19 @@ export default function HomeScreen() {
                   <Text style={profileMenu.backText}>← Back</Text>
                 </TouchableOpacity>
 
+                {/* Rullande yta ovanför tangentbordet (samma mönster som
+                    gästformuläret): flexShrink låter den krympa när custom-
+                    tangentbordet tar plats nedanför, så tangentbordet aldrig
+                    kapas. maxHeight bara medan tangentbordet är uppe. */}
+                <ScrollView
+                  ref={loginScrollRef}
+                  keyboardShouldPersistTaps="handled"
+                  style={{
+                    flexShrink: 1,
+                    maxHeight: loginPlayerNameFocused ? (SCREEN_HEIGHT < 700 ? 240 : 420) : undefined,
+                  }}
+                  contentContainerStyle={{ gap: SCREEN_HEIGHT < 700 ? Spacing.sm : Spacing.md }}
+                >
                 {/* Medan custom-tangentbordet är uppe döljs rubrik, undertext,
                     lägesväljare och glömt-länk — annars får tangentbordet inte
                     plats inom sheet:ens maxHeight (90 %) och kapas i botten. */}
@@ -3900,6 +3914,10 @@ export default function HomeScreen() {
                         onFocus={() => {
                           setLoginPlayerNameKbMode('letter');
                           setLoginPlayerNameFocused(true);
+                          // Namnfältet är överst när rubriken döljs — rulla dit.
+                          requestAnimationFrame(() => {
+                            loginScrollRef.current?.scrollTo({ y: 0, animated: true });
+                          });
                         }}
                         onBlur={() => setLoginPlayerNameFocused(false)}
                       />
@@ -3930,6 +3948,9 @@ export default function HomeScreen() {
                           }
                           setLoginPlayerNameKbMode('digit');
                           setLoginPlayerNameFocused(true);
+                          requestAnimationFrame(() => {
+                            loginScrollRef.current?.scrollTo({ y: 0, animated: true });
+                          });
                         }}
                         onBlur={() => setLoginPlayerNameFocused(false)}
                       />
@@ -4028,6 +4049,7 @@ export default function HomeScreen() {
                     </>
                   );
                 })()}
+                </ScrollView>
 
                 {loginPlayerNameFocused && loginMode === 'playerName' && (
                   <CodeKeyboard
