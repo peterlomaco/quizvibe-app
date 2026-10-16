@@ -1,5 +1,22 @@
 # QuizVibe brand master assets (SVG)
 
+> **FROZEN — QuizVibe Brand Master (approved on-device 2026-10-16).**
+> Do not change any of the following:
+> - the Q geometry or the circle's proportions
+> - the connector or the handle
+> - the two inner signal arcs or the single outer arc
+> - the arcs' alignment or stroke weights
+> - the Fredoka Bold wordmark geometry
+> - the proportions between the mark and the wordmark
+>
+> Approved derived compositions:
+> - the "Q only" subset (ring + connector + handle)
+> - a separate overlay glyph such as Hints' "?"
+>
+> Neither may alter the frozen geometry. App code gets its geometry from
+> `src/components/brand/quizVibeBrandGeometry.ts`, which is generated from
+> these files by `generate-rn-geometry.py`.
+
 Final master assets for the "Navy + Metallic Gold" QuizVibe logo, approved by Peter on 2026-10-16.
 They are **not yet used in the production app**. The app still renders the PNGs in `assets/brand/`.
 

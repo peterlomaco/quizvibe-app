@@ -3719,6 +3719,21 @@ export default function HomeScreen() {
             )}
           </Pressable>
         </View>
+        {/* ⚠ TEMPORÄR, DEV-ONLY (2026-10-16): ingång till /brand-preview för
+            validering av SVG-loggan på riktig enhet. __DEV__ är false i alla
+            release-byggen (TestFlight/App Store), så länken finns aldrig där.
+            Tas bort tillsammans med app/brand-preview.tsx. */}
+        {__DEV__ && (
+          <Pressable
+            onPress={() => router.push('/brand-preview')}
+            hitSlop={8}
+            style={{ alignSelf: 'center', marginTop: Spacing.sm }}
+          >
+            <Text style={[styles.footerText, styles.footerLink, { color: Colors.warning }]}>
+              Brand Preview (dev)
+            </Text>
+          </Pressable>
+        )}
       </ScrollView>
 
       <JoinModal
