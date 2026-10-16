@@ -8,7 +8,13 @@ import { BrandUi, Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { getCachedProfile, loadProfile, type ProfileData } from '../utils/profileStorage';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
-import { GearIcon } from './GearIcon';
+import { ChevronIcon } from './ChevronIcon';
+import { ProfileOutlineIcon } from './ProfileOutlineIcon';
+
+// Emoji-avatar för pillen: vald avatar när inloggad, annars 👤 (utloggad/gäst).
+function iconTextFor(profile: ProfileData | null | undefined, isLoggedIn: boolean): string {
+  return isLoggedIn ? getAvatarEmojiById(profile?.selectedAvatarId) : '👤';
+}
 
 interface Props {
   /**
@@ -52,6 +58,11 @@ interface Props {
    * != null) har företräde — om båda finns visas profilen.
    */
   guestName?: string;
+  /**
+   * True medan menyn som pillen öppnar är uppe → diskret guldkant
+   * (aktivt state). Skickas av Home (profileMenuVisible).
+   */
+  open?: boolean;
 }
 
 /**
@@ -61,7 +72,7 @@ interface Props {
  * via AsyncStorage på focus så den uppdateras när användaren ändrar
  * playerName/avatar i Profile-tabben och sedan kommer tillbaka.
  */
-export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profile: profileProp, guestName }: Props) {
+export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profile: profileProp, guestName, open = false }: Props) {
   // Seedas från den synkrona profil-spegeln så en re-mountad skärm inte
   // visar "Register or Login"-pillen medan loadProfile:s roundtrip pågår.
   const [internalProfile, setInternalProfile] = useState<ProfileData | null>(
@@ -95,14 +106,18 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
   const pillStyle = [
     styles.loginPill,
     isLoggedIn ? styles.loginPillActive : styles.loginPillMuted,
-    { backgroundColor: BrandUi.surface, borderColor: BrandUi.border },
+    { backgroundColor: BrandUi.surface, borderColor: open ? Colors.warning : BrandUi.border },
   ];
-  const gearColor = BrandUi.icon;
   // Inloggad utan vald emoji-avatar (selectedAvatarId tom efter registrering)
-  // → rendera QuizVibe Q-mark som default-avatar istället för 👤. Custom
+  // → neutral person-ikon (samma som bottom-navens Profile-tab; kugghjulet
+  // signalerade "Settings" fast pillen öppnar kontomenyn). Custom
   // emoji-avatarer renderas oförändrat när användaren valt en.
   const showBrandAvatar = isLoggedIn && !profile?.selectedAvatarId;
-  const iconText = isLoggedIn ? getAvatarEmojiById(profile?.selectedAvatarId) : '👤';
+  const leadingIcon = showBrandAvatar ? (
+    <ProfileOutlineIcon size={16} color={BrandUi.iconMuted} />
+  ) : (
+    <Text style={styles.loginPillIcon}>{iconTextFor(profile, isLoggedIn)}</Text>
+  );
   const labelText = isLoggedIn
     ? (profile?.playerName?.trim() || 'Signed in')
     : isGuest
@@ -143,22 +158,16 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
       ))}
       {onPress ? (
         <TouchableOpacity style={pillStyle} activeOpacity={0.7} onPress={onPress}>
-          {showBrandAvatar ? (
-            <GearIcon size={16} color={gearColor} />
-          ) : (
-            <Text style={styles.loginPillIcon}>{iconText}</Text>
-          )}
-          <Text style={labelStyle} numberOfLines={1}>
+          {leadingIcon}
+          <Text style={[labelStyle, styles.loginPillTextFlex]} numberOfLines={1}>
             {labelText}
           </Text>
+          {/* Liten nedåt-chevron = pillen öppnar en meny. */}
+          <ChevronIcon size={14} direction="down" color={open ? Colors.warning : BrandUi.iconMuted} />
         </TouchableOpacity>
       ) : (
         <View style={pillStyle}>
-          {showBrandAvatar ? (
-            <GearIcon size={16} color={gearColor} />
-          ) : (
-            <Text style={styles.loginPillIcon}>{iconText}</Text>
-          )}
+          {leadingIcon}
           <Text style={labelStyle} numberOfLines={1}>
             {labelText}
           </Text>
@@ -245,5 +254,9 @@ const styles = StyleSheet.create({
   },
   loginPillTextMuted: {
     color: Colors.textSecondary,
+  },
+  // Låt namnet ta resterande bredd så chevronen alltid sitter längst till höger.
+  loginPillTextFlex: {
+    flex: 1,
   },
 });

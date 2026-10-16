@@ -6,6 +6,9 @@ import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
 import { EyeIcon } from '@/src/components/EyeIcon';
+import { ChevronIcon } from '@/src/components/ChevronIcon';
+import { LogoutIcon } from '@/src/components/LogoutIcon';
+import { ProfileOutlineIcon } from '@/src/components/ProfileOutlineIcon';
 import { WaveDots } from '@/src/components/WaveDots';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { HostTypeOptions, type HostLobbyType } from '@/src/components/HostTypeOptions';
@@ -2174,6 +2177,13 @@ export default function HomeScreen() {
   const inviteSignal = useWaitingInviteSignal();
   const inviteBlink = useBlink(inviteSignal.hasNewInvite);
   const [profileMenuVisible, setProfileMenuVisible] = useState(false);
+  // True när kontomenyn stängs för att navigera (Profile settings / Store):
+  // då stängs sheet:en utan fade så användaren går direkt till nya vyn i
+  // stället för att först se formuläret tona bort.
+  const [profileMenuCloseInstant, setProfileMenuCloseInstant] = useState(false);
+  useEffect(() => {
+    if (profileMenuVisible) setProfileMenuCloseInstant(false);
+  }, [profileMenuVisible]);
   const [profileMenuStep, setProfileMenuStep] = useState<'menu' | 'login' | 'register' | 'forgot'>('menu');
   // Pending-flagga för ?openRegister=1-deeplinken (guest-hostens "Activate
   // Extra package"-flöde från Lobby). Sätts av param-effekten nedan och
@@ -3269,7 +3279,11 @@ export default function HomeScreen() {
           primär CTA för utloggade. Visas när profil finns (login-pill med
           avatar + PlayerName → profil-menyn). */}
       {isLoggedIn && (
-        <TopUserBanner profile={profile} onPress={() => setProfileMenuVisible(true)} />
+        <TopUserBanner
+          profile={profile}
+          open={profileMenuVisible}
+          onPress={() => setProfileMenuVisible(true)}
+        />
       )}
 
       <ScrollView
@@ -3684,7 +3698,7 @@ export default function HomeScreen() {
       <Modal
         visible={profileMenuVisible}
         transparent
-        animationType="fade"
+        animationType={profileMenuCloseInstant ? 'none' : 'fade'}
         onRequestClose={() => setProfileMenuVisible(false)}
       >
         <KeyboardAvoidingView
@@ -3700,10 +3714,19 @@ export default function HomeScreen() {
             activeOpacity={1}
             onPress={() => setProfileMenuVisible(false)}
           />
-          <View style={profileMenu.sheet}>
+          <View
+            style={[
+              profileMenu.sheet,
+              // Kontomenyn (inloggad) är kort — mindre bottenluft under Cancel.
+              isLoggedIn && profileMenuStep === 'menu' && profileMenu.sheetAccount,
+            ]}
+          >
             {/* ── Inloggad: header + Log out ────────────── */}
             {isLoggedIn && profileMenuStep === 'menu' && (
               <>
+                {/* Konto-sheet (Home v2, 2026-10-16): informativ identitets-
+                    header (ingen knapp-look), neutrala menyrader i stället för
+                    blå-konturerade CTA-knappar, och en tyst röd Log out-rad. */}
                 <View style={profileMenu.header}>
                   {profile?.selectedAvatarId ? (
                     <Text style={profileMenu.headerEmoji}>
@@ -3711,7 +3734,7 @@ export default function HomeScreen() {
                     </Text>
                   ) : (
                     <View style={profileMenu.headerBrandWrap}>
-                      <QuizVibeQAvatar size={32} />
+                      <ProfileOutlineIcon size={28} color={BrandUi.iconMuted} />
                     </View>
                   )}
                   <View style={{ flex: 1 }}>
@@ -3724,9 +3747,13 @@ export default function HomeScreen() {
                   </View>
                 </View>
 
+                <View style={profileMenu.menuDivider} />
+
                 <TouchableOpacity
-                  style={profileMenu.secondaryBtn}
+                  style={profileMenu.menuRow}
+                  activeOpacity={0.6}
                   onPress={() => {
+                    setProfileMenuCloseInstant(true);
                     setProfileMenuVisible(false);
                     // scrollToTop=1 så Profile:s useFocusEffect snäpper
                     // ScrollView:n till toppen — tab-navigatorn bevarar
@@ -3737,10 +3764,9 @@ export default function HomeScreen() {
                     });
                   }}
                 >
-                  <View style={profileMenu.secondaryBtnInner}>
-                    <QuizVibeQAvatar size={26} />
-                    <Text style={profileMenu.secondaryBtnText}>Profile settings</Text>
-                  </View>
+                  <ProfileOutlineIcon size={22} color={BrandUi.iconMuted} />
+                  <Text style={profileMenu.menuRowText}>Profile settings</Text>
+                  <ChevronIcon size={18} />
                 </TouchableOpacity>
 
                 {/* Store-genväg — utan focus-param följer Store sin default-
@@ -3748,20 +3774,30 @@ export default function HomeScreen() {
                     samma som direkt tab-tryck på Store. `from=/` så Store:s
                     Back-knapp tar användaren tillbaka till Home. */}
                 <TouchableOpacity
-                  style={profileMenu.secondaryBtn}
+                  style={profileMenu.menuRow}
+                  activeOpacity={0.6}
                   onPress={() => {
+                    setProfileMenuCloseInstant(true);
                     setProfileMenuVisible(false);
                     router.push('/store?from=/');
                   }}
                 >
-                  <View style={profileMenu.secondaryBtnInner}>
-                    <ShoppingCartIcon size={22} />
-                    <Text style={profileMenu.secondaryBtnText}>Store</Text>
-                  </View>
+                  <ShoppingCartIcon size={22} color={BrandUi.iconMuted} />
+                  <Text style={profileMenu.menuRowText}>Store</Text>
+                  <ChevronIcon size={18} />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={profileMenu.logoutBtn} onPress={handleLogout}>
-                  <Text style={profileMenu.logoutText}>Log out</Text>
+                <View style={profileMenu.menuDivider} />
+
+                {/* Destruktiv men tyst: röd text/ikon, ingen fylld knapp.
+                    handleLogout har kvar sin bekräftelse-Alert. */}
+                <TouchableOpacity
+                  style={profileMenu.logoutRow}
+                  activeOpacity={0.6}
+                  onPress={handleLogout}
+                >
+                  <LogoutIcon size={22} color={Colors.error} />
+                  <Text style={profileMenu.logoutRowText}>Log out</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -5634,16 +5670,17 @@ const profileMenu = StyleSheet.create({
     borderColor: Colors.border,
     maxHeight: '90%',
   },
+  sheetAccount: {
+    paddingBottom: Spacing.lg,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.sm,
-    backgroundColor: Colors.background,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    // Informativ identitets-header — ingen ram/yta, så den inte läses som
+    // en knapp.
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.xs,
   },
   headerEmoji: {
     fontSize: 28,
@@ -5661,9 +5698,47 @@ const profileMenu = StyleSheet.create({
     color: Colors.textPrimary,
   },
   headerStatus: {
-    fontSize: 12,
-    color: Colors.textPrimary,
+    fontSize: 13,
+    color: BrandUi.textMuted,
     marginTop: 2,
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: BrandUi.border,
+  },
+  // Neutral menyrad: ikon · text · chevron. Ingen blå kant i vila.
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    // 48 (var 56) + svagare yta: läses som menyrad, inte som knapp.
+    height: 48,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+  },
+  menuRowText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+  },
+  logoutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    height: 36,
+    paddingHorizontal: Spacing.lg,
+    // Drar upp den delade Cancel-raden så glappet Log out → Cancel krymper
+    // (sheet:ens gap gäller alla steg, så justeringen görs här).
+    marginBottom: -20,
+  },
+  logoutRowText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.error,
   },
   logoutBtn: {
     height: 52,
