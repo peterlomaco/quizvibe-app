@@ -30,7 +30,6 @@ import {
   backspacePlayerNameLetters,
   containsBlockedLetterSubstring,
   containsReservedTakenSubstring,
-  extractTakenGuestLetters,
   generatePlayerName,
   getPlayerNameDigits,
   getPlayerNameLetters,
@@ -129,7 +128,7 @@ interface JoinModalProps {
 type RemoteBlockContext = 'join' | 'host';
 
 /**
- * Förklaringstexten som ersätter "Sign in to create and join games" som
+ * Förklaringstexten som ersätter default-subtiteln som
  * subtitel i "Register or Login"-formuläret när spelaren kom dit via en
  * Remote 1vs1-gate. Ingen Alert i vägen (Peter 2026-08-08): tapp på en
  * blockerad knapp går DIREKT till formuläret, och texten här förklarar
@@ -217,11 +216,6 @@ interface GuestJoinDraft {
 }
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
-const ASSISTANCE_OPTIONS: { id: AssistanceLevel; label: string }[] = [
-  { id: 'full',     label: 'Full' },
-  { id: 'standard', label: 'Standard' },
-  { id: 'minimal',  label: 'Minimal' },
-];
 
 // Mock-list över "redan tagna" playerNames så availability-checken har något
 // att faktiskt fela på. Lowercase för case-insensitive match.
@@ -419,7 +413,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   const [code, setCode] = useState('');
   const [guestName, setGuestName] = useState('');
   const [guestBirthYearText, setGuestBirthYearText] = useState('');
-  const [guestAssistance, setGuestAssistance] = useState<AssistanceLevel>('full');
+  // Gäster (Join as Guest + Start Game as Guest) spelar ALLTID på Full
+  // assistance — väljaren är borttagen ur gästformuläret (Peter 2026-10-16).
+  const guestAssistance: AssistanceLevel = 'full';
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [playerNameStatus, setPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [invites, setInvites] = useState<WaitingInvite[]>([]);
@@ -625,7 +621,6 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       setCode('');
       setGuestName(initialGuestDraft?.guestName ?? '');
       setGuestBirthYearText(initialGuestDraft?.guestBirthYearText ?? '');
-      setGuestAssistance(initialGuestDraft?.guestAssistance ?? 'full');
       setYearPickerOpen(false);
       setPlayerNameStatus('idle');
       setStep(initialStep);
@@ -940,9 +935,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // är klart. PlayerNamet måste *valideras* (inte bara skrivas) innan year
   // låses upp — det är hur vi visar progress mot lobbyn.
   const yearUnlocked = playerNameStatus === 'available';
-  const assistanceUnlocked = yearUnlocked && parsedBirthYear !== null;
-  // Assistance är default-ifylld, så code-låset följer assistance-låset direkt.
-  const codeUnlocked = assistanceUnlocked;
+  // Rumskoden låses upp när ett år valts (gäster har ingen assistance-väljare).
+  const codeUnlocked = yearUnlocked && parsedBirthYear !== null;
 
   const isGuestFormValid =
     playerNameStatus === 'available' &&
@@ -1010,30 +1004,50 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     Keyboard.dismiss();
   };
 
-  // Auto-generera Player Name. Två branches:
-  //   • Fältet tomt → generera direkt med "Guest"-prefix → "GuestA-1234567".
-  //   • Användaren har redan typat letters → fråga "Try to keep PlayerName
-  //     letters or not?". Yes-branchen bevarar letters och randomiserar bara
-  //     digits; No-branchen genererar helt nytt med "Guest"-prefixet igen.
-  // excludeLetters härleds från lobbyns nuvarande spelar-lista så två
-  // guests inte får samma identifierar-bokstav (GuestA + GuestB istället
-  // för GuestA + GuestA). Async lookup mot mockLobbyPlayers; om koden
-  // saknar lobby-data faller setet tillbaka till tom (= ingen exclusion).
+  // Generera ett gästnamn "Guest-1234567" (Home v2, 2026-10-16 — ersätter
+  // "GuestA-1234567"). Unikheten vilar inte på slumpen ensam: kandidaten
+  // undviker mock-listan + namnen i lobbyn (guest-JOIN) och kontrolleras
+  // sedan mot servern (player_name_exists). Krock → nytt nummer, max 4
+  // försök; nätverksfel fail-open:ar som vanliga Check.
+  const generateGuestName = async (): Promise<string> => {
+    const lobbyPlayers = step === 'guest' && code.length === ROOM_CODE_LENGTH
+      ? await getLobbyPlayers(code).catch(() => null)
+      : null;
+    const taken = new Set(TAKEN_PLAYER_NAMES);
+    for (const p of lobbyPlayers ?? []) taken.add(p.name.trim().toLowerCase());
+    let candidate = generatePlayerName(taken, { prefix: 'Guest', prefixOnly: true });
+    for (let attempt = 0; attempt < 4; attempt++) {
+      let exists = false;
+      try {
+        exists = await playerNameExists(candidate);
+      } catch {
+        exists = false;
+      }
+      if (!exists) return candidate;
+      taken.add(candidate.toLowerCase());
+      candidate = generatePlayerName(taken, { prefix: 'Guest', prefixOnly: true });
+    }
+    return candidate;
+  };
+
+  // "Generate another" (f.d. Auto-generate). Två branches:
+  //   • Fältet tomt → nytt "Guest-1234567" direkt.
+  //   • Användaren har typat egna letters → fråga om de ska behållas
+  //     (Keep letters randomiserar bara siffrorna) eller ersättas.
   const handleGuestGenerateName = async () => {
     const trimmedLetters = getPlayerNameLetters(guestName.trim());
-    const lobbyPlayers = await getLobbyPlayers(code).catch(() => null);
-    const excludeLetters = extractTakenGuestLetters(
-      (lobbyPlayers ?? []).map((p) => p.name),
-    );
-    if (trimmedLetters.length > 0) {
+    const isOwnLetters = trimmedLetters.length > 0 && trimmedLetters !== 'Guest';
+    if (isOwnLetters) {
       Alert.alert(
-        'Auto-generate Player Name',
-        'Try to keep PlayerName letters or not?',
+        'Generate another name',
+        'Keep the letters you typed?',
         [
           { text: 'Cancel', style: 'cancel' },
           {
             text: 'Replace all',
-            onPress: () => applyGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest', excludeLetters })),
+            onPress: () => {
+              void generateGuestName().then(applyGenerated);
+            },
           },
           {
             text: 'Keep letters',
@@ -1043,7 +1057,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       );
       return;
     }
-    applyGenerated(generatePlayerName(TAKEN_PLAYER_NAMES, { prefix: 'Guest', excludeLetters }));
+    applyGenerated(await generateGuestName());
   };
 
   // CodeKeyboard skickar tecknet hit. Letter/digit dispatch:as via
@@ -1086,9 +1100,8 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // Auto-fyll Player Name när användaren går in i guest-steget och fältet
   // är tomt. Genererar ett unikt namn (verifierat mot mock TAKEN_PLAYER_NAMES)
   // och markerar status som 'available' så användaren kan gå direkt till
-  // year of birth. excludeLetters härleds från lobbyns spelar-lista via
-  // async lookup (getLobbyPlayers är Promise-baserad) så två guests inte
-  // får samma identifierar-bokstav. Manuell ändring återställer status till
+  // year of birth (namnet kontrolleras mot lobby + server i generateGuestName).
+  // Manuell ändring återställer status till
   // 'idle' via handleGuestNameChange och kräver Check innan formuläret går vidare.
   useEffect(() => {
     const wasGuest = prevGuestStepRef.current;
@@ -1097,21 +1110,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     if (inGuestStep && !wasGuest && guestName === '') {
       let cancelled = false;
       (async () => {
-        // Guest-host-steget har ingen rumkod ännu — ingen lobby att
-        // exkludera letters mot, så lookup:en hoppas över helt.
-        const lobbyPlayers = step === 'guest'
-          ? await getLobbyPlayers(code).catch(() => null)
-          : null;
+        // "Guest-1234567", kontrollerat mot lobby + server (generateGuestName).
+        const generated = await generateGuestName();
         if (cancelled) return;
-        const excludeLetters = extractTakenGuestLetters(
-          (lobbyPlayers ?? []).map((p) => p.name),
-        );
-        // Guest-flödet använder "Guest"-prefixet → "GuestA-1234567"
-        // (6 letters: "Guest" + 1 versal random, sedan 7 random digits).
-        const generated = generatePlayerName(TAKEN_PLAYER_NAMES, {
-          prefix: 'Guest',
-          excludeLetters,
-        });
         setGuestName(generated);
         setPlayerNameStatus('available');
       })();
@@ -1119,10 +1120,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
         cancelled = true;
       };
     }
+    // generateGuestName läser bara step/code, som redan står i deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, guestName, code]);
 
   const handleJoinAsGuest = async () => {
-    if (!isGuestFormValid || parsedBirthYear === null || guestAssistance === null) return;
+    if (!isGuestFormValid || parsedBirthYear === null) return;
     // Existence-check mot Supabase rooms-tabellen. PlayerName-uniqueness
     // kollas redan vid Check (handleCheckPlayerName → player_name_exists).
     if (!(await isActiveRoom(code))) {
@@ -1192,7 +1195,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Auto-fill-detektion: format `GuestA-1234567` — "Guest"-prefix + 1
     // versal random + dash + 7 digits. Om användaren ändrat namnet
     // manuellt blir flaggan false.
-    const autofilled = /^Guest[A-Z]-\d{7}$/.test(guestName.trim());
+    const autofilled = /^Guest[A-Z]?-\d{7}$/.test(guestName.trim());
     track('guest_name_created', { autofilled, assistance: guestAssistance });
     onClose();
     router.push({
@@ -1269,7 +1272,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     clearLobbySettings(newCode);
     clearEjected(newCode);
     clearGameStarted(newCode);
-    const autofilled = /^Guest[A-Z]-\d{7}$/.test(guestName.trim());
+    const autofilled = /^Guest[A-Z]?-\d{7}$/.test(guestName.trim());
     track('guest_name_created', { autofilled, assistance: guestAssistance });
     track('room_code_created', { guestHost: true });
     onClose();
@@ -1544,7 +1547,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   <Text style={modal.subtitle}>
                     {step === 'guest-host'
                       ? 'Host a game without an account'
-                      : 'Tap a field to fill in your details'}
+                      : 'Enter your details to join the game.'}
                   </Text>
                 </>
               )}
@@ -1565,16 +1568,25 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     State-värdet (`guestName`) håller sammansatt format
                     "Abcd-123" som källa; fälten visar derived getters. */}
                 <View style={modal.fieldGroup}>
-                  <Text style={modal.fieldLabel}>Player Name - Letter-digit format</Text>
-                  <View style={modal.playerNameRow}>
+                  {/* Home v2-gästformulär (2026-10-16): enkla etiketter i title
+                      case, guld kant = ifyllt + giltigt (aldrig vid fel). */}
+                  <Text style={modal.formLabel}>Your name</Text>
+                  {/* EN visuell ruta (Home v2, 2026-10-16): bokstäver + "-" +
+                      siffror läses som "Guest-1234567", med ✓/Check inuti.
+                      Under huven är det fortfarande två TextInputs (bokstäver
+                      resp. siffror) — samma input-logik och validering som
+                      förut. Blå kant = fokus, guld kant + guld ✓ = giltigt. */}
+                  <View
+                    style={[
+                      modal.guestBox,
+                      playerNameFocused && playerNameStatus !== 'available' && modal.guestBoxActive,
+                      playerNameStatus === 'available' && modal.fieldDone,
+                    ]}
+                  >
                     <TextInput
                       ref={playerNameLettersRef}
-                      style={[
-                        modal.inputText,
-                        modal.playerNameLettersInput,
-                        playerNameKbMode === 'letter' && playerNameStatus !== 'available' && modal.playerNameInputActive,
-                      ]}
-                      placeholder="Anna"
+                      style={[modal.guestNameText, modal.guestNameLetters]}
+                      placeholder="Name"
                       placeholderTextColor={Colors.textDisabled}
                       value={getPlayerNameLetters(guestName)}
                       maxLength={PLAYER_NAME_MAX_LETTERS}
@@ -1601,13 +1613,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       }}
                       onBlur={() => setPlayerNameFocused(false)}
                     />
-                    <Text style={modal.playerNameSeparator}>–</Text>
+                    <Text style={modal.guestNameText}>-</Text>
                     <TextInput
                       ref={playerNameDigitsRef}
                       style={[
-                        modal.inputText,
-                        modal.playerNameDigitsInput,
-                        playerNameKbMode === 'digit' && playerNameStatus !== 'available' && modal.playerNameInputActive,
+                        modal.guestNameText,
+                        modal.guestNameDigits,
                         getPlayerNameLetters(guestName).length === 0 && modal.playerNameInputDisabled,
                       ]}
                       placeholder="1234"
@@ -1639,29 +1650,26 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       }}
                       onBlur={() => setPlayerNameFocused(false)}
                     />
-                    <TouchableOpacity
-                      onPress={handleCheckPlayerName}
-                      disabled={!guestName.trim() || playerNameStatus === 'checking' || playerNameStatus === 'available'}
-                      style={[
-                        modal.checkBtn,
-                        (!guestName.trim() || playerNameStatus === 'checking') && modal.checkBtnDisabled,
-                        playerNameStatus === 'available' && modal.checkBtnDone,
-                      ]}
-                    >
-                      <Text
+                    {playerNameStatus === 'available' ? (
+                      <Text style={modal.guestBoxCheck}>✓</Text>
+                    ) : (
+                      <TouchableOpacity
+                        onPress={handleCheckPlayerName}
+                        disabled={!guestName.trim() || playerNameStatus === 'checking'}
                         style={[
-                          modal.checkBtnText,
-                          playerNameStatus === 'available' && modal.checkBtnTextDone,
+                          modal.guestBoxCheckBtn,
+                          (!guestName.trim() || playerNameStatus === 'checking') && modal.checkBtnDisabled,
                         ]}
                       >
-                        {playerNameStatus === 'checking' ? '…'
-                          : playerNameStatus === 'available' ? '✓'
-                          : 'Check'}
-                      </Text>
-                    </TouchableOpacity>
+                        <Text style={modal.guestBoxCheckBtnText}>
+                          {playerNameStatus === 'checking' ? '…' : 'Check'}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
-                  {/* Sekundära åtgärder under namnfältet — Remove är aktiv så
-                      fort fältet har innehåll. Auto-generate är ALLTID aktiv
+                  {/* Sekundära åtgärder under namnfältet — Remove (töm och skriv
+                      eget namn) är aktiv så fort fältet har innehåll. "Generate
+                      another" (f.d. Auto-generate) är ALLTID aktiv
                       (förutom under checking) — när användaren har typat
                       letters visas en "Try to keep PlayerName letters?"-prompt
                       innan namnet genereras. */}
@@ -1675,7 +1683,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                           modal.nameActionBtnDisabled,
                       ]}
                     >
-                      <Text style={modal.nameActionBtnText}>Remove</Text>
+                      <Text style={modal.nameActionBtnText}>Change name</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={handleGuestGenerateName}
@@ -1686,31 +1694,28 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                           modal.nameActionBtnDisabled,
                       ]}
                     >
-                      <Text style={modal.nameActionBtnText}>Auto-generate</Text>
+                      <Text style={modal.nameActionBtnText}>Generate another</Text>
                     </TouchableOpacity>
                   </View>
-                  {/* Status-rad */}
-                  {playerNameStatus === 'idle' && (
+                  {/* Status-rad — bara vid kontroll eller problem; ett giltigt
+                      namn bekräftas av guld-✓:et ovan. Format-hinten visas
+                      bara när ett egenskrivet namn ännu inte kontrollerats. */}
+                  {playerNameStatus === 'idle' && guestName.length > 0 && (
                     <Text style={modal.statusHint}>
-                      Format: 1-{PLAYER_NAME_MAX_LETTERS} letters, 0-{PLAYER_NAME_MAX_DIGITS} digits
+                      Letters, then up to {PLAYER_NAME_MAX_DIGITS} digits — tap Check
                     </Text>
                   )}
                   {playerNameStatus === 'checking' && (
-                    <Text style={modal.statusHint}>Checking availability…</Text>
-                  )}
-                  {playerNameStatus === 'available' && (
-                    <Text style={[modal.statusHint, modal.statusHintOk]}>
-                      ✓ Player Name is available
-                    </Text>
+                    <Text style={modal.statusHint}>Checking…</Text>
                   )}
                   {playerNameStatus === 'taken' && (
                     <Text style={[modal.statusHint, modal.statusHintError]}>
-                      ✗ Player Name already taken — try another
+                      ✗ That name is taken — try another
                     </Text>
                   )}
                   {playerNameStatus === 'invalid' && (
                     <Text style={[modal.statusHint, modal.statusHintError]}>
-                      ✗ Player Name not allowed — must follow format and avoid blocked combinations
+                      ✗ That name can’t be used — try another
                     </Text>
                   )}
                 </View>
@@ -1720,13 +1725,14 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   style={[modal.fieldGroup, !yearUnlocked && modal.fieldGroupLocked]}
                   pointerEvents={yearUnlocked ? 'auto' : 'none'}
                 >
-                  <Text style={modal.fieldLabel}>Competition Year of Birth</Text>
+                  <Text style={modal.formLabel}>Year of birth</Text>
                   <TouchableOpacity
                     style={[
                       modal.yearTrigger,
                       // Lys upp triggeren när den är "nästa steg" (upplåst
                       // men inget år valt än) så ögat dras dit.
                       yearUnlocked && !parsedBirthYear && modal.yearTriggerActive,
+                      !!parsedBirthYear && modal.fieldDone,
                     ]}
                     activeOpacity={0.7}
                     onPress={() => {
@@ -1747,128 +1753,81 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     >
                       {parsedBirthYear ? formatBirthYear(parsedBirthYear) : 'Select year'}
                     </Text>
-                    <Text style={modal.yearTriggerArrow}>›</Text>
+                    {parsedBirthYear ? (
+                      <Text style={modal.doneCheck}>✓</Text>
+                    ) : (
+                      <Text style={modal.yearTriggerArrow}>›</Text>
+                    )}
                   </TouchableOpacity>
                 </View>
-
-                {/* Assistance level (låst tills year valt). Default 'full'
-                    är förvalt, så användaren kan gå direkt till Room Code.
-                    Delas av guest-JOIN och guest-HOST sedan 2026-08-08 —
-                    guest host var tidigare låst till Full (visades som en
-                    read-only "Fixed Guest settings"-ruta tillsammans med
-                    60s svarstid). Guest host väljer numera allt fritt:
-                    nivån här, svarstiden och Game era (default [födelseår,
-                    idag], editerbar) i lobbyn.
-                    Guest-HOST har inga rumkods-celler — koden genereras vid
-                    submit i handleStartGameAsGuestHost.
-                    Guest-HOST döljer assistance-väljaren helt (2026-09-11) —
-                    guest host spelar alltid på Full. Bara guest-JOIN visar den. */}
-                {step === 'guest' && (
-                <>
-                <Text
-                  style={[
-                    modal.statusHint,
-                    !assistanceUnlocked && modal.fieldGroupLocked,
-                  ]}
-                >
-                  Use default or select prefered setup
-                </Text>
-                <View
-                  style={[modal.fieldGroup, !assistanceUnlocked && modal.fieldGroupLocked]}
-                  pointerEvents={assistanceUnlocked ? 'auto' : 'none'}
-                >
-                  <Text style={modal.fieldLabel}>Assistance Level</Text>
-                  <View style={modal.skillRow}>
-                    {ASSISTANCE_OPTIONS.map((opt) => {
-                      const isSelected = guestAssistance === opt.id;
-                      return (
-                        <TouchableOpacity
-                          key={opt.id}
-                          style={[
-                            modal.skillBtn,
-                            isSelected && modal.skillBtnActive,
-                          ]}
-                          onPress={() => {
-                            // Dölj custom CodeKeyboard om aktiv — användaren
-                            // har lämnat code-cellerna för att klicka assistance.
-                            setFocusedCodeIdx(null);
-                            setGuestAssistance(opt.id);
-                          }}
-                        >
-                          <Text
-                            style={[
-                              modal.skillBtnText,
-                              isSelected && modal.skillBtnTextActive,
-                            ]}
-                          >
-                            {opt.label}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-                </>
-                )}
 
                 {step === 'guest' && (
                 <>
                 {/* Room code — 3 bokstäver + bindestreck + 2 siffror +
                     1 trailing bokstav. Cell 0–2 och 5 visar bokstavs-
                     tangentbord, 3–4 sifferkeypad.
-                    Låst tills assistance level är valt. */}
+                    Låst tills år valts (assistance är förvald). */}
                 <View
                   style={[modal.fieldGroup, !codeUnlocked && modal.fieldGroupLocked]}
                   pointerEvents={codeUnlocked ? 'auto' : 'none'}
                 >
-                  <Text style={modal.fieldLabel}>Room Code</Text>
+                  {/* Etikett + diskret guld-✓ när hela koden är ifylld. */}
+                  <View style={modal.codeLabelRow}>
+                    <Text style={modal.formLabel}>Room code</Text>
+                    {code.length === ROOM_CODE_LENGTH && (
+                      <Text style={modal.codeLabelCheck}>✓</Text>
+                    )}
+                  </View>
+                  {/* Sex synliga rutor, grupperade [A][B] – [2][3] – [X][Y]
+                      (Home v2, 2026-10-16). Inmatning, sekventiell fokus,
+                      auto-advance/backsteg och validering är oförändrade
+                      (handleCellFocus + CodeKeyboard). Tom ruta = ram som
+                      väntar, blå = aktiv ruta, guld på alla = komplett kod. */}
                   <View style={modal.codeCellRow}>
-                    {(() => {
-                      // Hitta nästa tomma cell — den ska highlightas medan
-                      // användaren fyller i koden.
-                      const nextEmpty = codeCells.findIndex((c) => !c);
-                      return codeCells.map((cell, i) => {
-                        const isLetterCell = isLetterCellIndex(i);
-                        const isNextCell = codeUnlocked && i === nextEmpty;
-                        return (
-                          <React.Fragment key={i}>
-                            <TextInput
-                              ref={(ref) => { codeRefs.current[i] = ref; }}
-                              style={[
-                                modal.codeCell,
-                                !!cell && modal.codeCellFilled,
-                                isNextCell && !cell && modal.codeCellActive,
-                              ]}
-                              value={cell}
-                              onChangeText={(t) => handleCodeCellChange(i, t)}
-                              onKeyPress={(e) => handleCodeCellKeyPress(i, e.nativeEvent.key)}
-                              maxLength={1}
-                              // Se Room Code-flödet ovan för rationale —
-                              // CodeKeyboard (custom in-app) sköter input,
-                              // handleCellFocus enforcar sekventiell fokus.
-                              showSoftInputOnFocus={false}
-                              onFocus={() => {
-                                handleCellFocus(i);
-                                // Room Code är formens sista fält — scrolla ned
-                                // så det syns ovanför CodeKeyboardet på korta
-                                // skärmar.
-                                requestAnimationFrame(() => {
-                                  guestScrollRef.current?.scrollToEnd({ animated: true });
-                                });
-                              }}
-                              autoCapitalize={isLetterCell ? 'characters' : 'none'}
-                              autoCorrect={false}
-                              spellCheck={false}
-                              selectTextOnFocus
-                            />
-                            {(i === ROOM_CODE_LEADING_LETTERS - 1 ||
-                              i === ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS - 1) && (
-                              <Text style={modal.codeDash}>–</Text>
-                            )}
-                          </React.Fragment>
-                        );
-                      });
-                    })()}
+                    {codeCells.map((cell, i) => {
+                      const isLetterCell = isLetterCellIndex(i);
+                      const complete = code.length === ROOM_CODE_LENGTH;
+                      const isActive = !complete && focusedCodeIdx === i;
+                      return (
+                        <React.Fragment key={i}>
+                          <TextInput
+                            ref={(ref) => { codeRefs.current[i] = ref; }}
+                            style={[
+                              modal.codeCell,
+                              modal.codeCellGuest,
+                              !!cell && modal.codeCellGuestFilled,
+                              isActive && modal.codeCellGuestActive,
+                              complete && modal.fieldDone,
+                            ]}
+                            value={cell}
+                            onChangeText={(t) => handleCodeCellChange(i, t)}
+                            onKeyPress={(e) => handleCodeCellKeyPress(i, e.nativeEvent.key)}
+                            maxLength={1}
+                            // Se Room Code-flödet ovan för rationale —
+                            // CodeKeyboard (custom in-app) sköter input,
+                            // handleCellFocus enforcar sekventiell fokus.
+                            showSoftInputOnFocus={false}
+                            onFocus={() => {
+                              handleCellFocus(i);
+                              // Room Code är formens sista fält — scrolla ned
+                              // så det syns ovanför CodeKeyboardet på korta
+                              // skärmar.
+                              requestAnimationFrame(() => {
+                                guestScrollRef.current?.scrollToEnd({ animated: true });
+                              });
+                            }}
+                            autoCapitalize={isLetterCell ? 'characters' : 'none'}
+                            autoCorrect={false}
+                            spellCheck={false}
+                            selectTextOnFocus
+                          />
+                          {(i === ROOM_CODE_LEADING_LETTERS - 1 ||
+                            i === ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS - 1) && (
+                            <Text style={modal.codeDash}>–</Text>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
                   </View>
                 </View>
                 </>
@@ -1900,23 +1859,26 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                 <TouchableOpacity
                   style={[
                     modal.joinBtn,
-                    !isGuestFormValid && modal.joinBtnDisabled,
+                    isGuestFormValid ? modal.joinBtnGold : modal.joinBtnDisabled,
                   ]}
                   onPress={handleJoinAsGuest}
                   disabled={!isGuestFormValid}
                 >
-                  <Text style={modal.joinBtnText}>Join as Guest</Text>
+                  {/* Guld primär-CTA först när allt obligatoriskt är giltigt. */}
+                  {isGuestFormValid && <MetallicGoldFill />}
+                  <Text style={[modal.joinBtnText, isGuestFormValid && modal.joinBtnGoldText]}>Join Game</Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
                   style={[
                     modal.joinBtn,
-                    !isGuestHostFormValid && modal.joinBtnDisabled,
+                    isGuestHostFormValid ? modal.joinBtnGold : modal.joinBtnDisabled,
                   ]}
                   onPress={handleStartGameAsGuestHost}
                   disabled={!isGuestHostFormValid}
                 >
-                  <Text style={modal.joinBtnText}>Start Game - Guest login</Text>
+                  {isGuestHostFormValid && <MetallicGoldFill />}
+                  <Text style={[modal.joinBtnText, isGuestHostFormValid && modal.joinBtnGoldText]}>Start Game - Guest login</Text>
                 </TouchableOpacity>
               )}
             </>
@@ -2217,7 +2179,7 @@ export default function HomeScreen() {
   // konsumeras av open-side reset-effekten som annars forcerar step='menu'.
   const openRegisterPendingRef = useRef(false);
   // Kontextuell subtitel i "Register or Login"-formuläret. null = default
-  // ("Sign in to create and join games"). Sätts via ref-hand-off av
+  // ("Create an account to save your progress…"). Sätts via ref-hand-off av
   // Remote 1vs1-gaterna; konsumeras av open-side-resetet nedan.
   const pendingAuthNoticeRef = useRef<string | null>(null);
   const [authNotice, setAuthNotice] = useState<string | null>(null);
@@ -3241,14 +3203,6 @@ export default function HomeScreen() {
           >
             Register or Login
           </Text>
-          {/* FREE-badge — vit kantlinje så den syns mot knappens
-              gröna bakgrund. */}
-          <View
-            style={[styles.homeFreeBadge, styles.homeFreeBadgeRegister]}
-            pointerEvents="none"
-          >
-            <Text style={styles.homeFreeBadgeText}>FREE</Text>
-          </View>
         </TouchableOpacity>
       </Animated.View>
     </>
@@ -3398,6 +3352,7 @@ export default function HomeScreen() {
               </Animated.View>
               {hostTypeExpanded === 'registered' && (
                 <HostTypeOptions
+                  heading="Choose how to play"
                   accentColor={BrandUi.border}
                   iconColor={BrandUi.icon}
                   iconAccentColor={BrandUi.icon}
@@ -3476,7 +3431,7 @@ export default function HomeScreen() {
 
           {/* Start New Game (guest-host) — synlig i BÅDA login-lägena (inloggade
               spelare ska också kunna hosta som guest). Pulserar alltid.
-              Badge: "No Data Saved" inloggad / FREE utloggad.
+              Ingen badge (Home v2).
               Öppnar guest-HOST-formen
               (begränsad registrering → lobby som host). Inloggad: extra
               marginTop (Spacing.xl, samma sektions-separation som guest-
@@ -3574,12 +3529,13 @@ export default function HomeScreen() {
                     >
                       Start New Game
                     </Text>
-                    {/* Ingen badge (Home v2): FREE finns bara på Register or
-                        Login; "No Data Saved" togs bort 2026-10-16. */}
+                    {/* Inga badges på Home-knapparna (Home v2): FREE togs bort
+                        från Register or Login 2026-10-16. */}
                   </TouchableOpacity>
                 </Animated.View>
                 {hostTypeExpanded === 'guest' && (
                   <HostTypeOptions
+                    heading="Choose how to play"
                     accentColor={BrandUi.border}
                     iconColor={BrandUi.icon}
                     iconAccentColor={BrandUi.icon}
@@ -3810,22 +3766,17 @@ export default function HomeScreen() {
                     är enda stället spelaren får veta varför de hamnade här).
                     Annars default-texten. */}
                 <Text style={profileMenu.subtitle}>
-                  {authNotice ?? 'Sign in to create and join games'}
+                  {authNotice ?? 'Create an account to save your progress and play with friends.'}
                 </Text>
 
-                <View style={profileMenu.btnWithBadge}>
-                  <TouchableOpacity
-                    style={[profileMenu.secondaryBtn, profileMenu.secondaryBtnFree]}
-                    onPress={handleRegister}
-                  >
-                    <Text style={profileMenu.secondaryBtnText}>Register</Text>
-                  </TouchableOpacity>
-                  {/* FREE-badge som skär kantlinjen — samma teknik som
-                      HOST/GUEST-badges på spelarkorten i Lobbyn. */}
-                  <View style={profileMenu.freeBadge} pointerEvents="none">
-                    <Text style={profileMenu.freeBadgeText}>FREE</Text>
-                  </View>
-                </View>
+                {/* Register = arkets primära val: tunn guld kant (Brand
+                    Master). FREE-badgen borttagen 2026-10-16. */}
+                <TouchableOpacity
+                  style={[profileMenu.secondaryBtn, profileMenu.secondaryBtnFree]}
+                  onPress={handleRegister}
+                >
+                  <Text style={profileMenu.secondaryBtnText}>Register</Text>
+                </TouchableOpacity>
 
                 <TouchableOpacity
                   style={profileMenu.secondaryBtn}
@@ -4860,42 +4811,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#6B7280',
     borderColor: '#6B7280',
   },
-  // Kant-skärande FREE-badge på startskärmens tre knappar (utloggat läge).
-  // Grön bg + grön kant (guest-knapparna); Register-varianten byter till
-  // vit kant så badgen syns mot knappens gröna bakgrund.
-  homeFreeBadge: {
-    position: 'absolute',
-    top: -8,
-    right: Spacing.lg,
-    backgroundColor: Colors.success,
-    borderRadius: 4,
-    borderWidth: 1,
-    // Vit kant på ALLA Home-badges (2026-07-03, var Colors.success) —
-    // gör homeFreeBadgeRegister/homeUserBadge:s borderColor-overrides
-    // redundanta men de behålls (homeUserBadge sätter även bg).
-    borderColor: '#FFFFFF',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    zIndex: 10,
-    elevation: 4,
-  },
-  // "No Data Saved"-badgen på Start Game - Guest login i
-  // inloggat läge — grå bg (samma PREMIUM-grå som guest-knapparna) +
-  // vit kant. User-knapparnas "Game Results - Saved"-badges togs bort
-  // 2026-08-07.
-  homeUserBadge: {
-    backgroundColor: '#6B7280',
-    borderColor: '#FFFFFF',
-  },
-  homeFreeBadgeRegister: {
-    borderColor: '#FFFFFF',
-  },
-  homeFreeBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 0.6,
-  },
   createGameHint: {
     fontSize: 12,
     color: Colors.textSecondary,
@@ -5118,6 +5033,87 @@ const modal = StyleSheet.create({
   joinBtn: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
   joinBtnDisabled: { backgroundColor: 'rgba(255,255,255,0.06)' },
   joinBtnText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  // Gästformulärets primär-CTA när formuläret är giltigt: metallisk guld
+  // (MetallicGoldFill) + svart text, som Home:s Start New Game.
+  joinBtnGold: { overflow: 'hidden', borderWidth: 1, borderColor: METALLIC_GOLD_EDGE },
+  joinBtnGoldText: { color: '#000000', fontWeight: '700' },
+  // Gästformulärets etiketter (Home v2): title case, ingen versal-overline.
+  formLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+    paddingHorizontal: Spacing.xs,
+  },
+  // Gästformulärets sammanhållna fält (namn + rumskod): EN rundad ruta.
+  guestBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    paddingHorizontal: Spacing.md,
+  },
+  // Blå = aktivt/fokuserat fält.
+  guestBoxActive: {
+    borderColor: Colors.primary,
+  },
+  // Namnet: bokstäver högerställda + "-" + siffror vänsterställda, så de
+  // två inputarna möts och läses som en text ("Guest-1234567").
+  guestNameText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+    paddingVertical: 0,
+  },
+  guestNameLetters: { flex: 1, minWidth: 0, textAlign: 'right' },
+  guestNameDigits: { flex: 1, minWidth: 0, textAlign: 'left' },
+  guestBoxCheck: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.warning,
+    marginLeft: Spacing.sm,
+  },
+  guestBoxCheckBtn: {
+    height: 36,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.sm,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: Spacing.sm,
+  },
+  guestBoxCheckBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' },
+  // Gästformulärets rumskod: sex synliga rutor (bas = codeCell).
+  codeCellGuest: {
+    height: 52,
+    fontSize: 22,
+  },
+  // Ifylld ruta: något ljusare ram, fortfarande neutral (blå = aktiv).
+  codeCellGuestFilled: {
+    borderColor: Colors.textSecondary,
+  },
+  codeCellGuestActive: {
+    borderColor: Colors.primary,
+    borderWidth: 1.5,
+  },
+  codeLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  codeLabelCheck: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.warning,
+  },
+  // Ifyllt + giltigt fält: tunn guld kant, ingen glöd. Aldrig vid fel.
+  fieldDone: {
+    borderWidth: 1,
+    borderColor: Colors.warning,
+  },
+  doneCheck: { fontSize: 16, fontWeight: '700', color: Colors.warning },
   cancelBtn: { alignItems: 'center', paddingVertical: Spacing.xs },
   cancelText: { fontSize: 14, color: Colors.textSecondary },
 
@@ -5694,32 +5690,9 @@ const profileMenu = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
   },
-  // Override för Register: grön kantlinje som matchar FREE-badgen och
-  // signalerar "gratis / new-user-friendly".
+  // Override för Register (arkets primära val): tunn guld kant.
   secondaryBtnFree: {
-    borderColor: Colors.success,
-  },
-
-  // Wrapper som ger position-context för FREE-badgen på Register-knappen
-  btnWithBadge: {
-    position: 'relative',
-  },
-  freeBadge: {
-    position: 'absolute',
-    top: -8,
-    right: Spacing.lg,
-    backgroundColor: Colors.success,
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    zIndex: 10,
-    elevation: 4,
-  },
-  freeBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 0.6,
+    borderColor: Colors.warning,
   },
   input: {
     height: 52,

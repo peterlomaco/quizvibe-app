@@ -1810,7 +1810,7 @@ export default function LobbyScreen() {
         const age = guestBirthYear ? currentYear - parseInt(guestBirthYear, 10) : undefined;
         const assistance = (guestAssistance === 'minimal' || guestAssistance === 'standard' || guestAssistance === 'full')
           ? guestAssistance
-          : 'standard';
+          : 'full'; // Gäster spelar på Full (Peter 2026-10-16).
         const guestResolved = await resolveJoinerId(
           guestName,
           () => `guest-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,

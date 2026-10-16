@@ -259,6 +259,13 @@ export interface GeneratePlayerNameOptions {
    */
   excludeLetters?: Set<string>;
   /**
+   * Use the prefix as-is, without the random capital letter: "Guest" →
+   * "Guest-1234567". Used by the Home guest forms (2026-10-16). Uniqueness
+   * then rests on the 7 digits + the `taken` set + the caller's server-side
+   * player_name_exists check, so callers must still verify the result.
+   */
+  prefixOnly?: boolean;
+  /**
    * Bevarar exakt dessa bokstäver utan att randomisera dem. Endast digit-
    * sektionen blir slumpad. Typiskt användning: "Try to keep PlayerName
    * letters?" → Yes-branchen passar in användarens typade bokstäver.
@@ -319,6 +326,7 @@ export function generatePlayerName(
       // "Guest" + "A" = "GuestA". Defensiv cap mot MAX_LETTERS om prefix
       // redan är maxat (då returneras prefix ensamt).
       if (normalizedPrefix.length >= PLAYER_NAME_MAX_LETTERS) return normalizedPrefix;
+      if (options.prefixOnly) return normalizedPrefix;
       // excludeLetters filtrerar bort bokstäver som redan används av andra
       // guests i lobbyn så två guests inte får samma identifierar-suffix.
       // Bygg available-listan från LETTERS minus excluded. Tom available

@@ -2,8 +2,9 @@ import { Colors, Radius, Spacing } from '@/src/theme';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from '@/src/components/haptic';
-import Svg, { Circle, Rect as SvgRect, Text as SvgText } from 'react-native-svg';
 import { VersusIcon } from '@/src/components/VersusIcon';
+import { GroupOutlineIcon } from '@/src/components/GroupOutlineIcon';
+import { ProfileOutlineIcon } from '@/src/components/ProfileOutlineIcon';
 
 // ─── Lobbytyp-väljare (Start New Game / Start Game as Guest) ─────────────────
 // Renodlad 1vs1-lobby (2026-08-07): vägvalet mellan vanlig lobby och 1vs1-
@@ -20,77 +21,11 @@ export type LocalLobbyType = Exclude<HostLobbyType, '1v1'>;
 // sedan 2026-08-07 — delas med "1vs1"-knappen på Home (MyMatchesSection)
 // så duell-läget har EN ikon i appen.
 
-/** Ikon för "Single & Multiplayer mode": **Here&Now** på tre rader —
- *  "Here" överst och "Now" underst i blått, med ett guld-"&" i mitten.
- *  &-tecknet ritas SIST så det lägger sig ovanpå och täcker en del av både
- *  "Here" och "Now". Halo i kortets bakgrundsfärg separerar &-tecknet från
- *  orden under. Blått speglar VersusIcon:s blå silhuetter. */
-function HereNowIcon({
-  height = 60,
-  color = Colors.primary,
-  accentColor = Colors.warning,
-}: {
-  height?: number;
-  color?: string;
-  accentColor?: string;
-}) {
-  // viewBox 56×46 — VersusIcon är sedan 2026-08-07 något bredare (64×46);
-  // ikon-kolumnen (iconWrap) centrerar båda så de väger jämnt ändå.
-  const width = height * (56 / 46);
-  return (
-    <Svg width={width} height={height} viewBox="0 0 56 46">
-      <SvgText x={28} y={18} fontSize={15} fontWeight="bold" fill={color} textAnchor="middle">
-        Here
-      </SvgText>
-      <SvgText x={28} y={44} fontSize={15} fontWeight="bold" fill={color} textAnchor="middle">
-        Now
-      </SvgText>
-      {/* "&" ovanpå — halo först, sedan guld-fyllningen. textLength trycker
-          ihop tecknet i bredd så det inte breder ut sig över orden. */}
-      <SvgText
-        x={28}
-        y={33}
-        fontSize={18}
-        fontWeight="bold"
-        fill={Colors.cardElevated}
-        stroke={Colors.cardElevated}
-        strokeWidth={4}
-        textAnchor="middle"
-        textLength={11}
-        lengthAdjust="spacingAndGlyphs"
-      >
-        &amp;
-      </SvgText>
-      <SvgText
-        x={28}
-        y={33}
-        fontSize={18}
-        fontWeight="bold"
-        fill={accentColor}
-        textAnchor="middle"
-        textLength={11}
-        lengthAdjust="spacingAndGlyphs"
-      >
-        &amp;
-      </SvgText>
-    </Svg>
-  );
-}
-
-/** Ikon för "Single Game": EN blå profil-silhuett. Samma proportioner som
- *  VersusIcon:s två figurer (huvud r 6 + kropp 17×14, rx 6) så de tre
- *  raderna i panelen läses som en familj — en figur = solo, två = duell. */
-function SoloIcon({ height = 50, color = Colors.primary }: { height?: number; color?: string }) {
-  // Samma viewBox-kvot som HereNowIcon (56×46) — iconWrap centrerar båda.
-  const width = height * (56 / 46);
-  return (
-    <Svg width={width} height={height} viewBox="0 0 56 46">
-      {/* Figurens span är 8.5–37.5 → vertikalt centrerad i 46. */}
-      <Circle cx={28} cy={14.5} r={6} fill={color} />
-      <SvgRect x={19.5} y={23.5} width={17} height={14} rx={6} fill={color} />
-    </Svg>
-  );
-}
+// Single/Multiplayer-ikonerna är rena outline-ikoner (Home v2, 2026-10-16)
+// i samma familj som bottenmenyns Profile/Store — ersätter den blå
+// silhuetten och "Here&Now"-textgrafiken. Q:et används aldrig här.
+const MODE_ICON_SIZE = 36;
+const MODE_ICON_STROKE = 1.6;
 
 /** Inline-utfällning under Start-knappen (Peter 2026-08-07 rev 2: ingen
  *  separat modal — alternativen är en del av knappen och fälls ut under
@@ -98,9 +33,11 @@ function SoloIcon({ height = 50, color = Colors.primary }: { height?: number; co
  *  grå för guest) så panelen läses som knappens förlängning. */
 export function HostTypeOptions({
   accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge,
-  iconColor, iconAccentColor, arrowColor, pressedBorderColor,
+  iconColor, iconAccentColor, arrowColor, pressedBorderColor, heading,
 }: {
   accentColor: string;
+  /** Optional title above the cards (Home: "Choose how to play"). */
+  heading?: string;
   /** Functional icon colour (Solo / Here&Now / Versus). Default: legacy blue. */
   iconColor?: string;
   /** Icon accents ("&", wifi arcs). Default: legacy gold. */
@@ -144,6 +81,7 @@ export function HostTypeOptions({
 }) {
   return (
     <View style={hostTypeStyles.panel}>
+      {!!heading && <Text style={hostTypeStyles.heading}>{heading}</Text>}
       {/* Single/Multiplayer väljs sedan 2026-08-24 HÄR i stället för via
           Game Mode-rutorna inne i lobbyn — lobbyn öppnas med rätt läge
           förvalt, men båda lobbytyperna visar fortfarande hela Game Mode-
@@ -152,8 +90,8 @@ export function HostTypeOptions({
         accentColor={accentColor}
         arrowColor={arrowColor}
         pressedBorderColor={pressedBorderColor}
-        icon={<SoloIcon height={50} color={iconColor} />}
-        label="Single player"
+        icon={<ProfileOutlineIcon size={MODE_ICON_SIZE} color={iconColor ?? Colors.textPrimary} strokeWidth={MODE_ICON_STROKE} />}
+        label="Single Player"
         subtitle="Play solo on this device"
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
@@ -163,9 +101,10 @@ export function HostTypeOptions({
         accentColor={accentColor}
         arrowColor={arrowColor}
         pressedBorderColor={pressedBorderColor}
-        icon={<HereNowIcon height={50} color={iconColor} accentColor={iconAccentColor} />}
-        label="Multiplayer Game"
-        subtitle="Pass-the-Phone or Individual devices"
+        icon={<GroupOutlineIcon size={MODE_ICON_SIZE} color={iconColor ?? Colors.textPrimary} strokeWidth={MODE_ICON_STROKE} />}
+        label="Multiplayer"
+        subtitle="Play together here & now"
+        detail="Pass-the-Phone or individual devices"
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
         onPress={() => onSelect('multiplayer')}
@@ -196,7 +135,7 @@ export function HostTypeOptions({
 }
 
 function HostTypeOptionRow({
-  accentColor, icon, label, subtitle, onPress, locked = false, badgeText, badgeMuted = false,
+  accentColor, icon, label, subtitle, detail, onPress, locked = false, badgeText, badgeMuted = false,
   arrowColor, pressedBorderColor,
 }: {
   accentColor: string;
@@ -205,6 +144,8 @@ function HostTypeOptionRow({
   icon: React.ReactNode;
   label: string;
   subtitle: string;
+  /** Optional smaller secondary line under the subtitle. */
+  detail?: string;
   onPress: () => void;
   /** Kontogatad rad: dimmas, men förblir tappbar så tryck kan visa
    *  upsell:en istället för att välja läget. Badgen sätts separat via
@@ -240,6 +181,7 @@ function HostTypeOptionRow({
       <View style={[{ flex: 1 }, locked && hostTypeStyles.lockedDim]}>
         <Text style={hostTypeStyles.label}>{label}</Text>
         <Text style={hostTypeStyles.subtitle}>{subtitle}</Text>
+        {!!detail && <Text style={hostTypeStyles.detail}>{detail}</Text>}
       </View>
       <Text
         style={[
@@ -338,5 +280,18 @@ const hostTypeStyles = StyleSheet.create({
   },
   arrow: {
     fontSize: 28,
+  },
+  heading: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  detail: {
+    fontSize: 12,
+    color: Colors.textSecondary, // var textDisabled — för svag (2026-10-16)
+    marginTop: 2,
+    lineHeight: 16,
   },
 });
