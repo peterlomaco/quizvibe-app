@@ -5,6 +5,7 @@ import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicG
 import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
 import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
+import { EyeIcon } from '@/src/components/EyeIcon';
 import { WaveDots } from '@/src/components/WaveDots';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { HostTypeOptions, type HostLobbyType } from '@/src/components/HostTypeOptions';
@@ -2214,6 +2215,15 @@ export default function HomeScreen() {
   const loginPlayerNameDigitsRef = useRef<TextInput>(null);
   const [loginPlayerNameKbMode, setLoginPlayerNameKbMode] = useState<'letter' | 'digit'>('letter');
   const [loginPlayerNameFocused, setLoginPlayerNameFocused] = useState(false);
+  // UI-only (Home v2-login, 2026-10-16): fokus-state för blå ram, visa/dölj
+  // lösenord, och inline-fel ovanför CTA:n i stället för en Alert.
+  const [loginEmailFocused, setLoginEmailFocused] = useState(false);
+  const [loginPasswordFocused, setLoginPasswordFocused] = useState(false);
+  const [loginShowPassword, setLoginShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  useEffect(() => {
+    setLoginError(null);
+  }, [loginPlayerName, loginEmail, loginPassword, loginMode]);
 
   // ── Register-form state (sekventiell upplåsning som guest-flödet) ──
   const [regEmail, setRegEmail] = useState('');
@@ -2268,6 +2278,7 @@ export default function HomeScreen() {
         setLoginPlayerNameFocused(false);
         setLoginPlayerNameKbMode('letter');
         setLoginPassword('');
+        setLoginShowPassword(false);
         setForgotEmail('');
         setForgotStep('email');
         setForgotCode('');
@@ -2743,10 +2754,7 @@ export default function HomeScreen() {
         }
         // Generiskt fel för både "namnet finns inte" och "fel lösenord"
         // (function:n skiljer inte på dem — anti-enumerering).
-        Alert.alert(
-          'Login failed',
-          'Invalid Player Name or password. Please check, or switch to Email mode and use the email you registered with.',
-        );
+        setLoginError('Player name or password is incorrect.');
         return;
       }
       userId = result.user.id;
@@ -2784,7 +2792,7 @@ export default function HomeScreen() {
         return;
       }
       if (error || !data.user) {
-        Alert.alert('Login failed', 'Invalid PlayerName/Email or password. Please check');
+        setLoginError('Email or password is incorrect.');
         return;
       }
       userId = data.user.id;
@@ -3798,6 +3806,11 @@ export default function HomeScreen() {
                   <Text style={profileMenu.backText}>← Back</Text>
                 </TouchableOpacity>
 
+                {/* Medan custom-tangentbordet är uppe döljs rubrik, undertext,
+                    lägesväljare och glömt-länk — annars får tangentbordet inte
+                    plats inom sheet:ens maxHeight (90 %) och kapas i botten. */}
+                {!loginPlayerNameFocused && (
+                <>
                 <Text style={profileMenu.title}>Log in</Text>
                 <Text style={profileMenu.subtitle}>Choose login method</Text>
 
@@ -3844,19 +3857,36 @@ export default function HomeScreen() {
                     </Text>
                   </TouchableOpacity>
                 </View>
+                </>
+                )}
 
+                {(() => {
+                  // Lokal giltighet (bara format — INTE autentisering). Driver
+                  // guldram/✓ och om Log in-CTA:n blir guld.
+                  const loginNameValid = isPlayerNameFormatValid(normalizePlayerName(loginPlayerName.trim()));
+                  const loginEmailValid = /^\S+@\S+\.\S+$/.test(loginEmail.trim());
+                  const identifierValid = loginMode === 'playerName' ? loginNameValid : loginEmailValid;
+                  const canSubmit = identifierValid && loginPassword.trim().length > 0;
+                  const pwUnlocked = (loginMode === 'playerName' ? loginPlayerName : loginEmail).trim().length > 0;
+                  return (
+                    <>
                 {loginMode === 'playerName' ? (
                   <View style={modal.fieldGroup}>
-                    <Text style={modal.fieldLabel}>Player Name - Letter-digit format</Text>
-                    <View style={modal.playerNameRow}>
+                    <Text style={modal.formLabel}>Player name</Text>
+                    {/* EN visuell ruta som i gästformuläret: bokstäver + fast
+                        "–" + siffror. Under huven två TextInputs (oförändrad
+                        input-logik). Blå = redigeras, guld + ✓ = komplett. */}
+                    <View
+                      style={[
+                        modal.guestBox,
+                        loginPlayerNameFocused && modal.guestBoxActive,
+                        !loginPlayerNameFocused && loginNameValid && modal.fieldDone,
+                      ]}
+                    >
                       <TextInput
                         ref={loginPlayerNameLettersRef}
-                        style={[
-                          modal.inputText,
-                          modal.playerNameLettersInput,
-                          loginPlayerNameKbMode === 'letter' && modal.playerNameInputActive,
-                        ]}
-                        placeholder="Anna"
+                        style={[modal.guestNameText, modal.guestNameLetters]}
+                        placeholder="Name"
                         placeholderTextColor={Colors.textDisabled}
                         value={getPlayerNameLetters(loginPlayerName)}
                         maxLength={PLAYER_NAME_MAX_LETTERS}
@@ -3873,13 +3903,12 @@ export default function HomeScreen() {
                         }}
                         onBlur={() => setLoginPlayerNameFocused(false)}
                       />
-                      <Text style={modal.playerNameSeparator}>–</Text>
+                      <Text style={[modal.guestNameText, modal.loginNameSeparator]}>–</Text>
                       <TextInput
                         ref={loginPlayerNameDigitsRef}
                         style={[
-                          modal.inputText,
-                          modal.playerNameDigitsInput,
-                          loginPlayerNameKbMode === 'digit' && modal.playerNameInputActive,
+                          modal.guestNameText,
+                          modal.guestNameDigits,
                           getPlayerNameLetters(loginPlayerName).length === 0 && modal.playerNameInputDisabled,
                         ]}
                         placeholder="1234"
@@ -3904,75 +3933,99 @@ export default function HomeScreen() {
                         }}
                         onBlur={() => setLoginPlayerNameFocused(false)}
                       />
+                      {!loginPlayerNameFocused && loginNameValid && (
+                        <Text style={modal.guestBoxCheck}>✓</Text>
+                      )}
                     </View>
                   </View>
                 ) : (
-                  <TextInput
-                    style={[
-                      profileMenu.input,
-                      !loginEmail.trim() && profileMenu.inputActive,
-                    ]}
-                    placeholder="Email"
-                    placeholderTextColor={Colors.textDisabled}
-                    value={loginEmail}
-                    onChangeText={setLoginEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    returnKeyType="next"
-                  />
+                  <View style={modal.fieldGroup}>
+                    <Text style={modal.formLabel}>Email</Text>
+                    <TextInput
+                      style={[
+                        profileMenu.input,
+                        loginEmailFocused && profileMenu.inputActive,
+                        !loginEmailFocused && loginEmailValid && modal.fieldDone,
+                      ]}
+                      placeholder="Email address"
+                      placeholderTextColor={Colors.textDisabled}
+                      value={loginEmail}
+                      onChangeText={setLoginEmail}
+                      onFocus={() => setLoginEmailFocused(true)}
+                      onBlur={() => setLoginEmailFocused(false)}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                    />
+                  </View>
                 )}
 
-                {(() => {
-                  const identifier = (loginMode === 'playerName' ? loginPlayerName : loginEmail).trim();
-                  const pwUnlocked = identifier.length > 0;
-                  return (
-                    <View
-                      pointerEvents={pwUnlocked ? 'auto' : 'none'}
-                      style={!pwUnlocked && { opacity: 0.4 }}
-                    >
-                      <TextInput
-                        style={[
-                          profileMenu.input,
-                          pwUnlocked && !loginPassword.trim() && profileMenu.inputActive,
-                        ]}
-                        placeholder="Password"
-                        placeholderTextColor={Colors.textDisabled}
-                        value={loginPassword}
-                        onChangeText={setLoginPassword}
-                        secureTextEntry
-                        returnKeyType="done"
-                        onSubmitEditing={handleLogin}
-                      />
-                    </View>
-                  );
-                })()}
-
-                {/* Forgot-länk — leder till recovery-flow via email */}
-                <TouchableOpacity
-                  onPress={() => setProfileMenuStep('forgot')}
-                  style={profileMenu.forgotLinkWrap}
-                  hitSlop={6}
+                {/* Lösenord: blå vid fokus, aldrig guld (ifylld ≠ verifierad). */}
+                <View
+                  style={[modal.fieldGroup, !pwUnlocked && { opacity: 0.4 }]}
+                  pointerEvents={pwUnlocked ? 'auto' : 'none'}
                 >
-                  <Text style={profileMenu.forgotLinkText}>
-                    Forgot your Player Name or password?
-                  </Text>
-                </TouchableOpacity>
-
-                {(() => {
-                  const identifier = (loginMode === 'playerName' ? loginPlayerName : loginEmail).trim();
-                  const canSubmit = identifier.length > 0 && loginPassword.trim().length > 0;
-                  return (
+                  <Text style={modal.formLabel}>Password</Text>
+                  <View
+                    style={[
+                      profileMenu.passwordBox,
+                      loginPasswordFocused && profileMenu.inputActive,
+                    ]}
+                  >
+                    <TextInput
+                      style={profileMenu.passwordInput}
+                      placeholder="Password"
+                      placeholderTextColor={Colors.textDisabled}
+                      value={loginPassword}
+                      onChangeText={setLoginPassword}
+                      onFocus={() => setLoginPasswordFocused(true)}
+                      onBlur={() => setLoginPasswordFocused(false)}
+                      secureTextEntry={!loginShowPassword}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="done"
+                      onSubmitEditing={() => { if (canSubmit) handleLogin(); }}
+                    />
                     <TouchableOpacity
-                      style={[
-                        profileMenu.primaryBtn,
-                        !canSubmit && profileMenu.primaryBtnDisabled,
-                      ]}
-                      onPress={handleLogin}
-                      disabled={!canSubmit}
+                      onPress={() => setLoginShowPassword((v) => !v)}
+                      hitSlop={10}
+                      accessibilityLabel={loginShowPassword ? 'Hide password' : 'Show password'}
                     >
-                      <Text style={profileMenu.primaryBtnText}>Log in</Text>
+                      <EyeIcon off={loginShowPassword} />
                     </TouchableOpacity>
+                  </View>
+                  {/* Forgot-länk — diskret, direkt under lösenordet. Leder
+                      till samma email-baserade recovery-flöde som förut.
+                      Dold medan custom-tangentbordet är uppe (platsbrist). */}
+                  {!loginPlayerNameFocused && (
+                  <TouchableOpacity
+                    onPress={() => setProfileMenuStep('forgot')}
+                    style={profileMenu.forgotLinkWrap}
+                    hitSlop={6}
+                  >
+                    <Text style={profileMenu.forgotLinkText}>
+                      {loginMode === 'playerName' ? 'Forgot player name or password?' : 'Forgot password?'}
+                    </Text>
+                  </TouchableOpacity>
+                  )}
+                </View>
+
+                {loginError && <Text style={profileMenu.loginErrorText}>{loginError}</Text>}
+
+                {/* Guld = redo att skicka (lokalt giltigt), INTE inloggad. */}
+                <TouchableOpacity
+                  style={[
+                    modal.joinBtn,
+                    canSubmit ? modal.joinBtnGold : modal.joinBtnDisabled,
+                  ]}
+                  onPress={handleLogin}
+                  disabled={!canSubmit}
+                >
+                  {canSubmit && <MetallicGoldFill />}
+                  <Text style={[modal.joinBtnText, canSubmit && modal.joinBtnGoldText]}>Log in</Text>
+                </TouchableOpacity>
+                    </>
                   );
                 })()}
 
@@ -5069,6 +5122,8 @@ const modal = StyleSheet.create({
   },
   guestNameLetters: { flex: 1, minWidth: 0, textAlign: 'right' },
   guestNameDigits: { flex: 1, minWidth: 0, textAlign: 'left' },
+  // Log in: fast "–" mellan namn och siffror (användaren skriver det aldrig).
+  loginNameSeparator: { color: Colors.textSecondary, paddingHorizontal: Spacing.xs },
   guestBoxCheck: {
     fontSize: 20,
     fontWeight: '700',
@@ -5090,12 +5145,12 @@ const modal = StyleSheet.create({
     height: 52,
     fontSize: 22,
   },
-  // Ifylld ruta: något ljusare ram, fortfarande neutral (blå = aktiv).
+  // Ifylld ruta + rutan som ska fyllas i: guldram (guld = aktiv).
   codeCellGuestFilled: {
-    borderColor: Colors.textSecondary,
+    borderColor: Colors.warning,
   },
   codeCellGuestActive: {
-    borderColor: Colors.primary,
+    borderColor: Colors.warning,
     borderWidth: 1.5,
   },
   codeLabelRow: {
@@ -5421,13 +5476,15 @@ const modal = StyleSheet.create({
     color: Colors.textPrimary,
     textAlign: 'center',
   },
+  // Ifylld ruta + nästa tomma ruta: guldram (guld = aktiv), samma som
+  // gästformulärets codeCellGuestFilled/-Active.
   codeCellFilled: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.warning,
   },
   // Highlight på nästa tomma cell — visar var användaren förväntas skriva
   codeCellActive: {
-    borderColor: Colors.primary,
+    borderColor: Colors.warning,
+    borderWidth: 1.5,
   },
   codeDash: {
     fontSize: 24,
@@ -5714,9 +5771,33 @@ const profileMenu = StyleSheet.create({
   },
   forgotLinkText: {
     fontSize: 13,
-    color: Colors.primary,
+    color: Colors.textSecondary,
     fontWeight: '500',
-    textDecorationLine: 'underline',
+  },
+  // Lösenord + ögon-knapp i EN ruta (samma mått som input).
+  passwordBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 52,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.sm,
+  },
+  passwordInput: {
+    flex: 1,
+    height: '100%',
+    fontSize: 16,
+    color: Colors.textPrimary,
+  },
+  // Inline-fel ovanför Log in-CTA:n — lugnt, ingen Alert.
+  loginErrorText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.error,
+    textAlign: 'center',
   },
   backBtn: {
     alignSelf: 'flex-start',
