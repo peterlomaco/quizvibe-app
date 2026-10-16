@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BRAND_UI_ACTIVE, BRAND_UI_INACTIVE } from './brand/QuizVibeBrandSvg';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 import { ShoppingCartIcon } from './ShoppingCartIcon';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
@@ -82,7 +83,9 @@ export function BottomBanner() {
   const isProfile = pathname === '/profile';
   const isStore = pathname === '/store';
 
-  const col = (active: boolean) => (active ? Colors.warning : Colors.textSecondary);
+  // Brand UI-state rule (design/brand/README.md): ONLY the active tab is gold;
+  // every inactive tab uses the same reduced-opacity white.
+  const col = (active: boolean) => (active ? BRAND_UI_ACTIVE : BRAND_UI_INACTIVE);
 
   return (
     <View
@@ -146,11 +149,11 @@ const styles = StyleSheet.create({
   tabActive: {},
   label: {
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
+    color: BRAND_UI_INACTIVE,
     fontWeight: '500',
   },
   labelActive: {
-    color: Colors.warning,
+    color: BRAND_UI_ACTIVE,
     fontWeight: '600',
   },
 });

@@ -2,11 +2,15 @@ import { Redirect, useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
+  BRAND_UI_ACTIVE,
+  BRAND_UI_INACTIVE,
   type BrandVariant,
   QuizVibeLogoSvg,
   QuizVibeMarkSvg,
   QuizVibeWordmarkSvg,
+  WORDMARK_LOGO_SCALE,
 } from '@/src/components/brand/QuizVibeBrandSvg';
+import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 
 // ⚠ TEMPORARY, DEV-ONLY brand validation screen (2026-10-16).
@@ -85,7 +89,7 @@ export default function BrandPreview() {
             <View style={styles.simHomeBrand}>
               <QuizVibeMarkSvg size={116} />
               <View style={{ height: Spacing.md }} />
-              <QuizVibeWordmarkSvg width={220} />
+              <QuizVibeWordmarkSvg width={220 * WORDMARK_LOGO_SCALE} />
               <Text style={styles.simTagline}>Challenge yourself. Play together.</Text>
             </View>
             <View style={styles.simGoldBtn}>
@@ -124,33 +128,34 @@ export default function BrandPreview() {
 
         <Section title="Simulation 3 — navigation / profile placements">
           <View style={styles.phone}>
+            {/* Neutral button icon: not an active state → white, not gold. */}
             <View style={styles.simProfileRow}>
-              <QuizVibeMarkSvg size={28} />
-              <Text style={styles.simProfileText}>Profile settings</Text>
+              <QuizVibeMarkSvg size={28} variant="white" />
+              <Text style={styles.simProfileText}>Profile settings (neutral, white 28 pt)</Text>
             </View>
-            <View style={styles.simProfileRow}>
-              <QuizVibeMarkSvg size={20} variant="white" />
-              <Text style={styles.simProfileText}>Home (white, 20 pt)</Text>
-            </View>
+            {/* Tab bar rule: ONLY the active tab is (flat) gold; every inactive
+                tab uses the same reduced-opacity white. */}
             <View style={styles.simTabBar}>
               <View style={styles.simTab}>
-                <QuizVibeMarkSvg size={24} />
-                <Text style={[styles.simTabText, { color: Colors.warning }]}>Home</Text>
-              </View>
-              <View style={styles.simTab}>
-                <QuizVibeMarkSvg size={24} variant="white" />
-                <Text style={styles.simTabText}>Profile</Text>
-              </View>
-              <View style={styles.simTab}>
                 <QuizVibeMarkSvg size={24} variant="flatGold" />
-                <Text style={styles.simTabText}>Store</Text>
+                <Text style={[styles.simTabText, { color: BRAND_UI_ACTIVE }]}>Home</Text>
+              </View>
+              <View style={styles.simTab}>
+                <View style={{ opacity: 0.55 }}>
+                  <QuizVibeMarkSvg size={24} variant="white" />
+                </View>
+                <Text style={[styles.simTabText, { color: BRAND_UI_INACTIVE }]}>Profile</Text>
+              </View>
+              <View style={styles.simTab}>
+                <ShoppingCartIcon size={22} color={BRAND_UI_INACTIVE} />
+                <Text style={[styles.simTabText, { color: BRAND_UI_INACTIVE }]}>Store</Text>
               </View>
             </View>
           </View>
         </Section>
 
         <Text style={styles.footer}>
-          Validation only. Production screens still use the PNG logo.
+          Brand Master locked 2026-10-16. Production: Home uses it; other screens still use the PNG logo.
         </Text>
       </ScrollView>
     </SafeAreaView>

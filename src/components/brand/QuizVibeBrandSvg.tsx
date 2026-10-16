@@ -1,6 +1,7 @@
 import React, { useId } from 'react';
 import { View } from 'react-native';
 import Svg, { Defs, G, LinearGradient, Path, Stop } from 'react-native-svg';
+import { Colors } from '../../theme';
 import {
   MARK_PATHS,
   MARK_VIEWBOX,
@@ -8,12 +9,12 @@ import {
   WORDMARK_VIEWBOX,
 } from './quizVibeBrandGeometry';
 
-// Finalized QuizVibe brand (design/brand/, approved 2026-10-16) rendered with
-// react-native-svg — the method production would use. Geometry comes from the
-// generated quizVibeBrandGeometry.ts; this file only adds paint.
-//
-// ⚠ VALIDATION ONLY (2026-10-16): used solely by the dev-only /brand-preview
-// route. Production screens still render the PNG logo (QuizVibeGoldMark).
+// QuizVibe Brand Master (design/brand/, LOCKED 2026-10-16) rendered with
+// react-native-svg. Geometry comes from the generated quizVibeBrandGeometry.ts;
+// this file only adds paint. Mark, Manrope Bold wordmark and composition B are
+// final — do not edit shapes or proportions here or in the generated file.
+// Rollout status (2026-10-16): Home brand block (A1) + the dev-only
+// /brand-preview route. Other screens still use the PNG QuizVibeGoldMark.
 
 export type BrandVariant = 'metallic' | 'flatGold' | 'white' | 'mono';
 
@@ -119,12 +120,15 @@ export function QuizVibeWordmarkSvg({ width, variant = 'metallic' }: { width: nu
   );
 }
 
-// Complete logo layout, identical to design/brand/quizvibe-logo.svg: the
-// Home screen's proportions (mark 116 pt high, 16 pt gap, wordmark 220 pt
-// wide) expressed relative to the logo width.
+// Complete logo layout, identical to design/brand/quizvibe-logo.svg — the
+// FROZEN composition B: mark 1160 high, gap 160, wordmark at 95 % of the
+// 2200-unit logo width, centred. (Home's own brand block uses the same rule:
+// mark 116 pt, wordmark 220 × 0.95 = 209 pt.)
 const LOGO_W = 2200;
 const LOGO_MARK_H = 1160;
 const LOGO_GAP = 160;
+/** Frozen composition B: the wordmark is 95 % of the logo width. */
+export const WORDMARK_LOGO_SCALE = 0.95;
 
 /** Mark above wordmark. `width` = overall logo width in pt. */
 export function QuizVibeLogoSvg({ width, variant = 'metallic' }: { width: number; variant?: BrandVariant }) {
@@ -133,7 +137,13 @@ export function QuizVibeLogoSvg({ width, variant = 'metallic' }: { width: number
     <View style={{ alignItems: 'center', width }}>
       <QuizVibeMarkSvg size={LOGO_MARK_H * k} variant={variant} />
       <View style={{ height: LOGO_GAP * k }} />
-      <QuizVibeWordmarkSvg width={width} variant={variant} />
+      <QuizVibeWordmarkSvg width={width * WORDMARK_LOGO_SCALE} variant={variant} />
     </View>
   );
 }
+
+// UI-state colours for small brand/nav elements (frozen rule): gold means
+// active/selected; inactive or neutral states use reduced-opacity white.
+// Never use gold decoratively where it could read as "active".
+export const BRAND_UI_ACTIVE = Colors.warning;
+export const BRAND_UI_INACTIVE = 'rgba(255,255,255,0.55)';

@@ -57,7 +57,7 @@ lines = [
     '',
     'export const WORDMARK_VIEWBOX = { width: %s, height: %s } as const;' % (wvb[2], wvb[3]),
     '',
-    '/** "QuizVibe" in Fredoka Bold, as outlines. */',
+    '/** "QuizVibe" in Manrope Bold, as outlines. */',
     f'export const WORDMARK_PATH = {ts_str(word_d)};',
     '',
 ]

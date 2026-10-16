@@ -1,5 +1,5 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
-import { QuizVibeGoldMark, QuizVibeGoldWordmark } from '@/src/components/QuizVibeGoldMark';
+import { QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicGoldFill';
 import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
@@ -3264,9 +3264,15 @@ export default function HomeScreen() {
 
         {/* ── Brand ──────────────────────────────────────────── */}
         <View style={styles.brandSection}>
-          <QuizVibeGoldMark size={SCREEN_HEIGHT < 600 ? 83 : 116} />
+          {/* Låst Brand Master (design/brand/), Metallic Gold, renderad med
+              react-native-svg. Komposition B: symbolen oförändrad (116/83 pt),
+              ordmärket (Manrope Bold) 95 % av den tidigare bredden 220/170 pt. */}
+          <QuizVibeMarkSvg size={SCREEN_HEIGHT < 600 ? 83 : 116} variant="metallic" />
           <View style={styles.appNameWrap}>
-            <QuizVibeGoldWordmark width={SCREEN_HEIGHT < 600 ? 170 : 220} />
+            <QuizVibeWordmarkSvg
+              width={(SCREEN_HEIGHT < 600 ? 170 : 220) * WORDMARK_LOGO_SCALE}
+              variant="metallic"
+            />
           </View>
           {/* Cross-fade tagline-wrap. Första texten i flow definierar
               höjden; index 1+ är absolut-positionerade ovanpå och fadar
