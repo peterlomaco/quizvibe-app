@@ -1,5 +1,5 @@
 import { Colors, Radius, Spacing } from '@/src/theme';
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from '@/src/components/haptic';
 import Svg, { Circle, Rect as SvgRect, Text as SvgText } from 'react-native-svg';
@@ -25,16 +25,24 @@ export type LocalLobbyType = Exclude<HostLobbyType, '1v1'>;
  *  &-tecknet ritas SIST så det lägger sig ovanpå och täcker en del av både
  *  "Here" och "Now". Halo i kortets bakgrundsfärg separerar &-tecknet från
  *  orden under. Blått speglar VersusIcon:s blå silhuetter. */
-function HereNowIcon({ height = 60 }: { height?: number }) {
+function HereNowIcon({
+  height = 60,
+  color = Colors.primary,
+  accentColor = Colors.warning,
+}: {
+  height?: number;
+  color?: string;
+  accentColor?: string;
+}) {
   // viewBox 56×46 — VersusIcon är sedan 2026-08-07 något bredare (64×46);
   // ikon-kolumnen (iconWrap) centrerar båda så de väger jämnt ändå.
   const width = height * (56 / 46);
   return (
     <Svg width={width} height={height} viewBox="0 0 56 46">
-      <SvgText x={28} y={18} fontSize={15} fontWeight="bold" fill={Colors.primary} textAnchor="middle">
+      <SvgText x={28} y={18} fontSize={15} fontWeight="bold" fill={color} textAnchor="middle">
         Here
       </SvgText>
-      <SvgText x={28} y={44} fontSize={15} fontWeight="bold" fill={Colors.primary} textAnchor="middle">
+      <SvgText x={28} y={44} fontSize={15} fontWeight="bold" fill={color} textAnchor="middle">
         Now
       </SvgText>
       {/* "&" ovanpå — halo först, sedan guld-fyllningen. textLength trycker
@@ -58,7 +66,7 @@ function HereNowIcon({ height = 60 }: { height?: number }) {
         y={33}
         fontSize={18}
         fontWeight="bold"
-        fill={Colors.warning}
+        fill={accentColor}
         textAnchor="middle"
         textLength={11}
         lengthAdjust="spacingAndGlyphs"
@@ -72,14 +80,14 @@ function HereNowIcon({ height = 60 }: { height?: number }) {
 /** Ikon för "Single Game": EN blå profil-silhuett. Samma proportioner som
  *  VersusIcon:s två figurer (huvud r 6 + kropp 17×14, rx 6) så de tre
  *  raderna i panelen läses som en familj — en figur = solo, två = duell. */
-function SoloIcon({ height = 50 }: { height?: number }) {
+function SoloIcon({ height = 50, color = Colors.primary }: { height?: number; color?: string }) {
   // Samma viewBox-kvot som HereNowIcon (56×46) — iconWrap centrerar båda.
   const width = height * (56 / 46);
   return (
     <Svg width={width} height={height} viewBox="0 0 56 46">
       {/* Figurens span är 8.5–37.5 → vertikalt centrerad i 46. */}
-      <Circle cx={28} cy={14.5} r={6} fill={Colors.primary} />
-      <SvgRect x={19.5} y={23.5} width={17} height={14} rx={6} fill={Colors.primary} />
+      <Circle cx={28} cy={14.5} r={6} fill={color} />
+      <SvgRect x={19.5} y={23.5} width={17} height={14} rx={6} fill={color} />
     </Svg>
   );
 }
@@ -90,8 +98,17 @@ function SoloIcon({ height = 50 }: { height?: number }) {
  *  grå för guest) så panelen läses som knappens förlängning. */
 export function HostTypeOptions({
   accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge,
+  iconColor, iconAccentColor, arrowColor, pressedBorderColor,
 }: {
   accentColor: string;
+  /** Functional icon colour (Solo / Here&Now / Versus). Default: legacy blue. */
+  iconColor?: string;
+  /** Icon accents ("&", wifi arcs). Default: legacy gold. */
+  iconAccentColor?: string;
+  /** Row arrow colour. Default: accentColor. */
+  arrowColor?: string;
+  /** Border colour while a row is pressed (gold = selected). Default: none. */
+  pressedBorderColor?: string;
   onSelect: (lobbyType: HostLobbyType) => void;
   /**
    * Remote 1vs1 spelas ENBART av QuizVibe-users mot varandra (Peter
@@ -133,7 +150,9 @@ export function HostTypeOptions({
           sektionen så host kan byta utan att lämna. */}
       <HostTypeOptionRow
         accentColor={accentColor}
-        icon={<SoloIcon height={50} />}
+        arrowColor={arrowColor}
+        pressedBorderColor={pressedBorderColor}
+        icon={<SoloIcon height={50} color={iconColor} />}
         label="Single player"
         subtitle="Play solo on this device"
         badgeText={localBadge?.text}
@@ -142,7 +161,9 @@ export function HostTypeOptions({
       />
       <HostTypeOptionRow
         accentColor={accentColor}
-        icon={<HereNowIcon height={50} />}
+        arrowColor={arrowColor}
+        pressedBorderColor={pressedBorderColor}
+        icon={<HereNowIcon height={50} color={iconColor} accentColor={iconAccentColor} />}
         label="Multiplayer Game"
         subtitle="Pass-the-Phone or Individual devices"
         badgeText={localBadge?.text}
@@ -152,7 +173,9 @@ export function HostTypeOptions({
       {remoteMode !== 'hidden' && (
         <HostTypeOptionRow
           accentColor={accentColor}
-          icon={<VersusIcon height={50} />}
+          arrowColor={arrowColor}
+          pressedBorderColor={pressedBorderColor}
+          icon={<VersusIcon height={50} color={iconColor} accentColor={iconAccentColor} />}
           label="Head-to-head"
           // Samma subtitel oavsett låst/olåst — "QuizVibe user"-badgen bär
           // kontokravet, subtiteln får beskriva vad läget ÄR.
@@ -174,8 +197,11 @@ export function HostTypeOptions({
 
 function HostTypeOptionRow({
   accentColor, icon, label, subtitle, onPress, locked = false, badgeText, badgeMuted = false,
+  arrowColor, pressedBorderColor,
 }: {
   accentColor: string;
+  arrowColor?: string;
+  pressedBorderColor?: string;
   icon: React.ReactNode;
   label: string;
   subtitle: string;
@@ -193,14 +219,19 @@ function HostTypeOptionRow({
    *  grönt är för det som är gratis/upplåsande. */
   badgeMuted?: boolean;
 }) {
+  // Gold border while pressed = "selected" (only when pressedBorderColor is set).
+  const [pressed, setPressed] = useState(false);
+  const restBorder = locked ? Colors.borderStrong : accentColor;
   return (
     <TouchableOpacity
       style={[
         hostTypeStyles.row,
-        { borderColor: locked ? Colors.borderStrong : accentColor },
+        { borderColor: pressed && pressedBorderColor && !locked ? pressedBorderColor : restBorder },
         locked && hostTypeStyles.rowLocked,
       ]}
       onPress={onPress}
+      onPressIn={pressedBorderColor ? () => setPressed(true) : undefined}
+      onPressOut={pressedBorderColor ? () => setPressed(false) : undefined}
       activeOpacity={0.7}
     >
       {/* Dimningen ligger på INNEHÅLLET, inte på raden — badgen ska förbli
@@ -213,7 +244,7 @@ function HostTypeOptionRow({
       <Text
         style={[
           hostTypeStyles.arrow,
-          { color: locked ? Colors.borderStrong : accentColor },
+          { color: locked ? Colors.borderStrong : (arrowColor ?? accentColor) },
           locked && hostTypeStyles.lockedDim,
         ]}
       >

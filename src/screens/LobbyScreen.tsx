@@ -34,6 +34,7 @@ import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeGoldMark } from '../components/QuizVibeGoldMark';
+import { BRAND_TAGLINE } from '../components/brand/QuizVibeBrandSvg';
 import { GoldCtaButton } from '../components/GoldCtaButton';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
@@ -7270,21 +7271,23 @@ export default function LobbyScreen() {
               </View>
             </Pressable>
           )}
-          {/* Non-host: "Music. Film. Play."-tagline på samma rad som "Game
-              Lobby", uppe i högra hörnet (host saknar credits-pill där så
-              utrymmet är fritt). Host visar den ovanför room code-kortet. */}
+          {/* Non-host: den låsta Brand Master-taglinen (BRAND_TAGLINE) på
+              samma rad som "Game Lobby", uppe i högra hörnet (host saknar
+              credits-pill där så utrymmet är fritt). Host visar den ovanför
+              room code-kortet. Krymper hellre än klipps — texten är längre
+              än den gamla "Music. Film/TV. Play.". */}
           {!hostMode && (
-            <Text style={styles.headerTagline} numberOfLines={1}>
-              Music. Film/TV. Play.
+            <Text style={styles.headerTagline} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+              {BRAND_TAGLINE}
             </Text>
           )}
         </View>
 
-        {/* Brand-tagline (glowing gold, opacity-pulse) — host visar den OVANFÖR
-            room code-kortet; non-host visar den i headern (se ovan). */}
+        {/* Brand-tagline — host visar den OVANFÖR room code-kortet; non-host
+            visar den i headern (se ovan). Samma låsta text som Home. */}
         {hostMode && (
           <Text style={styles.roomTagline}>
-            Music. Film/TV. Play.
+            {BRAND_TAGLINE}
           </Text>
         )}
 
@@ -10682,7 +10685,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     rowGap: Spacing.sm,
   },
-  // Non-host: "Music. Film. Play." på samma rad som Game Lobby (höger).
+  // Non-host: tagline (BRAND_TAGLINE) på samma rad som Game Lobby (höger).
   headerTagline: {
     flexShrink: 1,
     fontSize: 19,

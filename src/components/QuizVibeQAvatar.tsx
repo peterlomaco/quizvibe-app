@@ -15,6 +15,10 @@ interface Props {
    * knapp). Wifi-arcs är verbatim-kopia av logo:s arcs translaterade +1x +1y
    * till avatar:s Q-center; viewBox expanderas så top-arc inte klipps. */
   variant?: 'smile' | 'wifi';
+  /** Ring + tail stroke in viewBox units. Default 3 (unchanged call-sites). */
+  strokeWidth?: number;
+  /** Inner wifi-arc stroke in viewBox units. Default 1.8. */
+  detailStrokeWidth?: number;
 }
 
 /**
@@ -28,7 +32,13 @@ interface Props {
  * den används inline i avatar-storlek snarare än som full brand-mark —
  * Q + svans + ansikte/wifi räcker som visuell signal.
  */
-export function QuizVibeQAvatar({ size = 44, variant = 'smile', color = Colors.primary }: Props) {
+export function QuizVibeQAvatar({
+  size = 44,
+  variant = 'smile',
+  color = Colors.primary,
+  strokeWidth = 3,
+  detailStrokeWidth = 1.8,
+}: Props) {
   // ViewBox expanderas för wifi-variant så top-bågen (som extends utanför
   // Q-ringen, samma som QuizVibeLogo) inte klipps. Smile-variant behåller
   // sin tätare viewBox för bakåtkompatibilitet med befintliga call-sites.
@@ -43,13 +53,13 @@ export function QuizVibeQAvatar({ size = 44, variant = 'smile', color = Colors.p
           r={13}
           fill="none"
           stroke={color}
-          strokeWidth={3}
+          strokeWidth={strokeWidth}
         />
         {/* Q-svans */}
         <Path
           d="M47 47 L53 53"
           stroke={color}
-          strokeWidth={3}
+          strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
         {variant === 'wifi' ? (
@@ -58,21 +68,21 @@ export function QuizVibeQAvatar({ size = 44, variant = 'smile', color = Colors.p
               d="M 30 24 A 12 12 0 0 1 46 24"
               fill="none"
               stroke={color}
-              strokeWidth={1.8}
+              strokeWidth={detailStrokeWidth}
               strokeLinecap="round"
             />
             <Path
               d="M 32 31 A 9 9 0 0 1 44 31"
               fill="none"
               stroke={color}
-              strokeWidth={1.8}
+              strokeWidth={detailStrokeWidth}
               strokeLinecap="round"
             />
             <Path
               d="M 34 35 A 6 6 0 0 1 42 35"
               fill="none"
               stroke={color}
-              strokeWidth={1.8}
+              strokeWidth={detailStrokeWidth}
               strokeLinecap="round"
             />
           </G>

@@ -10,9 +10,13 @@ const STOPS: [number, string][] = [
   [0, '#CB6A02'],
   [0.18, '#EE9305'],
   [0.36, '#FEB221'],
-  [0.48, '#FFE457'],
-  [0.54, '#FFF89C'],
-  [0.62, '#FDCE3F'],
+  // Mittens highlight dämpad ~30 % (Peter 2026-10-16): knapparna ska kännas
+  // premium-guld men logotypen ska förbli det mest lysande guldet.
+  // Tidigare #FFE457 / #FFF89C; dämpat i två steg (senast Home v2-låsningen)
+  // så toppen ligger klart under loggans #FFF89C-glans.
+  [0.48, '#FFCE3E'],
+  [0.54, '#FFD55C'],
+  [0.62, '#FDC838'],
   [0.82, '#EE9305'],
   [1, '#CB6A02'],
 ];

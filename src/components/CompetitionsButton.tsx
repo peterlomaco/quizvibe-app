@@ -20,7 +20,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, AppState, type AppStateStatus, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from '@/src/components/haptic';
 
-import { Colors, FontSize, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, Radius, Spacing } from '../theme';
 import { TrophyIcon } from './TrophyIcon';
 import { isAnonymousSession } from '../utils/auth';
 import {
@@ -112,7 +112,8 @@ export function CompetitionsButton({
 
   return (
     <TouchableOpacity
-      style={styles.btn}
+      // Neutral kant; guld bara vid väntande accept (guld = tillstånd).
+      style={[styles.btn, { backgroundColor: BrandUi.surface, borderColor: hasUpdate ? Colors.warning : BrandUi.border }]}
       activeOpacity={0.8}
       onPress={() =>
         router.push({
@@ -130,7 +131,7 @@ export function CompetitionsButton({
     >
       {/* Blå pokal + "Competition"-etikett som EN vänsterställd grupp. */}
       <View style={styles.iconGroup}>
-        <TrophyIcon height={22} />
+        <TrophyIcon height={22} color={BrandUi.icon} />
         <Text style={styles.label} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
           Marathon
         </Text>
@@ -146,7 +147,11 @@ export function CompetitionsButton({
         </Animated.Text>
       )}
       <Animated.Text
-        style={[styles.chevron, hasUpdate && { color: Colors.warning, opacity: blink }]}
+        style={[
+          styles.chevron,
+          { color: BrandUi.iconMuted },
+          hasUpdate && { color: Colors.warning, opacity: blink },
+        ]}
       >
         ›
       </Animated.Text>

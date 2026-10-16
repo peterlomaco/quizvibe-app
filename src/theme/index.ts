@@ -13,4 +13,6 @@ export { Radius } from './radius';
 export type { RadiusKey } from './radius';
  
 export { FontSize, FontWeight, LineHeight, Typography, TIGHT_TEXT_MAX_SCALE } from './typography';
+
+export { BrandUi } from './brandUi';
  

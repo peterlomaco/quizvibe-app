@@ -30,7 +30,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, AppState, type AppStateStatus, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from '@/src/components/haptic';
 
-import { Colors, FontSize, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, Radius, Spacing } from '../theme';
 import { VersusIcon } from './VersusIcon';
 import { supabase } from '../utils/supabase';
 import { isAnonymousSession } from '../utils/auth';
@@ -100,6 +100,9 @@ export function MyMatchesSection({
   onVisible,
 }: { full?: boolean; inRow?: boolean; onVisible?: (v: boolean) => void } = {}) {
   const compact = !full;
+  // Home:s kompakta variant följer Brand Master-UI:t (neutral yta, guld bara
+  // vid ny H2H-aktivitet). Profile:s fulla variant är oförändrad.
+  const v2 = compact;
   // Var knappen renderas ('/' på Home, '/profile' i Player history) —
   // skickas med som `from` så /my-matches Back-knapp går tillbaka hit
   // istället för alltid till Home (samma mönster som Store-skärmen).
@@ -248,6 +251,7 @@ export function MyMatchesSection({
       style={[
         styles.mainBtn,
         compact && (inRow ? styles.mainBtnInRow : styles.mainBtnCompact),
+        v2 && { backgroundColor: BrandUi.surface, borderColor: hasUpdate ? Colors.warning : BrandUi.border },
       ]}
       activeOpacity={0.8}
       onPress={() => handlePress(signature)}
@@ -276,7 +280,11 @@ export function MyMatchesSection({
           { marginLeft: compact ? Spacing.sm : Spacing.md },
         ]}
       >
-        <VersusIcon height={compact ? 22 : 30} />
+        <VersusIcon
+          height={compact ? 22 : 30}
+          color={v2 ? BrandUi.icon : undefined}
+          accentColor={v2 ? BrandUi.icon : undefined}
+        />
         {compact && <Text style={styles.compactLabel}>H2H</Text>}
       </View>
       {/* Spacer i full variant → "New update" + pilen grupperas högerställt
@@ -295,13 +303,16 @@ export function MyMatchesSection({
           adjustsFontSizeToFit={compact}
           minimumFontScale={0.75}
         >
-          {'New\nupdate'}
+          {/* Home: kort statusmärke "New" = all ny H2H-aktivitet (inbjudan,
+              spelad match, resultat). Profile:s fulla variant oförändrad. */}
+          {v2 ? 'New' : 'New\nupdate'}
         </Animated.Text>
       )}
       <Animated.Text
         style={[
           styles.chevron,
           compact && styles.chevronCompact,
+          v2 && { color: BrandUi.iconMuted },
           hasUpdate && { color: Colors.warning, opacity: blink },
         ]}
       >

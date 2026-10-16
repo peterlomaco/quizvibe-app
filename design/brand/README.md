@@ -77,12 +77,18 @@ Validation (master PNG vs SVG at 512–24 px on navy, black and white): `../logo
 
 **Gold means brand emphasis or an active/selected state, never decoration.** In the bottom navigation, ONLY the active tab is gold. All inactive tabs use the same muted treatment: reduced-opacity white for both icon and label. For example, when Home is active, Profile and Store are both muted, and Store is never gold. In code, use `BRAND_UI_ACTIVE` / `BRAND_UI_INACTIVE` from `src/components/brand/QuizVibeBrandSvg.tsx`.
 
+Neutral surfaces, borders, muted text and icons use the `BrandUi` tokens in `src/theme/brandUi.ts` (reduced-opacity white on navy), never blue or raw greys.
+
+## Tagline (locked 2026-10-16)
+
+The official tagline is **"Anyone. Anywhere. Let’s play."** (typographic apostrophe). One static string everywhere the brand needs a tagline: app, emails, website. It is never rotated or varied by user state, game mode or screen. In code, use `BRAND_TAGLINE` from `src/components/brand/QuizVibeBrandSvg.tsx`.
+
 ## Font licence
 
 Manrope is licensed under the SIL Open Font License 1.1 (Google Fonts, `github.com/google/fonts/tree/main/ofl/manrope`). Copyright 2019 The Manrope Project Authors (https://github.com/googlefonts/manrope). The wordmark ships only as converted outlines, not as a font file.
 
 ## Not done yet
 
-- Only Home is integrated. The other placements follow the approved rollout plan.
+- Home (Home v2) is integrated and locked. The other placements follow the approved rollout plan.
 - The app icon, splash and App Store assets are a separate design track and have not been changed.
-- Email templates and quizvibe.se are postponed.
+- Email templates and quizvibe.se still use the old logo. Only their tagline text has been updated in the repo, and it is not live until the Supabase templates are re-pasted, `send-welcome-email` is redeployed and `docs/` reaches master.

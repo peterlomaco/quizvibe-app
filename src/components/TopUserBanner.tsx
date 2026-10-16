@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 // Login-pill + back-label är korta etiketter → capped mot Dynamic Type.
 import { CappedText as Text } from './CappedText';
 import { TouchableOpacity } from '@/src/components/haptic';
-import { Colors, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { getCachedProfile, loadProfile, type ProfileData } from '../utils/profileStorage';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
@@ -91,10 +91,13 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
   // users har företräde om båda råkar vara satta.
   const trimmedGuestName = guestName?.trim() ?? '';
   const isGuest = !isLoggedIn && trimmedGuestName.length > 0;
+  // Neutral pill (Brand Master UI-regel: guld bara för aktiva states).
   const pillStyle = [
     styles.loginPill,
     isLoggedIn ? styles.loginPillActive : styles.loginPillMuted,
+    { backgroundColor: BrandUi.surface, borderColor: BrandUi.border },
   ];
+  const gearColor = BrandUi.icon;
   // Inloggad utan vald emoji-avatar (selectedAvatarId tom efter registrering)
   // → rendera QuizVibe Q-mark som default-avatar istället för 👤. Custom
   // emoji-avatarer renderas oförändrat när användaren valt en.
@@ -108,6 +111,7 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
   const labelStyle = [
     styles.loginPillText,
     isLoggedIn ? styles.loginPillTextActive : styles.loginPillTextMuted,
+    { color: Colors.textPrimary },
   ];
 
   return (
@@ -140,7 +144,7 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
       {onPress ? (
         <TouchableOpacity style={pillStyle} activeOpacity={0.7} onPress={onPress}>
           {showBrandAvatar ? (
-            <GearIcon size={16} color={Colors.primary} />
+            <GearIcon size={16} color={gearColor} />
           ) : (
             <Text style={styles.loginPillIcon}>{iconText}</Text>
           )}
@@ -151,7 +155,7 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
       ) : (
         <View style={pillStyle}>
           {showBrandAvatar ? (
-            <GearIcon size={16} color={Colors.primary} />
+            <GearIcon size={16} color={gearColor} />
           ) : (
             <Text style={styles.loginPillIcon}>{iconText}</Text>
           )}

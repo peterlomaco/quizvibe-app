@@ -7,7 +7,7 @@ import { Colors } from '../theme';
  *  1vs1-knappens silhuetter (VersusIcon) så de två Home-knapparna läser som
  *  ett par. Handtagen är strokade bågar i samma blå; kupa/stjälk/fot är
  *  fyllda. `height`-prop + viewBox-konvention som VersusIcon/SoloIcon. */
-export function TrophyIcon({ height = 22 }: { height?: number }) {
+export function TrophyIcon({ height = 22, color = Colors.primary }: { height?: number; color?: string }) {
   // viewBox 40×46 → bredd/höjd-kvot ~0.87 (pokal är högre än bred).
   const width = height * (40 / 46);
   return (
@@ -16,28 +16,28 @@ export function TrophyIcon({ height = 22 }: { height?: number }) {
       <Path
         d="M 9 8 C 2 9, 2 20, 10 20"
         fill="none"
-        stroke={Colors.primary}
+        stroke={color}
         strokeWidth={3}
         strokeLinecap="round"
       />
       <Path
         d="M 31 8 C 38 9, 38 20, 30 20"
         fill="none"
-        stroke={Colors.primary}
+        stroke={color}
         strokeWidth={3}
         strokeLinecap="round"
       />
       {/* Kupa. */}
       <Path
         d="M 9 6 H 31 V 15 C 31 23, 26 28, 20 28 C 14 28, 9 23, 9 15 Z"
-        fill={Colors.primary}
+        fill={color}
       />
       {/* Stjälk. */}
-      <SvgRect x={17.5} y={28} width={5} height={7} fill={Colors.primary} />
+      <SvgRect x={17.5} y={28} width={5} height={7} fill={color} />
       {/* Stjälk-till-fot-övergång (trapets). */}
-      <Path d="M 14 39 L 16 35 H 24 L 26 39 Z" fill={Colors.primary} />
+      <Path d="M 14 39 L 16 35 H 24 L 26 39 Z" fill={color} />
       {/* Fot. */}
-      <SvgRect x={12} y={39} width={16} height={4} rx={1.5} fill={Colors.primary} />
+      <SvgRect x={12} y={39} width={16} height={4} rx={1.5} fill={color} />
     </Svg>
   );
 }

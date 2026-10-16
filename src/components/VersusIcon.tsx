@@ -19,7 +19,17 @@ import { Colors } from '../theme';
  *  History"-knappen (MyMatchesSection) och samma skärms rubrik så duell-
  *  läget har EN ikon i appen. */
 
-export function VersusIcon({ height = 40 }: { height?: number }) {
+export function VersusIcon({
+  height = 40,
+  color = Colors.primary,
+  accentColor = Colors.warning,
+}: {
+  height?: number;
+  /** Silhouettes. Default brand-blue (legacy); Home v2 preview passes white. */
+  color?: string;
+  /** Wifi arcs between the figures. Default gold (legacy). */
+  accentColor?: string;
+}) {
   // viewBox 64×46 → bredd/höjd-kvot ~1.39.
   const width = height * (64 / 46);
   return (
@@ -27,11 +37,11 @@ export function VersusIcon({ height = 40 }: { height?: number }) {
       {/* Vänster person — huvud (r 6) + kropp (17×14, rx 6), 3 luft emellan.
           Sitter 4 enheter HÖGRE än den högra så paret läses som en duell
           över en diagonal linje. */}
-      <Circle cx={15} cy={12} r={6} fill={Colors.primary} />
-      <SvgRect x={6.5} y={21} width={17} height={14} rx={6} fill={Colors.primary} />
+      <Circle cx={15} cy={12} r={6} fill={color} />
+      <SvgRect x={6.5} y={21} width={17} height={14} rx={6} fill={color} />
       {/* Höger person — samma form, 4 enheter LÄGRE. */}
-      <Circle cx={49} cy={20} r={6} fill={Colors.primary} />
-      <SvgRect x={40.5} y={29} width={17} height={14} rx={6} fill={Colors.primary} />
+      <Circle cx={49} cy={20} r={6} fill={color} />
+      <SvgRect x={40.5} y={29} width={17} height={14} rx={6} fill={color} />
       {/* Wifi-symbol i glappet mellan figurerna (x 23.5–40.5): tre
           koncentriska bågar (R 9 / 6.5 / 4) med apex uppåt + prick i
           botten, centrerade på x=32. Bredaste bågen är 15 enheter → ~1
@@ -39,25 +49,25 @@ export function VersusIcon({ height = 40 }: { height?: number }) {
       <Path
         d="M 24.5 22 A 9 9 0 0 1 39.5 22"
         fill="none"
-        stroke={Colors.warning}
+        stroke={accentColor}
         strokeWidth="1.8"
         strokeLinecap="round"
       />
       <Path
         d="M 26.5 24.5 A 6.5 6.5 0 0 1 37.5 24.5"
         fill="none"
-        stroke={Colors.warning}
+        stroke={accentColor}
         strokeWidth="1.8"
         strokeLinecap="round"
       />
       <Path
         d="M 28.5 27 A 4 4 0 0 1 35.5 27"
         fill="none"
-        stroke={Colors.warning}
+        stroke={accentColor}
         strokeWidth="1.8"
         strokeLinecap="round"
       />
-      <Circle cx={32} cy={29.5} r={1.5} fill={Colors.warning} />
+      <Circle cx={32} cy={29.5} r={1.5} fill={accentColor} />
     </Svg>
   );
 }

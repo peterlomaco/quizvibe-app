@@ -1,5 +1,6 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
-import { QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
+import { BRAND_TAGLINE, QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
+import * as WebBrowser from 'expo-web-browser';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicGoldFill';
 import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
@@ -7,7 +8,7 @@ import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
 import { WaveDots } from '@/src/components/WaveDots';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { HostTypeOptions, type HostLobbyType } from '@/src/components/HostTypeOptions';
-import { Colors, Radius, Spacing } from '@/src/theme';
+import { BrandUi, Colors, Radius, Spacing } from '@/src/theme';
 import { markSeriesContinues } from '@/src/utils/aggregateLeaderboard';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
@@ -55,7 +56,6 @@ import {
   Alert,
   Animated,
   Dimensions,
-  Easing,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -2173,15 +2173,6 @@ function ChoiceRow({
 
 // ─── Home Screen ──────────────────────────────────────────────────────────────
 
-// Pulserande tagline-array. Renderingen växlar mellan dessa tre strängar
-// med en cross-fade (se taglineFade-effekten nedan). Module-level för
-// att undvika re-allokering per render. Behöver inte i18n:as här eftersom
-// hela appen är engelska för V1-launchen.
-const TAGLINES = [
-  'Challenge yourself. Play together.',
-  'Invite Friends. Socialize.',
-  'Music. Film/TV. Play.',
-];
 
 export default function HomeScreen() {
   const [joinVisible, setJoinVisible] = useState(false);
@@ -2280,53 +2271,6 @@ export default function HomeScreen() {
 
   const pulse = useRef(new Animated.Value(1)).current;
 
-  // Pulserande tagline-byte via TRUE cross-fade — alla tre texterna är
-  // alltid renderade (TAGLINES[0] i flow definierar wrap-höjden,
-  // TAGLINES[1+] är absolut-positionerade ovanpå), var och en med egen
-  // Animated.Value för opacity. Vid varje cycle körs två parallella
-  // timings: nuvarande text fadar till 0 + nästa fadar till 1, båda
-  // samtidigt = ingen blank-moment och en mjuk korsande övergång.
-  //
-  // Duration 2600ms + 6000ms mellan cykler = ~3.4s fullt synlig per
-  // tagline + 2600ms cross-fade. Långsam fade ger lugnt tempo på
-  // själva övergången utan att förlänga totaltiden per cykel.
-  // Bezier(0.4, 0, 0.2, 1) är Material:s "standard ease" — accelererar
-  // mjukt i början, decelererar mjukt i slutet, ingen plötslig
-  // start/slut-känsla.
-  //
-  // useNativeDriver: true → opacity körs på native-tråden så animationen
-  // stannar smooth även när JS-bridgen är upptagen (modal-öppningar,
-  // focus-effects, etc.).
-  const taglineOpacity0 = useRef(new Animated.Value(1)).current;
-  const taglineOpacity1 = useRef(new Animated.Value(0)).current;
-  const taglineOpacity2 = useRef(new Animated.Value(0)).current;
-  const taglineActiveIdxRef = useRef(0);
-  useEffect(() => {
-    const opacities = [taglineOpacity0, taglineOpacity1, taglineOpacity2];
-    const easing = Easing.bezier(0.4, 0, 0.2, 1);
-    const cycle = () => {
-      const current = taglineActiveIdxRef.current;
-      const next = (current + 1) % opacities.length;
-      Animated.parallel([
-        Animated.timing(opacities[current], {
-          toValue: 0,
-          duration: 2600,
-          easing,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacities[next], {
-          toValue: 1,
-          duration: 2600,
-          easing,
-          useNativeDriver: true,
-        }),
-      ]).start();
-      taglineActiveIdxRef.current = next;
-    };
-    const interval = setInterval(cycle, 6000);
-    return () => clearInterval(interval);
-  }, [taglineOpacity0, taglineOpacity1, taglineOpacity2]);
-  const taglineOpacities = [taglineOpacity0, taglineOpacity1, taglineOpacity2];
 
   // Ref + state för custom CodeKeyboard på Register-formens PlayerName-fält
   // — speglar guest-formens setup (se JoinModal). Samma motivation:
@@ -3243,6 +3187,116 @@ export default function HomeScreen() {
   const appNameFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
   const taglineFont = fontsLoaded ? 'Nunito_400Regular' : undefined;
 
+  // Home v2 (LÅST 2026-10-16) — den låsta Brand Mastern applicerad på Home.
+  // Gäst-Home (utloggad) har ordningen: brand → Play as guest → Start New
+  // Game (metallisk guld) → Join a Game → samtyckesrad → QuizVibe user /
+  // Register or Login. Inloggad: brand → Start New Game → Join a Game →
+  // Marathon/H2H → (fällbar) Play as guest. Gör inte om ordningen.
+
+  // Register-sektionen (QuizVibe user-rubrik + Register or Login) — renderas
+  // längst ned på gäst-Home, under guest-sektionen.
+  const registerSection = (
+    <>
+      {/* appNameFont (Nunito_700Bold) — en explicit fontFamily
+          override:ar fontWeight på iOS, så bold kräver bold-filen
+          (taglineFont = 400Regular renderade rubriken tunn). */}
+      {/* Rubrik + info-ikon på samma rad. Ikonen öppnar
+          jämförelsen user vs guest (USER_VS_GUEST_ROWS). Samma
+          ikon sitter på Guest-rubriken nedan och öppnar samma
+          modal — skillnaden ska kunna läsas från båda hållen. */}
+      <View style={styles.sectionHeaderRow}>
+        <Text
+          style={[
+            // Samma neutrala grå rubrikstil som "Play as guest".
+            styles.guestSectionHeader,
+            styles.mutedSectionHeader,
+            { marginTop: 0, fontFamily: appNameFont },
+          ]}
+        >
+          QuizVibe user
+        </Text>
+        <Pressable
+          onPress={() => setCompareInfoVisible(true)}
+          hitSlop={10}
+          style={({ pressed }) => [styles.infoIconBtn, styles.mutedInfoIconBtn, pressed && { opacity: 0.7 }]}
+          accessibilityRole="button"
+          accessibilityLabel="What is included as a QuizVibe user compared to Guest"
+        >
+          <Text style={[styles.infoIconText, styles.mutedInfoIconText]}>i</Text>
+        </Pressable>
+      </View>
+      <Animated.View style={{ transform: [{ scale: pulse }] }}>
+        <TouchableOpacity
+          style={[styles.gameBtn, styles.gameBtnRegister]}
+          activeOpacity={0.85}
+          onPress={() => setProfileMenuVisible(true)}
+        >
+          <Text
+            style={[
+              styles.gameBtnText,
+              { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            Register or Login
+          </Text>
+          {/* FREE-badge — vit kantlinje så den syns mot knappens
+              gröna bakgrund. */}
+          <View
+            style={[styles.homeFreeBadge, styles.homeFreeBadgeRegister]}
+            pointerEvents="none"
+          >
+            <Text style={styles.homeFreeBadgeText}>FREE</Text>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    </>
+  );
+
+  // Home v2: "Join a Game" (f.d. "Invitation - Room code") i samma stil för
+  // inloggad och gäst. Neutral i vila; guldkant + blinkande "New" BARA när en
+  // ny inbjudan finns (samma notifieringsspråk som H2H). Titeln förblir vit
+  // — guld bär tillståndet via kant/etikett/pil, inte via huvudtexten.
+  const joinGameButton = (onPress: () => void, hasUpdate: boolean) => (
+    <TouchableOpacity
+      style={[styles.gameBtn, styles.gameBtnJoinCode, styles.neutralBtn, hasUpdate && styles.goldStateBorder]}
+      activeOpacity={0.85}
+      onPress={onPress}
+      accessibilityLabel={hasUpdate ? 'Join a Game, enter room code. New invitation' : 'Join a Game, enter room code'}
+    >
+      <View style={styles.joinCodeTitleWrap} pointerEvents="none">
+        <Text
+          style={[
+            styles.gameBtnText,
+            { color: Colors.textPrimary },
+            { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+          ]}
+          numberOfLines={1}
+        >
+          Join a Game
+        </Text>
+        <Text style={[styles.joinSub, { fontFamily: taglineFont }]} numberOfLines={1}>
+          Enter room code
+        </Text>
+      </View>
+      {hasUpdate && (
+        <Animated.Text style={[styles.joinCodeUpdateLabel, { opacity: inviteBlink }]} numberOfLines={1}>
+          New
+        </Animated.Text>
+      )}
+      <Animated.Text
+        style={[
+          styles.joinCodeChevron,
+          { color: hasUpdate ? Colors.warning : BrandUi.iconMuted },
+          hasUpdate && { opacity: inviteBlink },
+        ]}
+      >
+        ›
+      </Animated.Text>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.safe}>
 
@@ -3274,96 +3328,31 @@ export default function HomeScreen() {
               variant="metallic"
             />
           </View>
-          {/* Cross-fade tagline-wrap. Första texten i flow definierar
-              höjden; index 1+ är absolut-positionerade ovanpå och fadar
-              i/ur via egna taglineOpacities[i]. `alignSelf: stretch` så
-              wrappen tar full brandSection-bredd och texterna kan
-              centreras via textAlign utan att kämpa om intrinsisk
-              bredd. Alla TAGLINES måste passa på en rad i samma
-              fontSize/lineHeight för att höjden ska kännas stabil. */}
+          {/* Låst Brand Master-tagline (Peter 2026-10-16) — EN statisk text,
+              samma för inloggad och gäst. Ingen rotation/cross-fade och
+              ingen växling per state; ersätter de tidigare tre roterande
+              taglinesen. Underordnad ordmärket: samma diskreta typografi. */}
           <View style={styles.taglineWrap}>
-            {TAGLINES.map((text, i) => (
-              <Animated.Text
-                key={i}
-                style={[
-                  styles.tagline,
-                  styles.taglineCentered,
-                  i > 0 && styles.taglineOverlay,
-                  { fontFamily: taglineFont, opacity: taglineOpacities[i] },
-                ]}
-              >
-                {text}
-              </Animated.Text>
-            ))}
+            <Text
+              style={[
+                styles.tagline,
+                styles.taglineCentered,
+                { fontFamily: taglineFont },
+              ]}
+            >
+              {BRAND_TAGLINE}
+            </Text>
           </View>
         </View>
 
         {/* ── Primary actions ───────────────────────────────── */}
-        {/* Knappordning (uppifrån):
-              1. Register or Login (bara när utloggad — pulse:ar som primär CTA,
-                 grön kantlinje)
-              2. Create Game (bara när inloggad)
-              3. Join with Room Code — user (bara när inloggad)
-              4. Guest-rutan + Join with Room Code — guest + Start Game as Guest
-            Pulse följer "primär åtgärd för aktuellt login-state":
-              - utloggad → Register or Login + båda guest-knapparna pulserar
-              - inloggad → Create + Join (registered) pulserar */}
+        {/* Knappordning (uppifrån), Home v2 (låst 2026-10-16):
+              Inloggad: Start New Game (metallisk guld) → Join a Game →
+                Marathon/H2H → fällbar "Play as guest".
+              Utloggad: Play as guest → Start New Game (metallisk guld) →
+                Join a Game → samtyckesrad → QuizVibe user / Register or Login.
+            Pulse ligger på knapparna, aldrig på utfällda paneler. */}
         <View style={styles.actionsSection}>
-          {/* Register or Login — bara när utloggad. Primär CTA → leder till
-              profile-menyn. Grön kantlinje särskiljer den från de blå
-              guest-knapparna. "QuizVibe user"-rubriken ovanför speglar
-              Guest-rubrikens ruta men i grönt (matchar knappens kantlinje). */}
-          {!isLoggedIn && hostTypeExpanded === 'none' && (
-            <>
-              {/* appNameFont (Nunito_700Bold) — en explicit fontFamily
-                  override:ar fontWeight på iOS, så bold kräver bold-filen
-                  (taglineFont = 400Regular renderade rubriken tunn). */}
-              {/* Rubrik + info-ikon på samma rad. Ikonen öppnar
-                  jämförelsen user vs guest (USER_VS_GUEST_ROWS). Samma
-                  ikon sitter på Guest-rubriken nedan och öppnar samma
-                  modal — skillnaden ska kunna läsas från båda hållen. */}
-              <View style={styles.sectionHeaderRow}>
-                <Text style={[styles.userSectionHeader, { fontFamily: appNameFont }]}>
-                  QuizVibe user
-                </Text>
-                <Pressable
-                  onPress={() => setCompareInfoVisible(true)}
-                  hitSlop={10}
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  accessibilityRole="button"
-                  accessibilityLabel="What is included as a QuizVibe user compared to Guest"
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-              </View>
-              <Animated.View style={{ transform: [{ scale: pulse }] }}>
-                <TouchableOpacity
-                  style={[styles.gameBtn, styles.gameBtnRegister]}
-                  activeOpacity={0.85}
-                  onPress={() => setProfileMenuVisible(true)}
-                >
-                  <Text
-                    style={[
-                      styles.gameBtnText,
-                      { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
-                    ]}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                  >
-                    Register or Login
-                  </Text>
-                  {/* FREE-badge — vit kantlinje så den syns mot knappens
-                      gröna bakgrund. */}
-                  <View
-                    style={[styles.homeFreeBadge, styles.homeFreeBadgeRegister]}
-                    pointerEvents="none"
-                  >
-                    <Text style={styles.homeFreeBadgeText}>FREE</Text>
-                  </View>
-                </TouchableOpacity>
-              </Animated.View>
-            </>
-          )}
 
           {/* Create Game — döljs helt när utloggad (tidigare 🔒-låst variant).
               Gold-tema för inloggade users (samma vokabulär som appens
@@ -3409,7 +3398,11 @@ export default function HomeScreen() {
               </Animated.View>
               {hostTypeExpanded === 'registered' && (
                 <HostTypeOptions
-                  accentColor={Colors.warning}
+                  accentColor={BrandUi.border}
+                  iconColor={BrandUi.icon}
+                  iconAccentColor={BrandUi.icon}
+                  arrowColor={BrandUi.iconMuted}
+                  pressedBorderColor={Colors.warning}
                   onSelect={(lobbyType) => {
                     // Kollapsa INTE panelen här. setHostTypeExpanded('none')
                     // skulle synkront återinföra Join-knappen + HomeExtrasRow
@@ -3434,54 +3427,11 @@ export default function HomeScreen() {
             </View>
           )}
 
-          {/* Join with Room Code — user — döljs helt när utloggad ELLER när
-              någon lobbytyp-utfällning är aktiv. */}
+          {/* Join a Game — inloggad. Döljs när en lobbytyp-utfällning är
+              aktiv. Guldkant + "New" bara när en ny inbjudan finns. */}
           {isLoggedIn && hostTypeExpanded === 'none' && (
             <Animated.View style={{ transform: [{ scale: pulse }] }}>
-              <TouchableOpacity
-                style={[styles.gameBtn, styles.gameBtnJoinCode]}
-                activeOpacity={0.85}
-                onPress={() => openJoin('choose', { hideGuest: true })}
-              >
-                {/* Titeln centreras via absolut overlay så den sitter still
-                    oavsett om "New update"-märket visas (annars förskjuts den
-                    när märket dyker upp). pointerEvents none → taps går vidare
-                    till knappen. */}
-                <View style={styles.joinCodeTitleWrap} pointerEvents="none">
-                  <Text
-                    style={[
-                      styles.gameBtnText,
-                      styles.gameBtnJoinCodeText,
-                      { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
-                    ]}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                  >
-                    Invitation - Room code
-                  </Text>
-                </View>
-                {/* Blinkande guld "New update" till höger — samma signal som
-                    Marathon/H2H när en ny Waiting Invite mottagits. */}
-                {inviteSignal.hasNewInvite && (
-                  <Animated.Text
-                    style={[styles.joinCodeUpdateLabel, { opacity: inviteBlink }]}
-                    numberOfLines={2}
-                  >
-                    {'New\nupdate'}
-                  </Animated.Text>
-                )}
-                {/* Guld-pil längst till höger (som H2H). Delar inviteBlink med
-                    "New update" så de blinkar i takt; står still (fast guld)
-                    utan update. */}
-                <Animated.Text
-                  style={[
-                    styles.joinCodeChevron,
-                    inviteSignal.hasNewInvite && { opacity: inviteBlink },
-                  ]}
-                >
-                  ›
-                </Animated.Text>
-              </TouchableOpacity>
+              {joinGameButton(() => openJoin('choose', { hideGuest: true }), inviteSignal.hasNewInvite)}
             </Animated.View>
           )}
 
@@ -3493,65 +3443,34 @@ export default function HomeScreen() {
               har minst en 1vs1-match — annars null. */}
           {isLoggedIn && hostTypeExpanded === 'none' && <HomeExtrasRow />}
 
-          {/* Guest-sektionen (rubrik + två knappar) — döljs HELT när
-              inloggad (registered users använder Join with Room Code —
-              user) ELLER när en lobbytyp-utfällning är aktiv. Knapparna
-              döljs visuellt när Join-modalen är öppen så att modal-sheetens
-              rundade ovankant inte avslöjar dem bakom; layout-utrymmet
-              bevaras med opacity/pointerEvents så övriga element inte hoppar. */}
+          {/* "Play as guest"-rubriken — gäst-Home (utloggad) börjar här.
+              Döljs när en lobbytyp-utfällning är aktiv. marginTop ger luft
+              mellan taglinen och gästsektionen (Peter 2026-10-16, empiriskt
+              tunat). Gästens knappar ligger under (Start New Game, Join a
+              Game) — de döljs visuellt när Join-modalen är öppen så sheetens
+              rundade ovankant inte avslöjar dem bakom. */}
           {!isLoggedIn && hostTypeExpanded === 'none' && (
             <>
-              {/* Guest-rubrik i grå text — separerar guest-pathen från
-                  registered-åtgärderna ovan. */}
-              {/* appNameFont av samma skäl som QuizVibe user-rubriken ovan.
-                  Sektions-marginalen (guestSectionHeader.marginTop) flyttas
-                  till radwrappern så rubrik + ikon centreras som en enhet. */}
-              <View style={[styles.sectionHeaderRow, { marginTop: Spacing.xl }]}>
+              <View style={[styles.sectionHeaderRow, { marginTop: Spacing.xl + Spacing.lg }]}>
                 <Text
-                  style={[styles.guestSectionHeader, { fontFamily: appNameFont, marginTop: 0 }]}
+                  style={[
+                    styles.guestSectionHeader,
+                    styles.mutedSectionHeader,
+                    { fontFamily: appNameFont, marginTop: 0 },
+                  ]}
                 >
-                  Guest login / Non-registered
+                  Play as guest
                 </Text>
                 <Pressable
                   onPress={() => setCompareInfoVisible(true)}
                   hitSlop={10}
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  style={({ pressed }) => [styles.infoIconBtn, styles.mutedInfoIconBtn, pressed && { opacity: 0.7 }]}
                   accessibilityRole="button"
                   accessibilityLabel="What is included as a Guest compared to a QuizVibe user"
                 >
-                  <Text style={styles.infoIconText}>i</Text>
+                  <Text style={[styles.infoIconText, styles.mutedInfoIconText]}>i</Text>
                 </Pressable>
               </View>
-
-              {/* Join with Room Code — guest. Pulserar (primär spel-path
-                  för guests). */}
-              <Animated.View
-                style={[
-                  joinVisible && { opacity: 0 },
-                  { transform: [{ scale: pulse }] },
-                ]}
-                pointerEvents={joinVisible ? 'none' : 'auto'}
-              >
-                <TouchableOpacity
-                  style={[styles.gameBtn, styles.gameBtnGuest]}
-                  activeOpacity={0.85}
-                  onPress={() => openJoin('guest')}
-                >
-                  <Text
-                    style={[
-                      styles.gameBtnText,
-                      { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
-                    ]}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                  >
-                    Invitation - Room code
-                  </Text>
-                  <View style={styles.homeFreeBadge} pointerEvents="none">
-                    <Text style={styles.homeFreeBadgeText}>FREE</Text>
-                  </View>
-                </TouchableOpacity>
-              </Animated.View>
             </>
           )}
 
@@ -3595,25 +3514,29 @@ export default function HomeScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={guestSectionExpanded ? 'Collapse guest options' : 'Expand guest options'}
                 >
-                  <View style={styles.guestFoldToggleBox}>
-                    <Text style={styles.guestFoldToggleText}>
+                  <View style={[styles.guestFoldToggleBox, { borderColor: BrandUi.border }]}>
+                    <Text style={[styles.guestFoldToggleText, { color: BrandUi.textMuted }]}>
                       {guestSectionExpanded ? '−' : '+'}
                     </Text>
                   </View>
                   <Text
-                    style={[styles.guestSectionHeader, { fontFamily: appNameFont, marginTop: 0 }]}
+                    style={[
+                      styles.guestSectionHeader,
+                      styles.mutedSectionHeader,
+                      { fontFamily: appNameFont, marginTop: 0 },
+                    ]}
                   >
-                    Guest login / Non-registered
+                    Play as guest
                   </Text>
                 </Pressable>
                 <Pressable
                   onPress={() => setCompareInfoVisible(true)}
                   hitSlop={10}
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  style={({ pressed }) => [styles.infoIconBtn, styles.mutedInfoIconBtn, pressed && { opacity: 0.7 }]}
                   accessibilityRole="button"
                   accessibilityLabel="What is included as a Guest compared to a QuizVibe user"
                 >
-                  <Text style={styles.infoIconText}>i</Text>
+                  <Text style={[styles.infoIconText, styles.mutedInfoIconText]}>i</Text>
                 </Pressable>
               </View>
             )}
@@ -3624,52 +3547,47 @@ export default function HomeScreen() {
                   style={{ transform: [{ scale: hostTypeExpanded === 'guest' ? 1 : pulse }] }}
                 >
                   <TouchableOpacity
-                    style={[styles.gameBtn, styles.gameBtnGuest]}
+                    style={[
+                      styles.gameBtn,
+                      // Utloggad: samma metalliska guld som inloggads Start New
+                      // Game (gästens primära handling). Inloggad gäst-väg:
+                      // neutral yta — den är sekundär under de egna knapparna.
+                      isLoggedIn
+                        ? [styles.gameBtnGuest, styles.neutralBtn]
+                        : [styles.gameBtnUser, styles.gameBtnMetallic],
+                    ]}
                     activeOpacity={0.85}
                     onPress={() =>
                       setHostTypeExpanded((prev) => (prev === 'guest' ? 'none' : 'guest'))
                     }
                   >
+                    {!isLoggedIn && <MetallicGoldFill />}
                     <Text
                       style={[
                         styles.gameBtnText,
-                        { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined },
+                        isLoggedIn
+                          ? { fontFamily: fontsLoaded ? 'Nunito_600SemiBold' : undefined }
+                          : [styles.gameBtnUserText, { fontFamily: fontsLoaded ? 'Nunito_700Bold' : undefined, fontWeight: '700' as const }],
                       ]}
                       numberOfLines={1}
                       adjustsFontSizeToFit
                     >
                       Start New Game
                     </Text>
-                    {/* Badge per login-läge: inloggad → "No Data Saved"
-                        i grått (samma homeUserBadge-stil som user-knapparna);
-                        utloggad → FREE i grönt (matchar övriga guest-/register-
-                        knappar).
-
-                        Göms när utfällningen är öppen: då bär Local Play/Remote
-                        Play sina egna badges och en badge på föräldern blir
-                        dubbelinformation. */}
-                    {hostTypeExpanded !== 'guest' && (
-                    <View
-                      style={[styles.homeFreeBadge, isLoggedIn && styles.homeUserBadge]}
-                      pointerEvents="none"
-                    >
-                      <Text style={styles.homeFreeBadgeText}>
-                        {isLoggedIn ? 'No Data Saved' : 'FREE'}
-                      </Text>
-                    </View>
-                    )}
+                    {/* Ingen badge (Home v2): FREE finns bara på Register or
+                        Login; "No Data Saved" togs bort 2026-10-16. */}
                   </TouchableOpacity>
                 </Animated.View>
                 {hostTypeExpanded === 'guest' && (
                   <HostTypeOptions
-                    accentColor="#6B7280"
-                    remoteMode={isLoggedIn ? 'hidden' : 'locked'}
-                    onRemoteLockedPress={() => handleRemoteAccountRequired('host')}
-                    localBadge={
-                      isLoggedIn
-                        ? { text: 'No Data Saved', muted: true }
-                        : { text: 'FREE' }
-                    }
+                    accentColor={BrandUi.border}
+                    iconColor={BrandUi.icon}
+                    iconAccentColor={BrandUi.icon}
+                    arrowColor={BrandUi.iconMuted}
+                    pressedBorderColor={Colors.warning}
+                    // Head-to-head visas aldrig i gästens utfällning (Peter
+                    // 2026-10-16 — den låsta raden för utloggade är borttagen).
+                    remoteMode="hidden"
                     onSelect={(lobbyType) => {
                       setHostTypeExpanded('none');
                       setGuestLobbyType(lobbyType);
@@ -3680,6 +3598,48 @@ export default function HomeScreen() {
               </>
             )}
           </View>
+          )}
+
+          {/* Utloggad: gästens "Join a Game" UNDER Start New Game, därefter
+              samtyckesraden och sist QuizVibe user / Register or Login. */}
+          {!isLoggedIn && hostTypeExpanded === 'none' && (
+            <Animated.View
+              style={[joinVisible && { opacity: 0 }, { transform: [{ scale: pulse }] }]}
+              pointerEvents={joinVisible ? 'none' : 'auto'}
+            >
+              {joinGameButton(() => openJoin('guest'), false)}
+            </Animated.View>
+          )}
+          {/* Juridisk samtyckesrad — ENBART gäst-Home (Peter 2026-10-16).
+              Ingen checkbox (gästspel ska vara friktionsfritt) och inte för
+              inloggade (de har redan godkänt vid registrering). Länkarna
+              öppnar samma sidor som Store/Profile. */}
+          {!isLoggedIn && hostTypeExpanded === 'none' && (
+            <Text
+              style={[styles.legalText, { fontFamily: taglineFont }, joinVisible && { opacity: 0 }]}
+            >
+              {/* Fast radbrytning: länkarna samlas på rad två. */}
+              {'By continuing, you agree to our\n'}
+              <Text
+                style={styles.legalLink}
+                onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/terms/')}
+                accessibilityRole="link"
+              >
+                Terms of Use
+              </Text>
+              {' '}and{' '}
+              <Text
+                style={styles.legalLink}
+                onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/privacy/')}
+                accessibilityRole="link"
+              >
+                Privacy Policy
+              </Text>
+              .
+            </Text>
+          )}
+          {!isLoggedIn && hostTypeExpanded === 'none' && (
+            <View style={{ marginTop: Spacing.xl, gap: Spacing.md }}>{registerSection}</View>
           )}
         </View>
 
@@ -3705,8 +3665,8 @@ export default function HomeScreen() {
             underline så det syns att raden är en länk även för logged-out
             users som är skärmens primära FAQ-målgrupp. */}
         <View style={styles.footer}>
-          <Text style={[styles.footerText, { fontFamily: taglineFont }]}>About QuizVibe</Text>
-          <Text style={[styles.footerDot, { fontFamily: taglineFont }]}>·</Text>
+          <Text style={[styles.footerText, { color: BrandUi.textMuted }, { fontFamily: taglineFont }]}>About QuizVibe</Text>
+          <Text style={[styles.footerDot, { color: BrandUi.textMuted }, { fontFamily: taglineFont }]}>·</Text>
           <Pressable
             onPress={() => router.push('/faq?from=/')}
             hitSlop={8}
@@ -3725,21 +3685,6 @@ export default function HomeScreen() {
             )}
           </Pressable>
         </View>
-        {/* ⚠ TEMPORÄR, DEV-ONLY (2026-10-16): ingång till /brand-preview för
-            validering av SVG-loggan på riktig enhet. __DEV__ är false i alla
-            release-byggen (TestFlight/App Store), så länken finns aldrig där.
-            Tas bort tillsammans med app/brand-preview.tsx. */}
-        {__DEV__ && (
-          <Pressable
-            onPress={() => router.push('/brand-preview')}
-            hitSlop={8}
-            style={{ alignSelf: 'center', marginTop: Spacing.sm }}
-          >
-            <Text style={[styles.footerText, styles.footerLink, { color: Colors.warning }]}>
-              Brand Preview (dev)
-            </Text>
-          </Pressable>
-        )}
       </ScrollView>
 
       <JoinModal
@@ -4773,6 +4718,30 @@ const styles = StyleSheet.create({
   brandSection: { alignItems: 'center', gap: SCREEN_HEIGHT < 600 ? 2 : Spacing.sm },
   // Ordmärket är en PNG (metallguld) sedan 2026-10-15 — bara spacingen
   // från den tidigare Text-stylen behålls.
+  // Neutral knappyta (inte brand, inte aktiv) på navy.
+  neutralBtn: {
+    backgroundColor: BrandUi.surface,
+    borderColor: BrandUi.border,
+  },
+  // Home v2: guld kant = tillstånd (t.ex. ny inbjudan), aldrig dekoration.
+  goldStateBorder: { borderColor: Colors.warning },
+  mutedSectionHeader: { color: BrandUi.textMuted },
+  joinSub: { fontSize: 12, color: BrandUi.textMuted, marginTop: 1 },
+  // Gäst-Home samtyckesrad: diskret sekundärtext (vit 60 % på navy ≈ 7:1
+  // kontrast), länkarna något ljusare + understrukna.
+  legalText: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: BrandUi.textMuted,
+    textAlign: 'center',
+    paddingHorizontal: Spacing.lg,
+  },
+  legalLink: {
+    color: 'rgba(255,255,255,0.85)',
+    textDecorationLine: 'underline',
+  },
+  mutedInfoIconBtn: { borderColor: BrandUi.textMuted },
+  mutedInfoIconText: { color: BrandUi.textMuted },
   appNameWrap: {
     marginTop: SCREEN_HEIGHT < 600 ? 2 : Spacing.sm,
   },
@@ -4781,25 +4750,12 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.2,
   },
-  // Wrap för cross-fade tagline. Stretches across full brandSection-bredd
-  // (annars skulle alignItems: center krympa wrappen till första textens
-  // intrinsiska bredd och den absolut-positionerade andra texten skulle
-  // sticka ut eller wrappa). position: 'relative' behövs för att
-  // taglineOverlay:s absolute-positioning ska anchor:as här.
+  // Den låsta taglinen tar full brandSection-bredd och centreras.
   taglineWrap: {
     alignSelf: 'stretch',
-    position: 'relative',
   },
   taglineCentered: {
     textAlign: 'center',
-  },
-  // Andra taglinen overlay:as ovanpå den första — fyller wrappens
-  // bounds så texten centreras i samma område som första texten.
-  taglineOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
   },
 
   actionsSection: { gap: Spacing.md },
