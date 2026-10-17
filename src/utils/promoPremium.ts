@@ -1,7 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────
-// Free Premium launch promo + vouchers — QuizVibe bjuder på Premium under
-// lansering, och Peter kan dela ut individuella voucher-koder för fler
-// månader.
+// Free Premium launch promo — QuizVibe bjuder på Premium under lansering.
+// (Egna voucher-koder togs bort ur klienten 2026-10, Guideline 3.1.1/2.5.19;
+// rabatter ska gå via Apple Offer Codes. RPC:n `redeem_voucher` finns kvar
+// server-side men anropas inte.)
 //
 // TVÅ OBEROENDE KLOCKOR. Att hålla isär dem ÄR hela designen:
 //
@@ -11,11 +12,10 @@
 //      OFFER_BACKSTOP_UNTIL som bakad hård gräns för enheter som aldrig
 //      når Supabase. Att stänga erbjudandet kräver INGEN App Store-release.
 //
-//   2. GRANT (per KONTO, SERVER-side) — en beviljad Premium-månad, gratis
-//      eller via voucher. Bor i Supabase-tabellen `premium_grants`
+//   2. GRANT (per KONTO, SERVER-side) — en beviljad Premium-månad. Bor i Supabase-tabellen `premium_grants`
 //      (migration 0047) och speglas lokalt i MIRROR_KEY för synkron-vänlig
 //      läsning. Gratismånaden gäller EXAKT en gång per registrerad profil
-//      (unikt index server-side); vouchers är individuella engångskoder.
+//      (unikt index server-side).
 //      REGEL (Peter): en månad kan bara aktiveras när INGEN premium är
 //      aktiv — servern avvisar annars med 'already_active'. Ingen stapling.
 //
@@ -232,7 +232,7 @@ async function readOwnedMirror(): Promise<GrantMirror | null> {
 
 /**
  * Hämtar kontots grant-status från servern och skriver den lokala spegeln.
- * Anropas vid app-start, vid SIGNED_IN, och efter claim/redeem.
+ * Anropas vid app-start, vid SIGNED_IN, och efter claim.
  *
  * Best-effort + no-op om ingen är inloggad (granten hör till ett konto).
  * Vid nätverksfel lämnas tidigare spegel orörd (fail-open).
@@ -261,7 +261,7 @@ export async function refreshPromoGrants(): Promise<void> {
 }
 
 /**
- * True om en promo-/voucher-månad är igång just nu (reflekterar BÅDA källorna).
+ * True om en promo-månad är igång just nu (reflekterar BÅDA källorna).
  *
  * MEDVETET oberoende av offer window — grandfathering. Detta är funktionen
  * subscriptionStorage.hasPremiumSubscription faller tillbaka på, och därmed
@@ -296,9 +296,8 @@ export async function getFreeMonthUsed(): Promise<boolean> {
 // och profileStorage:s `getCachedProfile`. StoreScreen:s flaggor (offerOpen
 // m.fl.) låg tidigare i `useState(false)` och fylldes först när en async
 // Promise.all-läsning resolvade — under den frame:n gav offerOpen=false att
-// voucher-/redeem-boxen (`showVoucher && !offerOpen`) renderades och sedan
-// försvann när kampanjen visade sig vara öppen (Peter 2026-09-02: "redeem
-// code flashar innan det bara visar Free"). Med en synkron spegel, VÄRMD vid
+// fel pris-kort renderades och sedan byttes när kampanjen visade sig vara
+// öppen (Peter 2026-09-02). Med en synkron spegel, VÄRMD vid
 // modul-load + räknad om vid varje refresh-punkt, är StoreScreen:s första
 // frame redan rätt.
 //
@@ -343,7 +342,7 @@ export async function computePromoFlags(): Promise<PromoFlags> {
   return cachedPromoFlags;
 }
 
-// ── Claim / redeem-resultat ──────────────────────────────────────────
+// ── Claim-resultat ──────────────────────────────────────────
 //
 // Fel-reason speglar RPC:ns raise-token. Anroparen (StoreScreen) mappar den
 // till Alert-copy. Efter framgång uppdaterar funktionerna PROMO-spegeln; det
@@ -359,17 +358,6 @@ export type ClaimReason =
 
 export type ClaimResult = { ok: true; until: Date } | { ok: false; reason: ClaimReason };
 
-export type RedeemReason =
-  | 'not_authenticated'
-  | 'not_registered'
-  | 'already_active'
-  | 'invalid_code'
-  | 'already_redeemed'
-  | 'expired'
-  | 'error';
-
-export type RedeemResult = { ok: true; until: Date } | { ok: false; reason: RedeemReason };
-
 function mapReason<T extends string>(message: string | undefined, known: readonly T[]): T | 'error' {
   const m = (message ?? '').toLowerCase();
   for (const reason of known) {
@@ -383,15 +371,6 @@ const CLAIM_REASONS = [
   'not_registered',
   'already_active',
   'already_used',
-] as const;
-
-const REDEEM_REASONS = [
-  'not_authenticated',
-  'not_registered',
-  'already_active',
-  'invalid_code',
-  'already_redeemed',
-  'expired',
 ] as const;
 
 /**
@@ -409,26 +388,6 @@ export async function claimFreeMonth(): Promise<ClaimResult> {
     return { ok: true, until };
   } catch (err) {
     console.warn('[promoPremium] claimFreeMonth failed:', err);
-    return { ok: false, reason: 'error' };
-  }
-}
-
-/**
- * Löser in en voucher-kod för en extra månad. Koden förbrukas server-side
- * (engångs). Blockeras när premium redan är aktiv ('already_active').
- */
-export async function redeemVoucher(code: string): Promise<RedeemResult> {
-  const trimmed = code.trim();
-  if (!trimmed) return { ok: false, reason: 'invalid_code' };
-  try {
-    const { data, error } = await supabase.rpc('redeem_voucher', { p_code: trimmed });
-    if (error) return { ok: false, reason: mapReason(error.message, REDEEM_REASONS) };
-    const until = data ? new Date(data as string) : null;
-    if (!until || Number.isNaN(until.getTime())) return { ok: false, reason: 'error' };
-    await refreshPromoGrants();
-    return { ok: true, until };
-  } catch (err) {
-    console.warn('[promoPremium] redeemVoucher failed:', err);
     return { ok: false, reason: 'error' };
   }
 }
