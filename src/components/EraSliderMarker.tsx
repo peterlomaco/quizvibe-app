@@ -36,6 +36,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 22,
   },
+  // Profile v2: mindre tumme (20 pt) så den sitter tätare på linjen och inte
+  // dominerar sektionen. Lobby kör fortfarande 24 pt-varianten.
+  thumbCompact: { width: 20, height: 20, borderRadius: 10 },
+  thumbCompactPressed: { width: 24, height: 24, borderRadius: 12 },
+  signCompact: { fontSize: 15, lineHeight: 15 },
+  signCompactPressed: { fontSize: 18, lineHeight: 18 },
 });
 
 export function EraMarkerMinus({ pressed }: MarkerProps) {
@@ -50,6 +56,22 @@ export function EraMarkerPlus({ pressed }: MarkerProps) {
   return (
     <View style={[styles.thumb, pressed && styles.thumbPressed]}>
       <Text style={[styles.sign, pressed && styles.signPressed]}>+</Text>
+    </View>
+  );
+}
+
+export function EraMarkerMinusCompact({ pressed }: MarkerProps) {
+  return (
+    <View style={[styles.thumb, styles.thumbCompact, pressed && styles.thumbCompactPressed]}>
+      <Text style={[styles.sign, styles.signCompact, pressed && styles.signCompactPressed]}>−</Text>
+    </View>
+  );
+}
+
+export function EraMarkerPlusCompact({ pressed }: MarkerProps) {
+  return (
+    <View style={[styles.thumb, styles.thumbCompact, pressed && styles.thumbCompactPressed]}>
+      <Text style={[styles.sign, styles.signCompact, pressed && styles.signCompactPressed]}>+</Text>
     </View>
   );
 }

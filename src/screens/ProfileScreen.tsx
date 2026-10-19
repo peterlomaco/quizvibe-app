@@ -24,7 +24,7 @@ import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
-import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
+import { EraMarkerMinusCompact, EraMarkerPlusCompact } from '../components/EraSliderMarker';
 import { HCPShieldCard } from '../components/HCPShield';
 import { HostTypeOptions, type HostLobbyType } from '../components/HostTypeOptions';
 import { PlayerHistorySection } from '../components/PlayerHistorySection';
@@ -292,7 +292,7 @@ function DecadeMarks() {
     { label: '2020', year: 2020 },
   ];
   return (
-    <View style={{ width: ERA_SLIDER_WIDTH, height: 75, marginTop: 6 }}>
+    <View style={{ width: ERA_SLIDER_WIDTH, height: 64, marginTop: 4 }}>
       {labelEntries.map(({ label, year }) => {
         const position = ERA_SLIDER_INSET + ((year - ERA_MIN) / (ERA_MAX - ERA_MIN)) * ERA_SLIDER_INNER_WIDTH;
         return (
@@ -304,8 +304,8 @@ function DecadeMarks() {
             {/* Label-container: width 60 × height 20 (var 30×10) för att
                 rymma fördubblad text. fontSize 16 (var 8) ≈ 2× större per
                 användarens önskan. */}
-            <View style={{ width: 60, height: 20, marginTop: 14, transform: [{ rotate: '90deg' }] }}>
-              <Text style={{ fontSize: 16, color: Colors.textSecondary, textAlign: 'center', width: 60 }}>
+            <View style={{ width: 52, height: 18, marginTop: 12, transform: [{ rotate: '90deg' }] }}>
+              <Text style={{ fontSize: 13, color: Colors.textSecondary, textAlign: 'center', width: 52 }}>
                 {label}
               </Text>
             </View>
@@ -1834,7 +1834,7 @@ export default function ProfileScreen() {
 
         {hostDefaultsExpanded && (
         <>
-        <View style={[styles.preview, { gap: Spacing.md + 2 }]}>
+        <View style={[styles.preview, { gap: Spacing.xl }]}>
           {/* ── Game Mode (host-default) ─────────────────────────
               Pass-the-Phone (gratis) vs Individual Devices (Premium).
               Speglar Lobby:s Game Mode-toggle exakt — grön aktiv för
@@ -2244,8 +2244,8 @@ export default function ProfileScreen() {
                 minMarkerOverlapDistance={ERA_MIN_INTERVAL_PX}
                 minMarkerValueTwo={ERA_TO_MIN}
                 isMarkersSeparated
-                customMarkerLeft={EraMarkerMinus}
-                customMarkerRight={EraMarkerPlus}
+                customMarkerLeft={EraMarkerMinusCompact}
+                customMarkerRight={EraMarkerPlusCompact}
                 markerOffsetY={3}
                 selectedStyle={{
                   backgroundColor: Colors.warning,
@@ -2310,6 +2310,9 @@ export default function ProfileScreen() {
               <View style={styles.roundsGuestBox}>
                 <Text style={styles.roundsGuestBoxText}>{roundsCount}</Text>
               </View>
+              {/* + och PREMIUM-pillen i en egen tät grupp så det syns direkt
+                  att det är ökningen som är Premium-låst. */}
+              <View style={styles.roundsPlusGroup}>
               <Pressable
                 style={({ pressed }) => [
                   styles.roundsStepperBtn,
@@ -2347,7 +2350,8 @@ export default function ProfileScreen() {
                     ],
                   )}
                   activeOpacity={0.7}
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 4 }}
+                  hitSlop={8}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
                 >
                   {/* Låst Premium-intervall: lås + liten guld-PREMIUM-pill. */}
                   {!hasPremium && <LockOutlineIcon size={13} />}
@@ -2356,6 +2360,7 @@ export default function ProfileScreen() {
                   </View>
                 </TouchableOpacity>
               )}
+              </View>
             </View>
             <View style={{ alignItems: 'center' }}>
               <RoundsRuler
@@ -2376,13 +2381,13 @@ export default function ProfileScreen() {
               />
             </View>
             <Text style={styles.roundsScopeNote}>
-              Applies to Multiplayer games. Single player is always 4 rounds.
+              Applies to Multiplayer games.{'\n'}Single player is limited to 4 rounds.
             </Text>
           </View>
 
           {/* Game mode quick-select — under RoundsRuler för snabb mode-byte.
               EN rad med två rutor, som huvud-Game Mode-sektionen. */}
-          <View style={styles.field}>
+          <View style={[styles.field, { marginTop: -Spacing.sm }]}>
             <View style={styles.modeRow}>
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true)}
@@ -2433,6 +2438,7 @@ export default function ProfileScreen() {
             label={savedSection === 'host' ? '✓ Saved' : 'Save Host settings'}
             onPress={() => handleSave('host')}
             variant={savedSection === 'host' ? 'secondary' : 'gold'}
+            style={{ height: 48 }}
           />
         </View>
         </>
@@ -4372,12 +4378,12 @@ const styles = StyleSheet.create({
   // använder exakt samma tidsjusterare som Lobbyn. Speglar in-game year-
   // selector-rutan från app/quiz.tsx (BOX_COLOR='#F5A623', BOX_BG=
   // 'rgba(26,48,80,0.92)') — gul kantlinje + gul glow + mörkblå fyllning.
-  eraGuestBoxWrap: { alignItems: 'center', paddingVertical: Spacing.sm },
+  eraGuestBoxWrap: { alignItems: 'center', paddingTop: Spacing.sm, paddingBottom: Spacing.xs },
   eraGuestBox: {
     // Profile v2: premium i stället för neon — tunn guldkant, mörk navy-yta,
     // bara en svag skugga (glöden var shadowOpacity 0.85 / radius 18).
     paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.sm + 2,
+    paddingVertical: Spacing.xs + 2,
     borderWidth: 1.5,
     borderRadius: Radius.md,
     borderColor: Colors.warning,
@@ -4391,7 +4397,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   eraGuestBoxText: {
-    fontSize: 28,
+    fontSize: 25,
     fontWeight: '700',
     color: '#F5A623',
     fontVariant: ['tabular-nums'],
@@ -4482,9 +4488,9 @@ const styles = StyleSheet.create({
   // Guld ✓ i övre högra hörnet på vald ruta.
   modeCheck: {
     position: 'absolute',
-    top: 2,
-    right: 6,
-    fontSize: 11,
+    top: 6,
+    right: 10,
+    fontSize: 9,
     fontWeight: '700',
     color: Colors.warning,
   },
@@ -5034,12 +5040,13 @@ const styles = StyleSheet.create({
   roundsScopeNote: {
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
-    marginTop: Spacing.xs,
+    marginTop: Spacing.sm,
+    lineHeight: 16,
     textAlign: 'center',
   },
   roundsGuestBox: {
     paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.md,
+    paddingVertical: Spacing.sm,
     // Profile v2: valt värde = guld (tunn kant, ingen fyllning).
     borderWidth: 1.5,
     borderRadius: Radius.md,
@@ -5055,6 +5062,11 @@ const styles = StyleSheet.create({
     color: Colors.warning,
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.5,
+  },
+  roundsPlusGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
   },
   roundsStepperRow: {
     flexDirection: 'row',
@@ -5093,10 +5105,10 @@ const styles = StyleSheet.create({
   responseRow: { flexDirection: 'row', gap: Spacing.sm },
   responseBtn: { flex: 1, height: 44, borderRadius: Radius.md, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   // Profile v2: vald = guld kant + svag guldton; ovald = neutral.
-  responseBtnActive: { borderColor: Colors.warning, backgroundColor: 'rgba(245,166,35,0.08)' },
+  responseBtnActive: { borderColor: Colors.warning, backgroundColor: Colors.warningMuted },
   responseBtnInactive: { borderColor: BrandUi.border, backgroundColor: 'transparent' },
   responseBtnText: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textSecondary },
-  responseBtnTextActive: { color: Colors.textPrimary, fontWeight: FontWeight.bold },
+  responseBtnTextActive: { color: Colors.warning, fontWeight: FontWeight.bold },
   selector: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -151,7 +151,24 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
           );
         })}
       </View>
-      {hasBracket && (
+      {hasBracket && brandV2 && (
+        // Profile v2: ingen klammer — två centrerade rader under skalan.
+        <View style={roundsRulerStyles.v2Hint}>
+          <Text style={roundsRulerStyles.v2HintText}>More than 4 rounds requires:</Text>
+          <View style={roundsRulerStyles.v2HintRow}>
+            <Text style={roundsRulerStyles.v2HintStrong}>Individual device +</Text>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onPremiumPress}
+              hitSlop={8}
+              style={roundsRulerStyles.premiumBadge}
+            >
+              <Text style={roundsRulerStyles.premiumBadgeText}>PREMIUM</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {hasBracket && !brandV2 && (
         <>
           {/* Label ovanför klammern — förklarar kravet för >4 rundor.
               Absolutpositionerad över klammerns horisontella span så texten
@@ -339,6 +356,10 @@ const roundsRulerStyles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   // Label ovanför klammern — förklarar kravet för >4 rundor.
+  v2Hint: { marginTop: 0, alignItems: 'center', gap: 6 },
+  v2HintText: { fontSize: 12, color: Colors.textSecondary, letterSpacing: 0.2 },
+  v2HintRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  v2HintStrong: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary },
   requiredHint: {
     fontSize: 10,
     fontWeight: '500',
