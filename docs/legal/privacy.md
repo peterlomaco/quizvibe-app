@@ -143,6 +143,7 @@ Once the Spotify app opens, any personal data is handled by Spotify under **Spot
 | Data type | Retention period |
 |---|---|
 | Registered user account (profile, game history, **and your email address** — which is personal data) | Until you delete it. Delete in-app via Profile → tap your name → Delete Account. Email info@quizvibe.se if you need help. |
+| Deleted-account block (a one-way hash of your email address + your Player Name) | 12 months after you delete your account, then automatically purged. Kept only to prevent the same email or Player Name from being re-registered for abuse (e.g. repeatedly claiming new-account benefits) and so we can release your Player Name to you on request — email info@quizvibe.se. Your email address itself is not kept. |
 | Guest anonymous session | Until you leave the game (immediate) or 30 days of inactivity. |
 | Lobby state (room codes, player list) | Auto-deleted 24 hours after the lobby was created. |
 | Analytics events (anonymized) | 90 days, then aggregated and de-identified for long-term retention. |

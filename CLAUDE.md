@@ -551,6 +551,7 @@ Five top-level collapsible sections — all use the same tappable-header pattern
   3. `supabase.auth.signOut()` rensar session-token.
   4. Returnerar `{ ok: true }` eller `{ ok: false, reason }`.
 - **Order matters**: lokal storage rensas BARA om server-deletion lyckades — annars hamnar vi i inconsistent state där lokala data är borta men user:n fortfarande finns i Supabase. Felflödet visar Alert "Could not delete account ({reason})" och låter user försöka igen (deletion är idempotent server-side eftersom CASCADE bara körs om user faktiskt fanns).
+- **Återregistrerings-block 365 dagar** (migration `0060_deleted_account_tombstones`): delete-account skriver en tombstone (sha256 av email + PlayerName) INNAN raderingen; failar skrivningen raderas inget (500 `tombstone_failed`). `email_exists`/`player_name_exists` räknar tombstones som "taken" och `handle_new_user` RAISE:ar som backstop (klienten mappar GoTrues "Database error saving new user" till en vänlig Alert med info@quizvibe.se). pg_cron `deleted-tombstone-purge` rensar efter 365 dagar. Support släpper ett block med SQL-snippet:en sist i 0060. Det fanns INGEN email-spärr före detta — farming av credits/gratismånad via delete+re-register var öppen.
 - **Analytics**: `track('user_account_deleted')` + `resetIdentity()` efter success, före `router.replace('/')`.
 - **Privacy Policy + ToS** (docs/legal/{privacy,terms}.md) uppdaterade 2026-05-23 för att hänvisa till in-app deletion istället för email-only — email-only räcker inte enligt Apple-review.
 

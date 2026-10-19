@@ -3075,7 +3075,16 @@ export default function HomeScreen() {
       },
     });
     if (error) {
-      Alert.alert('Registration failed', error.message);
+      // Migration 0060: handle_new_user RAISE:ar när email/namn tillhör ett
+      // konto som raderats senaste 365 dagarna. GoTrue wrappar trigger-fel
+      // som "Database error saving new user" — mappa till vänlig text.
+      const blocked = /database error saving new user|registration_blocked_deleted_account/i.test(error.message);
+      Alert.alert(
+        'Registration failed',
+        blocked
+          ? "This email or Player Name belonged to a deleted account and can't be reused for 12 months. Contact info@quizvibe.se if it was yours."
+          : error.message,
+      );
       return;
     }
     if (!data.user) {
@@ -4256,7 +4265,7 @@ export default function HomeScreen() {
                     )}
                     {regEmailStatus === 'taken' && (
                       <Text style={[modal.statusHint, modal.statusHintError]}>
-                        ✗ Email already registered — log in instead or use another
+                        ✗ Email already registered — log in instead or use another.{'\n'}If this was your deleted account, contact info@quizvibe.se
                       </Text>
                     )}
                     {regEmailStatus === 'invalid' && (
@@ -4382,7 +4391,7 @@ export default function HomeScreen() {
                     )}
                     {regPlayerNameStatus === 'taken' && (
                       <Text style={[modal.statusHint, modal.statusHintError]}>
-                        ✗ Player Name already taken — try another
+                        ✗ Player Name already taken — try another.{'\n'}If this was your deleted account, contact info@quizvibe.se
                       </Text>
                     )}
                     {regPlayerNameStatus === 'invalid' && (

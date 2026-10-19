@@ -9,8 +9,10 @@
 // Flöde:
 //   1. Klient skickar POST med Authorization: Bearer <access_token>.
 //   2. Vi verifierar JWT:n via admin.auth.getUser(token) — failure → 401.
-//   3. Anropar admin.auth.admin.deleteUser(user_id) med service-role-key.
-//   4. Postgres-CASCADE rensar resten automatiskt:
+//   3. Skriver en tombstone (hashad email + PlayerName, migration 0060) som
+//      blockerar återregistrering i 365 dagar. Failar den → 500, ingen radering.
+//   4. Anropar admin.auth.admin.deleteUser(user_id) med service-role-key.
+//   5. Postgres-CASCADE rensar resten automatiskt:
 //        - profiles (FK profiles.id → auth.users(id) ON DELETE CASCADE)
 //        - rooms där user var host (FK rooms.host_user_id → CASCADE)
 //        - waiting_invites till/från user (FK to_user_id → CASCADE)
@@ -80,6 +82,32 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'anonymous_account_cannot_delete' }, 400);
   }
 
+  // Tombstone (migration 0060): spara hashad email + PlayerName INNAN
+  // raderingen så samma email/namn inte kan registreras om på 365 dagar
+  // (stoppar credit-/gratismånad-farming + namnkapning). Misslyckas
+  // skrivningen raderar vi INTE — hellre ett retry-bart fel än ett raderat
+  // konto utan block. Hashen MÅSTE matcha SQL:ens
+  // encode(digest(lower(trim(email)),'sha256'),'hex').
+  const email = userData.user.email?.trim().toLowerCase() ?? '';
+  const { data: profileRow } = await admin
+    .from('profiles')
+    .select('player_name')
+    .eq('id', userId)
+    .maybeSingle();
+  const playerName =
+    (profileRow?.player_name as string | undefined) ??
+    (userData.user.user_metadata?.playerName as string | undefined) ??
+    null;
+  if (email && playerName) {
+    const { error: tombstoneError } = await admin
+      .from('deleted_account_tombstones')
+      .insert({ email_hash: await sha256Hex(email), player_name: playerName });
+    if (tombstoneError) {
+      console.error('[delete-account] tombstone insert failed:', tombstoneError);
+      return json({ error: 'tombstone_failed', message: tombstoneError.message }, 500);
+    }
+  }
+
   // Radera auth-user. Postgres CASCADE rensar profiles, rooms,
   // waiting_invites automatiskt via befintliga FK-constraints.
   const { error: deleteError } = await admin.auth.admin.deleteUser(userId);
@@ -90,6 +118,13 @@ Deno.serve(async (req: Request) => {
 
   return json({ ok: true }, 200);
 });
+
+async function sha256Hex(input: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
 
 function json(body: Record<string, unknown>, status: number): Response {
   return new Response(JSON.stringify(body), {
