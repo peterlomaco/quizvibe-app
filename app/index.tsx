@@ -4514,13 +4514,22 @@ export default function HomeScreen() {
 
                 <TouchableOpacity
                   style={[
-                    profileMenu.primaryBtn,
-                    !isRegisterFormValid && profileMenu.primaryBtnDisabled,
+                    modal.joinBtn,
+                    isRegisterFormValid ? modal.joinBtnGold : modal.joinBtnDisabled,
                   ]}
                   onPress={handleRegisterSubmit}
                   disabled={!isRegisterFormValid}
                 >
-                  <Text style={profileMenu.primaryBtnText}>Register</Text>
+                  {/* Guld primär-CTA först när formuläret är giltigt. */}
+                  {isRegisterFormValid && <MetallicGoldFill />}
+                  <Text
+                    style={[
+                      modal.joinBtnText,
+                      isRegisterFormValid ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
+                    ]}
+                  >
+                    Register
+                  </Text>
                 </TouchableOpacity>
               </>
             )}
@@ -5051,8 +5060,8 @@ const modal = StyleSheet.create({
     fontSize: 22, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center', letterSpacing: 4,
   },
   inputText: {
-    height: 52, borderRadius: Radius.md, backgroundColor: Colors.background,
-    borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg,
+    height: 46, borderRadius: Radius.md, backgroundColor: '#141C2B',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', paddingHorizontal: Spacing.lg,
     fontSize: 16, fontWeight: '500', color: Colors.textPrimary,
   },
   joinBtn: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
@@ -5062,6 +5071,7 @@ const modal = StyleSheet.create({
   // (MetallicGoldFill) + svart text, som Home:s Start New Game.
   joinBtnGold: { overflow: 'hidden', borderWidth: 1, borderColor: METALLIC_GOLD_EDGE },
   joinBtnGoldText: { color: '#000000', fontWeight: '700' },
+  joinBtnTextDisabled: { color: 'rgba(255,255,255,0.35)' },
   // Gästformulärets etiketter (Home v2): title case, ingen versal-overline.
   formLabel: {
     fontSize: 14,
@@ -5276,36 +5286,43 @@ const modal = StyleSheet.create({
   playerNameInputDisabled: {
     opacity: 0.45,
   },
+  // Aktivt fält: dämpad guldkant (ingen blå).
   playerNameInputActive: {
-    borderColor: Colors.primary,
+    borderColor: 'rgba(245,166,35,0.65)',
   },
   // Check bredvid det delade PlayerNameInput — samma höjd som fälten.
   checkBtnPlayerName: { height: 46 },
+  // Check / Confirm (Profile v2-språk): gunmetal + tunn dämpad guldkant.
+  // Godkänt = guldkant + guld ✓ (guld = klart och giltigt).
   checkBtn: {
     minWidth: 72,
-    height: 52,
+    height: 46,
     paddingHorizontal: Spacing.md,
     borderRadius: Radius.md,
-    backgroundColor: Colors.primary,
+    backgroundColor: '#141C2B',
+    borderWidth: 1,
+    borderColor: 'rgba(245,166,35,0.45)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkBtnDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   checkBtnDone: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#141C2B',
     borderWidth: 1,
-    borderColor: Colors.success,
+    borderColor: Colors.warning,
   },
   checkBtnText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
   checkBtnTextDone: {
-    color: Colors.success,
+    color: Colors.warning,
     fontSize: 18,
+    fontWeight: '700',
   },
 
   // Sekundära åtgärds-rad under namnfältet (Remove + Auto-generate).
@@ -5323,8 +5340,8 @@ const modal = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.cardElevated,
+    borderColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: '#141C2B',
   },
   // Opacity på hela knappen dimmer både text, border och bg så aktiv vs
   // inaktiv kontrast blir tydlig (white text @ 100% vs ~40%).
@@ -5382,16 +5399,15 @@ const modal = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 52,
+    height: 46,
     borderRadius: Radius.md,
-    backgroundColor: Colors.background,
+    backgroundColor: '#141C2B',
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: 'rgba(255,255,255,0.12)',
     paddingHorizontal: Spacing.lg,
   },
   yearTriggerActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: 'rgba(245,166,35,0.65)',
   },
   yearTriggerText: { fontSize: 16, fontWeight: '500', color: Colors.textPrimary },
   yearTriggerPlaceholder: { color: Colors.textDisabled, fontWeight: '400' },
