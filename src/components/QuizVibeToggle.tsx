@@ -116,7 +116,7 @@ export function QuizVibeToggle({
     >
       {/* Läges-etiketter i spåret (under knoppen i z-ordning). */}
       <Animated.Text
-        style={[styles.label, styles.labelOn, { fontSize: s.font, left: s.h / 2 - 4, opacity: onLabelOpacity }]}
+        style={[styles.label, styles.labelOn, { fontSize: s.font, left: s.h / 2 - 6, opacity: onLabelOpacity }]}
         allowFontScaling={false}
       >
         ON

@@ -42,6 +42,8 @@ import {
 } from '../components/RoundsRuler';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { setNavigationGuard } from '../utils/navigationGuard';
+import { QuizVibeDialog } from '@/src/components/QuizVibeDialog';
+import { PackageThumbnail, hasPackageThumbnail } from '@/src/components/PackageThumbnail';
 import { QuizVibeToggle, quizVibeToggleWidth } from '../components/QuizVibeToggle';
 import { ClapperboardIcon, MusicNoteIcon } from '../components/CategoryIcons';
 import { ChevronIcon } from '../components/ChevronIcon';
@@ -109,7 +111,7 @@ import {
     removeFriend,
     type Friend,
 } from '../utils/friendsStorage';
-import { PURCHASED_PACKAGES, type MusicPackage } from '../utils/mockPurchasedPackages';
+import { PURCHASED_PACKAGES, parentRestrictedPackageMessage, type MusicPackage } from '../utils/mockPurchasedPackages';
 import {
     clearProfile,
     getCachedProfile,
@@ -607,6 +609,22 @@ export default function ProfileScreen() {
   // egen huvudrubrik mellan Profile defaults och Game connections, samma
   // kollapsbara mönster som de övriga top-level sektionerna.
   const [hostDefaultsExpanded, setHostDefaultsExpanded] = useState(false);
+  // "Parent controlled"-dialogen (paketrad-info) + scroll-mål för "Go to
+  // Parent Control". Y = Host-sektionens preview (direkt barn till scroll-
+  // innehållet) + Parent Control-fältets y inuti den — onLayout-kedja, inte
+  // measureLayout (no-op på Fabric).
+  const [parentControlledDialogOpen, setParentControlledDialogOpen] = useState(false);
+  const hostPreviewYRef = useRef<number | null>(null);
+  const parentControlFieldYRef = useRef<number | null>(null);
+  const pendingParentControlScrollRef = useRef(false);
+  const tryScrollToParentControl = () => {
+    if (!pendingParentControlScrollRef.current) return;
+    const a = hostPreviewYRef.current;
+    const b = parentControlFieldYRef.current;
+    if (a == null || b == null) return;
+    pendingParentControlScrollRef.current = false;
+    scrollRef.current?.scrollTo({ y: Math.max(0, a + b - Spacing.lg), animated: true });
+  };
   // Customized Host packages — egen kollapsbar sektion mellan Host defaults
   // och Game connections. Listar PURCHASED_PACKAGES (mock tills Store-
   // integrationen är inkopplad) + Add-knapp som leder till Store.
@@ -623,7 +641,18 @@ export default function ProfileScreen() {
   const [enabledHostPackages, setEnabledHostPackages] = useState<string[]>(
     () => PURCHASED_PACKAGES.map((p) => p.id),
   );
+  // Parent Control blockerar parent-restricted-paket (Hip Hop & RnB) —
+  // dialogen erbjuder "Deactivate now" (PC av + paketet på i samma tryck).
+  const [pcBlockedPackageId, setPcBlockedPackageId] = useState<string | null>(null);
   const handleToggleHostPackage = (id: string) => {
+    if (
+      !enabledHostPackages.includes(id) &&
+      parentControlEnabled &&
+      PURCHASED_PACKAGES.find((p) => p.id === id)?.parentRestricted
+    ) {
+      setPcBlockedPackageId(id);
+      return;
+    }
     setEnabledHostPackages((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
@@ -1834,7 +1863,13 @@ export default function ProfileScreen() {
 
         {hostDefaultsExpanded && (
         <>
-        <View style={[styles.preview, { gap: Spacing.xl }]}>
+        <View
+          style={[styles.preview, { gap: Spacing.xl }]}
+          onLayout={(e) => {
+            hostPreviewYRef.current = e.nativeEvent.layout.y;
+            tryScrollToParentControl();
+          }}
+        >
           {/* ── Game Mode (host-default) ─────────────────────────
               Pass-the-Phone (gratis) vs Individual Devices (Premium).
               Speglar Lobby:s Game Mode-toggle exakt — grön aktiv för
@@ -2154,7 +2189,13 @@ export default function ProfileScreen() {
           {/* Parent Control — host-default. När på filtreras YT-klipp taggade
               parentControlled bort ur frågeurvalet i spel där denna profil är
               host. Placerad under Source Mixerboard, precis ovanför Game era. */}
-          <View style={styles.field}>
+          <View
+            style={styles.field}
+            onLayout={(e) => {
+              parentControlFieldYRef.current = e.nativeEvent.layout.y;
+              tryScrollToParentControl();
+            }}
+          >
             <View style={styles.regionLabelRow}>
               <Text style={styles.sectionLabel}>Parent Control</Text>
               <Pressable
@@ -2520,7 +2561,7 @@ export default function ProfileScreen() {
                 med per-paket-switcharna i listan. V1: PURCHASED_PACKAGES
                 är tom så empty-state-texten alltid visas. */}
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>
+              <Text style={[styles.fieldLabel, styles.packagesSubheading]}>
                 Available when you are the Host:
               </Text>
               {/* Select all-toggle göms när bara 1 paket finns — då blir
@@ -2555,7 +2596,22 @@ export default function ProfileScreen() {
                         key={pkg.id}
                         style={[styles.packageListRow, isEnabled && styles.packageListRowOn]}
                       >
-                        <MusicNoteIcon size={18} color={isEnabled ? Colors.warning : BrandUi.iconMuted} />
+                        {hasPackageThumbnail(pkg.id) ? (
+                          <View style={styles.packageThumbWrap}>
+                            <PackageThumbnail
+                              packageId={pkg.id}
+                              state={
+                                isEnabled
+                                  ? 'on'
+                                  : parentControlEnabled && pkg.parentRestricted
+                                    ? 'unavailable'
+                                    : 'off'
+                              }
+                            />
+                          </View>
+                        ) : (
+                          <MusicNoteIcon size={18} color={isEnabled ? Colors.warning : BrandUi.iconMuted} />
+                        )}
                         <View style={styles.packageNameWrap}>
                           <Text
                             style={[styles.packageRowText, !isEnabled && styles.packageRowTextInactive]}
@@ -2576,22 +2632,21 @@ export default function ProfileScreen() {
                             </View>
                           )}
                         </View>
+                        {/* Info-ikon bara på parent-restricted paket (Hip Hop & RnB). */}
+                        {pkg.parentRestricted && (
                         <Pressable
                           style={({ pressed }) => [
                             styles.infoIconBtn,
+                            styles.infoIconBtnSubtle,
                             pressed && { opacity: 0.7 },
                           ]}
-                          onPress={() =>
-                            Alert.alert(
-                              pkg.name,
-                              'Information about this package will be available later.',
-                            )
-                          }
-                          hitSlop={8}
+                          onPress={() => setParentControlledDialogOpen(true)}
+                          hitSlop={12}
                           accessibilityLabel={`${pkg.name} info`}
                         >
-                          <Text style={styles.infoIconText}>i</Text>
+                          <Text style={[styles.infoIconText, styles.infoIconTextSubtle]}>i</Text>
                         </Pressable>
+                        )}
                         <QuizVibeToggle
                           variant="mixer"
                           value={isEnabled}
@@ -2614,6 +2669,7 @@ export default function ProfileScreen() {
               label={savedSection === 'packages' ? '✓ Saved' : 'Save settings'}
               onPress={() => handleSave('packages')}
               variant={savedSection === 'packages' ? 'secondary' : 'gold'}
+              size="compact"
             />
             </>
             )}
@@ -3507,6 +3563,39 @@ export default function ProfileScreen() {
       {/* ── Spotify DJ guide modal ──────────────────────────────────────
           Visas när användaren tappar "Guide How Spotify DJ works" i Spotify-
           raden. Plan B (2026-07-22): ingen kontokoppling — bara Spotify-appen. */}
+      <QuizVibeDialog
+        visible={pcBlockedPackageId !== null}
+        title="Parent Control"
+        message={parentRestrictedPackageMessage(
+          PURCHASED_PACKAGES.find((p) => p.id === pcBlockedPackageId)?.name ?? null,
+        )}
+        secondaryLabel="Cancel"
+        primaryLabel="Deactivate now"
+        onClose={() => setPcBlockedPackageId(null)}
+        onPrimary={() => {
+          const id = pcBlockedPackageId;
+          setPcBlockedPackageId(null);
+          if (!id) return;
+          setParentControlEnabled(false);
+          setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+        }}
+      />
+
+      <QuizVibeDialog
+        visible={parentControlledDialogOpen}
+        title="Parent controlled"
+        message={'This package is controlled by Parent Control.\nTurn off Parent Control to activate this package.'}
+        secondaryLabel="Cancel"
+        primaryLabel="Go to Parent Control"
+        onClose={() => setParentControlledDialogOpen(false)}
+        onPrimary={() => {
+          setParentControlledDialogOpen(false);
+          pendingParentControlScrollRef.current = true;
+          if (hostDefaultsExpanded) tryScrollToParentControl();
+          else setHostDefaultsExpanded(true);
+        }}
+      />
+
       <Modal
         visible={spotifyGuideVisible}
         transparent
@@ -4893,16 +4982,26 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     minHeight: 44,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs + 2,
+    // Tumnageln (48) styr radhöjden → tunnare vertikal padding och mindre
+    // vänsterpadding så raden inte växer märkbart.
+    paddingLeft: Spacing.xs + 2,
+    paddingVertical: Spacing.xs,
     borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: BrandUi.border,
     backgroundColor: BrandUi.surface,
   },
-  // Påslaget paket: bara en svag guldkant — toggeln bär ON-signalen.
+  // Påslaget paket: bara en dämpad guldton i kanten — toggeln + guld-
+  // ikonen bär ON-signalen, raden ska inte ramas in i starkt guld.
   packageListRowOn: {
-    borderColor: 'rgba(245,166,35,0.35)',
+    borderColor: 'rgba(245,166,35,0.2)',
   },
+  // Luft under "Available when you are the Host:" innan Select all/listan.
+  packagesSubheading: {
+    marginBottom: Spacing.xs,
+  },
+  // Tumnagel → paketnamn = radens gap (8 pt), inget extra.
+  packageThumbWrap: {},
   packageNameWrap: {
     flex: 1,
     minWidth: 0,
@@ -4935,6 +5034,18 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: Colors.textSecondary,
     lineHeight: 15,
+  },
+  // Dämpad info-ikon i paketraderna — konkurrerar inte med namn/toggle.
+  infoIconBtnSubtle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderColor: BrandUi.border,
+  },
+  infoIconTextSubtle: {
+    fontSize: 12,
+    lineHeight: 14,
+    color: BrandUi.iconMuted,
   },
   // Speglar Lobby:s purchasedPackageBox + purchasedPackageBoxActive 1:1
   // — fixed width 204, xs-padding vertikalt, primary border + elevated bg
@@ -5012,7 +5123,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: Spacing.sm,
+    gap: Spacing.xs,
     marginTop: Spacing.xs,
     paddingRight: Spacing.md + 1,
   },
@@ -5021,7 +5132,7 @@ const styles = StyleSheet.create({
   },
   selectAllLabel: {
     fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
+    fontWeight: FontWeight.regular,
     color: BrandUi.textMuted,
   },
   // Empty state — när användaren inte har köpt några extra-paket.

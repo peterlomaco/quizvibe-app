@@ -18,6 +18,8 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;
+  /** 'compact' = 48 pt (≈8 % lägre) för sektions-Save under listor. */
+  size?: 'default' | 'compact';
   style?: ViewStyle;
 }
  
@@ -28,6 +30,7 @@ export function Button({
   disabled,
   loading,
   fullWidth = true,
+  size = 'default',
   style,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
@@ -39,6 +42,7 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         fullWidth && styles.fullWidth,
+        size === 'compact' && styles.compact,
         styles[variant],
         isDisabled && styles.disabled,
         pressed && !isDisabled && styles.pressed,
@@ -79,6 +83,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
   },
   fullWidth: { alignSelf: 'stretch' },
+  compact: { height: 48 },
  
   // ── Variants ────────────────────────────────────────────────────
   primary: {

@@ -104,3 +104,11 @@ export function getGenerationKeyFromBirthYear(
   if (birthYear <= 2012) return 'gen-z';
   return 'gen-alpha';
 }
+
+// Text för "Parent Control blockerar paketet"-dialogen (Lobby + Profile delar
+// formuleringen via samma QuizVibeDialog). `name` = paketnamnet, eller null
+// när flera paket berörs (Select all).
+export function parentRestrictedPackageMessage(name: string | null): string {
+  const subject = name ? `${name} is` : 'Some packages are';
+  return `${subject} restricted by Parent Control. You need to deactivate Parent Control to activate ${name ? 'this package' : 'them'}.\n\nDeactivating Parent Control allows mature content, some of which might not be appropriate for children.`;
+}

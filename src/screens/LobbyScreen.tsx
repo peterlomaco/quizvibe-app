@@ -28,6 +28,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { ApproveToggle } from '../components/ApproveToggle';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { QuizVibeDialog } from '../components/QuizVibeDialog';
 import { CodeKeyboard } from '../components/CodeKeyboard';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
@@ -82,6 +83,7 @@ import { clearGameStarted, isGameStarted, markGameStarted } from '../utils/mockS
 import {
   PURCHASED_PACKAGES,
   isPackageParentRestricted,
+  parentRestrictedPackageMessage,
   type MusicPackage,
 } from '../utils/mockPurchasedPackages';
 import {
@@ -1109,12 +1111,6 @@ function confirmAsync(
 
 // Blockar aktivering av ett parent-restricted-paket (Hip Hop) medan Parent
 // Control är på i lobbyn. Delas av alla fyra aktiverings-paths.
-function alertParentRestrictedPackage(): void {
-  Alert.alert(
-    'Parent Control',
-    "You're trying to activate a package that is restricted with Parent control. Please switch Parent control off before activating this package.",
-  );
-}
 
 // SequentialDots flyttat till src/components/SequentialDots.tsx för delning
 // med GetReadyIntro (icke-host:s "Waiting for Host to start quiz"-ruta).
@@ -3271,12 +3267,33 @@ export default function LobbyScreen() {
     [allPackagesCatalog, enabledHostPackages, hostMode],
   );
 
+  // "Parent Control blockerar paketet"-dialog (QuizVibeDialog). Erbjuder
+  // "Deactivate now" som slår av Parent Control OCH aktiverar det/de
+  // blockerade paketen i samma tryck. `kind` styr vad som aktiveras.
+  const [pcBlocked, setPcBlocked] = useState<
+    | { kind: 'single' | 'catalog'; id: string }
+    | { kind: 'all'; ids: string[] }
+    | null
+  >(null);
+  const handlePcBlockedDeactivateNow = () => {
+    const blocked = pcBlocked;
+    setPcBlocked(null);
+    if (!blocked) return;
+    setParentControlEnabled(false);
+    const ids = blocked.kind === 'all' ? blocked.ids : [blocked.id];
+    if (blocked.kind === 'catalog') {
+      setEnabledHostPackages((prev) => (prev.includes(blocked.id) ? prev : [...prev, blocked.id]));
+    }
+    setSelectedExtraPackages((prev) => [...prev, ...ids.filter((x) => !prev.includes(x))]);
+  };
+
   const handleToggleExtraPackage = (id: string) => {
     const isActivating = !selectedExtraPackages.includes(id);
     // Aktivering av ett parent-restricted-paket är blockerad medan Parent
-    // Control är på (avaktivering är alltid tillåten).
+    // Control är på (avaktivering är alltid tillåten) — dialogen erbjuder
+    // att avaktivera Parent Control direkt.
     if (isActivating && parentControlEnabled && isPackageParentRestricted(id)) {
-      alertParentRestrictedPackage();
+      setPcBlocked({ kind: 'single', id });
       return;
     }
     if (isActivating) {
@@ -3325,10 +3342,15 @@ export default function LobbyScreen() {
             const activatable = availablePackages.filter(
               (p) => !(parentControlEnabled && isPackageParentRestricted(p.id)),
             );
-            if (activatable.length < availablePackages.length) {
-              alertParentRestrictedPackage();
-            }
+            const blockedIds = availablePackages
+              .filter((p) => parentControlEnabled && isPackageParentRestricted(p.id))
+              .map((p) => p.id);
             setSelectedExtraPackages(activatable.map((p) => p.id));
+            if (blockedIds.length > 0) {
+              // RN-Modal direkt från en Alert-callback kan sväljas på iOS →
+              // vänta ut Alertens stängning.
+              setTimeout(() => setPcBlocked({ kind: 'all', ids: blockedIds }), 350);
+            }
           },
         },
       ],
@@ -3349,7 +3371,10 @@ export default function LobbyScreen() {
       // "+ Add package" aktiverar paketet direkt i lobbyn → blockeras för
       // parent-restricted-paket medan Parent Control är på.
       if (parentControlEnabled && isPackageParentRestricted(id)) {
-        alertParentRestrictedPackage();
+        // Två RN-Modals kan inte vara uppe samtidigt → stäng "+ Add package"
+        // först och visa dialogen när fade:en är klar.
+        setAddPackageModalVisible(false);
+        setTimeout(() => setPcBlocked({ kind: 'catalog', id }), 350);
         return;
       }
       // Aktivering kollapsar/omformar Source Mixerboard → bekräfta först.
@@ -8643,10 +8668,11 @@ export default function LobbyScreen() {
                   const activatable = availablePackages.filter(
                     (p) => !(parentControlEnabled && isPackageParentRestricted(p.id)),
                   );
-                  if (activatable.length < availablePackages.length) {
-                    alertParentRestrictedPackage();
-                  }
+                  const blockedIds = availablePackages
+                    .filter((p) => parentControlEnabled && isPackageParentRestricted(p.id))
+                    .map((p) => p.id);
                   setSelectedExtraPackages(activatable.map((p) => p.id));
+                  if (blockedIds.length > 0) setPcBlocked({ kind: 'all', ids: blockedIds });
                 };
                 const activateIsActive = hasPremium && isPackagesActive;
                 return (
@@ -10066,6 +10092,20 @@ export default function LobbyScreen() {
           Host väljer paket direkt ur HELA katalogen (allPackagesCatalog),
           oberoende av Profile-valet. PÅ = paketet blir tillgängligt i lobby-
           listan OCH aktivt i lobbyn (handleToggleCatalogPackage). */}
+      <QuizVibeDialog
+        visible={pcBlocked !== null}
+        title="Parent Control"
+        message={parentRestrictedPackageMessage(
+          pcBlocked && pcBlocked.kind !== 'all'
+            ? allPackagesCatalog.find((p) => p.id === pcBlocked.id)?.name ?? null
+            : null,
+        )}
+        secondaryLabel="Cancel"
+        primaryLabel="Deactivate now"
+        onClose={() => setPcBlocked(null)}
+        onPrimary={handlePcBlockedDeactivateNow}
+      />
+
       <Modal
         visible={addPackageModalVisible}
         transparent
