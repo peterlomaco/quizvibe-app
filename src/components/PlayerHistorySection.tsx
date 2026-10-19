@@ -4,6 +4,7 @@ import { Pressable } from '@/src/components/haptic';
 import Svg, { Path } from 'react-native-svg';
 import { useFocusEffect } from 'expo-router';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { SectionToggle } from './SectionToggle';
 import { buildAggregateStandings } from '../utils/aggregateLeaderboard';
 import {
   deleteGameHistoryEntry,
@@ -254,9 +255,7 @@ export function PlayerHistorySection() {
           <HistoryOutlineIcon size={24} color={BrandUi.iconMuted} />
         </View>
         <Text style={styles.sectionTitle}>Player history</Text>
-        <View style={[styles.toggleBox, expanded && styles.toggleBoxActive]}>
-          <Text style={styles.toggleText}>{expanded ? '−' : '+'}</Text>
-        </View>
+        <SectionToggle expanded={expanded} />
       </Pressable>
       {!expanded && <View style={styles.sectionDivider} />}
 
@@ -280,9 +279,7 @@ export function PlayerHistorySection() {
               hitSlop={8}
             >
               <Text style={styles.cardTitle}>Games played: {games.length}</Text>
-              <View style={[styles.toggleBox, gamesOpen && styles.toggleBoxActive]}>
-                <Text style={styles.toggleText}>{gamesOpen ? '−' : '+'}</Text>
-              </View>
+              <SectionToggle expanded={gamesOpen} />
             </Pressable>
             {!gamesOpen ? null : games.length === 0 ? (
               <Text style={styles.emptyText}>
@@ -557,6 +554,7 @@ const styles = StyleSheet.create({
     ...Typography.title,
     color: Colors.textPrimary,
     fontWeight: FontWeight.bold,
+    flex: 1,
   },
   // Profile v2: samma kompakta +/− som Profile-sektionerna.
   toggleBox: {
@@ -579,7 +577,7 @@ const styles = StyleSheet.create({
   toggleTextActive: { color: Colors.warning },
   sectionDivider: {
     height: 1,
-    backgroundColor: BrandUi.border,
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
 
   card: {

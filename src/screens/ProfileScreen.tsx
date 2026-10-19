@@ -18,7 +18,7 @@ import {
     View,
 } from 'react-native';
 import { Pressable, Switch, TouchableOpacity } from '@/src/components/haptic';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { Avatar } from '../components/Avatar';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
@@ -57,6 +57,8 @@ import {
   PackageOutlineIcon,
 } from '../components/SectionIcons';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { SectionToggle } from '../components/SectionToggle';
+import { PlayerNameInput } from '../components/PlayerNameInput';
 
 // Spotify Type-raden (Type: Year [toggle] Name [toggle]) ryms bara från ~375 pt;
 // smalare skärmar (SE / Display Zoom) staplar Year/Name.
@@ -67,39 +69,7 @@ const SPOTIFY_TYPE_INLINE = Dimensions.get('window').width >= 375;
 // Alla sektioner som Profile default settings: dämpad ikon även utfälld.
 const sectionIconColor = (_expanded: boolean) => BrandUi.iconMuted;
 
-/** Kompakt +/− i en liten ruta; guldkant + guld tecken när utfälld. */
-// subtle = neutral +/− med bara en svag guldton i kanten när utfälld
-// (Profile default settings, så rubriken inte tävlar med guld-CTA:n).
-function SectionToggle({ expanded, subtle = true }: { expanded: boolean; subtle?: boolean }) {
-  return (
-    <View
-      style={[
-        sectionToggleStyles.box,
-        expanded && (subtle ? sectionToggleStyles.boxActiveSubtle : sectionToggleStyles.boxActive),
-      ]}
-    >
-      <Text style={[sectionToggleStyles.text, expanded && !subtle && sectionToggleStyles.textActive]}>
-        {expanded ? '−' : '+'}
-      </Text>
-    </View>
-  );
-}
 
-const sectionToggleStyles = StyleSheet.create({
-  box: {
-    width: 24,
-    height: 24,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: BrandUi.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  boxActive: { borderColor: Colors.warning },
-  boxActiveSubtle: { borderColor: 'rgba(245,166,35,0.45)' },
-  text: { fontSize: 16, fontWeight: '700', color: BrandUi.iconMuted, lineHeight: 18 },
-  textActive: { color: Colors.warning },
-});
 import { resetIdentity, track } from '../utils/analytics';
 import { deleteAccount } from '../utils/auth';
 import { TRACK_VIEWPORT_W } from '../utils/responsive';
@@ -132,8 +102,6 @@ import {
     getPlayerNameDigits,
     getPlayerNameLetters,
     normalizePlayerName,
-    PLAYER_NAME_MAX_DIGITS,
-    PLAYER_NAME_MAX_LETTERS,
 } from '../utils/playerName';
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — self-attest via
 // ProfileData.spotifyAppConfirmed ersätter connectSpotify/getSpotifyConnectionStatus.
@@ -342,6 +310,15 @@ export default function ProfileScreen() {
   // Snapshot av profil-state vid senaste load/save — jämförs mot aktuell state
   // i guardedNavigate för att avgöra om osparade ändringar finns.
   const savedSnapshotRef = useRef('');
+  // Automatiska klampningar (premium saknas → Max 4, rundor över taket) är
+  // normalisering, inte användarändringar — uppdatera snapshoten så de
+  // aldrig triggar "Unsaved changes".
+  const rebaseSnapshot = (patch: Record<string, unknown>) => {
+    if (!savedSnapshotRef.current) return;
+    try {
+      savedSnapshotRef.current = JSON.stringify({ ...JSON.parse(savedSnapshotRef.current), ...patch });
+    } catch { /* ignore */ }
+  };
   const [pickerOpen, setPickerOpen]       = useState(false);
   const [playerName, setPlayerName]           = useState('Player One');
   const [email, setEmail]                     = useState<string>('');
@@ -434,7 +411,11 @@ export default function ProfileScreen() {
   // profil (race-safe: efffekten fyrar vid maxPlayers-ändringen → sätter 4 →
   // effekten fyrar igen men condition är false → stannar).
   useEffect(() => {
-    if (!hasPremium && maxPlayers > 4) setMaxPlayers(4);
+    if (!hasPremium && maxPlayers > 4) {
+      setMaxPlayers(4);
+      rebaseSnapshot({ maxPlayers: 4 });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasPremium, maxPlayers]);
   // HCP-sköldarnas visningsvärde. Seedas synkront ur profil-spegeln (undviker
   // flimmer vid mount) men uppdateras på FOCUS ur den AUKTORITATIVA progress-
@@ -519,8 +500,11 @@ export default function ProfileScreen() {
   // skulle effekten anropa setRoundsCount vid varje roundsCount-ändring).
   useEffect(() => {
     if (roundsCount > roundsMax) {
-      setRoundsCount(Math.max(ROUNDS_MIN, roundsMax));
+      const clamped = Math.max(ROUNDS_MIN, roundsMax);
+      setRoundsCount(clamped);
+      rebaseSnapshot({ roundsCount: clamped });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundsCount, roundsMax]);
 
   // Två fria multiplayer-val (host-default). Inget premium-gate på lägesvalet
@@ -1032,11 +1016,9 @@ export default function ProfileScreen() {
         // ERA_TO_MIN (1980) och from till [ERA_MIN, to - ERA_MIN_INTERVAL] så
         // gamla profiler (sparade när golvet/intervallet var lägre) hamnar i
         // ett giltigt läge istället för att box/thumb hamnar i otillåtet spann.
-        {
-          const clampTo = Math.max(ERA_TO_MIN, Math.min(ERA_MAX, augmented.gameEraTo ?? ERA_MAX));
-          const clampFrom = Math.max(ERA_MIN, Math.min(augmented.gameEraFrom ?? 1981, clampTo - ERA_MIN_INTERVAL));
-          setEraValues([clampFrom, clampTo]);
-        }
+        const clampTo = Math.max(ERA_TO_MIN, Math.min(ERA_MAX, augmented.gameEraTo ?? ERA_MAX));
+        const clampFrom = Math.max(ERA_MIN, Math.min(augmented.gameEraFrom ?? 1981, clampTo - ERA_MIN_INTERVAL));
+        setEraValues([clampFrom, clampTo]);
         setMaxPlayers(augmented.maxPlayers ?? 4);
         // Stale-coerce: 'remote-1v1' kan ligga sparad som host-default från
         // innan Remote-rutan togs bort (2026-08-07 — 1vs1 väljs numera per
@@ -1057,7 +1039,8 @@ export default function ProfileScreen() {
           hasPremium &&
           (augmented.gameMode ?? 'pass-the-phone') === 'individual-devices';
         const initialMax = isIndivPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
-        setRoundsCount(Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)));
+        const loadedRounds = Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds));
+        setRoundsCount(loadedRounds);
         setEnabledHostPackages(augmented.enabledHostPackages ?? PURCHASED_PACKAGES.map((p) => p.id));
         setYoutubeEnabledCategories(augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories());
         setImagesEnabledCategories(augmented.imagesEnabledCategories ?? defaultEnabledMainCategories());
@@ -1074,15 +1057,14 @@ export default function ProfileScreen() {
           birthYear: augmented.birthYear,
           assistance: augmented.assistance,
           voice: augmented.voice ?? DEFAULT_VOICE_ID,
-          gameEraFrom: augmented.gameEraFrom ?? 1981,
-          gameEraTo: augmented.gameEraTo ?? ERA_MAX,
+          // Era + rundor: EXAKT de klampade värden som gick in i state —
+          // annars ger en gammal profil (era/rundor utanför dagens regler)
+          // en evig falsk "Unsaved changes"-popup.
+          gameEraFrom: clampFrom,
+          gameEraTo: clampTo,
           gameMode: loadedGameMode,
           maxPlayers: augmented.maxPlayers ?? 4,
-          roundsCount: Math.max(ROUNDS_MIN, Math.min(
-            // Bara IndDev får 20-cappen — PtP OCH Remote 1v1 är max 4.
-            (augmented.gameMode ?? 'pass-the-phone') === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS,
-            augmented.roundsDefault ?? ROUNDS_DEFAULT,
-          )),
+          roundsCount: loadedRounds,
           answerResponseSeconds: augmented.answerResponseSeconds ?? 30,
           youtubeEnabledCategories: augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories(),
           imagesEnabledCategories: augmented.imagesEnabledCategories ?? defaultEnabledMainCategories(),
@@ -1320,7 +1302,25 @@ export default function ProfileScreen() {
       imagesEnabledCategories, enabledHostPackages,
       parentControlEnabled,
     });
-    return current !== savedSnapshotRef.current;
+    // Profilen har inte laddats klart (loadProfile gör en Supabase-roundtrip)
+    // → inget att jämföra mot, alltså inga osparade ändringar.
+    if (!savedSnapshotRef.current) return false;
+    // Jämför fält för fält; arrayer oberoende av ordning (samma kategorier/
+    // paket i annan ordning är ingen ändring).
+    const norm = (v: unknown) =>
+      Array.isArray(v) ? JSON.stringify([...v].map(String).sort()) : JSON.stringify(v ?? null);
+    let saved: Record<string, unknown>;
+    try {
+      saved = JSON.parse(savedSnapshotRef.current);
+    } catch {
+      return false;
+    }
+    const now = JSON.parse(current) as Record<string, unknown>;
+    const changed = Object.keys(now).filter((k) => norm(now[k]) !== norm(saved[k]));
+    if (__DEV__ && changed.length > 0) {
+      console.log('[Profile] unsaved fields:', changed.map((k) => `${k}: ${norm(saved[k])} → ${norm(now[k])}`));
+    }
+    return changed.length > 0;
   };
 
   // Interceptar navigation bort från Profile med osparade ändringar.
@@ -1644,7 +1644,7 @@ export default function ProfileScreen() {
             <ProfileOutlineIcon size={24} color={BrandUi.iconMuted} />
           </View>
           <Text style={styles.gameConnectionsHeader}>Profile default settings</Text>
-          <SectionToggle expanded={profileDefaultsExpanded} subtle />
+          <SectionToggle expanded={profileDefaultsExpanded} />
         </Pressable>
         {!profileDefaultsExpanded && <View style={styles.sectionDivider} />}
 
@@ -2700,14 +2700,10 @@ export default function ProfileScreen() {
             Lobby's Share invite (visas hos vänner i Join Waiting Invites). */}
         <View style={styles.friendsCard}>
           <View style={styles.friendsHeader}>
-            <View style={styles.friendsIconWrap}>
-              <FriendsOutlineIcon size={30} color={BrandUi.iconMuted} />
-            </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.friendsTitle}>QuizVibe friends</Text>
+              <Text style={styles.friendsTitle}>Friends</Text>
               <Text style={styles.friendsSubtitle}>
-                Share game invitations easier to friends and follow
-                each other progression.
+                Add friends for faster game invites.
               </Text>
             </View>
             <View style={styles.friendsCount}>
@@ -2731,7 +2727,9 @@ export default function ProfileScreen() {
               pressed && { opacity: 0.85 },
             ]}
           >
-            <Text style={styles.friendsBtnText}>+ Add QuizVibe Friends</Text>
+            <Text style={styles.friendsBtnText}>
+              <Text style={styles.friendsBtnPlus}>+  </Text>Add Friend
+            </Text>
           </Pressable>
 
           {/* Inline lista över sparade vänner — en rad per friend. Speglar
@@ -2739,27 +2737,29 @@ export default function ProfileScreen() {
               som samma vy. Modalens lista är kvar oförändrad. */}
           {friends.length > 0 && (
             <View style={styles.friendsList}>
-              {friends.map((friend, i) => (
-                <View key={friend.id}>
-                  {i > 0 && <View style={styles.friendsListDivider} />}
-                  <View style={styles.friendsListRow}>
+              {friends.map((friend) => (
+                <View key={friend.id} style={styles.friendsListRow}>
+                  <View style={styles.friendsListAvatar}>
                     <Text style={styles.friendsListEmoji}>
                       {getAvatarEmojiById(friend.avatarId)}
                     </Text>
-                    <Text style={styles.friendsListName} numberOfLines={1}>
-                      {friend.playerName}
-                    </Text>
-                    <Pressable
-                      onPress={() => handleRemoveFriend(friend.id)}
-                      hitSlop={10}
-                      style={({ pressed }) => [
-                        styles.friendsListRemoveBtn,
-                        pressed && { opacity: 0.6 },
-                      ]}
-                    >
-                      <Text style={styles.friendsListRemoveText}>×</Text>
-                    </Pressable>
                   </View>
+                  <Text style={styles.friendsListName} numberOfLines={1}>
+                    {friend.playerName}
+                  </Text>
+                  {/* Dämpat grått × i vila — rött bara medan det trycks. */}
+                  <Pressable
+                    onPress={() => handleRemoveFriend(friend.id)}
+                    hitSlop={12}
+                    style={styles.friendsListRemoveBtn}
+                  >
+                    {({ pressed }) => (
+                      <Svg width={14} height={14} viewBox="0 0 24 24">
+                        <Line x1={6} y1={6} x2={18} y2={18} stroke={pressed ? Colors.error : BrandUi.iconMuted} strokeWidth={2} strokeLinecap="round" />
+                        <Line x1={18} y1={6} x2={6} y2={18} stroke={pressed ? Colors.error : BrandUi.iconMuted} strokeWidth={2} strokeLinecap="round" />
+                      </Svg>
+                    )}
+                  </Pressable>
                 </View>
               ))}
             </View>
@@ -2851,14 +2851,14 @@ export default function ProfileScreen() {
           <Text style={styles.accountSectionLabel}>Account</Text>
           <Pressable
             style={({ pressed }) => [
-              styles.deleteAccountBtn,
-              pressed && { opacity: 0.85 },
+              styles.accountDeleteBtn,
+              pressed && { borderColor: Colors.error, opacity: 0.9 },
               deletingAccount && { opacity: 0.5 },
             ]}
             onPress={handleRequestDeleteAccount}
             disabled={deletingAccount}
           >
-            <Text style={styles.deleteAccountBtnText}>
+            <Text style={styles.accountDeleteBtnText}>
               {deletingAccount ? 'Deleting…' : 'Delete Account'}
             </Text>
           </Pressable>
@@ -2905,9 +2905,9 @@ export default function ProfileScreen() {
           />
           <View style={friendsModal.sheet}>
             <View style={friendsModal.handle} />
-            <Text style={friendsModal.title}>QuizVibe friends</Text>
+            <Text style={friendsModal.title}>Add Friend</Text>
             <Text style={friendsModal.subtitle}>
-              Save Player Names to invite friends with one tap from Lobby.
+              Add a player to your Friends list for faster game invites.
             </Text>
 
             {/* Add friend row — samma split-field-struktur (bokstäver +
@@ -2917,83 +2917,54 @@ export default function ProfileScreen() {
                 versal-först/gemener-resten-formatet per tangenttryck.
                 `playerNameExists` verifierar att namnet tillhör en
                 registrerad QuizVibe-user innan det sparas. */}
-            <Text style={friendsModal.addFieldLabel}>Add by Player Name</Text>
-            <View style={friendsModal.addRow}>
-              <TextInput
-                ref={addFriendLettersRef}
-                style={[
-                  friendsModal.addInput,
-                  friendsModal.addPlayerNameLettersInput,
-                  addFriendKbMode === 'letter' && friendsModal.addPlayerNameInputActive,
-                ]}
-                placeholder="Anna"
-                placeholderTextColor={Colors.textDisabled}
-                value={getPlayerNameLetters(newFriendPlayerName)}
-                maxLength={PLAYER_NAME_MAX_LETTERS}
-                editable={!addFriendChecking}
-                showSoftInputOnFocus={false}
-                selection={{
-                  start: getPlayerNameLetters(newFriendPlayerName).length,
-                  end: getPlayerNameLetters(newFriendPlayerName).length,
-                }}
-                selectTextOnFocus={false}
-                contextMenuHidden={true}
-                onFocus={() => {
-                  setAddFriendKbMode('letter');
-                  setAddFriendFocused(true);
-                }}
-                onBlur={() => setAddFriendFocused(false)}
-              />
-              <Text style={friendsModal.addPlayerNameSeparator}>–</Text>
-              <TextInput
-                ref={addFriendDigitsRef}
-                style={[
-                  friendsModal.addInput,
-                  friendsModal.addPlayerNameDigitsInput,
-                  addFriendKbMode === 'digit' && friendsModal.addPlayerNameInputActive,
-                  getPlayerNameLetters(newFriendPlayerName).length === 0 && friendsModal.addPlayerNameInputDisabled,
-                ]}
-                placeholder="1234"
-                placeholderTextColor={Colors.textDisabled}
-                value={getPlayerNameDigits(newFriendPlayerName)}
-                maxLength={PLAYER_NAME_MAX_DIGITS}
-                editable={!addFriendChecking && getPlayerNameLetters(newFriendPlayerName).length > 0}
-                showSoftInputOnFocus={false}
-                selection={{
-                  start: getPlayerNameDigits(newFriendPlayerName).length,
-                  end: getPlayerNameDigits(newFriendPlayerName).length,
-                }}
-                selectTextOnFocus={false}
-                contextMenuHidden={true}
-                onFocus={() => {
-                  if (getPlayerNameLetters(newFriendPlayerName).length === 0) {
-                    addFriendLettersRef.current?.focus();
-                    return;
-                  }
-                  setAddFriendKbMode('digit');
-                  setAddFriendFocused(true);
-                }}
-                onBlur={() => setAddFriendFocused(false)}
-              />
-              <Pressable
-                onPress={handleAddFriend}
-                disabled={!newFriendPlayerName.trim() || addFriendChecking}
-                style={({ pressed }) => [
-                  friendsModal.addBtn,
-                  (!newFriendPlayerName.trim() || addFriendChecking) && friendsModal.addBtnDisabled,
-                  pressed && { opacity: 0.85 },
-                ]}
-              >
-                <Text
-                  style={[
-                    friendsModal.addBtnText,
-                    (!newFriendPlayerName.trim() || addFriendChecking) && { color: Colors.textSecondary },
+            <Text style={friendsModal.addFieldLabel}>Player Name</Text>
+            <PlayerNameInput
+              letters={getPlayerNameLetters(newFriendPlayerName)}
+              digits={getPlayerNameDigits(newFriendPlayerName)}
+              lettersRef={addFriendLettersRef}
+              digitsRef={addFriendDigitsRef}
+              focusedField={addFriendFocused ? addFriendKbMode : null}
+              lettersEditable={!addFriendChecking}
+              digitsEditable={!addFriendChecking && getPlayerNameLetters(newFriendPlayerName).length > 0}
+              digitsDimmed={getPlayerNameLetters(newFriendPlayerName).length === 0}
+              onLettersFocus={() => {
+                setAddFriendKbMode('letter');
+                setAddFriendFocused(true);
+              }}
+              onDigitsFocus={() => {
+                if (getPlayerNameLetters(newFriendPlayerName).length === 0) {
+                  addFriendLettersRef.current?.focus();
+                  return;
+                }
+                setAddFriendKbMode('digit');
+                setAddFriendFocused(true);
+              }}
+              onBlur={() => setAddFriendFocused(false)}
+              trailing={
+                <Pressable
+                  onPress={handleAddFriend}
+                  disabled={!newFriendPlayerName.trim() || addFriendChecking}
+                  style={({ pressed }) => [
+                    friendsModal.addBtn,
+                    (!newFriendPlayerName.trim() || addFriendChecking) && friendsModal.addBtnDisabled,
+                    pressed && { opacity: 0.85 },
                   ]}
                 >
-                  {addFriendChecking ? '…' : 'Add'}
-                </Text>
-              </Pressable>
-            </View>
+                  <Text
+                    style={[
+                      friendsModal.addBtnText,
+                      (!newFriendPlayerName.trim() || addFriendChecking) && friendsModal.addBtnTextDisabled,
+                    ]}
+                  >
+                    {addFriendChecking ? '…' : (
+                      <>
+                        <Text style={newFriendPlayerName.trim() ? friendsModal.addBtnPlus : undefined}>+ </Text>Add
+                      </>
+                    )}
+                  </Text>
+                </Pressable>
+              }
+            />
             {addFriendError && (
               <Text style={friendsModal.addErrorText}>{addFriendError}</Text>
             )}
@@ -3031,12 +3002,14 @@ export default function ProfileScreen() {
                 friends.map((friend, i) => {
                   const checked = selectedFriendIds.has(friend.id);
                   return (
-                    <View key={friend.id}>
+                    <View key={friend.id} style={i > 0 && friendsModal.friendRowSpacing}>
                       <View style={friendsModal.friendRow}>
-                        <Text style={friendsModal.friendEmoji}>
-                          {getAvatarEmojiById(friend.avatarId)}
-                        </Text>
-                        <Text style={friendsModal.friendName}>{friend.playerName}</Text>
+                        <View style={friendsModal.friendAvatar}>
+                          <Text style={friendsModal.friendEmoji}>
+                            {getAvatarEmojiById(friend.avatarId)}
+                          </Text>
+                        </View>
+                        <Text style={friendsModal.friendName} numberOfLines={1}>{friend.playerName}</Text>
                         {/* Kryssruta (2026-08-27, ersatte per-rad "×") —
                             speglar Lobby:s shareSheet.checkbox-mönster så
                             host bockar för flera friends och tar bort dem
@@ -3056,10 +3029,13 @@ export default function ProfileScreen() {
                           accessibilityState={{ checked }}
                           accessibilityLabel={`Select ${friend.playerName}`}
                         >
-                          {checked && <Text style={friendsModal.checkmark}>✓</Text>}
+                          {checked && (
+                            <Svg width={12} height={12} viewBox="0 0 24 24">
+                              <Path d="M5 12.5 L10 17 L19 7" stroke={Colors.warning} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                            </Svg>
+                          )}
                         </Pressable>
                       </View>
-                      {i < friends.length - 1 && <View style={friendsModal.divider} />}
                     </View>
                   );
                 })
@@ -3085,7 +3061,7 @@ export default function ProfileScreen() {
                 onPress={() => setFriendsModalOpen(false)}
                 style={friendsModal.closeBtn}
               >
-                <Text style={friendsModal.closeBtnText}>Done</Text>
+                <Text style={friendsModal.closeBtnText}>Close</Text>
               </Pressable>
             </View>
           </View>
@@ -3932,16 +3908,32 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xl,
     gap: Spacing.sm,
   },
+  // Account-sektionens egen Delete-knapp — lugnare än sheet-varianten:
+  // lägre, tunnare röd kant, dämpad röd text, mörk yta.
+  accountDeleteBtn: {
+    height: 40,
+    borderRadius: Radius.md,
+    backgroundColor: '#141C2B',
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  accountDeleteBtnText: {
+    fontSize: FontSize.sm,
+    fontWeight: '600',
+    color: 'rgba(255,107,107,0.9)',
+  },
   accountSectionLabel: {
     fontSize: FontSize.xs,
     fontWeight: '600',
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 1.2,
   },
   accountSectionNote: {
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
     textAlign: 'center',
   },
 
@@ -4138,6 +4130,8 @@ const styles = StyleSheet.create({
     ...Typography.title,
     color: Colors.textPrimary,
     fontWeight: FontWeight.bold,
+    // flex: 1 → +/−-rutan hamnar i högerkanten, linjerad för alla sektioner.
+    flex: 1,
   },
   // Ledande ikon/emoji framför sektionsrubriken. Två varianter:
   // sectionHeaderIcon (för Q-avatar SVG, behöver wrap-View) och
@@ -4175,17 +4169,18 @@ const styles = StyleSheet.create({
   // i expanded state eftersom innehålls-korten ger separation där.
   sectionDivider: {
     height: 1,
-    backgroundColor: BrandUi.border,
+    // Profile v2: låg kontrast — luft bär separationen, inte linjen.
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
 
   // Legal-sektionens kort (Privacy Policy + Terms of Service-rader).
   // Sparsam styling — sektionen är sällan-besökt och ska kännas som
   // en lista, inte ett feature-kort.
   legalCard: {
-    backgroundColor: Colors.card,
+    backgroundColor: BrandUi.card,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: BrandUi.border,
+    borderColor: 'rgba(255,255,255,0.10)',
     marginTop: Spacing.md,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
@@ -4208,7 +4203,7 @@ const styles = StyleSheet.create({
   },
   legalRowDivider: {
     height: 1,
-    backgroundColor: BrandUi.border,
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
   legalFootnote: {
     ...Typography.caption,
@@ -4224,30 +4219,22 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // QuizVibe friends card (header upptill, full-bredd-knapp i underkant)
+  // Friends-kortet (Profile v2, 2026-10-19): mörk navy/gunmetal, bara en
+  // aning ljusare än bakgrunden + tunn kant — ingen blå "settings-panel".
   friendsCard: {
-    backgroundColor: Colors.card,
+    backgroundColor: BrandUi.card,
     borderRadius: Radius.lg,
-    // Profile v2: ingen stark blå ram — neutral kant som övriga kort.
     borderWidth: 1,
-    borderColor: BrandUi.border,
+    borderColor: 'rgba(255,255,255,0.07)',
     padding: Spacing.lg,
-    gap: Spacing.md,
+    gap: Spacing.lg,
+    // Negativ marginal: ~18 % kortare luft ned till Player history.
+    marginBottom: -6,
   },
   friendsHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: Spacing.md,
-  },
-  // Wrapper för QuizVibeFriendsLogo. Bredden (44) matchar paddingen i
-  // andra header-ikoner så text-blocket börjar på samma x; SVG:n får
-  // rendera lite större (52) och tillåts overflow:a wrapper-bounds så
-  // ikonen visuellt blir större utan att skjuta titeln längre höger.
-  friendsIconWrap: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   friendsTitle: {
     fontSize: FontSize.md,
@@ -4256,37 +4243,36 @@ const styles = StyleSheet.create({
   },
   friendsSubtitle: {
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-    marginTop: 2,
+    color: BrandUi.textMuted,
+    marginTop: 4,
     lineHeight: 17,
   },
+  // Antal vänner: mörk pill, tunn guldkant, guld siffra.
   friendsCount: {
-    minWidth: 32,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    minWidth: 24,
+    height: 24,
+    paddingHorizontal: 7,
     borderRadius: Radius.full,
-    backgroundColor: BrandUi.surface,
+    backgroundColor: '#141C2B',
     borderWidth: 1,
-    borderColor: BrandUi.border,
+    borderColor: 'rgba(245,166,35,0.45)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   friendsCountText: {
-    fontSize: FontSize.sm,
+    fontSize: FontSize.xs,
     fontWeight: FontWeight.bold,
     color: Colors.warning,
     fontVariant: ['tabular-nums'],
   },
-  // Friends-knappen använder samma färgpalett som TopBanner-pillen och
-  // Game era year-display — primaryMuted bg + primaryBorder + primary
-  // text. Det ger en mörkblå-tonad yta istället för solid bright blue.
-  // Profile v2: sekundär åtgärd — neutral yta + kant, inte som en spel-CTA.
+  // + Add Friend: sekundär CTA — gunmetal yta, tunn dämpad guldkant,
+  // vit text med guld "+". Ingen guldfyllning, ingen glöd.
   friendsBtn: {
     height: 44,
     borderRadius: Radius.md,
-    backgroundColor: BrandUi.surface,
+    backgroundColor: '#141C2B',
     borderWidth: 1,
-    borderColor: BrandUi.border,
+    borderColor: 'rgba(245,166,35,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -4296,48 +4282,52 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
-  // Inline friends-lista under knappen. Mörkare yta (background) inuti
-  // kortet så raderna läses som en egen lista, inte som del av kortet.
+  friendsBtnPlus: {
+    color: Colors.warning,
+    fontWeight: FontWeight.bold,
+  },
+  // Vänlistan: en kompakt profilrad per vän.
   friendsList: {
-    backgroundColor: Colors.background,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingHorizontal: Spacing.md,
+    gap: Spacing.sm,
   },
   friendsListRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.md,
+    gap: Spacing.sm,
     paddingVertical: Spacing.sm,
+    paddingLeft: Spacing.sm,
+    paddingRight: Spacing.md,
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  friendsListAvatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#141C2B',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   friendsListEmoji: {
-    fontSize: 20,
-    width: 30,
+    fontSize: 16,
     textAlign: 'center',
   },
   friendsListName: {
     flex: 1,
     fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
+    fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
+  // Subtilt ×: ingen synlig behållare, bara en tappyta.
   friendsListRemoveBtn: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: Colors.cardElevated,
+    width: 28,
+    height: 28,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  friendsListRemoveText: {
-    fontSize: 17,
-    color: Colors.textSecondary,
-    lineHeight: 19,
-  },
-  friendsListDivider: {
-    height: 1,
-    backgroundColor: Colors.separator,
   },
 
   // Preview card — vertical container: [columns row] + [Save button]
@@ -5675,52 +5665,59 @@ const styles = StyleSheet.create({
 const friendsModal = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)' },
+  // Profile v2 (2026-10-19): mörk navy/gunmetal i stället för blå panel.
   sheet: {
-    backgroundColor: Colors.card,
+    backgroundColor: '#111827',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.md,
+    paddingTop: Spacing.sm,
     paddingBottom: Spacing.xxl,
     gap: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderBottomWidth: 0,
+    borderColor: 'rgba(255,255,255,0.08)',
     // Bounder sheet:en till viewport så toppen aldrig spiller över skärmen
     // när CodeKeyboard:et (Add by Player Name) tar plats — samma mönster
     // som Lobby:s Share invite-modal.
     maxHeight: '90%',
   },
   handle: {
-    width: 36,
+    width: 32,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Colors.borderStrong,
+    backgroundColor: 'rgba(255,255,255,0.18)',
     alignSelf: 'center',
     marginBottom: Spacing.sm,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: Colors.textPrimary,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 13,
-    color: Colors.textSecondary,
+    lineHeight: 18,
+    color: BrandUi.textMuted,
     textAlign: 'center',
-    marginBottom: Spacing.sm,
+    alignSelf: 'center',
+    maxWidth: 280,
+    // Tätare mot titeln, mer luft före formuläret.
+    marginTop: -Spacing.xs,
+    marginBottom: Spacing.md,
   },
   // Add-by-Player-Name-label + split-field-rad (2026-08-27) — samma
   // struktur (bokstäver + siffror via CodeKeyboard) som PlayerName skapas
   // överallt annars i appen. Speglar Lobby:s shareSheet-motsvarigheter
   // (LobbyScreen.tsx) exakt.
   addFieldLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
-    color: Colors.textSecondary,
-    letterSpacing: 0.4,
+    color: BrandUi.textMuted,
+    letterSpacing: 1,
     textTransform: 'uppercase',
-    paddingHorizontal: Spacing.xs,
+    marginBottom: -Spacing.xs,
   },
   addRow: {
     flexDirection: 'row',
@@ -5728,11 +5725,11 @@ const friendsModal = StyleSheet.create({
     gap: Spacing.sm,
   },
   addInput: {
-    height: 48,
+    height: 46,
     borderRadius: Radius.md,
-    backgroundColor: Colors.background,
+    backgroundColor: '#141C2B',
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: 'rgba(255,255,255,0.12)',
     paddingHorizontal: Spacing.lg,
     fontSize: 15,
     color: Colors.textPrimary,
@@ -5750,31 +5747,36 @@ const friendsModal = StyleSheet.create({
     textAlign: 'center',
   },
   addPlayerNameSeparator: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.textSecondary,
+    fontSize: 18,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.3)',
     paddingHorizontal: 2,
   },
-  addPlayerNameInputActive: { borderColor: Colors.primary },
+  addPlayerNameInputActive: { borderColor: 'rgba(245,166,35,0.65)' },
   addPlayerNameInputDisabled: { opacity: 0.45 },
+  // Add = sekundär: gunmetal + tunn dämpad guldkant (svagare än Done).
   addBtn: {
-    height: 44,
+    height: 46,
     borderRadius: Radius.md,
-    // Profile v2: modalens primärhandling = guld (svart text).
-    backgroundColor: Colors.warning,
+    backgroundColor: '#141C2B',
+    borderWidth: 1,
+    borderColor: 'rgba(245,166,35,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: Spacing.md,
   },
   addBtnDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'transparent',
   },
   addBtnText: {
     fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    color: '#000',
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
+  addBtnTextDisabled: { color: 'rgba(255,255,255,0.35)' },
+  addBtnPlus: { color: Colors.warning, fontWeight: FontWeight.bold },
   // Inline felmeddelande under Add-raden — visas när playerNameExists()
   // inte hittar någon registrerad user med det inskrivna Player Name.
   addErrorText: {
@@ -5798,37 +5800,53 @@ const friendsModal = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
   },
+  // Samma kompakta profilrad som Friends-kortet på Profile.
   friendRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.md,
-    paddingVertical: Spacing.md,
+    gap: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingLeft: Spacing.sm,
+    paddingRight: Spacing.md,
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  friendRowSpacing: { marginTop: Spacing.sm },
+  friendAvatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#141C2B',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   friendEmoji: {
-    fontSize: 22,
-    width: 36,
+    fontSize: 16,
     textAlign: 'center',
   },
   friendName: {
     flex: 1,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.medium,
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
   // Kryssruta (2026-08-27, ersatte removeBtn/"×") — speglar Lobby:s
   // shareSheet.checkbox/checkboxChecked/checkmark-mönster exakt.
   checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 5,
-    borderWidth: 1.5,
-    borderColor: Colors.borderStrong,
-    backgroundColor: 'transparent',
+    width: 20,
+    height: 20,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: '#141C2B',
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: Colors.warning,
     borderColor: Colors.warning,
   },
   checkmark: {
@@ -5843,37 +5861,43 @@ const friendsModal = StyleSheet.create({
   },
   // Footer-raden (2026-08-27) — Delete + Done sida vid sida, ersatte den
   // ensamma "Done"-knappen.
+  // Hierarki: Done (primär, bredast, tydligast guldkant) > Add >
+  // Delete (kontextuell, smal, röd bara när något är markerat).
   footerRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
-    marginTop: Spacing.sm,
+    marginTop: Spacing.xs,
   },
   deleteBtn: {
     flex: 1,
-    height: 48,
+    height: 42,
     borderRadius: Radius.md,
-    backgroundColor: Colors.error,
+    backgroundColor: '#141C2B',
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.55)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   deleteBtnDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderColor: 'transparent',
   },
   deleteBtnText: {
-    fontSize: 15,
+    fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
-    color: '#fff',
+    color: 'rgba(255,107,107,0.9)',
   },
   deleteBtnTextDisabled: {
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.3)',
   },
   closeBtn: {
-    flex: 1,
+    flex: 1.8,
     height: 48,
     borderRadius: Radius.md,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: '#141C2B',
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(245,166,35,0.65)',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -9,6 +9,7 @@ import React, {
 import { Alert, Animated, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { SectionToggle } from './SectionToggle';
 import { buildAggregateStandings } from '../utils/aggregateLeaderboard';
 import {
   dismissAggregateLeaderboard,
@@ -401,9 +402,7 @@ export function SavedAggregatesCard({
           hitSlop={8}
         >
           <Text style={styles.cardTitle}>{titleText}</Text>
-          <View style={styles.toggleBox}>
-            <Text style={styles.toggleText}>{cardOpen ? '−' : '+'}</Text>
-          </View>
+          <SectionToggle expanded={cardOpen} />
         </Pressable>
       ) : (
         <Text style={styles.cardTitle}>{titleText}</Text>

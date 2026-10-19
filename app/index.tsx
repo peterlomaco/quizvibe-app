@@ -1,4 +1,5 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
+import { PlayerNameInput } from '@/src/components/PlayerNameInput';
 import { BRAND_TAGLINE, QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
 import * as WebBrowser from 'expo-web-browser';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicGoldFill';
@@ -1580,97 +1581,66 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       Under huven är det fortfarande två TextInputs (bokstäver
                       resp. siffror) — samma input-logik och validering som
                       förut. Blå kant = fokus, guld kant + guld ✓ = giltigt. */}
-                  <View
-                    style={[
-                      modal.guestBox,
-                      playerNameFocused && playerNameStatus !== 'available' && modal.guestBoxActive,
-                      playerNameStatus === 'available' && modal.fieldDone,
-                    ]}
-                  >
-                    <TextInput
-                      ref={playerNameLettersRef}
-                      style={[modal.guestNameText, modal.guestNameLetters]}
-                      placeholder="Name"
-                      placeholderTextColor={Colors.textDisabled}
-                      value={getPlayerNameLetters(guestName)}
-                      maxLength={PLAYER_NAME_MAX_LETTERS}
-                      editable={playerNameStatus !== 'checking'}
-                      showSoftInputOnFocus={false}
-                      // Cursor låst efter sista tecknet — användaren kan inte
-                      // markera text eller flytta cursor in i mitten. Backspace
-                      // är enda sättet att radera och tar alltid sista tecknet.
-                      selection={{
-                        start: getPlayerNameLetters(guestName).length,
-                        end: getPlayerNameLetters(guestName).length,
-                      }}
-                      selectTextOnFocus={false}
-                      contextMenuHidden={true}
-                      onFocus={() => {
-                        setFocusedCodeIdx(null);
-                        setPlayerNameKbMode('letter');
-                        setPlayerNameFocused(true);
-                        // Scrolla PlayerName (formens första fält) till toppen
-                        // så det syns ovanför CodeKeyboardet på korta skärmar.
-                        requestAnimationFrame(() => {
-                          guestScrollRef.current?.scrollTo({ y: 0, animated: true });
-                        });
-                      }}
-                      onBlur={() => setPlayerNameFocused(false)}
-                    />
-                    <Text style={modal.guestNameText}>-</Text>
-                    <TextInput
-                      ref={playerNameDigitsRef}
-                      style={[
-                        modal.guestNameText,
-                        modal.guestNameDigits,
-                        getPlayerNameLetters(guestName).length === 0 && modal.playerNameInputDisabled,
-                      ]}
-                      placeholder="1234"
-                      placeholderTextColor={Colors.textDisabled}
-                      value={getPlayerNameDigits(guestName)}
-                      maxLength={PLAYER_NAME_MAX_DIGITS}
-                      editable={playerNameStatus !== 'checking' && getPlayerNameLetters(guestName).length > 0}
-                      showSoftInputOnFocus={false}
-                      selection={{
-                        start: getPlayerNameDigits(guestName).length,
-                        end: getPlayerNameDigits(guestName).length,
-                      }}
-                      selectTextOnFocus={false}
-                      contextMenuHidden={true}
-                      onFocus={() => {
-                        if (getPlayerNameLetters(guestName).length === 0) {
-                          // Prevent fokus om letter-fältet är tomt — flytta
-                          // tillbaka till letter-fältet så användaren typar
-                          // letters först.
-                          playerNameLettersRef.current?.focus();
-                          return;
-                        }
-                        setFocusedCodeIdx(null);
-                        setPlayerNameKbMode('digit');
-                        setPlayerNameFocused(true);
-                        requestAnimationFrame(() => {
-                          guestScrollRef.current?.scrollTo({ y: 0, animated: true });
-                        });
-                      }}
-                      onBlur={() => setPlayerNameFocused(false)}
-                    />
-                    {playerNameStatus === 'available' ? (
-                      <Text style={modal.guestBoxCheck}>✓</Text>
-                    ) : (
+                  <PlayerNameInput
+                    letters={getPlayerNameLetters(guestName)}
+                    digits={getPlayerNameDigits(guestName)}
+                    lettersRef={playerNameLettersRef}
+                    digitsRef={playerNameDigitsRef}
+                    focusedField={
+                      playerNameFocused && playerNameStatus !== 'available' ? playerNameKbMode : null
+                    }
+                    done={playerNameStatus === 'available'}
+                    lettersEditable={playerNameStatus !== 'checking'}
+                    digitsEditable={playerNameStatus !== 'checking' && getPlayerNameLetters(guestName).length > 0}
+                    digitsDimmed={getPlayerNameLetters(guestName).length === 0}
+                    onLettersFocus={() => {
+                      setFocusedCodeIdx(null);
+                      setPlayerNameKbMode('letter');
+                      setPlayerNameFocused(true);
+                      // Scrolla PlayerName (formens första fält) till toppen
+                      // så det syns ovanför CodeKeyboardet på korta skärmar.
+                      requestAnimationFrame(() => {
+                        guestScrollRef.current?.scrollTo({ y: 0, animated: true });
+                      });
+                    }}
+                    onDigitsFocus={() => {
+                      if (getPlayerNameLetters(guestName).length === 0) {
+                        // Bokstäver först — flytta tillbaka fokus.
+                        playerNameLettersRef.current?.focus();
+                        return;
+                      }
+                      setFocusedCodeIdx(null);
+                      setPlayerNameKbMode('digit');
+                      setPlayerNameFocused(true);
+                      requestAnimationFrame(() => {
+                        guestScrollRef.current?.scrollTo({ y: 0, animated: true });
+                      });
+                    }}
+                    onBlur={() => setPlayerNameFocused(false)}
+                    trailing={
                       <TouchableOpacity
                         onPress={handleCheckPlayerName}
-                        disabled={!guestName.trim() || playerNameStatus === 'checking'}
+                        disabled={!guestName.trim() || playerNameStatus === 'checking' || playerNameStatus === 'available'}
                         style={[
-                          modal.guestBoxCheckBtn,
+                          modal.checkBtn,
+                          modal.checkBtnPlayerName,
                           (!guestName.trim() || playerNameStatus === 'checking') && modal.checkBtnDisabled,
+                          playerNameStatus === 'available' && modal.checkBtnDone,
                         ]}
                       >
-                        <Text style={modal.guestBoxCheckBtnText}>
-                          {playerNameStatus === 'checking' ? '…' : 'Check'}
+                        <Text
+                          style={[
+                            modal.checkBtnText,
+                            playerNameStatus === 'available' && modal.checkBtnTextDone,
+                          ]}
+                        >
+                          {playerNameStatus === 'checking' ? '…'
+                            : playerNameStatus === 'available' ? '✓'
+                            : 'Check'}
                         </Text>
                       </TouchableOpacity>
-                    )}
-                  </View>
+                    }
+                  />
                   {/* Sekundära åtgärder under namnfältet — Remove (töm och skriv
                       eget namn) är aktiv så fort fältet har innehåll. "Generate
                       another" (f.d. Auto-generate) är ALLTID aktiv
@@ -3926,74 +3896,36 @@ export default function HomeScreen() {
                     {/* EN visuell ruta som i gästformuläret: bokstäver + fast
                         "–" + siffror. Under huven två TextInputs (oförändrad
                         input-logik). Blå = redigeras, guld + ✓ = komplett. */}
-                    <View
-                      style={[
-                        modal.guestBox,
-                        loginPlayerNameFocused && modal.guestBoxActive,
-                        !loginPlayerNameFocused && loginNameValid && modal.fieldDone,
-                      ]}
-                    >
-                      <TextInput
-                        ref={loginPlayerNameLettersRef}
-                        style={[modal.guestNameText, modal.guestNameLetters]}
-                        placeholder="Name"
-                        placeholderTextColor={Colors.textDisabled}
-                        value={getPlayerNameLetters(loginPlayerName)}
-                        maxLength={PLAYER_NAME_MAX_LETTERS}
-                        showSoftInputOnFocus={false}
-                        selection={{
-                          start: getPlayerNameLetters(loginPlayerName).length,
-                          end: getPlayerNameLetters(loginPlayerName).length,
-                        }}
-                        selectTextOnFocus={false}
-                        contextMenuHidden={true}
-                        onFocus={() => {
-                          setLoginPlayerNameKbMode('letter');
-                          setLoginPlayerNameFocused(true);
-                          // Namnfältet är överst när rubriken döljs — rulla dit.
-                          requestAnimationFrame(() => {
-                            loginScrollRef.current?.scrollTo({ y: 0, animated: true });
-                          });
-                        }}
-                        onBlur={() => setLoginPlayerNameFocused(false)}
-                      />
-                      <Text style={[modal.guestNameText, modal.loginNameSeparator]}>–</Text>
-                      <TextInput
-                        ref={loginPlayerNameDigitsRef}
-                        style={[
-                          modal.guestNameText,
-                          modal.guestNameDigits,
-                          getPlayerNameLetters(loginPlayerName).length === 0 && modal.playerNameInputDisabled,
-                        ]}
-                        placeholder="1234"
-                        placeholderTextColor={Colors.textDisabled}
-                        value={getPlayerNameDigits(loginPlayerName)}
-                        maxLength={PLAYER_NAME_MAX_DIGITS}
-                        editable={getPlayerNameLetters(loginPlayerName).length > 0}
-                        showSoftInputOnFocus={false}
-                        selection={{
-                          start: getPlayerNameDigits(loginPlayerName).length,
-                          end: getPlayerNameDigits(loginPlayerName).length,
-                        }}
-                        selectTextOnFocus={false}
-                        contextMenuHidden={true}
-                        onFocus={() => {
-                          if (getPlayerNameLetters(loginPlayerName).length === 0) {
-                            loginPlayerNameLettersRef.current?.focus();
-                            return;
-                          }
-                          setLoginPlayerNameKbMode('digit');
-                          setLoginPlayerNameFocused(true);
-                          requestAnimationFrame(() => {
-                            loginScrollRef.current?.scrollTo({ y: 0, animated: true });
-                          });
-                        }}
-                        onBlur={() => setLoginPlayerNameFocused(false)}
-                      />
-                      {!loginPlayerNameFocused && loginNameValid && (
-                        <Text style={modal.guestBoxCheck}>✓</Text>
-                      )}
-                    </View>
+                    <PlayerNameInput
+                      letters={getPlayerNameLetters(loginPlayerName)}
+                      digits={getPlayerNameDigits(loginPlayerName)}
+                      lettersRef={loginPlayerNameLettersRef}
+                      digitsRef={loginPlayerNameDigitsRef}
+                      focusedField={loginPlayerNameFocused ? loginPlayerNameKbMode : null}
+                      done={!loginPlayerNameFocused && loginNameValid}
+                      digitsEditable={getPlayerNameLetters(loginPlayerName).length > 0}
+                      digitsDimmed={getPlayerNameLetters(loginPlayerName).length === 0}
+                      onLettersFocus={() => {
+                        setLoginPlayerNameKbMode('letter');
+                        setLoginPlayerNameFocused(true);
+                        // Namnfältet är överst när rubriken döljs — rulla dit.
+                        requestAnimationFrame(() => {
+                          loginScrollRef.current?.scrollTo({ y: 0, animated: true });
+                        });
+                      }}
+                      onDigitsFocus={() => {
+                        if (getPlayerNameLetters(loginPlayerName).length === 0) {
+                          loginPlayerNameLettersRef.current?.focus();
+                          return;
+                        }
+                        setLoginPlayerNameKbMode('digit');
+                        setLoginPlayerNameFocused(true);
+                        requestAnimationFrame(() => {
+                          loginScrollRef.current?.scrollTo({ y: 0, animated: true });
+                        });
+                      }}
+                      onBlur={() => setLoginPlayerNameFocused(false)}
+                    />
                   </View>
                 ) : (
                   <View style={modal.fieldGroup}>
@@ -4344,100 +4276,73 @@ export default function HomeScreen() {
                       regPlayerNameYRef.current = e.nativeEvent.layout.y;
                     }}
                   >
-                    <Text style={modal.fieldLabel}>Player Name - Letter-digit format</Text>
-                    <View style={modal.playerNameRow}>
-                      <TextInput
-                        ref={regPlayerNameLettersRef}
-                        style={[
-                          modal.inputText,
-                          modal.playerNameLettersInput,
-                          regPlayerNameUnlocked && regPlayerNameKbMode === 'letter' && regPlayerNameStatus !== 'available' && modal.playerNameInputActive,
-                        ]}
-                        placeholder="Anna"
-                        placeholderTextColor={Colors.textDisabled}
-                        value={getPlayerNameLetters(regPlayerName)}
-                        maxLength={PLAYER_NAME_MAX_LETTERS}
-                        editable={regPlayerNameStatus !== 'checking'}
-                        showSoftInputOnFocus={false}
-                        selection={{
-                          start: getPlayerNameLetters(regPlayerName).length,
-                          end: getPlayerNameLetters(regPlayerName).length,
-                        }}
-                        selectTextOnFocus={false}
-                        contextMenuHidden={true}
-                        onFocus={() => {
-                          setRegPlayerNameKbMode('letter');
-                          setRegPlayerNameFocused(true);
-                          requestAnimationFrame(() => {
-                            regScrollRef.current?.scrollTo({
-                              y: regPlayerNameYRef.current,
-                              animated: true,
-                            });
+                    <Text style={modal.fieldLabel}>Player name</Text>
+                    <PlayerNameInput
+                      letters={getPlayerNameLetters(regPlayerName)}
+                      digits={getPlayerNameDigits(regPlayerName)}
+                      lettersRef={regPlayerNameLettersRef}
+                      digitsRef={regPlayerNameDigitsRef}
+                      focusedField={
+                        regPlayerNameUnlocked && regPlayerNameFocused && regPlayerNameStatus !== 'available'
+                          ? regPlayerNameKbMode
+                          : null
+                      }
+                      done={regPlayerNameStatus === 'available'}
+                      lettersEditable={regPlayerNameStatus !== 'checking'}
+                      digitsEditable={regPlayerNameStatus !== 'checking' && getPlayerNameLetters(regPlayerName).length > 0}
+                      digitsDimmed={getPlayerNameLetters(regPlayerName).length === 0}
+                      onLettersFocus={() => {
+                        setRegPlayerNameKbMode('letter');
+                        setRegPlayerNameFocused(true);
+                        requestAnimationFrame(() => {
+                          regScrollRef.current?.scrollTo({
+                            y: regPlayerNameYRef.current,
+                            animated: true,
                           });
-                        }}
-                        onBlur={() => setRegPlayerNameFocused(false)}
-                      />
-                      <Text style={modal.playerNameSeparator}>–</Text>
-                      <TextInput
-                        ref={regPlayerNameDigitsRef}
-                        style={[
-                          modal.inputText,
-                          modal.playerNameDigitsInput,
-                          regPlayerNameUnlocked && regPlayerNameKbMode === 'digit' && regPlayerNameStatus !== 'available' && modal.playerNameInputActive,
-                          getPlayerNameLetters(regPlayerName).length === 0 && modal.playerNameInputDisabled,
-                        ]}
-                        placeholder="1234"
-                        placeholderTextColor={Colors.textDisabled}
-                        value={getPlayerNameDigits(regPlayerName)}
-                        maxLength={PLAYER_NAME_MAX_DIGITS}
-                        editable={regPlayerNameStatus !== 'checking' && getPlayerNameLetters(regPlayerName).length > 0}
-                        showSoftInputOnFocus={false}
-                        selection={{
-                          start: getPlayerNameDigits(regPlayerName).length,
-                          end: getPlayerNameDigits(regPlayerName).length,
-                        }}
-                        selectTextOnFocus={false}
-                        contextMenuHidden={true}
-                        onFocus={() => {
-                          if (getPlayerNameLetters(regPlayerName).length === 0) {
-                            regPlayerNameLettersRef.current?.focus();
-                            return;
-                          }
-                          setRegPlayerNameKbMode('digit');
-                          setRegPlayerNameFocused(true);
-                          requestAnimationFrame(() => {
-                            regScrollRef.current?.scrollTo({
-                              y: regPlayerNameYRef.current,
-                              animated: true,
-                            });
+                        });
+                      }}
+                      onDigitsFocus={() => {
+                        if (getPlayerNameLetters(regPlayerName).length === 0) {
+                          regPlayerNameLettersRef.current?.focus();
+                          return;
+                        }
+                        setRegPlayerNameKbMode('digit');
+                        setRegPlayerNameFocused(true);
+                        requestAnimationFrame(() => {
+                          regScrollRef.current?.scrollTo({
+                            y: regPlayerNameYRef.current,
+                            animated: true,
                           });
-                        }}
-                        onBlur={() => setRegPlayerNameFocused(false)}
-                      />
-                      <TouchableOpacity
-                        onPress={handleRegCheckPlayerName}
-                        disabled={!regPlayerName.trim() || regPlayerNameStatus === 'checking' || regPlayerNameStatus === 'available'}
-                        style={[
-                          modal.checkBtn,
-                          (!regPlayerName.trim() || regPlayerNameStatus === 'checking') && modal.checkBtnDisabled,
-                          regPlayerNameStatus === 'available' && modal.checkBtnDone,
-                        ]}
-                      >
-                        <Text
+                        });
+                      }}
+                      onBlur={() => setRegPlayerNameFocused(false)}
+                      trailing={
+                        <TouchableOpacity
+                          onPress={handleRegCheckPlayerName}
+                          disabled={!regPlayerName.trim() || regPlayerNameStatus === 'checking' || regPlayerNameStatus === 'available'}
                           style={[
-                            modal.checkBtnText,
-                            regPlayerNameStatus === 'available' && modal.checkBtnTextDone,
+                            modal.checkBtn,
+                            modal.checkBtnPlayerName,
+                            (!regPlayerName.trim() || regPlayerNameStatus === 'checking') && modal.checkBtnDisabled,
+                            regPlayerNameStatus === 'available' && modal.checkBtnDone,
                           ]}
                         >
-                          {regPlayerNameStatus === 'checking' ? '…'
-                            : regPlayerNameStatus === 'available' ? '✓'
-                            : 'Check'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
+                          <Text
+                            style={[
+                              modal.checkBtnText,
+                              regPlayerNameStatus === 'available' && modal.checkBtnTextDone,
+                            ]}
+                          >
+                            {regPlayerNameStatus === 'checking' ? '…'
+                              : regPlayerNameStatus === 'available' ? '✓'
+                              : 'Check'}
+                          </Text>
+                        </TouchableOpacity>
+                      }
+                    />
                     {/* Sekundära åtgärder under namnfältet — se guest-formen
                         ovan för rationale (mutually-exclusive enable). */}
-                    <View style={modal.playerNameActionRow}>
+                    <View style={[modal.playerNameActionRow, modal.playerNameActionRowSpaced]}>
                       <TouchableOpacity
                         onPress={handleRegRemoveName}
                         disabled={regPlayerName.length === 0 || regPlayerNameStatus === 'checking'}
@@ -4447,7 +4352,7 @@ export default function HomeScreen() {
                             modal.nameActionBtnDisabled,
                         ]}
                       >
-                        <Text style={modal.nameActionBtnText}>Remove</Text>
+                        <Text style={modal.nameActionBtnText}>Clear</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={handleRegGenerateName}
@@ -5365,6 +5270,8 @@ const modal = StyleSheet.create({
   playerNameInputActive: {
     borderColor: Colors.primary,
   },
+  // Check bredvid det delade PlayerNameInput — samma höjd som fälten.
+  checkBtnPlayerName: { height: 46 },
   checkBtn: {
     minWidth: 72,
     height: 52,
@@ -5400,6 +5307,8 @@ const modal = StyleSheet.create({
     marginTop: Spacing.xs,
     alignSelf: 'flex-start',
   },
+  // Register: lite mer luft mellan namnraden och Clear / Auto-generate.
+  playerNameActionRowSpaced: { marginTop: Spacing.xs + 5 },
   nameActionBtn: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,

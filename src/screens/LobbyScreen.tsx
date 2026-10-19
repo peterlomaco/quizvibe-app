@@ -30,6 +30,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { QuizVibeDialog } from '../components/QuizVibeDialog';
 import { CodeKeyboard } from '../components/CodeKeyboard';
+import { PlayerNameInput } from '@/src/components/PlayerNameInput';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
@@ -769,88 +770,54 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
             {/* PlayerName — måste valideras mot taken-list/profanity innan
                 Year låses upp. Speglar Join-as-Guest-flödet 1:1. */}
             <View style={modal.fieldGroup}>
-              <Text style={modal.fieldLabel}>Player Name</Text>
-              <View style={modal.playerNameRow}>
-                <TextInput
-                  ref={playerNameLettersRef}
-                  style={[
-                    modal.inputText,
-                    modal.playerNameLettersInput,
-                    playerNameKbMode === 'letter' && playerNameStatus !== 'available' && modal.playerNameInputActive,
-                  ]}
-                  placeholder="Anna"
-                  placeholderTextColor={Colors.textDisabled}
-                  value={getPlayerNameLetters(name)}
-                  maxLength={PLAYER_NAME_MAX_LETTERS}
-                  editable={playerNameStatus !== 'checking'}
-                  showSoftInputOnFocus={false}
-                  // Cursor låst efter sista tecknet — användaren kan inte
-                  // markera text eller flytta cursor in i mitten. Backspace
-                  // är enda sättet att radera och tar alltid sista tecknet.
-                  selection={{
-                    start: getPlayerNameLetters(name).length,
-                    end: getPlayerNameLetters(name).length,
-                  }}
-                  selectTextOnFocus={false}
-                  contextMenuHidden={true}
-                  onFocus={() => {
-                    setPlayerNameKbMode('letter');
-                    setPlayerNameFocused(true);
-                  }}
-                  onBlur={() => setPlayerNameFocused(false)}
-                />
-                <Text style={modal.playerNameSeparator}>–</Text>
-                <TextInput
-                  ref={playerNameDigitsRef}
-                  style={[
-                    modal.inputText,
-                    modal.playerNameDigitsInput,
-                    playerNameKbMode === 'digit' && playerNameStatus !== 'available' && modal.playerNameInputActive,
-                    getPlayerNameLetters(name).length === 0 && modal.playerNameInputDisabled,
-                  ]}
-                  placeholder="1234"
-                  placeholderTextColor={Colors.textDisabled}
-                  value={getPlayerNameDigits(name)}
-                  maxLength={PLAYER_NAME_MAX_DIGITS}
-                  editable={playerNameStatus !== 'checking' && getPlayerNameLetters(name).length > 0}
-                  showSoftInputOnFocus={false}
-                  selection={{
-                    start: getPlayerNameDigits(name).length,
-                    end: getPlayerNameDigits(name).length,
-                  }}
-                  selectTextOnFocus={false}
-                  contextMenuHidden={true}
-                  onFocus={() => {
-                    if (getPlayerNameLetters(name).length === 0) {
-                      playerNameLettersRef.current?.focus();
-                      return;
-                    }
-                    setPlayerNameKbMode('digit');
-                    setPlayerNameFocused(true);
-                  }}
-                  onBlur={() => setPlayerNameFocused(false)}
-                />
-                <TouchableOpacity
-                  onPress={handleCheckPlayerName}
-                  disabled={!name.trim() || playerNameStatus === 'checking' || playerNameStatus === 'available'}
-                  style={[
-                    modal.checkBtn,
-                    (!name.trim() || playerNameStatus === 'checking') && modal.checkBtnDisabled,
-                    playerNameStatus === 'available' && modal.checkBtnDone,
-                  ]}
-                >
-                  <Text
+              <Text style={modal.fieldLabel}>Player name</Text>
+              <PlayerNameInput
+                letters={getPlayerNameLetters(name)}
+                digits={getPlayerNameDigits(name)}
+                lettersRef={playerNameLettersRef}
+                digitsRef={playerNameDigitsRef}
+                focusedField={playerNameFocused && playerNameStatus !== 'available' ? playerNameKbMode : null}
+                done={playerNameStatus === 'available'}
+                lettersEditable={playerNameStatus !== 'checking'}
+                digitsEditable={playerNameStatus !== 'checking' && getPlayerNameLetters(name).length > 0}
+                digitsDimmed={getPlayerNameLetters(name).length === 0}
+                onLettersFocus={() => {
+                  setPlayerNameKbMode('letter');
+                  setPlayerNameFocused(true);
+                }}
+                onDigitsFocus={() => {
+                  if (getPlayerNameLetters(name).length === 0) {
+                    playerNameLettersRef.current?.focus();
+                    return;
+                  }
+                  setPlayerNameKbMode('digit');
+                  setPlayerNameFocused(true);
+                }}
+                onBlur={() => setPlayerNameFocused(false)}
+                trailing={
+                  <TouchableOpacity
+                    onPress={handleCheckPlayerName}
+                    disabled={!name.trim() || playerNameStatus === 'checking' || playerNameStatus === 'available'}
                     style={[
-                      modal.checkBtnText,
-                      playerNameStatus === 'available' && modal.checkBtnTextDone,
+                      modal.checkBtn,
+                      { height: 46 },
+                      (!name.trim() || playerNameStatus === 'checking') && modal.checkBtnDisabled,
+                      playerNameStatus === 'available' && modal.checkBtnDone,
                     ]}
                   >
-                    {playerNameStatus === 'checking' ? '…'
-                      : playerNameStatus === 'available' ? '✓'
-                      : 'Check'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                    <Text
+                      style={[
+                        modal.checkBtnText,
+                        playerNameStatus === 'available' && modal.checkBtnTextDone,
+                      ]}
+                    >
+                      {playerNameStatus === 'checking' ? '…'
+                        : playerNameStatus === 'available' ? '✓'
+                        : 'Check'}
+                    </Text>
+                  </TouchableOpacity>
+                }
+              />
               <View style={modal.playerNameActionRow}>
                 <TouchableOpacity
                   onPress={handleRemoveName}
@@ -861,7 +828,7 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
                       modal.nameActionBtnDisabled,
                   ]}
                 >
-                  <Text style={modal.nameActionBtnText}>Remove</Text>
+                  <Text style={modal.nameActionBtnText}>Clear</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handleGenerateName}
@@ -9708,7 +9675,7 @@ export default function LobbyScreen() {
                   shareSheet.addPlayerNameLettersInput,
                   addFriendKbMode === 'letter' && shareSheet.addPlayerNameInputActive,
                 ]}
-                placeholder="Anna"
+                placeholder="Name"
                 placeholderTextColor={Colors.textDisabled}
                 value={getPlayerNameLetters(newFriendPlayerName)}
                 maxLength={PLAYER_NAME_MAX_LETTERS}
