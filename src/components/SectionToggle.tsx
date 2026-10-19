@@ -5,6 +5,9 @@ import { BrandUi, Colors, Radius } from '../theme';
 
 interface Props {
   expanded: boolean;
+  /** 'neutral' = ingen guldton i utfällt läge — för vanlig navigering i
+   *  listor (Player history-grupper/kort). Guld reserveras för sektioner. */
+  tone?: 'accent' | 'neutral';
   style?: StyleProp<ViewStyle>;
 }
 
@@ -15,10 +18,11 @@ interface Props {
  * Ritat på 24-gridet med samma streckvikt (1.8) som övriga outline-ikoner,
  * så alla expand/collapse-kontroller har identisk storlek och vikt.
  */
-export function SectionToggle({ expanded, style }: Props) {
-  const color = expanded ? Colors.warning : BrandUi.iconMuted;
+export function SectionToggle({ expanded, tone = 'accent', style }: Props) {
+  const accent = expanded && tone === 'accent';
+  const color = accent ? Colors.warning : BrandUi.iconMuted;
   return (
-    <View style={[styles.box, expanded && styles.boxActive, style]}>
+    <View style={[styles.box, accent && styles.boxActive, style]}>
       <Svg width={16} height={16} viewBox="0 0 24 24">
         <Line x1={6} y1={12} x2={18} y2={12} stroke={color} strokeWidth={2} strokeLinecap="round" />
         {!expanded && (

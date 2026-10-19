@@ -2688,7 +2688,7 @@ export default function ProfileScreen() {
           <View style={styles.sectionHeaderIcon}>
             <FriendsOutlineIcon size={24} color={sectionIconColor(gameConnectionsExpanded)} />
           </View>
-          <Text style={styles.gameConnectionsHeader}>QuizVibe Community & Friends</Text>
+          <Text style={styles.gameConnectionsHeader}>Community & Friends</Text>
           <SectionToggle expanded={gameConnectionsExpanded} />
         </Pressable>
         {!gameConnectionsExpanded && <View style={styles.sectionDivider} />}

@@ -824,6 +824,20 @@ quiz-init-effektens `bailIfEnded` fångar `cancelled` + `forfeited` (Alert → H
 
 **`QuizVibeDialog`** är appens första delade in-app-dialog (navy-kort, dimmad overlay, guld bara på primärknappen). Använd den i stället för `Alert.alert` när en native popup byts ut i polish-passet.
 
+**`QuizVibeDialogOverlay`** (samma fil) = dialogkortet UTAN egen `<Modal>`. Använd den för bekräftelser INNE i en redan öppen RN-Modal (lägg sist i modalens träd) — två samtidiga Modals kan sväljas på iOS. `destructive`-propen ger röd kontur-knapp i stället för guld (guld betyder aldrig fel/förlust).
+
+### Player History v2 (2026-10-19, UI-only)
+
+Samma språk som Profile v2; ingen logik ändrad. Delade komponenter som ändrades (påverkar alla call-sites):
+- **`SectionToggle`** har `tone?: 'accent' | 'neutral'`. `accent` (default) = svag guldkant när utfälld — används på Profiles SEKTIONSRUBRIKER, inkl. "Player history". `neutral` = alltid grå — används på korten (Marathon tables / Games played) och alla accordion-grupper. Guld i listor = bara faktiska val.
+- **`CollapsibleGroup`**: hierarki via typografi i stället för avdelarlinjer (månad = md semibold vit, datum = sm 85 % vit, spelform = xs uppercase dämpad). Neutral `SectionToggle` (28 pt) på alla nivåer. `body` har MEDVETET ingen paddingBottom — nästlade nivåer staplade annars tom yta under sista kortet.
+- **`SegmentedControl`**: nedsänkt mörk ränna, inaktiva val utan kant, valt = tunn guldkant + svag guldyta + guldtext. Används även i HCPSettings.
+- **`PlayerFilterPicker`**: kompakt pill (28 pt, filter-ikon). Aktivt filter = "Players · N" + × med svag guldkant; inaktivt = neutral.
+- **`LeaderboardTable variant="subtle"`**: bara Player history-modalerna (slutskärmen kör default). Ingen blå rubrikrad, mycket svaga kanter/radavdelare, vita poäng, avatar = guld Q på neutral yta (Profile v2-avataren).
+- **Kort**: `BrandUi.card`-yta + `Colors.border`; rubriken "Games played" / "Marathon tables" med antalet i dämpad text. Spelkort: datum + `0/4` vita, `· 0%` dämpat, metadata `Age · Assistance · Era` dämpad, `Generic · YouTube + Hints` ännu svagare (inga "Package:"/"Sources:"-etiketter). Marathon-rad: `Updated 15 Oct 2026 ›`.
+- **Detaljmodalen**: kort `#0F1828`, kompakt röd Delete-pill, Close 37 pt. Delete-bekräftelsen är `QuizVibeDialogOverlay` (destructive) inne i modalen — ingen native Alert.
+- ⚠ **Den flytande kugghjuls-knappen** som syns över modaler i dev-byggen är Expo dev-menuns FAB (`expo-dev-menu`, eget native-fönster). Den finns inte i TestFlight/App Store och kan inte döljas från JS — stängs av i dev-menyns inställningar.
+
 ## SOURCE MIXERBOARD — per-source category matrix (uppdaterad 2026-07-01)
 
 ⚠ **PAKET-LÄGE KOLLAPSAR MIXERBOARDEN (2026-08-31).** När ett Host-paket är valt (`anyPackageActive`) renderar Lobby INTE längre den låsta 3×3-matrisen — den ersätts av **två aggregat-toggles: YouTube + Hints** (var och en styr HELA paketets material för den källan) plus **Spotify som komplement**. Nya boolean-fält `packageYoutubeEnabled` / `packageHintsEnabled` (default true) styr dem; de **synkas till non-host** via en SEPARAT targeted UPDATE i `setLobbySettings` (kolumner via **migration `0055_lobby_settings_package_toggles.sql`**, samma mönster som `remote_assistance` — INTE i `settingsToRow`; ej körd migration → console.warn + tolerant `?? true`). Tidigare skrevs de aldrig, så non-host visade YT som PÅ även när host kört enbart Spotify — det är fixat. en toggle är **disabled när paketet saknar material** för källan (`pkgHasYoutube`/`pkgHasHints` via `computePackageCoverage`; nuvarande paket = Music/YT/Spotify → Hints-toggeln disabled). quiz.tsx: `effectiveYoutubeCategories = packageActive ? (packageYoutubeEnabled ? coveredYtCats : []) : …`, `packagedImages` gatas på `packageHintsEnabled`. Era-låset (`packageEraLocked`) oförändrat. 3×3-matrisen visas fortsatt UTAN paket.

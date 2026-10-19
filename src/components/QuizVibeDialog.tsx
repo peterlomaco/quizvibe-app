@@ -20,41 +20,69 @@ interface Props {
   onPrimary: () => void;
   secondaryLabel?: string;
   onClose: () => void;
+  /** Destruktiv primär-action (t.ex. Delete): röd kontur i stället för guld —
+   *  guld betyder aldrig fel/förlust. */
+  destructive?: boolean;
 }
 
-export function QuizVibeDialog({
-  visible,
+export function QuizVibeDialog({ visible, onClose, ...rest }: Props) {
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <QuizVibeDialogOverlay onClose={onClose} {...rest} />
+    </Modal>
+  );
+}
+
+/**
+ * Samma dialog UTAN egen <Modal> — för att visa en bekräftelse inne i en
+ * redan öppen RN-Modal (två samtidiga Modals kan sväljas på iOS). Lägg den
+ * sist i modalens träd; den fyller hela ytan med dimmad overlay.
+ */
+export function QuizVibeDialogOverlay({
   title,
   message,
   primaryLabel,
   onPrimary,
   secondaryLabel,
   onClose,
-}: Props) {
+  destructive = false,
+}: Omit<Props, 'visible'>) {
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <Pressable
-          style={styles.backdrop}
-          onPress={onClose}
-          accessibilityLabel="Close dialog"
-        />
-        <View style={styles.card} accessibilityViewIsModal>
-          <Text style={styles.title} accessibilityRole="header">
-            {title}
-          </Text>
-          <Text style={styles.message}>{message}</Text>
-          <View style={styles.actions}>
-            {secondaryLabel ? (
-              <Button
-                label={secondaryLabel}
-                onPress={onClose}
-                variant="secondary"
-                size="compact"
-                fullWidth={false}
-                style={styles.actionBtn}
-              />
-            ) : null}
+    <View style={styles.overlay}>
+      <Pressable
+        style={styles.backdrop}
+        onPress={onClose}
+        accessibilityLabel="Close dialog"
+      />
+      <View style={styles.card} accessibilityViewIsModal>
+        <Text style={styles.title} accessibilityRole="header">
+          {title}
+        </Text>
+        <Text style={styles.message}>{message}</Text>
+        <View style={styles.actions}>
+          {secondaryLabel ? (
+            <Button
+              label={secondaryLabel}
+              onPress={onClose}
+              variant="secondary"
+              size="compact"
+              fullWidth={false}
+              style={styles.actionBtn}
+            />
+          ) : null}
+          {destructive ? (
+            <Pressable
+              onPress={onPrimary}
+              accessibilityRole="button"
+              style={({ pressed }) => [
+                styles.actionBtn,
+                styles.destructiveBtn,
+                pressed && { opacity: 0.8 },
+              ]}
+            >
+              <Text style={styles.destructiveLabel}>{primaryLabel}</Text>
+            </Pressable>
+          ) : (
             <Button
               label={primaryLabel}
               onPress={onPrimary}
@@ -63,16 +91,20 @@ export function QuizVibeDialog({
               fullWidth={false}
               style={styles.actionBtn}
             />
-          </View>
+          )}
         </View>
       </View>
-    </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
@@ -109,5 +141,19 @@ const styles = StyleSheet.create({
   actionBtn: {
     flex: 1,
     paddingHorizontal: Spacing.sm,
+  },
+  destructiveBtn: {
+    height: 48,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.6)',
+    backgroundColor: 'rgba(255,107,107,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  destructiveLabel: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.error,
   },
 });

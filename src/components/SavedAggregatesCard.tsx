@@ -10,6 +10,8 @@ import { Alert, Animated, Modal, ScrollView, StyleSheet, Text, View } from 'reac
 import { Pressable } from '@/src/components/haptic';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { SectionToggle } from './SectionToggle';
+import { ChevronIcon } from './ChevronIcon';
+import { QuizVibeDialogOverlay } from './QuizVibeDialog';
 import { buildAggregateStandings } from '../utils/aggregateLeaderboard';
 import {
   dismissAggregateLeaderboard,
@@ -67,16 +69,14 @@ function toggleSetKey(prev: Set<string>, key: string): Set<string> {
   return next;
 }
 
-/** Sist spelad (updated_at ?? created_at) → "10 Sep 2026", eller null om saknas/ogiltig. */
+/** Sist spelad (updated_at ?? created_at) → "10 Sep 2026" (samma format som
+ *  Games played-korten), eller null om saknas/ogiltig. */
 function formatLastPlayed(iso?: string): string | null {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString('en', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  const month = d.toLocaleString('en', { month: 'short' });
+  return `${d.getDate()} ${month} ${d.getFullYear()}`;
 }
 
 export function SavedAggregatesCard({
@@ -122,6 +122,9 @@ export function SavedAggregatesCard({
   const appliedFocusRef = useRef<string | null>(null);
   // Radera-knappen i detalj-modalen — busy-guard mot dubbeltapp.
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  // Delete-bekräftelsen renderas inuti detalj-modalen (QuizVibeDialogOverlay)
+  // — två samtidiga RN-Modals kan sväljas på iOS.
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Flash-guide: den utpekade raden markeras numera med en BLINKANDE guldkant
   // (ingen kant-skärande pill längre). En delad loop så alla flashade rader
@@ -315,35 +318,24 @@ export function SavedAggregatesCard({
 
   // Radera en Marathon-tabell ur MIN historik (0052). Per-user: övriga
   // deltagare behåller den, men serien blir permanent olåsbar för re-match.
-  const handleDeleteMarathon = useCallback(() => {
+  const handleDeleteMarathon = useCallback(async () => {
     if (!open) return;
     const id = open.id;
-    const solo = open.participants.length <= 1;
-    Alert.alert(
-      'Delete from your history?',
-      solo
-        ? 'This marathon will be removed from your history and can no longer be replayed.'
-        : 'This marathon will be removed from your history and can no longer be re-played by anyone. The other players keep it in their own history.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setDeletingId(id);
-            const ok = await dismissAggregateLeaderboard(id);
-            setDeletingId(null);
-            if (!ok) {
-              Alert.alert('Could not delete', 'Please try again.');
-              return;
-            }
-            setItems((prev) => prev.filter((a) => a.id !== id));
-            setOpenId(null);
-          },
-        },
-      ],
-    );
+    setConfirmDelete(false);
+    setDeletingId(id);
+    const ok = await dismissAggregateLeaderboard(id);
+    setDeletingId(null);
+    if (!ok) {
+      Alert.alert('Could not delete', 'Please try again.');
+      return;
+    }
+    setItems((prev) => prev.filter((a) => a.id !== id));
+    setOpenId(null);
   }, [open]);
+  const closeDetail = useCallback(() => {
+    setConfirmDelete(false);
+    setOpenId(null);
+  }, []);
 
   if (items.length === 0) return null;
 
@@ -378,10 +370,10 @@ export function SavedAggregatesCard({
           <View style={styles.rowRight}>
             {lastPlayed ? (
               <Text style={styles.rowDate} numberOfLines={1}>
-                Last update: {lastPlayed}
+                Updated {lastPlayed}
               </Text>
             ) : null}
-            <Text style={styles.chevron}>›</Text>
+            <ChevronIcon size={18} strokeWidth={2} color="rgba(255,255,255,0.75)" />
           </View>
         </Pressable>
       </Animated.View>
@@ -390,8 +382,12 @@ export function SavedAggregatesCard({
 
   const contentHidden = collapsible && !cardOpen;
   // Antal sparade Marathon tables (efter dismiss-filtret) — speglar
-  // "Games played: N"-rubriken.
-  const titleText = `Marathon tables: ${items.length}`;
+  // "Games played N"-rubriken (antalet i dämpad text).
+  const titleNode = (
+    <Text style={styles.cardTitle}>
+      Marathon tables <Text style={styles.cardCount}>{items.length}</Text>
+    </Text>
+  );
 
   return (
     <View style={styles.card}>
@@ -401,11 +397,11 @@ export function SavedAggregatesCard({
           style={({ pressed }) => [styles.cardHeaderRow, pressed && { opacity: 0.7 }]}
           hitSlop={8}
         >
-          <Text style={styles.cardTitle}>{titleText}</Text>
-          <SectionToggle expanded={cardOpen} />
+          {titleNode}
+          <SectionToggle expanded={cardOpen} tone="neutral" />
         </Pressable>
       ) : (
-        <Text style={styles.cardTitle}>{titleText}</Text>
+        titleNode
       )}
       {!contentHidden && (
         <>
@@ -563,7 +559,7 @@ export function SavedAggregatesCard({
         visible={open !== null}
         transparent
         animationType="fade"
-        onRequestClose={() => setOpenId(null)}
+        onRequestClose={closeDetail}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
@@ -574,7 +570,7 @@ export function SavedAggregatesCard({
                 {open?.name}
               </Text>
               <Pressable
-                onPress={handleDeleteMarathon}
+                onPress={() => setConfirmDelete(true)}
                 disabled={!!deletingId}
                 hitSlop={8}
                 style={({ pressed }) => [
@@ -588,7 +584,7 @@ export function SavedAggregatesCard({
               </Pressable>
             </View>
             <ScrollView style={{ maxHeight: 360 }}>
-              <LeaderboardTable entries={openRows} />
+              <LeaderboardTable entries={openRows} variant="subtle" />
             </ScrollView>
             {/* Re-match/Replay-åtgärder — bara när kortet öppnats från Home
                 (/competitions). Host initierar, deltagare accepterar, host
@@ -610,31 +606,53 @@ export function SavedAggregatesCard({
                 styles.modalCloseBtn,
                 pressed && { opacity: 0.8 },
               ]}
-              onPress={() => setOpenId(null)}
+              onPress={closeDetail}
             >
               <Text style={styles.modalCloseText}>Close</Text>
             </Pressable>
           </View>
+          {confirmDelete && open && (
+            <QuizVibeDialogOverlay
+              title="Delete from your history?"
+              message={
+                open.participants.length <= 1
+                  ? 'This marathon will be removed from your history and can no longer be replayed.'
+                  : 'This marathon will be removed from your history and can no longer be re-played by anyone. The other players keep it in their own history.'
+              }
+              secondaryLabel="Cancel"
+              primaryLabel="Delete"
+              destructive
+              onPrimary={handleDeleteMarathon}
+              onClose={() => setConfirmDelete(false)}
+            />
+          )}
         </View>
       </Modal>
     </View>
   );
 }
 
+// Player history v2 (2026-10-19): samma lugna kortspråk som Games played.
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.card,
-    borderRadius: Radius.md,
+    backgroundColor: BrandUi.card,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: BrandUi.border,
+    borderColor: Colors.border,
     padding: Spacing.lg,
-    gap: Spacing.sm,
+    paddingBottom: Spacing.xl,
+    gap: Spacing.md,
     marginBottom: Spacing.md,
   },
   cardTitle: {
-    fontSize: FontSize.md,
+    fontSize: FontSize.lg,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
+  },
+  cardCount: {
+    fontWeight: FontWeight.medium,
+    color: BrandUi.textMuted,
+    fontVariant: ['tabular-nums'],
   },
   // Tappbar rubrik-rad (collapsible-läge): titel + +/−-ruta i höger kant.
   cardHeaderRow: {
@@ -642,40 +660,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  toggleBox: {
-    width: 24,
-    height: 24,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: BrandUi.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  toggleText: {
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-    color: BrandUi.iconMuted,
-    lineHeight: 18,
-  },
-  groups: { gap: Spacing.sm },
+  groups: { gap: Spacing.xs },
   rowList: { gap: Spacing.sm },
-  // Speglar MyMatchesScreens rad-vokabulär.
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
     backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: BrandUi.border,
+    borderColor: Colors.border,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.md,
   },
   rowText: { flex: 1 },
-  // Flash-guide: wrapper runt varje rad. Bär ALLTID en 2.5px-kant (transparent
-  // som standard) så layouten är identisk för alla rader; den utpekade radens
-  // kant animeras till pulserande guld. En riktig bordered box, inte ett
-  // absolut overlay — kan aldrig kollapsa till en prick.
   rowFlashWrap: {
     borderWidth: 2.5,
     borderColor: 'transparent',
@@ -690,28 +688,23 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   rowMeta: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
+    fontSize: FontSize.sm,
+    color: BrandUi.textMuted,
     marginTop: 2,
   },
-  // Höger kolumn: sist-spelad-datum (övre högra hörnet) ovanpå chevron.
+  // Höger: "Updated 15 Oct 2026 ›" på en rad.
   rowRight: {
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    alignSelf: 'stretch',
-    gap: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
   },
   rowDate: {
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
-  },
-  chevron: {
-    fontSize: 22,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
   },
   emptyNote: {
     fontSize: FontSize.sm,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
     paddingVertical: Spacing.sm,
   },
   modalOverlay: {
@@ -723,12 +716,12 @@ const styles = StyleSheet.create({
   },
   modalCard: {
     alignSelf: 'stretch',
-    backgroundColor: Colors.card,
-    borderRadius: Radius.md,
+    backgroundColor: '#0F1828',
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     padding: Spacing.lg,
-    gap: Spacing.md,
+    gap: Spacing.lg,
   },
   modalHeaderRow: {
     flexDirection: 'row',
@@ -738,25 +731,26 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     flex: 1,
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
   },
-  // Röd Delete uppe till höger i modalen (radera ur egen historik).
+  // Kompakt destruktiv sekundär-action (radera ur egen historik).
   modalDeleteBtn: {
     borderWidth: 1,
-    borderColor: Colors.error,
-    borderRadius: Radius.sm,
+    borderColor: 'rgba(255,107,107,0.5)',
+    borderRadius: Radius.full,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
+    height: 30,
+    justifyContent: 'center',
   },
   modalDeleteText: {
     fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.medium,
     color: Colors.error,
   },
   modalCloseBtn: {
-    height: 48,
+    height: 37,
     borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: BrandUi.border,

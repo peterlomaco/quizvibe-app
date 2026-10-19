@@ -3,7 +3,7 @@ import { Modal, ScrollView, StyleSheet, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 // Alla texter i den här tabellen är trånga celler → capped mot Dynamic Type.
 import { CappedText as Text } from './CappedText';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from './RoundLeaderboard';
 import { Avatar } from './Avatar';
 import { HCPShieldCard } from './HCPShield';
@@ -120,8 +120,12 @@ export function LeaderboardTable({
   entries,
   hcpChanges,
   hcpCategoryChanges,
+  variant = 'default',
 }: {
   entries: LeaderboardRow[];
+  /** 'subtle' = Player history-modalernas lugnare stil (Profile v2): ingen
+   *  blå rubrikrad, svagare radavdelare, vita poäng. Slutskärmen kör default. */
+  variant?: 'default' | 'subtle';
   // §5 — nytt Total-HCP + förändring från matchens start per spelare, t.ex.
   // "HCP 42 (-1)". Visas under assistance/age. Bara rader som finns i mappen
   // får en HCP-rad. Utelämnad (Aggregate-vyn) → ingen HCP-rad.
@@ -136,13 +140,14 @@ export function LeaderboardTable({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const expandedEntry = expandedId ? entries.find((e) => e.playerId === expandedId) : undefined;
   const expandedCat = expandedId ? hcpCategoryChanges?.[expandedId] : undefined;
+  const s = variant === 'subtle' ? subtleStyles : styles;
   return (
     <View>
-        <View style={styles.lbTable}>
+        <View style={s.lbTable}>
         {/* Vänster fixed kolumn: Position + Namn */}
-        <View style={styles.lbLeftCol}>
-          <View style={[styles.lbCell, styles.lbHeaderCell, styles.lbLeftCell]}>
-            <Text style={styles.lbHeaderText}>Player</Text>
+        <View style={s.lbLeftCol}>
+          <View style={[s.lbCell, s.lbHeaderCell, s.lbLeftCell]}>
+            <Text style={s.lbHeaderText}>Player</Text>
           </View>
           {entries.map((entry, index) => {
             const meta = [
@@ -155,17 +160,27 @@ export function LeaderboardTable({
             const catChange = hcpCategoryChanges?.[entry.playerId];
             const isExpanded = expandedId === entry.playerId;
             return (
-              <View key={entry.playerId} style={[styles.lbCell, styles.lbLeftCell]}>
+              <View key={entry.playerId} style={[s.lbCell, s.lbLeftCell]}>
                 {/* Avhoppare får ingen placeringssiffra — de deltog inte
                     i hela matchen och rankas därför inte. Texten renderas
                     ändå (tom) så `lbPos`:ens fasta bredd håller kolumnen
                     i linje. Sorteringen lägger dem sist, så `index + 1`
                     förblir korrekt för de spelare som FÅR en siffra. */}
-                <Text style={styles.lbPos} numberOfLines={1}>
+                <Text style={s.lbPos} numberOfLines={1}>
                   {entry.hasLeft ? '' : index + 1}
                 </Text>
-                <Avatar uri={entry.avatarUri} emoji={entry.emoji} name={entry.name} size={26} useBrandFallback />
-                <View style={styles.lbNameStack}>
+                <Avatar
+                  uri={entry.avatarUri}
+                  emoji={entry.emoji}
+                  name={entry.name}
+                  size={26}
+                  useBrandFallback
+                  // Subtle (Player history): Profile v2-avataren — guld Q på
+                  // neutral yta i stället för den gamla blå varianten.
+                  brandColor={variant === 'subtle' ? Colors.warning : undefined}
+                  style={variant === 'subtle' ? subtleAvatarStyle : undefined}
+                />
+                <View style={s.lbNameStack}>
                   {(() => {
                     // PlayerName-format [Letters]-[Digits]: håll namnet på EN rad
                     // när det får plats, men bryt vid bindestrecket när det inte
@@ -175,30 +190,30 @@ export function LeaderboardTable({
                     const dashIdx = entry.name.indexOf('-');
                     if (dashIdx === -1) {
                       return (
-                        <Text style={styles.lbName} numberOfLines={1}>
+                        <Text style={s.lbName} numberOfLines={1}>
                           {entry.name}
                         </Text>
                       );
                     }
                     return (
-                      <View style={styles.lbNameSplit}>
-                        <Text style={styles.lbName} numberOfLines={1}>
+                      <View style={s.lbNameSplit}>
+                        <Text style={s.lbName} numberOfLines={1}>
                           {entry.name.slice(0, dashIdx + 1)}
                         </Text>
-                        <Text style={styles.lbName} numberOfLines={1}>
+                        <Text style={s.lbName} numberOfLines={1}>
                           {entry.name.slice(dashIdx + 1)}
                         </Text>
                       </View>
                     );
                   })()}
                   {meta.length > 0 && (
-                    <Text style={styles.lbNameMeta} numberOfLines={1}>
+                    <Text style={s.lbNameMeta} numberOfLines={1}>
                       {meta}
                     </Text>
                   )}
                   {hcp && (
-                    <View style={styles.lbHcpLine}>
-                      <Text style={styles.lbNameHcp} numberOfLines={1}>
+                    <View style={s.lbHcpLine}>
+                      <Text style={s.lbNameHcp} numberOfLines={1}>
                         HCP {hcp.after}
                         {hcpDelta !== 0 ? ` (${hcpDelta > 0 ? '+' : ''}${hcpDelta})` : ''}
                       </Text>
@@ -210,9 +225,9 @@ export function LeaderboardTable({
                         <Pressable
                           onPress={() => setExpandedId((cur) => (cur === entry.playerId ? null : entry.playerId))}
                           hitSlop={8}
-                          style={styles.lbHcpExpandBtn}
+                          style={s.lbHcpExpandBtn}
                         >
-                          <Text style={styles.lbHcpExpandText}>{isExpanded ? '−' : '+'}</Text>
+                          <Text style={s.lbHcpExpandText}>{isExpanded ? '−' : '+'}</Text>
                         </Pressable>
                       )}
                     </View>
@@ -227,83 +242,83 @@ export function LeaderboardTable({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.lbMidScroll}
+          style={s.lbMidScroll}
         >
           <View>
-            <View style={[styles.lbMidRow, styles.lbHeaderCell]}>
-              <Text style={[styles.lbMidHeader, styles.lbColR]}>Q</Text>
-              <Text style={[styles.lbMidHeader, styles.lbColCheck]}>✓</Text>
-              <Text style={[styles.lbMidHeader, styles.lbColCheck]}>✗</Text>
-              <View style={[styles.lbColConnErr, { alignItems: 'center', justifyContent: 'center' }]}>
+            <View style={[s.lbMidRow, s.lbHeaderCell]}>
+              <Text style={[s.lbMidHeader, s.lbColR]}>Q</Text>
+              <Text style={[s.lbMidHeader, s.lbColCheck]}>✓</Text>
+              <Text style={[s.lbMidHeader, s.lbColCheck]}>✗</Text>
+              <View style={[s.lbColConnErr, { alignItems: 'center', justifyContent: 'center' }]}>
                 <WifiOffIcon size={17} />
               </View>
-              <Text style={[styles.lbMidHeader, styles.lbColTime]}>AVG</Text>
-              <Text style={[styles.lbMidHeader, styles.lbColTime]}>LAST</Text>
-              <Text style={[styles.lbMidHeader, styles.lbColLast5]}>Last 5</Text>
+              <Text style={[s.lbMidHeader, s.lbColTime]}>AVG</Text>
+              <Text style={[s.lbMidHeader, s.lbColTime]}>LAST</Text>
+              <Text style={[s.lbMidHeader, s.lbColLast5]}>Last 5</Text>
             </View>
             {entries.map((entry) =>
               entry.hasLeft ? (
                 <View
                   key={entry.playerId}
-                  style={[styles.lbMidRow, styles.lbHasLeftRow]}
+                  style={[s.lbMidRow, s.lbHasLeftRow]}
                 >
-                  <Text style={styles.lbHasLeftText} numberOfLines={1}>
+                  <Text style={s.lbHasLeftText} numberOfLines={1}>
                     Left the game
                   </Text>
                 </View>
               ) : (
-                <View key={entry.playerId} style={styles.lbMidRow}>
-                  <Text style={[styles.lbMidCell, styles.lbColR]}>
+                <View key={entry.playerId} style={s.lbMidRow}>
+                  <Text style={[s.lbMidCell, s.lbColR]}>
                     {entry.playedRounds}
                   </Text>
                   <Text
                     style={[
-                      styles.lbMidCell,
-                      styles.lbColCheck,
-                      styles.lbCorrectText,
+                      s.lbMidCell,
+                      s.lbColCheck,
+                      s.lbCorrectText,
                     ]}
                   >
                     {entry.correctAnswers}
                   </Text>
                   <Text
                     style={[
-                      styles.lbMidCell,
-                      styles.lbColCheck,
-                      styles.lbWrongText,
+                      s.lbMidCell,
+                      s.lbColCheck,
+                      s.lbWrongText,
                     ]}
                   >
                     {entry.incorrectAnswers}
                   </Text>
-                  <Text style={[styles.lbMidCell, styles.lbColConnErr, entry.connectionErrors > 0 ? styles.lbWrongText : styles.lbConnErrZero]}>
+                  <Text style={[s.lbMidCell, s.lbColConnErr, entry.connectionErrors > 0 ? s.lbWrongText : s.lbConnErrZero]}>
                     {entry.connectionErrors > 0 ? String(entry.connectionErrors) : '—'}
                   </Text>
-                  <Text style={[styles.lbMidCell, styles.lbColTime]}>
+                  <Text style={[s.lbMidCell, s.lbColTime]}>
                     {entry.playedRounds > 0 && entry.avgResponseSeconds > 0
                       ? `${entry.avgResponseSeconds.toFixed(2)}s`
                       : '—'}
                   </Text>
-                  <Text style={[styles.lbMidCell, styles.lbColTime]}>
+                  <Text style={[s.lbMidCell, s.lbColTime]}>
                     {entry.lastResponseSeconds !== null
                       ? `${entry.lastResponseSeconds.toFixed(2)}s`
                       : '—'}
                   </Text>
-                  <View style={[styles.lbColLast5, styles.lbLast5Wrap]}>
+                  <View style={[s.lbColLast5, s.lbLast5Wrap]}>
                     {Array.from({ length: 5 }).map((_, i) => {
                       const offset = entry.lastFiveResults.length - 5 + i;
                       const result =
                         offset >= 0 ? entry.lastFiveResults[offset] : undefined;
                       if (result === undefined) {
-                        return <View key={i} style={styles.lbDotEmpty} />;
+                        return <View key={i} style={s.lbDotEmpty} />;
                       }
                       return (
                         <View
                           key={i}
                           style={[
-                            styles.lbDot,
-                            result ? styles.lbDotCorrect : styles.lbDotWrong,
+                            s.lbDot,
+                            result ? s.lbDotCorrect : s.lbDotWrong,
                           ]}
                         >
-                          <Text style={styles.lbDotGlyph}>
+                          <Text style={s.lbDotGlyph}>
                             {result ? '✓' : '✗'}
                           </Text>
                         </View>
@@ -317,16 +332,16 @@ export function LeaderboardTable({
         </ScrollView>
 
         {/* Höger fixed kolumn: PTS */}
-        <View style={styles.lbRightCol}>
-          <View style={[styles.lbCell, styles.lbHeaderCell, styles.lbRightCell]}>
-            <Text style={styles.lbHeaderText}>PTS</Text>
+        <View style={s.lbRightCol}>
+          <View style={[s.lbCell, s.lbHeaderCell, s.lbRightCell]}>
+            <Text style={s.lbHeaderText}>PTS</Text>
           </View>
           {entries.map((entry) => (
             <View
               key={entry.playerId}
-              style={[styles.lbCell, styles.lbRightCell]}
+              style={[s.lbCell, s.lbRightCell]}
             >
-              <Text style={styles.lbPoints} numberOfLines={1}>
+              <Text style={s.lbPoints} numberOfLines={1}>
                 {entry.hasLeft ? '—' : entry.points}
               </Text>
             </View>
@@ -342,31 +357,31 @@ export function LeaderboardTable({
         animationType="fade"
         onRequestClose={() => setExpandedId(null)}
       >
-        <Pressable style={styles.lbHcpModalBackdrop} onPress={() => setExpandedId(null)}>
+        <Pressable style={s.lbHcpModalBackdrop} onPress={() => setExpandedId(null)}>
           {/* Inre Pressable med no-op onPress fångar tappet så backdrop-
               stängningen inte fyrar när man tappar på själva kortet. */}
-          <Pressable style={styles.lbHcpModalCard} onPress={() => {}}>
+          <Pressable style={s.lbHcpModalCard} onPress={() => {}}>
             {expandedEntry && expandedCat && (
               <>
-                <View style={styles.lbHcpModalTitleRow}>
+                <View style={s.lbHcpModalTitleRow}>
                   <Avatar uri={expandedEntry.avatarUri} emoji={expandedEntry.emoji} name={expandedEntry.name} size={30} useBrandFallback />
-                  <View style={styles.lbHcpModalTitleStack}>
-                    <Text style={styles.lbHcpModalName} numberOfLines={1}>
+                  <View style={s.lbHcpModalTitleStack}>
+                    <Text style={s.lbHcpModalName} numberOfLines={1}>
                       {expandedEntry.name}
                     </Text>
-                    <Text style={styles.lbHcpModalSub}>HCP Progression</Text>
+                    <Text style={s.lbHcpModalSub}>HCP Progression</Text>
                   </View>
                   {/* Balanserar avataren till vänster så namn/undertitel
                       hamnar i kortets faktiska mitt, inte förskjutet höger. */}
-                  <View style={styles.lbHcpModalTitleSpacer} />
+                  <View style={s.lbHcpModalTitleSpacer} />
                 </View>
-                <View style={styles.lbHcpModalRow}>
+                <View style={s.lbHcpModalRow}>
                   <HCPShieldCard hcp={expandedCat.total.after} size={48} label="Total" deltaBadge={expandedCat.total.delta} />
                   <HCPShieldCard hcp={expandedCat.music.after} size={48} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.music.delta} />
                   <HCPShieldCard hcp={expandedCat.film.after} size={48} label="Film/TV" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.film.delta} />
                 </View>
-                <Pressable style={styles.lbHcpModalClose} onPress={() => setExpandedId(null)}>
-                  <Text style={styles.lbHcpModalCloseText}>Close</Text>
+                <Pressable style={s.lbHcpModalClose} onPress={() => setExpandedId(null)}>
+                  <Text style={s.lbHcpModalCloseText}>Close</Text>
                 </Pressable>
               </>
             )}
@@ -651,3 +666,25 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 });
+
+// Player history (Profile v2, 2026-10-19): samma tabell, lugnare yta.
+const subtleAvatarStyle = {
+  backgroundColor: BrandUi.surface,
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.08)',
+};
+
+const subtleStyles = {
+  ...styles,
+  lbTable: { ...styles.lbTable, backgroundColor: 'rgba(255,255,255,0.025)', borderColor: 'rgba(255,255,255,0.035)' },
+  lbHeaderCell: { ...styles.lbHeaderCell, backgroundColor: 'transparent' },
+  lbCell: { ...styles.lbCell, borderBottomColor: 'rgba(255,255,255,0.035)' },
+  lbMidRow: { ...styles.lbMidRow, borderBottomColor: 'rgba(255,255,255,0.035)' },
+  lbHeaderText: { ...styles.lbHeaderText, color: BrandUi.textMuted, fontWeight: FontWeight.semibold },
+  lbMidHeader: { ...styles.lbMidHeader, color: BrandUi.textMuted, fontWeight: FontWeight.semibold },
+  lbPos: { ...styles.lbPos, color: BrandUi.textMuted },
+  lbNameMeta: { ...styles.lbNameMeta, color: BrandUi.textMuted },
+  lbPoints: { ...styles.lbPoints, color: Colors.textPrimary },
+  lbCorrectText: { ...styles.lbCorrectText, fontWeight: FontWeight.medium },
+  lbWrongText: { ...styles.lbWrongText, fontWeight: FontWeight.medium },
+} as unknown as typeof styles;

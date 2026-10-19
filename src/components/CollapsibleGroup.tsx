@@ -1,14 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
-import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Spacing } from '../theme';
+import { SectionToggle } from './SectionToggle';
 
 /**
  * Återanvändbar collapsible grupp-header med +/−-toggle-box. Delas av
  * Player history + Marathon-listan för BÅDA nivåerna (level 1 = host/månad,
  * level 2 = spelform). Stil portad från PlayerHistorySection:s
- * monthHeader/monthToggleBox så utseendet är oförändrat; `level` styr
- * toggle-box-storlek (26 vs 22), label-vikt och indrag.
+ * monthHeader/monthToggleBox; `level` styr label-vikt och indrag. +/− är
+ * den delade neutrala SectionToggle på alla nivåer (v2, 2026-10-19).
  */
 export function CollapsibleGroup({
   label,
@@ -21,7 +22,7 @@ export function CollapsibleGroup({
 }: {
   label: string;
   summary?: string;
-  /** 1 = host/månad (bold, 26-box), 2 = spelform (uppercase, indrag),
+  /** 1 = host/månad (starkast), 2 = spelform (uppercase, indrag),
    *  3 = datum-mellannivå i Date-läget (läsbar, indrag). */
   level: 1 | 2 | 3;
   open: boolean;
@@ -31,7 +32,6 @@ export function CollapsibleGroup({
    *  +/−-boxen. */
   badge?: React.ReactNode;
 }) {
-  const isL1 = level === 1;
   const groupStyle =
     level === 1 ? styles.groupL1 : level === 3 ? styles.groupL3 : styles.groupL2;
   const labelStyle =
@@ -54,87 +54,55 @@ export function CollapsibleGroup({
           <View style={styles.spacer} />
         )}
         {badge}
-        <View style={isL1 ? styles.toggleBoxL1 : styles.toggleBoxL2}>
-          <Text style={isL1 ? styles.toggleTextL1 : styles.toggleTextL2}>
-            {open ? '−' : '+'}
-          </Text>
-        </View>
+        <SectionToggle expanded={open} tone="neutral" />
       </Pressable>
       {open && <View style={styles.body}>{children}</View>}
     </View>
   );
 }
 
+// Player history v2 (2026-10-19): hierarkin bärs av typografi + luft i
+// stället för avdelarlinjer. Månad = starkast, datum = sekundär, spelform =
+// liten dämpad versal-etikett. Samma neutrala +/− (SectionToggle, 28 pt) på
+// alla nivåer.
 const styles = StyleSheet.create({
   groupL1: { gap: Spacing.xs },
-  // Level 2 (spelform) dras in något så nästlingen läses visuellt.
+  // Level 2 (spelform) och 3 (datum) dras in så nästlingen läses visuellt.
   groupL2: { gap: Spacing.xs, paddingLeft: Spacing.md },
-  // Level 3 (datum-mellannivå i Date-läget) — samma indrag som L2; nästlas
-  // inuti månaden, och spelform-L2:orna inuti får sitt eget indrag ovanpå.
   groupL3: { gap: Spacing.xs, paddingLeft: Spacing.md },
-  labelL3: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.separator,
+    minHeight: 40,
   },
   labelL1: {
-    fontSize: FontSize.sm,
+    fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
+  },
+  labelL3: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: 'rgba(255,255,255,0.85)',
   },
   labelL2: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
     textTransform: 'uppercase',
-    letterSpacing: 0.4,
+    letterSpacing: 0.8,
   },
   summary: {
     flex: 1,
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
     fontVariant: ['tabular-nums'],
   },
   spacer: { flex: 1 },
-  toggleBoxL1: {
-    width: 26,
-    height: 26,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: BrandUi.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  toggleTextL1: {
-    fontSize: 18,
-    fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
-    lineHeight: 20,
-  },
-  toggleBoxL2: {
-    width: 22,
-    height: 22,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: BrandUi.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  toggleTextL2: {
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
-    lineHeight: 16,
-  },
+  // Ingen paddingBottom — nästlade nivåer staplade annars luft under sista
+  // kortet (Games played-kortet slutade med en stor tom yta).
   body: {
-    paddingTop: Spacing.sm,
+    paddingTop: Spacing.xs,
   },
 });

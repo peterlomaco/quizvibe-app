@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
-import Svg, { Path } from 'react-native-svg';
 import { useFocusEffect } from 'expo-router';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { SectionToggle } from './SectionToggle';
+import { ChevronIcon } from './ChevronIcon';
+import { QuizVibeDialogOverlay } from './QuizVibeDialog';
 import { buildAggregateStandings } from '../utils/aggregateLeaderboard';
 import {
   deleteGameHistoryEntry,
@@ -107,6 +108,9 @@ export function PlayerHistorySection() {
   // Detalj-modalen (final leaderboard för ETT spel) + radera-busy-guard.
   const [openId, setOpenId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  // Bekräftelse för Delete — QuizVibeDialog-kortet renderas INUTI detalj-
+  // modalen (två samtidiga RN-Modals kan sväljas på iOS).
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Re-load varje gång Profile får fokus så listan speglar senaste
   // append:en (Quiz → Final Leaderboard → Home → Profile).
@@ -213,31 +217,20 @@ export function PlayerHistorySection() {
   // Radera spelet ur MIN lokala history (per-device/per-user). Motståndarna
   // behåller det på sina egna devices; ingår det i en marathon är serien
   // oberörd (separat vy, separat delete).
-  const handleDeleteGame = useCallback(() => {
+  const handleDeleteGame = useCallback(async () => {
     if (!openEntry) return;
     const id = openEntry.id;
-    const multi = (openEntry.players?.length ?? 1) > 1;
-    Alert.alert(
-      'Delete from your history?',
-      multi
-        ? 'This game will be removed from your history on this device. The other players keep it in their own history.'
-        : 'This game will be removed from your history.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setDeletingId(id);
-            await deleteGameHistoryEntry(id);
-            setDeletingId(null);
-            setHistory((prev) => prev.filter((e) => e.id !== id));
-            setOpenId(null);
-          },
-        },
-      ],
-    );
+    setConfirmDelete(false);
+    setDeletingId(id);
+    await deleteGameHistoryEntry(id);
+    setDeletingId(null);
+    setHistory((prev) => prev.filter((e) => e.id !== id));
+    setOpenId(null);
   }, [openEntry]);
+  const closeDetail = useCallback(() => {
+    setConfirmDelete(false);
+    setOpenId(null);
+  }, []);
 
   const renderCard = (entry: HistoryEntry) => (
     <GameCard key={entry.id} entry={entry} onOpen={() => setOpenId(entry.id)} />
@@ -250,7 +243,7 @@ export function PlayerHistorySection() {
         style={({ pressed }) => [styles.headerRow, pressed && { opacity: 0.7 }]}
         hitSlop={8}
       >
-        {/* Profile v2: outline-ikon (dämpad, guld när utfälld) + guld +/−. */}
+        {/* Samma rubrik som övriga Profile-sektioner: dämpad ikon + +/− med svag guldkant utfälld. */}
         <View style={styles.sectionHeaderSvg}>
           <HistoryOutlineIcon size={24} color={BrandUi.iconMuted} />
         </View>
@@ -278,8 +271,10 @@ export function PlayerHistorySection() {
               style={({ pressed }) => [styles.cardHeaderRow, pressed && { opacity: 0.7 }]}
               hitSlop={8}
             >
-              <Text style={styles.cardTitle}>Games played: {games.length}</Text>
-              <SectionToggle expanded={gamesOpen} />
+              <Text style={styles.cardTitle}>
+                Games played <Text style={styles.cardCount}>{games.length}</Text>
+              </Text>
+              <SectionToggle expanded={gamesOpen} tone="neutral" />
             </Pressable>
             {!gamesOpen ? null : games.length === 0 ? (
               <Text style={styles.emptyText}>
@@ -438,7 +433,7 @@ export function PlayerHistorySection() {
         visible={openEntry !== null}
         transparent
         animationType="fade"
-        onRequestClose={() => setOpenId(null)}
+        onRequestClose={closeDetail}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
@@ -447,7 +442,7 @@ export function PlayerHistorySection() {
                 {openEntry ? formatDate(openEntry.date) : ''}
               </Text>
               <Pressable
-                onPress={handleDeleteGame}
+                onPress={() => setConfirmDelete(true)}
                 disabled={!!deletingId}
                 hitSlop={8}
                 style={({ pressed }) => [
@@ -461,18 +456,33 @@ export function PlayerHistorySection() {
               </Pressable>
             </View>
             <ScrollView style={{ maxHeight: 360 }}>
-              <LeaderboardTable entries={openRows} />
+              <LeaderboardTable entries={openRows} variant="subtle" />
             </ScrollView>
             <Pressable
               style={({ pressed }) => [
                 styles.modalCloseBtn,
                 pressed && { opacity: 0.8 },
               ]}
-              onPress={() => setOpenId(null)}
+              onPress={closeDetail}
             >
               <Text style={styles.modalCloseText}>Close</Text>
             </Pressable>
           </View>
+          {confirmDelete && openEntry && (
+            <QuizVibeDialogOverlay
+              title="Delete from your history?"
+              message={
+                (openEntry.players?.length ?? 1) > 1
+                  ? 'This game will be removed from your history on this device. The other players keep it in their own history.'
+                  : 'This game will be removed from your history.'
+              }
+              secondaryLabel="Cancel"
+              primaryLabel="Delete"
+              destructive
+              onPrimary={handleDeleteGame}
+              onClose={() => setConfirmDelete(false)}
+            />
+          )}
         </View>
       </Modal>
     </View>
@@ -520,23 +530,26 @@ function GameCard({
         <Text style={styles.gameDate}>{formatDate(entry.date)}</Text>
         <View style={styles.gameTopRight}>
           <Text style={styles.gameScore}>
-            {entry.correctAnswers}/{entry.totalQuestions} ({pct}%)
+            {entry.correctAnswers}/{entry.totalQuestions}
+            <Text style={styles.gamePct}> · {pct}%</Text>
           </Text>
-          <Text style={styles.chevron}>›</Text>
+          <ChevronIcon size={18} strokeWidth={2} color="rgba(255,255,255,0.75)" />
         </View>
       </View>
       <Text style={styles.gameMeta} numberOfLines={1}>
         {isSingle
-          ? `Age ${entry.age} · ${ASSISTANCE_LABEL[entry.assistance]} · Era ${entry.eraFrom}-${entry.eraTo}`
-          : `${playerCount} players · Era ${entry.eraFrom}-${entry.eraTo}`}
+          ? `Age ${entry.age} · ${ASSISTANCE_LABEL[entry.assistance]} · Era ${entry.eraFrom}–${entry.eraTo}`
+          : `${playerCount} players · Era ${entry.eraFrom}–${entry.eraTo}`}
       </Text>
-      <Text style={styles.gameMeta} numberOfLines={1}>
-        Package: {packages} · Sources: {sourcesLabel}
+      <Text style={styles.gameMetaTertiary} numberOfLines={1}>
+        {packages} · {sourcesLabel}
       </Text>
     </Pressable>
   );
 }
 
+// Player history v2 (2026-10-19): mörka, lugna kort; hierarki via vit /
+// dämpad text i stället för kanter. Guld bara för aktiva val.
 const styles = StyleSheet.create({
   container: { gap: Spacing.md },
   contentWrap: { gap: Spacing.md },
@@ -548,7 +561,6 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     marginTop: Spacing.sm,
   },
-  // Wrap för SVG-ikon i rubriken — samma höjd som emoji-varianten.
   sectionHeaderSvg: { width: 24, height: 26, alignItems: 'center', justifyContent: 'center' },
   sectionTitle: {
     ...Typography.title,
@@ -556,44 +568,30 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     flex: 1,
   },
-  // Profile v2: samma kompakta +/− som Profile-sektionerna.
-  toggleBox: {
-    width: 24,
-    height: 24,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: BrandUi.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  // Svag guldton i kanten när utfälld — samma som Profile-sektionerna.
-  toggleBoxActive: { borderColor: 'rgba(245,166,35,0.45)' },
-  toggleText: {
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-    color: BrandUi.iconMuted,
-    lineHeight: 18,
-  },
-  toggleTextActive: { color: Colors.warning },
   sectionDivider: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.06)',
   },
 
   card: {
-    backgroundColor: Colors.card,
+    backgroundColor: BrandUi.card,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: BrandUi.border,
+    borderColor: Colors.border,
     padding: Spacing.lg,
+    paddingBottom: 20,
     gap: Spacing.md,
   },
   cardTitle: {
-    fontSize: FontSize.md,
+    fontSize: FontSize.lg,
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
-  // Tappbar rubrik-rad för "Games played" — titel + +/−-ruta i höger kant.
+  cardCount: {
+    fontWeight: FontWeight.medium,
+    color: BrandUi.textMuted,
+    fontVariant: ['tabular-nums'],
+  },
   cardHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -601,56 +599,60 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: FontSize.sm,
-    color: Colors.textSecondary,
-    fontStyle: 'italic',
+    color: BrandUi.textMuted,
   },
   emptyNote: {
     fontSize: FontSize.sm,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
     paddingVertical: Spacing.sm,
   },
 
   gameList: { gap: Spacing.sm },
 
-  // Tappbart per-spel-kort (speglar Marathon-listans rad-vokabulär).
+  // Per-spel-kort — höjs från bakgrunden via ytkontrast, nästan ingen kant.
   gameCard: {
-    gap: 2,
+    gap: 4,
     backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: BrandUi.border,
+    borderColor: Colors.border,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.md,
   },
   gameTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 2,
   },
   gameTopRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
+    gap: Spacing.xs,
+  },
+  gameDate: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
   },
   gameScore: {
     fontSize: FontSize.md,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
-  gameDate: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
-    color: Colors.textPrimary,
+  gamePct: {
+    fontWeight: FontWeight.regular,
+    color: BrandUi.textMuted,
   },
   gameMeta: {
-    fontSize: FontSize.xs,
-    color: Colors.textSecondary,
+    fontSize: FontSize.sm,
+    color: 'rgba(255,255,255,0.52)',
     fontVariant: ['tabular-nums'],
   },
-  chevron: {
-    fontSize: 22,
-    color: Colors.textSecondary,
+  gameMetaTertiary: {
+    fontSize: FontSize.xs,
+    color: 'rgba(255,255,255,0.4)',
   },
 
   // Detalj-modal (final leaderboard + delete) — speglar SavedAggregatesCard.
@@ -663,12 +665,12 @@ const styles = StyleSheet.create({
   },
   modalCard: {
     alignSelf: 'stretch',
-    backgroundColor: Colors.card,
-    borderRadius: Radius.md,
+    backgroundColor: '#0F1828',
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     padding: Spacing.lg,
-    gap: Spacing.md,
+    gap: Spacing.lg,
   },
   modalHeaderRow: {
     flexDirection: 'row',
@@ -678,24 +680,26 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     flex: 1,
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
   },
+  // Kompakt destruktiv sekundär-action — röd men konkurrerar inte med titeln.
   modalDeleteBtn: {
     borderWidth: 1,
-    borderColor: Colors.error,
-    borderRadius: Radius.sm,
+    borderColor: 'rgba(255,107,107,0.5)',
+    borderRadius: Radius.full,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
+    height: 30,
+    justifyContent: 'center',
   },
   modalDeleteText: {
     fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.medium,
     color: Colors.error,
   },
   modalCloseBtn: {
-    height: 48,
+    height: 37,
     borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: BrandUi.border,

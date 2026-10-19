@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
+import Svg, { Path } from 'react-native-svg';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import type { Friend } from '../utils/friendsStorage';
@@ -31,35 +32,44 @@ export function PlayerFilterPicker({
 
   return (
     <>
+      {/* Player history v2 (2026-10-19): kompakt sekundär pill. Guld bara
+          när ett filter faktiskt är aktivt ("Players · 2" + ×). */}
       <View style={styles.filterRow}>
         <Pressable
           onPress={() => {
             setPendingIds(new Set(appliedFriendIds));
             setPickerOpen(true);
           }}
-          style={({ pressed }) => [styles.filterBtn, pressed && { opacity: 0.85 }]}
+          style={({ pressed }) => [
+            styles.filterBtn,
+            selectedFriends.length > 0 && styles.filterBtnActive,
+            pressed && { opacity: 0.85 },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={
+            selectedFriends.length > 0
+              ? `Filtered by ${selectedFriends.length} players. Change filter`
+              : 'Filter by players'
+          }
         >
-          <Text style={styles.filterBtnText}>
-            {selectedFriends.length > 0 ? 'Change players' : 'Filter by players'}
+          <FilterIcon
+            color={selectedFriends.length > 0 ? Colors.warning : BrandUi.iconMuted}
+          />
+          <Text style={styles.filterBtnText} numberOfLines={1}>
+            {selectedFriends.length > 0
+              ? `Players · ${selectedFriends.length}`
+              : 'Filter by players'}
           </Text>
-        </Pressable>
-        {selectedFriends.length > 0 && (
-          <View style={styles.filterChip}>
-            <Text style={styles.filterChipIcon}>
-              {selectedFriends.length === 1
-                ? getAvatarEmojiById(selectedFriends[0].avatarId)
-                : '👥'}
-            </Text>
-            <Text style={styles.filterChipText} numberOfLines={1}>
-              {selectedFriends.length === 1
-                ? selectedFriends[0].playerName
-                : `${selectedFriends.length} players`}
-            </Text>
-            <Pressable hitSlop={8} onPress={() => onApply(new Set())}>
-              <Text style={styles.filterChipClear}>×</Text>
+          {selectedFriends.length > 0 && (
+            <Pressable
+              hitSlop={10}
+              onPress={() => onApply(new Set())}
+              accessibilityLabel="Clear player filter"
+            >
+              <Text style={styles.filterClear}>×</Text>
             </Pressable>
-          </View>
-        )}
+          )}
+        </Pressable>
       </View>
 
       <Modal
@@ -160,6 +170,20 @@ export function PlayerFilterPicker({
   );
 }
 
+function FilterIcon({ color }: { color: string }) {
+  return (
+    <Svg width={14} height={14} viewBox="0 0 24 24">
+      <Path
+        d="M4 5h16l-6.2 7.4V18l-3.6 1.8v-7.4L4 5z"
+        stroke={color}
+        strokeWidth={1.8}
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </Svg>
+  );
+}
+
 const styles = StyleSheet.create({
   filterRow: {
     flexDirection: 'row',
@@ -168,42 +192,30 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   filterBtn: {
-    // Profile v2: sekundär neutral kontroll (var blå kant).
-    backgroundColor: BrandUi.surface,
-    borderWidth: 1,
-    borderColor: BrandUi.border,
-    borderRadius: Radius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-  },
-  filterBtnText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-  },
-  filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
-    backgroundColor: 'rgba(245,166,35,0.08)',
+    gap: 5,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.warning,
+    borderColor: Colors.border,
     borderRadius: Radius.full,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm + 2,
+    height: 28,
   },
-  filterChipIcon: { fontSize: 16 },
-  filterChipText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-    maxWidth: 160,
+  filterBtnActive: {
+    backgroundColor: 'rgba(245,166,35,0.06)',
+    borderColor: 'rgba(245,166,35,0.55)',
   },
-  filterChipClear: {
+  filterBtnText: {
+    fontSize: 13,
+    fontWeight: FontWeight.medium,
+    color: 'rgba(255,255,255,0.85)',
+  },
+  filterClear: {
     fontSize: 18,
     lineHeight: 20,
     color: BrandUi.iconMuted,
-    paddingHorizontal: 2,
+    marginLeft: 2,
   },
   sheetOverlay: {
     flex: 1,
