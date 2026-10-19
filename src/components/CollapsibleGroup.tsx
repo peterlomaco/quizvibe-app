@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 
 /**
  * Återanvändbar collapsible grupp-header med +/−-toggle-box. Delas av
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     height: 26,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },

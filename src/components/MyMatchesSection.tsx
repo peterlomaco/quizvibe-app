@@ -252,6 +252,8 @@ export function MyMatchesSection({
         styles.mainBtn,
         compact && (inRow ? styles.mainBtnInRow : styles.mainBtnCompact),
         v2 && { backgroundColor: BrandUi.surface, borderColor: hasUpdate ? Colors.warning : BrandUi.border },
+        // Profile (full): guldkant bara som accent när det finns en ny uppdatering.
+        !v2 && hasUpdate && { borderColor: Colors.warning },
       ]}
       activeOpacity={0.8}
       onPress={() => handlePress(signature)}
@@ -359,11 +361,11 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     minHeight: 56,
     borderWidth: 1,
-    // Vit kant (Peter 2026-08-07) — skiljer 1vs1-knappen från Home:s
-    // blå/gröna/grå CTA-familjer utan att införa en ny brand-färg.
-    borderColor: Colors.textPrimary,
+    // Profile v2 (2026-10-16): vanligt QuizVibe-kort — dämpad kant i
+    // stället för den vita (guld när ny uppdatering, se render).
+    borderColor: BrandUi.border,
     borderRadius: Radius.md,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: BrandUi.surface,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
   },

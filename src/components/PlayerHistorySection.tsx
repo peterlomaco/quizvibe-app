@@ -3,7 +3,7 @@ import { Alert, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import Svg, { Path } from 'react-native-svg';
 import { useFocusEffect } from 'expo-router';
-import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { buildAggregateStandings } from '../utils/aggregateLeaderboard';
 import {
   deleteGameHistoryEntry,
@@ -29,6 +29,7 @@ import { MyMatchesSection } from './MyMatchesSection';
 import { PlayerFilterPicker } from './PlayerFilterPicker';
 import { SavedAggregatesCard } from './SavedAggregatesCard';
 import { SegmentedControl } from './SegmentedControl';
+import { HistoryOutlineIcon } from './SectionIcons';
 
 // Player history-sektionen visar en lista över alla spel användaren har
 // spelat, var och en som ett eget TAPPBART kort som öppnar spelets final-
@@ -248,14 +249,12 @@ export function PlayerHistorySection() {
         style={({ pressed }) => [styles.headerRow, pressed && { opacity: 0.7 }]}
         hitSlop={8}
       >
-        {/* Blå pokal-silhuett (Colors.primary) — matchar blå-temat. */}
+        {/* Profile v2: outline-ikon (dämpad, guld när utfälld) + guld +/−. */}
         <View style={styles.sectionHeaderSvg}>
-          <Svg width={24} height={24} viewBox="0 0 24 24">
-            <Path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" fill={Colors.primary} />
-          </Svg>
+          <HistoryOutlineIcon size={24} color={BrandUi.iconMuted} />
         </View>
         <Text style={styles.sectionTitle}>Player history</Text>
-        <View style={styles.toggleBox}>
+        <View style={[styles.toggleBox, expanded && styles.toggleBoxActive]}>
           <Text style={styles.toggleText}>{expanded ? '−' : '+'}</Text>
         </View>
       </Pressable>
@@ -281,7 +280,7 @@ export function PlayerHistorySection() {
               hitSlop={8}
             >
               <Text style={styles.cardTitle}>Games played: {games.length}</Text>
-              <View style={styles.toggleBox}>
+              <View style={[styles.toggleBox, gamesOpen && styles.toggleBoxActive]}>
                 <Text style={styles.toggleText}>{gamesOpen ? '−' : '+'}</Text>
               </View>
             </Pressable>
@@ -559,31 +558,35 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontWeight: FontWeight.bold,
   },
+  // Profile v2: samma kompakta +/− som Profile-sektionerna.
   toggleBox: {
-    width: 26,
-    height: 26,
+    width: 24,
+    height: 24,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Svag guldton i kanten när utfälld — samma som Profile-sektionerna.
+  toggleBoxActive: { borderColor: 'rgba(245,166,35,0.45)' },
   toggleText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
-    lineHeight: 20,
+    color: BrandUi.iconMuted,
+    lineHeight: 18,
   },
+  toggleTextActive: { color: Colors.warning },
   sectionDivider: {
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: BrandUi.border,
   },
 
   card: {
     backgroundColor: Colors.card,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     padding: Spacing.lg,
     gap: Spacing.md,
   },
@@ -614,9 +617,9 @@ const styles = StyleSheet.create({
   // Tappbart per-spel-kort (speglar Marathon-listans rad-vokabulär).
   gameCard: {
     gap: 2,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
@@ -634,7 +637,7 @@ const styles = StyleSheet.create({
   gameScore: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   gameDate: {
@@ -696,14 +699,15 @@ const styles = StyleSheet.create({
   modalCloseBtn: {
     height: 48,
     borderRadius: Radius.md,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalCloseText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
   },
 });

@@ -6,9 +6,10 @@ import {
     ViewStyle,
 } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
+import { METALLIC_GOLD_EDGE, MetallicGoldFill } from './MetallicGoldFill';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
  
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'gold';
  
 interface ButtonProps {
   label: string;
@@ -44,6 +45,9 @@ export function Button({
         style,
       ]}
     >
+      {/* 'gold' = QuizVibe primär-CTA (metallisk guld + svart text), samma
+          som Home:s Start New Game och Join Game. */}
+      {variant === 'gold' && !isDisabled && <MetallicGoldFill />}
       {loading ? (
         <ActivityIndicator
           color={isDisabled ? Colors.textSecondary : Colors.textPrimary}
@@ -55,6 +59,7 @@ export function Button({
             styles.label,
             variant === 'ghost' && styles.ghostLabel,
             variant === 'secondary' && styles.secondaryLabel,
+            variant === 'gold' && styles.goldLabel,
             isDisabled && styles.disabledLabel,
           ]}
         >
@@ -87,6 +92,11 @@ const styles = StyleSheet.create({
   ghost: {
     backgroundColor: 'transparent',
   },
+  gold: {
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: METALLIC_GOLD_EDGE,
+  },
  
   // ── States ──────────────────────────────────────────────────────
   disabled: {
@@ -106,5 +116,6 @@ const styles = StyleSheet.create({
   },
   ghostLabel: { color: Colors.primary },
   secondaryLabel: { color: Colors.textPrimary },
+  goldLabel: { color: '#000000', fontWeight: FontWeight.bold },
   disabledLabel: { color: Colors.textSecondary },
 });

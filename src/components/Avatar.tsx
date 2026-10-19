@@ -22,6 +22,8 @@ interface AvatarProps {
    * klippas i hörnet.
    */
   useBrandFallback?: boolean;
+  /** Färg på Q-marken i brand-fallbacken (default Colors.primary). Profile v2 skickar guld. */
+  brandColor?: string;
 }
 
 export function Avatar({
@@ -32,6 +34,7 @@ export function Avatar({
   selected,
   style,
   useBrandFallback,
+  brandColor,
 }: AvatarProps) {
   const initials = name
     ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
@@ -54,7 +57,7 @@ export function Avatar({
           style={[styles.image, { borderRadius: size / 2 }]}
         />
       ) : showBrand ? (
-        <QuizVibeQAvatar size={Math.round(size * 0.7)} />
+        <QuizVibeQAvatar size={Math.round(size * 0.7)} color={brandColor} />
       ) : emoji ? (
         <Text style={{ fontSize: size * 0.46, lineHeight: size * 0.58 }}>
           {emoji}

@@ -172,6 +172,12 @@ interface HCPShieldCardProps {
   // countdown-vyns kategori-badge.
   badgeColor?: string;
   badgeTextColor?: string;
+  // Valfri tunn kant runt etikett-badgen (Profile v2: mörk pill + guldkant
+  // för kategori-korten så de inte läses som PREMIUM-badges/knappar).
+  badgeBorderColor?: string;
+  // Valfri minsta bredd på etikett-badgen så flera kort i rad får lika breda
+  // pills (Profile: Music = samma bredd som Film/TV).
+  badgeMinWidth?: number;
   // HCP-förändring efter spelet (after − before). När satt renderas en badge i
   // övre HÖGRA hörnet: 0 (grå) / -x (grön = bättre) / +y (röd = sämre). Flaggan
   // flyttas då till övre VÄNSTRA hörnet så de inte krockar.
@@ -190,6 +196,8 @@ export function HCPShieldCard({
   notDefined = false,
   badgeColor,
   badgeTextColor,
+  badgeBorderColor,
+  badgeMinWidth,
   deltaBadge,
   hideBox = false,
 }: HCPShieldCardProps) {
@@ -220,7 +228,7 @@ export function HCPShieldCard({
       <HCPShield hcp={hcp} size={size} notDefined={notDefined} />
       {label ? (
         <View style={cardStyles.labelBadgeWrap} pointerEvents="none">
-          <View style={[cardStyles.labelBadge, { backgroundColor: labelBg }]}>
+          <View style={[cardStyles.labelBadge, { backgroundColor: labelBg }, badgeBorderColor ? { borderWidth: 1, borderColor: badgeBorderColor } : null, badgeMinWidth ? { minWidth: badgeMinWidth, alignItems: 'center' } : null]}>
             <Text style={[cardStyles.labelBadgeText, { color: labelFg }]} numberOfLines={1}>{label}</Text>
           </View>
         </View>
@@ -334,8 +342,11 @@ const cardStyles = StyleSheet.create({
   labelBadgeWrap: {
     position: 'absolute',
     bottom: -9,
-    left: 0,
-    right: 0,
+    // Wrappen får sticka ut 24 pt på var sida så etiketten kan bli bredare
+    // än kortet ("Film/TV" kapades till "Film/…" på de mindre sköldarna).
+    // alignItems: 'center' håller den centrerad under skölden.
+    left: -24,
+    right: -24,
     alignItems: 'center',
     zIndex: 10,
     elevation: 6,

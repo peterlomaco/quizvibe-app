@@ -9,6 +9,7 @@ import { getAvatarEmojiById } from '../utils/avatars';
 import { getCachedProfile, loadProfile, type ProfileData } from '../utils/profileStorage';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
 import { ChevronIcon } from './ChevronIcon';
+import { BRAND_UI_INACTIVE } from './brand/QuizVibeBrandSvg';
 import { ProfileOutlineIcon } from './ProfileOutlineIcon';
 
 // Emoji-avatar för pillen: vald avatar när inloggad, annars 👤 (utloggad/gäst).
@@ -152,7 +153,7 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
         >
           {/* wifi-variant matchar Final Leaderboard:s Home-knapp och
               start-skärmens QuizVibeLogo — brand-konsistent Q-mark. */}
-          <QuizVibeQAvatar size={20} variant="wifi" />
+          <QuizVibeQAvatar size={20} variant="wifi" color={BRAND_UI_INACTIVE} />
           <Text style={styles.backLinkText}>{backLabel}</Text>
         </TouchableOpacity>
       ))}
@@ -203,7 +204,8 @@ const styles = StyleSheet.create({
   backLinkText: {
     fontSize: 11,
     fontWeight: '600',
-    color: Colors.primary,
+    // Samma grå som bottom-navens inaktiva ikoner (Home v2).
+    color: BRAND_UI_INACTIVE,
   },
   // Join-as-guest-modalens backBtn-style — plain "← Back"-text, ingen icon-
   // stack. Används i Store där Back betyder "stäng denna vy och gå tillbaka

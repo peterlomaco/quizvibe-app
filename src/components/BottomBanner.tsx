@@ -10,6 +10,8 @@ import { ShoppingCartIcon } from './ShoppingCartIcon';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 import { getCachedProfile, loadProfile, subscribeProfileChanges } from '../utils/profileStorage';
 import { supabase } from '../utils/supabase';
+// Osparade ändringar (Profile) → samma "Unsaved changes"-popup som top bannerns Home.
+import { runWithNavigationGuard } from '../utils/navigationGuard';
 
 export const BOTTOM_BANNER_HEIGHT = 52;
 
@@ -124,7 +126,7 @@ export function BottomBanner() {
           }
           label="Home"
           active={isHome}
-          onPress={() => router.replace('/')}
+          onPress={() => runWithNavigationGuard(() => router.replace('/'))}
         />
         <TabItem
           icon={<ProfileOutlineIcon size={NAV_ICON_BOX} color={col(isProfile)} strokeWidth={NAV_STROKE_PT} />}
@@ -136,7 +138,7 @@ export function BottomBanner() {
           icon={<ShoppingCartIcon size={NAV_ICON_BOX} color={col(isStore)} />}
           label="Store"
           active={isStore}
-          onPress={() => router.replace('/store')}
+          onPress={() => runWithNavigationGuard(() => router.replace('/store'))}
         />
       </View>
     </View>

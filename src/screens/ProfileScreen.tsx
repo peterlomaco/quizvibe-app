@@ -5,6 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Alert,
+    Dimensions,
     FlatList,
     KeyboardAvoidingView,
     Modal,
@@ -40,7 +41,63 @@ import {
     RoundsRuler,
 } from '../components/RoundsRuler';
 import { TopUserBanner } from '../components/TopUserBanner';
-import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { setNavigationGuard } from '../utils/navigationGuard';
+import { QuizVibeToggle, quizVibeToggleWidth } from '../components/QuizVibeToggle';
+import { ClapperboardIcon, MusicNoteIcon } from '../components/CategoryIcons';
+import { ChevronIcon } from '../components/ChevronIcon';
+import { LogoutIcon } from '../components/LogoutIcon';
+import { ProfileOutlineIcon } from '../components/ProfileOutlineIcon';
+import {
+  CrownOutlineIcon,
+  DocumentOutlineIcon,
+  FriendsOutlineIcon,
+  LockOutlineIcon,
+  PackageOutlineIcon,
+} from '../components/SectionIcons';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+
+// Spotify Type-raden (Type: Year [toggle] Name [toggle]) ryms bara från ~375 pt;
+// smalare skärmar (SE / Display Zoom) staplar Year/Name.
+const SPOTIFY_TYPE_INLINE = Dimensions.get('window').width >= 375;
+
+// ── Profile v2 (2026-10-16): delad accordion-vokabulär ──────────────────
+// Dämpad ikon i vila, guld när sektionen är utfälld (aktivt state).
+// Alla sektioner som Profile default settings: dämpad ikon även utfälld.
+const sectionIconColor = (_expanded: boolean) => BrandUi.iconMuted;
+
+/** Kompakt +/− i en liten ruta; guldkant + guld tecken när utfälld. */
+// subtle = neutral +/− med bara en svag guldton i kanten när utfälld
+// (Profile default settings, så rubriken inte tävlar med guld-CTA:n).
+function SectionToggle({ expanded, subtle = true }: { expanded: boolean; subtle?: boolean }) {
+  return (
+    <View
+      style={[
+        sectionToggleStyles.box,
+        expanded && (subtle ? sectionToggleStyles.boxActiveSubtle : sectionToggleStyles.boxActive),
+      ]}
+    >
+      <Text style={[sectionToggleStyles.text, expanded && !subtle && sectionToggleStyles.textActive]}>
+        {expanded ? '−' : '+'}
+      </Text>
+    </View>
+  );
+}
+
+const sectionToggleStyles = StyleSheet.create({
+  box: {
+    width: 24,
+    height: 24,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  boxActive: { borderColor: Colors.warning },
+  boxActiveSubtle: { borderColor: 'rgba(245,166,35,0.45)' },
+  text: { fontSize: 16, fontWeight: '700', color: BrandUi.iconMuted, lineHeight: 18 },
+  textActive: { color: Colors.warning },
+});
 import { resetIdentity, track } from '../utils/analytics';
 import { deleteAccount } from '../utils/auth';
 import { TRACK_VIEWPORT_W } from '../utils/responsive';
@@ -499,15 +556,18 @@ export default function ProfileScreen() {
           )
         }
       >
+        {/* Home v2 (2026-10-16): ingen FREE-badge (gratis = normalt), guld
+            kant + guld ✓ = vald. redIndiv ger inte längre röd text — rött
+            betyder fel/destruktivt, inte "ej tillgängligt". */}
         <Text
-          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree, redIndiv && key === 'indiv' && !isActive && { color: Colors.error }]}
+          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree]}
           numberOfLines={2}
         >
           {label}
         </Text>
-        <View style={[styles.freeBadge, !isActive && styles.freeBadgeDimmed]} pointerEvents="none">
-          <Text style={[styles.freeBadgeText, !isActive && styles.freeBadgeTextDimmed]}>FREE</Text>
-        </View>
+        {isActive && (
+          <Text style={styles.modeCheck} pointerEvents="none">✓</Text>
+        )}
       </Pressable>
     );
   };
@@ -515,6 +575,13 @@ export default function ProfileScreen() {
   const [yearPickerOpen, setYearPickerOpen]     = useState(false);
   const [assistancePickerOpen, setAssistancePickerOpen]   = useState(false);
   const [voicePickerOpen, setVoicePickerOpen]   = useState(false);
+  // Film/TV-kolumnens bredd (onLayout) → högerinsättning som gör att Spotify-
+  // och Parent Control-togglarna linjerar exakt med Film/TV-togglarna (som är
+  // centrerade i kolumnen) på alla skärmbredder. Kolumnen har 1 pt vänsterkant.
+  const [filmColWidth, setFilmColWidth] = useState(0);
+  const mixerToggleRightInset = filmColWidth
+    ? Math.max(0, (filmColWidth - 1 - quizVibeToggleWidth('mixer')) / 2)
+    : Spacing.sm;
   // "+"-utfällning av per-kategori-HCP-sköldarna (Music/Film). Default av.
   const [hcpCategoriesExpanded, setHcpCategoriesExpanded] = useState(false);
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
@@ -1255,6 +1322,21 @@ export default function ProfileScreen() {
     );
   };
 
+  // Bottom-bannerns Home/Store-tabbar (som lever i _layout utanför skärmen)
+  // ska ge samma "Unsaved changes"-popup. Ref-spegel så den registrerade
+  // guarden alltid läser aktuellt state; registreras bara medan Profile har
+  // fokus.
+  const guardedNavigateRef = useRef(guardedNavigate);
+  useEffect(() => {
+    guardedNavigateRef.current = guardedNavigate;
+  });
+  useFocusEffect(
+    useCallback(
+      () => setNavigationGuard((navigate) => guardedNavigateRef.current(navigate)),
+      [],
+    ),
+  );
+
   // Tap på Host Game Credits-pillen. Utan prenumeration frågar vi först —
   // pillen sitter i headern och nås lätt av misstag. Med prenumeration finns
   // inget att sälja, så då är tappet en ren genväg till Store. Speglar Lobby;
@@ -1425,6 +1507,37 @@ export default function ProfileScreen() {
     router.push({ pathname: '/lobby', params: { code, isHost: 'true', lobbyType } });
   };
 
+  // Spotify-svarslägen — renderas i både rad- och staplad layout (Type-blocket).
+  // Samma guards som förut: minst ett svarsläge måste vara på.
+  const renderSpotifyYearToggle = () => (
+    <QuizVibeToggle
+      variant="mixer"
+      value={spotifyAnswerYear}
+      onValueChange={(v) => {
+        if (!v && !spotifyAnswerName) {
+          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+          return;
+        }
+        setSpotifyAnswerYear(v);
+      }}
+      accessibilityLabel="Spotify answer type Year"
+    />
+  );
+  const renderSpotifyNameToggle = () => (
+    <QuizVibeToggle
+      variant="mixer"
+      value={spotifyAnswerName}
+      onValueChange={(v) => {
+        if (!v && !spotifyAnswerYear) {
+          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+          return;
+        }
+        setSpotifyAnswerName(v);
+      }}
+      accessibilityLabel="Spotify answer type Name"
+    />
+  );
+
   return (
     <SafeAreaView style={styles.safe}>
       {/* Top board (login status) — sticky utanför ScrollView. Klick på
@@ -1433,8 +1546,10 @@ export default function ProfileScreen() {
           useFocusEffect så den uppdateras när vi navigerar tillbaka efter
           login/edit på andra skärmar. */}
       <TopUserBanner
+        open={logoutModalVisible}
         onPress={() => { setHostTypeExpanded(false); setLogoutModalVisible(true); }}
-        onBackPress={() => guardedNavigate(() => router.replace('/'))}
+        // Ingen Home-länk här (Peter 2026-10-16) — bottennavigeringens Home
+        // räcker och går genom samma unsaved-changes-guard.
       />
       <ScrollView
         ref={scrollRef}
@@ -1460,8 +1575,8 @@ export default function ProfileScreen() {
                 grå när den inte är det (samma lås-signal som Max 12-rutan och
                 Rounds-rulern). Speglar Lobby. */}
             <View style={styles.creditsMembershipBadgeWrap} pointerEvents="none">
-              <View style={[styles.creditsMembershipBadge, !hasPremium && styles.creditsMembershipBadgeGrey]}>
-                <Text style={[styles.creditsMembershipBadgeText, !hasPremium && styles.creditsMembershipBadgeTextGrey]}>PREMIUM</Text>
+              <View style={styles.creditsMembershipBadge}>
+                <Text style={styles.creditsMembershipBadgeText}>PREMIUM</Text>
               </View>
             </View>
             {/* 2 rader — labeln wrappar i stället för att kapas när pillen är
@@ -1496,14 +1611,11 @@ export default function ProfileScreen() {
           hitSlop={8}
         >
           <View style={styles.sectionHeaderIcon}>
-            <QuizVibeQAvatar size={28} />
+            {/* Dämpad ikon även utfälld — guld reserveras för Save Profile. */}
+            <ProfileOutlineIcon size={24} color={BrandUi.iconMuted} />
           </View>
           <Text style={styles.gameConnectionsHeader}>Profile default settings</Text>
-          <View style={styles.gameConnectionsToggleBox}>
-            <Text style={styles.gameConnectionsChevron}>
-              {profileDefaultsExpanded ? '−' : '+'}
-            </Text>
-          </View>
+          <SectionToggle expanded={profileDefaultsExpanded} subtle />
         </Pressable>
         {!profileDefaultsExpanded && <View style={styles.sectionDivider} />}
 
@@ -1528,6 +1640,7 @@ export default function ProfileScreen() {
               <Avatar
                 emoji={source === 'default' ? undefined : selectedAvatar?.emoji}
                 useBrandFallback={source === 'default'}
+                brandColor={Colors.warning}
                 size={96}
               />
               <View style={styles.changeBadge} pointerEvents="none">
@@ -1545,7 +1658,7 @@ export default function ProfileScreen() {
                 Music + Film). Music/Film fälls ut via "HCP per category"-raden
                 i höger-kolumnen. */}
             <View style={styles.hcpShieldWrap}>
-              <HCPShieldCard hcp={hcpShieldBundle.total} size={64} label="Total" />
+              <HCPShieldCard hcp={hcpShieldBundle.total} size={54} label="Total" badgeColor={Colors.background} badgeTextColor={Colors.textPrimary} badgeBorderColor={Colors.warning} />
             </View>
           </View>
 
@@ -1557,7 +1670,7 @@ export default function ProfileScreen() {
 
             {/* Competition Year of birth */}
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Competition Year of birth</Text>
+              <Text style={styles.fieldLabelPlain}>Year of birth</Text>
               <Pressable
                 onPress={() => setYearPickerOpen(true)}
                 style={({ pressed }) => [
@@ -1573,7 +1686,7 @@ export default function ProfileScreen() {
                 >
                   {birthYear !== null ? formatBirthYear(birthYear) : 'Select'}
                 </Text>
-                <Text style={styles.selectorChevron}>›</Text>
+                <ChevronIcon size={16} />
               </Pressable>
             </View>
 
@@ -1581,7 +1694,7 @@ export default function ProfileScreen() {
                 visas inline till höger om labeln så raden inte tar mer
                 vertikal yta än gap-en till intilliggande fält. */}
             <View style={styles.ageRow}>
-              <Text style={styles.fieldLabel}>Competition Age</Text>
+              <Text style={styles.fieldLabelPlain}>Age</Text>
               <Text
                 style={[
                   styles.ageValue,
@@ -1595,7 +1708,7 @@ export default function ProfileScreen() {
             {/* Assistance level */}
             <View style={styles.field}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={styles.fieldLabel}>Assistance level</Text>
+                <Text style={styles.fieldLabelPlain}>Assistance level</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() => Alert.alert(
@@ -1622,14 +1735,14 @@ export default function ProfileScreen() {
                 >
                   {assistanceLabel ?? 'Select'}
                 </Text>
-                <Text style={styles.selectorChevron}>›</Text>
+                <ChevronIcon size={16} />
               </Pressable>
             </View>
 
             {/* Countdown voice */}
             <View style={styles.field}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={styles.fieldLabel}>Voice</Text>
+                <Text style={styles.fieldLabelPlain}>Voice</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() => Alert.alert(
@@ -1651,7 +1764,7 @@ export default function ProfileScreen() {
                 <Text style={styles.selectorText}>
                   {voiceLabel ?? 'Female voice'}
                 </Text>
-                <Text style={styles.selectorChevron}>›</Text>
+                <ChevronIcon size={16} />
               </Pressable>
             </View>
 
@@ -1668,15 +1781,17 @@ export default function ProfileScreen() {
                   {hcpCategoriesExpanded ? '−' : '+'}
                 </Text>
               </View>
-              <Text style={styles.fieldLabel}>HCP per category</Text>
+              <Text style={styles.fieldLabelPlain}>HCP by category</Text>
             </Pressable>
             {/* Per-kategori-HCP (§1.3) — full-bredds-rad, utfälld via raden ovan.
                 Bara Music + Film (Sport parkerad). Badge-färgen matchar
                 GetReady/countdown-vyns kategori-badge (guld + svart). */}
             {hcpCategoriesExpanded && (
               <View style={styles.hcpSubRow}>
-                <HCPShieldCard hcp={hcpShieldBundle.music} size={56} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" />
-                <HCPShieldCard hcp={hcpShieldBundle.film} size={56} label="Film/TV" badgeColor={Colors.warning} badgeTextColor="#000" />
+                {/* ~18 % mindre än förr (56) så Total förblir primär; mörka
+                    pills med tunn guldkant i stället för solida guld-badges. */}
+                <HCPShieldCard hcp={hcpShieldBundle.music} size={46} label="Music" badgeColor={Colors.background} badgeTextColor={Colors.textPrimary} badgeBorderColor={Colors.warning} badgeMinWidth={68} />
+                <HCPShieldCard hcp={hcpShieldBundle.film} size={46} label="Film/TV" badgeColor={Colors.background} badgeTextColor={Colors.textPrimary} badgeBorderColor={Colors.warning} badgeMinWidth={68} />
               </View>
             )}
 
@@ -1687,7 +1802,7 @@ export default function ProfileScreen() {
           <Button
             label={savedSection === 'defaults' ? '✓ Saved' : 'Save Profile'}
             onPress={() => handleSave('defaults')}
-            variant={savedSection === 'defaults' ? 'secondary' : 'primary'}
+            variant={savedSection === 'defaults' ? 'secondary' : 'gold'}
           />
         </View>
         </>
@@ -1709,24 +1824,17 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
-          {/* Blå krona-silhuett (Colors.primary) — matchar blå-temat. */}
           <View style={styles.sectionHeaderIcon}>
-            <Svg width={24} height={24} viewBox="0 0 24 24">
-              <Path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5zm0 2h14v2H5v-2z" fill={Colors.primary} />
-            </Svg>
+            <CrownOutlineIcon size={24} color={sectionIconColor(hostDefaultsExpanded)} />
           </View>
           <Text style={styles.gameConnectionsHeader}>Host default settings</Text>
-          <View style={styles.gameConnectionsToggleBox}>
-            <Text style={styles.gameConnectionsChevron}>
-              {hostDefaultsExpanded ? '−' : '+'}
-            </Text>
-          </View>
+          <SectionToggle expanded={hostDefaultsExpanded} />
         </Pressable>
         {!hostDefaultsExpanded && <View style={styles.sectionDivider} />}
 
         {hostDefaultsExpanded && (
         <>
-        <View style={styles.preview}>
+        <View style={[styles.preview, { gap: Spacing.md + 2 }]}>
           {/* ── Game Mode (host-default) ─────────────────────────
               Pass-the-Phone (gratis) vs Individual Devices (Premium).
               Speglar Lobby:s Game Mode-toggle exakt — grön aktiv för
@@ -1734,38 +1842,29 @@ export default function ProfileScreen() {
               (premium-läge). Försök att välja Individual Devices utan
               Premium triggar Store-omdirigering. */}
           <View style={styles.field}>
-            <Text style={styles.sectionLabel}>Multiplayer Game Mode</Text>
-            {/* Två rutor i EN rad + bracket-etikett undertill — speglar Lobby.
-                Single player och Remote (1vs1) är INTE host-defaults: de väljs
-                per spel via "Start New Game" på Home (2026-08-26). ⚠ Flex-talet
-                på bracket-raden MÅSTE spegla antalet rutor ovanför. */}
+            {/* Rubrik + info-ikon (flyttad hit från den borttagna MULTIPLAYER-
+                klammern under rutorna — Profile v2, 2026-10-16). Single player
+                och Remote (1vs1) är INTE host-defaults: de väljs per spel via
+                "Start New Game" på Home (2026-08-26). */}
+            <View style={styles.regionLabelRow}>
+              <Text style={styles.sectionLabel}>Multiplayer Game Mode</Text>
+              <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() =>
+                  Alert.alert(
+                    'Multiplayer mode',
+                    'This is your default for Multiplayer games.\n\nPass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nSingle player and Head-to-head are picked per game on the Home screen — tap Start New Game and choose "Single Game" or "Head-to-head".',
+                  )
+                }
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            </View>
             <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true)}
             </View>
-            <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
-              {/* Bracket under "Pass-the-Phone" + "Individual device" —
-                  flex:1 så den spänner över hela raden (båda rutorna). */}
-              <View style={{ flex: 1, alignItems: 'center' }}>
-                <View style={styles.multiplayerBracket} />
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
-                  <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
-                  <Pressable
-                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    onPress={() =>
-                      Alert.alert(
-                        'Multiplayer mode',
-                        'This is your default for Multiplayer games.\n\nPass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nSingle player and Head-to-head are picked per game on the Home screen — tap Start New Game and choose "Single Game" or "Head-to-head".',
-                      )
-                    }
-                    hitSlop={8}
-                  >
-                    <Text style={styles.infoIconText}>i</Text>
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-
             {/* Players — max antal spelare (Max 4 gratis / Max 12 Premium). */}
             <View style={styles.playersLabelRow}>
               <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
@@ -1796,24 +1895,28 @@ export default function ProfileScreen() {
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
                   Max 4 players
                 </Text>
-                <View style={[styles.freeBadge, maxPlayers !== 4 && styles.freeBadgeDimmed]} pointerEvents="none">
-                  <Text style={[styles.freeBadgeText, maxPlayers !== 4 && styles.freeBadgeTextDimmed]}>FREE</Text>
-                </View>
+                {maxPlayers === 4 && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
               </Pressable>
               {/* Max 12: aktiv (guld) när maxPlayers===12. Badge grå/guld per premium-status. */}
               <Pressable
                 style={({ pressed }) => [
                   styles.modeOption,
-                  maxPlayers === 12 ? styles.modeOptionPremiumActive : styles.modeOptionInactive,
+                  maxPlayers === 12 ? styles.modeOptionPassActive : styles.modeOptionInactive,
                   pressed && { opacity: 0.7 },
                 ]}
                 onPress={() => handleSelectMaxPlayers(12)}
               >
-                <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && styles.modeLabelActivePremium]}>
-                  Max 12 players
-                </Text>
-                <View style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]} pointerEvents="none">
-                  <Text style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}>PREMIUM</Text>
+                {/* Låst Premium-val: dämpat + lås-ikon; den lilla guld-
+                    PREMIUM-badgen bär förklaringen (aldrig rött). */}
+                <View style={[styles.lockedContentRow, !hasPremium && styles.lockedContent]}>
+                  {!hasPremium && <LockOutlineIcon size={13} />}
+                  <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && styles.modeLabelActiveFree]}>
+                    Max 12 players
+                  </Text>
+                </View>
+                {maxPlayers === 12 && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
+                <View style={styles.premiumBadge} pointerEvents="none">
+                  <Text style={styles.premiumBadgeText}>PREMIUM</Text>
                 </View>
               </Pressable>
             </View>
@@ -1838,13 +1941,13 @@ export default function ProfileScreen() {
             >
               <Text style={{ fontSize: 18 }}>{region ? REGION_FLAGS[region] ?? '' : ''}</Text>
               <Text style={styles.regionTriggerText}>{regionLabel ?? 'Select'}</Text>
-              <Text style={{ fontSize: 14, color: Colors.textSecondary }}>⌄</Text>
+              <ChevronIcon size={16} direction="down" />
             </TouchableOpacity>
           </View>
 
           {/* Source Mixerboard */}
           <View style={styles.field}>
-            <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
+            <Text style={styles.sectionLabel}>Quiz Mixer</Text>
             {/* Grå ram runt hela mixerboarden (Spotify + YouTube + Hints) —
                 samma setup som lobby-vyn. Spotify-blockets egen bg borttagen så
                 ramen blir en enda enhetlig box. */}
@@ -1861,37 +1964,25 @@ export default function ProfileScreen() {
                 marginLeft: Spacing.sm,
                 marginRight: 0,
                 marginTop: 6,
-                borderWidth: 1,
-                borderColor: spotifyConnected ? Colors.success : Colors.error,
-                borderRadius: Radius.sm,
+                // Ingen ram (Peter 2026-10-19) — toggeln bär läget.
                 paddingLeft: Spacing.sm,
-                paddingRight: 18,
+                paddingRight: mixerToggleRightInset,
                 paddingVertical: 6,
               }}
             >
-              {!!playerName && (
-                <View
-                  style={[styles.spotifyAttestBadge, { backgroundColor: spotifyConnected ? Colors.success : Colors.error }]}
-                  pointerEvents="none"
-                >
-                  <Text style={styles.spotifyAttestBadgeText} numberOfLines={1}>{playerName}</Text>
-                </View>
-              )}
+              {/* Namn-badgen på attest-boxen borttagen (Peter 2026-10-19). */}
               <Text style={[styles.spotifyLinkText, { color: Colors.textPrimary, fontSize: FontSize.sm, flex: 1, textDecorationLine: 'none' }]}>
                 I have Spotify App on this device
               </Text>
-              <View style={{ marginRight: -16 }}>
-                <Switch
-                  value={spotifyConnected}
-                  onValueChange={handleToggleSpotifyUser}
-                  trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                  thumbColor="#FFF"
-                  ios_backgroundColor={spotifyConnected ? '#1DB954' : '#3C3C3C'}
-                  style={styles.sourceMatrixSwitch}
-                />
-              </View>
+              <QuizVibeToggle
+                variant="mixer"
+                value={spotifyConnected}
+                onValueChange={handleToggleSpotifyUser}
+                accessibilityLabel="I have Spotify App on this device"
+              />
             </View>
-            <View style={[styles.spotifyDJRow, { backgroundColor: undefined, borderRadius: undefined, marginBottom: 0 }]}>
+            {/* paddingRight = attest-radens (Spacing.sm) så Spotify-toggeln linjerar med de andra. */}
+            <View style={[styles.spotifyDJRow, { backgroundColor: undefined, borderRadius: undefined, marginBottom: 0, paddingRight: mixerToggleRightInset }]}>
               <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 1, marginLeft: -2 }]}>
                 <SpotifyBrandIcon size={22} variant="white" />
               </View>
@@ -1914,22 +2005,16 @@ export default function ProfileScreen() {
               </View>
               {/* Enabled/Disabled-pill + toggle (samma som lobby). Pillen visas
                   bara när Spotify är attestat; speglar spotifyEnabled-läget. */}
-              <View style={[styles.spotifyHostControls, { marginRight: -16, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
-                {spotifyConnected && (
-                  <View style={[styles.spotifyAvailPill, spotifyEnabled ? styles.spotifyAvailPillOn : styles.spotifyAvailPillOff]}>
-                    <Text style={[styles.spotifyAvailPillText, !spotifyEnabled && styles.spotifyAvailPillTextOff]}>
-                      {spotifyEnabled ? 'Enabled' : 'Disabled'}
-                    </Text>
-                  </View>
-                )}
-                <Switch
+              <View style={[styles.spotifyHostControls, { alignSelf: 'center', gap: Spacing.sm }]}>
+                {/* "Enabled/Disabled"-pillen borttagen 2026-10-19 — den speglade
+                    bara spotifyEnabled, dvs. exakt samma läge som toggeln visar. */}
+                {/* Låst (disabled) tills Spotify är attesterat — som förut. */}
+                <QuizVibeToggle
+                  variant="mixer"
                   value={spotifyConnected && spotifyEnabled}
                   onValueChange={spotifyConnected ? handleToggleSpotifyEnabled : undefined}
                   disabled={!spotifyConnected}
-                  trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                  thumbColor={spotifyConnected ? '#FFF' : '#888'}
-                  ios_backgroundColor={spotifyConnected && spotifyEnabled ? '#1DB954' : '#3C3C3C'}
-                  style={[styles.sourceMatrixSwitch, !spotifyConnected && { opacity: 0.4 }]}
+                  accessibilityLabel="Spotify DJ"
                 />
               </View>
             </View>
@@ -1938,46 +2023,32 @@ export default function ProfileScreen() {
               // header + Year/Name-rader nära högerkanten, label direkt till
               // vänster om sin toggle. Togglarna (marginRight -16) linjerar under
               // Spotify/YouTube/Hints-togglarna. Speglar lobby-vyn.
-              <View style={{ paddingRight: 18, paddingTop: 2, paddingBottom: 4, alignItems: 'flex-end' }}>
-                <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Type:</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                  <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
-                  <View style={{ marginRight: -16 }}>
-                    <Switch
-                      value={spotifyAnswerYear}
-                      onValueChange={(v) => {
-                        if (!v && !spotifyAnswerName) {
-                          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
-                          return;
-                        }
-                        setSpotifyAnswerYear(v);
-                      }}
-                      trackColor={{ false: Colors.error, true: Colors.success }}
-                      thumbColor="#FFF"
-                      ios_backgroundColor={spotifyAnswerYear ? Colors.success : Colors.error}
-                      style={styles.sourceMatrixSwitch}
-                    />
+              // Inre block vänsterställt så "Type:", "Year" och "Name" börjar på
+              // samma x (Name står kvar där den stod); togglarna i högerkanten.
+              <View style={{ paddingRight: mixerToggleRightInset, paddingTop: 2, paddingBottom: 4, alignItems: 'flex-end' }}>
+                {SPOTIFY_TYPE_INLINE ? (
+                  // Kompakt: "Type:  Year [toggle]  Name [toggle]" på en rad.
+                  <View style={styles.spotifyTypeInline}>
+                    <Text style={styles.spotifyTypeHeader}>Type:</Text>
+                    <Text style={styles.spotifyTypeInlineLabel}>Year</Text>
+                    {renderSpotifyYearToggle()}
+                    <Text style={[styles.spotifyTypeInlineLabel, { marginLeft: Spacing.xs }]}>Name</Text>
+                    {renderSpotifyNameToggle()}
                   </View>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                  <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Name</Text>
-                  <View style={{ marginRight: -16 }}>
-                    <Switch
-                      value={spotifyAnswerName}
-                      onValueChange={(v) => {
-                        if (!v && !spotifyAnswerYear) {
-                          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
-                          return;
-                        }
-                        setSpotifyAnswerName(v);
-                      }}
-                      trackColor={{ false: Colors.error, true: Colors.success }}
-                      thumbColor="#FFF"
-                      ios_backgroundColor={spotifyAnswerName ? Colors.success : Colors.error}
-                      style={styles.sourceMatrixSwitch}
-                    />
+                ) : (
+                  // Smala skärmar: staplat, men tätare.
+                  <View style={{ alignItems: 'flex-start' }}>
+                    <Text style={styles.spotifyTypeHeader}>Type:</Text>
+                    <View style={styles.spotifyTypeRow}>
+                      <Text style={styles.spotifyTypeLabel}>Year</Text>
+                      {renderSpotifyYearToggle()}
+                    </View>
+                    <View style={styles.spotifyTypeRow}>
+                      <Text style={styles.spotifyTypeLabel}>Name</Text>
+                      {renderSpotifyNameToggle()}
+                    </View>
                   </View>
-                </View>
+                )}
               </View>
             )}
             </View>
@@ -1994,14 +2065,12 @@ export default function ProfileScreen() {
                 <View style={[styles.smHeaderCell, styles.smDataShift]}>
                   <Text style={styles.sourceMatrixAllText}>All</Text>
                 </View>
-                <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
-                  <Switch
+                <View style={[styles.smAllToggleCell, { borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
+                  <QuizVibeToggle
+                    variant="mixer"
                     value={sourcesAllEnabled}
                     onValueChange={handleToggleAllSources}
-                    trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={sourcesAllEnabled ? Colors.success : PROFILE_MATRIX_OFF}
-                    style={styles.profileSwitch}
+                    accessibilityLabel="All sources"
                   />
                 </View>
                 <View style={styles.smLabelSourceCell}>
@@ -2019,8 +2088,8 @@ export default function ProfileScreen() {
                 <View style={styles.smLabelSourceCell}>
                   <View style={styles.imagesIconWrap}>
                     <Svg width={20} height={20} viewBox="24 22 32 32">
-                      <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
-                      <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
+                      <Circle cx="40" cy="38" r="13" fill="none" stroke={BrandUi.iconMuted} strokeWidth="2.5" />
+                      <Path d="M49 47 L53 51" stroke={BrandUi.iconMuted} strokeWidth="2.5" strokeLinecap="round" />
                     </Svg>
                     <Text style={styles.imagesQMark}>?</Text>
                   </View>
@@ -2040,32 +2109,40 @@ export default function ProfileScreen() {
                 <View style={styles.smHeaderCell}>
                   <Text style={styles.sourceMatrixHeaderText}>Music</Text>
                 </View>
-                <View style={[styles.smAllToggleCell, styles.smSwitchNudge]}>
-                  <Switch value={artistsAllOn} onValueChange={handleToggleArtistsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={artistsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                {/* QuizVibeToggle (mixer) med not-ikon i knoppen — ikonen syns i
+                    båda lägena; guld är det enda ON-språket. */}
+                <View style={styles.smAllToggleCell}>
+                  <QuizVibeToggle variant="mixer" value={artistsAllOn} onValueChange={handleToggleArtistsColumn} icon={(color, size) => <MusicNoteIcon size={size} color={color} strokeWidth={2.2} />} accessibilityLabel="All Music sources" />
                 </View>
-                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
-                  <Switch value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                <View style={styles.smSwitchCell}>
+                  <QuizVibeToggle variant="mixer" value={youtubeEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsYoutube} icon={(color, size) => <MusicNoteIcon size={size} color={color} strokeWidth={2.2} />} accessibilityLabel="Music on YouTube" />
                 </View>
                 <View style={styles.smAutoCell} />
-                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
-                  <Switch value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Music') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                <View style={styles.smSwitchCell}>
+                  <QuizVibeToggle variant="mixer" value={imagesEnabledCategories.includes('Music')} onValueChange={handleToggleArtistsGuessWho} icon={(color, size) => <MusicNoteIcon size={size} color={color} strokeWidth={2.2} />} accessibilityLabel="Music in Hints" />
                 </View>
               </View>
 
               {/* Film (Actors) kolumn */}
-              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
+              <View
+                style={[styles.smDataStack, styles.sourceMatrixColSep]}
+                onLayout={(e) => {
+                  const w = Math.round(e.nativeEvent.layout.width);
+                  setFilmColWidth((prev) => (prev === w ? prev : w));
+                }}
+              >
                 <View style={styles.smHeaderCell}>
                   <Text style={styles.sourceMatrixHeaderText} numberOfLines={1}>Film/TV</Text>
                 </View>
-                <View style={[styles.smAllToggleCell, styles.smSwitchNudge, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
-                  <Switch value={actorsAllOn} onValueChange={handleToggleActorsColumn} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={actorsAllOn ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                <View style={[styles.smAllToggleCell, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
+                  <QuizVibeToggle variant="mixer" value={actorsAllOn} onValueChange={handleToggleActorsColumn} icon={(color, size) => <ClapperboardIcon size={size} color={color} strokeWidth={2.2} />} accessibilityLabel="All Film/TV sources" />
                 </View>
-                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
-                  <Switch value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={youtubeEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                <View style={styles.smSwitchCell}>
+                  <QuizVibeToggle variant="mixer" value={youtubeEnabledCategories.includes('Film')} onValueChange={handleToggleActorsYoutube} icon={(color, size) => <ClapperboardIcon size={size} color={color} strokeWidth={2.2} />} accessibilityLabel="Film/TV on YouTube" />
                 </View>
                 <View style={styles.smAutoCell} />
-                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
-                  <Switch value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} trackColor={{ false: PROFILE_MATRIX_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={imagesEnabledCategories.includes('Film') ? Colors.success : PROFILE_MATRIX_OFF} style={styles.profileSwitch} />
+                <View style={styles.smSwitchCell}>
+                  <QuizVibeToggle variant="mixer" value={imagesEnabledCategories.includes('Film')} onValueChange={handleToggleActorsGuessWho} icon={(color, size) => <ClapperboardIcon size={size} color={color} strokeWidth={2.2} />} accessibilityLabel="Film/TV in Hints" />
                 </View>
               </View>
 
@@ -2087,15 +2164,19 @@ export default function ProfileScreen() {
               >
                 <Text style={styles.infoIconText}>i</Text>
               </Pressable>
+              {/* QuizVibe-toggle på rubrikraden, högerställd så den linjerar
+                  med Film/TV-togglarna (mixerboard-ram 1 + padding 4 = +5 pt).
+                  Kontrollerad: avstängningens bekräftelse-Alert lämnar den på
+                  ON tills användaren bekräftar. */}
+              <View style={{ marginLeft: 'auto', marginRight: mixerToggleRightInset + 5 }}>
+                <QuizVibeToggle
+                  variant="mixer"
+                  value={parentControlEnabled}
+                  onValueChange={handleToggleParentControl}
+                  accessibilityLabel="Parent Control"
+                />
+              </View>
             </View>
-            <Switch
-              value={parentControlEnabled}
-              onValueChange={handleToggleParentControl}
-              trackColor={{ false: '#3C3C3C', true: Colors.success }}
-              thumbColor="#FFF"
-              ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
-              style={styles.sourceMatrixSwitch}
-            />
           </View>
 
           {/* Game era — adjustable år-spann för frågor. */}
@@ -2169,11 +2250,12 @@ export default function ProfileScreen() {
                 selectedStyle={{
                   backgroundColor: Colors.warning,
                   borderRadius: 3,
+                  // Profile v2: svag glöd (var 0.85 / 8).
                   shadowColor: Colors.warning,
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.85,
-                  shadowRadius: 8,
-                  elevation: 4,
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3,
+                  elevation: 1,
                 }}
                 unselectedStyle={{ backgroundColor: Colors.border }}
                 trackStyle={{ height: 6 }}
@@ -2265,9 +2347,13 @@ export default function ProfileScreen() {
                     ],
                   )}
                   activeOpacity={0.7}
-                  style={{ backgroundColor: hasPremium ? '#F5A623' : '#6B7280', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 4 }}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 4 }}
                 >
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: hasPremium ? '#000' : '#FFF', letterSpacing: 0.6 }}>PREMIUM</Text>
+                  {/* Låst Premium-intervall: lås + liten guld-PREMIUM-pill. */}
+                  {!hasPremium && <LockOutlineIcon size={13} />}
+                  <View style={{ backgroundColor: Colors.warning, borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: '#000', letterSpacing: 0.6 }}>PREMIUM</Text>
+                  </View>
                 </TouchableOpacity>
               )}
             </View>
@@ -2286,6 +2372,7 @@ export default function ProfileScreen() {
                 )}
                 hasSubscription={hasPremium}
                 indivActive={gameMode === 'individual-devices'}
+                brandV2
               />
             </View>
             <Text style={styles.roundsScopeNote}>
@@ -2298,7 +2385,7 @@ export default function ProfileScreen() {
           <View style={styles.field}>
             <View style={styles.modeRow}>
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
-              {renderModeBox('indiv', 'Individual device', true, true)}
+              {renderModeBox('indiv', 'Individual device', true)}
             </View>
           </View>
 
@@ -2345,7 +2432,7 @@ export default function ProfileScreen() {
           <Button
             label={savedSection === 'host' ? '✓ Saved' : 'Save Host settings'}
             onPress={() => handleSave('host')}
-            variant={savedSection === 'host' ? 'secondary' : 'primary'}
+            variant={savedSection === 'host' ? 'secondary' : 'gold'}
           />
         </View>
         </>
@@ -2366,18 +2453,11 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
-          {/* Blå present/paket-silhuett (Colors.primary) — matchar blå-temat. */}
           <View style={styles.sectionHeaderIcon}>
-            <Svg width={24} height={24} viewBox="0 0 24 24">
-              <Path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z" fill={Colors.primary} />
-            </Svg>
+            <PackageOutlineIcon size={24} color={sectionIconColor(customizedPackagesExpanded)} />
           </View>
           <Text style={styles.gameConnectionsHeader}>Customized Host packages</Text>
-          <View style={styles.gameConnectionsToggleBox}>
-            <Text style={styles.gameConnectionsChevron}>
-              {customizedPackagesExpanded ? '−' : '+'}
-            </Text>
-          </View>
+          <SectionToggle expanded={customizedPackagesExpanded} />
         </Pressable>
         {!customizedPackagesExpanded && <View style={styles.sectionDivider} />}
 
@@ -2391,6 +2471,9 @@ export default function ProfileScreen() {
             <Pressable
               style={({ pressed }) => [
                 styles.addPackageBtn,
+                // Starkaste guldet i sektionen: full guldkant med Premium,
+                // dämpad guld utan (låst).
+                { borderColor: hasPremium ? Colors.warning : 'rgba(245,166,35,0.45)' },
                 pressed && { opacity: 0.7 },
               ]}
               onPress={() =>
@@ -2409,14 +2492,15 @@ export default function ProfileScreen() {
                     )
               }
             >
-              <Text style={styles.modeLabel}>Activate Extra package</Text>
-              <View
-                style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]}
-                pointerEvents="none"
-              >
-                <Text style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}>
-                  PREMIUM
-                </Text>
+              <View style={[styles.lockedContentRow, !hasPremium && styles.lockedContent]}>
+                {!hasPremium && <LockOutlineIcon size={13} />}
+                <Text style={[styles.modeLabel, hasPremium && styles.modeLabelActiveFree]}>Activate Extra package</Text>
+              </View>
+              <View style={styles.premiumBadge} pointerEvents="none">
+                <Text style={styles.premiumBadgeText}>PREMIUM</Text>
+              </View>
+              <View style={styles.addPackageChevron} pointerEvents="none">
+                <ChevronIcon size={16} />
               </View>
             </Pressable>
 
@@ -2439,18 +2523,12 @@ export default function ProfileScreen() {
               {availablePackages.length > 1 && (
                 <View style={styles.selectAllRow}>
                   <Text style={styles.selectAllLabel}>Select all</Text>
-                  <Switch
+                  {/* Compact QuizVibeToggle — samma logik som förut. */}
+                  <QuizVibeToggle
+                    variant="mixer"
                     value={isAllPackagesEnabled}
                     onValueChange={handleToggleAllPackages}
-                    trackColor={{ false: Colors.error, true: Colors.success }}
-                    thumbColor="#FFF"
-                    // iOS Switch:s native track är något smalare än outer
-                    // pill, så `ios_backgroundColor` läcker igenom som en
-                    // tunn röd flärd vid kanterna även när toggle är ON.
-                    // Synca färgen med aktiv track-färg så ingen röd flärd
-                    // syns när toggle är aktiverad.
-                    ios_backgroundColor={isAllPackagesEnabled ? Colors.success : Colors.error}
-                    style={styles.selectAllSwitch}
+                    accessibilityLabel="Select all packages"
                   />
                 </View>
               )}
@@ -2464,44 +2542,18 @@ export default function ProfileScreen() {
                     const isEnabled = enabledHostPackages.includes(pkg.id);
                     const isFree = !!pkg.free;
                     return (
-                      <View key={pkg.id} style={styles.packageListRow}>
-                        {/* Info-ikon — speglar Lobby:s purchasedPackageRow-
-                            mönster (20×20 cirkel, italic "i"). Tap visar
-                            Alert med paketets namn + Store-text. */}
-                        <Pressable
-                          style={({ pressed }) => [
-                            styles.infoIconBtn,
-                            pressed && { opacity: 0.7 },
-                          ]}
-                          onPress={() =>
-                            Alert.alert(
-                              pkg.name,
-                              'Information about this package will be available later.',
-                            )
-                          }
-                          hitSlop={8}
-                          accessibilityLabel={`${pkg.name} info`}
-                        >
-                          <Text style={styles.infoIconText}>i</Text>
-                        </Pressable>
-                        {/* Paketnamns-box: aktiv styling när enabled, dämpad
-                            (grå border, transparent bg, dämpad text) när
-                            disabled — speglar Lobby:s purchasedPackageBox /
-                            purchasedPackageBoxActive-mönster. Free-paket
-                            (pkg.free=true) får en kantskärande FREE-badge —
-                            inga free-paket i V1 men styling-pattern bevaras
-                            för framtida gratis-paket. */}
-                        <View
-                          style={[
-                            styles.packageRow,
-                            !isEnabled && styles.packageRowInactive,
-                          ]}
-                        >
+                      // Profile v2-paketrad (2026-10-19): [identitet] [namn]
+                      // [i] [compact-toggle]. Toggeln bär ON-signalen; raden
+                      // får bara en svag guldkant när paketet är på.
+                      <View
+                        key={pkg.id}
+                        style={[styles.packageListRow, isEnabled && styles.packageListRowOn]}
+                      >
+                        <MusicNoteIcon size={18} color={isEnabled ? Colors.warning : BrandUi.iconMuted} />
+                        <View style={styles.packageNameWrap}>
                           <Text
-                            style={[
-                              styles.packageRowText,
-                              !isEnabled && styles.packageRowTextInactive,
-                            ]}
+                            style={[styles.packageRowText, !isEnabled && styles.packageRowTextInactive]}
+                            numberOfLines={2}
                           >
                             {pkg.name}
                           </Text>
@@ -2518,18 +2570,27 @@ export default function ProfileScreen() {
                             </View>
                           )}
                         </View>
-                        {/* On/off-toggle — styr om paketet visas i Lobby
-                            när användaren är host. Samma röd/grön-track +
-                            vit thumb + 0.8-skala som Lobby:s switchar. */}
-                        <Switch
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.infoIconBtn,
+                            pressed && { opacity: 0.7 },
+                          ]}
+                          onPress={() =>
+                            Alert.alert(
+                              pkg.name,
+                              'Information about this package will be available later.',
+                            )
+                          }
+                          hitSlop={8}
+                          accessibilityLabel={`${pkg.name} info`}
+                        >
+                          <Text style={styles.infoIconText}>i</Text>
+                        </Pressable>
+                        <QuizVibeToggle
+                          variant="mixer"
                           value={isEnabled}
                           onValueChange={() => handleToggleHostPackage(pkg.id)}
-                          trackColor={{ false: Colors.error, true: Colors.success }}
-                          thumbColor="#FFF"
-                          // Synca ios_backgroundColor med aktiv track-färg —
-                          // se Select all-switchen ovan för rationale.
-                          ios_backgroundColor={isEnabled ? Colors.success : Colors.error}
-                          style={styles.packageSwitch}
+                          accessibilityLabel={pkg.name}
                         />
                       </View>
                     );
@@ -2546,7 +2607,7 @@ export default function ProfileScreen() {
             <Button
               label={savedSection === 'packages' ? '✓ Saved' : 'Save settings'}
               onPress={() => handleSave('packages')}
-              variant={savedSection === 'packages' ? 'secondary' : 'primary'}
+              variant={savedSection === 'packages' ? 'secondary' : 'gold'}
             />
             </>
             )}
@@ -2562,14 +2623,11 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
-          {/* Profil-silhuett-emoji — samma ikon som Players in Lobby. */}
-          <Text style={styles.sectionHeaderEmoji}>👥</Text>
-          <Text style={styles.gameConnectionsHeader}>QuizVibe Community & Friends</Text>
-          <View style={styles.gameConnectionsToggleBox}>
-            <Text style={styles.gameConnectionsChevron}>
-              {gameConnectionsExpanded ? '−' : '+'}
-            </Text>
+          <View style={styles.sectionHeaderIcon}>
+            <FriendsOutlineIcon size={24} color={sectionIconColor(gameConnectionsExpanded)} />
           </View>
+          <Text style={styles.gameConnectionsHeader}>QuizVibe Community & Friends</Text>
+          <SectionToggle expanded={gameConnectionsExpanded} />
         </Pressable>
         {!gameConnectionsExpanded && <View style={styles.sectionDivider} />}
 
@@ -2581,7 +2639,7 @@ export default function ProfileScreen() {
         <View style={styles.friendsCard}>
           <View style={styles.friendsHeader}>
             <View style={styles.friendsIconWrap}>
-              <QuizVibeFriendsLogo size={48} />
+              <FriendsOutlineIcon size={30} color={BrandUi.iconMuted} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.friendsTitle}>QuizVibe friends</Text>
@@ -2664,13 +2722,11 @@ export default function ProfileScreen() {
           ]}
           hitSlop={8}
         >
-          <Text style={styles.sectionHeaderEmoji}>📄</Text>
-          <Text style={styles.gameConnectionsHeader}>Legal</Text>
-          <View style={styles.gameConnectionsToggleBox}>
-            <Text style={styles.gameConnectionsChevron}>
-              {legalExpanded ? '−' : '+'}
-            </Text>
+          <View style={styles.sectionHeaderIcon}>
+            <DocumentOutlineIcon size={24} color={sectionIconColor(legalExpanded)} />
           </View>
+          <Text style={styles.gameConnectionsHeader}>Legal</Text>
+          <SectionToggle expanded={legalExpanded} />
         </Pressable>
         {!legalExpanded && <View style={styles.sectionDivider} />}
 
@@ -2688,7 +2744,7 @@ export default function ProfileScreen() {
               ]}
             >
               <Text style={styles.legalRowText}>Privacy Policy</Text>
-              <Text style={styles.legalRowChevron}>›</Text>
+              <ChevronIcon size={18} />
             </Pressable>
             <View style={styles.legalRowDivider} />
             <Pressable
@@ -2703,7 +2759,7 @@ export default function ProfileScreen() {
               ]}
             >
               <Text style={styles.legalRowText}>Terms of Service</Text>
-              <Text style={styles.legalRowChevron}>›</Text>
+              <ChevronIcon size={18} />
             </Pressable>
             <View style={styles.legalRowDivider} />
             <Pressable
@@ -2714,7 +2770,7 @@ export default function ProfileScreen() {
               ]}
             >
               <Text style={styles.legalRowText}>FAQ</Text>
-              <Text style={styles.legalRowChevron}>›</Text>
+              <ChevronIcon size={18} />
             </Pressable>
             <Text style={styles.legalFootnote}>
               Privacy Policy and Terms open in a secure in-app browser.
@@ -2866,7 +2922,12 @@ export default function ProfileScreen() {
                   pressed && { opacity: 0.85 },
                 ]}
               >
-                <Text style={friendsModal.addBtnText}>
+                <Text
+                  style={[
+                    friendsModal.addBtnText,
+                    (!newFriendPlayerName.trim() || addFriendChecking) && { color: Colors.textSecondary },
+                  ]}
+                >
                   {addFriendChecking ? '…' : 'Add'}
                 </Text>
               </Pressable>
@@ -3304,7 +3365,7 @@ export default function ProfileScreen() {
                 </Text>
               ) : (
                 <View style={styles.logoutHeaderBrandWrap}>
-                  <QuizVibeQAvatar size={32} />
+                  <ProfileOutlineIcon size={28} color={BrandUi.iconMuted} />
                 </View>
               )}
               <View style={{ flex: 1 }}>
@@ -3382,20 +3443,20 @@ export default function ProfileScreen() {
                 router.push('/store?from=/profile');
               })}
             >
-              <View style={styles.logoutStoreBtnInner}>
-                <ShoppingCartIcon size={22} />
-                <Text style={styles.logoutStoreBtnText}>Store</Text>
-              </View>
+              <ShoppingCartIcon size={22} color={BrandUi.iconMuted} />
+              <Text style={[styles.logoutStoreBtnText, { flex: 1 }]}>Store</Text>
+              <ChevronIcon size={18} />
             </Pressable>
 
             <Pressable
               style={({ pressed }) => [
                 styles.logoutBtn,
-                pressed && { opacity: 0.85 },
+                pressed && { opacity: 0.6 },
               ]}
               onPress={handleConfirmLogout}
               disabled={deletingAccount}
             >
+              <LogoutIcon size={22} color={Colors.error} />
               <Text style={styles.logoutBtnText}>Log out</Text>
             </Pressable>
 
@@ -3656,16 +3717,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
+  // Profile v2: informativ identitets-header (ingen ram) — speglar Home:s
+  // konto-sheet.
   logoutHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.sm,
-    backgroundColor: Colors.background,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.xs,
   },
   logoutHeaderBrandWrap: {
     width: 40,
@@ -3683,8 +3742,8 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   logoutHeaderStatus: {
-    fontSize: 12,
-    color: Colors.textPrimary,
+    fontSize: 13,
+    color: BrandUi.textMuted,
     marginTop: 2,
   },
   // Create Game + Join Game-knappar i logout-sheet:n. Speglar Store-
@@ -3692,12 +3751,13 @@ const styles = StyleSheet.create({
   // text) så alla tre genvägar visuellt grupperas. CTA-hierarkin är:
   // Create Game / Join Game / Store (alla neutrala) → Log out (röd,
   // destruktiv) → Cancel (text-only).
+  // Profile v2: neutrala menyrader (samma som Home:s konto-sheet).
   logoutCreateGameBtn: {
-    height: 52,
+    height: 48,
     borderRadius: Radius.md,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: 'rgba(255,255,255,0.04)',
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: 'rgba(255,255,255,0.10)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -3711,13 +3771,15 @@ const styles = StyleSheet.create({
   // CTA-hierarkin är: Store (neutral) → Log out (röd, destruktiv) →
   // Cancel (text-only). Höjd matchar logoutBtn för visuell rytm.
   logoutStoreBtn: {
-    height: 52,
-    borderRadius: Radius.md,
-    backgroundColor: Colors.cardElevated,
-    borderWidth: 1,
-    borderColor: Colors.primary,
+    height: 48,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
   },
   logoutStoreBtnText: {
     fontSize: 16,
@@ -3732,14 +3794,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
   },
+  // Tyst röd rad (ingen fylld knapp) — som Home:s konto-sheet.
   logoutBtn: {
-    height: 52,
-    borderRadius: Radius.md,
-    backgroundColor: 'rgba(255,107,107,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,107,107,0.4)',
+    height: 40,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: Spacing.md,
+    paddingHorizontal: Spacing.lg,
   },
   logoutBtnText: {
     fontSize: 16,
@@ -3811,11 +3872,12 @@ const styles = StyleSheet.create({
   // Host Game Credits pill (top-right of Profile header). Visar två siffror på
   // samma rad: Free (gratis credits från Basic-planen) och Extras (köpta från
   // Store). minWidth bumpat från 110 → 170 för att rymma dubbla key/value-par.
+  // Profile v2: återhållsamt navy-kort, neutral kant (guld när Premium).
   creditsPill: {
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: Colors.card,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
+    borderColor: BrandUi.border,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs + 2,
     alignItems: 'center',
@@ -3835,8 +3897,8 @@ const styles = StyleSheet.create({
   // är "premium-tier". Renderas additativt ovanpå creditsPill när
   // hasPremium=true.
   creditsPillMembership: {
-    borderWidth: 2,
-    borderColor: '#F5A623',
+    borderWidth: 1,
+    borderColor: Colors.warning,
   },
   // Wrap för "Unlimited"-badgen (gold pillen-skärande lapp i top-right).
   // pointerEvents:none så outer pillens onPress fortfarande fyrar när
@@ -3892,14 +3954,13 @@ const styles = StyleSheet.create({
   creditsValue: {
     fontSize: 16,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
-  // Färg-overrides för att skilja Free (grön = "ingår gratis") från Extras
-  // (guld = "köpt premium-resurs"). Gold matchar PREMIUM-badgen i Lobby
-  // och 1st-place-färgen i RoundLeaderboard för visuell konsistens.
+  // Profile v2: Free-saldot är vanlig vit information (grönt = bara äkta
+  // success). Premium-hostens "Unlimited" är guld.
   creditsValueFree: {
-    color: Colors.success,
+    color: Colors.textPrimary,
   },
   // Premium-hostens "Unlimited" — samma guld som PREMIUM-badgen + pillens
   // ram, så hela pillen läses som ett guld-tema när prenumerationen är aktiv.
@@ -4019,7 +4080,7 @@ const styles = StyleSheet.create({
   // i expanded state eftersom innehålls-korten ger separation där.
   sectionDivider: {
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: BrandUi.border,
   },
 
   // Legal-sektionens kort (Privacy Policy + Terms of Service-rader).
@@ -4029,7 +4090,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     marginTop: Spacing.md,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
@@ -4052,7 +4113,7 @@ const styles = StyleSheet.create({
   },
   legalRowDivider: {
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: BrandUi.border,
   },
   legalFootnote: {
     ...Typography.caption,
@@ -4072,8 +4133,9 @@ const styles = StyleSheet.create({
   friendsCard: {
     backgroundColor: Colors.card,
     borderRadius: Radius.lg,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
+    // Profile v2: ingen stark blå ram — neutral kant som övriga kort.
+    borderWidth: 1,
+    borderColor: BrandUi.border,
     padding: Spacing.lg,
     gap: Spacing.md,
   },
@@ -4108,34 +4170,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: Radius.full,
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   friendsCountText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: Colors.warning,
     fontVariant: ['tabular-nums'],
   },
   // Friends-knappen använder samma färgpalett som TopBanner-pillen och
   // Game era year-display — primaryMuted bg + primaryBorder + primary
   // text. Det ger en mörkblå-tonad yta istället för solid bright blue.
+  // Profile v2: sekundär åtgärd — neutral yta + kant, inte som en spel-CTA.
   friendsBtn: {
     height: 44,
     borderRadius: Radius.md,
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   friendsBtnText: {
     fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    color: '#FFFFFF',
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
   // Inline friends-lista under knappen. Mörkare yta (background) inuti
@@ -4187,7 +4250,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     padding: Spacing.lg,
     gap: Spacing.lg,
   },
@@ -4219,14 +4282,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm + 2,
     paddingVertical: 3,
     borderRadius: Radius.full,
-    backgroundColor: 'rgba(11,18,32,0.85)',
+    // Profile v2: tydlig sekundär kontroll — mörk navy, tunn kant, vit text.
+    backgroundColor: Colors.background,
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: 'rgba(255,255,255,0.22)',
   },
   changeBadgeText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
   playerNameDisplay: {
@@ -4250,11 +4314,11 @@ const styles = StyleSheet.create({
   // "+"/"−"-knapp som fäller ut kategori-sköldarna — samma stil som
   // sektion-rubrikernas gameConnectionsToggleBox.
   hcpCatToggleBox: {
-    width: 26,
-    height: 26,
+    width: 24,
+    height: 24,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -4310,17 +4374,19 @@ const styles = StyleSheet.create({
   // 'rgba(26,48,80,0.92)') — gul kantlinje + gul glow + mörkblå fyllning.
   eraGuestBoxWrap: { alignItems: 'center', paddingVertical: Spacing.sm },
   eraGuestBox: {
+    // Profile v2: premium i stället för neon — tunn guldkant, mörk navy-yta,
+    // bara en svag skugga (glöden var shadowOpacity 0.85 / radius 18).
     paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.md,
-    borderWidth: 3,
-    borderRadius: 10,
-    borderColor: '#F5A623',
-    backgroundColor: 'rgba(26,48,80,0.92)',
-    shadowColor: '#F5A623',
+    paddingVertical: Spacing.sm + 2,
+    borderWidth: 1.5,
+    borderRadius: Radius.md,
+    borderColor: Colors.warning,
+    backgroundColor: Colors.background,
+    shadowColor: Colors.warning,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.85,
-    shadowRadius: 18,
-    elevation: 8,
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -4333,8 +4399,16 @@ const styles = StyleSheet.create({
   },
   // Info-ikon-rader för rubriker — speglar Lobby 1:1.
   multiplayerLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.xs, marginBottom: 8 },
-  playersLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.md, marginBottom: 8 },
+  // Profile v2: lite närmare Game Mode-rutorna efter att klammer-raden togs bort.
+  playersLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.lg, marginBottom: 8 },
   regionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  // Profile v2: enkel etikett i title case (ingen versal-overline) för
+  // Profile default settings — samma stil som gästformulärets formLabel.
+  fieldLabelPlain: {
+    fontSize: 13,
+    fontWeight: FontWeight.semibold,
+    color: BrandUi.textMuted,
+  },
   fieldLabel: {
     fontSize: 10,
     fontWeight: FontWeight.semibold,
@@ -4389,7 +4463,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   modeOptionInactive: {
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     backgroundColor: 'transparent',
   },
   // Dämpad variant — appliceras på Pass-the-Phone-rutan när
@@ -4400,9 +4474,28 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderStrong,
     backgroundColor: 'transparent',
   },
+  // Profile v2: vald = guld kant + svag guldton (var grön kant).
   modeOptionPassActive: {
-    borderColor: Colors.success,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.warning,
+    backgroundColor: 'rgba(245,166,35,0.08)',
+  },
+  // Guld ✓ i övre högra hörnet på vald ruta.
+  modeCheck: {
+    position: 'absolute',
+    top: 2,
+    right: 6,
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.warning,
+  },
+  // Låst Premium-val: lås + dämpad etikett på samma rad.
+  lockedContentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  lockedContent: {
+    opacity: 0.55,
   },
   modeOptionIndivActive: {
     borderColor: Colors.primary,
@@ -4466,19 +4559,20 @@ const styles = StyleSheet.create({
   },
   // PREMIUM-badge — guld-tag på Max 12-knappen (matchar Individual
   // Devices-knappen i Lobby:s Game Mode-toggle).
+  // Profile v2: liten guld-PREMIUM-pill (alltid guld, aldrig grå).
   premiumBadge: {
     position: 'absolute',
-    top: -8,
+    top: -7,
     right: Spacing.sm,
-    backgroundColor: '#F5A623',
+    backgroundColor: Colors.warning,
     borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
     zIndex: 10,
     elevation: 4,
   },
   premiumBadgeText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '700',
     color: '#000',
     letterSpacing: 0.6,
@@ -4522,7 +4616,7 @@ const styles = StyleSheet.create({
     gap: 6,
     height: 52,
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
     marginBottom: Spacing.xs,
   },
   smHeaderCell: {
@@ -4534,7 +4628,7 @@ const styles = StyleSheet.create({
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
     marginBottom: Spacing.xs,
   },
   smDataShift: {
@@ -4586,7 +4680,8 @@ const styles = StyleSheet.create({
   },
   sourceMatrixColSep: {
     borderLeftWidth: 1,
-    borderLeftColor: Colors.borderStrong,
+    // Dämpad avdelare Music | Film/TV.
+    borderLeftColor: 'rgba(255,255,255,0.07)',
   },
   autoSyncLabel: {
     fontSize: 9,
@@ -4607,7 +4702,7 @@ const styles = StyleSheet.create({
     right: 0,
     textAlign: 'center',
     lineHeight: 20,
-    color: Colors.primary,
+    color: BrandUi.iconMuted,
     fontSize: 9,
     fontWeight: FontWeight.bold,
   },
@@ -4744,10 +4839,10 @@ const styles = StyleSheet.create({
   multiplayerBracket: {
     alignSelf: 'stretch',
     height: 10,
-    borderLeftWidth: 1.5,
-    borderRightWidth: 1.5,
-    borderBottomWidth: 1.5,
-    borderColor: '#6B7280',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: BrandUi.border,
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 4,
   },
@@ -4766,15 +4861,16 @@ const styles = StyleSheet.create({
   // utan att klippas (overflow:'hidden' undviks).
   addPackageBtn: {
     alignSelf: 'stretch',
-    height: 46,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.sm,
     // Tjockare kantlinje (3 px → bumpat från 2 → ursprungligen 1) så
     // Add-knappen sticker ut tydligt mot listan över aktiverade paket
     // nedanför, som har 1 px-borders.
-    borderWidth: 3,
-    borderColor: Colors.borderStrong,
+    // Profile v2: 1 px neutral kant (var 3 px).
+    borderWidth: 1,
+    borderColor: BrandUi.border,
     backgroundColor: 'transparent',
     position: 'relative',
   },
@@ -4783,11 +4879,36 @@ const styles = StyleSheet.create({
   packagesList: {
     gap: Spacing.sm,
   },
-  // Yttre rad: info-ikon (20px) + paketnamns-box (flex 1).
+  // Profile v2-paketrad: kompakt navy-rad med tunn kant (~44 pt).
+  // [ikon] [namn flex:1] [i] [compact-toggle].
   packageListRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
+    minHeight: 44,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs + 2,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
+  },
+  // Påslaget paket: bara en svag guldkant — toggeln bär ON-signalen.
+  packageListRowOn: {
+    borderColor: 'rgba(245,166,35,0.35)',
+  },
+  packageNameWrap: {
+    flex: 1,
+    minWidth: 0,
+    position: 'relative',
+  },
+  // Chevron i Activate Extra package-knappens högerkant.
+  addPackageChevron: {
+    position: 'absolute',
+    right: Spacing.md,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
   },
   // Info-ikon — 20×20 cirkel med italic "i". Identisk styling som Lobby:s
   // infoIconBtn så det ser likadant ut i båda vyerna.
@@ -4818,23 +4939,24 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.cardElevated,
+    // Profile v2: påslaget paket = guldkant (var blå).
+    borderColor: Colors.warning,
+    backgroundColor: 'transparent',
   },
   packageRowText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
   // Disabled-läge för paket-rutan (toggle off): grå borderStrong-kant +
   // transparent bg + dämpad text (samma look som Lobby:s
   // purchasedPackageBox utan active-styling).
   packageRowInactive: {
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     backgroundColor: 'transparent',
   },
   packageRowTextInactive: {
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.75)',
   },
   // Kantskärande FREE-badge — markerar gratis generations-paket som ingår
   // utifrån user:s Competition Year of Birth. Speglar samma teknik som
@@ -4878,20 +5000,23 @@ const styles = StyleSheet.create({
   // Egen switch-style utan marginLeft:'auto' (som packageSwitch har)
   // så label + switch sitter ihop som en grupp i höger kant istället
   // för att switchen dras till rad-änden och lämnar label vid vänsterkant.
+  // Select all: sekundär rad, högerställd så compact-toggeln linjerar med
+  // paketradernas togglar (radens paddingHorizontal: md + 1 pt kant).
   selectAllRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: Spacing.xs,
+    gap: Spacing.sm,
     marginTop: Spacing.xs,
+    paddingRight: Spacing.md + 1,
   },
   selectAllSwitch: {
     transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
   },
   selectAllLabel: {
-    fontSize: FontSize.xs,
-    fontStyle: 'italic',
-    color: Colors.textSecondary,
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: BrandUi.textMuted,
   },
   // Empty state — när användaren inte har köpt några extra-paket.
   // Centrerad sekundär-text inom samma field-block.
@@ -4915,10 +5040,11 @@ const styles = StyleSheet.create({
   roundsGuestBox: {
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.md,
-    borderWidth: 2,
-    borderRadius: 10,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    // Profile v2: valt värde = guld (tunn kant, ingen fyllning).
+    borderWidth: 1.5,
+    borderRadius: Radius.md,
+    borderColor: Colors.warning,
+    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     minWidth: 80,
@@ -4926,7 +5052,7 @@ const styles = StyleSheet.create({
   roundsGuestBoxText: {
     fontSize: 28,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.warning,
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.5,
   },
@@ -4941,32 +5067,34 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: Radius.md,
-    borderWidth: 2,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    // Profile v2: neutrala −/+ (blått = bara fokus/redigering).
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   roundsStepperBtnDisabled: {
-    borderColor: Colors.borderStrong,
+    borderColor: 'rgba(255,255,255,0.06)',
     backgroundColor: 'transparent',
   },
   roundsStepperBtnText: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.textPrimary,
     lineHeight: 26,
   },
   roundsStepperBtnTextDisabled: {
     color: Colors.textDisabled,
   },
   // Region trigger + Answer response — speglar Lobby 1:1.
-  regionTrigger: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.background, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md },
+  regionTrigger: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.background, borderRadius: Radius.md, borderWidth: 1, borderColor: BrandUi.border, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md },
   regionTriggerText: { flex: 1, fontSize: FontSize.md, fontWeight: FontWeight.medium, color: Colors.textPrimary },
   responseRow: { flexDirection: 'row', gap: Spacing.sm },
   responseBtn: { flex: 1, height: 44, borderRadius: Radius.md, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  responseBtnActive: { borderColor: Colors.primaryBorder, backgroundColor: Colors.primaryMuted },
-  responseBtnInactive: { borderColor: Colors.borderStrong, backgroundColor: 'transparent' },
+  // Profile v2: vald = guld kant + svag guldton; ovald = neutral.
+  responseBtnActive: { borderColor: Colors.warning, backgroundColor: 'rgba(245,166,35,0.08)' },
+  responseBtnInactive: { borderColor: BrandUi.border, backgroundColor: 'transparent' },
   responseBtnText: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textSecondary },
   responseBtnTextActive: { color: Colors.textPrimary, fontWeight: FontWeight.bold },
   selector: {
@@ -4975,10 +5103,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: Spacing.xs + 2,
     paddingHorizontal: Spacing.sm + 2,
-    backgroundColor: Colors.cardElevated,
+    // Profile v2: neutralt navy-fält med dämpad kant.
+    backgroundColor: Colors.background,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
   },
   selectorPressed: { opacity: 0.7 },
   selectorText: {
@@ -5009,7 +5138,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
   },
-  optionRowSelected: { backgroundColor: Colors.primaryMuted },
+  optionRowSelected: { backgroundColor: 'rgba(245,166,35,0.08)' },
   optionRowPressed: { backgroundColor: 'rgba(255,255,255,0.04)' },
   optionText: {
     fontSize: FontSize.md,
@@ -5017,12 +5146,12 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   optionTextSelected: {
-    color: Colors.primary,
+    color: Colors.warning,
     fontWeight: FontWeight.semibold,
   },
   optionCheck: {
     fontSize: FontSize.md,
-    color: Colors.primary,
+    color: Colors.warning,
     fontWeight: FontWeight.bold,
   },
   // Voice-pickerns ▶-preview: liten rund tap-yta till vänster om labeln.
@@ -5031,14 +5160,14 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
-    backgroundColor: Colors.cardElevated,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   voicePreviewIcon: {
     fontSize: 13,
-    color: Colors.primary,
+    color: Colors.warning,
     marginLeft: 2, // optisk centrering av ▶-glyfen
   },
   voiceOptionLabel: {
@@ -5182,7 +5311,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
   },
-  yearRowSelected: { backgroundColor: Colors.primaryMuted },
+  yearRowSelected: { backgroundColor: 'rgba(245,166,35,0.08)' },
   yearRowPressed: { backgroundColor: 'rgba(255,255,255,0.04)' },
   yearText: {
     fontSize: FontSize.md,
@@ -5191,7 +5320,7 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   yearTextSelected: {
-    color: Colors.primary,
+    color: Colors.warning,
     fontWeight: FontWeight.semibold,
   },
   yearAge: {
@@ -5213,6 +5342,37 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     paddingVertical: 6,
     paddingLeft: Spacing.sm,
+  },
+  // Spotify "Type:"-rader: fast etikettbredd så Year/Name-togglarna linjerar.
+  spotifyTypeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginTop: 2,
+  },
+  // Rad-layouten: Type: · Year [toggle] · Name [toggle].
+  spotifyTypeInline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  spotifyTypeInlineLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: BrandUi.textMuted,
+  },
+  spotifyTypeHeader: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+  },
+  // Fast bredd + vänsterställd → Year/Name/Type: delar startpunkt.
+  spotifyTypeLabel: {
+    width: 42,
+    textAlign: 'left',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: BrandUi.textMuted,
   },
   spotifyConnectedLabel: {
     fontSize: FontSize.xs,
@@ -5244,8 +5404,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   spotifyAvailPillOn: {
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.success,
+    backgroundColor: 'rgba(245,166,35,0.08)',
+    borderColor: Colors.warning,
   },
   spotifyAvailPillOff: {
     backgroundColor: 'rgba(255,255,255,0.04)',
@@ -5254,7 +5414,7 @@ const styles = StyleSheet.create({
   spotifyAvailPillText: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
-    color: Colors.success,
+    color: Colors.warning,
     letterSpacing: 0.4,
     textAlign: 'center',
   },
@@ -5290,7 +5450,7 @@ const styles = StyleSheet.create({
   // lobby-vyns mixerboardBox.
   mixerboardBox: {
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     borderRadius: Radius.md,
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.xs,
@@ -5299,7 +5459,7 @@ const styles = StyleSheet.create({
   // Grått streck inuti mixerboarden mellan Spotify-delen och YouTube-delen.
   mixerboardDivider: {
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: BrandUi.border,
     marginVertical: Spacing.xs,
   },
   connectionLabel: {
@@ -5477,7 +5637,8 @@ const friendsModal = StyleSheet.create({
   addBtn: {
     height: 44,
     borderRadius: Radius.md,
-    backgroundColor: Colors.primary,
+    // Profile v2: modalens primärhandling = guld (svart text).
+    backgroundColor: Colors.warning,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: Spacing.md,
@@ -5488,7 +5649,7 @@ const friendsModal = StyleSheet.create({
   addBtnText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
-    color: '#fff',
+    color: '#000',
     letterSpacing: 0.3,
   },
   // Inline felmeddelande under Add-raden — visas när playerNameExists()
@@ -5544,11 +5705,11 @@ const friendsModal = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: Colors.success,
-    borderColor: Colors.success,
+    backgroundColor: Colors.warning,
+    borderColor: Colors.warning,
   },
   checkmark: {
-    color: '#fff',
+    color: '#000',
     fontSize: 15,
     fontWeight: '700',
     lineHeight: 15,

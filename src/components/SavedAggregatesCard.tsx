@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import { Alert, Animated, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { buildAggregateStandings } from '../utils/aggregateLeaderboard';
 import {
   dismissAggregateLeaderboard,
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     padding: Spacing.lg,
     gap: Spacing.sm,
     marginBottom: Spacing.md,
@@ -644,19 +644,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   toggleBox: {
-    width: 26,
-    height: 26,
+    width: 24,
+    height: 24,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   toggleText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
-    lineHeight: 20,
+    color: BrandUi.iconMuted,
+    lineHeight: 18,
   },
   groups: { gap: Spacing.sm },
   rowList: { gap: Spacing.sm },
@@ -665,9 +665,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
@@ -759,14 +759,15 @@ const styles = StyleSheet.create({
   modalCloseBtn: {
     height: 48,
     borderRadius: Radius.md,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalCloseText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
   },
 });

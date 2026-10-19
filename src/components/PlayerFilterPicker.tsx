@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import type { Friend } from '../utils/friendsStorage';
 
@@ -168,9 +168,10 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   filterBtn: {
-    backgroundColor: Colors.cardElevated,
+    // Profile v2: sekundär neutral kontroll (var blå kant).
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: BrandUi.border,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
@@ -178,15 +179,15 @@ const styles = StyleSheet.create({
   filterBtnText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
   },
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: 'rgba(245,166,35,0.08)',
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: Colors.warning,
     borderRadius: Radius.full,
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xs,
@@ -195,13 +196,13 @@ const styles = StyleSheet.create({
   filterChipText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     maxWidth: 160,
   },
   filterChipClear: {
     fontSize: 18,
     lineHeight: 20,
-    color: Colors.primary,
+    color: BrandUi.iconMuted,
     paddingHorizontal: 2,
   },
   sheetOverlay: {
@@ -257,9 +258,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: BrandUi.border,
     borderRadius: Radius.full,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 4,
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
   friendPillText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     flexShrink: 1,
   },
   friendAllText: {
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.border,
   },
   addBtn: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.warning,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.xs,
@@ -306,8 +307,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    backgroundColor: Colors.warning,
+    borderColor: Colors.warning,
   },
   checkmark: {
     fontSize: 15,
@@ -317,14 +318,15 @@ const styles = StyleSheet.create({
   closeBtn: {
     height: 48,
     borderRadius: Radius.md,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
   },
 });

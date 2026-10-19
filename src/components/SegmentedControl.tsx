@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
  
 export interface SegmentOption {
   label: string;
@@ -60,10 +60,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: Radius.sm,
   },
+  // Profile v2: vald flik = guld kant + guld text (var blå text).
   selectedOption: {
     backgroundColor: Colors.card,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: Colors.warning,
   },
   pressedOption: {
     backgroundColor: 'rgba(255,255,255,0.04)',
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   selectedLabel: {
-    color: Colors.primary,
+    color: Colors.warning,
     fontWeight: FontWeight.semibold,
   },
 });

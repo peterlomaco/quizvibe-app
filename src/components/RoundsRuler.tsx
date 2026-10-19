@@ -51,7 +51,7 @@ const RULER_WIDTH = TRACK_VIEWPORT_W;
  * också allt unlocked eftersom IndDev:s rounds-cap är 20 och locked-zonen
  * inte renderas.
  */
-export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false, applicable = true, indivActive = false }: {
+export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false, applicable = true, indivActive = false, brandV2 = false }: {
   value: number;
   min: number;
   gameModeMax: number;
@@ -59,18 +59,25 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
   hasSubscription?: boolean;
   applicable?: boolean;
   indivActive?: boolean;
+  /**
+   * Home v2-/Profile v2-stil (2026-10-16): guld = valbart/valt, ingen grön
+   * FREE-klammer, inget rött, dämpad låst zon + alltid-guld PREMIUM-pill.
+   * Lobby kör fortfarande legacy-stilen tills den görs om.
+   */
+  brandV2?: boolean;
 }) {
+  const accent = brandV2 ? Colors.warning : Colors.primary;
   // Klammer + ticks visas "unlocked" bara när BÅDA villkoren stämmer:
   // user äger premium OCH feature:n gäller i nuvarande mode. Annars grå.
   const featureUnlocked = hasSubscription && applicable;
   const klammerColor = featureUnlocked ? '#F5A623' : '#6B7280';
-  const lockedTickColor = featureUnlocked ? Colors.primary : Colors.borderStrong;
-  const lockedFigureColor = featureUnlocked ? Colors.primary : Colors.textDisabled;
+  const lockedTickColor = featureUnlocked ? accent : Colors.borderStrong;
+  const lockedFigureColor = featureUnlocked ? accent : Colors.textDisabled;
   // PREMIUM-badge:s färgschema följer ENDAST hasSubscription (ownership-
   // signal). Premium-host får guld även när feature:n inte gäller här —
   // klammern + texten ovanför signalerar att den inte är applicable.
-  const badgeBg = hasSubscription ? '#F5A623' : '#6B7280';
-  const badgeTextColor = hasSubscription ? '#000' : '#FFF';
+  const badgeBg = hasSubscription || brandV2 ? '#F5A623' : '#6B7280';
+  const badgeTextColor = hasSubscription || brandV2 ? '#000' : '#FFF';
   const RULER_MAX = ROUNDS_MAX_INDIV;
   const ticks: number[] = [];
   for (let n = min; n <= RULER_MAX; n += 2) ticks.push(n);
@@ -106,7 +113,7 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
     <View style={{ width: RULER_WIDTH, marginTop: 6 }}>
       {/* Tunn track-linje + filled-portion */}
       <View style={{ height: 2, borderRadius: 1, backgroundColor: Colors.border }}>
-        <View style={{ height: 2, width: fillWidth, borderRadius: 1, backgroundColor: Colors.primary }} />
+        <View style={{ height: 2, width: fillWidth, borderRadius: 1, backgroundColor: accent }} />
       </View>
       {/* Vertikala tick-streck på linjen + nummer-labels under */}
       <View style={{ height: 32, marginTop: 0 }}>
@@ -125,15 +132,16 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
                 width: 1.5,
                 height: 7,
                 marginTop: -4,
-                backgroundColor: isLocked ? lockedTickColor : Colors.primary,
+                backgroundColor: isLocked ? lockedTickColor : accent,
               }} />
               {isCurrent ? (
-                <View style={roundsRulerStyles.tickBoxCurrent}>
-                  <Text style={roundsRulerStyles.tickBoxTextCurrent}>{n}</Text>
+                <View style={[roundsRulerStyles.tickBoxCurrent, brandV2 && roundsRulerStyles.tickBoxCurrentV2]}>
+                  <Text style={[roundsRulerStyles.tickBoxTextCurrent, brandV2 && { color: '#000' }]}>{n}</Text>
                 </View>
               ) : (
                 <Text style={[
                   roundsRulerStyles.tickText,
+                  brandV2 && { color: accent },
                   isLocked && { color: lockedFigureColor },
                 ]}>
                   {n}
@@ -169,6 +177,7 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
               sitter i en absolutpositionerad centrerad wrapper över samma
               bracket-bredd så den auto-centrerar oavsett innehållsbredd. */}
           <View style={{ marginTop: 0, height: 34 }}>
+            {!brandV2 && (<>
             {/* FREE-klammer (2–4 rundor) — direkt intill premium-klammern.
                 Alltid grön, ingen press-handler (gratis-tier kräver inget). */}
             <View style={[roundsRulerStyles.bracket, {
@@ -191,6 +200,7 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
                 <Text style={roundsRulerStyles.freeBadgeText}>FREE</Text>
               </View>
             </View>
+            </>)}
             <View style={[roundsRulerStyles.bracket, {
               left: bracketLeft,
               width: bracketWidth,
@@ -209,7 +219,7 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
               }}
             >
               {/* "Individual device +" — grön när IndDev aktivt, röd annars. */}
-              <Text style={[roundsRulerStyles.individualDeviceText, { color: indivActive ? Colors.success : Colors.error }]} numberOfLines={1}>
+              <Text style={[roundsRulerStyles.individualDeviceText, { color: brandV2 ? Colors.textSecondary : indivActive ? Colors.success : Colors.error }]} numberOfLines={1}>
                 Individual device +
               </Text>
               {/* hasBracket => interactive => onPremiumPress definierad. Säkert
@@ -252,6 +262,13 @@ const roundsRulerStyles = StyleSheet.create({
     shadowOpacity: 0.7,
     shadowRadius: 6,
     elevation: 4,
+  },
+  // Profile v2: guld box, ingen glöd.
+  tickBoxCurrentV2: {
+    borderColor: Colors.warning,
+    backgroundColor: Colors.warning,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   tickBoxTextCurrent: {
     fontSize: 11,
