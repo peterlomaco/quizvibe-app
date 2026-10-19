@@ -23,6 +23,12 @@ interface Props {
   /** Destruktiv primär-action (t.ex. Delete): röd kontur i stället för guld —
    *  guld betyder aldrig fel/förlust. */
   destructive?: boolean;
+  /** Valfri ikon ovanför titeln (t.ex. röd papperskorg för Delete Account). */
+  icon?: React.ReactNode;
+  /** Valfri avskild varningsrad under meddelandet (dämpad röd). */
+  warning?: string;
+  /** Valfri ikon före etiketten på den destruktiva knappen. */
+  destructiveIcon?: React.ReactNode;
 }
 
 export function QuizVibeDialog({ visible, onClose, ...rest }: Props) {
@@ -46,6 +52,9 @@ export function QuizVibeDialogOverlay({
   secondaryLabel,
   onClose,
   destructive = false,
+  icon,
+  warning,
+  destructiveIcon,
 }: Omit<Props, 'visible'>) {
   return (
     <View style={styles.overlay}>
@@ -55,11 +64,18 @@ export function QuizVibeDialogOverlay({
         accessibilityLabel="Close dialog"
       />
       <View style={styles.card} accessibilityViewIsModal>
+        {icon ? <View style={styles.iconWrap}>{icon}</View> : null}
         <Text style={styles.title} accessibilityRole="header">
           {title}
         </Text>
         <Text style={styles.message}>{message}</Text>
-        <View style={styles.actions}>
+        {warning ? (
+          <>
+            <View style={styles.warningDivider} />
+            <Text style={styles.warning}>{warning}</Text>
+          </>
+        ) : null}
+        <View style={[styles.actions, destructive && styles.actionsDestructive]}>
           {secondaryLabel ? (
             <Button
               label={secondaryLabel}
@@ -80,6 +96,7 @@ export function QuizVibeDialogOverlay({
                 pressed && { opacity: 0.8 },
               ]}
             >
+              {destructiveIcon}
               <Text style={styles.destructiveLabel}>{primaryLabel}</Text>
             </Pressable>
           ) : (
@@ -138,6 +155,29 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     marginTop: Spacing.xs,
   },
+  // Extra luft mellan Cancel och den destruktiva knappen mot feltryck.
+  actionsDestructive: {
+    gap: Spacing.md,
+  },
+  iconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.35)',
+    backgroundColor: 'rgba(255,107,107,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  warningDivider: {
+    height: 1,
+    backgroundColor: BrandUi.border,
+  },
+  warning: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: 'rgba(255,107,107,0.85)',
+  },
   actionBtn: {
     flex: 1,
     paddingHorizontal: Spacing.sm,
@@ -148,6 +188,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,107,107,0.6)',
     backgroundColor: 'rgba(255,107,107,0.08)',
+    flexDirection: 'row',
+    gap: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },

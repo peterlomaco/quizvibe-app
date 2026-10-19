@@ -42,7 +42,8 @@ import {
 } from '../components/RoundsRuler';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { setNavigationGuard } from '../utils/navigationGuard';
-import { QuizVibeDialog } from '@/src/components/QuizVibeDialog';
+import { QuizVibeDialog, QuizVibeDialogOverlay } from '@/src/components/QuizVibeDialog';
+import { TrashIcon } from '../components/TrashIcon';
 import { PackageThumbnail, hasPackageThumbnail } from '@/src/components/PackageThumbnail';
 import { QuizVibeToggle, quizVibeToggleWidth } from '../components/QuizVibeToggle';
 import { ClapperboardIcon, MusicNoteIcon } from '../components/CategoryIcons';
@@ -1456,19 +1457,30 @@ export default function ProfileScreen() {
   // Wrapper som visar två-stegs confirmation FÖRE deletion. Tydlig copy
   // om irreversibilitet — Apple-review tittar specifikt efter att flödet
   // inte är "oavsiktligt destruktivt".
-  const handleRequestDeleteAccount = () => {
-    Alert.alert(
-      'Delete Account?',
-      'This will permanently delete your QuizVibe account and all associated data — profile, game history, friends, and any active subscriptions. This cannot be undone.\n\nAre you sure?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete Account',
-          style: 'destructive',
-          onPress: handleConfirmDeleteAccount,
-        },
-      ],
-    );
+  // UI 2026-10-19: native Alert ersatt av mörk QuizVibeDialog. Källan styr
+  // VAR dialogen renderas — från logout-sheet:en måste den ligga inuti
+  // sheet:ens Modal (QuizVibeDialogOverlay), annars kan två samtidiga RN-
+  // Modals sväljas på iOS. Flödet (Cancel / Delete → handleConfirmDeleteAccount)
+  // är oförändrat.
+  const [deleteConfirmSource, setDeleteConfirmSource] = useState<'screen' | 'sheet' | null>(null);
+  const handleRequestDeleteAccount = (source: 'screen' | 'sheet') => {
+    setDeleteConfirmSource(source);
+  };
+  const deleteConfirmProps = {
+    title: 'Delete account?',
+    message:
+      'This will permanently delete your QuizVibe account and all associated data, including your profile, game history and friends.',
+    warning: 'This cannot be undone.',
+    icon: <TrashIcon size={22} color="rgba(255,107,107,0.9)" />,
+    secondaryLabel: 'Cancel',
+    primaryLabel: 'Delete Account',
+    destructive: true,
+    destructiveIcon: <TrashIcon size={18} color={Colors.error} />,
+    onClose: () => setDeleteConfirmSource(null),
+    onPrimary: () => {
+      setDeleteConfirmSource(null);
+      handleConfirmDeleteAccount();
+    },
   };
 
   // Create Game-genväg från logout-sheet:n. Identisk logik som Home-
@@ -2848,22 +2860,26 @@ export default function ProfileScreen() {
             avslag 2026-10-14: granskaren hittade inte knappen i login-pill-
             sheet:en). Samma två-stegs-confirm som sheet-varianten. */}
         <View style={styles.accountSection}>
-          <Text style={styles.accountSectionLabel}>Account</Text>
+          <Text style={styles.accountSectionLabel}>Danger zone</Text>
           <Pressable
             style={({ pressed }) => [
               styles.accountDeleteBtn,
-              pressed && { borderColor: Colors.error, opacity: 0.9 },
+              pressed && { borderColor: 'rgba(255,107,107,0.85)', opacity: 0.9 },
               deletingAccount && { opacity: 0.5 },
             ]}
-            onPress={handleRequestDeleteAccount}
+            onPress={() => handleRequestDeleteAccount('screen')}
             disabled={deletingAccount}
+            accessibilityRole="button"
+            accessibilityHint="Permanently deletes your account. This cannot be undone."
           >
+            <TrashIcon size={20} color={Colors.error} />
             <Text style={styles.accountDeleteBtnText}>
               {deletingAccount ? 'Deleting…' : 'Delete Account'}
             </Text>
           </Pressable>
           <Text style={styles.accountSectionNote}>
-            Permanently deletes your QuizVibe account and all associated data.
+            Permanently deletes your QuizVibe account and all associated data. This{' '}
+            <Text style={styles.accountSectionNoteStrong}>cannot be undone</Text>.
           </Text>
         </View>
 
@@ -3510,9 +3526,10 @@ export default function ProfileScreen() {
                 pressed && { opacity: 0.85 },
                 deletingAccount && { opacity: 0.5 },
               ]}
-              onPress={handleRequestDeleteAccount}
+              onPress={() => handleRequestDeleteAccount('sheet')}
               disabled={deletingAccount}
             >
+              <TrashIcon size={18} color={Colors.error} />
               <Text style={styles.deleteAccountBtnText}>
                 {deletingAccount ? 'Deleting…' : 'Delete Account'}
               </Text>
@@ -3533,8 +3550,11 @@ export default function ProfileScreen() {
               <Text style={styles.logoutCancelText}>{hostTypeExpanded ? 'Back' : 'Cancel'}</Text>
             </Pressable>
           </View>
+          {deleteConfirmSource === 'sheet' && <QuizVibeDialogOverlay {...deleteConfirmProps} />}
         </View>
       </Modal>
+
+      <QuizVibeDialog visible={deleteConfirmSource === 'screen'} {...deleteConfirmProps} />
 
       {/* ── Spotify DJ guide modal ──────────────────────────────────────
           Visas när användaren tappar "Guide How Spotify DJ works" i Spotify-
@@ -3893,9 +3913,11 @@ const styles = StyleSheet.create({
   deleteAccountBtn: {
     height: 44,
     borderRadius: Radius.md,
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: Colors.error,
+    backgroundColor: '#141C2B',
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.6)',
+    flexDirection: 'row',
+    gap: Spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -3910,31 +3932,41 @@ const styles = StyleSheet.create({
   },
   // Account-sektionens egen Delete-knapp — lugnare än sheet-varianten:
   // lägre, tunnare röd kant, dämpad röd text, mörk yta.
+  // UI 2026-10-19: "Danger zone" — samma höjd (48) som compact-knapparna,
+  // mörk gunmetal-yta, raffinerad röd kant + röd papperskorg. Inget guld,
+  // ingen glöd.
   accountDeleteBtn: {
-    height: 40,
+    height: 48,
     borderRadius: Radius.md,
     backgroundColor: '#141C2B',
     borderWidth: 1,
-    borderColor: 'rgba(255,107,107,0.55)',
+    borderColor: 'rgba(255,107,107,0.6)',
+    flexDirection: 'row',
+    gap: Spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   accountDeleteBtnText: {
-    fontSize: FontSize.sm,
+    fontSize: FontSize.md,
     fontWeight: '600',
-    color: 'rgba(255,107,107,0.9)',
+    color: Colors.error,
   },
   accountSectionLabel: {
     fontSize: FontSize.xs,
-    fontWeight: '600',
-    color: BrandUi.textMuted,
+    fontWeight: '700',
+    color: 'rgba(255,107,107,0.65)',
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
+    letterSpacing: 1.6,
   },
   accountSectionNote: {
     fontSize: FontSize.xs,
+    lineHeight: 17,
     color: BrandUi.textMuted,
     textAlign: 'center',
+  },
+  accountSectionNoteStrong: {
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.85)',
   },
 
   safe: { flex: 1, backgroundColor: Colors.background },
