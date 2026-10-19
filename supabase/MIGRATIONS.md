@@ -77,7 +77,7 @@ applied (the app depends on it) but not individually re-verified · `—` env no
 | 0044c_policy_hardening | ✅ 2026-08-30 | ✅ 2026-08-30 | |
 | 0045_lobby_players_insert_hardening | ✅ 2026-08-30 | ✅ 2026-08-30 | all 4 join flows verified on staging first |
 | 0046_subscription_entitlements | ⬜ (held — E1 foundation) | — | + deploy `functions/revenuecat-webhook` |
-| 0060_deleted_account_tombstones | ⬜ (after App Store review) | ⬜ | + redeploy `functions/delete-account` on the same project |
+| 0060_deleted_account_tombstones | ⬜ (after App Store review) | ✅ 2026-10-19 (+ delete-account redeployed, verified end-to-end) | + redeploy `functions/delete-account` on the same project |
 
 > The `✅?` marks are best-effort: the app runs against prod, so it depends on
 > these, but they were applied before this ledger existed. When you set up
