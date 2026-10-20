@@ -45,10 +45,14 @@ const MARK_D = [
   MARK_PATHS.handle,
 ];
 
-function MarkShapes({ fill, dy = 0 }: { fill: string; dy?: number }) {
+// Avatar-varianten (2026-10-20): SAMMA låsta geometri, men utan de tre
+// signalbågarna — läser rent i små storlekar. Inga nya former.
+const MARK_Q_ONLY_D = [MARK_PATHS.ring, MARK_PATHS.connector, MARK_PATHS.handle];
+
+function MarkShapes({ fill, dy = 0, paths = MARK_D }: { fill: string; dy?: number; paths?: string[] }) {
   return (
     <G fill={fill} transform={dy ? `translate(0 ${dy})` : undefined}>
-      {MARK_D.map((d, i) => (
+      {paths.map((d, i) => (
         <Path key={i} d={d} />
       ))}
     </G>
@@ -80,6 +84,41 @@ export function QuizVibeMarkSvg({ size, variant = 'metallic' }: { size: number; 
         </>
       ) : (
         <MarkShapes fill={SOLID[variant]} />
+      )}
+    </Svg>
+  );
+}
+
+/**
+ * The Q symbol WITHOUT the three signal arcs (ring + connector + handle from
+ * the locked geometry). Used only for the default profile avatar. `size` =
+ * height in pt. `color` paints it in one flat colour (e.g. muted inactive
+ * state); omitted = the same metallic gold treatment as QuizVibeMarkSvg.
+ */
+export function QuizVibeMarkQOnlySvg({ size, color }: { size: number; color?: string }) {
+  const id = useSvgId('qvQ');
+  const { width: vw, height: vh } = MARK_VIEWBOX;
+  return (
+    <Svg width={(size * vw) / vh} height={size} viewBox={`0 0 ${vw} ${vh}`}>
+      {color ? (
+        <MarkShapes fill={color} paths={MARK_Q_ONLY_D} />
+      ) : (
+        <>
+          <Defs>
+            <LinearGradient id={`${id}g`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={vw} y2={vh}>
+              {MARK_GOLD_STOPS.map(([o, c]) => (
+                <Stop key={o} offset={o} stopColor={c} />
+              ))}
+            </LinearGradient>
+            <LinearGradient id={`${id}s`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={vw * 0.6} y2={vh * 0.6}>
+              <Stop offset={0} stopColor="#FFFFFF" stopOpacity={0.35} />
+              <Stop offset={1} stopColor="#FFFFFF" stopOpacity={0} />
+            </LinearGradient>
+          </Defs>
+          <MarkShapes fill={DEPTH} dy={vh * 0.008} paths={MARK_Q_ONLY_D} />
+          <MarkShapes fill={`url(#${id}g)`} paths={MARK_Q_ONLY_D} />
+          <MarkShapes fill={`url(#${id}s)`} paths={MARK_Q_ONLY_D} />
+        </>
       )}
     </Svg>
   );

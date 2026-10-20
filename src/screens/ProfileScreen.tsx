@@ -45,6 +45,7 @@ import { setNavigationGuard } from '../utils/navigationGuard';
 import { QuizVibeDialog, QuizVibeDialogOverlay } from '@/src/components/QuizVibeDialog';
 import { TrashIcon } from '../components/TrashIcon';
 import { PackageThumbnail, hasPackageThumbnail } from '@/src/components/PackageThumbnail';
+import { QuizVibeAvatarQ, QuizVibeDefaultAvatar } from '../components/QuizVibeDefaultAvatar';
 import { QuizVibeToggle, quizVibeToggleWidth } from '../components/QuizVibeToggle';
 import { ClapperboardIcon, MusicNoteIcon } from '../components/CategoryIcons';
 import { ChevronIcon } from '../components/ChevronIcon';
@@ -1689,15 +1690,32 @@ export default function ProfileScreen() {
                 styles.avatarButton,
                 pressed && { opacity: 0.8 },
               ]}
+              accessibilityRole="button"
+              accessibilityLabel="Change avatar"
             >
               <Avatar
                 emoji={source === 'default' ? undefined : selectedAvatar?.emoji}
                 useBrandFallback={source === 'default'}
                 brandColor={Colors.warning}
+                // Q:t krympt ~6 % och lyft ~4 pt — optiskt centrerat med
+                // plats för redigera-badgen nere till höger.
+                brandMarkScale={0.525}
+                brandOffsetY={-4}
                 size={96}
               />
+              {/* Liten redigera-badge nere till höger — hela avataren (96 pt)
+                  är tap-ytan, så badgen kan vara visuellt liten. */}
               <View style={styles.changeBadge} pointerEvents="none">
-                <Text style={styles.changeBadgeText}>Change</Text>
+                <Svg width={14} height={14} viewBox="0 0 24 24">
+                  <Path
+                    d="M4 20h4L18.5 9.5a2.12 2.12 0 0 0-3-3L5 17v3z M13.5 8.5l3 3"
+                    stroke={Colors.warning}
+                    strokeWidth={1.9}
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </Svg>
               </View>
             </Pressable>
 
@@ -3425,13 +3443,13 @@ export default function ProfileScreen() {
           />
           <View style={styles.logoutSheet}>
             <View style={styles.logoutHeader}>
-              {selectedAvatarId ? (
+              {selectedAvatarId && source !== 'default' ? (
                 <Text style={styles.logoutHeaderEmoji}>
                   {getAvatarEmojiById(selectedAvatarId)}
                 </Text>
               ) : (
                 <View style={styles.logoutHeaderBrandWrap}>
-                  <ProfileOutlineIcon size={28} color={BrandUi.iconMuted} />
+                  <QuizVibeDefaultAvatar size={36} framed />
                 </View>
               )}
               <View style={{ flex: 1 }}>
@@ -3662,6 +3680,14 @@ export default function ProfileScreen() {
 }
 
 // ─── Avatar picker (inside modal) ─────────────────────────────────────────────
+// Profile v2 (2026-10-20): navy/gunmetal-ytor, guld ENBART för valt läge
+// (källa, kategori, avatar) + primär-CTA. Done ligger i en fast footer under
+// listan så sista raden alltid kan scrollas fram ovanför knappen. Logik,
+// avatar-id:n och spar-beteende orörda.
+
+const AVATAR_CELL = 60;
+const GOLD_SELECT_BORDER = Colors.warning;
+const GOLD_SELECT_BG = 'rgba(245,166,35,0.07)';
 
 function AvatarPicker({
   source, setSource,
@@ -3682,89 +3708,141 @@ function AvatarPicker({
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.modalHeader}>
-        <Text style={styles.modalTitle}>Change Avatar</Text>
+      <View style={styles.apHeader}>
+        <Text style={styles.apTitle}>Change Avatar</Text>
         <Pressable
           onPress={onClose}
-          style={({ pressed }) => [styles.modalClose, pressed && { opacity: 0.6 }]}
+          style={({ pressed }) => [styles.apClose, pressed && { opacity: 0.6 }]}
           hitSlop={10}
+          accessibilityLabel="Close"
         >
-          <Text style={styles.modalCloseText}>✕</Text>
+          <Svg width={14} height={14} viewBox="0 0 24 24">
+            <Line x1="5" y1="5" x2="19" y2="19" stroke={BrandUi.iconMuted} strokeWidth={2.4} strokeLinecap="round" />
+            <Line x1="19" y1="5" x2="5" y2="19" stroke={BrandUi.iconMuted} strokeWidth={2.4} strokeLinecap="round" />
+          </Svg>
         </Pressable>
       </View>
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.modalContent}
+        contentContainerStyle={styles.apContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Source selector */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Photo Source</Text>
-          <Card padding={Spacing.sm}>
-            {SOURCE_OPTIONS.map((opt, i) => (
-              <React.Fragment key={opt.id}>
-                <SourceRow
-                  icon={opt.icon}
-                  label={opt.label}
-                  subtitle={opt.subtitle}
-                  selected={source === opt.id}
-                  onPress={() => setSource(opt.id)}
-                />
-                {i < SOURCE_OPTIONS.length - 1 && <View style={styles.divider} />}
-              </React.Fragment>
+        <View style={styles.apSection}>
+          <Text style={styles.apSectionLabel}>Avatar style</Text>
+          <View style={styles.apSourceList}>
+            {SOURCE_OPTIONS.map((opt) => (
+              <SourceRow
+                key={opt.id}
+                icon={opt.icon}
+                label={opt.label}
+                subtitle={opt.subtitle}
+                selected={source === opt.id}
+                onPress={() => setSource(opt.id)}
+              />
             ))}
-          </Card>
+          </View>
         </View>
 
         {/* Avatar picker (only when source = 'choose') */}
         {source === 'choose' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Avatar Collection</Text>
+          <View style={styles.apSection}>
+            <Text style={styles.apSectionLabel}>Collection</Text>
 
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoryRow}
+              style={styles.apChipScroll}
+              contentContainerStyle={styles.apChipRow}
             >
-              {CATEGORIES.map((cat) => (
-                <Pressable
-                  key={cat}
-                  onPress={() => setCategory(cat)}
-                  style={[styles.chip, category === cat && styles.chipActive]}
-                >
-                  <Text style={[styles.chipLabel, category === cat && styles.chipLabelActive]}>
-                    {cat}
-                  </Text>
-                </Pressable>
-              ))}
+              {CATEGORIES.map((cat) => {
+                const active = category === cat;
+                return (
+                  <Pressable
+                    key={cat}
+                    onPress={() => setCategory(cat)}
+                    style={({ pressed }) => [
+                      styles.apChip,
+                      active && styles.apChipActive,
+                      pressed && !active && { opacity: 0.7 },
+                    ]}
+                  >
+                    <Text style={[styles.apChipLabel, active && styles.apChipLabelActive]}>
+                      {cat}
+                    </Text>
+                  </Pressable>
+                );
+              })}
             </ScrollView>
 
-            <Card padding={Spacing.md}>
-              <View style={styles.grid}>
-                {filteredAvatars.map((item) => (
-                  <Pressable
-                    key={item.id}
-                    onPress={() => setSelectedId(item.id)}
-                    style={styles.gridCell}
-                  >
-                    <Avatar
-                      emoji={item.emoji}
-                      size={56}
-                      selected={selectedAvatarId === item.id}
-                    />
-                  </Pressable>
-                ))}
+            <View style={styles.apGridPanel}>
+              <View style={styles.apGrid}>
+                {filteredAvatars.map((item) => {
+                  const isSel = selectedAvatarId === item.id;
+                  return (
+                    <Pressable
+                      key={item.id}
+                      onPress={() => setSelectedId(item.id)}
+                      style={({ pressed }) => [styles.apGridCell, pressed && !isSel && { opacity: 0.7 }]}
+                      accessibilityState={{ selected: isSel }}
+                    >
+                      <View>
+                        <Avatar
+                          emoji={item.emoji}
+                          size={AVATAR_CELL}
+                          selected={isSel}
+                          style={isSel ? styles.apAvatarSelected : styles.apAvatar}
+                        />
+                        {isSel && (
+                          <View style={styles.apCheckBadge} pointerEvents="none">
+                            <GoldCheck size={10} />
+                          </View>
+                        )}
+                      </View>
+                    </Pressable>
+                  );
+                })}
               </View>
-            </Card>
+            </View>
           </View>
         )}
-
-        <Button label="Done" onPress={onClose} variant="primary" />
-
-        <View style={styles.bottomPad} />
+        {/* Default Image vald: centrerad förhandsvisning så vyn inte känns tom. */}
+        {source === 'default' && (
+          <View style={styles.apDefaultPreview}>
+            <QuizVibeDefaultAvatar size={128} framed />
+            <Text style={styles.apDefaultCaption}>QuizVibe default</Text>
+          </View>
+        )}
       </ScrollView>
+
+      {/* Fast footer — utanför ScrollView så Done aldrig täcker sista raden. */}
+      <View style={styles.apFooter}>
+        <Button label="Done" onPress={onClose} variant="gold" />
+      </View>
     </SafeAreaView>
+  );
+}
+
+// ─── Small icons for the avatar picker ───────────────────────────────────────
+
+function GoldCheck({ size = 10, color = '#1A1205' }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M5 12.5l4.5 4.5L19 7.5" stroke={color} strokeWidth={3.4} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+/** Outline-ikon för "Choose Avatar" — fyra cirklar i ett 2×2-rutnät (24-grid). */
+function AvatarGridIcon({ size = 22, color }: { size?: number; color: string }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx="7.5" cy="7.5" r="3.6" stroke={color} strokeWidth={1.8} fill="none" />
+      <Circle cx="16.5" cy="7.5" r="3.6" stroke={color} strokeWidth={1.8} fill="none" />
+      <Circle cx="7.5" cy="16.5" r="3.6" stroke={color} strokeWidth={1.8} fill="none" />
+      <Circle cx="16.5" cy="16.5" r="3.6" stroke={color} strokeWidth={1.8} fill="none" />
+    </Svg>
   );
 }
 
@@ -3776,33 +3854,34 @@ function SourceRow({
   icon: string; label: string; subtitle: string;
   selected: boolean; onPress: () => void;
 }) {
+  const iconColor = selected ? Colors.warning : BrandUi.iconMuted;
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="radio"
+      accessibilityState={{ selected }}
       style={({ pressed }) => [
         styles.sourceRow,
         selected && styles.sourceRowSelected,
-        pressed && styles.sourceRowPressed,
+        pressed && !selected && styles.sourceRowPressed,
       ]}
     >
       <View style={[styles.sourceIcon, selected && styles.sourceIconSelected]}>
         {/* icon='Q' är en sentinel för Default Image-raden — rendera
-            QuizVibe Q-brand-SVG istället för en text-emoji så raden
-            visuellt speglar den faktiska avataren som blir resultatet. */}
+            QuizVibe Q-marken (samma som profil-avataren blir) i stället
+            för en text-emoji. */}
         {icon === 'Q' ? (
-          <QuizVibeQAvatar size={28} />
+          <QuizVibeAvatarQ size={24} color={selected ? undefined : BrandUi.iconMuted} />
         ) : (
-          <Text style={styles.sourceIconText}>{icon}</Text>
+          <AvatarGridIcon color={iconColor} />
         )}
       </View>
       <View style={styles.sourceInfo}>
-        <Text style={[styles.sourceLabel, selected && styles.sourceLabelSelected]}>
-          {label}
-        </Text>
+        <Text style={styles.sourceLabel}>{label}</Text>
         <Text style={styles.sourceSubtitle}>{subtitle}</Text>
       </View>
       <View style={[styles.radio, selected && styles.radioSelected]}>
-        {selected && <View style={styles.radioDot} />}
+        {selected && <GoldCheck size={12} />}
       </View>
     </Pressable>
   );
@@ -4428,20 +4507,17 @@ const styles = StyleSheet.create({
   },
   changeBadge: {
     position: 'absolute',
-    bottom: 4,
-    paddingHorizontal: Spacing.sm + 2,
-    paddingVertical: 3,
-    borderRadius: Radius.full,
-    // Profile v2: tydlig sekundär kontroll — mörk navy, tunn kant, vit text.
-    backgroundColor: Colors.background,
+    right: 0,
+    bottom: 2,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    // Profile v2: sekundär redigera-badge — mörk navy, tunn kant, guld penna.
+    backgroundColor: '#152238',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.22)',
-  },
-  changeBadgeText: {
-    fontSize: 11,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-    letterSpacing: 0.3,
+    borderColor: 'rgba(255,255,255,0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   playerNameDisplay: {
     fontSize: FontSize.md,
@@ -5394,57 +5470,156 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing.md,
   },
 
+  // ── Avatar picker (Profile v2) ──────────────────────────────
+  apHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  apTitle: {
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+  },
+  apClose: {
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: BrandUi.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  apContent: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.xl,
+    gap: Spacing.xl,
+  },
+  apSection: { gap: Spacing.sm },
+  apSectionLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: BrandUi.textMuted,
+    paddingHorizontal: Spacing.xs,
+  },
+  apSourceList: { gap: Spacing.sm },
+
   // Source rows
   sourceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: Spacing.md,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
     borderRadius: Radius.md,
     gap: Spacing.md,
-  },
-  sourceRowSelected: { backgroundColor: Colors.primaryMuted },
-  sourceRowPressed: { backgroundColor: 'rgba(255,255,255,0.04)' },
-  sourceIcon: {
-    width: 40, height: 40,
-    borderRadius: Radius.sm,
-    backgroundColor: Colors.cardElevated,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  sourceIconSelected: { backgroundColor: Colors.primaryBorder },
-  sourceIconText: { fontSize: 18 },
-  sourceInfo: { flex: 1 },
-  sourceLabel: { ...Typography.bodyMedium, color: Colors.textPrimary },
-  sourceLabelSelected: { color: Colors.primary },
-  sourceSubtitle: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2 },
-  radio: {
-    width: 20, height: 20, borderRadius: 10,
-    borderWidth: 2, borderColor: Colors.border,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  radioSelected: { borderColor: Colors.primary },
-  radioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.primary },
-
-  // Category chips
-  categoryRow: { gap: Spacing.sm, paddingBottom: Spacing.xs },
-  chip: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm - 2,
-    borderRadius: Radius.full,
-    backgroundColor: Colors.card,
+    backgroundColor: BrandUi.card,
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  chipActive: { backgroundColor: Colors.primaryMuted, borderColor: Colors.primaryBorder },
-  chipLabel: {
+  sourceRowSelected: {
+    backgroundColor: GOLD_SELECT_BG,
+    borderColor: 'rgba(245,166,35,0.55)',
+  },
+  sourceRowPressed: { backgroundColor: 'rgba(255,255,255,0.07)' },
+  sourceIcon: {
+    width: 44, height: 44,
+    borderRadius: Radius.sm,
+    backgroundColor: BrandUi.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  sourceIconSelected: {
+    backgroundColor: 'rgba(245,166,35,0.08)',
+    borderColor: 'rgba(245,166,35,0.30)',
+  },
+  sourceInfo: { flex: 1 },
+  sourceLabel: { ...Typography.bodyMedium, color: Colors.textPrimary },
+  sourceSubtitle: { ...Typography.caption, color: BrandUi.textMuted, marginTop: 2 },
+  // Val-indikator: tom tunn ring (ej vald) → liten guld-bock (vald).
+  radio: {
+    width: 22, height: 22, borderRadius: 11,
+    borderWidth: 1.5, borderColor: BrandUi.border,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  radioSelected: { borderWidth: 0, backgroundColor: Colors.warning },
+
+  // Category chips — scrollen går kant-i-kant så chippen som fortsätter
+  // åt höger klipps mot skärmkanten (avsiktligt), inte mitt i innehållet.
+  apChipScroll: { marginHorizontal: -Spacing.lg },
+  apChipRow: { gap: Spacing.sm, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xs },
+  apChip: {
+    paddingHorizontal: Spacing.md + 2,
+    height: 34,
+    justifyContent: 'center',
+    borderRadius: Radius.full,
+    backgroundColor: BrandUi.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  apChipActive: {
+    backgroundColor: 'rgba(245,166,35,0.10)',
+    borderColor: 'rgba(245,166,35,0.60)',
+  },
+  apChipLabel: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
   },
-  chipLabelActive: { color: Colors.primary },
+  apChipLabelActive: { color: Colors.warning, fontWeight: FontWeight.semibold },
 
   // Grid
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
-  gridCell: { width: '22%', alignItems: 'center', paddingVertical: Spacing.xs },
+  apGridPanel: {
+    backgroundColor: BrandUi.card,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xs,
+  },
+  apGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: Spacing.md },
+  apGridCell: { width: '25%', alignItems: 'center' },
+  apAvatar: {
+    backgroundColor: '#152238',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+  },
+  apAvatarSelected: {
+    backgroundColor: 'rgba(245,166,35,0.10)',
+    borderWidth: 2,
+    borderColor: GOLD_SELECT_BORDER,
+  },
+  apDefaultPreview: {
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingTop: Spacing.xl,
+  },
+  apDefaultCaption: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: BrandUi.textMuted,
+  },
+  apCheckBadge: {
+    position: 'absolute',
+    right: -1,
+    bottom: -1,
+    width: 20, height: 20, borderRadius: 10,
+    backgroundColor: Colors.warning,
+    borderWidth: 2,
+    borderColor: Colors.background,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  apFooter: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    backgroundColor: Colors.background,
+  },
 
   // Year picker modal (centered card)
   pickerBackdrop: {

@@ -5,6 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicGoldFill';
 import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
+import { QuizVibeDefaultAvatar } from '@/src/components/QuizVibeDefaultAvatar';
 import { ShoppingCartIcon } from '@/src/components/ShoppingCartIcon';
 import { EyeIcon } from '@/src/components/EyeIcon';
 import { ChevronIcon } from '@/src/components/ChevronIcon';
@@ -3709,13 +3710,13 @@ export default function HomeScreen() {
                     Delete Account visas MEDVETET inte här (konto-hantering
                     hör hemma i Profile-skärmens sheet / Danger zone). */}
                 <View style={profileMenu.header}>
-                  {profile?.selectedAvatarId ? (
+                  {profile?.selectedAvatarId && profile?.avatarSource !== 'default' ? (
                     <Text style={profileMenu.headerEmoji}>
                       {getAvatarEmojiById(profile?.selectedAvatarId)}
                     </Text>
                   ) : (
                     <View style={profileMenu.headerBrandWrap}>
-                      <ProfileOutlineIcon size={28} color={BrandUi.iconMuted} />
+                      <QuizVibeDefaultAvatar size={36} framed />
                     </View>
                   )}
                   <View style={{ flex: 1 }}>

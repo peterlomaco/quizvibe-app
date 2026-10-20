@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Colors, FontWeight } from '../theme';
 import { DEFAULT_AVATAR_EMOJI } from '../utils/avatars';
-import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+import { QuizVibeDefaultAvatar } from './QuizVibeDefaultAvatar';
 
 interface AvatarProps {
   uri?: string;
@@ -22,8 +22,11 @@ interface AvatarProps {
    * klippas i hörnet.
    */
   useBrandFallback?: boolean;
-  /** Färg på Q-marken i brand-fallbacken (default Colors.primary). Profile v2 skickar guld. */
+  /** @deprecated Default-avataren är alltid metallguld (QuizVibeDefaultAvatar). */
   brandColor?: string;
+  /** Lokal justering av default-Q:t (storlek-andel + vertikal offset i pt). */
+  brandMarkScale?: number;
+  brandOffsetY?: number;
 }
 
 export function Avatar({
@@ -35,6 +38,8 @@ export function Avatar({
   style,
   useBrandFallback,
   brandColor,
+  brandMarkScale,
+  brandOffsetY,
 }: AvatarProps) {
   const initials = name
     ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
@@ -57,7 +62,7 @@ export function Avatar({
           style={[styles.image, { borderRadius: size / 2 }]}
         />
       ) : showBrand ? (
-        <QuizVibeQAvatar size={Math.round(size * 0.7)} color={brandColor} />
+        <QuizVibeDefaultAvatar size={size} markScale={brandMarkScale} offsetY={brandOffsetY} />
       ) : emoji ? (
         <Text style={{ fontSize: size * 0.46, lineHeight: size * 0.58 }}>
           {emoji}
@@ -81,8 +86,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   selected: {
-    borderColor: Colors.primary,
-    borderWidth: 2.5,
+    // Profile v2: valt läge = QuizVibe-guld (enda call-site är avatar-pickern).
+    borderColor: Colors.warning,
+    borderWidth: 2,
   },
   image: {
     width: '100%',

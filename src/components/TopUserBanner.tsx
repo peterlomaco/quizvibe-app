@@ -8,6 +8,7 @@ import { BrandUi, Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { getCachedProfile, loadProfile, type ProfileData } from '../utils/profileStorage';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+import { QuizVibeDefaultAvatar } from './QuizVibeDefaultAvatar';
 import { ChevronIcon } from './ChevronIcon';
 import { BRAND_UI_INACTIVE } from './brand/QuizVibeBrandSvg';
 import { ProfileOutlineIcon } from './ProfileOutlineIcon';
@@ -113,9 +114,10 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
   // → neutral person-ikon (samma som bottom-navens Profile-tab; kugghjulet
   // signalerade "Settings" fast pillen öppnar kontomenyn). Custom
   // emoji-avatarer renderas oförändrat när användaren valt en.
-  const showBrandAvatar = isLoggedIn && !profile?.selectedAvatarId;
+  const showBrandAvatar =
+    isLoggedIn && (!profile?.selectedAvatarId || profile?.avatarSource === 'default');
   const leadingIcon = showBrandAvatar ? (
-    <ProfileOutlineIcon size={16} color={BrandUi.iconMuted} />
+    <QuizVibeDefaultAvatar size={20} framed />
   ) : (
     <Text style={styles.loginPillIcon}>{iconTextFor(profile, isLoggedIn)}</Text>
   );

@@ -5,7 +5,7 @@ import { Pressable } from '@/src/components/haptic';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BRAND_UI_ACTIVE, BRAND_UI_INACTIVE } from './brand/QuizVibeBrandSvg';
 import { ProfileOutlineIcon } from './ProfileOutlineIcon';
-import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+import { QuizVibeAvatarQ } from './QuizVibeDefaultAvatar';
 import { ShoppingCartIcon } from './ShoppingCartIcon';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 import { getCachedProfile, loadProfile, subscribeProfileChanges } from '../utils/profileStorage';
@@ -18,17 +18,12 @@ export const BOTTOM_BANNER_HEIGHT = 52;
 const SHOW_ON = ['/', '/profile', '/store', '/my-matches', '/competitions'];
 
 // Normalized nav icon set: every icon sits in the same 24 pt box and uses the
-// same visible stroke weight (1.8 pt). The Q gets a slightly smaller render
-// size (its glyph fills more of its viewBox) and its strokes are given in its
-// own viewBox units, converted so they land on the same pt weights.
+// same visible stroke weight (1.8 pt). Home = det förenklade vektor-Q:t ur
+// Brand Master-geometrin (utan signalbågar, samma som default-avataren),
+// enfärgat i tab-färgen; 22.5 pt (+7 %) för att väga jämnt mot Profile/Store.
 const NAV_ICON_BOX = 24;
 const NAV_STROKE_PT = 1.8;
-const NAV_Q_SIZE = 22;
-const Q_WIFI_VIEWBOX = 36; // QuizVibeQAvatar 'wifi' viewBox width
-const Q_UNITS_PER_PT = Q_WIFI_VIEWBOX / NAV_Q_SIZE;
-// Brand rule: the arcs stay thinner than the ring.
-const NAV_Q_RING_STROKE = NAV_STROKE_PT * Q_UNITS_PER_PT;
-const NAV_Q_ARC_STROKE = NAV_STROKE_PT * 0.75 * Q_UNITS_PER_PT;
+const NAV_Q_SIZE = 22.5;
 
 interface TabItemProps {
   icon: React.ReactNode;
@@ -116,13 +111,7 @@ export function BottomBanner() {
       <View style={styles.row}>
         <TabItem
           icon={
-            <QuizVibeQAvatar
-              size={NAV_Q_SIZE}
-              variant="wifi"
-              color={col(isHome)}
-              strokeWidth={NAV_Q_RING_STROKE}
-              detailStrokeWidth={NAV_Q_ARC_STROKE}
-            />
+            <QuizVibeAvatarQ size={NAV_Q_SIZE} color={col(isHome)} />
           }
           label="Home"
           active={isHome}
