@@ -70,38 +70,41 @@ Deno.serve(async (req) => {
     `${greeting}\n\n` +
     `Your QuizVibe account is activated. Jump in and put your ` +
     `Music & Film knowledge to the test.`;
+  // Brand Master (2026-10-20): navy-bakgrund, metallisk Q + wordmark som PNG
+  // (docs/assets/brand/quizvibe-logo-email.png på quizvibe.se — mejlklienter
+  // renderar inte SVG). Samma ram som "Confirm signup"-mallen.
   const html = `
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-       style="background:#F4F7FB;margin:0;padding:0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#0B1220"
+       style="background:#0B1220;margin:0;padding:0;">
   <tr>
     <td align="center" style="padding:32px 16px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-             style="max-width:480px;background:#FFFFFF;border:1px solid #E6ECF3;
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#121A29"
+             style="max-width:480px;background:#121A29;border:1px solid #232D40;
                     border-radius:16px;overflow:hidden;
                     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',
                     Roboto,Helvetica,Arial,sans-serif;">
         <tr>
-          <td align="center" style="padding:36px 32px 8px;">
-            <img src="https://quizvibe.se/quizvibe-logo.png" width="72" height="72"
-                 alt="QuizVibe" style="display:block;margin:0 auto;border:0;" />
-            <div style="font-size:12px;font-weight:700;letter-spacing:2px;
-                        text-transform:uppercase;color:#8A97AB;
-                        margin-top:12px;">Anyone. Anywhere. Let’s play.</div>
+          <td align="center" style="padding:36px 32px 0;">
+            <img src="https://quizvibe.se/assets/brand/quizvibe-logo-email.png"
+                 width="120" height="99" alt="QuizVibe"
+                 style="display:block;margin:0 auto;border:0;width:120px;height:auto;" />
+            <div style="font-size:13px;line-height:1.4;color:#A8B3C7;
+                        margin-top:14px;">Anyone. Anywhere. Let’s play.</div>
           </td>
         </tr>
         <tr>
-          <td style="padding:8px 32px 0;">
-            <div style="height:1px;background:#EDF1F6;margin:20px 0 4px;"></div>
+          <td style="padding:24px 32px 0;">
+            <div style="height:1px;line-height:1px;font-size:1px;background:#232D40;">&nbsp;</div>
           </td>
         </tr>
         <tr>
-          <td align="center" style="padding:20px 32px 36px;">
-            <h1 style="font-size:22px;font-weight:700;color:#1A2233;
+          <td align="center" style="padding:28px 32px 36px;">
+            <h1 style="font-size:22px;line-height:1.3;font-weight:700;color:#FFFFFF;
                        margin:0 0 12px;">Your account is activated 🎉</h1>
-            <p style="font-size:15px;line-height:1.55;color:#4A5568;margin:0 0 10px;">
+            <p style="font-size:15px;line-height:1.6;color:#C9D1DE;margin:0 0 10px;">
               ${greeting}
             </p>
-            <p style="font-size:15px;line-height:1.55;color:#4A5568;margin:0 0 8px;">
+            <p style="font-size:15px;line-height:1.6;color:#C9D1DE;margin:0 0 8px;">
               Your QuizVibe account is ready. Jump in and put your
               Music &amp; Film knowledge to the test.
             </p>

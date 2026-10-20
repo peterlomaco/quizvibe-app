@@ -9,40 +9,44 @@
   verifies the token and redirects to the emailRedirectTo passed by the client
   (https://quizvibe.se/email-confirmed.html) — see docs/email-confirmed.html.
 
-  BRANDING: header shows the QuizVibe logo (docs/quizvibe-logo.png, hosted at
-  https://quizvibe.se/quizvibe-logo.png). alt="QuizVibe" is the fallback shown
-  when a client blocks images; the SMTP sender name "QuizVibe" also identifies it.
+  BRANDING (2026-10-20, Brand Master): navy background, metallic Q + wordmark
+  as PNG (docs/assets/brand/quizvibe-logo-email.png, hosted at
+  https://quizvibe.se/assets/brand/quizvibe-logo-email.png — rendered from
+  design/brand/quizvibe-logo.svg; email clients don't render SVG). The image
+  only resolves once docs/ is merged to master. alt="QuizVibe" is the fallback
+  when a client blocks images.
 
-  Email-safe: table layout + inline styles, light background, brand-blue accent.
+  Email-safe: table layout, inline styles + bgcolor attributes (keeps the navy
+  in clients that strip CSS backgrounds). Gold CTA = the one primary action.
 -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-       style="background:#F4F7FB;margin:0;padding:0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#0B1220"
+       style="background:#0B1220;margin:0;padding:0;">
   <tr>
     <td align="center" style="padding:32px 16px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-             style="max-width:480px;background:#FFFFFF;border:1px solid #E6ECF3;
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#121A29"
+             style="max-width:480px;background:#121A29;border:1px solid #232D40;
                     border-radius:16px;overflow:hidden;
                     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',
                     Roboto,Helvetica,Arial,sans-serif;">
         <tr>
-          <td align="center" style="padding:36px 32px 8px;">
-            <img src="https://quizvibe.se/quizvibe-logo.png" width="72" height="72"
-                 alt="QuizVibe" style="display:block;margin:0 auto;border:0;" />
-            <div style="font-size:12px;font-weight:700;letter-spacing:2px;
-                        text-transform:uppercase;color:#8A97AB;
-                        margin-top:12px;">Anyone. Anywhere. Let’s play.</div>
+          <td align="center" style="padding:36px 32px 0;">
+            <img src="https://quizvibe.se/assets/brand/quizvibe-logo-email.png"
+                 width="120" height="99" alt="QuizVibe"
+                 style="display:block;margin:0 auto;border:0;width:120px;height:auto;" />
+            <div style="font-size:13px;line-height:1.4;color:#A8B3C7;
+                        margin-top:14px;">Anyone. Anywhere. Let’s play.</div>
           </td>
         </tr>
         <tr>
-          <td style="padding:8px 32px 0;">
-            <div style="height:1px;background:#EDF1F6;margin:20px 0 4px;"></div>
+          <td style="padding:24px 32px 0;">
+            <div style="height:1px;line-height:1px;font-size:1px;background:#232D40;">&nbsp;</div>
           </td>
         </tr>
         <tr>
-          <td align="center" style="padding:20px 32px 0;">
-            <h1 style="font-size:22px;font-weight:700;color:#1A2233;
+          <td align="center" style="padding:28px 32px 0;">
+            <h1 style="font-size:22px;line-height:1.3;font-weight:700;color:#FFFFFF;
                        margin:0 0 12px;">Confirm your email address</h1>
-            <p style="font-size:15px;line-height:1.55;color:#4A5568;
+            <p style="font-size:15px;line-height:1.6;color:#C9D1DE;
                       margin:0 0 8px;">
               Thanks for signing up to QuizVibe. Please confirm your email
               address to activate your account.
@@ -51,31 +55,37 @@
         </tr>
         <tr>
           <td align="center" style="padding:24px 32px 8px;">
-            <a href="{{ .ConfirmationURL }}"
-               style="display:inline-block;background:#1E6FD9;color:#FFFFFF;
-                      font-size:16px;font-weight:700;text-decoration:none;
-                      padding:14px 28px;border-radius:10px;">
-              Confirm your email address
-            </a>
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td align="center" bgcolor="#F5A623" style="background:#F5A623;border-radius:12px;">
+                  <a href="{{ .ConfirmationURL }}"
+                     style="display:inline-block;color:#1A1205;
+                            font-size:16px;font-weight:700;text-decoration:none;
+                            padding:14px 30px;border-radius:12px;">
+                    Confirm your email address
+                  </a>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
         <tr>
-          <td align="center" style="padding:12px 32px 0;">
+          <td align="center" style="padding:16px 32px 0;">
             <p style="font-size:13px;line-height:1.5;color:#8A97AB;margin:0;">
               Or paste this link into your browser:
             </p>
             <p style="font-size:13px;line-height:1.5;margin:6px 0 0;
                       word-break:break-all;">
               <a href="{{ .ConfirmationURL }}"
-                 style="color:#1E6FD9;text-decoration:underline;">
+                 style="color:#F5A623;text-decoration:underline;">
                 {{ .ConfirmationURL }}</a>
             </p>
           </td>
         </tr>
         <tr>
-          <td style="padding:24px 32px 32px;">
-            <div style="height:1px;background:#EDF1F6;margin:0 0 16px;"></div>
-            <p style="font-size:12px;line-height:1.5;color:#9AA6B8;margin:0;">
+          <td style="padding:28px 32px 32px;">
+            <div style="height:1px;line-height:1px;font-size:1px;background:#232D40;margin:0 0 16px;">&nbsp;</div>
+            <p style="font-size:12px;line-height:1.5;color:#8A97AB;margin:0;">
               If you didn't create a QuizVibe account, you can safely ignore
               this email.
             </p>
