@@ -210,3 +210,68 @@ a:focus-visible { outline: 2px solid var(--qv-gold); outline-offset: 2px; border
   .doc h2 { font-size: 23px; }
   .tldr-card { padding: 24px 28px 8px; }
 }
+
+/* ── Info-sidor (About / Contact / Support) ─────────────── */
+
+/* Ingress: första stycket direkt under titeln. */
+.doc-page .doc h1 + p {
+  color: var(--qv-muted);
+  font-size: 17px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* Nyckel/värde-tabeller (markdown med tom header-rad: | | |) → info-kort. */
+.doc table.kv-table thead { display: none; }
+.doc table.kv-table td:last-child a { white-space: nowrap; }
+.doc table.kv-table {
+  display: table;
+  background: var(--qv-card);
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+.doc table.kv-table td { padding: 12px 16px; }
+.doc table.kv-table td:first-child {
+  width: 42%;
+  color: var(--qv-muted);
+}
+.doc table.kv-table td:first-child strong { color: var(--qv-muted); font-weight: 500; }
+.doc table.kv-table td:last-child { color: var(--qv-text); }
+
+/* Numrerade steg (Support: radera konto, avsluta prenumeration …). */
+.doc ol {
+  list-style: none;
+  counter-reset: qv-step;
+  padding-left: 0;
+}
+.doc ol > li {
+  counter-increment: qv-step;
+  position: relative;
+  padding-left: 38px;
+  min-height: 26px;
+  margin-bottom: 10px;
+}
+.doc ol > li::before {
+  content: counter(qv-step);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--qv-gold-soft);
+  color: var(--qv-gold);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 22px;
+  text-align: center;
+}
+
+/* "← Back to QuizVibe homepage" sist på sidan → diskret länk. */
+.doc > p:last-child > a:only-child {
+  color: var(--qv-muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+.doc > p:last-child > a:only-child:hover { color: var(--qv-text); }

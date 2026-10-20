@@ -44,6 +44,13 @@
   </footer>
 
   <script>
+    // Nyckel/värde-tabeller (markdown med tom header-rad "| | |") → info-kort.
+    document.querySelectorAll('.doc table').forEach(function (t) {
+      var ths = t.querySelectorAll('thead th');
+      if (ths.length && Array.prototype.every.call(ths, function (th) { return !th.textContent.trim(); })) {
+        t.classList.add('kv-table');
+      }
+    });
     // TL;DR-sektionen → diskret info-kort. Ren presentation: flyttar befintliga
     // element (rubrik + lista + avslutande rad fram till nästa <hr>) in i en
     // <section>. Utan JS renderas texten exakt som förut.
