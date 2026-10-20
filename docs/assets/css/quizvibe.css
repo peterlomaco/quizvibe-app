@@ -1,0 +1,212 @@
+/*
+ * QuizVibe – webbdesign för quizvibe.se (Privacy, Terms, Support, …).
+ * Speglar appens tokens: Colors.background #0B1220, BrandUi (surface/border/
+ * textMuted), QuizVibe-guld #F5A623. Inga gradienter/glöd.
+ */
+:root {
+  --qv-bg: #0B1220;
+  --qv-header: #0E1626;
+  --qv-card: rgba(255, 255, 255, 0.04);
+  --qv-card-border: rgba(255, 255, 255, 0.10);
+  --qv-divider: rgba(255, 255, 255, 0.08);
+  --qv-text: #FFFFFF;
+  --qv-body: rgba(255, 255, 255, 0.82);
+  --qv-muted: #A8B3C7;
+  --qv-faint: rgba(168, 179, 199, 0.7);
+  --qv-gold: #F5A623;
+  --qv-gold-soft: rgba(245, 166, 35, 0.45);
+  --qv-radius: 16px;
+  --qv-measure: 720px;
+  --qv-gutter: 20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--qv-bg);
+  color: var(--qv-body);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.site-header {
+  background: var(--qv-header);
+  border-bottom: 1px solid var(--qv-divider);
+}
+.site-header__inner {
+  max-width: var(--qv-measure);
+  margin: 0 auto;
+  padding: 14px var(--qv-gutter);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.brand__mark { width: 25px; height: 26px; display: block; }
+.brand__wordmark { width: 93px; height: 22px; display: block; }
+
+/* ── Dokument ───────────────────────────────────────────── */
+.doc {
+  max-width: var(--qv-measure);
+  margin: 0 auto;
+  padding: 36px var(--qv-gutter) 48px;
+  overflow-wrap: break-word;
+}
+
+.doc h1 {
+  color: var(--qv-text);
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+}
+.doc h2 {
+  color: var(--qv-text);
+  font-size: 21px;
+  line-height: 1.3;
+  font-weight: 700;
+  margin: 40px 0 12px;
+}
+.doc h3 {
+  color: var(--qv-text);
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 600;
+  margin: 28px 0 8px;
+}
+.doc h4, .doc h5, .doc h6 {
+  color: var(--qv-text);
+  font-size: 15px;
+  font-weight: 600;
+  margin: 22px 0 6px;
+}
+
+.doc p { margin: 0 0 16px; }
+.doc strong { color: var(--qv-text); font-weight: 600; }
+.doc em { color: var(--qv-muted); }
+
+.doc ul, .doc ol { margin: 0 0 18px; padding-left: 22px; }
+.doc li { margin: 0 0 8px; }
+.doc li::marker { color: var(--qv-faint); }
+.doc li > ul, .doc li > ol { margin: 8px 0 0; }
+
+/* Metadata under titeln ("Last updated … Effective date …") — bara legal-sidor. */
+.doc-legal .doc h1 + p {
+  color: var(--qv-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+.doc-legal .doc h1 + p strong { color: var(--qv-muted); font-weight: 500; }
+
+/* ── Länkar ─────────────────────────────────────────────── */
+.doc a, .site-footer a {
+  color: var(--qv-gold);
+  text-decoration: underline;
+  text-decoration-color: var(--qv-gold-soft);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.doc a:hover, .doc a:focus-visible,
+.site-footer a:hover, .site-footer a:focus-visible {
+  text-decoration-color: var(--qv-gold);
+}
+.doc a:active, .site-footer a:active { opacity: 0.75; }
+a:focus-visible { outline: 2px solid var(--qv-gold); outline-offset: 2px; border-radius: 3px; }
+
+/* ── Avdelare ───────────────────────────────────────────── */
+.doc hr {
+  border: 0;
+  height: 1px;
+  background: var(--qv-divider);
+  margin: 32px 0;
+}
+
+/* ── TL;DR-kort (wrappas av layoutens script) ───────────── */
+.tldr-card {
+  background: var(--qv-card);
+  border: 1px solid var(--qv-card-border);
+  border-radius: var(--qv-radius);
+  padding: 20px 20px 4px;
+  margin: 8px 0 0;
+}
+.tldr-card h2 { margin-top: 0; font-size: 18px; }
+.tldr-card ul { color: var(--qv-body); }
+.tldr-card > p:last-child { color: var(--qv-muted); font-size: 14px; }
+
+/* ── Tabeller / kod / citat ─────────────────────────────── */
+.doc table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  border: 1px solid var(--qv-card-border);
+  border-radius: 12px;
+}
+.doc th, .doc td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--qv-divider);
+}
+.doc th { color: var(--qv-text); font-weight: 600; background: var(--qv-card); }
+.doc tr:last-child td { border-bottom: 0; }
+
+.doc code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+.doc pre {
+  background: var(--qv-card);
+  border: 1px solid var(--qv-card-border);
+  border-radius: 12px;
+  padding: 14px;
+  overflow-x: auto;
+}
+.doc pre code { background: none; padding: 0; }
+
+.doc blockquote {
+  margin: 0 0 18px;
+  padding: 2px 0 2px 16px;
+  border-left: 2px solid var(--qv-card-border);
+  color: var(--qv-muted);
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+.site-footer {
+  border-top: 1px solid var(--qv-divider);
+}
+.site-footer__inner {
+  max-width: var(--qv-measure);
+  margin: 0 auto;
+  padding: 24px var(--qv-gutter) 40px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--qv-faint);
+}
+.site-footer__about { margin: 0 0 10px; }
+.site-footer__links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.site-footer a { color: var(--qv-muted); text-decoration-color: rgba(168, 179, 199, 0.35); }
+
+@media (min-width: 768px) {
+  :root { --qv-gutter: 32px; }
+  .doc { padding-top: 56px; }
+  .doc h1 { font-size: 40px; }
+  .doc h2 { font-size: 23px; }
+  .tldr-card { padding: 24px 28px 8px; }
+}
