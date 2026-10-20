@@ -2208,6 +2208,8 @@ export default function HomeScreen() {
   }, [loginPlayerName, loginEmail, loginPassword, loginMode]);
 
   // ── Register-form state (sekventiell upplåsning som guest-flödet) ──
+  // Paus efter sista tangenttrycket innan email/namn kontrolleras automatiskt.
+  const REG_AUTO_CHECK_MS = 700;
   const [regEmail, setRegEmail] = useState('');
   // Email valideras vid email-steget: format + "finns redan?" (Check-knapp).
   // Delar status-type med PlayerName (idle/checking/available/taken/invalid).
@@ -2215,7 +2217,9 @@ export default function HomeScreen() {
   const [regPlayerName, setRegPlayerName] = useState('');
   const [regPlayerNameStatus, setRegPlayerNameStatus] = useState<PlayerNameStatus>('idle');
   const [regPassword, setRegPassword] = useState('');
-  const [regPasswordConfirmed, setRegPasswordConfirmed] = useState(false);
+  // Lösenordet "bekräftas" inte längre manuellt — giltigt = klart (2026-10-20).
+  // Blur-flaggan styr bara när ett för-kort-fel visas (inte under skrivning).
+  const [regPasswordBlurred, setRegPasswordBlurred] = useState(false);
   const [regBirthYearText, setRegBirthYearText] = useState('');
   // Default-värden: användaren kan registrera direkt efter year of birth.
   // Assistance och Region är förvalda men kan ändras via picker:erna.
@@ -2271,7 +2275,7 @@ export default function HomeScreen() {
         setRegPlayerName('');
         setRegPlayerNameStatus('idle');
         setRegPassword('');
-        setRegPasswordConfirmed(false);
+        setRegPasswordBlurred(false);
         setRegBirthYearText('');
         setRegAssistance('full');
         setRegRegion('sweden');
@@ -2346,7 +2350,7 @@ export default function HomeScreen() {
       setRegPlayerName('');
       setRegPlayerNameStatus('idle');
       setRegPassword('');
-      setRegPasswordConfirmed(false);
+      setRegPasswordBlurred(false);
       setRegBirthYearText('');
       setRegAssistance('full');
       setRegRegion('sweden');
@@ -2369,7 +2373,7 @@ export default function HomeScreen() {
       setRegPlayerName('');
       setRegPlayerNameStatus('idle');
       setRegPassword('');
-      setRegPasswordConfirmed(false);
+      setRegPasswordBlurred(false);
       setRegBirthYearText('');
       setRegAssistance('full');
       setRegRegion('sweden');
@@ -2862,7 +2866,6 @@ export default function HomeScreen() {
     if (isNaN(n) || n < MIN_BIRTH_YEAR || n > MAX_BIRTH_YEAR) return null;
     return n;
   })();
-  const regEmailValid = REG_EMAIL_REGEX.test(regEmail.trim());
   // Password måste ha minst 6 tecken — i linje med NIST-baseline-policy så
   // användaren inte tvingas migrera från 1-2-tecken-lösenord när riktig
   // backend-validering kopplas in. Användaren måste även explicit trycka
@@ -2870,6 +2873,7 @@ export default function HomeScreen() {
   const REG_PASSWORD_MIN_LENGTH = 6;
   const REG_PASSWORD_MAX_LENGTH = 32;
   const regPasswordValid = regPassword.length >= REG_PASSWORD_MIN_LENGTH;
+  const regPasswordConfirmed = regPasswordValid;
   // Sekventiella gates: email → playerName → password → year → assistance → region.
   // Email måste nu Check:as (format + uniqueness) — inte bara ha giltigt format —
   // innan PlayerName låses upp.
@@ -2891,13 +2895,26 @@ export default function HomeScreen() {
     if (regEmailStatus !== 'idle') setRegEmailStatus('idle');
   };
 
+  // Automatisk validering (2026-10-20) ersätter Check/Confirm-knapparna:
+  // email + Player Name kontrolleras REG_AUTO_CHECK_MS efter sista
+  // tangenttrycket (och direkt vid blur för email). Request-id-refs kastar
+  // svar från en äldre kontroll om användaren hunnit skriva vidare —
+  // samma RPC:er och lokala regler som förut, inget är försvagat.
+  const regEmailCheckIdRef = useRef(0);
+  // Password-fältet — Next-tangenten på namn-keyboardet flyttar fokus hit.
+  const regPasswordInputRef = useRef<TextInput>(null);
+  const regNameCheckIdRef = useRef(0);
+  // Auto-genererade namn markeras 'available' direkt (som förut) — hoppa
+  // över den automatiska kontrollen för exakt det värdet.
+  const regGeneratedNameRef = useRef<string | null>(null);
+
   // Check-knapp på email: (1) format via REG_EMAIL_REGEX, (2) uniqueness via
   // email_exists-RPC. Fail-open till 'available' vid nätverksfel — Register-
   // submitens signUp är sista auktoriteten (samma som playerName-checken).
   const handleRegCheckEmail = async () => {
     const trimmed = regEmail.trim();
     if (!trimmed) return;
-    Keyboard.dismiss();
+    const id = ++regEmailCheckIdRef.current;
     if (!REG_EMAIL_REGEX.test(trimmed)) {
       setRegEmailStatus('invalid');
       return;
@@ -2905,20 +2922,29 @@ export default function HomeScreen() {
     setRegEmailStatus('checking');
     try {
       const exists = await emailExists(trimmed);
+      if (id !== regEmailCheckIdRef.current) return;
       setRegEmailStatus(exists ? 'taken' : 'available');
     } catch {
+      if (id !== regEmailCheckIdRef.current) return;
       setRegEmailStatus('available');
     }
   };
 
+  useEffect(() => {
+    if (profileMenuStep !== 'register' || !regEmail.trim()) return;
+    const t = setTimeout(() => { void handleRegCheckEmail(); }, REG_AUTO_CHECK_MS);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [regEmail, profileMenuStep]);
+
   const handleRegCheckPlayerName = async () => {
     const trimmed = regPlayerName.trim();
     if (!trimmed) return;
-    // Auto-inserta dash om användaren bara typat letters innan Check —
-    // dashen är "fixed" i format-spec:en.
+    // Validera den normaliserade formen (orphan-dash strippas). Fältet
+    // skrivs INTE om här — kontrollen körs medan användaren skriver, och
+    // submit normaliserar själv.
     const normalized = normalizePlayerName(trimmed);
-    if (normalized !== regPlayerName) setRegPlayerName(normalized);
-    Keyboard.dismiss();
+    const id = ++regNameCheckIdRef.current;
     setRegPlayerNameStatus('checking');
     // Snabb lokal validering (format + profanity + mock-blocklist).
     const localResult = validatePlayerName(normalized);
@@ -2929,17 +2955,29 @@ export default function HomeScreen() {
     // Riktigt uniqueness-check mot Supabase: om namnet finns → 'taken'.
     try {
       const exists = await playerNameExists(normalized);
+      if (id !== regNameCheckIdRef.current) return;
       setRegPlayerNameStatus(exists ? 'taken' : 'available');
     } catch {
+      if (id !== regNameCheckIdRef.current) return;
       // Vid nätverksfel: faller tillbaka på lokal validering (godkänd).
       setRegPlayerNameStatus('available');
     }
   };
 
+  useEffect(() => {
+    if (profileMenuStep !== 'register' || !regPlayerName.trim()) return;
+    if (regGeneratedNameRef.current === regPlayerName) return;
+    const t = setTimeout(() => { void handleRegCheckPlayerName(); }, REG_AUTO_CHECK_MS);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [regPlayerName, profileMenuStep]);
+
   // Rensa namnet och låt användaren skriva eget. Status faller till 'idle'
   // så Password-låset stängs igen tills nytt namn validerats via Check.
   // Refokus → CodeKeyboard:n stannar uppe (custom keyboard pushar inte layout).
   const handleRegRemoveName = () => {
+    regNameCheckIdRef.current++;
+    regGeneratedNameRef.current = null;
     setRegPlayerName('');
     setRegPlayerNameStatus('idle');
     setRegPlayerNameKbMode('letter');
@@ -2947,6 +2985,8 @@ export default function HomeScreen() {
   };
 
   const applyRegGenerated = (generated: string) => {
+    regNameCheckIdRef.current++;
+    regGeneratedNameRef.current = generated;
     setRegPlayerName(generated);
     setRegPlayerNameStatus('available');
     Keyboard.dismiss();
@@ -3019,13 +3059,6 @@ export default function HomeScreen() {
   // Om de ändrar password efteråt återställs confirmed-state.
   const handleRegPasswordChange = (t: string) => {
     setRegPassword(t);
-    if (regPasswordConfirmed) setRegPasswordConfirmed(false);
-  };
-
-  const handleRegConfirmPassword = () => {
-    if (!regPasswordValid) return;
-    Keyboard.dismiss();
-    setRegPasswordConfirmed(true);
   };
 
   // När registreringen är klar — skicka aktiveringsmail, logga INTE in.
@@ -4085,18 +4118,27 @@ export default function HomeScreen() {
                       onSubmitEditing={handleSendRecoveryCode}
                     />
 
-                    <TouchableOpacity
-                      style={[
-                        profileMenu.primaryBtn,
-                        (!forgotEmailValid || forgotSending) && profileMenu.primaryBtnDisabled,
-                      ]}
-                      onPress={handleSendRecoveryCode}
-                      disabled={!forgotEmailValid || forgotSending}
-                    >
-                      <Text style={profileMenu.primaryBtnText}>
-                        {forgotSending ? 'Sending…' : 'Send code'}
-                      </Text>
-                    </TouchableOpacity>
+                    {/* Guld primär-CTA (som Log in / Register) först när giltig. */}
+                    {(() => {
+                      const ready = forgotEmailValid && !forgotSending;
+                      return (
+                        <TouchableOpacity
+                          style={[modal.joinBtn, ready ? modal.joinBtnGold : modal.joinBtnDisabled]}
+                          onPress={handleSendRecoveryCode}
+                          disabled={!ready}
+                        >
+                          {ready && <MetallicGoldFill />}
+                          <Text
+                            style={[
+                              modal.joinBtnText,
+                              ready ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
+                            ]}
+                          >
+                            {forgotSending ? 'Sending…' : 'Send code'}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })()}
                   </>
                 ) : (
                   <>
@@ -4140,19 +4182,26 @@ export default function HomeScreen() {
                       />
                     </View>
 
-                    <TouchableOpacity
-                      style={[
-                        profileMenu.primaryBtn,
-                        (!forgotCodeValid || !forgotNewPasswordValid || forgotSending) &&
-                          profileMenu.primaryBtnDisabled,
-                      ]}
-                      onPress={handleResetPassword}
-                      disabled={!forgotCodeValid || !forgotNewPasswordValid || forgotSending}
-                    >
-                      <Text style={profileMenu.primaryBtnText}>
-                        {forgotSending ? 'Resetting…' : 'Reset password'}
-                      </Text>
-                    </TouchableOpacity>
+                    {(() => {
+                      const ready = forgotCodeValid && forgotNewPasswordValid && !forgotSending;
+                      return (
+                        <TouchableOpacity
+                          style={[modal.joinBtn, ready ? modal.joinBtnGold : modal.joinBtnDisabled]}
+                          onPress={handleResetPassword}
+                          disabled={!ready}
+                        >
+                          {ready && <MetallicGoldFill />}
+                          <Text
+                            style={[
+                              modal.joinBtnText,
+                              ready ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
+                            ]}
+                          >
+                            {forgotSending ? 'Resetting…' : 'Reset password'}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })()}
 
                     <TouchableOpacity
                       onPress={handleSendRecoveryCode}
@@ -4212,47 +4261,31 @@ export default function HomeScreen() {
                       efter Register. */}
                   <View style={modal.fieldGroup}>
                     <Text style={modal.fieldLabel}>Email</Text>
-                    <View style={modal.playerNameRow}>
-                      <TextInput
-                        style={[
-                          modal.inputText,
-                          modal.playerNameInput,
-                          // Highlight medan email är aktivt steg (ej Check:ad än)
-                          regEmailStatus !== 'available' && modal.playerNameInputActive,
-                        ]}
-                        placeholder="you@example.com"
-                        placeholderTextColor={Colors.textDisabled}
-                        value={regEmail}
-                        onChangeText={handleRegEmailChange}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        maxLength={60}
-                        editable={regEmailStatus !== 'checking'}
-                        returnKeyType="next"
-                        onSubmitEditing={handleRegCheckEmail}
-                      />
-                      <TouchableOpacity
-                        onPress={handleRegCheckEmail}
-                        disabled={!regEmailValid || regEmailStatus === 'checking' || regEmailStatus === 'available'}
-                        style={[
-                          modal.checkBtn,
-                          (!regEmailValid || regEmailStatus === 'checking') && modal.checkBtnDisabled,
-                          regEmailStatus === 'available' && modal.checkBtnDone,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            modal.checkBtnText,
-                            regEmailStatus === 'available' && modal.checkBtnTextDone,
-                          ]}
-                        >
-                          {regEmailStatus === 'checking' ? '…'
-                            : regEmailStatus === 'available' ? '✓'
-                            : 'Check'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
+                    {/* Kontrolleras automatiskt (paus i skrivandet eller blur) —
+                        ingen Check-knapp. Fältet förblir redigerbart under
+                        kontrollen; en ny ändring ersätter den pågående. */}
+                    <TextInput
+                      style={[
+                        modal.inputText,
+                        regEmailStatus !== 'available' && modal.playerNameInputActive,
+                        regEmailStatus === 'available' && modal.fieldDone,
+                      ]}
+                      placeholder="you@example.com"
+                      placeholderTextColor={Colors.textDisabled}
+                      value={regEmail}
+                      onChangeText={handleRegEmailChange}
+                      onBlur={() => {
+                        if (regEmailStatus === 'idle') void handleRegCheckEmail();
+                      }}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      maxLength={60}
+                      returnKeyType="next"
+                      onSubmitEditing={() => {
+                        if (regEmailStatus === 'idle') void handleRegCheckEmail();
+                      }}
+                    />
                     {regEmailStatus === 'idle' && (
                       <Text style={modal.statusHint}>
                         We&apos;ll send an activation link here to verify your address.
@@ -4300,8 +4333,10 @@ export default function HomeScreen() {
                           : null
                       }
                       done={regPlayerNameStatus === 'available'}
-                      lettersEditable={regPlayerNameStatus !== 'checking'}
-                      digitsEditable={regPlayerNameStatus !== 'checking' && getPlayerNameLetters(regPlayerName).length > 0}
+                      // Alltid redigerbart: kontrollen körs automatiskt medan
+                      // man skriver. editable=false under 'checking' fick iOS
+                      // att tappa fokus → CodeKeyboard stängdes mitt i namnet.
+                      digitsEditable={getPlayerNameLetters(regPlayerName).length > 0}
                       digitsDimmed={getPlayerNameLetters(regPlayerName).length === 0}
                       onLettersFocus={() => {
                         setRegPlayerNameKbMode('letter');
@@ -4328,29 +4363,6 @@ export default function HomeScreen() {
                         });
                       }}
                       onBlur={() => setRegPlayerNameFocused(false)}
-                      trailing={
-                        <TouchableOpacity
-                          onPress={handleRegCheckPlayerName}
-                          disabled={!regPlayerName.trim() || regPlayerNameStatus === 'checking' || regPlayerNameStatus === 'available'}
-                          style={[
-                            modal.checkBtn,
-                            modal.checkBtnPlayerName,
-                            (!regPlayerName.trim() || regPlayerNameStatus === 'checking') && modal.checkBtnDisabled,
-                            regPlayerNameStatus === 'available' && modal.checkBtnDone,
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              modal.checkBtnText,
-                              regPlayerNameStatus === 'available' && modal.checkBtnTextDone,
-                            ]}
-                          >
-                            {regPlayerNameStatus === 'checking' ? '…'
-                              : regPlayerNameStatus === 'available' ? '✓'
-                              : 'Check'}
-                          </Text>
-                        </TouchableOpacity>
-                      }
                     />
                     {/* Sekundära åtgärder under namnfältet — se guest-formen
                         ovan för rationale (mutually-exclusive enable). */}
@@ -4416,12 +4428,12 @@ export default function HomeScreen() {
                     }}
                   >
                     <Text style={modal.fieldLabel}>Password</Text>
-                    <View style={modal.playerNameRow}>
-                      <TextInput
+                    <TextInput
+                        ref={regPasswordInputRef}
                         style={[
                           modal.inputText,
-                          modal.playerNameInput,
                           regPasswordUnlocked && !regPasswordConfirmed && modal.playerNameInputActive,
+                          regPasswordConfirmed && modal.fieldDone,
                         ]}
                         placeholder={`At least ${REG_PASSWORD_MIN_LENGTH} characters`}
                         placeholderTextColor={Colors.textDisabled}
@@ -4430,7 +4442,10 @@ export default function HomeScreen() {
                         secureTextEntry
                         maxLength={REG_PASSWORD_MAX_LENGTH}
                         returnKeyType="done"
-                        onSubmitEditing={handleRegConfirmPassword}
+                        onSubmitEditing={() => {
+                          setRegPasswordBlurred(true);
+                          Keyboard.dismiss();
+                        }}
                         onFocus={() => {
                           // Markera fältet som fokuserat — den globala
                           // keyboardDidShow-effekten plockar upp detta och
@@ -4440,30 +4455,22 @@ export default function HomeScreen() {
                         }}
                         onBlur={() => {
                           regPasswordFocusedRef.current = false;
+                          setRegPasswordBlurred(true);
                         }}
                       />
-                      <TouchableOpacity
-                        onPress={handleRegConfirmPassword}
-                        disabled={!regPasswordValid || regPasswordConfirmed}
-                        style={[
-                          modal.checkBtn,
-                          !regPasswordValid && modal.checkBtnDisabled,
-                          regPasswordConfirmed && modal.checkBtnDone,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            modal.checkBtnText,
-                            regPasswordConfirmed && modal.checkBtnTextDone,
-                          ]}
-                        >
-                          {regPasswordConfirmed ? '✓' : 'Confirm'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <Text style={modal.statusHint}>
-                      Format: min {REG_PASSWORD_MIN_LENGTH}-{REG_PASSWORD_MAX_LENGTH} characters
-                    </Text>
+                    {regPasswordValid ? (
+                      <Text style={[modal.statusHint, modal.statusHintOk]}>
+                        ✓ Password meets the requirements
+                      </Text>
+                    ) : regPasswordBlurred && regPassword.length > 0 ? (
+                      <Text style={[modal.statusHint, modal.statusHintError]}>
+                        ✗ Use at least {REG_PASSWORD_MIN_LENGTH} characters
+                      </Text>
+                    ) : (
+                      <Text style={modal.statusHint}>
+                        {REG_PASSWORD_MIN_LENGTH}–{REG_PASSWORD_MAX_LENGTH} characters
+                      </Text>
+                    )}
                   </View>
 
                   {/* Year of birth */}
@@ -4512,6 +4519,13 @@ export default function HomeScreen() {
                     // Digit-mode kräver minst 1 letter — toggle-knappen dimmas
                     // i letter-mode tills letter-sektionen har innehåll.
                     modeToggleDisabled={regPlayerNameKbMode === 'letter' && regPlayerName.length === 0}
+                    // Next → Password (öppnar systemtangentbordet; keyboardDidShow-
+                    // lyssnaren scrollar fältet i vy). Guld först när namnet är godkänt.
+                    nextEnabled={regPasswordUnlocked}
+                    onNext={() => {
+                      setRegPlayerNameFocused(false);
+                      regPasswordInputRef.current?.focus();
+                    }}
                   />
                 )}
 

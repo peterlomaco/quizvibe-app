@@ -76,6 +76,13 @@ interface Props {
    * [Delete] istället för [123/ABC] [Delete].
    */
   onCancel?: () => void;
+  /**
+   * När definierad renderas en "Next ›"-knapp sist i botten-raden (Register,
+   * 2026-10-20): tar användaren vidare till nästa fält utan att behöva förstå
+   * att formuläret måste scrollas. Guld när `nextEnabled`, annars dämpad.
+   */
+  onNext?: () => void;
+  nextEnabled?: boolean;
 }
 
 function chunk(chars: string, cols: number): string[][] {
@@ -94,6 +101,8 @@ export function CodeKeyboard({
   onModeToggle,
   modeToggleDisabled = false,
   onCancel,
+  onNext,
+  nextEnabled = false,
 }: Props) {
   const activeLetterCharset = letterCharset ?? LETTER_CHARSET;
   const letterRowCount = Math.ceil(activeLetterCharset.length / LETTER_COLS);
@@ -227,6 +236,27 @@ export function CodeKeyboard({
         >
           <Text style={styles.bottomBtnText}>⌫  Delete</Text>
         </Pressable>
+        {onNext && (
+          <Pressable
+            onPress={nextEnabled ? onNext : undefined}
+            disabled={!nextEnabled}
+            style={({ pressed }) => [
+              styles.bottomBtn,
+              nextEnabled && styles.nextBtnEnabled,
+              pressed && nextEnabled && styles.keyPressed,
+              !nextEnabled && styles.bottomBtnDisabled,
+            ]}
+          >
+            <Text
+              style={[
+                styles.bottomBtnText,
+                nextEnabled ? styles.nextBtnTextEnabled : styles.bottomBtnTextDisabled,
+              ]}
+            >
+              Next ›
+            </Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );
@@ -304,6 +334,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: Colors.textSecondary,
+  },
+  // Next: guldkant + guldtext när nästa steg är upplåst (guld = klart/giltigt).
+  nextBtnEnabled: {
+    borderColor: 'rgba(245,166,35,0.65)',
+  },
+  nextBtnTextEnabled: {
+    color: '#F5A623',
+    fontWeight: '700',
   },
   bottomBtnDisabled: {
     opacity: 0.4,
