@@ -3705,7 +3705,9 @@ export default function HomeScreen() {
               <>
                 {/* Konto-sheet (Home v2, 2026-10-16): informativ identitets-
                     header (ingen knapp-look), neutrala menyrader i stället för
-                    blå-konturerade CTA-knappar, och en tyst röd Log out-rad. */}
+                    blå-konturerade CTA-knappar, och en neutral Log out-rad.
+                    Delete Account visas MEDVETET inte här (konto-hantering
+                    hör hemma i Profile-skärmens sheet / Danger zone). */}
                 <View style={profileMenu.header}>
                   {profile?.selectedAvatarId ? (
                     <Text style={profileMenu.headerEmoji}>
@@ -3720,9 +3722,9 @@ export default function HomeScreen() {
                     <Text style={profileMenu.headerName}>
                       {profile?.playerName?.trim() || 'Signed in'}
                     </Text>
-                    <Text style={profileMenu.headerStatus}>
-                      {profile?.email?.trim() || 'Logged in'}
-                    </Text>
+                    {/* "Logged in" i stället för e-post — samma identitetsblock
+                        som Profile-skärmens konto-sheet (UI 2026-10-20). */}
+                    <Text style={profileMenu.headerStatus}>Logged in</Text>
                   </View>
                 </View>
 
@@ -3768,14 +3770,14 @@ export default function HomeScreen() {
 
                 <View style={profileMenu.menuDivider} />
 
-                {/* Destruktiv men tyst: röd text/ikon, ingen fylld knapp.
+                {/* Neutral sekundär rad (ingen röd, UI 2026-10-20).
                     handleLogout har kvar sin bekräftelse-Alert. */}
                 <TouchableOpacity
                   style={profileMenu.logoutRow}
                   activeOpacity={0.6}
                   onPress={handleLogout}
                 >
-                  <LogoutIcon size={22} color={Colors.error} />
+                  <LogoutIcon size={22} color={BrandUi.iconMuted} />
                   <Text style={profileMenu.logoutRowText}>Log out</Text>
                 </TouchableOpacity>
               </>
@@ -5601,7 +5603,7 @@ const profileMenu = StyleSheet.create({
     paddingBottom: SCREEN_HEIGHT < 700 ? Spacing.lg : Spacing.xxl,
     gap: SCREEN_HEIGHT < 700 ? Spacing.sm : Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     maxHeight: '90%',
   },
   sheetAccount: {
@@ -5669,10 +5671,12 @@ const profileMenu = StyleSheet.create({
     // (sheet:ens gap gäller alla steg, så justeringen görs här).
     marginBottom: -20,
   },
+  // UI 2026-10-20: neutral sekundär rad (ingen röd) — samma som Profile:s
+  // konto-sheet; röd är reserverad för Delete Account.
   logoutRowText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.error,
+    color: 'rgba(255,255,255,0.78)',
   },
   logoutBtn: {
     height: 52,

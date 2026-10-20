@@ -1450,6 +1450,7 @@ export default function ProfileScreen() {
 
     track('user_account_deleted');
     resetIdentity();
+    setDeleteConfirmSource(null);
     setLogoutModalVisible(false);
     router.replace('/');
   };
@@ -1475,10 +1476,21 @@ export default function ProfileScreen() {
     secondaryLabel: 'Cancel',
     primaryLabel: 'Delete Account',
     destructive: true,
-    destructiveIcon: <TrashIcon size={18} color={Colors.error} />,
-    onClose: () => setDeleteConfirmSource(null),
+    // 2026-10-20: dra-för-att-radera i stället för en knapp. Dialogen står
+    // kvar under raderingen ("Deleting account…"); vid fel återställs
+    // slidern och den vanliga felmeddelande-Alerten visas.
+    slideToConfirm: {
+      label: 'Slide to permanently delete',
+      busyLabel: 'Deleting account…',
+      busy: deletingAccount,
+      accessibilityHint:
+        'Drag all the way to the right to permanently delete your account. This cannot be undone.',
+    },
+    onClose: () => {
+      if (!deletingAccount) setDeleteConfirmSource(null);
+    },
     onPrimary: () => {
-      setDeleteConfirmSource(null);
+      if (deletingAccount) return;
       handleConfirmDeleteAccount();
     },
   };
@@ -3426,11 +3438,12 @@ export default function ProfileScreen() {
                 <Text style={styles.logoutHeaderName}>
                   {playerName.trim() || 'Signed in'}
                 </Text>
-                <Text style={styles.logoutHeaderStatus}>
-                  {email.trim() || 'Logged in'}
-                </Text>
+                {/* "Logged in" i stället för e-post — renare meny (UI 2026-10-20). */}
+                <Text style={styles.logoutHeaderStatus}>Logged in</Text>
               </View>
             </View>
+            {/* Samma avdelare som Home:s konto-sheet (profileMenu.menuDivider). */}
+            <View style={styles.logoutHeaderDivider} />
 
             {/* Start New Game — fäller ut samma lobbytyp-väljare (Single
                 Game / Multiplayer Game / Head-to-head) som Home:s "Start New
@@ -3498,8 +3511,10 @@ export default function ProfileScreen() {
               })}
             >
               <ShoppingCartIcon size={22} color={BrandUi.iconMuted} />
-              <Text style={[styles.logoutStoreBtnText, { flex: 1 }]}>Store</Text>
-              <ChevronIcon size={18} />
+              <Text style={styles.logoutStoreBtnText}>Store</Text>
+              <View style={styles.logoutStoreChevron} pointerEvents="none">
+                <ChevronIcon size={18} />
+              </View>
             </Pressable>
 
             <Pressable
@@ -3510,30 +3525,35 @@ export default function ProfileScreen() {
               onPress={handleConfirmLogout}
               disabled={deletingAccount}
             >
-              <LogoutIcon size={22} color={Colors.error} />
+              <LogoutIcon size={22} color={BrandUi.iconMuted} />
               <Text style={styles.logoutBtnText}>Log out</Text>
             </Pressable>
 
-            {/* Delete Account — separat från Log out, tydligt destruktiv
-                styling (röd outline + röd text). Apple App Store
-                Guideline 5.1.1(v) kräver in-app deletion för apps med
-                kontoflow. Två-stegs confirmation via Alert i
-                handleRequestDeleteAccount så user inte triggar deletion
-                av misstag. */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.deleteAccountBtn,
-                pressed && { opacity: 0.85 },
-                deletingAccount && { opacity: 0.5 },
-              ]}
-              onPress={() => handleRequestDeleteAccount('sheet')}
-              disabled={deletingAccount}
-            >
-              <TrashIcon size={18} color={Colors.error} />
-              <Text style={styles.deleteAccountBtnText}>
-                {deletingAccount ? 'Deleting…' : 'Delete Account'}
-              </Text>
-            </Pressable>
+            {/* Danger zone (UI 2026-10-20) — Delete Account avskild från Log
+                out, samma dämpade röda stil som Profile-skärmens Danger
+                zone. Öppnar SAMMA slide-to-delete-dialog (källa 'sheet'
+                → QuizVibeDialogOverlay inuti denna Modal). Apple Guideline
+                5.1.1(v): in-app deletion. */}
+            <View style={styles.sheetDangerZone}>
+              <Text style={styles.sheetDangerLabel}>Danger zone</Text>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.accountDeleteBtn,
+                  styles.sheetDeleteBtn,
+                  pressed && { borderColor: 'rgba(255,107,107,0.85)', opacity: 0.9 },
+                  deletingAccount && { opacity: 0.5 },
+                ]}
+                onPress={() => handleRequestDeleteAccount('sheet')}
+                disabled={deletingAccount}
+                accessibilityRole="button"
+                accessibilityHint="Permanently deletes your account. This cannot be undone."
+              >
+                <TrashIcon size={20} color={Colors.error} />
+                <Text style={styles.accountDeleteBtnText}>
+                  {deletingAccount ? 'Deleting…' : 'Delete Account'}
+                </Text>
+              </Pressable>
+            </View>
               </>
             )}
 
@@ -3803,19 +3823,24 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: Spacing.xl,
-    paddingBottom: Spacing.xxl,
+    // Samma bottenpadding som Home:s konto-sheet (profileMenu.sheetAccount).
+    paddingBottom: Spacing.lg,
     gap: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
   },
   // Profile v2: informativ identitets-header (ingen ram) — speglar Home:s
-  // konto-sheet.
+  // konto-sheet 1:1 (header + separat hårfin avdelare).
   logoutHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.xs,
+  },
+  logoutHeaderDivider: {
+    height: 1,
+    backgroundColor: BrandUi.border,
   },
   logoutHeaderBrandWrap: {
     width: 40,
@@ -3865,12 +3890,19 @@ const styles = StyleSheet.create({
     height: 48,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.md,
+    // Ikon + text centrerade som Start New Game / Join; chevronen ligger
+    // absolut i högerkanten så den inte drar grupperingen ur centrum.
+    justifyContent: 'center',
+    gap: Spacing.sm,
     paddingHorizontal: Spacing.lg,
     borderRadius: Radius.md,
     backgroundColor: 'rgba(255,255,255,0.04)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
+  },
+  logoutStoreChevron: {
+    position: 'absolute',
+    right: Spacing.lg,
   },
   logoutStoreBtnText: {
     fontSize: 16,
@@ -3893,10 +3925,31 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
     paddingHorizontal: Spacing.lg,
   },
+  // UI 2026-10-20: Log out är en NEUTRAL sekundär rad (ingen röd) — bara
+  // Delete Account i Danger zone ser destruktiv ut.
   logoutBtnText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.error,
+    color: 'rgba(255,255,255,0.78)',
+  },
+  sheetDangerZone: {
+    // + sheet:ens gap (md) ≈ 20 pt luft mellan Log out och avdelaren.
+    marginTop: Spacing.sm,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: BrandUi.border,
+    gap: Spacing.sm,
+  },
+  sheetDangerLabel: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: 'rgba(255,107,107,0.42)',
+    textTransform: 'uppercase',
+    letterSpacing: 1.6,
+  },
+  // Något lägre än Profile-skärmens Danger zone-knapp för bättre balans i sheet:en.
+  sheetDeleteBtn: {
+    height: 42,
   },
   logoutCancelBtn: {
     alignItems: 'center',
@@ -3905,26 +3958,6 @@ const styles = StyleSheet.create({
   logoutCancelText: {
     fontSize: 14,
     color: Colors.textSecondary,
-  },
-  // Delete Account — destruktiv outline-styling. Tunnare/mindre visuell
-  // vikt än Log out (som har soft red bg) för att signalera "rare,
-  // dangerous action" snarare än "frequent CTA". Solid red outline +
-  // transparent bg + röd text följer iOS HIG för destructive buttons.
-  deleteAccountBtn: {
-    height: 44,
-    borderRadius: Radius.md,
-    backgroundColor: '#141C2B',
-    borderWidth: 1,
-    borderColor: 'rgba(255,107,107,0.6)',
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  deleteAccountBtnText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.error,
   },
   accountSection: {
     marginTop: Spacing.xl,

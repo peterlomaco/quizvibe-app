@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from './Button';
+import { SlideToConfirm } from './SlideToConfirm';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 
 /**
@@ -29,6 +30,15 @@ interface Props {
   warning?: string;
   /** Valfri ikon före etiketten på den destruktiva knappen. */
   destructiveIcon?: React.ReactNode;
+  /** Ersätter den primära knappen med en dra-för-att-bekräfta-kontroll
+   *  (Cancel fullbredd överst, slidern under). `onPrimary` körs när slidern
+   *  dragits hela vägen. Under `busy` är Cancel + overlay-tap avstängda. */
+  slideToConfirm?: {
+    label: string;
+    busyLabel: string;
+    busy: boolean;
+    accessibilityHint?: string;
+  };
 }
 
 export function QuizVibeDialog({ visible, onClose, ...rest }: Props) {
@@ -55,15 +65,17 @@ export function QuizVibeDialogOverlay({
   icon,
   warning,
   destructiveIcon,
+  slideToConfirm,
 }: Omit<Props, 'visible'>) {
+  const busy = slideToConfirm?.busy ?? false;
   return (
     <View style={styles.overlay}>
       <Pressable
         style={styles.backdrop}
-        onPress={onClose}
+        onPress={busy ? undefined : onClose}
         accessibilityLabel="Close dialog"
       />
-      <View style={styles.card} accessibilityViewIsModal>
+      <View style={[styles.card, slideToConfirm && styles.cardCompact]} accessibilityViewIsModal>
         {icon ? <View style={styles.iconWrap}>{icon}</View> : null}
         <Text style={styles.title} accessibilityRole="header">
           {title}
@@ -75,6 +87,28 @@ export function QuizVibeDialogOverlay({
             <Text style={styles.warning}>{warning}</Text>
           </>
         ) : null}
+        {slideToConfirm ? (
+          <View style={styles.slideActions}>
+            {secondaryLabel ? (
+              <Button
+                label={secondaryLabel}
+                onPress={onClose}
+                variant="secondary"
+                size="compact"
+                disabled={busy}
+                style={styles.slideCancelBtn}
+              />
+            ) : null}
+            <SlideToConfirm
+              label={slideToConfirm.label}
+              busyLabel={slideToConfirm.busyLabel}
+              busy={busy}
+              onConfirm={onPrimary}
+              accessibilityLabel={primaryLabel}
+              accessibilityHint={slideToConfirm.accessibilityHint}
+            />
+          </View>
+        ) : (
         <View style={[styles.actions, destructive && styles.actionsDestructive]}>
           {secondaryLabel ? (
             <Button
@@ -110,6 +144,7 @@ export function QuizVibeDialogOverlay({
             />
           )}
         </View>
+        )}
       </View>
     </View>
   );
@@ -154,6 +189,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.sm,
     marginTop: Spacing.xs,
+  },
+  // Slide-läget: Cancel överst, slidern under — gott om luft mot feltryck.
+  slideActions: {
+    gap: 10,
+    marginTop: 2,
+  },
+  // Slide-läget: Cancel lägre och mer sekundär (transparent yta, neutral
+  // hårfin kant) så den inte konkurrerar med slidern.
+  slideCancelBtn: {
+    height: 42,
+    backgroundColor: 'transparent',
+    borderColor: BrandUi.border,
+  },
+  // Slide-läget: tätare vertikalt så dialogen känns kompakt.
+  cardCompact: {
+    paddingVertical: Spacing.md,
+    gap: 8,
   },
   // Extra luft mellan Cancel och den destruktiva knappen mot feltryck.
   actionsDestructive: {
