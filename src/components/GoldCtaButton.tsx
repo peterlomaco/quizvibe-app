@@ -1,6 +1,8 @@
 import { Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity } from '@/src/components/haptic';
+import { LoadingContent } from './LoadingContent';
 import { Colors, Radius } from '../theme';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from './MetallicGoldFill';
 
@@ -15,6 +17,8 @@ interface Props {
   /** Innehåll efter labeln, t.ex. <SequentialDots /> i ett vänteläge. */
   trailing?: React.ReactNode;
   accessibilityLabel?: string;
+  /** Asynkront anrop pågår: spinner i stället för labeln, tap avstängt. */
+  loading?: boolean;
 }
 
 /**
@@ -24,12 +28,12 @@ interface Props {
  * Q-play-loggorna på Lobby:s Start Game och Get Ready:s Press Play
  * (Peter 2026-10-15).
  */
-export function GoldCtaButton({ label, onPress, locked = false, trailing, accessibilityLabel }: Props) {
+export function GoldCtaButton({ label, onPress, locked = false, trailing, accessibilityLabel, loading = false }: Props) {
   const [fontsLoaded] = useFonts({ Nunito_700Bold });
   const pulse = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    if (locked) {
+    if (locked || loading) {
       pulse.setValue(1);
       return;
     }
@@ -41,7 +45,7 @@ export function GoldCtaButton({ label, onPress, locked = false, trailing, access
     );
     loop.start();
     return () => loop.stop();
-  }, [locked, pulse]);
+  }, [locked, loading, pulse]);
 
   return (
     <Animated.View style={{ transform: [{ scale: pulse }] }}>
@@ -49,12 +53,13 @@ export function GoldCtaButton({ label, onPress, locked = false, trailing, access
         style={[styles.btn, locked && styles.btnLocked]}
         activeOpacity={0.85}
         onPress={onPress}
-        disabled={locked || !onPress}
+        disabled={locked || loading || !onPress}
         accessibilityRole="button"
-        accessibilityState={{ disabled: locked }}
+        accessibilityState={{ disabled: locked, busy: loading }}
         accessibilityLabel={accessibilityLabel ?? label}
       >
         {!locked && <MetallicGoldFill />}
+        <LoadingContent loading={loading} color="#000000">
         <View style={styles.row}>
           <Text
             style={[
@@ -70,6 +75,7 @@ export function GoldCtaButton({ label, onPress, locked = false, trailing, access
           </Text>
           {trailing}
         </View>
+        </LoadingContent>
       </TouchableOpacity>
     </Animated.View>
   );

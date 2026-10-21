@@ -4,6 +4,7 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+    ActivityIndicator,
     Alert,
     Dimensions,
     FlatList,
@@ -18,6 +19,7 @@ import {
     View,
 } from 'react-native';
 import { Pressable, Switch, TouchableOpacity } from '@/src/components/haptic';
+import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { Avatar } from '../components/Avatar';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
@@ -293,6 +295,10 @@ function DecadeMarks() {
 const PROFILE_MATRIX_OFF = '#3A5068';
 
 export default function ProfileScreen() {
+  // Save-knapparna skriver profilen till Supabase — spinner + dubbeltrycks-skydd.
+  const saveAction = useAsyncAction();
+  // Start New Game-raderna i konto-sheet:en (credit-gate + rums-registrering).
+  const createAction = useAsyncAction();
   // ScrollView-ref för programmatisk scroll-to-top när man entrar via Home:s
   // "Profile settings"-knapp (som pushar med scrollToTop=1 i routen-paramen).
   // Tab-navigatorn bevarar scroll-position mellan tab-byten, så utan denna
@@ -578,6 +584,17 @@ export default function ProfileScreen() {
   // inline-väljare (Single Game / Multiplayer Game / Head-to-head) som Home:s
   // "Start New Game" (Peter 2026-08-29). Kollapsas när sheet:en stängs.
   const [hostTypeExpanded, setHostTypeExpanded] = useState(false);
+  // Konto-sheet:en ligger ovanför nav-stacken (iOS): nästa skärm glider in
+  // bakom den. Stäng den först när pushen landat, annars syns Profile ett
+  // ögonblick innan nästa skärm (Peter 2026-10-21).
+  const closeSheetBehindNav = () =>
+    new Promise<void>((resolve) => {
+      setTimeout(() => {
+        setHostTypeExpanded(false);
+        setLogoutModalVisible(false);
+        resolve();
+      }, 350);
+    });
   // Loading-state under server-anropet i handleConfirmDeleteAccount. Blockar
   // dubbel-tap på Delete Account-knappen + dimmer UI:t i sheet:en så user
   // ser att något händer.
@@ -1555,11 +1572,12 @@ export default function ProfileScreen() {
     clearEjected(code);
     clearGameStarted(code);
     track('room_code_created');
-    setHostTypeExpanded(false);
-    setLogoutModalVisible(false);
     // lobbyType styr lobbyns förvalda läge ('single'/'multiplayer') resp.
     // remote-läget ('1v1') — samma param som Home skickar.
+    // Push FÖRST, stäng sheet:en när lobbyn landat (ingen Profile-glimt).
     router.push({ pathname: '/lobby', params: { code, isHost: 'true', lobbyType } });
+    // Await:as så radens spinner står kvar tills sheet:en försvunnit.
+    await closeSheetBehindNav();
   };
 
   // Spotify-svarslägen — renderas i både rad- och staplad layout (Type-blocket).
@@ -1873,7 +1891,8 @@ export default function ProfileScreen() {
           {/* ── Save (inuti kortet) ─────────────────────────────── */}
           <Button
             label={savedSection === 'defaults' ? '✓ Saved' : 'Save Profile'}
-            onPress={() => handleSave('defaults')}
+            onPress={() => saveAction.run('defaults', () => handleSave('defaults'))}
+            loading={saveAction.isBusy('defaults')}
             variant={savedSection === 'defaults' ? 'secondary' : 'gold'}
           />
         </View>
@@ -2520,7 +2539,8 @@ export default function ProfileScreen() {
               svep oavsett knapp. */}
           <Button
             label={savedSection === 'host' ? '✓ Saved' : 'Save Host settings'}
-            onPress={() => handleSave('host')}
+            onPress={() => saveAction.run('host', () => handleSave('host'))}
+            loading={saveAction.isBusy('host')}
             variant={savedSection === 'host' ? 'secondary' : 'gold'}
             style={{ height: 48 }}
           />
@@ -2710,7 +2730,8 @@ export default function ProfileScreen() {
                 hela profilen i ett svep oavsett knapp. */}
             <Button
               label={savedSection === 'packages' ? '✓ Saved' : 'Save settings'}
-              onPress={() => handleSave('packages')}
+              onPress={() => saveAction.run('packages', () => handleSave('packages'))}
+            loading={saveAction.isBusy('packages')}
               variant={savedSection === 'packages' ? 'secondary' : 'gold'}
               size="compact"
             />
@@ -2791,7 +2812,7 @@ export default function ProfileScreen() {
                     {friend.playerName}
                   </Text>
                   {/* Dämpat grått × i vila — rött bara medan det trycks. */}
-                  <Pressable
+                  <Pressable pressFeedback
                     onPress={() => handleRemoveFriend(friend.id)}
                     hitSlop={12}
                     style={styles.friendsListRemoveBtn}
@@ -3061,7 +3082,7 @@ export default function ProfileScreen() {
                             speglar Lobby:s shareSheet.checkbox-mönster så
                             host bockar för flera friends och tar bort dem
                             allihop via Delete-knappen längst ner. */}
-                        <Pressable
+                        <Pressable pressFeedback
                           onPress={() => {
                             setSelectedFriendIds((prev) => {
                               const next = new Set(prev);
@@ -3090,7 +3111,7 @@ export default function ProfileScreen() {
             </ScrollView>
 
             <View style={friendsModal.footerRow}>
-              <Pressable
+              <Pressable pressFeedback
                 onPress={handleDeleteSelectedFriends}
                 disabled={selectedFriendIds.size === 0}
                 style={[friendsModal.deleteBtn, selectedFriendIds.size === 0 && friendsModal.deleteBtnDisabled]}
@@ -3104,7 +3125,7 @@ export default function ProfileScreen() {
                   {selectedFriendIds.size > 0 ? `Delete (${selectedFriendIds.size})` : 'Delete'}
                 </Text>
               </Pressable>
-              <Pressable
+              <Pressable pressFeedback
                 onPress={() => setFriendsModalOpen(false)}
                 style={friendsModal.closeBtn}
               >
@@ -3488,8 +3509,11 @@ export default function ProfileScreen() {
                   // rums-registrering) körs. handleCreateGame stänger själv
                   // sheet:en + panelen precis före router.push, och lämnar
                   // panelen utfälld om credit-gaten avbryter.
-                  guardedNavigate(() => handleCreateGame(lobbyType));
+                  guardedNavigate(() => {
+                    void createAction.run(lobbyType, () => handleCreateGame(lobbyType));
+                  });
                 }}
+                loadingType={createAction.busyKey as HostLobbyType | null}
               />
             )}
 
@@ -3509,8 +3533,8 @@ export default function ProfileScreen() {
                 pressed && { opacity: 0.85 },
               ]}
               onPress={() => guardedNavigate(() => {
-                setLogoutModalVisible(false);
                 router.push('/?openJoinRegistered=1');
+                void closeSheetBehindNav();
               })}
             >
               <Text style={styles.logoutCreateGameBtnText}>Join with Room code</Text>
@@ -3525,8 +3549,8 @@ export default function ProfileScreen() {
                 pressed && { opacity: 0.85 },
               ]}
               onPress={() => guardedNavigate(() => {
-                setLogoutModalVisible(false);
                 router.push('/store?from=/profile');
+                void closeSheetBehindNav();
               })}
             >
               <ShoppingCartIcon size={22} color={BrandUi.iconMuted} />
@@ -3544,8 +3568,16 @@ export default function ProfileScreen() {
               onPress={handleConfirmLogout}
               disabled={deletingAccount || loggingOut}
             >
-              <LogoutIcon size={22} color={BrandUi.iconMuted} />
-              <Text style={styles.logoutBtnText}>{loggingOut ? 'Logging out…' : 'Log out'}</Text>
+              {/* Vänsterställd rad: spinnern tar ikonens plats (samma 22 pt-ruta)
+                  så labeln står still. */}
+              <View style={styles.logoutIconSlot}>
+                {loggingOut ? (
+                  <ActivityIndicator size="small" color={BrandUi.iconMuted} />
+                ) : (
+                  <LogoutIcon size={22} color={BrandUi.iconMuted} />
+                )}
+              </View>
+              <Text style={styles.logoutBtnText}>Log out</Text>
             </Pressable>
 
             {/* Danger zone (UI 2026-10-20) — Delete Account avskild från Log
@@ -3576,7 +3608,7 @@ export default function ProfileScreen() {
               </>
             )}
 
-            <Pressable
+            <Pressable pressFeedback
               style={styles.logoutCancelBtn}
               onPress={() => {
                 // Utfälld väljare → kollapsa tillbaka till menyn; annars
@@ -3998,6 +4030,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   // Tyst röd rad (ingen fylld knapp) — som Home:s konto-sheet.
+  logoutIconSlot: { width: 22, height: 22, alignItems: 'center', justifyContent: 'center' },
   logoutBtn: {
     height: 40,
     flexDirection: 'row',

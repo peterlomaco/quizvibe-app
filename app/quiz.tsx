@@ -173,6 +173,8 @@ import {
   View,
 } from 'react-native';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
+import { useAsyncAction } from '@/src/utils/useAsyncAction';
+import { runBehindGlobalOverlay } from '@/src/utils/globalOverlay';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 
@@ -1462,6 +1464,10 @@ const AnswerStopwatch = React.memo(function AnswerStopwatch({
 });
 
 export default function QuizScreen() {
+  // Slutskärmens backend-knappar (Yes / Start New Game / Home): spinner i
+  // knappen + dubbeltrycks-skydd medan credit-gate/rums-registrering/
+  // broadcast pågår.
+  const finalAction = useAsyncAction();
   const params = useLocalSearchParams<{
     assistance?: string;
     age?: string;
@@ -8353,11 +8359,11 @@ export default function QuizScreen() {
    *  seedar från host-profilen, precis som Home:s clearLobbySettings). */
   const handleLocalStartNewGameSelect = (lobbyType: HostLobbyType) => {
     setStartNewGameExpanded(false);
+    // Returnerar promisen så slutskärmens spinner följer hela flödet.
     if (lobbyType === '1v1') {
-      void handleStartNewGameFromFinal('1v1');
-      return;
+      return handleStartNewGameFromFinal('1v1');
     }
-    void goToNewLobby(
+    return goToNewLobby(
       false,
       false,
       undefined,
@@ -8955,47 +8961,48 @@ export default function QuizScreen() {
         {
           text: 'Quit game',
           style: 'destructive',
-          onPress: async () => {
-            // Spara frågor som visats hittills (index 0 till questionIndex-1)
-            // så hosten inte ser dem igen vid nästa spelstart.
-            if (questionIndex > 0) {
-              const playedIds = [
-                ...new Set(gameQuestions.slice(0, questionIndex).map((q) => q.id)),
-              ];
-              await addSessionRecord(playedIds);
-              // PtP: skriv även under registrerade deltagares playerName-
-              // nycklar (samma rationale som leaderboard-recordingen).
-              if (gameMode !== 'individual-devices' && turnOrder.length > 1) {
-                const registeredNames = turnOrder
-                  .filter((p) => p.type === 'registered' && p.name)
-                  .map((p) => p.name);
-                if (registeredNames.length > 0) {
-                  addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
+          onPress: () =>
+            runBehindGlobalOverlay('Please Wait — Ending this Game', async () => {
+              // Spara frågor som visats hittills (index 0 till questionIndex-1)
+              // så hosten inte ser dem igen vid nästa spelstart.
+              if (questionIndex > 0) {
+                const playedIds = [
+                  ...new Set(gameQuestions.slice(0, questionIndex).map((q) => q.id)),
+                ];
+                await addSessionRecord(playedIds);
+                // PtP: skriv även under registrerade deltagares playerName-
+                // nycklar (samma rationale som leaderboard-recordingen).
+                if (gameMode !== 'individual-devices' && turnOrder.length > 1) {
+                  const registeredNames = turnOrder
+                    .filter((p) => p.type === 'registered' && p.name)
+                    .map((p) => p.name);
+                  if (registeredNames.length > 0) {
+                    addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
+                  }
                 }
+                persistEpochLedger();
+                persistCategoryLedger();
               }
-              persistEpochLedger();
-              persistCategoryLedger();
-            }
-            const code = params.roomCode;
-            // Non-hosts sitter kvar i /quiz (IndDev-spelare, PtP-spectators)
-            // och har inget annat sätt att upptäcka att host avbrutit —
-            // rums-pollingen finns bara i Lobby. Fire FÖRE deactivateRoom så
-            // eventet hinner ut innan vår channel rivs vid unmount.
-            if (isHost && syncActive && code && syncChannelRef.current) {
-              syncChannelRef.current
-                .broadcastLobbyDeleted({ room_code: code })
-                .catch(() => {});
-            }
-            if (code) {
-              await deactivateRoom(code);
-              clearLeftPlayers(code);
-              clearLobbyPlayers(code);
-              clearLobbySettings(code);
-              clearEjected(code);
-              clearGameStarted(code);
-            }
-            router.replace('/');
-          },
+              const code = params.roomCode;
+              // Non-hosts sitter kvar i /quiz (IndDev-spelare, PtP-spectators)
+              // och har inget annat sätt att upptäcka att host avbrutit —
+              // rums-pollingen finns bara i Lobby. Fire FÖRE deactivateRoom så
+              // eventet hinner ut innan vår channel rivs vid unmount.
+              if (isHost && syncActive && code && syncChannelRef.current) {
+                syncChannelRef.current
+                  .broadcastLobbyDeleted({ room_code: code })
+                  .catch(() => {});
+              }
+              if (code) {
+                await deactivateRoom(code);
+                clearLeftPlayers(code);
+                clearLobbyPlayers(code);
+                clearLobbySettings(code);
+                clearEjected(code);
+                clearGameStarted(code);
+              }
+              router.replace('/');
+            }),
         },
       ],
     );
@@ -9248,26 +9255,27 @@ export default function QuizScreen() {
         {
           text: 'Quit game',
           style: 'destructive',
-          onPress: async () => {
-            selfForfeitedRef.current = true;
-            await recordRemoteQuestionsShown();
-            if (remoteMatchId) {
-              await forfeitRemoteMatch(remoteMatchId);
-            }
-            // Bara host äger rummet — matchen är terminal, så koden ska
-            // inte ligga kvar joinbar. Motståndaren rör aldrig rums-
-            // livscykeln (samma regel som i lokala lägen).
-            const code = params.roomCode;
-            if (isHost && code) {
-              await deactivateRoom(code);
-              clearLeftPlayers(code);
-              clearLobbyPlayers(code);
-              clearLobbySettings(code);
-              clearEjected(code);
-              clearGameStarted(code);
-            }
-            router.replace('/');
-          },
+          onPress: () =>
+            runBehindGlobalOverlay('Please Wait — Ending this Game', async () => {
+              selfForfeitedRef.current = true;
+              await recordRemoteQuestionsShown();
+              if (remoteMatchId) {
+                await forfeitRemoteMatch(remoteMatchId);
+              }
+              // Bara host äger rummet — matchen är terminal, så koden ska
+              // inte ligga kvar joinbar. Motståndaren rör aldrig rums-
+              // livscykeln (samma regel som i lokala lägen).
+              const code = params.roomCode;
+              if (isHost && code) {
+                await deactivateRoom(code);
+                clearLeftPlayers(code);
+                clearLobbyPlayers(code);
+                clearLobbySettings(code);
+                clearEjected(code);
+                clearGameStarted(code);
+              }
+              router.replace('/');
+            }),
         },
       ],
     );
@@ -9285,10 +9293,11 @@ export default function QuizScreen() {
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Save & Exit',
-          onPress: async () => {
-            await recordRemoteQuestionsShown();
-            router.replace('/');
-          },
+          onPress: () =>
+            runBehindGlobalOverlay('Please Wait — Saving', async () => {
+              await recordRemoteQuestionsShown();
+              router.replace('/');
+            }),
         },
       ],
     );
@@ -10673,7 +10682,8 @@ export default function QuizScreen() {
           totalRounds={totalQuestions}
           onNextRound={handleAdvanceToNextRound}
           onPlayAgain={handlePlayAgain}
-          onGoHome={handleGoHome}
+          onGoHome={() => finalAction.run('home', handleGoHome)}
+          busyAction={finalAction.busyKey as 'replay-yes' | 'start-new' | 'home' | null}
           onApprovePlayAgain={handleApprovePlayAgain}
           isLastRound={isLastQuestion}
           isHost={isHost}
@@ -10722,16 +10732,18 @@ export default function QuizScreen() {
           // knappen. Remote har ingen re-match och får den direkt.
           onStartNewGame={
             isRemote && isLastQuestion && !isGuestHostGame
-              ? handleStartNewGameFromFinal
+              ? (t: HostLobbyType) => finalAction.run('start-new', () => handleStartNewGameFromFinal(t))
               : localStartNewGameReady
-                ? handleLocalStartNewGameSelect
+                ? (t: HostLobbyType) => finalAction.run('start-new', () => handleLocalStartNewGameSelect(t))
                 : undefined
           }
           // Lokalt flöde: tappet kör credit-gaten och öppnar lägesvalet;
           // invite-frågan ställs först EFTER valet, så panelens öppet-läge
           // ägs här.
           onStartNewGamePress={
-            localStartNewGameReady ? handleLocalStartNewGamePress : undefined
+            localStartNewGameReady
+              ? () => finalAction.run('start-new', handleLocalStartNewGamePress)
+              : undefined
           }
           startNewGameExpanded={
             localStartNewGameReady ? startNewGameExpanded : undefined
@@ -10742,7 +10754,7 @@ export default function QuizScreen() {
           // med minst en gäst i uppställningen (ptpRematchBlocked).
           onReplayYes={
             rematchQuestionEnabled && replayChoice === 'ask'
-              ? handleReplayYes
+              ? () => finalAction.run('replay-yes', handleReplayYes)
               : undefined
           }
           replayTitle={replayTitle}
@@ -11655,7 +11667,7 @@ export default function QuizScreen() {
                   djStopConfirmStep === 'openSpotify' ? (
                     <>
                       <Animated.View style={nextTabPulseStyle}>
-                        <Pressable
+                        <Pressable pressFeedback
                           style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
                           onPress={() => openSpotifyApp()}
                         >
@@ -11714,7 +11726,7 @@ export default function QuizScreen() {
                         pointerEvents="none"
                         style={[styles.djStartHalo, { opacity: djStartGlow }]}
                       />
-                      <Pressable
+                      <Pressable pressFeedback
                         style={[styles.spotifyDJActionBtn, { flex: 0 }]}
                         onPress={handleStartSpotifyTrack}
                       >
@@ -11749,7 +11761,7 @@ export default function QuizScreen() {
                   // omstart mitt i nedräkningen. "Open Spotify" räcker.
                   <DJTrackCard hint={currentQ?.type === 'timeline' ? currentQ.hint : null} trackId={currentSpotifyTrackId}>
                     <Animated.View style={nextTabPulseStyle}>
-                      <Pressable
+                      <Pressable pressFeedback
                         style={[styles.spotifyDJActionBtn, { flex: 0, paddingHorizontal: Spacing.xl }]}
                         onPress={() => openSpotifyApp()}
                       >

@@ -77,6 +77,8 @@ import {
   View,
 } from 'react-native';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
+import { LoadingContent } from '@/src/components/LoadingContent';
+import { useAsyncAction } from '@/src/utils/useAsyncAction';
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 // ─── Join Modal ───────────────────────────────────────────────────────────────
@@ -419,6 +421,25 @@ async function resolveInviteGameMode(code: string): Promise<InviteGameMode> {
 
 function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'multiplayer', onRemoteAccountRequired, initialGuestDraft, hasNewInvite = false, onInvitesSeen }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
+  // Spinner + dubbeltrycks-skydd för formulärets backend-knappar (Join,
+  // Join as Guest, Start as Guest, Accept invite) — de kedjar flera
+  // Supabase-anrop innan de navigerar.
+  const joinAction = useAsyncAction();
+  // Navigera FÖRST och stäng formuläret först när pushen landat — den
+  // transparenta modalen ligger ovanför nav-stacken (iOS) så nästa skärm
+  // glider in BAKOM den och modalen fadar direkt mot den. Stängs modalen
+  // före pushen blottas Home under fade + slide-in (Peter 2026-10-21).
+  // Promisen resolvar efter stängningen så knappens spinner står kvar
+  // ända tills formuläret försvinner.
+  const navigateBehindModal = (href: Parameters<typeof router.push>[0]) => {
+    router.push(href);
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        onClose();
+        resolve();
+      }, MODAL_SWAP_DELAY_MS);
+    });
+  };
   const [code, setCode] = useState('');
   const [guestName, setGuestName] = useState('');
   const [guestBirthYearText, setGuestBirthYearText] = useState('');
@@ -824,7 +845,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // så /lobby-pushen körs bakom den. Stäng modalen EFTER att pushen hunnit
     // landa (MODAL_SWAP_DELAY_MS) så den fadar direkt mot lobbyn istället för
     // att blotta Home-skärmen under slide-in-transitionen.
-    router.push({
+    await navigateBehindModal({
       pathname: '/lobby',
       params: {
         code: invite.roomCode,
@@ -843,7 +864,6 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           : {}),
       },
     });
-    setTimeout(() => onClose(), MODAL_SWAP_DELAY_MS);
   };
 
   // "Deny" (Peter 2026-08-27) — tyst avböjning, ingen host-notifiering.
@@ -866,7 +886,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       'Accept invitation?',
       'By accepting this invitation you will both 1. join the lobby and 2. accept that both of you will be added to each others QuizVibe friend list.',
       [
-        { text: 'OK', onPress: () => proceedAcceptInvite(invite) },
+        { text: 'OK', onPress: () => joinAction.run(`accept-${invite.id}`, () => proceedAcceptInvite(invite)) },
         { text: 'Deny', style: 'destructive', onPress: () => handleDenyInvite(invite) },
         { text: 'Cancel', style: 'cancel' },
       ],
@@ -896,8 +916,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
             );
             return;
           }
-          onClose();
-          router.push({ pathname: '/quiz', params: buildRemoteQuizParams(my) });
+          await navigateBehindModal({ pathname: '/quiz', params: buildRemoteQuizParams(my) });
           return;
         }
       }
@@ -927,8 +946,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Spotify-lobby: self-attest-fråga redan här (Plan B — ingen OAuth), så
     // host:s auto-approve inte blockeras av en saknad attest.
     if (await checkSpotifyLobbyGate(code)) return;
-    onClose();
-    router.push({ pathname: '/lobby', params: { code, isHost: 'false' } });
+    await navigateBehindModal({ pathname: '/lobby', params: { code, isHost: 'false' } });
   };
 
   // Parsea och validera birth year. Returnerar null om input inte är ett
@@ -1018,7 +1036,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
   // undviker mock-listan + namnen i lobbyn (guest-JOIN) och kontrolleras
   // sedan mot servern (player_name_exists). Krock → nytt nummer, max 4
   // försök; nätverksfel fail-open:ar som vanliga Check.
-  const generateGuestName = async (): Promise<string> => {
+  const generateGuestName = async (first?: string): Promise<string> => {
     const lobbyPlayers = step === 'guest' && code.length === ROOM_CODE_LENGTH
       ? await getLobbyPlayers(code).catch(() => null)
       : null;
@@ -1027,7 +1045,15 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // En slumpad bokstav ("A-1234567", 2026-10-21) — undvik bokstäver som
     // andra gäster i lobbyn redan har.
     const excludeLetters = extractTakenGuestLetters((lobbyPlayers ?? []).filter((p) => !p.hasLeft).map((p) => p.name));
-    let candidate = generatePlayerName(taken, { singleLetter: true, excludeLetters });
+    // `first` = redan visat namn (instant-fyllningen): behåll det om det
+    // klarar lobby-kollen, annars nytt.
+    const firstOk =
+      !!first &&
+      !taken.has(first.toLowerCase()) &&
+      !excludeLetters.has(first.charAt(0));
+    let candidate = firstOk
+      ? first
+      : generatePlayerName(taken, { singleLetter: true, excludeLetters });
     for (let attempt = 0; attempt < 4; attempt++) {
       let exists = false;
       try {
@@ -1040,6 +1066,24 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       candidate = generatePlayerName(taken, { singleLetter: true, excludeLetters });
     }
     return candidate;
+  };
+
+  // Fyll ett gästnamn DIREKT (lokal generering, inget nätverk) och
+  // verifiera det mot lobby + server i bakgrunden (Peter 2026-10-21: väntan
+  // på player_name_exists gav 3-4 s tomt fält när formuläret öppnades).
+  // Krockar namnet — ~1 på 260M — byts det tyst, men bara om fältet
+  // fortfarande visar just det namnet (användaren kan ha hunnit ändra).
+  const fillGuestNameInstant = (opts?: { dismissKeyboard?: boolean }) => {
+    const candidate = generatePlayerName(TAKEN_PLAYER_NAMES, { singleLetter: true });
+    setGuestName(candidate);
+    setPlayerNameStatus('available');
+    if (opts?.dismissKeyboard) Keyboard.dismiss();
+    void generateGuestName(candidate).then((verified) => {
+      if (verified !== candidate && guestNameRef.current === candidate) {
+        setGuestName(verified);
+        setPlayerNameStatus('available');
+      }
+    });
   };
 
   // "Generate another" (f.d. Auto-generate). Två branches:
@@ -1057,9 +1101,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
           { text: 'Cancel', style: 'cancel' },
           {
             text: 'Replace all',
-            onPress: () => {
-              void generateGuestName().then(applyGenerated);
-            },
+            onPress: () => fillGuestNameInstant({ dismissKeyboard: true }),
           },
           {
             text: 'Keep letters',
@@ -1069,7 +1111,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       );
       return;
     }
-    applyGenerated(await generateGuestName());
+    fillGuestNameInstant({ dismissKeyboard: true });
   };
 
   // CodeKeyboard skickar tecknet hit. Letter/digit dispatch:as via
@@ -1120,19 +1162,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     const inGuestStep = step === 'guest' || step === 'guest-host';
     prevGuestStepRef.current = inGuestStep;
     if (inGuestStep && !wasGuest && guestName === '') {
-      let cancelled = false;
-      (async () => {
-        // "Guest-1234567", kontrollerat mot lobby + server (generateGuestName).
-        const generated = await generateGuestName();
-        if (cancelled) return;
-        setGuestName(generated);
-        setPlayerNameStatus('available');
-      })();
-      return () => {
-        cancelled = true;
-      };
+      // Namnet syns direkt; server-kollen sker i bakgrunden.
+      fillGuestNameInstant();
     }
-    // generateGuestName läser bara step/code, som redan står i deps.
+    // fillGuestNameInstant läser bara step/code, som redan står i deps.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, guestName, code]);
 
@@ -1209,8 +1242,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // manuellt blir flaggan false.
     const autofilled = /^(?:Guest[A-Z]?|[A-Z])-\d{7}$/.test(guestName.trim());
     track('guest_name_created', { autofilled, assistance: guestAssistance });
-    onClose();
-    router.push({
+    await navigateBehindModal({
       pathname: '/lobby',
       params: {
         code,
@@ -1287,8 +1319,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     const autofilled = /^(?:Guest[A-Z]?|[A-Z])-\d{7}$/.test(guestName.trim());
     track('guest_name_created', { autofilled, assistance: guestAssistance });
     track('room_code_created', { guestHost: true });
-    onClose();
-    router.push({
+    await navigateBehindModal({
       pathname: '/lobby',
       params: {
         code: newCode,
@@ -1439,10 +1470,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   modal.joinBtn,
                   code.length < ROOM_CODE_LENGTH && modal.joinBtnDisabled,
                 ]}
-                onPress={handleJoinWithCode}
-                disabled={code.length < ROOM_CODE_LENGTH}
+                onPress={() => joinAction.run('join-code', handleJoinWithCode)}
+                disabled={code.length < ROOM_CODE_LENGTH || joinAction.busy}
               >
-                <Text style={modal.joinBtnText}>Join Game Lobby</Text>
+                <LoadingContent loading={joinAction.isBusy('join-code')} color="#fff">
+                  <Text style={modal.joinBtnText}>Join Game Lobby</Text>
+                </LoadingContent>
               </TouchableOpacity>
             </>
           )}
@@ -1530,9 +1563,12 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                       <TouchableOpacity
                         style={modal.inviteAcceptBtn}
                         activeOpacity={0.7}
-                        onPress={() => handleAcceptInvite(inv)}
+                        onPress={() => joinAction.run(`accept-${inv.id}`, () => handleAcceptInvite(inv))}
+                        disabled={joinAction.busy}
                       >
-                        <Text style={modal.inviteAcceptText}>Accept</Text>
+                        <LoadingContent loading={joinAction.isBusy(`accept-${inv.id}`)} color="#fff">
+                          <Text style={modal.inviteAcceptText}>Accept</Text>
+                        </LoadingContent>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -1842,12 +1878,14 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     modal.joinBtn,
                     isGuestFormValid ? modal.joinBtnGold : modal.joinBtnDisabled,
                   ]}
-                  onPress={handleJoinAsGuest}
-                  disabled={!isGuestFormValid}
+                  onPress={() => joinAction.run('join-guest', handleJoinAsGuest)}
+                  disabled={!isGuestFormValid || joinAction.busy}
                 >
                   {/* Guld primär-CTA först när allt obligatoriskt är giltigt. */}
                   {isGuestFormValid && <MetallicGoldFill />}
-                  <Text style={[modal.joinBtnText, isGuestFormValid && modal.joinBtnGoldText]}>Join Game</Text>
+                  <LoadingContent loading={joinAction.isBusy('join-guest')} color="#000000">
+                    <Text style={[modal.joinBtnText, isGuestFormValid && modal.joinBtnGoldText]}>Join Game</Text>
+                  </LoadingContent>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
@@ -1855,11 +1893,13 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                     modal.joinBtn,
                     isGuestHostFormValid ? modal.joinBtnGold : modal.joinBtnDisabled,
                   ]}
-                  onPress={handleStartGameAsGuestHost}
-                  disabled={!isGuestHostFormValid}
+                  onPress={() => joinAction.run('host-guest', handleStartGameAsGuestHost)}
+                  disabled={!isGuestHostFormValid || joinAction.busy}
                 >
                   {isGuestHostFormValid && <MetallicGoldFill />}
-                  <Text style={[modal.joinBtnText, isGuestHostFormValid && modal.joinBtnGoldText]}>Start Game - Guest login</Text>
+                  <LoadingContent loading={joinAction.isBusy('host-guest')} color="#000000">
+                    <Text style={[modal.joinBtnText, isGuestHostFormValid && modal.joinBtnGoldText]}>Start Game - Guest login</Text>
+                  </LoadingContent>
                 </TouchableOpacity>
               )}
             </>
@@ -2118,6 +2158,8 @@ function ChoiceRow({
 
 
 export default function HomeScreen() {
+  // Spinner + dubbeltrycks-skydd för auth-formuläret (Log in / Register).
+  const authAction = useAsyncAction();
   const [joinVisible, setJoinVisible] = useState(false);
   const [joinInitialStep, setJoinInitialStep] = useState<JoinStep>('choose');
   const [joinHideGuest, setJoinHideGuest] = useState(false);
@@ -2132,6 +2174,8 @@ export default function HomeScreen() {
   // handleCreateGame:s async-gap. Ref:en stoppar en andra rad-tap från att
   // fyra en andra handleCreateGame (dubbel registerActiveRoom + dubbel push).
   const creatingGameRef = useRef(false);
+  // Spegel av creatingGameRef för renderingen: raden som väntar visar spinner.
+  const [creatingLobbyType, setCreatingLobbyType] = useState<HostLobbyType | null>(null);
   const [guestLobbyType, setGuestLobbyType] = useState<HostLobbyType>('multiplayer');
   // Guest-sektionens fold-state — bara relevant för inloggade users (Peter
   // 2026-08-27). Default false (ihopfälld) så "Start New Game"-guest-
@@ -2416,6 +2460,16 @@ export default function HomeScreen() {
   useEffect(() => {
     if (isLoggedIn) setGuestSectionExpanded(false);
   }, [isLoggedIn]);
+
+  // Menyn ligger ovanför nav-stacken (iOS) — nästa skärm glider in bakom
+  // den. Stäng den (utan animation) först när pushen landat, annars blottas
+  // Home ett ögonblick innan nästa skärm syns.
+  const closeProfileMenuBehindNav = () => {
+    setTimeout(() => {
+      setProfileMenuCloseInstant(true);
+      setProfileMenuVisible(false);
+    }, MODAL_SWAP_DELAY_MS);
+  };
 
   const openJoin = (step: JoinStep = 'choose', options?: { hideGuest?: boolean }) => {
     setJoinInitialStep(step);
@@ -3416,13 +3470,16 @@ export default function HomeScreen() {
                     // off-screen i blur-cleanup:en (useFocusEffect nedan).
                     if (creatingGameRef.current) return;
                     creatingGameRef.current = true;
+                    setCreatingLobbyType(lobbyType);
                     void handleCreateGame(lobbyType).finally(() => {
                       // Släpp guarden när flödet settlar — täcker både
                       // success-pushen och credit-/registrerings-abort:en
                       // (Alert + return utan navigation).
                       creatingGameRef.current = false;
+                      setCreatingLobbyType(null);
                     });
                   }}
+                  loadingType={creatingLobbyType}
                 />
               )}
             </View>
@@ -3614,34 +3671,6 @@ export default function HomeScreen() {
               {joinGameButton(() => openJoin('guest'), false)}
             </Animated.View>
           )}
-          {/* Juridisk samtyckesrad — ENBART gäst-Home (Peter 2026-10-16).
-              Ingen checkbox (gästspel ska vara friktionsfritt) och inte för
-              inloggade (de har redan godkänt vid registrering). Länkarna
-              öppnar samma sidor som Store/Profile. */}
-          {!isLoggedIn && hostTypeExpanded === 'none' && (
-            <Text
-              style={[styles.legalText, { fontFamily: taglineFont }, joinVisible && { opacity: 0 }]}
-            >
-              {/* Fast radbrytning: länkarna samlas på rad två. */}
-              {'By continuing, you agree to our\n'}
-              <Text
-                style={styles.legalLink}
-                onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/terms/')}
-                accessibilityRole="link"
-              >
-                Terms of Use
-              </Text>
-              {' '}and{' '}
-              <Text
-                style={styles.legalLink}
-                onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/privacy/')}
-                accessibilityRole="link"
-              >
-                Privacy Policy
-              </Text>
-              .
-            </Text>
-          )}
           {!isLoggedIn && hostTypeExpanded === 'none' && (
             <View style={{ marginTop: Spacing.xl, gap: Spacing.md }}>{registerSection}</View>
           )}
@@ -3689,6 +3718,35 @@ export default function HomeScreen() {
             )}
           </Pressable>
         </View>
+        {/* Juridisk samtyckesrad — ENBART gäst-Home (Peter 2026-10-16), längst
+            ner under footern (Peter 2026-10-21).
+            Ingen checkbox (gästspel ska vara friktionsfritt) och inte för
+            inloggade (de har redan godkänt vid registrering). Länkarna
+            öppnar samma sidor som Store/Profile. */}
+        {!isLoggedIn && hostTypeExpanded === 'none' && (
+          <Text
+            style={[styles.legalText, styles.legalTextFooter, { fontFamily: taglineFont }, joinVisible && { opacity: 0 }]}
+          >
+            {/* Fast radbrytning: länkarna samlas på rad två. */}
+            {'By continuing, you agree to our\n'}
+            <Text
+              style={styles.legalLink}
+              onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/terms/')}
+              accessibilityRole="link"
+            >
+              Terms of Use
+            </Text>
+            {' '}and{' '}
+            <Text
+              style={styles.legalLink}
+              onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/privacy/')}
+              accessibilityRole="link"
+            >
+              Privacy Policy
+            </Text>
+            .
+          </Text>
+        )}
       </ScrollView>
 
       <JoinModal
@@ -3780,15 +3838,16 @@ export default function HomeScreen() {
                   style={profileMenu.menuRow}
                   activeOpacity={0.6}
                   onPress={() => {
-                    setProfileMenuCloseInstant(true);
-                    setProfileMenuVisible(false);
                     // scrollToTop=1 så Profile:s useFocusEffect snäpper
                     // ScrollView:n till toppen — tab-navigatorn bevarar
                     // annars senaste scroll-position mellan tab-byten.
+                    // Push FÖRST, stäng menyn när skärmen landat (ingen
+                    // Home-glimt) — se closeProfileMenuBehindNav.
                     router.push({
                       pathname: '/profile',
                       params: { scrollToTop: '1' },
                     });
+                    closeProfileMenuBehindNav();
                   }}
                 >
                   <ProfileOutlineIcon size={22} color={BrandUi.iconMuted} />
@@ -3804,9 +3863,8 @@ export default function HomeScreen() {
                   style={profileMenu.menuRow}
                   activeOpacity={0.6}
                   onPress={() => {
-                    setProfileMenuCloseInstant(true);
-                    setProfileMenuVisible(false);
                     router.push('/store?from=/');
+                    closeProfileMenuBehindNav();
                   }}
                 >
                   <ShoppingCartIcon size={22} color={BrandUi.iconMuted} />
@@ -3825,7 +3883,7 @@ export default function HomeScreen() {
                   disabled={loggingOut}
                 >
                   <LogoutIcon size={22} color={BrandUi.iconMuted} />
-                  <Text style={profileMenu.logoutRowText}>{loggingOut ? 'Logging out…' : 'Log out'}</Text>
+                  <Text style={profileMenu.logoutRowText}>Log out</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -4066,11 +4124,13 @@ export default function HomeScreen() {
                     modal.joinBtn,
                     canSubmit ? modal.joinBtnGold : modal.joinBtnDisabled,
                   ]}
-                  onPress={handleLogin}
-                  disabled={!canSubmit}
+                  onPress={() => authAction.run('login', handleLogin)}
+                  disabled={!canSubmit || authAction.busy}
                 >
                   {canSubmit && <MetallicGoldFill />}
-                  <Text style={[modal.joinBtnText, canSubmit && modal.joinBtnGoldText]}>Log in</Text>
+                  <LoadingContent loading={authAction.isBusy('login')} color="#000000">
+                    <Text style={[modal.joinBtnText, canSubmit && modal.joinBtnGoldText]}>Log in</Text>
+                  </LoadingContent>
                 </TouchableOpacity>
                     </>
                   );
@@ -4133,22 +4193,25 @@ export default function HomeScreen() {
 
                     {/* Guld primär-CTA (som Log in / Register) först när giltig. */}
                     {(() => {
-                      const ready = forgotEmailValid && !forgotSending;
+                      // Förblir guld medan anropet pågår — spinnern bär "skickar".
+                      const ready = forgotEmailValid;
                       return (
                         <TouchableOpacity
                           style={[modal.joinBtn, ready ? modal.joinBtnGold : modal.joinBtnDisabled]}
                           onPress={handleSendRecoveryCode}
-                          disabled={!ready}
+                          disabled={!ready || forgotSending}
                         >
                           {ready && <MetallicGoldFill />}
-                          <Text
-                            style={[
-                              modal.joinBtnText,
-                              ready ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
-                            ]}
-                          >
-                            {forgotSending ? 'Sending…' : 'Send code'}
-                          </Text>
+                          <LoadingContent loading={forgotSending} color="#000000">
+                            <Text
+                              style={[
+                                modal.joinBtnText,
+                                ready ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
+                              ]}
+                            >
+                              {'Send code'}
+                            </Text>
+                          </LoadingContent>
                         </TouchableOpacity>
                       );
                     })()}
@@ -4196,22 +4259,25 @@ export default function HomeScreen() {
                     </View>
 
                     {(() => {
-                      const ready = forgotCodeValid && forgotNewPasswordValid && !forgotSending;
+                      // Förblir guld medan anropet pågår — spinnern bär "skickar".
+                      const ready = forgotCodeValid && forgotNewPasswordValid;
                       return (
                         <TouchableOpacity
                           style={[modal.joinBtn, ready ? modal.joinBtnGold : modal.joinBtnDisabled]}
                           onPress={handleResetPassword}
-                          disabled={!ready}
+                          disabled={!ready || forgotSending}
                         >
                           {ready && <MetallicGoldFill />}
-                          <Text
-                            style={[
-                              modal.joinBtnText,
-                              ready ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
-                            ]}
-                          >
-                            {forgotSending ? 'Resetting…' : 'Reset password'}
-                          </Text>
+                          <LoadingContent loading={forgotSending} color="#000000">
+                            <Text
+                              style={[
+                                modal.joinBtnText,
+                                ready ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
+                              ]}
+                            >
+                              {'Reset password'}
+                            </Text>
+                          </LoadingContent>
                         </TouchableOpacity>
                       );
                     })()}
@@ -4547,19 +4613,21 @@ export default function HomeScreen() {
                     modal.joinBtn,
                     isRegisterFormValid ? modal.joinBtnGold : modal.joinBtnDisabled,
                   ]}
-                  onPress={handleRegisterSubmit}
-                  disabled={!isRegisterFormValid}
+                  onPress={() => authAction.run('register', handleRegisterSubmit)}
+                  disabled={!isRegisterFormValid || authAction.busy}
                 >
                   {/* Guld primär-CTA först när formuläret är giltigt. */}
                   {isRegisterFormValid && <MetallicGoldFill />}
-                  <Text
-                    style={[
-                      modal.joinBtnText,
-                      isRegisterFormValid ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
-                    ]}
-                  >
-                    Register
-                  </Text>
+                  <LoadingContent loading={authAction.isBusy('register')} color="#000000">
+                    <Text
+                      style={[
+                        modal.joinBtnText,
+                        isRegisterFormValid ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
+                      ]}
+                    >
+                      Register
+                    </Text>
+                  </LoadingContent>
                 </TouchableOpacity>
               </>
             )}
@@ -4618,7 +4686,8 @@ export default function HomeScreen() {
             title="Log out?"
             message="Your profile will be removed from this device."
             secondaryLabel="Cancel"
-            primaryLabel={loggingOut ? 'Logging out…' : 'Log out'}
+            primaryLabel="Log out"
+            primaryLoading={loggingOut}
             onPrimary={() => { void handleConfirmLogout(); }}
             onClose={() => { if (!loggingOut) setLogoutConfirmVisible(false); }}
           />
@@ -5070,6 +5139,7 @@ const styles = StyleSheet.create({
   },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm, paddingTop: Spacing.sm },
   footerText: { fontSize: 12, color: Colors.textSecondary },
+  legalTextFooter: { marginTop: Spacing.md + 14 },
   footerDot: { fontSize: 12, color: Colors.textSecondary },
   // Tappbar variant av footerText. Lite mer framträdande färg
   // (textPrimary) + underline så det syns att raden är en länk även för

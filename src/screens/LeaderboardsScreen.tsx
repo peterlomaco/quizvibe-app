@@ -64,7 +64,7 @@ export default function LeaderboardsScreen() {
         {/* Timeframe chips */}
         <View style={styles.chipRow}>
           {TIMEFRAMES.map((tf) => (
-            <Pressable
+            <Pressable pressFeedback
               key={tf.id}
               onPress={() => setTimeframe(tf.id)}
               style={[styles.chip, timeframe === tf.id && styles.chipActive]}

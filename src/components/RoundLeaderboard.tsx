@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
+import { LoadingContent } from './LoadingContent';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { HostTypeOptions, type HostLobbyType } from './HostTypeOptions';
@@ -517,6 +518,7 @@ export function RoundLeaderboard({
   hideRemotePlay = false,
   onReplayYes,
   onReplayNo,
+  busyAction = null,
   replayTitle = 'Re-match with Marathon table?',
   aggregateName,
   onRenameAggregate,
@@ -626,6 +628,10 @@ export function RoundLeaderboard({
    * skickar in `onStartNewGame` i stället och blocket försvinner.
    */
   onReplayYes?: () => void;
+  /** Slutskärms-action som väntar på backend (credit-gate, rums-
+   *  registrering, broadcast): knappen visar spinnern och alla tre är
+   *  otappbara tills den settlar. */
+  busyAction?: 'replay-yes' | 'start-new' | 'home' | null;
   onReplayNo?: () => void;
   /** Rubriken över Yes/No. Single player aggregerar en SCORE (en spelare),
    *  flerspelar en LEADERBOARD — call-siten äger ordvalet så komponenten
@@ -1046,20 +1052,23 @@ export function RoundLeaderboard({
                   }
                   onReplayYes();
                 }}
+                disabled={busyAction != null}
                 style={({ pressed }) => [
                   styles.replayYesBtn,
                   replayLocked && styles.startNewGameBtnLocked,
-                  pressed && { opacity: 0.85 },
+                  pressed && busyAction == null && { opacity: 0.85, transform: [{ scale: 0.985 }] },
                 ]}
               >
-                <Text
-                  style={[
-                    styles.replayYesBtnText,
-                    replayLocked && styles.startNewGameBtnTextLocked,
-                  ]}
-                >
-                  Yes
-                </Text>
+                <LoadingContent loading={busyAction === 'replay-yes'} color="#000000">
+                  <Text
+                    style={[
+                      styles.replayYesBtnText,
+                      replayLocked && styles.startNewGameBtnTextLocked,
+                    ]}
+                  >
+                    Yes
+                  </Text>
+                </LoadingContent>
               </Pressable>
             </Animated.View>
             {/* No göms sa fort host svarat Yes — inbjudan ar redan utskickad
@@ -1110,20 +1119,23 @@ export function RoundLeaderboard({
               }
               setInternalStartNewGameExpanded((prev) => !prev);
             }}
+            disabled={busyAction != null}
             style={({ pressed }) => [
               styles.startNewGameBtn,
               startNewGameLocked && styles.startNewGameBtnLocked,
-              pressed && { opacity: 0.85 },
+              pressed && busyAction == null && { opacity: 0.85, transform: [{ scale: 0.985 }] },
             ]}
           >
-            <Text
-              style={[
-                styles.startNewGameBtnText,
-                startNewGameLocked && styles.startNewGameBtnTextLocked,
-              ]}
-            >
-              Start New Game
-            </Text>
+            <LoadingContent loading={busyAction === 'start-new'} color="#000000">
+              <Text
+                style={[
+                  styles.startNewGameBtnText,
+                  startNewGameLocked && styles.startNewGameBtnTextLocked,
+                ]}
+              >
+                Start New Game
+              </Text>
+            </LoadingContent>
           </Pressable>
           </Animated.View>
           {startNewGameExpanded && !startNewGameLocked && (
@@ -1192,6 +1204,7 @@ export function RoundLeaderboard({
           const homeButton = (h: number, columnStacked = false) => (
             <Pressable
               onPress={onGoHome}
+              disabled={busyAction != null}
               style={({ pressed }) => [
                 styles.finalHomeBtn,
                 { height: h },
@@ -1202,8 +1215,12 @@ export function RoundLeaderboard({
                 pressed && { opacity: 0.7 },
               ]}
             >
-              <QuizVibeQAvatar size={32} variant="wifi" />
-              <Text style={styles.finalHomeBtnText}>Home</Text>
+              <LoadingContent loading={busyAction === 'home'} color={Colors.primary}>
+                <View style={styles.finalHomeBtnInner}>
+                  <QuizVibeQAvatar size={32} variant="wifi" />
+                  <Text style={styles.finalHomeBtnText}>Home</Text>
+                </View>
+              </LoadingContent>
             </Pressable>
           );
           if (
@@ -1738,6 +1755,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: Spacing.sm,
+  },
+  finalHomeBtnInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
   },
   finalHomeBtnText: {

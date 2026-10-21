@@ -142,7 +142,7 @@ export function ActorSelectBlock({
             : Colors.cardElevated;
           const showMovieMeta = isCorrectRevealRow && movieTitle;
           return (
-            <Pressable
+            <Pressable pressFeedback
               key={name}
               onPress={onPress}
               style={[styles.nameButton, { borderColor, backgroundColor: bg }]}
@@ -178,7 +178,7 @@ export function ActorSelectBlock({
         const prefixColor = isDimmed ? Colors.textDisabled : Colors.primary;
 
         return (
-          <Pressable key={name} onPress={onPress} style={styles.prefixRow}>
+          <Pressable pressFeedback key={name} onPress={onPress} style={styles.prefixRow}>
             {/* Prefix-knapp */}
             <View
               style={[

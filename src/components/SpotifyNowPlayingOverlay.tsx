@@ -125,7 +125,7 @@ export function SpotifyNowPlayingOverlay({
         </View>
         {/* Play / Pause-knapp — döljs permanent när dismiss-X väl visats */}
         {!showDismissX && (
-          <Pressable onPress={onPlayPause} style={styles.playPauseBtn} hitSlop={8}>
+          <Pressable pressFeedback onPress={onPlayPause} style={styles.playPauseBtn} hitSlop={8}>
             {isPlaying ? (
               <Svg width={28} height={28} viewBox="0 0 28 28">
                 <Rect x="5" y="4" width="7" height="20" rx="2" fill={Colors.textSecondary} />
@@ -141,7 +141,7 @@ export function SpotifyNowPlayingOverlay({
         {/* Dismiss-slot: visar nedräkning 5→1 innan X visas.
             hitSlop=0 — padding: Spacing.lg ger redan >56px tappyta.
             Utan hitSlop undviks överlapp med playPauseBtn:s hitSlop=8. */}
-        <Pressable onPress={showDismissX ? onDismiss : undefined} style={styles.dismiss}>
+        <Pressable pressFeedback onPress={showDismissX ? onDismiss : undefined} style={styles.dismiss}>
           {isCountingDown ? (
             <Text style={styles.dismissCountdownText}>{dismissCountdown}</Text>
           ) : (
@@ -157,12 +157,12 @@ export function SpotifyNowPlayingOverlay({
         </Pressable>
       </View>
       {canActivate && (
-        <Pressable style={styles.activateBtn} onPress={onActivate}>
+        <Pressable pressFeedback style={styles.activateBtn} onPress={onActivate}>
           <Text style={styles.activateBtnText}>Activate Timer</Text>
         </Pressable>
       )}
       {showDismissX && onOpenSpotify && (
-        <Pressable style={styles.openSpotify} onPress={onOpenSpotify} hitSlop={8}>
+        <Pressable pressFeedback style={styles.openSpotify} onPress={onOpenSpotify} hitSlop={8}>
           <SpotifyBrandIcon size={13} variant="white" />
           <Text style={styles.openSpotifyText}> Open in Spotify to control music</Text>
         </Pressable>

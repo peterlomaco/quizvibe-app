@@ -838,7 +838,7 @@ export default function StoreScreen() {
           Legal). Renderas alltid i subscription-sektionen, oavsett om
           kampanjen är öppen eller det betalda kortet visas. */}
       <View style={styles.legalLinksRow}>
-        <Pressable
+        <Pressable pressFeedback
           onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/privacy/')}
           hitSlop={8}
         >
@@ -847,7 +847,7 @@ export default function StoreScreen() {
           )}
         </Pressable>
         <Text style={styles.legalLinkSeparator}>·</Text>
-        <Pressable
+        <Pressable pressFeedback
           onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/terms/')}
           hitSlop={8}
         >

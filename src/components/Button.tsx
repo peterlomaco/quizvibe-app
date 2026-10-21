@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-    ActivityIndicator,
     StyleSheet,
     Text,
     ViewStyle,
 } from 'react-native';
-import { Pressable } from '@/src/components/haptic';
+import { PRESSED_FEEDBACK, Pressable } from '@/src/components/haptic';
+import { LoadingContent } from './LoadingContent';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from './MetallicGoldFill';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
  
@@ -33,31 +33,37 @@ export function Button({
   size = 'default',
   style,
 }: ButtonProps) {
-  const isDisabled = disabled || loading;
+  // `loading` låser knappen men behåller dess variant-utseende (guld förblir
+  // guld) — bara labeln byts mot spinnern, så knappen varken blinkar grå
+  // eller ändrar storlek medan anropet pågår.
+  const isDisabled = !!disabled;
+  const spinnerColor =
+    variant === 'gold'
+      ? '#000000'
+      : variant === 'ghost'
+        ? Colors.primary
+        : Colors.textPrimary;
  
   return (
     <Pressable
       onPress={onPress}
-      disabled={isDisabled}
+      disabled={isDisabled || loading}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: isDisabled, busy: !!loading }}
       style={({ pressed }) => [
         styles.base,
         fullWidth && styles.fullWidth,
         size === 'compact' && styles.compact,
         styles[variant],
         isDisabled && styles.disabled,
-        pressed && !isDisabled && styles.pressed,
+        pressed && !isDisabled && !loading && PRESSED_FEEDBACK,
         style,
       ]}
     >
       {/* 'gold' = QuizVibe primär-CTA (metallisk guld + svart text), samma
           som Home:s Start New Game och Join Game. */}
       {variant === 'gold' && !isDisabled && <MetallicGoldFill />}
-      {loading ? (
-        <ActivityIndicator
-          color={isDisabled ? Colors.textSecondary : Colors.textPrimary}
-          size="small"
-        />
-      ) : (
+      <LoadingContent loading={!!loading} color={spinnerColor}>
         <Text
           style={[
             styles.label,
@@ -69,7 +75,7 @@ export function Button({
         >
           {label}
         </Text>
-      )}
+      </LoadingContent>
     </Pressable>
   );
 }
@@ -106,10 +112,6 @@ const styles = StyleSheet.create({
   // ── States ──────────────────────────────────────────────────────
   disabled: {
     backgroundColor: 'rgba(255,255,255,0.06)',
-  },
-  pressed: {
-    opacity: 0.82,
-    transform: [{ scale: 0.985 }],
   },
  
   // ── Labels ──────────────────────────────────────────────────────

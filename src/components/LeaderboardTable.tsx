@@ -222,7 +222,7 @@ export function LeaderboardTable({
                           och trycka resultatet åt höger). Fäller ut kategori-
                           sköldarna (Total/Music/Film) i popupen nedan. */}
                       {catChange && !entry.hasLeft && (
-                        <Pressable
+                        <Pressable pressFeedback
                           onPress={() => setExpandedId((cur) => (cur === entry.playerId ? null : entry.playerId))}
                           hitSlop={8}
                           style={s.lbHcpExpandBtn}
@@ -380,7 +380,7 @@ export function LeaderboardTable({
                   <HCPShieldCard hcp={expandedCat.music.after} size={48} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.music.delta} />
                   <HCPShieldCard hcp={expandedCat.film.after} size={48} label="Film/TV" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.film.delta} />
                 </View>
-                <Pressable style={s.lbHcpModalClose} onPress={() => setExpandedId(null)}>
+                <Pressable pressFeedback style={s.lbHcpModalClose} onPress={() => setExpandedId(null)}>
                   <Text style={s.lbHcpModalCloseText}>Close</Text>
                 </Pressable>
               </>

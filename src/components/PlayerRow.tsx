@@ -174,7 +174,7 @@ export function PlayerRow({
             </View>
             {(onMoveUp || onMoveDown) && !hasLeft && (
               <View style={styles.turnArrows}>
-                <Pressable
+                <Pressable pressFeedback
                   onPress={onMoveUp}
                   disabled={!canMoveUp}
                   hitSlop={4}
@@ -182,7 +182,7 @@ export function PlayerRow({
                 >
                   <Text style={styles.turnArrowText}>↑</Text>
                 </Pressable>
-                <Pressable
+                <Pressable pressFeedback
                   onPress={onMoveDown}
                   disabled={!canMoveDown}
                   hitSlop={4}

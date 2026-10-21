@@ -920,7 +920,7 @@ export function GetReadyIntro({
               </Pressable>
             ) : null}
 
-            <Pressable
+            <Pressable pressFeedback
               style={styles.exitSheetCancelBtn}
               onPress={() => setExitSheetVisible(false)}
             >

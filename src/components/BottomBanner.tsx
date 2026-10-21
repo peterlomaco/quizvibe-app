@@ -34,7 +34,7 @@ interface TabItemProps {
 
 function TabItem({ icon, label, active, onPress }: TabItemProps) {
   return (
-    <Pressable
+    <Pressable pressFeedback
       style={[styles.tab, active && styles.tabActive]}
       onPress={onPress}
       hitSlop={4}

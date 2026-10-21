@@ -61,7 +61,7 @@ export function PlayerFilterPicker({
               : 'Filter by players'}
           </Text>
           {selectedFriends.length > 0 && (
-            <Pressable
+            <Pressable pressFeedback
               hitSlop={10}
               onPress={() => onApply(new Set())}
               accessibilityLabel="Clear player filter"
@@ -102,7 +102,7 @@ export function PlayerFilterPicker({
                     ikryssade och stänger. Filtret = rader där ALLA ikryssade
                     spelare deltog. */}
                 <View style={styles.sheetHeaderRow}>
-                  <Pressable hitSlop={8} onPress={() => setPendingIds(new Set())}>
+                  <Pressable pressFeedback hitSlop={8} onPress={() => setPendingIds(new Set())}>
                     <Text style={styles.friendAllText}>All players</Text>
                   </Pressable>
                   <Pressable
@@ -131,7 +131,7 @@ export function PlayerFilterPicker({
                             {f.playerName}
                           </Text>
                         </View>
-                        <Pressable
+                        <Pressable pressFeedback
                           onPress={() =>
                             setPendingIds((prev) => {
                               const next = new Set(prev);

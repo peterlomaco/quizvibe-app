@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from './Button';
+import { LoadingContent } from './LoadingContent';
 import { SlideToConfirm } from './SlideToConfirm';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 
@@ -33,6 +34,9 @@ interface Props {
   /** Ersätter den primära knappen med en dra-för-att-bekräfta-kontroll
    *  (Cancel fullbredd överst, slidern under). `onPrimary` körs när slidern
    *  dragits hela vägen. Under `busy` är Cancel + overlay-tap avstängda. */
+  /** Primär-actionen väntar på backend: spinner i knappen, båda knapparna
+   *  + overlay-tap avstängda (ingen dubbel-submit, ingen halv-avbruten action). */
+  primaryLoading?: boolean;
   slideToConfirm?: {
     label: string;
     busyLabel: string;
@@ -66,8 +70,9 @@ export function QuizVibeDialogOverlay({
   warning,
   destructiveIcon,
   slideToConfirm,
+  primaryLoading = false,
 }: Omit<Props, 'visible'>) {
-  const busy = slideToConfirm?.busy ?? false;
+  const busy = (slideToConfirm?.busy ?? false) || primaryLoading;
   return (
     <View style={styles.overlay}>
       <Pressable
@@ -114,6 +119,7 @@ export function QuizVibeDialogOverlay({
             <Button
               label={secondaryLabel}
               onPress={onClose}
+              disabled={busy}
               variant="secondary"
               size="compact"
               fullWidth={false}
@@ -123,20 +129,27 @@ export function QuizVibeDialogOverlay({
           {destructive ? (
             <Pressable
               onPress={onPrimary}
+              disabled={primaryLoading}
               accessibilityRole="button"
+              accessibilityState={{ busy: primaryLoading }}
               style={({ pressed }) => [
                 styles.actionBtn,
                 styles.destructiveBtn,
-                pressed && { opacity: 0.8 },
+                pressed && !primaryLoading && { opacity: 0.82, transform: [{ scale: 0.985 }] },
               ]}
             >
-              {destructiveIcon}
-              <Text style={styles.destructiveLabel}>{primaryLabel}</Text>
+              <LoadingContent loading={primaryLoading} color={Colors.error}>
+                <View style={styles.destructiveInner}>
+                  {destructiveIcon}
+                  <Text style={styles.destructiveLabel}>{primaryLabel}</Text>
+                </View>
+              </LoadingContent>
             </Pressable>
           ) : (
             <Button
               label={primaryLabel}
               onPress={onPrimary}
+              loading={primaryLoading}
               variant="gold"
               size="compact"
               fullWidth={false}
@@ -244,6 +257,11 @@ const styles = StyleSheet.create({
     gap: 6,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  destructiveInner: {
+    flexDirection: 'row',
+    gap: 6,
+    alignItems: 'center',
   },
   destructiveLabel: {
     fontSize: FontSize.md,

@@ -23,6 +23,8 @@ import {
   ViewStyle,
 } from 'react-native';
 import { Pressable, Switch, TouchableOpacity } from '@/src/components/haptic';
+import { useAsyncAction } from '@/src/utils/useAsyncAction';
+import { LoadingContent } from '../components/LoadingContent';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { ApproveToggle } from '../components/ApproveToggle';
@@ -56,7 +58,7 @@ import {
 } from '../components/RoundsRuler';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { MorseAmbientSound } from '../components/MorseAmbientSound';
-import { hideGlobalOverlay, showGlobalOverlay } from '../utils/globalOverlay';
+import { hideGlobalOverlay, runBehindGlobalOverlay, showGlobalOverlay } from '../utils/globalOverlay';
 import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
@@ -1050,6 +1052,9 @@ function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
 // ger destinationsskärmen (Home) + BottomBanner tid att måla BAKOM covern så
 // inget flimrar fram innan reveal. Tunbar (bumpa om en flash smiter förbi).
 const OVERLAY_SETTLE_MS = 150;
+// MorseAmbientSound rampar master-gain till 0 på 300 ms; vänta ut den innan
+// en navigation som unmountar WebView:n (annars ett hörbart klick).
+const AMBIENT_FADE_BEFORE_UNMOUNT_MS = 320;
 
 /**
  * Alert.alert som en await-bar Promise<boolean>. Används för guards inuti
@@ -1249,6 +1254,9 @@ export default function LobbyScreen() {
      *  lobby (ej carry-over) → seeden faller på stored/profil. */
     seedGameMode?: string;
   }>();
+  // Start Game väntar på flera Supabase-skrivningar (spelare, settings,
+  // credits, match-raden) innan navigationen — spinner + dubbeltrycks-skydd.
+  const startAction = useAsyncAction();
   // Om ingen kod skickas (t.ex. om man öppnar lobby-tabben direkt) genereras en.
   // useMemo ser till att koden är stabil över re-renders.
   const roomCode = useMemo(() => code ?? generateRoomCode(), [code]);
@@ -2381,8 +2389,9 @@ export default function LobbyScreen() {
   // Sätts true FÖRST i performLobbyDelete så MorseAmbientSound tonar ut till
   // tystnad (300ms FADE_OUT) INNAN router.replace unmountar LobbyScreen +
   // WebView:n. Att riva en WebView mitt i en ringande ton ger annars ett
-  // hörbart klick/beep (Peter 2026 — samma hazard som Start Game hade). Den
-  // 1.6s delete-covern är gott om tid för uttoningen. Element:et förblir
+  // hörbart klick/beep (Peter 2026 — samma hazard som Start Game hade).
+  // performLobbyDelete väntar AMBIENT_FADE_BEFORE_UNMOUNT_MS innan den
+  // navigerar, så uttoningen hinner klart. Element:et förblir
   // MONTERAT (hostMode && showAmbient orört) — bara `active` går false.
   const [ambientSilenced, setAmbientSilenced] = useState(false);
 
@@ -4980,35 +4989,36 @@ export default function LobbyScreen() {
         {
           text: 'Yes',
           style: 'destructive',
-          onPress: async () => {
-            const ownId = ownPlayerIdRef.current;
-            const ownPlayer = ownId ? players.find((p) => p.id === ownId) : undefined;
-            if (ownPlayer) {
-              // Cross-device-sync (Slice 3C-ii): UPDATE:a egen rad i
-              // lobby_players med has_left=true så övriga klienter får
-              // Realtime-broadcast → ser kortet renderat med grå "LEFT
-              // THIS GAME LOBBY"-styling utan att vänta på polling.
-              // Parallellt med AsyncStorage-snapshot:en (legacy + offline-
-              // fallback för test-seed-rum). Båda körs i parallel — DB
-              // failar tyst om guests saknar anon-session, AsyncStorage
-              // funkar alltid lokalt.
-              await Promise.all([
-                markOwnPlayerLeft(roomCode, ownPlayer.id),
-                addLeftPlayer(roomCode, {
-                  id: ownPlayer.id,
-                  name: ownPlayer.name,
-                  emoji: ownPlayer.emoji,
-                  avatarUri: ownPlayer.avatarUri,
-                  type: ownPlayer.type,
-                  age: ownPlayer.age,
-                  assistance: ownPlayer.assistance,
-                  hcpComplete: ownPlayer.hcpComplete,
-                  approved: ownPlayer.approved,
-                }),
-              ]);
-            }
-            router.replace('/');
-          },
+          onPress: () =>
+            runBehindGlobalOverlay('Please Wait — Leaving this Lobby', async () => {
+              const ownId = ownPlayerIdRef.current;
+              const ownPlayer = ownId ? players.find((p) => p.id === ownId) : undefined;
+              if (ownPlayer) {
+                // Cross-device-sync (Slice 3C-ii): UPDATE:a egen rad i
+                // lobby_players med has_left=true så övriga klienter får
+                // Realtime-broadcast → ser kortet renderat med grå "LEFT
+                // THIS GAME LOBBY"-styling utan att vänta på polling.
+                // Parallellt med AsyncStorage-snapshot:en (legacy + offline-
+                // fallback för test-seed-rum). Båda körs i parallel — DB
+                // failar tyst om guests saknar anon-session, AsyncStorage
+                // funkar alltid lokalt.
+                await Promise.all([
+                  markOwnPlayerLeft(roomCode, ownPlayer.id),
+                  addLeftPlayer(roomCode, {
+                    id: ownPlayer.id,
+                    name: ownPlayer.name,
+                    emoji: ownPlayer.emoji,
+                    avatarUri: ownPlayer.avatarUri,
+                    type: ownPlayer.type,
+                    age: ownPlayer.age,
+                    assistance: ownPlayer.assistance,
+                    hcpComplete: ownPlayer.hcpComplete,
+                    approved: ownPlayer.approved,
+                  }),
+                ]);
+              }
+              router.replace('/');
+            }),
         },
       ],
     );
@@ -5016,18 +5026,31 @@ export default function LobbyScreen() {
 
   // Delad delete-mekanik för host:en — används av BÅDE "Delete this Game
   // Lobby"-flödet OCH guest-hostens "Activate Extra package → register"-
-  // flöde (2026-07-07). Deaktiverar rummet + rensar mock-stores, visar
-  // loading-overlay ~1.6s och kör sedan onDone (navigation).
+  // flöde (2026-07-07). Visar loading-overlay direkt, deaktiverar rummet +
+  // rensar mock-stores och kör sedan onDone (navigation) utan extra väntan.
   // Speglar EXAKT tidigare handleDeleteLobby-beteende (clearLeftPlayers
   // ingår medvetet INTE — anropades inte tidigare heller).
+  const lobbyDeleteInFlightRef = useRef(false);
   const performLobbyDelete = async (onDone: () => void) => {
+    // Dubbeltrycks-skydd: ett andra Yes (eller en annan väg hit) medan
+    // raderingen pågår ignoreras.
+    if (lobbyDeleteInFlightRef.current) return;
+    lobbyDeleteInFlightRef.current = true;
+    // Visa GLOBAL cover DIREKT vid tappet (Peter 2026-10-21) — tidigare
+    // await:ades deactivateRoom FÖRST, så skärmen stod oförändrad under hela
+    // nätverksanropet och tappet såg ut att inte ha registrerats. Covern bor
+    // i app/_layout.tsx (utanför Stack) så den överlever router.replace —
+    // Home + BottomBanner monteras och målas BAKOM covern, som tonas bort
+    // först efter en kort settle. Ingen banner-flash före Home.
+    showGlobalOverlay('Please Wait — Deleting this Lobby');
     // Tona ut ambient-ljudet FÖRST så WebView:n är tyst (~0 gain efter 300ms
     // FADE_OUT) innan router.replace unmountar den — annars ett hörbart klick.
     // Element:et förblir monterat via `active`-flaggan; se ambientSilenced.
     setAmbientSilenced(true);
-    // Deaktivera rummet direkt så non-hosts polling-detection
-    // upptäcker det inom ~2s (även medan host:s loading-overlay
-    // visas — det är realistiskt async-beteende).
+    const fadeDone = new Promise<void>((resolve) =>
+      setTimeout(resolve, AMBIENT_FADE_BEFORE_UNMOUNT_MS),
+    );
+    // Deaktivera rummet så non-hosts polling-detection upptäcker det inom ~2s.
     await deactivateRoom(roomCode);
     // Rensa stale waiting_invites EXPLICIT — förlita oss inte enbart på
     // ON DELETE CASCADE (rooms → waiting_invites). Om FK-cascaden inte
@@ -5043,20 +5066,15 @@ export default function LobbyScreen() {
     clearLobbySettings(roomCode);
     clearEjected(roomCode);
     clearGameStarted(roomCode);
-    // Visa GLOBAL cover i ~1.6s (visuell "processar"-feedback), navigera
-    // sedan MEDAN covern fortfarande är uppe. Covern bor i app/_layout.tsx
-    // (utanför Stack) så den överlever router.replace — Home + BottomBanner
-    // monteras och målas BAKOM covern, som tonas bort först efter en kort
-    // settle. Resultat: inget banner-flimmer före Home. hideGlobalOverlay +
-    // settle-callbacken anropar bara module-funktioner (ingen setState på
+    // Ingen artificiell väntan (tidigare fast 1.6s): navigera så fort rummet
+    // är deaktiverat — bara ambient-faden får hålla emot. hideGlobalOverlay
+    // + settle-callbacken anropar bara module-funktioner (ingen setState på
     // denna skärm) så de kör tryggt efter att LobbyScreen unmountat.
-    showGlobalOverlay('Please Wait — Deleting this Lobby');
-    setTimeout(() => {
-      onDone();
-      InteractionManager.runAfterInteractions(() => {
-        setTimeout(hideGlobalOverlay, OVERLAY_SETTLE_MS);
-      });
-    }, 1600);
+    await fadeDone;
+    onDone();
+    InteractionManager.runAfterInteractions(() => {
+      setTimeout(hideGlobalOverlay, OVERLAY_SETTLE_MS);
+    });
   };
 
   // "Switch to single player" i "No approved players"-dialogen (2026-09-02).
@@ -5107,9 +5125,10 @@ export default function LobbyScreen() {
     // klampad till single-lobbyns 2/4-intervall (seeden re-klampar också).
     // Parental Control går via nav-param nedan (seeden läser aldrig stored för
     // den). spotifyEnabled/maxPlayers/gameMode/singlePlayerDefault forceras till
-    // single-lägets värden. Skriv EFTER clear-bunten. In-memory-mocken sätts
-    // synkront så den nya mountens seed (efter ~1.6s overlay) hinner läsa den.
-    setLobbySettings(newCode, {
+    // single-lägets värden. Skriv EFTER clear-bunten. Await:as så den nya
+    // lobbyns seed kan läsa raden direkt — navigationen väntar inte längre
+    // ~1.6s på overlayen.
+    await setLobbySettings(newCode, {
       gameMode: 'pass-the-phone',
       singlePlayerDefault: true,
       maxPlayers: 4,
@@ -5135,8 +5154,8 @@ export default function LobbyScreen() {
       mutualAssistanceEnabled,
     }).catch(() => { /* loggas i mockLobbySettings */ });
     // Riv den nuvarande multiplayer-lobbyn + navigera in i den nya single-
-    // lobbyn. performLobbyDelete deaktiverar roomCode, städar mock-stores
-    // + waiting_invites och visar loading-overlay ~1.6s innan onDone.
+    // lobbyn. performLobbyDelete visar loading-overlay direkt, deaktiverar
+    // roomCode, städar mock-stores + waiting_invites och kör sedan onDone.
     await performLobbyDelete(() => {
       router.replace({
         pathname: '/lobby',
@@ -6572,7 +6591,7 @@ export default function LobbyScreen() {
         'Are all players in the same room so you can share this device?',
         [
           { text: 'No', style: 'cancel' },
-          { text: 'Yes', onPress: () => handleStartGame(true) },
+          { text: 'Yes', onPress: () => startAction.run('start', () => handleStartGame(true)) },
         ],
       );
       return;
@@ -9399,7 +9418,8 @@ export default function LobbyScreen() {
                     : 'Start Re-match'
                   : 'Start Game'
               }
-              onPress={() => handleStartGame()}
+              onPress={() => startAction.run('start', () => handleStartGame())}
+              loading={startAction.isBusy('start')}
             />
           ) : (
             <GoldCtaButton
@@ -9734,9 +9754,9 @@ export default function LobbyScreen() {
                   pressed && { opacity: 0.85 },
                 ]}
               >
-                <Text style={shareSheet.addBtnText}>
-                  {addFriendChecking ? '…' : 'Add'}
-                </Text>
+                <LoadingContent loading={addFriendChecking} color={Colors.textPrimary}>
+                  <Text style={shareSheet.addBtnText}>Add</Text>
+                </LoadingContent>
               </Pressable>
             </View>
             {addFriendError && (
@@ -9847,7 +9867,7 @@ export default function LobbyScreen() {
                             friends och skickar dem alla via "Send invite"
                             längst ner. Redan skickade (invited) renderas
                             grön+låst så host inte råkar dubbel-skicka. */}
-                        <Pressable
+                        <Pressable pressFeedback
                           onPress={() => {
                             if (invited || inLobby) return;
                             setSelectedFriendIds((prev) => {
@@ -9893,13 +9913,14 @@ export default function LobbyScreen() {
                 backdrop-tap/hardware-back stänger fortfarande utan att
                 skicka något. */}
             <TouchableOpacity
-              onPress={handleSendInvites}
-              disabled={selectedFriendIds.size === 0}
+              onPress={() => startAction.run('send-invites', handleSendInvites)}
+              disabled={selectedFriendIds.size === 0 || startAction.busy}
               style={[
                 shareSheet.closeBtn,
                 selectedFriendIds.size === 0 && shareSheet.closeBtnDisabled,
               ]}
             >
+              <LoadingContent loading={startAction.isBusy('send-invites')} color={Colors.textPrimary}>
               <Text
                 style={[
                   shareSheet.closeBtnText,
@@ -9908,6 +9929,7 @@ export default function LobbyScreen() {
               >
                 Send invite
               </Text>
+              </LoadingContent>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -9977,7 +9999,7 @@ export default function LobbyScreen() {
               <Text style={styles.guestLeaveBtnText}>Leave Game Lobby — Go to Home</Text>
             </Pressable>
 
-            <Pressable
+            <Pressable pressFeedback
               style={styles.guestLeaveCancelBtn}
               onPress={() => setGuestLeaveSheetVisible(false)}
             >
@@ -10046,7 +10068,7 @@ export default function LobbyScreen() {
               <Text style={styles.guestLeaveBtnText}>Delete this Game Lobby</Text>
             </Pressable>
 
-            <Pressable
+            <Pressable pressFeedback
               style={styles.guestLeaveCancelBtn}
               onPress={() => setHostDeleteSheetVisible(false)}
             >
@@ -10130,7 +10152,7 @@ export default function LobbyScreen() {
                   })
               )}
             </ScrollView>
-            <Pressable
+            <Pressable pressFeedback
               style={styles.addPkgDoneBtn}
               onPress={() => setAddPackageModalVisible(false)}
             >
@@ -10211,7 +10233,7 @@ export default function LobbyScreen() {
               );
             })()}
 
-            <Pressable
+            <Pressable pressFeedback
               style={styles.guestLeaveCancelBtn}
               onPress={() => setNoApprovedModalVisible(false)}
             >
@@ -10302,7 +10324,7 @@ export default function LobbyScreen() {
                 </Text>
               </Pressable>
 
-              <Pressable
+              <Pressable pressFeedback
                 style={styles.guestLeaveCancelBtn}
                 onPress={handleJoinPopupLater}
               >

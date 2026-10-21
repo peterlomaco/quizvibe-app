@@ -1,6 +1,6 @@
 import { Colors, Radius, Spacing } from '@/src/theme';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from '@/src/components/haptic';
 import { VersusIcon } from '@/src/components/VersusIcon';
 import { GroupOutlineIcon } from '@/src/components/GroupOutlineIcon';
@@ -33,7 +33,7 @@ const MODE_ICON_STROKE = 1.6;
  *  grå för guest) så panelen läses som knappens förlängning. */
 export function HostTypeOptions({
   accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge,
-  iconColor, iconAccentColor, arrowColor, pressedBorderColor, heading,
+  iconColor, iconAccentColor, arrowColor, pressedBorderColor, heading, loadingType = null,
 }: {
   accentColor: string;
   /** Optional title above the cards (Home: "Choose how to play"). */
@@ -78,7 +78,11 @@ export function HostTypeOptions({
    * ('hidden').
    */
   localBadge?: { text: string; muted?: boolean };
+  /** Raden vars val väntar på backend (credit-gate + rums-registrering):
+   *  pilen byts mot spinnern och ALLA rader är otappbara tills den settlar. */
+  loadingType?: HostLobbyType | null;
 }) {
+  const anyLoading = loadingType != null;
   return (
     <View style={hostTypeStyles.panel}>
       {!!heading && <Text style={hostTypeStyles.heading}>{heading}</Text>}
@@ -96,6 +100,8 @@ export function HostTypeOptions({
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
         onPress={() => onSelect('single')}
+        loading={loadingType === 'single'}
+        disabled={anyLoading}
       />
       <HostTypeOptionRow
         accentColor={accentColor}
@@ -108,6 +114,8 @@ export function HostTypeOptions({
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
         onPress={() => onSelect('multiplayer')}
+        loading={loadingType === 'multiplayer'}
+        disabled={anyLoading}
       />
       {remoteMode !== 'hidden' && (
         <HostTypeOptionRow
@@ -128,6 +136,8 @@ export function HostTypeOptions({
             }
             onSelect('1v1');
           }}
+          loading={loadingType === '1v1'}
+          disabled={anyLoading}
         />
       )}
     </View>
@@ -136,7 +146,7 @@ export function HostTypeOptions({
 
 function HostTypeOptionRow({
   accentColor, icon, label, subtitle, detail, onPress, locked = false, badgeText, badgeMuted = false,
-  arrowColor, pressedBorderColor,
+  arrowColor, pressedBorderColor, loading = false, disabled = false,
 }: {
   accentColor: string;
   arrowColor?: string;
@@ -159,6 +169,8 @@ function HostTypeOptionRow({
    *  på knapparna ovanför. Används för varningar ("No Data Saved"), medan
    *  grönt är för det som är gratis/upplåsande. */
   badgeMuted?: boolean;
+  loading?: boolean;
+  disabled?: boolean;
 }) {
   // Gold border while pressed = "selected" (only when pressedBorderColor is set).
   const [pressed, setPressed] = useState(false);
@@ -167,10 +179,15 @@ function HostTypeOptionRow({
     <TouchableOpacity
       style={[
         hostTypeStyles.row,
-        { borderColor: pressed && pressedBorderColor && !locked ? pressedBorderColor : restBorder },
+        {
+          borderColor:
+            (pressed || loading) && pressedBorderColor && !locked ? pressedBorderColor : restBorder,
+        },
         locked && hostTypeStyles.rowLocked,
       ]}
       onPress={onPress}
+      disabled={disabled}
+      accessibilityState={{ disabled, busy: loading }}
       onPressIn={pressedBorderColor ? () => setPressed(true) : undefined}
       onPressOut={pressedBorderColor ? () => setPressed(false) : undefined}
       activeOpacity={0.7}
@@ -183,15 +200,19 @@ function HostTypeOptionRow({
         <Text style={hostTypeStyles.subtitle}>{subtitle}</Text>
         {!!detail && <Text style={hostTypeStyles.detail}>{detail}</Text>}
       </View>
-      <Text
-        style={[
-          hostTypeStyles.arrow,
-          { color: locked ? Colors.borderStrong : (arrowColor ?? accentColor) },
-          locked && hostTypeStyles.lockedDim,
-        ]}
-      >
-        ›
-      </Text>
+      {loading ? (
+        <ActivityIndicator size="small" color={pressedBorderColor ?? arrowColor ?? accentColor} />
+      ) : (
+        <Text
+          style={[
+            hostTypeStyles.arrow,
+            { color: locked ? Colors.borderStrong : (arrowColor ?? accentColor) },
+            locked && hostTypeStyles.lockedDim,
+          ]}
+        >
+          ›
+        </Text>
+      )}
       {!!badgeText && (
         <View
           style={[hostTypeStyles.rowBadge, badgeMuted && hostTypeStyles.rowBadgeMuted]}
