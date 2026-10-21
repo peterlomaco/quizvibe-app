@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
+  Linking,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -9,8 +10,20 @@ import {
 } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import { TopUserBanner } from '../components/TopUserBanner';
+import { SectionToggle } from '../components/SectionToggle';
+import { MusicNoteIcon } from '../components/CategoryIcons';
+import {
+  ControllerOutlineIcon,
+  DevicesOutlineIcon,
+  GlobeOutlineIcon,
+  LockOutlineIcon,
+  RocketOutlineIcon,
+  StarOutlineIcon,
+  TargetOutlineIcon,
+  TicketOutlineIcon,
+} from '../components/SectionIcons';
 import { SUBSCRIPTION_FEATURES } from './StoreScreen';
-import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 // Q&A:s härleds från det som är dokumenterat i koden + CLAUDE.md. Inga
@@ -43,11 +56,11 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What is QuizVibe?',
-        a: 'A social quiz game about music and film. Guess the release year on song and movie clips, or the name behind an artist or band from a set of progressive hints. Play with friends in the same room (Pass-the-Phone) or on separate phones (Individual Devices — free for everyone).',
+        a: 'A social quiz game about music and film. Guess the release year on song and movie clips, or the name behind an artist or band from a set of progressive hints. Play solo (Single Player), with friends in the same room — on one shared phone (Pass-the-Phone) or on everyone\'s own phone (Individual device) — or challenge a friend remotely (Head-to-head).',
       },
       {
         q: 'Do I need an account to play?',
-        a: 'No. You can join a game as a guest with a Room Code + a Player Name, and you can even host a game as a guest — a trial version with default settings. To save game history, host with your own settings, play Remote 1vs1, or buy Premium, you need to register an account.',
+        a: 'No. You can join a game as a guest with a Room Code + a Player Name, and you can even host a game as a guest — a trial version with default settings. To save game history, host with your own settings, play Head-to-head, or get Premium, you need to register an account.',
       },
       {
         q: 'What is the age minimum?',
@@ -55,7 +68,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'How do I get started fastest?',
-        a: '(1) Tap Create Game on the Home screen, (2) share the Room Code with friends or invite them from the Lobby, (3) approve players who join, (4) tap Start Game. As a registered user you get a set of free Host Game Credits that refresh every day.',
+        a: '(1) Tap Start New Game on the Home screen and choose how to play — Single Player, Multiplayer or Head-to-head, (2) share the Room Code with friends or tap Invite friends in the Lobby, (3) approve players who join, (4) tap Start Game. Friends join with Join a Game on their Home screen. As a registered user you get a set of free Host Game Credits that refresh every day.',
       },
       {
         q: 'Does QuizVibe work on Android?',
@@ -73,12 +86,12 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     title: 'Game modes',
     items: [
       {
-        q: 'What is the difference between Pass-the-Phone and Individual Devices?',
-        a: 'Pass-the-Phone (free): all players share one phone and take turns — the quiz pauses between rounds so you can pass it on. Individual Devices (free): each player has their own phone and answers the same question in parallel.',
+        q: 'What is the difference between Pass-the-Phone and Individual device?',
+        a: 'Both are Multiplayer modes. Pass-the-Phone (free): all players share one phone and take turns — the quiz pauses between turns so you can pass it on. Individual device (free): each player has their own phone and answers the same question at the same time.',
       },
       {
         q: 'What is Single Player mode?',
-        a: 'A way to play on your own. Tap Start New Game on the Home screen and choose Single Game — the Lobby then opens locked to a single player, so you can start right away without approving anyone.',
+        a: 'A way to play on your own. Tap Start New Game on the Home screen and choose Single Player — the Lobby then opens locked to one player, so you can start right away without approving anyone.',
       },
       {
         q: 'What is the difference between Host and non-host?',
@@ -86,15 +99,15 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What is a Guest?',
-        a: 'A Guest is a player who is not a registered QuizVibe user. You can join a game as a Guest with just a Player Name and Year of birth, or host a trial game as a Guest — but Guest games don\'t save any Player history or HCP, and some features (Remote 1vs1, Extra packages, unlimited rounds) require a registered account. A Guest can be either the Host or a non-host in a room.',
+        a: 'A Guest is a player who is not a registered QuizVibe user. You can join a game as a Guest with just a Player Name and Year of birth, or host a trial game as a Guest — but Guest games don\'t save any Player history or HCP, and some features (Head-to-head, Extra packages, more rounds) require a registered account. A Guest can be either the Host or a non-host in a room.',
       },
       {
         q: 'How many players can be in one room?',
-        a: 'Max 4 players per room for free Hosts. Premium Hosts can have up to 12 players.',
+        a: 'Up to 4 players per room. With Premium, Individual device games can have up to 12 players (Pass-the-Phone is always max 4). Single Player is one player and Head-to-head is two.',
       },
       {
-        q: 'Does Individual Devices require Premium?',
-        a: 'No — Individual Devices is free for all registered users. Premium unlocks extra capacity: up to 12 players per room and up to 20 rounds per game (instead of the free limit of 4 players and 4 rounds in Pass-the-Phone). Here is everything Premium adds:',
+        q: 'Does Individual device require Premium?',
+        a: 'No — Individual device is free for everyone. Premium unlocks extra capacity in Individual device games: up to 12 players per room and up to 20 rounds per game (the free limit is 4 players and 4 rounds). Here is everything Premium adds:',
         membershipCard: true,
       },
     ],
@@ -102,7 +115,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
   {
     id: 'connection',
     emoji: '📡',
-    title: 'Connection & Individual Devices',
+    title: 'Connection & Devices',
     items: [
       {
         q: 'Do all players need internet?',
@@ -110,15 +123,15 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What happens if my connection drops mid-game?',
-        a: 'In Pass-the-Phone only the Host\'s phone needs to be online — if the Host loses internet, the game pauses until the connection is back. In Individual Devices the system flags an "unstable peer" on the affected player and can block Start Game if anyone has red peer-health.',
+        a: 'In Pass-the-Phone only the Host\'s phone needs to be online — if the Host loses internet, the game pauses until the connection is back. In Individual device games, a player with an unstable connection is flagged in the Lobby, and the Host is warned before starting while someone\'s connection is unstable.',
       },
       {
         q: 'What WiFi strength is recommended?',
-        a: 'For Pass-the-Phone: normal 4G/5G or WiFi is enough. For Individual Devices: all players should be on the same WiFi network or have stable 4G/5G — YouTube buffering on one player does not affect others.',
+        a: 'For Pass-the-Phone: normal 4G/5G or WiFi is enough. For Individual device: every player needs stable WiFi or 4G/5G on their own phone — YouTube buffering on one player\'s phone does not affect the others.',
       },
       {
         q: 'Why can\'t I join a room?',
-        a: 'Common reasons: (1) Room Code misspelled — check against the Host\'s screen, (2) the Lobby is full (4 players for free Host, 12 for Premium), (3) the Host has deleted the Lobby, (4) the Host has already started the game without you.',
+        a: 'Common reasons: (1) Room Code misspelled — check against the Host\'s screen, (2) the Lobby is full (4 players, or up to 12 in a Premium Individual device game), (3) the Host has deleted the Lobby, (4) the Host has already started the game without you, (5) it is a Single Player lobby, or a Head-to-head match (which requires a QuizVibe account).',
       },
     ],
   },
@@ -129,11 +142,11 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'Why do some questions play a clip and others show hints?',
-        a: 'QuizVibe has two question types: song and movie clips from YouTube/Spotify (answer = the release year, or for films one of the main actors) and Hints — a country flag plus progressive clues about an artist or band (answer = the name). The Host tunes which sources are used in the Lobby\'s Source Mixerboard, but at least one source must always be active.',
+        a: 'QuizVibe has two question types: song and movie clips from YouTube/Spotify (answer = the release year, or for films one of the main actors) and Hints — a country flag plus progressive clues about a person or band (answer = the name). The Host tunes which sources are used in the Lobby\'s Source Mixerboard, but at least one source must always be active.',
       },
       {
         q: 'Can questions be based on Spotify?',
-        a: 'Yes. In Individual Devices games the Host can turn on Spotify DJ in the Source Mixerboard. For a Spotify question one player becomes the DJ and opens the track in the Spotify app on their own phone; everyone else listens and guesses the release year or the artist name. You don\'t need Spotify Premium, but the Spotify app should be installed on the DJ\'s phone.',
+        a: 'Yes. In Individual device games the Host can turn on Spotify DJ in the Source Mixerboard. For a Spotify question one player becomes the DJ and opens the track in the Spotify app on their own phone; everyone else listens and guesses the release year or the artist name. You don\'t need Spotify Premium, but the Spotify app should be installed on the DJ\'s phone.',
       },
       {
         q: 'Why do I sometimes get questions from before my time?',
@@ -152,7 +165,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
   {
     id: 'hcp',
     emoji: '🎯',
-    title: 'Handicap (HCP)',
+    title: 'HCP',
     items: [
       {
         q: 'What is HCP?',
@@ -219,7 +232,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'Can I get a refund?',
-        a: 'Apple handles all refunds. You can request a refund via reportaproblem.apple.com or via iPhone Settings → Wallet → your subscription. QuizVibe doesn\'t have access to payment decisions.',
+        a: 'Apple handles all refunds. You can request a refund via reportaproblem.apple.com. QuizVibe doesn\'t have access to payment decisions.',
       },
       {
         q: 'How does the subscription work?',
@@ -234,7 +247,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'How do I delete my account?',
-        a: 'Tap your Player Name pill (top right corner) → Delete Account. Everything is permanently deleted: profile, game history, subscription binding, friends, pending invites. Cannot be undone.',
+        a: 'Go to Profile and scroll to the bottom → Delete Account, then slide to confirm. (You can also tap your Player Name at the top right of the Profile screen → Delete Account.) Everything is permanently deleted: profile, game history, subscription binding, friends, pending invites. Cannot be undone.',
       },
       {
         q: 'Where do I find the Privacy Policy and Terms of Service?',
@@ -265,7 +278,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What does "Region Scope" mean?',
-        a: 'A setting available in Profile defaults and on the Lobby screen (host-only). It controls the regional scope of the question selection. The V1 catalog covers Sweden, so Region Scope is effectively fixed to Sweden in this version.',
+        a: 'A setting in Host default settings on Profile and in the Lobby (Host only). It controls the regional scope of the question selection. The V1 catalog covers Sweden, so Region Scope is effectively fixed to Sweden in this version.',
       },
       {
         q: 'Does QuizVibe work outside Sweden?',
@@ -276,6 +289,21 @@ const FAQ_CATEGORIES: FaqCategory[] = [
 ];
 
 // ─── Komponent ──────────────────────────────────────────────────────────────
+
+// Kategori-ikoner (UI 2026-10-21): outline-familjen från Profile (24-grid,
+// 1.8-streck, dämpad vit) ersätter de färgglada emojierna. Data-filens
+// emoji-fält lämnas orört men renderas inte längre.
+const CATEGORY_ICONS: Record<string, (props: { size?: number; color?: string }) => React.ReactElement> = {
+  'getting-started': RocketOutlineIcon,
+  'game-modes': ControllerOutlineIcon,
+  connection: DevicesOutlineIcon,
+  generations: MusicNoteIcon,
+  hcp: TargetOutlineIcon,
+  credits: TicketOutlineIcon,
+  premium: StarOutlineIcon,
+  account: LockOutlineIcon,
+  region: GlobeOutlineIcon,
+};
 
 export default function FAQScreen() {
   const router = useRouter();
@@ -354,11 +382,15 @@ export default function FAQScreen() {
                   pressed && { opacity: 0.7 },
                 ]}
               >
-                <Text style={styles.categoryEmoji}>{category.emoji}</Text>
-                <Text style={styles.categoryTitle}>{category.title}</Text>
-                <View style={styles.toggleBox}>
-                  <Text style={styles.toggleChevron}>{isCategoryOpen ? '−' : '+'}</Text>
+                <View style={styles.categoryIcon}>
+                  {(() => {
+                    const Icon = CATEGORY_ICONS[category.id];
+                    return Icon ? <Icon size={24} color={BrandUi.iconMuted} /> : null;
+                  })()}
                 </View>
+                <Text style={styles.categoryTitle}>{category.title}</Text>
+                {/* Samma +/−-kontroll som Profile-sektionerna. */}
+                <SectionToggle expanded={isCategoryOpen} />
               </Pressable>
               {!isCategoryOpen && <View style={styles.sectionDivider} />}
 
@@ -410,8 +442,15 @@ export default function FAQScreen() {
         })}
 
         <Text style={styles.footnote}>
-          Missing an answer? Email info@quizvibe.se and we&apos;ll add
-          the question here if it&apos;s of general value.
+          Missing an answer? Email{' '}
+          <Text
+            style={styles.footnoteLink}
+            onPress={() => { void Linking.openURL('mailto:info@quizvibe.se'); }}
+            accessibilityRole="link"
+          >
+            info@quizvibe.se
+          </Text>{' '}
+          and we&apos;ll add the question here if it&apos;s of general value.
         </Text>
 
         <View style={styles.bottomPad} />
@@ -449,42 +488,32 @@ const styles = StyleSheet.create({
   // emoji + titel vänster, +/−-toggle-box höger. Ingen aktiv border när
   // kollapsad — sectionDivider under raden ger separation istället.
   categoryWrap: {
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   categoryHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
-    paddingVertical: Spacing.sm,
+    gap: Spacing.md,
+    paddingVertical: Spacing.md,
   },
-  categoryEmoji: {
-    fontSize: 22,
-    lineHeight: 26,
-  },
-  categoryTitle: {
-    ...Typography.title,
-    color: Colors.textPrimary,
-    fontWeight: FontWeight.bold,
-    flex: 1,
-  },
-  toggleBox: {
-    width: 26,
-    height: 26,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: Colors.borderStrong,
+  // Samma mått som Profile:s sectionHeaderIcon (28×28 runt 24-ikonen).
+  categoryIcon: {
+    width: 28,
+    height: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  toggleChevron: {
-    fontSize: 18,
-    fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
-    lineHeight: 20,
+  // Tydligt under sidtiteln (24/700): 17 semibold.
+  categoryTitle: {
+    ...Typography.title,
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.semibold,
+    flex: 1,
   },
   sectionDivider: {
     height: 1,
-    backgroundColor: Colors.border,
+    // Profile v2: låg kontrast — luft bär separationen, inte linjen.
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
 
   // Q&A-kort som visas när kategorin är expanded. Innehåller alla Q:s
@@ -492,10 +521,11 @@ const styles = StyleSheet.create({
   // sker inom kortet — ingen återbruk av legalCard-styling eftersom
   // kategorin har egen visuell scope.
   questionsCard: {
-    backgroundColor: Colors.card,
+    // Samma yta som Profile:s Legal-kort.
+    backgroundColor: BrandUi.card,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255,255,255,0.10)',
     marginTop: Spacing.sm,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.xs,
@@ -515,7 +545,7 @@ const styles = StyleSheet.create({
   },
   questionChevron: {
     fontSize: 22,
-    color: Colors.textSecondary,
+    color: BrandUi.iconMuted,
     lineHeight: 22,
     width: 22,
     textAlign: 'center',
@@ -529,7 +559,7 @@ const styles = StyleSheet.create({
   },
   questionDivider: {
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
 
   // Premium-vs-Basic-jämförelsekort — speglar StoreScreen:s featureList 1:1
@@ -575,11 +605,16 @@ const styles = StyleSheet.create({
 
   footnote: {
     ...Typography.caption,
-    color: Colors.textSecondary,
-    marginTop: Spacing.lg,
+    color: BrandUi.textMuted,
+    marginTop: Spacing.xl,
     textAlign: 'center',
     paddingHorizontal: Spacing.md,
-    lineHeight: 18,
+    lineHeight: 20,
+  },
+  // Kontaktadressen = det interaktiva elementet (öppnar mejlappen).
+  footnoteLink: {
+    color: Colors.warning,
+    textDecorationLine: 'underline',
   },
 
   bottomPad: { height: Spacing.xl },

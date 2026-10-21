@@ -84,3 +84,103 @@ export function LockOutlineIcon({ size = 14, color = BrandUi.iconMuted, strokeWi
     </Svg>
   );
 }
+
+/* ── FAQ-kategorier (2026-10-21) — samma 24-grid / 1.8-streck-familj. ── */
+
+/** Getting started — play i cirkel. */
+export function PlayCircleOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx={12} cy={12} r={8.5} {...common(color, strokeWidth)} />
+      <Path d="M10.25 8.75 L15.25 12 L10.25 15.25 Z" {...common(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+/** Game modes — handkontroll. */
+export function ControllerOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M7.5 7.5 H16.5 C19 7.5 20.75 9.5 21 12.25 L21.4 15.6 C21.6 17.4 19.4 18.4 18.1 17.1 L16 15 H8 L5.9 17.1 C4.6 18.4 2.4 17.4 2.6 15.6 L3 12.25 C3.25 9.5 5 7.5 7.5 7.5 Z"
+        {...common(color, strokeWidth)}
+      />
+      <Path d="M7.5 10 V13 M6 11.5 H9" {...common(color, strokeWidth)} />
+      <Path d="M15.5 10.5 H15.51 M17.5 12.5 H17.51" {...common(color, strokeWidth + 0.6)} />
+    </Svg>
+  );
+}
+
+/** Connection & Individual Devices — två enheter. */
+export function DevicesOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Rect x={3} y={5} width={9} height={14} rx={2} {...common(color, strokeWidth)} />
+      <Rect x={14} y={8} width={7} height={11} rx={1.75} {...common(color, strokeWidth)} />
+      <Path d="M6.5 16 H8.5 M16.75 16 H18.25" {...common(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+/** Handicap (HCP) — måltavla. */
+export function TargetOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx={12} cy={12} r={8.5} {...common(color, strokeWidth)} />
+      <Circle cx={12} cy={12} r={4.75} {...common(color, strokeWidth)} />
+      <Circle cx={12} cy={12} r={1} {...common(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+/** Host Game Credits — biljett. */
+export function TicketOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M4 6.5 H20 V9.75 C18.75 9.75 17.75 10.75 17.75 12 C17.75 13.25 18.75 14.25 20 14.25 V17.5 H4 V14.25 C5.25 14.25 6.25 13.25 6.25 12 C6.25 10.75 5.25 9.75 4 9.75 Z"
+        {...common(color, strokeWidth)}
+      />
+      <Path d="M14 6.5 V8 M14 11.25 V12.75 M14 16 V17.5" {...common(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+/** Premium subscription — stjärna. */
+export function StarOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M12 3.75 L14.45 8.7 L19.9 9.5 L15.95 13.35 L16.9 18.8 L12 16.2 L7.1 18.8 L8.05 13.35 L4.1 9.5 L9.55 8.7 Z"
+        {...common(color, strokeWidth)}
+      />
+    </Svg>
+  );
+}
+
+/** Region — jordglob. */
+export function GlobeOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx={12} cy={12} r={8.5} {...common(color, strokeWidth)} />
+      <Path d="M3.5 12 H20.5" {...common(color, strokeWidth)} />
+      <Path d="M12 3.5 C14.4 6 15.5 9 15.5 12 C15.5 15 14.4 18 12 20.5 C9.6 18 8.5 15 8.5 12 C8.5 9 9.6 6 12 3.5 Z" {...common(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+/** Getting started — raket. */
+export function RocketOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M14.5 4.2 C17 3.5 19.7 3.6 20.4 3.6 C20.4 4.3 20.5 7 19.8 9.5 C19.1 12 17.3 14.1 14.6 15.9 L8.1 9.4 C9.9 6.7 12 4.9 14.5 4.2 Z"
+        {...common(color, strokeWidth)}
+      />
+      <Circle cx={15.25} cy={8.75} r={1.6} {...common(color, strokeWidth)} />
+      <Path d="M8.1 9.4 L5 9.4 L3.6 11.6 L6.9 12.8" {...common(color, strokeWidth)} />
+      <Path d="M14.6 15.9 V19 L12.4 20.4 L11.2 17.1" {...common(color, strokeWidth)} />
+      <Path d="M8.6 15.4 C7.3 15.6 5.6 16.8 5.1 18.9 C7.2 18.4 8.4 16.7 8.6 15.4 Z" {...common(color, strokeWidth)} />
+    </Svg>
+  );
+}

@@ -116,8 +116,12 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
   // emoji-avatarer renderas oförändrat när användaren valt en.
   const showBrandAvatar =
     isLoggedIn && (!profile?.selectedAvatarId || profile?.avatarSource === 'default');
+  // Utloggad / gäst: dämpad outline-profilikon (UI 2026-10-21) i stället för
+  // den färgade 👤-emojin — samma ikon som bottom-navens Profile-tab.
   const leadingIcon = showBrandAvatar ? (
     <QuizVibeDefaultAvatar size={20} framed />
+  ) : !isLoggedIn ? (
+    <ProfileOutlineIcon size={18} color={BrandUi.iconMuted} />
   ) : (
     <Text style={styles.loginPillIcon}>{iconTextFor(profile, isLoggedIn)}</Text>
   );
