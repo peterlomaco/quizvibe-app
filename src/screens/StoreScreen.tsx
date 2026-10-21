@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
+import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '../components/MetallicGoldFill';
 import type { PurchasesOffering, PurchasesPackage } from 'react-native-purchases';
 import { TopUserBanner } from '../components/TopUserBanner';
 import {
@@ -23,7 +24,7 @@ import {
   purchasePackage,
   restorePurchases,
 } from '../lib/iap';
-import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { track } from '../utils/analytics';
 import { loadProfile, saveProfile } from '../utils/profileStorage';
 import {
@@ -108,7 +109,7 @@ const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   {
     id: 'sub-1mth',
     productId: 'pkg_sub_monthly',
-    label: 'Monthly subscription',
+    label: 'Monthly Subscription',
     price: '79 kr',
     priceAmount: 79,
     pricePerMonth: '79 kr / month',
@@ -703,7 +704,7 @@ export default function StoreScreen() {
     <View style={styles.section}>
       {/* Skärmens topprubrik sedan headern togs bort — screenTitle-storlek
           (samma typografi som "Add QuizVibe Premium" hade). */}
-      <Text style={styles.screenTitle}>QuizVibe membership</Text>
+      <Text style={styles.screenTitle}>QuizVibe Premium</Text>
 
       {/* Feature-lista med Premium-vs-Basic-jämförelse per rad. */}
       <View style={styles.featureList}>
@@ -825,7 +826,7 @@ export default function StoreScreen() {
         ]}
       >
         {restoring ? (
-          <ActivityIndicator size="small" color={Colors.primary} />
+          <ActivityIndicator size="small" color={Colors.warning} />
         ) : (
           <Text style={styles.restoreBtnText}>Restore Purchases</Text>
         )}
@@ -840,17 +841,19 @@ export default function StoreScreen() {
         <Pressable
           onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/privacy/')}
           hitSlop={8}
-          style={({ pressed }) => pressed && { opacity: 0.7 }}
         >
-          <Text style={styles.legalLink}>Privacy Policy</Text>
+          {({ pressed }) => (
+            <Text style={[styles.legalLink, pressed && styles.legalLinkPressed]}>Privacy Policy</Text>
+          )}
         </Pressable>
         <Text style={styles.legalLinkSeparator}>·</Text>
         <Pressable
           onPress={() => WebBrowser.openBrowserAsync('https://quizvibe.se/legal/terms/')}
           hitSlop={8}
-          style={({ pressed }) => pressed && { opacity: 0.7 }}
         >
-          <Text style={styles.legalLink}>Terms of Use</Text>
+          {({ pressed }) => (
+            <Text style={[styles.legalLink, pressed && styles.legalLinkPressed]}>Terms of Use</Text>
+          )}
         </Pressable>
       </View>
     </View>
@@ -1095,15 +1098,13 @@ function PromoTierCard({
   redeeming: boolean;
   onVoucherFocusChange?: (focused: boolean) => void;
 }) {
-  const accent = Colors.warning;
-
   return (
-    // Grön kort-styling när premium är aktivt — grönt betyder "aktiv" i resten
-    // av appen. Måla inte grönt innan man aktiverat.
+    // Aktivt Premium (UI 2026-10-21): navy-kort med dämpad guldkant i stället
+    // för grönt fält — den lilla ACTIVE-pillen bär statusen.
     <View style={[styles.tierCard, premiumActive && styles.tierCardActive]}>
       <View style={[styles.tierContent, { alignItems: 'flex-start' }]}>
         <View style={styles.tierLeft}>
-          <Text style={styles.tierHeadline}>Single month</Text>
+          <Text style={styles.tierHeadline}>Single Month</Text>
           <Text style={styles.tierSubline}>no auto-renewal</Text>
           {claimActive && expiry && (
             <Text style={styles.tierSubline}>Free until {formatPromoDate(expiry)}</Text>
@@ -1130,11 +1131,12 @@ function PromoTierCard({
               disabled={isClaiming}
               style={({ pressed }) => [
                 styles.buyBtn,
-                { backgroundColor: accent },
+                styles.buyBtnGold,
                 pressed && { opacity: 0.85 },
                 isClaiming && { opacity: 0.5 },
               ]}
             >
+              <MetallicGoldFill />
               {isClaiming ? (
                 // Mörk spinner — vit syns dåligt mot guld.
                 <ActivityIndicator size="small" color={Colors.background} />
@@ -1216,11 +1218,12 @@ function SubscriptionTierCard({
             disabled={disabled}
             style={({ pressed }) => [
               styles.buyBtn,
-              { backgroundColor: accent },
+              styles.buyBtnGold,
               pressed && { opacity: 0.85 },
               disabled && { opacity: 0.5 },
             ]}
           >
+            <MetallicGoldFill />
             {isPurchasing ? (
               // Mörk spinner (samma färg som knapptexten) — vit syns dåligt
               // mot guld.
@@ -1298,11 +1301,12 @@ const styles = StyleSheet.create({
   },
 
   // Feature list (subscription)
+  // UI 2026-10-21: samma kortyta som Profile v2 (BrandUi.card + låg kontrast).
   featureList: {
-    backgroundColor: Colors.card,
-    borderRadius: Radius.md,
+    backgroundColor: BrandUi.card,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255,255,255,0.10)',
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
     gap: Spacing.sm,
@@ -1315,7 +1319,7 @@ const styles = StyleSheet.create({
   },
   featureCheck: {
     fontSize: FontSize.md,
-    color: Colors.success,
+    color: 'rgba(245,166,35,0.85)',
     fontWeight: FontWeight.bold,
     width: 16,
     marginTop: 1,
@@ -1341,18 +1345,17 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   tierCard: {
-    backgroundColor: Colors.card,
+    backgroundColor: BrandUi.card,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255,255,255,0.10)',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
     position: 'relative',
   },
   // Basic plan-card: subtilt grön border så aktiv-state syns
   tierCardActive: {
-    borderColor: Colors.successBorder,
-    backgroundColor: Colors.successMuted,
+    borderColor: 'rgba(245,166,35,0.28)',
   },
   // Border-cutting badges (matchar mönster från Lobby PlayerRow + Game Mode)
   tierBadge: {
@@ -1433,24 +1436,36 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs + 2,
     borderRadius: Radius.md,
   },
+  // Primär-CTA (Free / Subscribe): metallisk guld som övriga guld-CTA:er.
+  buyBtnGold: {
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: METALLIC_GOLD_EDGE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   buyBtnText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
-    color: Colors.background,
+    color: '#000000',
     letterSpacing: 0.3,
   },
 
   // ACTIVE-pill för basic-plan
+  // Dämpad grön status-pill (tunn kant + svag fyllning) — grönt bara för
+  // tydlig aktiv-status, inte som stor yta.
   activePill: {
     paddingHorizontal: Spacing.sm + 2,
     paddingVertical: 4,
     borderRadius: Radius.full,
-    backgroundColor: Colors.success,
+    backgroundColor: 'rgba(82,200,122,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(82,200,122,0.45)',
   },
   activePillText: {
     fontSize: 10,
     fontWeight: FontWeight.bold,
-    color: '#000',
+    color: Colors.success,
     letterSpacing: 0.6,
   },
 
@@ -1474,10 +1489,11 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   restoreBtnText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    fontSize: FontSize.xs + 1,
+    fontWeight: FontWeight.medium,
+    color: 'rgba(245,166,35,0.85)',
     textDecorationLine: 'underline',
+    textDecorationColor: 'rgba(245,166,35,0.4)',
   },
 
   // Privacy Policy · Terms of Use — App Store 3.1.2. Diskret rad under
@@ -1491,12 +1507,15 @@ const styles = StyleSheet.create({
   },
   legalLink: {
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
     textDecorationLine: 'underline',
+  },
+  legalLinkPressed: {
+    color: Colors.warning,
   },
   legalLinkSeparator: {
     fontSize: FontSize.xs,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
   },
 
   // Förbrukad gratismånad — grå, otryckbar knapp (samma geometri som buyBtn).
@@ -1548,7 +1567,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm + 2,
     borderRadius: Radius.md,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.warning,
     minWidth: 88,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1556,7 +1575,7 @@ const styles = StyleSheet.create({
   voucherBtnText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
-    color: '#FFFFFF',
+    color: '#000000',
     letterSpacing: 0.3,
   },
   // Voucher inbäddad i Single month-kortet — ingen egen kortbakgrund, bara en

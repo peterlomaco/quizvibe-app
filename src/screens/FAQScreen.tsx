@@ -219,7 +219,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'What is included in Premium?',
-        a: 'Premium vs the free Basic plan — the same comparison shown under "QuizVibe membership" in the Store:',
+        a: 'Premium vs the free Basic plan — the same comparison shown under "QuizVibe Premium" in the Store:',
         membershipCard: true,
       },
       {
