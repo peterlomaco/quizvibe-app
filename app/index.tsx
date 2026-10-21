@@ -2482,7 +2482,20 @@ export default function HomeScreen() {
   // användaren landar direkt på registered-user join-flödet (hideGuest:true)
   // utan att se Home flicker. router.setParams clearar paramen efter open
   // så framtida fokus utan param inte trigggar modalen igen.
-  const localParams = useLocalSearchParams<{ openJoinRegistered?: string; openRegister?: string; openAuth?: string }>();
+  const localParams = useLocalSearchParams<{ openJoinRegistered?: string; openRegister?: string; openAuth?: string; openProfileMenu?: string }>();
+
+  // Auto-open profileMenu när Home entras med `?openProfileMenu=1` — FAQ:s
+  // TopUserBanner (2026-10-21). Samma sheet som Home:s egen banner /
+  // "Register or Login"-knapp: utloggad → menu-steget (Register / Log in),
+  // inloggad → profil-menyn. Open-side-reseten väljer steget.
+  useFocusEffect(
+    useCallback(() => {
+      if (localParams.openProfileMenu === '1') {
+        setProfileMenuVisible(true);
+        router.setParams({ openProfileMenu: undefined });
+      }
+    }, [localParams.openProfileMenu]),
+  );
   useFocusEffect(
     useCallback(() => {
       if (localParams.openJoinRegistered === '1') {

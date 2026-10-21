@@ -324,7 +324,13 @@ export default function FAQScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <TopUserBanner onBackPress={handleBack} backLabel="Back" />
+      {/* Pillen öppnar samma sheet som på Home (Register or Login / profil-
+          menyn) — via Home:s ?openProfileMenu=1-deeplink. */}
+      <TopUserBanner
+        onBackPress={handleBack}
+        backLabel="Back"
+        onPress={() => router.replace('/?openProfileMenu=1' as never)}
+      />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
