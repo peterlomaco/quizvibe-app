@@ -54,7 +54,8 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
 
   const reload = useCallback(async () => {
     const [{ data: userResp }, list] = await Promise.all([
-      supabase.auth.getUser(),
+      // Lokal session — se kommentaren vid prenumerationen nedan.
+      supabase.auth.getSession().then(({ data }) => ({ data: { user: data.session?.user ?? null } })),
       loadInvites(),
     ]);
     setInvites(list);
@@ -100,7 +101,9 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
     let cancelled = false;
     let channel: ReturnType<typeof supabase.channel> | null = null;
     (async () => {
-      const { data: userResp } = await supabase.auth.getUser();
+      // Lokal session (ingen nätverksrunda / inget auth-lås) — bara uid behövs;
+      // servern validerar JWT:n vid varje skrivning ändå (2026-10-21).
+      const userResp = { user: (await supabase.auth.getSession()).data.session?.user ?? null };
       const uid = userResp.user?.id;
       if (!uid || cancelled) return;
       const topic = `realtime:waiting_invites_signal:${uid}`;

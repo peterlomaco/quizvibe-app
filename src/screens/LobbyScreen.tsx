@@ -3,7 +3,6 @@ import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert,
   Animated,
   Dimensions,
   Easing,
@@ -21,8 +20,9 @@ import {
   TextStyle,
   View,
   ViewStyle,
+  ActivityIndicator,
 } from 'react-native';
-import { Pressable, Switch, TouchableOpacity } from '@/src/components/haptic';
+import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import { LoadingContent } from '../components/LoadingContent';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -40,6 +40,17 @@ import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeGoldMark } from '../components/QuizVibeGoldMark';
 import { BRAND_TAGLINE } from '../components/brand/QuizVibeBrandSvg';
 import { GoldCtaButton } from '../components/GoldCtaButton';
+import { GroupOutlineIcon } from '../components/GroupOutlineIcon';
+import { LockOutlineIcon } from '../components/SectionIcons';
+import { PackageThumbnail, hasPackageThumbnail } from '../components/PackageThumbnail';
+import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '../components/MetallicGoldFill';
+import { SectionToggle } from '../components/SectionToggle';
+import { QuizVibeToggle, quizVibeToggleWidth } from '../components/QuizVibeToggle';
+import { QuizVibeWatermark } from '../components/QuizVibeWatermark';
+import { QuizVibeAlertHost } from '../components/QuizVibeAlertHost';
+import { QuizVibeDialogOverlay } from '../components/QuizVibeDialog';
+import { quizVibeAlert } from '../utils/quizVibeAlert';
+import { ClapperboardIcon, MusicNoteIcon } from '../components/CategoryIcons';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — handleConnectSpotify/
@@ -59,7 +70,7 @@ import {
 import { TopUserBanner } from '../components/TopUserBanner';
 import { MorseAmbientSound } from '../components/MorseAmbientSound';
 import { hideGlobalOverlay, runBehindGlobalOverlay, showGlobalOverlay } from '../utils/globalOverlay';
-import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
@@ -399,6 +410,7 @@ function RegionModal({ visible, value, onChange, onClose }: {
           </TouchableOpacity>
         </View>
       </View>
+      <QuizVibeAlertHost active={visible} />
     </Modal>
   );
 }
@@ -523,7 +535,7 @@ const isOnlyYtFilm = (
 };
 
 const ytFilmAloneAlert = () =>
-  Alert.alert(
+  quizVibeAlert(
     "YouTube Film/TV can't be alone",
     "YouTube Film/TV content is limited and can't be played on its own. Keep or add another source to play.",
   );
@@ -694,7 +706,7 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
   const handleGenerateName = () => {
     const trimmedLetters = getPlayerNameLetters(name.trim());
     if (trimmedLetters.length > 0) {
-      Alert.alert(
+      quizVibeAlert(
         'Auto-generate Player Name',
         'Try to keep PlayerName letters or not?',
         [
@@ -935,7 +947,8 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
             onPress={handleAdd}
             disabled={!isFormValid}
           >
-            <Text style={modal.joinBtnText}>Add to Lobby</Text>
+            {isFormValid && <MetallicGoldFill />}
+            <Text style={[modal.joinBtnText, !isFormValid && modal.joinBtnTextDisabled]}>Add to Lobby</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onClose} style={modal.cancelBtn}>
             <Text style={modal.cancelText}>Cancel</Text>
@@ -979,6 +992,7 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
           </View>
         )}
       </KeyboardAvoidingView>
+      <QuizVibeAlertHost active={visible} />
     </Modal>
   );
 }
@@ -1070,7 +1084,7 @@ function confirmAsync(
   cancelLabel = 'Cancel',
 ): Promise<boolean> {
   return new Promise((resolve) => {
-    Alert.alert(
+    quizVibeAlert(
       title,
       message,
       [
@@ -1156,9 +1170,6 @@ function BlinkingLabel({
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-// Synlig OFF-färg för source matrix-switchar. Colors.borderStrong är
-// rgba(255,255,255,0.14) = nästan osynlig på mörk bakgrund.
-const MATRIX_SWITCH_OFF = '#3A5068';
 
 /**
  * Parsar `carryPackages`-URL-paramet (JSON-array av Host-paket-IDs som var
@@ -2156,7 +2167,6 @@ export default function LobbyScreen() {
     }, [roomCode, isGuestHost]),
   );
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const ROOM_LOGO_SIZE = 104;
   // Lobby-wide settings — defaults speglar generic-fallback-spec (används
   // bara innan profil-seed-effekten hinner köra). Profile:s host-default
   // settings overridar dessa vid lobby-mount för host (se useEffect nedan).
@@ -2469,9 +2479,12 @@ export default function LobbyScreen() {
     const cycle = () => {
       const current = hostBadgeIdxRef.current;
       const next = (current + 1) % opacities.length;
-      Animated.parallel([
-        Animated.timing(opacities[current], { toValue: 0, duration: 2600, easing, useNativeDriver: true }),
-        Animated.timing(opacities[next], { toValue: 1, duration: 2600, easing, useNativeDriver: true }),
+      // Sekventiellt (2026-10-21): nuvarande frasen tonas ut HELT innan nästa
+      // tonas in — ingen överlappning mellan texterna. Samma totaltid (2,6 s)
+      // och samma 5 s-kadens som den tidigare parallella cross-faden.
+      Animated.sequence([
+        Animated.timing(opacities[current], { toValue: 0, duration: 1300, easing, useNativeDriver: true }),
+        Animated.timing(opacities[next], { toValue: 1, duration: 1300, easing, useNativeDriver: true }),
       ]).start();
       hostBadgeIdxRef.current = next;
     };
@@ -2568,7 +2581,7 @@ export default function LobbyScreen() {
       goToStoreFromCredits();
       return;
     }
-    Alert.alert(
+    quizVibeAlert(
       'Go to Store?',
       'QuizVibe Premium gives you unlimited host games — no daily limit.',
       [
@@ -2637,7 +2650,7 @@ export default function LobbyScreen() {
   const handleIncrementRounds = useCallback(() => {
     if (roundsCount >= stepperMax) {
       if (singlePlayerDefault || gameMode === 'pass-the-phone' || gameMode === 'remote-1v1') {
-        Alert.alert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
+        quizVibeAlert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
       }
       return;
     }
@@ -2654,13 +2667,13 @@ export default function LobbyScreen() {
   const handleRoundsPremiumPress = useCallback(() => {
     if (hasPremium) {
       if (gameMode === 'individual-devices' && !singlePlayerDefault) {
-        Alert.alert('Premium active', 'You have QuizVibe Premium — up to 20 rounds are unlocked in Individual device mode.');
+        quizVibeAlert('Premium active', 'You have QuizVibe Premium — up to 20 rounds are unlocked in Individual device mode.');
       } else {
-        Alert.alert('Individual device required', 'Switch to Individual device mode to host up to 20 rounds. Premium is already active on your account.');
+        quizVibeAlert('Individual device required', 'Switch to Individual device mode to host up to 20 rounds. Premium is already active on your account.');
       }
       return;
     }
-    Alert.alert(
+    quizVibeAlert(
       'Premium feature',
       'Host more than 4 rounds require QuizVibe Premium. Get in Store?',
       [
@@ -2715,6 +2728,11 @@ export default function LobbyScreen() {
   // Host kommer in med Players in Lobby hopfälld (likt Game Settings + Quiz
   // Tuning); non-host får den utfälld så de direkt ser spelarlistan.
   const [playersExpanded, setPlayersExpanded] = useState(false);
+  // Single player-lobbyn: sektionen är ALLTID utfälld och går inte att fälla
+  // ihop (Peter 2026-10-21) — spelarkortet ska synas direkt, oavsett om host
+  // är inloggad, guest host, eller utloggad guest. isSingleLobby läser
+  // lobbyType-paramet synkront, så kortet syns redan första framen.
+  const playersSectionOpen = isSingleLobby || playersExpanded;
   const [newPlayerJoined, setNewPlayerJoined] = useState(false);
   const [quizTuningExpanded, setQuizTuningExpanded] = useState(false);
   const [customizeExpanded, setCustomizeExpanded] = useState(false);
@@ -2791,7 +2809,14 @@ export default function LobbyScreen() {
   // Fasta höger-marginaler i stället; de nya YouTube/Hints-raderna delar
   // spotifySwitchMR så alla tre switch-högerkanter linjerar. Justera dessa
   // två tal om switcharna behöver nudgas på en specifik skärm.
-  const spotifySwitchMR = -16;
+  // (spotifySwitchMR = -16 ersatt av mixerToggleRightInset nedan, Profile-paritet.)
+  // Profile-paritet (2026-10-21): högerinsättning ur Film/TV-kolumnens bredd
+  // så Spotify-/Type-togglarna linjerar exakt med Film/TV-togglarna (centrerade
+  // i kolumnen) — samma formel som ProfileScreen. Kolumnen har 1 pt vänsterkant.
+  const [filmColWidth, setFilmColWidth] = useState(0);
+  const mixerToggleRightInset = filmColWidth
+    ? Math.max(0, (filmColWidth - 1 - quizVibeToggleWidth('mixer')) / 2)
+    : 18;
 
   // Namnet på spelaren vars enhet detta är — visas i den kant-skärande badgen
   // på "I have Spotify App on this device"-boxen (grön bg = bekräftat, röd =
@@ -2809,15 +2834,21 @@ export default function LobbyScreen() {
   // värdet snappar tillbaka visuellt (samma mönster som Year/Name-
   // togglarna). Registrerings-trigger per Peters trial-design 2026-07-04.
   const guestLockAlert = () =>
-    Alert.alert(
+    quizVibeAlert(
       'Locked for Guest Host',
       'Activation/deactivation only applicable by QuizVibe users Host',
+    );
+  // Samma locked-popup som guestLockAlert, med Parent Control-specifik text.
+  const guestParentControlAlert = () =>
+    quizVibeAlert(
+      'Locked for Guest Host',
+      'Parent Control can only be changed when a registered QuizVibe user hosts the game.',
     );
 
   // Tap på den låsta Game Mode-indikatorn i en replay/re-match-lobby (single,
   // PtP, IndDev eller 1vs1) — läget är fast, förklara varför (Peter 2026-08-28).
   const lockedModeAlert = () =>
-    Alert.alert(
+    quizVibeAlert(
       'Game mode locked',
       'This game is a replay / rematch Marathon with Game mode settings fixed.',
     );
@@ -2825,7 +2856,7 @@ export default function LobbyScreen() {
   const handleToggleAllSources = (value: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!value && !spotifyEnabled) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.');
       return;
     }
     // Music + Film (de enda live kategorierna sedan Sport togs bort 2026-09).
@@ -2851,7 +2882,7 @@ export default function LobbyScreen() {
         imagesEnabledCategories.includes('Film'),
       ].filter(Boolean).length;
       if (remainingActors < 2) {
-        Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
+        quizVibeAlert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
         return;
       }
     }
@@ -2869,11 +2900,11 @@ export default function LobbyScreen() {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
         // Utan Music-källa (Artists) finns inget kvar när Actors stängs av.
-        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.');
+        quizVibeAlert('Not applicable', 'Enable Artists or Spotify before turning off Actors.');
         return;
       }
       if (enabledColumnsCount <= 1) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.');
         return;
       }
     }
@@ -2905,13 +2936,13 @@ export default function LobbyScreen() {
           imagesEnabledCategories.includes('Film'),
         ].filter(Boolean).length;
         if (remainingActors < 2) {
-          Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
+          quizVibeAlert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
           return;
         }
       }
       // Befintlig min-1-guard (sista kolumn)
       if (enabledColumnsCount <= 1 && !artistsWouldStillBeActive) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.');
         return;
       }
     }
@@ -2936,12 +2967,12 @@ export default function LobbyScreen() {
           imagesEnabledCategories.includes('Film'),
         ].filter(Boolean).length;
         if (remainingActors < 2) {
-          Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
+          quizVibeAlert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
           return;
         }
       }
       if (enabledColumnsCount <= 1 && !artistsWouldStillBeActive) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.');
         return;
       }
     }
@@ -2956,9 +2987,9 @@ export default function LobbyScreen() {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
         // Utan Music-källa (Artists) finns inget kvar när Actors-YT stängs av.
-        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
+        quizVibeAlert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
-      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
+      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Film')) { quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
@@ -2976,9 +3007,9 @@ export default function LobbyScreen() {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
         // Utan Music-källa (Artists) finns inget kvar när Actors-Hints stängs av.
-        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
+        quizVibeAlert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
-      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
+      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Film')) { quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setImagesEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
@@ -3050,7 +3081,7 @@ export default function LobbyScreen() {
       applySpotifyAttest();
       return;
     }
-    Alert.alert(
+    quizVibeAlert(
       'Spotify not found on this device',
       "We couldn't find the Spotify app on this device. You need it installed to be the DJ in a Spotify game.",
       [
@@ -3111,7 +3142,7 @@ export default function LobbyScreen() {
       else applySpotifyDisconnect();
       return;
     }
-    Alert.alert(
+    quizVibeAlert(
       'Update your profile?',
       `Your Profile will be changed to Spotify ${v ? 'ON' : 'OFF'}.`,
       [
@@ -3133,7 +3164,7 @@ export default function LobbyScreen() {
    */
   const handleToggleSpotifyEnabled = (val: boolean) => {
     if (val && !spotifyConnected) {
-      Alert.alert(
+      quizVibeAlert(
         'Confirm Spotify first',
         'Confirm that you have the Spotify app on this device before enabling Spotify DJ mode. No Spotify account connection is needed — the song opens in your own Spotify app.',
         [
@@ -3151,7 +3182,7 @@ export default function LobbyScreen() {
       const approvedNonHosts = players.filter((p) => !p.isHost && !p.hasLeft && p.approved);
       const withoutSpotify = approvedNonHosts.filter((p) => !p.spotifyConnected);
       if (withoutSpotify.length > 0) {
-        Alert.alert(
+        quizVibeAlert(
           'Players need Spotify',
           `${withoutSpotify.length} approved player${withoutSpotify.length > 1 ? 's have' : ' has'} not confirmed the Spotify app. Everyone must confirm Spotify (in their settings row) before you can enable Spotify DJ mode.`,
         );
@@ -3176,7 +3207,7 @@ export default function LobbyScreen() {
       const artistsActiveForSpotify =
         youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActiveForSpotify && activeNonSpotifyCount < 2) {
-        Alert.alert(
+        quizVibeAlert(
           'Not applicable',
           'Enable at least 2 source combinations, or enable Artists or Spotify — those can be played on their own.',
         );
@@ -3205,7 +3236,7 @@ export default function LobbyScreen() {
     // fortfarande har innehåll. Redan valda källor lämnas orörda.
     setYoutubeEnabledCategories((prev) => (prev.length > 0 ? prev : defaultEnabledMainCategories()));
     setImagesEnabledCategories((prev) => (prev.length > 0 ? prev : defaultEnabledMainCategories()));
-    Alert.alert(
+    quizVibeAlert(
       'Spotify disabled by a player',
       'Players have disabled Spotify and Source Mixerboard will automatically be activated.',
     );
@@ -3276,7 +3307,7 @@ export default function LobbyScreen() {
     if (isActivating) {
       // Ett aktivt paket kollapsar/omformar Source Mixerboard (tema-only pool
       // + coverage-graying + era-lås) → bekräfta med host innan valet appliceras.
-      Alert.alert(
+      quizVibeAlert(
         'Extra package',
         'Please be aware that this might affect your selection in Source mixerboard.',
         [
@@ -3305,7 +3336,7 @@ export default function LobbyScreen() {
       return;
     }
     // Aktivering av paket kollapsar/omformar Source Mixerboard → bekräfta först.
-    Alert.alert(
+    quizVibeAlert(
       'Extra package',
       'Please be aware that this might affect your selection in Source mixerboard.',
       [
@@ -3355,7 +3386,7 @@ export default function LobbyScreen() {
         return;
       }
       // Aktivering kollapsar/omformar Source Mixerboard → bekräfta först.
-      Alert.alert(
+      quizVibeAlert(
         'Extra package',
         'Please be aware that this might affect your selection in Source mixerboard.',
         [
@@ -3379,7 +3410,7 @@ export default function LobbyScreen() {
   //  • ON utan aktivt restricted-paket → direkt.
   const handleToggleParentControlLobby = (next: boolean) => {
     if (!next) {
-      Alert.alert(
+      quizVibeAlert(
         'Parent Control',
         'I am aware that this activates mature content, some of it might not be appropriate for children. Still want to deactivate Parent control?',
         [
@@ -3391,7 +3422,7 @@ export default function LobbyScreen() {
     }
     const activeRestricted = selectedExtraPackages.filter(isPackageParentRestricted);
     if (activeRestricted.length > 0) {
-      Alert.alert(
+      quizVibeAlert(
         'Parent Control',
         'This will turn off the activated package and content that is restricted with Parent control. Still want to activate Parent control?',
         [
@@ -3505,7 +3536,7 @@ export default function LobbyScreen() {
   const handleTogglePackageYoutube = (v: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!v && !pkgHintsActive && !pkgSpotifyOnlyOk) {
-      Alert.alert(
+      quizVibeAlert(
         'At least one source required',
         'Turn on YouTube, Hints, or Spotify for this package.',
       );
@@ -3516,7 +3547,7 @@ export default function LobbyScreen() {
   const handleTogglePackageHints = (v: boolean) => {
     if (isGuestHost) { guestLockAlert(); return; }
     if (!v && !pkgYtActive && !pkgSpotifyOnlyOk) {
-      Alert.alert(
+      quizVibeAlert(
         'At least one source required',
         'Turn on YouTube, Hints, or Spotify for this package.',
       );
@@ -3554,7 +3585,7 @@ export default function LobbyScreen() {
       applySwitch();
       return;
     }
-    Alert.alert(
+    quizVibeAlert(
       title,
       'Guest players added by the Host will be removed — they have no device of their own. Ask them to join with their own device instead.',
       [
@@ -3619,7 +3650,7 @@ export default function LobbyScreen() {
         (p) => !p.isHost && !p.hasLeft && !p.addedByHost,
       );
       if (selfJoinedNonHosts.length > 1) {
-        Alert.alert(
+        quizVibeAlert(
           'Switch to Head-to-head?',
           'Head-to-head allows only 1 opponent. All players will be removed from the lobby — invite ONE opponent again after switching.',
           [
@@ -3658,7 +3689,7 @@ export default function LobbyScreen() {
     // ejektas — lobbyn skalas ner till enbart host.
     const approvedNonHosts = players.filter((p) => !p.isHost && !p.hasLeft && p.approved);
     if (approvedNonHosts.length > 3) {
-      Alert.alert(
+      quizVibeAlert(
         'Change to Pass-the-Phone',
         'Change from Individual Devices will remove all players from lobby. Do you want to continue?',
         [
@@ -3707,7 +3738,7 @@ export default function LobbyScreen() {
     if (n === 12) {
       // Fel läge: Max 12 kräver Individual device
       if (singlePlayerDefault || gameMode !== 'individual-devices') {
-        Alert.alert(
+        quizVibeAlert(
           'Individual device required',
           'Please activate Individual device to be able to select Max 12 players.',
           [{ text: 'OK' }],
@@ -3716,7 +3747,7 @@ export default function LobbyScreen() {
       }
       // Rätt läge men inget premium → Store
       if (!hasPremium) {
-        Alert.alert(
+        quizVibeAlert(
           'Premium feature',
           'Hosting up to 12 players requires QuizVibe Premium. Get it in the Store?',
           [
@@ -3753,14 +3784,12 @@ export default function LobbyScreen() {
         activeOpacity={0.7}
       >
         <Text
-          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree, redIndiv && key === 'indiv' && !isActive && { color: Colors.error }]}
+          style={[styles.modeLabel, { textAlign: 'center' }, smallText && { fontSize: FontSize.xs }, isActive && styles.modeLabelActiveFree]}
           numberOfLines={2}
         >
           {label}
         </Text>
-        <View style={[styles.freeBadge, !isActive && styles.freeBadgeDimmed]} pointerEvents="none">
-          <Text style={[styles.freeBadgeText, !isActive && styles.freeBadgeTextDimmed]}>FREE</Text>
-        </View>
+        {isActive && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
       </TouchableOpacity>
     );
   };
@@ -4134,7 +4163,7 @@ export default function LobbyScreen() {
     // renderas inte i det läget — detta är belt-and-suspenders mot oväntade
     // call-paths (och gör regeln läsbar där den faktiskt gäller).
     if (isRematchLobby) {
-      Alert.alert(
+      quizVibeAlert(
         'Line-up locked',
         'A re-match keeps the exact same players as the previous game. Use Start New Game to play with someone else.',
       );
@@ -4144,7 +4173,7 @@ export default function LobbyScreen() {
     // väljs via "Start New Game" på Home och kan inte bytas härifrån. Knappen
     // renderas inte i single-lobbyn, så detta är bara ett skyddsnät.
     if (isSingleLobby) {
-      Alert.alert(
+      quizVibeAlert(
         'Single player lobby',
         'This lobby is locked to one player. Start a Multiplayer Game from Home to play with others.',
       );
@@ -4153,14 +4182,14 @@ export default function LobbyScreen() {
     // Individual device + Remote 1v1 kräver egen enhet — host kan inte lägga
     // till guests manuellt. De måste joina med egen enhet via room code.
     if ((gameMode === 'individual-devices' || gameMode === 'remote-1v1') && !singlePlayerDefault) {
-      Alert.alert(
+      quizVibeAlert(
         'Own device required',
         "Players can't be added manually in this game mode — every player needs their own device. Ask them to join with the room code instead, or switch game mode.",
       );
       return;
     }
     if (isLobbyAtCapacity()) {
-      Alert.alert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
+      quizVibeAlert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
       return;
     }
     setAddModalVisible(true);
@@ -4172,7 +4201,7 @@ export default function LobbyScreen() {
   // återinförs i modalen. onAdd:s tredje arg (assistance) tas därför inte emot.
   const handleAddPlayer = (name: string, age: number) => {
     if (isLobbyAtCapacity()) {
-      Alert.alert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
+      quizVibeAlert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
       return;
     }
     setPlayers((prev) => [
@@ -4202,11 +4231,11 @@ export default function LobbyScreen() {
     // godkänd. Detta är den auktoritativa spärren: den läser host:s EGEN
     // live-state, inte en DB-rad som kan vara i otakt.
     if (approved && singlePlayerDefault) {
-      Alert.alert(...SINGLE_PLAYER_APPROVE_BLOCK);
+      quizVibeAlert(...SINGLE_PLAYER_APPROVE_BLOCK);
       return false;
     }
     if (approved && lobbyPeerHealth[id] === 'unstable') {
-      Alert.alert(
+      quizVibeAlert(
         'Connection unstable',
         'This player has an unstable connection. Wait for it to stabilize before approving them.',
       );
@@ -4216,7 +4245,7 @@ export default function LobbyScreen() {
     if (approved && spotifyEnabled) {
       const player = players.find((p) => p.id === id);
       if (player && !player.spotifyConnected) {
-        Alert.alert(
+        quizVibeAlert(
           'No Spotify confirmed',
           'This player has not confirmed the Spotify app. Either ask the player to confirm Spotify in their settings row, or switch off Spotify DJ in Source Dashboard to approve the player.',
         );
@@ -4286,7 +4315,7 @@ export default function LobbyScreen() {
   // players[]. För approved-spelare måste host först toggla tillbaka
   // till No så raden hamnar i waiting-listan igen och papperskorgen syns.
   const handleDeletePlayer = (id: string) => {
-    Alert.alert(
+    quizVibeAlert(
       'Remove player',
       'Are you sure you want to delete this Player from this Lobby?',
       [
@@ -4343,7 +4372,7 @@ export default function LobbyScreen() {
     // (Det var precis den luckan som lät en non-host bli approved i en
     // single-player-lobby, Peter 2026-08-24.)
     if (singlePlayerDefault) {
-      Alert.alert(...SINGLE_PLAYER_APPROVE_BLOCK);
+      quizVibeAlert(...SINGLE_PLAYER_APPROVE_BLOCK);
       return;
     }
     // Check 4: Spotify är aktiverat och några waiting-spelare saknar Spotify-attest.
@@ -4351,7 +4380,7 @@ export default function LobbyScreen() {
       const waiting = players.filter((p) => !p.isHost && !p.hasLeft && !p.approved && p.hcpComplete);
       const withoutSpotify = waiting.filter((p) => !p.spotifyConnected);
       if (withoutSpotify.length > 0) {
-        Alert.alert(
+        quizVibeAlert(
           'Not all players have Spotify',
           'Not all players in the lobby have confirmed the Spotify app. Please ask them to confirm Spotify in their settings row, or switch off Spotify DJ in Source Dashboard to approve players.',
         );
@@ -4440,7 +4469,7 @@ export default function LobbyScreen() {
   const handleSavePlayerEdit = () => {
     if (!playerEditTargetId || !playerEditTarget) return;
     if (editBirthYear === null) {
-      Alert.alert('Missing year', 'Pick a Competition Year of Birth.');
+      quizVibeAlert('Missing year', 'Pick a Competition Year of Birth.');
       return;
     }
     const target = playerEditTarget;
@@ -4450,7 +4479,7 @@ export default function LobbyScreen() {
 
     // 1) Age får bara höjas (= tidigare birth year). Stå-still tillåtet.
     if (nextAge < originalAge) {
-      Alert.alert(
+      quizVibeAlert(
         'Cannot lower age',
         'Age can only be raised — pick an earlier Year of Birth.',
       );
@@ -4468,7 +4497,7 @@ export default function LobbyScreen() {
       const trimmed = editHcpValue.trim();
       const parsed = parseInt(trimmed, 10);
       if (isNaN(parsed) || parsed < MIN_HCP || parsed > 99) {
-        Alert.alert('Invalid HCP', `HCP must be a number between ${MIN_HCP} and 99.`);
+        quizVibeAlert('Invalid HCP', `HCP must be a number between ${MIN_HCP} and 99.`);
         return;
       }
       const calcHcp =
@@ -4477,7 +4506,7 @@ export default function LobbyScreen() {
           : null;
       const originalHcp = target.hcpOverride ?? calcHcp;
       if (originalHcp !== null && parsed > originalHcp) {
-        Alert.alert(
+        quizVibeAlert(
           'Cannot raise HCP',
           `HCP can only be lowered — pick a value of ${originalHcp} or less.`,
         );
@@ -4842,7 +4871,7 @@ export default function LobbyScreen() {
       // scenario att hantera, bara en enkel ja/nej-check.
       const friend = toSend[0];
       if (hostUserId && (await hasRemote1v1RelationshipWith(hostUserId, friend.playerName))) {
-        Alert.alert(
+        quizVibeAlert(
           'Invitation limit reached',
           `You already have an ongoing or pending H2H invitation with ${friend.playerName}. Wait for it to finish or be answered before sending a new one.`,
         );
@@ -4874,14 +4903,14 @@ export default function LobbyScreen() {
 
     if (cappedIds.size > 0) {
       if (sendable.length === 0) {
-        Alert.alert(
+        quizVibeAlert(
           'Invitation limit reached',
           'The selected player(s) already have the maximum of 3 pending invitations from you. Either play those first or ask them to deny at least one to make room for a new invitation.',
         );
         return;
       }
       const proceed = await new Promise<boolean>((resolve) => {
-        Alert.alert(
+        quizVibeAlert(
           'Invitation limit reached',
           'Some users already have maximum of 3 invitations pending from you. Send this invitation to the other players anyway?',
           [
@@ -4960,7 +4989,7 @@ export default function LobbyScreen() {
       opponentName: counterpart?.name ?? null,
       savedAt: new Date().toISOString(),
     });
-    Alert.alert(
+    quizVibeAlert(
       'H2H lobby saved',
       'Find it under "H2H" on the Home screen, with status Not started. The lobby stays open for 24 hours.',
       [{ text: 'OK', onPress: () => router.replace('/') }],
@@ -4977,7 +5006,7 @@ export default function LobbyScreen() {
   //   när komponenten unmountas.
   const handleGuestLeaveRoom = () => {
     setGuestLeaveSheetVisible(false);
-    Alert.alert(
+    quizVibeAlert(
       'Leave this Game Lobby?',
       // Remote 1v1 spelas bara av QuizVibe-users — där finns ingen
       // guest-data att förlora, så meddelandet säger bara vad som händer.
@@ -4990,7 +5019,7 @@ export default function LobbyScreen() {
           text: 'Yes',
           style: 'destructive',
           onPress: () =>
-            runBehindGlobalOverlay('Please Wait — Leaving this Lobby', async () => {
+            runBehindGlobalOverlay('Leaving lobby…', async () => {
               const ownId = ownPlayerIdRef.current;
               const ownPlayer = ownId ? players.find((p) => p.id === ownId) : undefined;
               if (ownPlayer) {
@@ -5042,7 +5071,7 @@ export default function LobbyScreen() {
     // i app/_layout.tsx (utanför Stack) så den överlever router.replace —
     // Home + BottomBanner monteras och målas BAKOM covern, som tonas bort
     // först efter en kort settle. Ingen banner-flash före Home.
-    showGlobalOverlay('Please Wait — Deleting this Lobby');
+    showGlobalOverlay('Deleting lobby…');
     // Tona ut ambient-ljudet FÖRST så WebView:n är tyst (~0 gain efter 300ms
     // FADE_OUT) innan router.replace unmountar den — annars ett hörbart klick.
     // Element:et förblir monterat via `active`-flaggan; se ambientSilenced.
@@ -5105,7 +5134,7 @@ export default function LobbyScreen() {
       isRemote1v1: false,
     });
     if (!roomRegistered) {
-      Alert.alert(
+      quizVibeAlert(
         'Could not create game lobby',
         'The room could not be registered. Check your connection and that you are signed in, then try again.',
       );
@@ -5190,20 +5219,23 @@ export default function LobbyScreen() {
   //     nedan och får "Game Lobby deleted by Host"-popup → OK → Home.
   // Host själv navigeras till Home direkt efter deactivation. Lokal lobby-
   // state kasseras automatiskt när komponenten unmountas.
+  // Bekräftelsen visas som QuizVibe-dialog INUTI host-sheeten (en andra
+  // RN-Modal kan sväljas på iOS). Delete stänger sheeten och kör sedan samma
+  // performLobbyDelete som förut — efter MODAL_SWAP-fördröjningen så den
+  // globala "Deleting lobby…"-covern (egen Modal) inte presenteras medan
+  // sheeten fortfarande tonar ut.
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const handleDeleteLobby = () => {
+    setDeleteConfirmVisible(true);
+  };
+  const handleCancelDeleteLobby = () => {
+    setDeleteConfirmVisible(false);
     setHostDeleteSheetVisible(false);
-    Alert.alert(
-      'Delete this Game Lobby?',
-      'All players currently in this lobby will be notified and disconnected. The room code will become inactive.',
-      [
-        { text: 'No', style: 'cancel' },
-        {
-          text: 'Yes',
-          style: 'destructive',
-          onPress: () => performLobbyDelete(() => router.replace('/')),
-        },
-      ],
-    );
+  };
+  const handleConfirmDeleteLobby = () => {
+    setDeleteConfirmVisible(false);
+    setHostDeleteSheetVisible(false);
+    setTimeout(() => performLobbyDelete(() => router.replace('/')), 350);
   };
 
   // Non-host detection: pollar roomExists var 2:a sekund. När rummet
@@ -5909,7 +5941,7 @@ export default function LobbyScreen() {
           // den inte "tillbaka" för att den ser felplacerad ut — då blir
           // "Not now" den som ser ut som standardvalet igen. På Android
           // ignoreras style och ordningen avgör; Follow ligger först.
-          Alert.alert(
+          quizVibeAlert(
             'Host has started the Game',
             'Play on the Host device. Keep the live leaderboard on this phone so you can join a re-match afterwards.',
             [
@@ -6208,7 +6240,7 @@ export default function LobbyScreen() {
   // tap:a runt om popup:en — de MÅSTE acknowledgea via OK.
   useEffect(() => {
     if (!roomDeletedDetected) return;
-    Alert.alert(
+    quizVibeAlert(
       'Game Lobby deleted',
       'This Game Lobby has been deleted by Host.',
       [{ text: 'OK', onPress: () => router.replace('/') }],
@@ -6222,7 +6254,7 @@ export default function LobbyScreen() {
   // inte hela rummet.
   useEffect(() => {
     if (!playerEjectedDetected) return;
-    Alert.alert(
+    quizVibeAlert(
       'Removed from lobby',
       'User have been removed from this lobby',
       [{ text: 'OK', onPress: () => router.replace('/') }],
@@ -6240,7 +6272,7 @@ export default function LobbyScreen() {
   // som blockas här kan redan ha ett konto och bara vara utloggad.
   useEffect(() => {
     if (!remoteGuestBlockedDetected) return;
-    Alert.alert(
+    quizVibeAlert(
       'Head-to-head Room',
       'This Room Code belongs to a Head-to-head match. Head-to-head duels can only be played between QuizVibe users — register a free account or log in to join.',
       [
@@ -6255,7 +6287,7 @@ export default function LobbyScreen() {
   // den här spelaren. Speglar samma cancelable:false + OK→Home-mönster.
   useEffect(() => {
     if (!startedWithoutMeDetected) return;
-    Alert.alert(
+    quizVibeAlert(
       'Game already started',
       'Host started game without this user',
       [{ text: 'OK', onPress: () => router.replace('/') }],
@@ -6281,7 +6313,7 @@ export default function LobbyScreen() {
           .select('id', { count: 'exact', head: true })
           .eq('from_user_id', userId);
         if (!error && (count ?? 0) >= 4) {
-          Alert.alert(
+          quizVibeAlert(
             'Invitation limit reached',
             'You already have 4 unanswered H2H invitations. Wait for an answer or for old invitations to expire before sending more.',
           );
@@ -6299,7 +6331,7 @@ export default function LobbyScreen() {
             .eq('from_user_id', userId)
             .eq('room_code', roomCode);
           if (!roomErr && (roomCount ?? 0) > 0) {
-            Alert.alert(
+            quizVibeAlert(
               'Invitation already sent',
               'You already have a pending H2H invitation for this lobby. Wait for a response, or for it to be denied, before inviting someone else.',
             );
@@ -6314,7 +6346,7 @@ export default function LobbyScreen() {
     // self-friend-guarden (Layer 1) hindrar att man ligger i sin egen
     // friends-lista är detta en backstop (t.ex. stale listor).
     if (friend.playerName.trim().toLowerCase() === fromPlayerName.toLowerCase()) {
-      Alert.alert("That's you", "You can't invite yourself to your own lobby.");
+      quizVibeAlert("That's you", "You can't invite yourself to your own lobby.");
       return;
     }
     await addInvite(friend.playerName, {
@@ -6379,7 +6411,7 @@ export default function LobbyScreen() {
     // källor är aktiv — YT, Hints ELLER Spotify (Spotify får vara enda källan
     // för vilket paket som helst med Spotify-täckning, se pkgSpotifyOnlyOk).
     if (anyPackageActive && !pkgYtActive && !pkgHintsActive && !pkgSpotifyOnlyOk) {
-      Alert.alert(
+      quizVibeAlert(
         'At least one source required',
         'Turn on YouTube, Hints, or Spotify for this package.',
       );
@@ -6406,7 +6438,7 @@ export default function LobbyScreen() {
     const artistsActive =
       youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
     if (!anyPackageActive && !spotifyEnabled && !artistsActive && activeNonSpotifyCount < 2) {
-      Alert.alert(
+      quizVibeAlert(
         'Too few sources selected',
         'Enable at least 2 source combinations for Actors/Athletes, or also enable Artists or Spotify — those can be played on their own.',
       );
@@ -6420,7 +6452,7 @@ export default function LobbyScreen() {
       imagesEnabledCategories.length === 0 &&
       (singlePlayerDefault || approvedNonHostCount === 0)
     ) {
-      Alert.alert(
+      quizVibeAlert(
         'Spotify DJ not applicable',
         'Spotify DJ mode is not possible for single player. Please approve other players or change source settings.',
       );
@@ -6466,7 +6498,7 @@ export default function LobbyScreen() {
       return inEra && matchesImgCat(subjectToMainCategory(q.contentSubject));
     });
     if (!hasMusicHit && !hasImageHit) {
-      Alert.alert(
+      quizVibeAlert(
         'No matching quiz',
         'No quiz within selected range of game connections, game era and main category. Please change settings.',
       );
@@ -6502,7 +6534,7 @@ export default function LobbyScreen() {
       }));
 
     if (turnOrder.length === 0) {
-      Alert.alert('Cannot start', 'No approved players to start the game.');
+      quizVibeAlert('Cannot start', 'No approved players to start the game.');
       return;
     }
 
@@ -6517,7 +6549,7 @@ export default function LobbyScreen() {
     );
     // Spotify DJ kräver minst en annan spelare — blockera single player.
     if (spotifyEnabled && (singlePlayerDefault || approvedNonHosts.length === 0)) {
-      Alert.alert(
+      quizVibeAlert(
         'Spotify DJ not applicable',
         'Spotify DJ mode requires at least one other player. Please approve other players or disable Spotify DJ in Source Dashboard before starting.',
       );
@@ -6532,7 +6564,7 @@ export default function LobbyScreen() {
     if (spotifyEnabled) {
       const missingSpotify = approvedNonHosts.filter((p) => !p.spotifyConnected);
       if (missingSpotify.length > 0) {
-        Alert.alert(
+        quizVibeAlert(
           'Players missing Spotify',
           `${missingSpotify.length} player${missingSpotify.length > 1 ? 's have' : ' has'} Spotify disabled. Turn off Spotify DJ, or wait for everyone to confirm the Spotify app, before starting.`,
         );
@@ -6558,7 +6590,7 @@ export default function LobbyScreen() {
         validRounds.length > 1
           ? `${validRounds.slice(0, -1).join(', ')} or ${validRounds[validRounds.length - 1]}`
           : String(validRounds[0]);
-      Alert.alert(
+      quizVibeAlert(
         'Uneven Spotify DJ turns',
         validRounds.length > 0
           ? `With only Spotify as source, every player must DJ equally often. With ${n} players, choose ${list} rounds, or enable YouTube or Hints.`
@@ -6586,7 +6618,7 @@ export default function LobbyScreen() {
       approvedNonHosts.length > 0 &&
       !ptpConfirmed
     ) {
-      Alert.alert(
+      quizVibeAlert(
         'Pass-the-Phone mode',
         'Are all players in the same room so you can share this device?',
         [
@@ -6625,7 +6657,7 @@ export default function LobbyScreen() {
         (p) => !p.isHost && !p.hasLeft && p.addedByHost,
       );
       if (guestPlayer) {
-        Alert.alert(
+        quizVibeAlert(
           'Own device required',
           `${guestPlayer.name} was added by the Host and has no device of their own. Remove them or switch game mode before starting an Individual device game.`,
         );
@@ -6635,7 +6667,7 @@ export default function LobbyScreen() {
         (p) => !p.isHost && !p.hasLeft && lobbyPeerHealth[p.id] === 'unstable',
       );
       if (unstablePlayer) {
-        Alert.alert(
+        quizVibeAlert(
           'Connection unstable',
           `${unstablePlayer.name} has an unstable connection. Wait for it to stabilize, or remove them from the lobby before starting.`,
         );
@@ -6656,7 +6688,7 @@ export default function LobbyScreen() {
       // hit — Home-gaten + lobby-backstoppen fångar det — men detta är den
       // enda punkten där en felaktig match faktiskt skulle persisteras.
       if (isGuestHost) {
-        Alert.alert(
+        quizVibeAlert(
           'QuizVibe account required',
           'Head-to-head matches can only be played between QuizVibe users. Register or sign in to host an H2H match.',
         );
@@ -6664,7 +6696,7 @@ export default function LobbyScreen() {
       }
       const activeApprovedNonHosts = approvedPlayers.filter((p) => !p.isHost && !p.hasLeft);
       if (activeApprovedNonHosts.length !== 1) {
-        Alert.alert(
+        quizVibeAlert(
           'Head-to-head requires exactly 1 opponent',
           activeApprovedNonHosts.length === 0
             ? 'Invite and approve one opponent before starting the match.'
@@ -6674,7 +6706,7 @@ export default function LobbyScreen() {
       }
       remoteOpponent = activeApprovedNonHosts[0];
       if (remoteOpponent.addedByHost) {
-        Alert.alert(
+        quizVibeAlert(
           'Own device required',
           `${remoteOpponent.name} was added by the Host and has no device of their own. Head-to-head opponents must join with their own device.`,
         );
@@ -6683,7 +6715,7 @@ export default function LobbyScreen() {
       // Motståndar-sidan av users-only-regeln: `type === 'guest'` betyder
       // att de gick in via guest-formen, oavsett om enheten har ett konto.
       if (remoteOpponent.type === 'guest') {
-        Alert.alert(
+        quizVibeAlert(
           'QuizVibe account required',
           `${remoteOpponent.name} joined as a Guest. Head-to-head matches can only be played between QuizVibe users.`,
         );
@@ -6697,7 +6729,7 @@ export default function LobbyScreen() {
         .maybeSingle();
       remoteOpponentUserId = (oppRow?.user_id as string | null) ?? null;
       if (oppErr || !remoteOpponentUserId) {
-        Alert.alert(
+        quizVibeAlert(
           'Cannot start match',
           `${remoteOpponent.name}'s device session could not be verified. Ask them to re-join with the room code, then try again.`,
         );
@@ -6708,7 +6740,7 @@ export default function LobbyScreen() {
     // Spotify DJ-guard: om läget är aktiverat måste host ha self-attestat
     // Spotify-appen (Plan B — ingen kontokoppling, inget Premium-krav).
     if (spotifyEnabled && !spotifyConnected) {
-      Alert.alert(
+      quizVibeAlert(
         'Spotify not confirmed',
         'Confirm that you have the Spotify app on this device before starting a Spotify DJ game.',
         [
@@ -6749,7 +6781,7 @@ export default function LobbyScreen() {
     if (isRematchLobby) {
       const missing = findMissingRematchPlayers(rematchExpectedIds, players);
       if (missing.length > 0) {
-        Alert.alert(
+        quizVibeAlert(
           'Waiting for players',
           `${describeMissingPlayers(missing)} from the previous game hasn't re-joined yet. A re-match keeps the exact same line-up, so everyone has to be back before it can start.`,
         );
@@ -6771,7 +6803,7 @@ export default function LobbyScreen() {
     if (!isGuestHost) {
       const profile = await loadProfile();
       if (!profile) {
-        Alert.alert('Sign in required', 'Log in or register before starting a game.');
+        quizVibeAlert('Sign in required', 'Log in or register before starting a game.');
         return;
       }
       const free = profile.freeGameCredits ?? 0;
@@ -6780,7 +6812,7 @@ export default function LobbyScreen() {
       // skulle gå ut senare och dags-cappen återuppstår.
       if (!hasPremium) {
         if (free === 0) {
-          Alert.alert(
+          quizVibeAlert(
             'Out of Host Game Credits',
             'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
             [
@@ -6830,7 +6862,7 @@ export default function LobbyScreen() {
       const hostIsAnonymous = await isAnonymousSession();
       const hostUserId = await getOwnUserId();
       if (!hostUserId) {
-        Alert.alert('Cannot start match', 'No active session. Check your connection and try again.');
+        quizVibeAlert('Cannot start match', 'No active session. Check your connection and try again.');
         return;
       }
       remoteMatchId = await createRemoteMatch(
@@ -6898,7 +6930,7 @@ export default function LobbyScreen() {
             }
           } catch { /* tyst — pillen självkorrigerar vid nästa load */ }
         }
-        Alert.alert('Cannot start match', 'The H2H match could not be created. Check your connection and try again.');
+        quizVibeAlert('Cannot start match', 'The H2H match could not be created. Check your connection and try again.');
         return;
       }
     }
@@ -7192,8 +7224,21 @@ export default function LobbyScreen() {
     return slots;
   }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault, selectedExtraPackages, approvedPlayers.length]);
 
+  // Gemensamt vertikalt spacing-system för ALLA lobby-varianter (2026-10-21):
+  // rubrik → kontroll för GAME MODE / PLAYERS / QUIZ MIXER (ett token), och
+  // Game Settings-kortet tätt under sin rubrik.
+  const HEADING_TO_CONTROL = Spacing.md;
+
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Passiv brand-vattenstämpel (det nya Q:t) i ALLA värd-lobbyer (gäst och
+          QuizVibe-user; single, multiplayer och H2H) — samma
+          logik som Final Leaderboard. Bakom allt innehåll (första barnet),
+          ingen touch, påverkar inte layout/scroll. Syns främst när Players /
+          Customize är hopfällda och ytan annars känns tom. */}
+      {hostMode && (
+        <QuizVibeWatermark size={LOBBY_WATERMARK_SIZE} style={styles.lobbyWatermark} />
+      )}
       {/* Morse-ambient-ljud — tystas när skärmen tappar fokus (Stack-
           navigation till t.ex. Quiz), annars fortsätter WebView:n spela trots
           att LobbyScreen ligger kvar monterad i stacken.
@@ -7307,43 +7352,41 @@ export default function LobbyScreen() {
             har ingen kod att dela, inga andra spelare som kan ansluta och
             koden behövs inte för sparade spel (Peter 2026-09-06). */}
         {!isSingleLobby && (
-        <Card style={styles.roomCard} padding={Spacing.xl}>
-          {/* Loggan är absolut-positionerad i Card:ens övre vänstra hörn med
-              en liten inset från kantlinjen. Card är default position:
-              relative i RN så absolute children pinnas mot Card:s padding-
-              edge. */}
-          <View style={[styles.roomCodeLogoWrap, { width: ROOM_LOGO_SIZE, height: ROOM_LOGO_SIZE }]}>
-            {/* Guld-Q:t (2026-10-15) — 0.8 av slotten ger samma synliga
-                storlek som den gamla SVG:n (som hade luft runt kvadraterna). */}
-            <QuizVibeGoldMark size={Math.round(ROOM_LOGO_SIZE * 0.8)} />
+        <Card style={styles.roomCard} padding={Spacing.lg}>
+          {/* Lobby v2 (korrigering 2026-10-21): kompakt informationskort.
+              Hierarki: ROOM CODE-etikett → koden → liten status-rad (host-
+              crossfade / "You are invited") → Share som sekundär action.
+              Q-märket är en liten, dämpad signatur i övre vänstra hörnet. */}
+          <View style={styles.roomCodeLogoWrap} pointerEvents="none">
+            <QuizVibeGoldMark size={26} />
           </View>
-          {/* För guest renderas labeln absolut i Card:s övre del med
-              vertikal mitt direkt på loggans visuella mitt — ger ett
-              "label-genom-loggan"-uttryck som inte kan rubbas av flex-
-              layout-quirks. textAlign center + left/right: 0 håller
-              labeln horisontellt centrerad i kortet. "You are invited"
-              läggs till ovanför som kontext-rad — gäller alla non-hosts
-              (både code-only joiners och guests anslutit via JoinModal). */}
-          {!hostMode && (
-            <>
-              <View style={styles.guestInvitedBadgeWrap}>
-                <View style={styles.guestInvitedBadge}>
-                  <Text style={styles.guestInvitedBadgeText}>You are invited</Text>
+          <Text style={styles.roomLabel}>Room Code</Text>
+          {/* Koden i tre grupper (bokstäver · siffror · bokstäver) med EN ruta
+              per tecken — host läser upp den tecken för tecken: E N – 7 9 – J E. */}
+          <View style={styles.roomCodeCellsRow}>
+            {[
+              roomCode.slice(0, ROOM_CODE_LEADING_LETTERS),
+              roomCode.slice(ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS),
+              roomCode.slice(ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS),
+            ].map((group, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <Text style={styles.roomCodeCellDash}>–</Text>}
+                <View style={styles.roomCodeGroup}>
+                  {group.split('').map((ch, j) => (
+                    <View key={j} style={styles.roomCodeCharBox}>
+                      <Text style={styles.roomCodeCellText}>{ch}</Text>
+                    </View>
+                  ))}
                 </View>
-              </View>
-              <Text style={styles.roomLabelGuestAbsolute}>Room Code</Text>
-            </>
-          )}
-          {/* Host-badge med tre cross-fadande fraser:
-              "You are the host" (blå) → "Invite friends" (guld) → lägesberoende
-              tredje fras (guld): "1vs1 challenge" i remote-lobbyn, annars
-              "Single or multiplayer game". */}
-          {hostMode && (
+              </React.Fragment>
+            ))}
+          </View>
+          {hostMode ? (
             <View style={[styles.hostBadge, { position: 'relative' }]}>
               {/* Index 0 — "You are the host" (blå, starts visible) */}
               <Animated.View style={[styles.hostBadgeInner, { opacity: hostBadgeOp0 }]}>
-                <Svg width={18} height={18} viewBox="0 0 24 24">
-                  <Path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5zm0 2h14v2H5v-2z" fill={Colors.primary} />
+                <Svg width={12} height={12} viewBox="0 0 24 24">
+                  <Path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5zm0 2h14v2H5v-2z" fill={BrandUi.iconMuted} />
                 </Svg>
                 <Text style={styles.hostBadgeText}>You are the host</Text>
               </Animated.View>
@@ -7365,33 +7408,9 @@ export default function LobbyScreen() {
                 </Text>
               </Animated.View>
             </View>
+          ) : (
+            <Text style={styles.roomStatusText}>You are invited</Text>
           )}
-          <View style={[styles.roomCodeRow, !hostMode && styles.roomCodeRowGuestSpacing, hostMode && styles.roomCodeRowHostSpacing]}>
-            <View style={styles.roomCodeStack}>
-              {hostMode && (
-                <Text style={styles.roomLabel}>Room Code</Text>
-              )}
-              {/* Varje tecken i en bordered cell — samma look som "Enter Room
-                  Code"-inputen i Join-modalen i fyllt läge (Colors.primary
-                  border + Colors.primaryMuted bg). Bindestreck renderas som
-                  separata textelement vid varje letter/digit-transition
-                  (efter cell 1 och efter cell 3), identiskt med Join-
-                  modalens layout. */}
-              <View style={styles.roomCodeCellsRow}>
-                {roomCode.split('').map((ch, i) => (
-                  <React.Fragment key={i}>
-                    <View style={styles.roomCodeCell}>
-                      <Text style={styles.roomCodeCellText}>{ch}</Text>
-                    </View>
-                    {(i === ROOM_CODE_LEADING_LETTERS - 1 ||
-                      i === ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS - 1) && (
-                      <Text style={styles.roomCodeCellDash}>–</Text>
-                    )}
-                  </React.Fragment>
-                ))}
-              </View>
-            </View>
-          </View>
           {/* Share invite är host-only — bara host bjuder in nya spelare.
               Guest host: dold — friends-invites kräver registrerat konto;
               guests delar rumkoden muntligt istället.
@@ -7426,15 +7445,15 @@ export default function LobbyScreen() {
           {/* Kollapsbar sektionsrubrik (samma +/− mönster som Profile). */}
           <TouchableOpacity
             onPress={() => setPlayersExpanded(!playersExpanded)}
+            disabled={isSingleLobby}
             activeOpacity={0.7}
             style={styles.sectionHeaderRow}
             hitSlop={8}
           >
-            <Text style={styles.sectionHeaderEmoji}>👥</Text>
-            <Text style={styles.sectionHeaderTitle}>Players in Lobby</Text>
-            <View style={styles.sectionToggleBox}>
-              <Text style={styles.sectionChevron}>{playersExpanded ? '−' : '+'}</Text>
+            <View style={styles.sectionHeaderSvg}>
+              <GroupOutlineIcon size={22} color={BrandUi.iconMuted} />
             </View>
+            <Text style={styles.sectionHeaderTitle}>Players in Lobby</Text>
             {/* Röd "Players Waiting"-signal till höger om +/− när det finns
                 spelare som väntar på godkännande. Försvinner när alla är godkända. */}
             {showWaitingLabel && (
@@ -7442,14 +7461,15 @@ export default function LobbyScreen() {
                 Players Waiting
               </BlinkingLabel>
             )}
-            {!playersExpanded && newPlayerJoined && waitingForApproval.length === 0 && (
+            {!playersSectionOpen && newPlayerJoined && waitingForApproval.length === 0 && (
               <BlinkingLabel style={[styles.playersWaitingLabel, { color: Colors.success }]}>
                 New Player joined
               </BlinkingLabel>
             )}
+            {!isSingleLobby && <SectionToggle expanded={playersExpanded} />}
           </TouchableOpacity>
-          {!playersExpanded && <View style={styles.sectionDivider} />}
-          {playersExpanded && (<>
+          {!playersSectionOpen && <View style={styles.sectionDivider} />}
+          {playersSectionOpen && (<>
           {/* Approved-räknaren + "+ Add Guest" flyttade ned till egen rad
               under rubriken (2026-06-01), högerställd med lite toppluft. */}
           {/* Approved-kapacitetsmätare: "Approved"-rubrik + N rutor (N = maxPlayers,
@@ -7458,14 +7478,12 @@ export default function LobbyScreen() {
               alltid med = ruta 1), blinkande = väntar på godkännande, tom = ledig
               plats. Sista rutan visar "max N". */}
           <View style={[styles.sectionRow, styles.playersMetaRow]}>
-            <Text style={styles.approvedLabel}>Approved</Text>
-            <View style={styles.approvedBoxesGrid}>
-              {(() => {
+            {/* Lobby v2: kompakt readiness-rad i stället för N små rutor.
+                Samma underlag som förut (approvedCount / waitingCount / samma
+                capacity-regler för single, re-match och maxPlayers). */}
+            {(() => {
                 const approvedCount = approvedPlayers.filter((p) => !p.hasLeft).length;
-                // 4 rutor i bredd → 4 spelare = 1 rad, 12 spelare = 3 rader
-                // (ruta 5 hamnar under ruta 1, ruta 6 under ruta 2 osv.).
-                const COLS = 4;
-                // Single player: EN ruta. maxPlayers står kvar på 4 i state
+                // Single player: tak 1. maxPlayers står kvar på 4 i state
                 // (DB-CHECK tillåter bara 2/4/12) — taket 1 är rent visuellt.
                 // Re-match/Replay: uppsättningen är LÅST till förra spelets
                 // spelare, så taket = exakt det antalet (t.ex. ett 2-spelars
@@ -7481,62 +7499,17 @@ export default function LobbyScreen() {
                   : isRematchLobby
                     ? rematchCapacity
                     : maxPlayers;
-                const renderBox = (i: number) => {
-                  const isFilled = i < approvedCount;
-                  const isBlinking = !isFilled && i < approvedCount + waitingCount;
-                  // Sista rutan får "max N"-stacken — utom i 1vs1-lobbyn där
-                  // taket alltid är 2 och rutan bara visar siffran "2", i
-                  // single-lobbyn där "max 1" bara är brus, och i re-match/replay
-                  // där uppsättningen är LÅST till exakt antalet (då är rutan en
-                  // riktig spelarplats, inte ett tak att sträva mot).
-                  const isLast =
-                    i === capacity - 1 &&
-                    gameMode !== 'remote-1v1' &&
-                    !isSingleLobby &&
-                    !isRematchLobby;
-                  const boxStyle = [
-                    styles.approvedBox,
-                    (isFilled || isBlinking) && styles.approvedBoxFilled,
-                  ];
-                  // Sista rutan: "max" på en rad och siffran (4/12) på raden under.
-                  const content = isLast ? (
-                    <View style={styles.approvedBoxMaxStack}>
-                      <Text style={styles.approvedBoxMaxLabel} numberOfLines={1}>max</Text>
-                      <Text style={styles.approvedBoxMaxNum} numberOfLines={1}>{capacity}</Text>
-                    </View>
-                  ) : (
-                    <Text
-                      style={styles.approvedBoxNumber}
-                      numberOfLines={1}
-                      adjustsFontSizeToFit
-                      minimumFontScale={0.6}
-                    >
-                      {i + 1}
+                return (
+                  <View style={styles.readinessWrap}>
+                    <Text style={styles.readinessText}>
+                      Approved <Text style={styles.readinessCount}>{approvedCount}</Text> / {capacity}
                     </Text>
-                  );
-                  // ApprovedBox äger sin egen blink-loop (start/stopp via prop)
-                  // så övergången fast sken ↔ blinkande fungerar pålitligt.
-                  return (
-                    <ApprovedBox key={i} blinking={isBlinking} style={boxStyle}>
-                      {content}
-                    </ApprovedBox>
-                  );
-                };
-                const rowCount = Math.ceil(capacity / COLS);
-                return Array.from({ length: rowCount }).map((_, r) => (
-                  <View key={r} style={styles.approvedBoxesGridRow}>
-                    {Array.from({ length: COLS }).map((_, c) => {
-                      const i = r * COLS + c;
-                      // Osynlig spacer på ev. ofull sista rad så kolumnerna
-                      // linjerar (4/12 = alltid full, single = 1 + 3 spacers).
-                      return i < capacity ? renderBox(i) : (
-                        <View key={`sp-${c}`} style={styles.approvedBoxSpacer} />
-                      );
-                    })}
+                    {waitingCount > 0 && (
+                      <Text style={styles.readinessWaiting}>· {waitingCount} waiting</Text>
+                    )}
                   </View>
-                ));
+                );
               })()}
-            </View>
             {hostMode && gameMode === 'pass-the-phone' && !isRematchLobby && !isSingleLobby && (
               <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
                 <Text style={styles.addBtnText}>+ Add Guest</Text>
@@ -7550,7 +7523,7 @@ export default function LobbyScreen() {
           {gameMode === 'pass-the-phone' && !isSingleLobby && approvedPlayers.length > 0 && (
             <Text style={styles.turnOrderHint}>
               {hostMode
-                ? 'Turn order — top plays first. Use ↑↓ to reorder.'
+                ? 'Top plays first · reorder with the arrows'
                 : 'Playing order — selected by Host'}
             </Text>
           )}
@@ -7571,6 +7544,7 @@ export default function LobbyScreen() {
                 age={player.age}
                 assistance={mutualAssistanceActive ? remoteAssistance : player.assistance}
                 isHostPlayer={player.isHost}
+                hideHostTag={isSingleLobby && !isGuestHost}
                 isGuest={player.type === 'guest'}
                 hcp={player.type === 'guest' ? undefined : resolveDisplayHcp(player.id === ownPlayerIdRef.current ? (selfHcp ?? player.hcpOverride) : (player.hcp ?? player.hcpOverride))}
                 hcpMusic={player.type === 'guest' ? undefined : (player.id === ownPlayerIdRef.current ? selfHcpCat?.music : player.hcpMusic)}
@@ -7681,13 +7655,14 @@ export default function LobbyScreen() {
         <TouchableOpacity
           onPress={() => setCustomizeExpanded((v) => !v)}
           activeOpacity={0.7}
-          style={styles.customizeSectionHeader}
+          // EN regel för alla lobbyer (referens: gäst-värd multiplayer): ~24 pt
+          // tätare när Players in Lobby är utfälld, oavsett om Details är öppet.
+          style={[styles.customizeSectionHeader, playersSectionOpen && { marginTop: -Spacing.lg - Spacing.sm }]}
         >
           <Text style={styles.customizeSectionHeaderText}>Customize QuizVibe</Text>
-          <View style={styles.sectionToggleBox}>
-            <Text style={styles.sectionChevron}>{customizeExpanded ? '−' : '+'}</Text>
-          </View>
+          <SectionToggle expanded={customizeExpanded} />
         </TouchableOpacity>
+        {!customizeExpanded && <View style={styles.sectionDivider} />}
 
         {customizeExpanded && (<>
 
@@ -7699,22 +7674,25 @@ export default function LobbyScreen() {
         <TouchableOpacity
           onPress={() => setGameSettingsExpanded(!gameSettingsExpanded)}
           activeOpacity={0.7}
-          style={styles.sectionHeaderRow}
+          style={[styles.sectionHeaderRow, styles.subSectionHeaderRow]}
           hitSlop={8}
         >
-          {/* Blå kugghjuls-silhuett (Colors.primary) — matchar blå-temat. */}
+          {/* Dämpad kugghjuls-silhuett (Lobby v2: ingen blå ikon). */}
           <View style={styles.sectionHeaderSvg}>
-            <Svg width={24} height={24} viewBox="0 0 24 24">
+            <Svg width={20} height={20} viewBox="0 0 24 24">
               <Path
                 d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
-                fill={Colors.primary}
+                fill={BrandUi.iconMuted}
               />
             </Svg>
           </View>
-          <Text style={styles.sectionHeaderTitle}>Game Settings</Text>
-          <View style={styles.sectionToggleBox}>
-            <Text style={styles.sectionChevron}>{gameSettingsExpanded ? '−' : '+'}</Text>
+          {/* Guest host: hänglåset sitter i rubriken (tillhör Game Settings) i
+              stället för på panelens kant intill +/−-knappen. */}
+          <View style={styles.subSectionTitleRow}>
+            <Text style={styles.subSectionHeaderTitleInline}>Game Settings</Text>
+            {isGuestHost && <Text style={styles.subSectionLockIcon}>🔒</Text>}
           </View>
+          <SectionToggle expanded={gameSettingsExpanded} tone="neutral" />
         </TouchableOpacity>
         {!gameSettingsExpanded && <View style={styles.sectionDivider} />}
 
@@ -7723,17 +7701,13 @@ export default function LobbyScreen() {
             container. Ger semantiskt en "vad spelet ska spelas som"-sektion
             som visuellt skiljer sig från Players in Lobby nedanför. */}
         {gameSettingsExpanded && (
-        <View style={[styles.gameSettingsBorder, isGuestHost && styles.gameSettingsBorderGuest]}>
+        <View style={[styles.gameSettingsBorder, isGuestHost && styles.gameSettingsBorderGuest, { marginTop: -Spacing.xs, paddingTop: Spacing.sm }]}>
         {/* Guest host (BÅDE single OCH multiplayer): HELA Game Settings-sektionen
             får den gröna låsta ramen (i stället för per-sektion grön box på
             mixerboarden), och "DEFINED BY HOST"-badgen ersätts av hänglås-badgen
             — samma stil som single-player-rutans lockBadge (Peter 2026-09-18,
             utökat från single-only). */}
-        {isGuestHost ? (
-        <View style={styles.guestLockBadge} pointerEvents="none">
-          <Text style={styles.guestLockBadgeText}>🔒</Text>
-        </View>
-        ) : (
+        {hostMode ? null : (
         <View style={styles.definedByHostBadge} pointerEvents="none">
           <Text style={styles.definedByHostBadgeText}>DEFINED BY HOST</Text>
         </View>
@@ -7768,9 +7742,7 @@ export default function LobbyScreen() {
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
                   Head-to-head
                 </Text>
-                <View style={styles.freeBadge} pointerEvents="none">
-                  <Text style={styles.freeBadgeText}>FREE</Text>
-                </View>
+                <Text style={styles.modeCheck} pointerEvents="none">✓</Text>
               </TouchableOpacity>
               <View style={{ flex: 1 }} />
             </View>
@@ -7791,7 +7763,7 @@ export default function LobbyScreen() {
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                 onPress={() =>
-                  Alert.alert(
+                  quizVibeAlert(
                     'Mutual assistance level',
                     'Off: each player plays with their own personal assistance level.\n\nOn: both players get the SAME level — the one the Host picks below. In an H2H match both answer the same questions on their own devices, so a shared level makes the duel directly comparable.\n\nFull: the full names are listed, just pick the right one.\nStandard: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
                   )
@@ -7801,14 +7773,12 @@ export default function LobbyScreen() {
               >
                 <Text style={styles.infoIconText}>i</Text>
               </Pressable>
-              <Switch
+              <QuizVibeToggle
+                variant="mixer"
                 value={mutualAssistanceEnabled}
                 onValueChange={setMutualAssistanceEnabled}
                 disabled={!hostMode}
-                trackColor={{ false: '#3C3C3C', true: Colors.success }}
-                thumbColor="#FFF"
-                ios_backgroundColor={mutualAssistanceEnabled ? Colors.success : '#3C3C3C'}
-                style={styles.sourceMatrixSwitch}
+                accessibilityLabel="Mutual assistance level"
               />
             </View>
             {mutualAssistanceEnabled && (
@@ -7892,9 +7862,7 @@ export default function LobbyScreen() {
                           : 'Pass-the-Phone'
                       }`}
                 </Text>
-                <View style={styles.freeBadge} pointerEvents="none">
-                  <Text style={styles.freeBadgeText}>FREE</Text>
-                </View>
+                <Text style={styles.modeCheck} pointerEvents="none">✓</Text>
               </TouchableOpacity>
             </View>
             <Text style={styles.guestHostNote}>
@@ -7917,22 +7885,12 @@ export default function LobbyScreen() {
                 onPress={lockedModeAlert}
                 activeOpacity={0.7}
               >
-                {/* Stängt hänglås — läget är LÅST för lobbyns livstid (single
-                    väljs på Home / vid replay och kan inte bytas här). Samma
-                    signal som re-match-rutan (Peter 2026-08-28). Döljs för guest
-                    host — låst-signalen bärs där av den gröna sektionsramen +
-                    dess hänglås-badge (Peter 2026-09-11). */}
-                {!isGuestHost && (
-                <View style={styles.lockBadge} pointerEvents="none">
-                  <Text style={styles.lockBadgeText}>🔒</Text>
-                </View>
-                )}
+                {/* Inget hänglås (Peter 2026-10-21): rutan är ändå fast — läget väljs
+                    på Home — och användaren konfigurerar sitt eget spel. */}
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
-                  Single player — 1 player
+                  Single player
                 </Text>
-                <View style={styles.freeBadge} pointerEvents="none">
-                  <Text style={styles.freeBadgeText}>FREE</Text>
-                </View>
+                <Text style={styles.modeCheck} pointerEvents="none">✓</Text>
               </TouchableOpacity>
               <View style={{ flex: 1 }} />
             </View>
@@ -7959,9 +7917,14 @@ export default function LobbyScreen() {
               <TouchableOpacity
                 style={[styles.modeOption, styles.modeOptionPassActive]}
                 onPress={() =>
-                  Alert.alert(
+                  quizVibeAlert(
                     'Pass-the-Phone',
-                    'Guest games are played Pass-the-Phone on one device. Individual device mode is available for registered QuizVibe users.',
+                    // Inloggad user som valt att spela som Guest (t.ex. slut på
+                    // host credits) ÄR registrerad — texten ska då peka på att
+                    // starta spelet som QuizVibe user, inte på att registrera sig.
+                    getCachedProfile()
+                      ? 'Guest games are played Pass-the-Phone on one device. Individual device mode is available when you start the game as a QuizVibe user, not as Guest.'
+                      : 'Guest games are played Pass-the-Phone on one device. Individual device mode is available for registered QuizVibe users.',
                   )
                 }
                 activeOpacity={0.7}
@@ -7969,14 +7932,14 @@ export default function LobbyScreen() {
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
                   Pass-the-Phone
                 </Text>
-                <View style={styles.freeBadge} pointerEvents="none">
-                  <Text style={styles.freeBadgeText}>FREE</Text>
-                </View>
+                <Text style={styles.modeCheck} pointerEvents="none">✓</Text>
               </TouchableOpacity>
               <View style={{ flex: 1 }} />
             </View>
             <Text style={styles.guestHostNote}>
-              Individual device mode is available for registered QuizVibe users.
+              {getCachedProfile()
+                ? 'Individual device mode is available when you start the game as a QuizVibe user, not as Guest.'
+                : 'Individual device mode is available for registered QuizVibe users.'}
             </Text>
           </View>
         ) : (
@@ -7985,9 +7948,27 @@ export default function LobbyScreen() {
               klammer + label under toggle:n nedan. Båda delar samma
               sectionLabel-style → Typography.overline:s textTransform
               uppercasar hela strängen automatiskt. */}
-          <Text style={styles.sectionLabel}>
-            Game Mode
-          </Text>
+          <View style={styles.regionLabelRow}>
+            <Text style={styles.sectionLabel}>
+              Game Mode
+            </Text>
+            {/* Värden: info-ikonen sitter här sedan klammern + MULTIPLAYER-
+                etiketten under lägesrutorna togs bort (2026-10-21). */}
+            {hostMode && (
+                <Pressable
+                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                onPress={() =>
+                  quizVibeAlert(
+                    'Multiplayer mode',
+                    'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or H2H? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Head-to-head".',
+                  )
+                }
+                hitSlop={8}
+              >
+                <Text style={styles.infoIconText}>i</Text>
+              </Pressable>
+            )}
+          </View>
 
           {/* Två rutor i EN rad + bracket-etikett undertill. Single player
               och Remote (1vs1) väljs på Home via "Start New Game" och
@@ -7995,10 +7976,11 @@ export default function LobbyScreen() {
               sedan 2026-08-26. ⚠ Flex-talen på bracket-raden MÅSTE spegla
               antalet rutor ovanför; det är just den kopplingen som gick
               sönder när Remote-rutan lades till/togs bort. */}
-          <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
+          <View style={[styles.modeRow, { marginTop: HEADING_TO_CONTROL - Spacing.sm }]}>
             {renderModeBox('ptp', 'Pass-the-Phone', true)}
             {renderModeBox('indiv', 'Individual device', true)}
           </View>
+          {!hostMode && (
           <View style={{ flexDirection: 'row', gap: Spacing.sm, marginTop: 2 }}>
             {/* Bracket under "Pass-the-Phone" + "Individual device" —
                 flex:1 så den spänner över hela raden (båda rutorna). */}
@@ -8009,7 +7991,7 @@ export default function LobbyScreen() {
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() =>
-                    Alert.alert(
+                    quizVibeAlert(
                       'Multiplayer mode',
                       'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or H2H? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Head-to-head".',
                     )
@@ -8021,18 +8003,19 @@ export default function LobbyScreen() {
               </View>
             </View>
           </View>
+          )}
 
           {/* Players — max antal spelare. Max 4 gratis, Max 12 Premium. Styr
               lobby-cap + hur många host kan godkänna i "Players in lobby".
               Renderas för alla men disabled för non-host (read-only). */}
           {/* Versaler i samma stil som Game Mode-rubriken (sectionLabel/overline)
               + info-ikon vars popup förklarar Max 4 vs Max 12. */}
-          <View style={styles.playersLabelRow}>
+          <View style={[styles.playersLabelRow, { marginBottom: HEADING_TO_CONTROL }]}>
             <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
             <Pressable
               style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
               onPress={() =>
-                Alert.alert(
+                quizVibeAlert(
                   'Players',
                   'Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with Individual device mode.',
                 )
@@ -8059,9 +8042,7 @@ export default function LobbyScreen() {
               <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
                 Max 4 players
               </Text>
-              <View style={[styles.freeBadge, maxPlayers !== 4 && styles.freeBadgeDimmed]} pointerEvents="none">
-                <Text style={[styles.freeBadgeText, maxPlayers !== 4 && styles.freeBadgeTextDimmed]}>FREE</Text>
-              </View>
+              {maxPlayers === 4 && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
             </TouchableOpacity>
             {/* Max 12: auto-valt och aktivt (guld) när premium.
                 Guest host: rutan renderas inte alls — Max 4 är enda valet;
@@ -8076,6 +8057,7 @@ export default function LobbyScreen() {
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && styles.modeLabelActivePremium]}>
                   Max 12 players
                 </Text>
+                {maxPlayers === 12 && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
                 <View style={[styles.premiumBadge, !hasPremium && styles.premiumBadgeGrey]} pointerEvents="none">
                   <Text style={[styles.premiumBadgeText, !hasPremium && styles.premiumBadgeTextGrey]}>PREMIUM</Text>
                 </View>
@@ -8106,8 +8088,8 @@ export default function LobbyScreen() {
         {/* Visar vilka källor spelet drar frågor från. Vänsterjusterad lista
             med färgade brand-badges (kompakt list-format). marginTop ger lite
             extra luft mellan Game Mode-beskrivningen och denna rubrik. */}
-        <View style={[styles.section, { marginTop: Spacing.sm }]}>
-          <Text style={styles.sectionLabel}>SOURCE MIXERBOARD</Text>
+        <View style={[styles.section, { marginTop: Spacing.md, gap: HEADING_TO_CONTROL }]}>
+          <Text style={styles.sectionLabel}>Quiz Mixer</Text>
           <View style={styles.connectionsList}>
             {/* ── Spotify DJ-läge ─────────────────────────────────────────
                 Göms HELT (inkl. attest-raden) i tre fall där Spotify aldrig
@@ -8154,12 +8136,9 @@ export default function LobbyScreen() {
                 marginLeft: Spacing.sm,
                 marginRight: 0,
                 marginTop: 6,
-                borderWidth: 1,
-                // Ramfärg speglar attest-läget: grön = Yes, röd = No.
-                borderColor: spotifyConnected ? Colors.success : Colors.error,
-                borderRadius: Radius.sm,
+                // Profile-paritet: ingen ram — toggeln bär läget.
                 paddingLeft: Spacing.sm,
-                paddingRight: 18,
+                paddingRight: mixerToggleRightInset,
                 paddingVertical: 6,
               }}
             >
@@ -8167,37 +8146,22 @@ export default function LobbyScreen() {
                   Grön bg = Spotify bekräftat (toggle on), röd bg = ej
                   bekräftat. Vit text. bg speglar boxens ramfärg så badgen
                   läses som en del av ramen (samma mönster som HOST/GUEST). */}
-              {ownSpotifyBadgeName !== '' && (
-                <View
-                  style={[
-                    styles.spotifyAttestBadge,
-                    { backgroundColor: spotifyConnected ? Colors.success : Colors.error },
-                  ]}
-                  pointerEvents="none"
-                >
-                  <Text style={styles.spotifyAttestBadgeText} numberOfLines={1}>
-                    {ownSpotifyBadgeName}
-                  </Text>
-                </View>
-              )}
               <Text
                 style={[styles.spotifyLinkText, { color: Colors.textPrimary, fontSize: FontSize.sm, flex: 1, textDecorationLine: 'none' }]}
               >
                 I have Spotify App on this device
               </Text>
-              <View style={{ marginRight: spotifySwitchMR }}>
-                <Switch
+              <View>
+                <QuizVibeToggle
+                  variant="mixer"
                   value={spotifyConnected}
                   onValueChange={(v) => { void handleSpotifyAttestToggle(v); }}
-                  trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                  thumbColor="#FFF"
-                  ios_backgroundColor={spotifyConnected ? '#1DB954' : '#3C3C3C'}
-                  style={styles.sourceMatrixSwitch}
+                  accessibilityLabel="I have Spotify App on this device"
                 />
               </View>
             </View>
-            <View style={[styles.spotifyDJRow, { backgroundColor: undefined, borderRadius: undefined, marginBottom: 0 }]}>
-              <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 0, marginLeft: -2 }]}>
+            <View style={[styles.spotifyDJRow, { backgroundColor: undefined, borderRadius: undefined, marginBottom: 0, paddingRight: mixerToggleRightInset }]}>
+              <View style={[styles.connectionIconWrap, { alignSelf: 'flex-start', marginTop: 1, marginLeft: -2 }]}>
                 {/* variant="white" — mörk kortbakgrund kräver monokrom vit
                     per Spotifys brand guidelines (grönt bara på svart/vit bg). */}
                 <SpotifyBrandIcon size={22} variant="white" />
@@ -8208,7 +8172,7 @@ export default function LobbyScreen() {
                   <Pressable
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                     onPress={() =>
-                      Alert.alert(
+                      quizVibeAlert(
                         'Spotify',
                         '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium',
                         [
@@ -8237,53 +8201,33 @@ export default function LobbyScreen() {
                 // attest-switchen slogs på/av. Pillen dyker upp till VÄNSTER
                 // om switchen (radens högerkant ligger fast) så switchens
                 // position är stabil i båda lägen.
-                <View style={[styles.spotifyHostControls, { marginRight: spotifySwitchMR, alignSelf: 'flex-start', marginTop: 1, gap: 4 }]}>
+                <View style={[styles.spotifyHostControls, { alignSelf: 'center', gap: Spacing.sm }]}>
                   {/* Availability-pill: visas bara när Spotify är kopplat — annars tar pillen för mycket horisontellt utrymme och "Not activated"-texten tvingas ned på ny rad */}
                   {/* Pillen speglar det FAKTISKA på/av-läget (samma villkor som
                       switchens value) — inte bara mode-tillgänglighet. Stänger
                       host av toggeln ska pillen säga "Disabled". */}
-                  {spotifyConnected && (() => {
-                    const spotifyPillOn = spotifyEnabled && isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify);
-                    return (
-                      <View style={[
-                        styles.spotifyAvailPill,
-                        spotifyPillOn ? styles.spotifyAvailPillOn : styles.spotifyAvailPillOff,
-                      ]}>
-                        <Text style={[
-                          styles.spotifyAvailPillText,
-                          !spotifyPillOn && styles.spotifyAvailPillTextOff,
-                        ]}>
-                          {spotifyPillOn ? 'Enabled' : 'Disabled'}
-                        </Text>
-                      </View>
-                    );
-                  })()}
                   {/* Paket-läge: Spotify är valbart som KOMPLEMENT när paketet har
                       Spotify-material (pkgHasSpotify). Tidigare hård-disable när
                       paket aktivt → nu bara disabled om paketet saknar Spotify. */}
-                  <Switch
+                  <QuizVibeToggle
+                    variant="mixer"
                     value={spotifyEnabled && isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify)}
                     onValueChange={isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify) ? handleToggleSpotifyEnabled : undefined}
                     disabled={!isSpotifyAvailable || (anyPackageActive && !pkgHasSpotify)}
-                    trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                    thumbColor={isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify) ? '#FFF' : '#888'}
-                    ios_backgroundColor={spotifyEnabled && isSpotifyAvailable && (!anyPackageActive || pkgHasSpotify) ? '#1DB954' : '#3C3C3C'}
+                    accessibilityLabel="Spotify DJ"
                     style={[
-                      styles.sourceMatrixSwitch,
-                      (!isSpotifyAvailable || (anyPackageActive && !pkgHasSpotify)) && { opacity: 0.4 },
+                      (!isSpotifyAvailable || (anyPackageActive && !pkgHasSpotify)) && { opacity: 0.45 },
                     ]}
                   />
                 </View>
               ) : (
                 /* Non-host: read-only switch speglar host:s spotifyEnabled-val */
-                <View style={{ marginRight: spotifySwitchMR, alignSelf: 'flex-start', marginTop: 1 }}>
-                  <Switch
+                <View style={{ alignSelf: 'center' }}>
+                  <QuizVibeToggle
+                    variant="mixer"
                     value={spotifyEnabled}
                     disabled
-                    trackColor={{ false: '#3C3C3C', true: '#1DB954' }}
-                    thumbColor={spotifyEnabled ? '#FFF' : '#888'}
-                    ios_backgroundColor={spotifyEnabled ? '#1DB954' : '#3C3C3C'}
-                    style={styles.sourceMatrixSwitch}
+                    accessibilityLabel="Spotify DJ"
                   />
                 </View>
               )}
@@ -8296,53 +8240,69 @@ export default function LobbyScreen() {
               // vänster om sin toggle (gap 8). Togglarna (marginRight:
               // spotifySwitchMR) linjerar under Spotify/YouTube/Hints-togglarna.
               // Se mockup (to-be höger).
-              <View style={{ paddingRight: 18, paddingTop: 2, paddingBottom: 4, alignItems: 'flex-end' }}>
-                <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Type:</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                  <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Year</Text>
-                  <View style={{ marginRight: spotifySwitchMR }}>
-                    <Switch
+              // Profile-paritet: Type-blocket högerställt; "Type:  Year [toggle]  Name [toggle]"
+              // på en rad (staplat på smala skärmar), togglarna linjerar med Film/TV.
+              <View style={{ paddingRight: mixerToggleRightInset, paddingTop: 2, paddingBottom: 4, alignItems: 'flex-end' }}>
+                {(() => {
+                  const yearToggle = (
+                    <QuizVibeToggle
+                      variant="mixer"
                       value={spotifyAnswerYear}
-                      disabled={!hostMode}
                       onValueChange={(v) => {
                         // Guest host: Year/Name är låsta (båda ON) — bara
                         // Spotify på/av är guest-valbart.
                         if (isGuestHost) { guestLockAlert(); return; }
                         if (!v && !spotifyAnswerName) {
-                          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+                          quizVibeAlert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
                           return;
                         }
                         setSpotifyAnswerYear(v);
                       }}
-                      trackColor={{ false: Colors.error, true: Colors.success }}
-                      thumbColor="#FFF"
-                      ios_backgroundColor={spotifyAnswerYear ? Colors.success : Colors.error}
-                      style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
-                    />
-                  </View>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                  <Text style={{ fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary }}>Name</Text>
-                  <View style={{ marginRight: spotifySwitchMR }}>
-                    <Switch
-                      value={spotifyAnswerName}
                       disabled={!hostMode}
+                      locked={isGuestHost} accessibilityLabel="Spotify answer type Year"
+                      style={isGuestHost && { opacity: 0.45 }}
+                    />
+                  );
+                  const nameToggle = (
+                    <QuizVibeToggle
+                      variant="mixer"
+                      value={spotifyAnswerName}
                       onValueChange={(v) => {
                         // Guest host: låst — se Year-switchen ovan.
                         if (isGuestHost) { guestLockAlert(); return; }
                         if (!v && !spotifyAnswerYear) {
-                          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+                          quizVibeAlert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
                           return;
                         }
                         setSpotifyAnswerName(v);
                       }}
-                      trackColor={{ false: Colors.error, true: Colors.success }}
-                      thumbColor="#FFF"
-                      ios_backgroundColor={spotifyAnswerName ? Colors.success : Colors.error}
-                      style={[styles.sourceMatrixSwitch, isGuestHost && { opacity: 0.45 }]}
+                      disabled={!hostMode}
+                      locked={isGuestHost} accessibilityLabel="Spotify answer type Name"
+                      style={isGuestHost && { opacity: 0.45 }}
                     />
-                  </View>
-                </View>
+                  );
+                  return SPOTIFY_TYPE_INLINE ? (
+                    <View style={styles.spotifyTypeInline}>
+                      <Text style={styles.spotifyTypeHeader}>Type:</Text>
+                      <Text style={styles.spotifyTypeInlineLabel}>Year</Text>
+                      {yearToggle}
+                      <Text style={[styles.spotifyTypeInlineLabel, { marginLeft: Spacing.xs }]}>Name</Text>
+                      {nameToggle}
+                    </View>
+                  ) : (
+                    <View style={{ alignItems: 'flex-start' }}>
+                      <Text style={styles.spotifyTypeHeader}>Type:</Text>
+                      <View style={styles.spotifyTypeRow}>
+                        <Text style={styles.spotifyTypeLabel}>Year</Text>
+                        {yearToggle}
+                      </View>
+                      <View style={styles.spotifyTypeRow}>
+                        <Text style={styles.spotifyTypeLabel}>Name</Text>
+                        {nameToggle}
+                      </View>
+                    </View>
+                  );
+                })()}
               </View>
             )}
             </View>
@@ -8350,7 +8310,7 @@ export default function LobbyScreen() {
 
             {/* Grått streck mellan Spotify-delen och YouTube-delen. Visas bara
                 när Spotify-blocket finns (multiplayer, ej remote/single). */}
-            {gameMode !== 'remote-1v1' && !isSingleLobby && (
+            {gameMode !== 'remote-1v1' && !isSingleLobby && !isGuestHost && (
               <View style={styles.mixerboardDivider} />
             )}
 
@@ -8371,22 +8331,21 @@ export default function LobbyScreen() {
                 <View style={[styles.smHeaderCell, styles.smDataShift]}>
                   <Text style={styles.sourceMatrixAllText}>All</Text>
                 </View>
-                <View style={[styles.smAllToggleCell, { paddingLeft: 29, borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
-                  <Switch
+                <View style={[styles.smAllToggleCell, { borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm }]}>
+                  <QuizVibeToggle
+                    variant="mixer"
                     value={smAllValue}
                     onValueChange={hostMode ? handleToggleAllSources : undefined}
                     disabled={!hostMode || anyPackageActive}
-                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={smAllValue ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, (isGuestHost || (anyPackageActive && !pkgAllCovered)) && { opacity: 0.45 }]}
+                    locked={isGuestHost} accessibilityLabel="All sources"
+                    style={(isGuestHost || (anyPackageActive && !pkgAllCovered)) && { opacity: 0.45 }}
                   />
                 </View>
                 <View style={styles.smLabelSourceCell}>
-                  <YouTubeBrandIcon size={22} />
+                  <YouTubeBrandIcon size={20} />
                   <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
                   <Pressable
-                    onPress={() => Alert.alert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers')}
+                    onPress={() => quizVibeAlert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers')}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
@@ -8396,15 +8355,15 @@ export default function LobbyScreen() {
                 <View style={styles.smAutoCell} />
                 <View style={styles.smLabelSourceCell}>
                   <View style={styles.imagesIconWrap}>
-                    <Svg width={22} height={22} viewBox="24 22 32 32">
-                      <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
-                      <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
+                    <Svg width={20} height={20} viewBox="24 22 32 32">
+                      <Circle cx="40" cy="38" r="13" fill="none" stroke={BrandUi.iconMuted} strokeWidth="2.5" />
+                      <Path d="M49 47 L53 51" stroke={BrandUi.iconMuted} strokeWidth="2.5" strokeLinecap="round" />
                     </Svg>
                     <Text style={styles.imagesQMark}>?</Text>
                   </View>
                   <Text style={styles.sourceMatrixSourceText}>Hints</Text>
                   <Pressable
-                    onPress={() => Alert.alert('Hints', 'Guess the artist, band or actor from a flag + progressive clues.')}
+                    onPress={() => quizVibeAlert('Hints', 'Guess the artist, band or actor from a flag + progressive clues.')}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
@@ -8418,40 +8377,46 @@ export default function LobbyScreen() {
                 <View style={styles.smHeaderCell}>
                   <Text style={styles.sourceMatrixHeaderText}>Music</Text>
                 </View>
-                <View style={[styles.smAllToggleCell, styles.smSwitchNudge]}>
-                  <Switch
+                <View style={styles.smAllToggleCell}>
+                  <QuizVibeToggle
+                    variant="mixer"
                     value={smColValue('Music', artistsAllOn)}
                     onValueChange={hostMode ? handleToggleArtistsColumn : undefined}
                     disabled={!hostMode || anyPackageActive}
-                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={smColValue('Music', artistsAllOn) ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Music')) && { opacity: 0.45 }]}
+                    icon={(color, size) => <MusicNoteIcon size={size} color={color} strokeWidth={2.2} />}
+                    locked={isGuestHost} accessibilityLabel="Music, all sources"
+                    style={(isGuestHost || pkgGrayColumn('Music')) && { opacity: 0.45 }}
                   />
                 </View>
-                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
-                  <Switch value={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'youtube')) && { opacity: 0.45 }]} />
+                <View style={styles.smSwitchCell}>
+                  <QuizVibeToggle variant="mixer" value={smCellValue('Music', 'youtube', youtubeEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsYoutube} disabled={!hostMode || anyPackageActive} icon={(color, size) => <MusicNoteIcon size={size} color={color} strokeWidth={2.2} />} locked={isGuestHost} accessibilityLabel="Music on YouTube" style={[(isGuestHost || pkgGray('Music', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={styles.smAutoCell} />
-                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
-                  <Switch value={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Music', 'hints')) && { opacity: 0.45 }]} />
+                <View style={styles.smSwitchCell}>
+                  <QuizVibeToggle variant="mixer" value={smCellValue('Music', 'hints', imagesEnabledCategories.includes('Music'))} onValueChange={handleToggleArtistsGuessWho} disabled={!hostMode || anyPackageActive} icon={(color, size) => <MusicNoteIcon size={size} color={color} strokeWidth={2.2} />} locked={isGuestHost} accessibilityLabel="Music Hints" style={[(isGuestHost || pkgGray('Music', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
               {/* ── Film (Actors) kolumn-stack ── */}
-              <View style={[styles.smDataStack, styles.sourceMatrixColSep]}>
+              <View
+                style={[styles.smDataStack, styles.sourceMatrixColSep]}
+                onLayout={(e) => {
+                  const w = Math.round(e.nativeEvent.layout.width);
+                  setFilmColWidth((prev) => (prev === w ? prev : w));
+                }}
+              >
                 <View style={styles.smHeaderCell}>
                   <Text style={styles.sourceMatrixHeaderText} numberOfLines={1}>Film/TV</Text>
                 </View>
-                <View style={[styles.smAllToggleCell, styles.smSwitchNudge, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
-                  <Switch value={smColValue('Film', actorsAllOn)} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smColValue('Film', actorsAllOn) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGrayColumn('Film')) && { opacity: 0.45 }]} />
+                <View style={[styles.smAllToggleCell, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm }]}>
+                  <QuizVibeToggle variant="mixer" value={smColValue('Film', actorsAllOn)} onValueChange={hostMode ? handleToggleActorsColumn : undefined} disabled={!hostMode || anyPackageActive} icon={(color, size) => <ClapperboardIcon size={size} color={color} strokeWidth={2.2} />} locked={isGuestHost} accessibilityLabel="Film, all sources" style={(isGuestHost || pkgGrayColumn('Film')) && { opacity: 0.45 }} />
                 </View>
-                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
-                  <Switch value={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsYoutube} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'youtube')) && { opacity: 0.45 }]} />
+                <View style={styles.smSwitchCell}>
+                  <QuizVibeToggle variant="mixer" value={smCellValue('Film', 'youtube', youtubeEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsYoutube} disabled={!hostMode || anyPackageActive} icon={(color, size) => <ClapperboardIcon size={size} color={color} strokeWidth={2.2} />} locked={isGuestHost} accessibilityLabel="Film on YouTube" style={[(isGuestHost || pkgGray('Film', 'youtube')) && { opacity: 0.45 }]} />
                 </View>
                 <View style={styles.smAutoCell} />
-                <View style={[styles.smSwitchCell, styles.smSwitchNudge]}>
-                  <Switch value={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode || anyPackageActive} trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }} thumbColor="#FFF" ios_backgroundColor={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film')) ? Colors.success : MATRIX_SWITCH_OFF} style={[styles.sourceMatrixSwitch, (isGuestHost || pkgGray('Film', 'hints')) && { opacity: 0.45 }]} />
+                <View style={styles.smSwitchCell}>
+                  <QuizVibeToggle variant="mixer" value={smCellValue('Film', 'hints', imagesEnabledCategories.includes('Film'))} onValueChange={handleToggleActorsGuessWho} disabled={!hostMode || anyPackageActive} icon={(color, size) => <ClapperboardIcon size={size} color={color} strokeWidth={2.2} />} locked={isGuestHost} accessibilityLabel="Film Hints" style={[(isGuestHost || pkgGray('Film', 'hints')) && { opacity: 0.45 }]} />
                 </View>
               </View>
 
@@ -8468,34 +8433,32 @@ export default function LobbyScreen() {
                   <YouTubeBrandIcon size={22} />
                   <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
                   <View style={{ flex: 1 }} />
-                  <Switch
+                  <QuizVibeToggle
+                    variant="mixer"
                     value={pkgYtActive}
                     onValueChange={hostMode ? handleTogglePackageYoutube : undefined}
                     disabled={!hostMode || !pkgHasYoutube}
-                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={pkgYtActive ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, (!hostMode || !pkgHasYoutube) && { opacity: 0.45 }]}
+                    accessibilityLabel="Package YouTube"
+                    style={(!hostMode || !pkgHasYoutube) && { opacity: 0.45 }}
                   />
                 </View>
                 <View style={styles.pkgSourceRow}>
                   <View style={styles.imagesIconWrap}>
-                    <Svg width={22} height={22} viewBox="24 22 32 32">
-                      <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
-                      <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
+                    <Svg width={20} height={20} viewBox="24 22 32 32">
+                      <Circle cx="40" cy="38" r="13" fill="none" stroke={BrandUi.iconMuted} strokeWidth="2.5" />
+                      <Path d="M49 47 L53 51" stroke={BrandUi.iconMuted} strokeWidth="2.5" strokeLinecap="round" />
                     </Svg>
                     <Text style={styles.imagesQMark}>?</Text>
                   </View>
                   <Text style={styles.sourceMatrixSourceText}>Hints</Text>
                   <View style={{ flex: 1 }} />
-                  <Switch
+                  <QuizVibeToggle
+                    variant="mixer"
                     value={pkgHintsActive}
                     onValueChange={hostMode ? handleTogglePackageHints : undefined}
                     disabled={!hostMode || !pkgHasHints}
-                    trackColor={{ false: MATRIX_SWITCH_OFF, true: Colors.success }}
-                    thumbColor="#FFF"
-                    ios_backgroundColor={pkgHintsActive ? Colors.success : MATRIX_SWITCH_OFF}
-                    style={[styles.sourceMatrixSwitch, (!hostMode || !pkgHasHints) && { opacity: 0.45 }]}
+                    accessibilityLabel="Package Hints"
+                    style={(!hostMode || !pkgHasHints) && { opacity: 0.45 }}
                   />
                 </View>
                 <Text style={styles.guestHostNote}>
@@ -8520,27 +8483,36 @@ export default function LobbyScreen() {
                 Sitter längst ner i Source Mixerboard, precis ovanför Customized
                 Host packages. När på filtrerar quiz.tsx bort YT-klipp taggade
                 parentControlled ur frågeurvalet. */}
-            <View style={styles.parentControlRow}>
+            {/* Guest host: HELA raden är tappbar och visar samma låst-popup som
+                switchen (info-ikonen och switchen behåller sina egna tapp —
+                innersta tryckbara element vinner). Ingen tryck-feedback, så
+                raden ser exakt likadan ut. Övriga roller: inget onPress. */}
+            <Pressable
+              style={styles.parentControlRow}
+              onPress={hostMode && isGuestHost ? guestParentControlAlert : undefined}
+              accessible={false}
+            >
               <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Parent Control</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => Alert.alert('Parent Control', 'When on, mature content is kept out of the game — parent-controlled clips and mature packages are excluded from the question selection.')}
+                  onPress={() => quizVibeAlert('Parent Control', 'When on, mature content is kept out of the game — parent-controlled clips and mature packages are excluded from the question selection.')}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
                 </Pressable>
               </View>
-              <Switch
+              <QuizVibeToggle
+                variant="mixer"
                 value={parentControlEnabled}
-                onValueChange={hostMode && !isGuestHost ? handleToggleParentControlLobby : undefined}
-                disabled={!hostMode || isGuestHost}
-                trackColor={{ false: '#3C3C3C', true: Colors.success }}
-                thumbColor="#FFF"
-                ios_backgroundColor={parentControlEnabled ? Colors.success : '#3C3C3C'}
-                style={[styles.connectionSwitch, { marginLeft: 0 }, (!hostMode || isGuestHost) && { opacity: 0.6 }]}
+                // Guest host: tappbar men låst — samma locked-popup som de
+                // låsta mixer-switcharna, så kontrollen aldrig känns trasig.
+                onValueChange={hostMode ? (isGuestHost ? guestParentControlAlert : handleToggleParentControlLobby) : undefined}
+                disabled={!hostMode}
+                locked={isGuestHost} accessibilityLabel="Parent Control"
+                style={(!hostMode || isGuestHost) && { opacity: 0.45 }}
               />
-            </View>
+            </Pressable>
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
                 Basic-utbudet är alltid implicit aktivt (ingen synlig chip);
@@ -8561,7 +8533,7 @@ export default function LobbyScreen() {
                     pressed && { opacity: 0.7 },
                   ]}
                   onPress={() =>
-                    Alert.alert(
+                    quizVibeAlert(
                       'Customized Host packages',
                       'Generic - Generic portfolio includes the full music quiz (YouTube + Hints).\n\nExtra Host Packages - specific themes for a customized game experience',
                     )
@@ -8591,7 +8563,7 @@ export default function LobbyScreen() {
                 const handleGenericPress = () => {
                   if (isGenericActive) return;
                   // Minst ett paket valt → fråga innan vi rensar selection.
-                  Alert.alert(
+                  quizVibeAlert(
                     'Switch to Generic?',
                     'This will deactivate all selected packages and use only the generic content for this lobby.',
                     [
@@ -8615,7 +8587,7 @@ export default function LobbyScreen() {
                 //     Generic-knappens active-no-op).
                 const handleActivatePress = () => {
                   if (isGuestHost) {
-                    Alert.alert(
+                    quizVibeAlert(
                       'Premium feature',
                       'Extra packages are only available for QuizVibe users with Premium. Do you want to register as a QuizVibe user? Please be aware this Game Lobby will be deleted.',
                       [
@@ -8633,7 +8605,7 @@ export default function LobbyScreen() {
                     return;
                   }
                   if (!hasPremium) {
-                    Alert.alert(
+                    quizVibeAlert(
                       'Premium feature',
                       'Extra Host packages for a customized quiz experience are included with QuizVibe Premium. Get it in the Store?',
                       [
@@ -8757,7 +8729,7 @@ export default function LobbyScreen() {
                     valt att aktivera i den här lobbyn. */}
                 <View style={styles.extraPackagesHeadingRow}>
                   <Text style={styles.extraPackagesHeading}>
-                    {hostMode ? 'Your Customized packages:' : 'Packages for this lobby selected by the Host:'}
+                    {hostMode ? 'Customized packages' : 'Packages for this lobby selected by the Host:'}
                   </Text>
                   {/* Select all-toggle göms när bara 1 paket finns — då
                       blir den redundant (single packagets egen toggle gör
@@ -8766,16 +8738,12 @@ export default function LobbyScreen() {
                   {hostMode && availablePackages.length > 1 && (
                     <View style={styles.selectAllGroup}>
                       <Text style={styles.selectAllLabel}>Select all</Text>
-                      <Switch
+                      <QuizVibeToggle
+                        variant="mixer"
                         value={isAllSelected}
                         onValueChange={handleToggleAll}
                         disabled={availablePackages.length === 0}
-                        trackColor={{ false: Colors.error, true: Colors.success }}
-                        thumbColor="#FFF"
-                        // Synca ios_backgroundColor med aktiv track-färg —
-                        // se YouTube-switchen ovan för rationale.
-                        ios_backgroundColor={isAllSelected ? Colors.success : Colors.error}
-                        style={styles.connectionSwitch}
+                        accessibilityLabel="Select all packages"
                       />
                     </View>
                   )}
@@ -8809,33 +8777,28 @@ export default function LobbyScreen() {
                     const showActive = hostMode ? isSelected : true;
                     const isFree = !!pkg.free;
                     return (
-                      <View key={pkg.id} style={styles.purchasedPackageRow}>
-                        <TouchableOpacity
-                          style={styles.infoIconBtn}
-                          onPress={() =>
-                            Alert.alert(
-                              pkg.name,
-                              'Information about this package will be available later.',
-                            )
-                          }
-                          hitSlop={8}
-                          accessibilityLabel={`${pkg.name} info`}
-                        >
-                          <Text style={styles.infoIconText}>i</Text>
-                        </TouchableOpacity>
-                        <View
-                          style={[
-                            styles.purchasedPackageBox,
-                            showActive && styles.purchasedPackageBoxActive,
-                          ]}
-                        >
+                      // Profile v2-paketrad (2026-10-21, = Profile): [tumnagel]
+                      // [namn] [i bara när det finns innehåll] [toggle]. Toggeln
+                      // bär ON-signalen; raden får bara en svag guldkant.
+                      <View key={pkg.id} style={[styles.packageListRow, showActive && styles.packageListRowOn]}>
+                        {hasPackageThumbnail(pkg.id) ? (
+                          <PackageThumbnail
+                            packageId={pkg.id}
+                            state={
+                              showActive
+                                ? 'on'
+                                : parentControlEnabled && pkg.parentRestricted
+                                  ? 'unavailable'
+                                  : 'off'
+                            }
+                          />
+                        ) : (
+                          <MusicNoteIcon size={18} color={showActive ? Colors.warning : BrandUi.iconMuted} />
+                        )}
+                        <View style={styles.packageNameWrap}>
                           <Text
-                            style={[
-                              styles.purchasedPackageName,
-                              showActive && styles.purchasedPackageNameActive,
-                            ]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
+                            style={[styles.packageRowText, !showActive && styles.packageRowTextInactive]}
+                            numberOfLines={2}
                           >
                             {pkg.name}
                           </Text>
@@ -8852,16 +8815,28 @@ export default function LobbyScreen() {
                             </View>
                           )}
                         </View>
+                        {/* Info-ikon bara på parent-restricted paket (= Profile). */}
+                        {pkg.parentRestricted && (
+                          <Pressable
+                            style={({ pressed }) => [styles.infoIconBtn, styles.infoIconBtnSubtle, pressed && { opacity: 0.7 }]}
+                            onPress={() =>
+                              quizVibeAlert(
+                                'Parent controlled',
+                                'This package is controlled by Parent Control.\nTurn off Parent Control to activate this package.',
+                              )
+                            }
+                            hitSlop={12}
+                            accessibilityLabel={`${pkg.name} info`}
+                          >
+                            <Text style={[styles.infoIconText, styles.infoIconTextSubtle]}>i</Text>
+                          </Pressable>
+                        )}
                         {hostMode && (
-                          <Switch
+                          <QuizVibeToggle
+                            variant="mixer"
                             value={isSelected}
                             onValueChange={() => handleToggleExtraPackage(pkg.id)}
-                            trackColor={{ false: Colors.error, true: Colors.success }}
-                            thumbColor="#FFF"
-                            // Synca ios_backgroundColor med aktiv track-färg
-                            // — se YouTube-switchen ovan för rationale.
-                            ios_backgroundColor={isSelected ? Colors.success : Colors.error}
-                            style={styles.connectionSwitch}
+                            accessibilityLabel="Package"
                           />
                         )}
                       </View>
@@ -8897,46 +8872,47 @@ export default function LobbyScreen() {
             "– defined by Host" visas på sektion-rubriken för icke-host,
             inte per-block, så ramen visuellt klumpar host-kontrollerade
             quiz-inställningar tillsammans. */}
-        <View style={styles.section}>
+        <View style={[styles.section, styles.sectionAfterExpanded]}>
           {/* Kollapsbar sektionsrubrik (samma +/− mönster som Profile). */}
           <TouchableOpacity
             onPress={() => setQuizTuningExpanded(!quizTuningExpanded)}
             activeOpacity={0.7}
-            style={styles.sectionHeaderRow}
+            style={[styles.sectionHeaderRow, styles.subSectionHeaderRow]}
             hitSlop={8}
           >
             {/* Sliders/equalizer-ikon (tre horisontella reglage med rattar)
                 — inline-SVG, matchar referensbilden. Cirklarna fylls med
                 bakgrundsfärgen så linjen "stannar" vid ratten (hollow knob). */}
             <View style={styles.sectionHeaderSvg}>
-              <Svg width={24} height={24} viewBox="0 0 24 24">
-                <Path d="M3 6 H21" stroke={Colors.primary} strokeWidth={2} strokeLinecap="round" />
-                <Path d="M3 12 H21" stroke={Colors.primary} strokeWidth={2} strokeLinecap="round" />
-                <Path d="M3 18 H21" stroke={Colors.primary} strokeWidth={2} strokeLinecap="round" />
-                <Circle cx={9} cy={6} r={3} fill={Colors.background} stroke={Colors.primary} strokeWidth={2} />
-                <Circle cx={15} cy={12} r={3} fill={Colors.background} stroke={Colors.primary} strokeWidth={2} />
-                <Circle cx={9} cy={18} r={3} fill={Colors.background} stroke={Colors.primary} strokeWidth={2} />
+              <Svg width={20} height={20} viewBox="0 0 24 24">
+                <Path d="M3 6 H21" stroke={BrandUi.iconMuted} strokeWidth={1.8} strokeLinecap="round" />
+                <Path d="M3 12 H21" stroke={BrandUi.iconMuted} strokeWidth={1.8} strokeLinecap="round" />
+                <Path d="M3 18 H21" stroke={BrandUi.iconMuted} strokeWidth={1.8} strokeLinecap="round" />
+                <Circle cx={9} cy={6} r={3} fill={Colors.background} stroke={BrandUi.iconMuted} strokeWidth={1.8} />
+                <Circle cx={15} cy={12} r={3} fill={Colors.background} stroke={BrandUi.iconMuted} strokeWidth={1.8} />
+                <Circle cx={9} cy={18} r={3} fill={Colors.background} stroke={BrandUi.iconMuted} strokeWidth={1.8} />
               </Svg>
             </View>
-            <Text style={styles.sectionHeaderTitle}>Quiz Tuning</Text>
-            <View style={styles.sectionToggleBox}>
-              <Text style={styles.sectionChevron}>{quizTuningExpanded ? '−' : '+'}</Text>
-            </View>
+            <Text style={styles.subSectionHeaderTitle}>Quiz Tuning</Text>
+            <SectionToggle expanded={quizTuningExpanded} tone="neutral" />
           </TouchableOpacity>
           {!quizTuningExpanded && <View style={styles.sectionDivider} />}
 
           {quizTuningExpanded && (
-          <View style={styles.quizSettingsBorder}>
+          <View style={[styles.quizSettingsBorder, { marginTop: -Spacing.xs, paddingTop: Spacing.sm }]}>
+            {/* Inloggad single player: ingen DEFINED BY HOST — användaren ställer in sitt eget spel. */}
+            {!hostMode && (
             <View style={styles.definedByHostBadge} pointerEvents="none">
               <Text style={styles.definedByHostBadgeText}>DEFINED BY HOST</Text>
             </View>
-            {/* Game Era */}
-            <View>
+            )}
+            {/* Game Era — marginTop xs = samma luft panel→rubrik som Game Mode i Game Settings. */}
+            <View style={{ marginTop: Spacing.xs }}>
               <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Game Era (min 15 year interval)</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => Alert.alert('Game Era', 'Set the time span for questions')}
+                  onPress={() => quizVibeAlert('Game Era', 'Set the time span for questions')}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -9030,9 +9006,9 @@ export default function LobbyScreen() {
                       borderRadius: 3,
                       shadowColor: Colors.warning,
                       shadowOffset: { width: 0, height: 0 },
-                      shadowOpacity: 0.85,
-                      shadowRadius: 8,
-                      elevation: 4,
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3,
+                      elevation: 1,
                     }}
                     unselectedStyle={{ backgroundColor: Colors.border }}
                     trackStyle={{ height: 6 }}
@@ -9091,7 +9067,7 @@ export default function LobbyScreen() {
                 <Text style={styles.sectionLabel}>Number of Rounds</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => Alert.alert('Number of Rounds', 'How many rounds in this game')}
+                  onPress={() => quizVibeAlert('Number of Rounds', 'How many rounds in this game')}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -9140,7 +9116,9 @@ export default function LobbyScreen() {
                 </>
               ) : hostMode ? (
                 <>
-                  <View style={styles.roundsStepperRow}>
+                  {/* marginVertical 4 = Profile:s field-gap (4) → rubrik→kontroller
+                      och kontroller→skala blir 12 pt i båda vyerna. */}
+                  <View style={[styles.roundsStepperRow, { marginVertical: 4 }]}>
                     <TouchableOpacity
                       style={[styles.roundsStepperBtn, roundsCount <= ROUNDS_MIN && styles.roundsStepperBtnDisabled]}
                       onPress={handleDecrementRounds}
@@ -9152,10 +9130,13 @@ export default function LobbyScreen() {
                     <View style={styles.roundsGuestBox}>
                       <Text style={styles.roundsGuestBoxText}>{roundsCount}</Text>
                     </View>
+                    {/* + och PREMIUM i en egen tät grupp (= Profile) så det syns
+                        direkt att det är ökningen som är Premium-låst. */}
+                    <View style={styles.roundsPlusGroup}>
                     <TouchableOpacity
                       style={[styles.roundsStepperBtn, roundsCount >= stepperMax && styles.roundsStepperBtnDisabled]}
                       onPress={roundsCount >= stepperMax && !hasPremium && gameMode !== 'remote-1v1'
-                        ? () => Alert.alert(
+                        ? () => quizVibeAlert(
                             'Premium feature',
                             'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
                             [
@@ -9178,11 +9159,17 @@ export default function LobbyScreen() {
                       <TouchableOpacity
                         onPress={handleRoundsPremiumPress}
                         activeOpacity={0.7}
-                        style={{ backgroundColor: hasPremium ? '#F5A623' : '#6B7280', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 4 }}
+                        hitSlop={8}
+                        style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
                       >
-                        <Text style={{ fontSize: 10, fontWeight: '700', color: hasPremium ? '#000' : '#FFF', letterSpacing: 0.6 }}>PREMIUM</Text>
+                        {/* = Profile: låst Premium-intervall → lås + guld-PREMIUM-pill. */}
+                        {!hasPremium && <LockOutlineIcon size={13} />}
+                        <View style={{ backgroundColor: Colors.warning, borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2 }}>
+                          <Text style={{ fontSize: 10, fontWeight: '700', color: '#000', letterSpacing: 0.6 }}>PREMIUM</Text>
+                        </View>
                       </TouchableOpacity>
                     )}
+                    </View>
                   </View>
                   <View style={{ alignItems: 'center' }}>
                     <RoundsRuler
@@ -9195,6 +9182,10 @@ export default function LobbyScreen() {
                       onPremiumPress={gameMode === 'remote-1v1' ? undefined : handleRoundsPremiumPress}
                       hasSubscription={hasPremium}
                       indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
+                      // Profile-stil (2026-10-21): ingen grön FREE-/stor Premium-
+                      // klammer, i stället "More than 4 rounds requires: Individual
+                      // device + PREMIUM". Samma regler, bara presentationen.
+                      brandV2
                     />
                   </View>
                   {/* Game mode quick-select — under RoundsRuler för snabb mode-byte.
@@ -9207,9 +9198,10 @@ export default function LobbyScreen() {
                       längre upp, och VARJE lägesbyte ejectar spelare. */}
                   {gameMode !== 'remote-1v1' && !isRematchLobby && (
                     <>
+                      {/* Förklaringstext → lägesrutor = 16 pt, samma som Profile. */}
                       <View style={[styles.modeRow, { marginTop: Spacing.lg }]}>
                         {renderModeBox('ptp', 'Pass-the-Phone', true)}
-                        {renderModeBox('indiv', 'Individual device', true, true)}
+                        {renderModeBox('indiv', 'Individual device', true)}
                       </View>
                     </>
                   )}
@@ -9247,7 +9239,7 @@ export default function LobbyScreen() {
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() =>
-                    Alert.alert(
+                    quizVibeAlert(
                       'Game Sequence',
                       'Preview of which source (Spotify / YouTube / Hints) each round will use based on current settings.'
                     )
@@ -9293,8 +9285,8 @@ export default function LobbyScreen() {
                       ) : slot.source === 'image' ? (
                         <View style={styles.gsSourceQWrap}>
                           <Svg width={13} height={13} viewBox="24 22 32 32">
-                            <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.primary} strokeWidth="2.5" />
-                            <Path d="M49 47 L53 51" stroke={Colors.primary} strokeWidth="2.5" strokeLinecap="round" />
+                            <Circle cx="40" cy="38" r="13" fill="none" stroke={BrandUi.iconMuted} strokeWidth="2.5" />
+                            <Path d="M49 47 L53 51" stroke={BrandUi.iconMuted} strokeWidth="2.5" strokeLinecap="round" />
                           </Svg>
                           <Text style={styles.gsSourceQMark}>?</Text>
                         </View>
@@ -9320,7 +9312,7 @@ export default function LobbyScreen() {
                 <Text style={styles.sectionLabel}>Answer response time</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => Alert.alert('Answer response time', 'Seconds players have to answer each question')}
+                  onPress={() => quizVibeAlert('Answer response time', 'Seconds players have to answer each question')}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -9363,15 +9355,19 @@ export default function LobbyScreen() {
 
         </>)}{/* /customizeExpanded */}
 
+        {/* Lobby v2: diskret "Back to top" — bara när Customize är utfälld
+            (då blir sidan lång nog att motivera den); ingen blink. */}
+        {customizeExpanded && (
         <TouchableOpacity
           onPress={() => mainScrollRef.current?.scrollTo({ y: 0, animated: true })}
           activeOpacity={0.7}
-          style={styles.toTopBtn}
+          style={[styles.toTopBtn, styles.sectionAfterExpanded]}
         >
           <View style={styles.toTopBox}>
-            <BlinkingLabel style={styles.toTopLabel} duration={1800}>Back to the top ↑</BlinkingLabel>
+            <Text style={styles.toTopLabel}>↑ Back to top</Text>
           </View>
         </TouchableOpacity>
+        )}
 
         <View style={styles.bottomPad} />
       </ScrollView>
@@ -9395,8 +9391,8 @@ export default function LobbyScreen() {
                Fönstret är normalt sub-sekund. */
             <GoldCtaButton
               locked
-              label="Preparing lobby"
-              trailing={<SequentialDots color={Colors.textSecondary} />}
+              label="Preparing lobby…"
+              leading={<ActivityIndicator size="small" color={BrandUi.textMuted} />}
             />
           ) : hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
            approvedPlayers.filter((p) => !p.isHost).length === 0 ? (
@@ -9585,6 +9581,7 @@ export default function LobbyScreen() {
             </ScrollView>
 
             <TouchableOpacity onPress={handleSavePlayerEdit} style={playerEditSheet.saveBtn}>
+              <MetallicGoldFill />
               <Text style={playerEditSheet.saveBtnText}>Save</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={closePlayerEdit} style={playerEditSheet.cancelBtn}>
@@ -9633,6 +9630,7 @@ export default function LobbyScreen() {
             </View>
           )}
         </KeyboardAvoidingView>
+        <QuizVibeAlertHost active={playerEditTargetId !== null} />
       </Modal>
       <RegionModal
         visible={regionModalOpen}
@@ -9933,6 +9931,7 @@ export default function LobbyScreen() {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+        <QuizVibeAlertHost active={shareModalOpen} />
       </Modal>
 
       {/* ── Guest leave-room sheet ───────────────────────────────────
@@ -10007,6 +10006,7 @@ export default function LobbyScreen() {
             </Pressable>
           </View>
         </View>
+        <QuizVibeAlertHost active={guestLeaveSheetVisible} />
       </Modal>
 
       {/* ── Host delete-lobby sheet ───────────────────────────────────
@@ -10076,6 +10076,18 @@ export default function LobbyScreen() {
             </Pressable>
           </View>
         </View>
+        {deleteConfirmVisible && (
+          <QuizVibeDialogOverlay
+            title="Delete this Game Lobby?"
+            message="All players currently in this lobby will be notified and disconnected. The room code will become inactive."
+            secondaryLabel="Cancel"
+            onClose={handleCancelDeleteLobby}
+            primaryLabel="Delete"
+            onPrimary={handleConfirmDeleteLobby}
+            destructive
+          />
+        )}
+        <QuizVibeAlertHost active={hostDeleteSheetVisible} />
       </Modal>
 
       {/* ── "+ Add package"-modal ─────────────────────────────────────
@@ -10139,13 +10151,12 @@ export default function LobbyScreen() {
                             {pkg.name}
                           </Text>
                         </View>
-                        <Switch
+                        <QuizVibeToggle
+                          variant="mixer"
                           value={isOn}
                           onValueChange={() => handleToggleCatalogPackage(pkg.id)}
-                          trackColor={{ false: Colors.error, true: Colors.success }}
-                          thumbColor="#FFF"
-                          ios_backgroundColor={isOn ? Colors.success : Colors.error}
-                          style={styles.connectionSwitch}
+                          accessibilityLabel="Package"
+                          style={{ marginLeft: 'auto' }}
                         />
                       </View>
                     );
@@ -10160,6 +10171,7 @@ export default function LobbyScreen() {
             </Pressable>
           </View>
         </View>
+        <QuizVibeAlertHost active={addPackageModalVisible} />
       </Modal>
 
       {/* ── "No approved players"-dialog (Start Game-guard) ───────────
@@ -10241,6 +10253,7 @@ export default function LobbyScreen() {
             </Pressable>
           </View>
         </View>
+        <QuizVibeAlertHost active={noApprovedModalVisible} />
       </Modal>
 
       {/* ── Join-approval-popup (host) ────────────────────────────────
@@ -10305,11 +10318,13 @@ export default function LobbyScreen() {
               <Pressable
                 style={({ pressed }) => [
                   styles.noApprovedBtn,
+                  styles.noApprovedBtnPrimary,
                   pressed && { opacity: 0.85 },
                 ]}
                 onPress={handleJoinPopupApprove}
               >
-                <Text style={styles.noApprovedBtnText}>Approve</Text>
+                <MetallicGoldFill />
+                <Text style={[styles.noApprovedBtnText, styles.noApprovedBtnTextPrimary]}>Approve</Text>
               </Pressable>
 
               <Pressable
@@ -10333,6 +10348,7 @@ export default function LobbyScreen() {
             </View>
           )}
         </View>
+        <QuizVibeAlertHost active={hostMode && !!joinPopupPlayer} />
       </Modal>
 
       {/* ── "Remote Play started — 1vs1"-popup ────────────────────────
@@ -10387,6 +10403,7 @@ export default function LobbyScreen() {
             </View>
           )}
         </View>
+        <QuizVibeAlertHost active={!!remoteStartPrompt} />
       </Modal>
 
       {/* Deleting-lobby-covern renderas numera GLOBALT i app/_layout.tsx
@@ -10445,8 +10462,13 @@ export default function LobbyScreen() {
             </Pressable>
           </View>
         </View>
+        <QuizVibeAlertHost active={spotifyGuideVisible} />
       </Modal>
 
+      {/* Skärm-host för quizVibeAlert: en vanlig vy i lobbyns eget träd
+          (rot-hosten i _layout hamnar bakom native-stackens skärmar). Sist i
+          trädet så dialogen ligger överst; öppna sheets har egna hostar. */}
+      <QuizVibeAlertHost />
     </SafeAreaView>
   );
 }
@@ -10490,6 +10512,22 @@ const lobbyScrollHintStyles = StyleSheet.create({
   },
 });
 
+// Spotify Type: på en rad från 375 pt bredd, annars staplat (= ProfileScreen).
+const SPOTIFY_TYPE_INLINE = Dimensions.get('window').width >= 375;
+// Brand-vattenstämpel i lobbyn — samma relativa storlek som Final Leaderboard.
+const LOBBY_WATERMARK_SIZE = Math.round(Dimensions.get('window').width * 0.8);
+
+// ── Lobby v2 (2026-10-21) — navy/gunmetal + QuizVibe-guld ──────────────
+// Paneler (Game Settings / Quiz Tuning) är OPAKA så kant-skärande badges
+// (DEFINED BY HOST, hänglåset) kan dela panelens fyllning.
+const LOBBY_PANEL_BG = '#131A27';
+// Val-rutor: ovald = mörk, låg kontrast, svag kant; vald = guldkant + svag guldton.
+const CHOICE_BG = '#111826';
+const CHOICE_BORDER = 'rgba(255,255,255,0.10)';
+// Profile är facit (Lobby v2, 2026-10-21): vald = guldkant + svag guldton.
+const CHOICE_SELECTED_BORDER = Colors.warning;
+const CHOICE_SELECTED_BG = Colors.warningMuted;
+
 const styles = StyleSheet.create({
   // ── Guest leave-room sheet (speglar ProfileScreen.logout-sheet —
   //     samma shell/typografi/färgpalett. Status-texten är textSecondary
@@ -10507,7 +10545,7 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xxl,
     gap: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
   },
   guestLeaveHeader: {
     flexDirection: 'row',
@@ -10515,10 +10553,10 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.sm,
-    backgroundColor: Colors.background,
+    backgroundColor: CHOICE_BG,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
   },
   guestLeaveHeaderEmoji: {
     fontSize: 28,
@@ -10584,11 +10622,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: Spacing.xl,
   },
+  // Lobby v2: samma kort som QuizVibeDialog (Radius.lg + neutral kant).
   noApprovedCard: {
     backgroundColor: Colors.card,
-    borderRadius: Radius.md,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     padding: Spacing.xl,
     gap: Spacing.md,
   },
@@ -10605,14 +10644,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
+  // Sekundär dialog-knapp (samma som Button variant="secondary").
   noApprovedBtn: {
-    height: 52,
+    height: 48,
     borderRadius: Radius.md,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Primär dialog-knapp — metallisk guld (MetallicGoldFill ritas i JSX).
+  noApprovedBtnPrimary: {
+    backgroundColor: Colors.warning,
+    borderColor: METALLIC_GOLD_EDGE,
+    overflow: 'hidden',
+  },
+  noApprovedBtnTextPrimary: {
+    color: '#000',
+    fontWeight: '700',
   },
   noApprovedBtnDisabled: {
     backgroundColor: 'transparent',
@@ -10662,9 +10712,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -10683,12 +10733,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.textPrimary,
   },
+  // Samma röda kontur som QuizVibeDialog:s destruktiva knapp.
   joinApprovalDenyBtn: {
-    height: 52,
+    height: 48,
     borderRadius: Radius.md,
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: Colors.error,
+    backgroundColor: 'rgba(255,107,107,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,107,107,0.6)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -10700,6 +10751,8 @@ const styles = StyleSheet.create({
 
   safe: { flex: 1, backgroundColor: Colors.background },
   scroll: { flex: 1 },
+  // Vattenstämpelns yta: nedre delen av skärmen (under rumskortet).
+  lobbyWatermark: { top: '45%' },
   content: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl, paddingBottom: Spacing.xxl, gap: Spacing.xl, flexGrow: 1 },
 
   // Lobby-header — title vänster, Host Game Credits-pill höger.
@@ -10727,10 +10780,10 @@ const styles = StyleSheet.create({
   // Speglar Profile:s creditsPill 1:1 (samma styling, samma layout) så
   // pillen ser identisk ut i båda vyerna och användaren känner igen den.
   creditsPill: {
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: Colors.card,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
+    borderColor: BrandUi.border,
     paddingHorizontal: NARROW_SCREEN ? Spacing.sm : Spacing.md,
     paddingVertical: Spacing.xs + 2,
     alignItems: 'center',
@@ -10753,8 +10806,8 @@ const styles = StyleSheet.create({
   // Border-färgen byts till gold (samma `#F5A623` som premium-badges
   // använder); border-bredden bumpas till 2 så ramen syns tydligare.
   creditsPillMembership: {
-    borderWidth: 2,
-    borderColor: '#F5A623',
+    borderWidth: 1,
+    borderColor: Colors.warning,
   },
   // Wrap för MEMBERSHIP-badgen — absolut-positionerad ovanför pillens
   // topp-border (top: -8). Höger-anchorad (right: 12) istället för
@@ -10810,11 +10863,11 @@ const styles = StyleSheet.create({
   creditsValue: {
     fontSize: 16,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   creditsValueFree: {
-    color: Colors.success,
+    color: Colors.textPrimary,
   },
   // Premium-hostens "Unlimited" — samma guld som PREMIUM-badgen + pillens
   // ram, så hela pillen läses som ett guld-tema när prenumerationen är aktiv.
@@ -10824,7 +10877,7 @@ const styles = StyleSheet.create({
   creditsValueExtras: {
     color: '#F5A623',
   },
-  creditsArrow: { fontSize: 16, color: Colors.primary, marginLeft: 2 },
+  creditsArrow: { fontSize: 16, color: BrandUi.iconMuted, marginLeft: 2 },
   // Extras-ruta inom pillen — speglar Profile:s creditsExtrasBox 1:1.
   creditsExtrasBox: {
     flexDirection: 'row',
@@ -10883,15 +10936,18 @@ const styles = StyleSheet.create({
   },
 
   // "You are the host" — centrerad rubrik med cross-fade animation.
-  hostBadge: { alignSelf: 'stretch', marginTop: -Spacing.sm, marginBottom: Spacing.sm, height: 26 },
+  // Liten status-rad under koden (Lobby v2-korrigering).
+  hostBadge: { alignSelf: 'stretch', marginTop: Spacing.xs, height: 18 },
+  roomStatusText: { marginTop: Spacing.xs, fontSize: FontSize.xs, fontWeight: FontWeight.medium, color: BrandUi.textMuted },
   hostBadgeInner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   hostBadgeOverlay: { position: 'absolute', top: 0, left: 0, right: 0 },
-  hostBadgeText: { fontSize: FontSize.lg, fontWeight: FontWeight.bold, color: Colors.primary },
-  hostBadgeTextGold: { fontSize: FontSize.lg, fontWeight: FontWeight.bold, color: Colors.warning },
+  hostBadgeText: { fontSize: FontSize.xs, fontWeight: FontWeight.medium, color: BrandUi.textMuted },
+  hostBadgeTextGold: { fontSize: FontSize.xs, fontWeight: FontWeight.medium, color: Colors.textPrimary },
 
   // paddingBottom override:ar Card:ens uniforma Spacing.xl-padding → minskar
   // avståndet mellan Share invite-rutan och kortets nederkant.
-  roomCard: { alignItems: 'center', paddingBottom: Spacing.lg },
+  // Lobby v2: gunmetal-panel i stället för Card:s blå Colors.card.
+  roomCard: { alignItems: 'center', paddingBottom: Spacing.md, backgroundColor: LOBBY_PANEL_BG, borderColor: BrandUi.border },
   // Logga + Room Code-stack på en rad. Stacken har `flex: 1` och en
   // matchande spacer på höger sida så Room Code-numret hamnar centrerat
   // i kortet samtidigt som loggan ligger vänsterställd. width: '100%' så
@@ -10924,17 +10980,15 @@ const styles = StyleSheet.create({
   // Card:s padding-edge (RN positionerar absolute children från padding-
   // edge, inte content-edge). Negativa offsets drar in loggan i själva
   // padding-zonen så den hamnar närmare Card:s rundade kant.
+  // Liten, dämpad Q-signatur i kortets övre vänstra hörn (Lobby v2).
   roomCodeLogoWrap: {
     position: 'absolute',
-    top: -Spacing.sm,
-    left: -Spacing.sm,
-    // Bredd/höjd sätts inline (ROOM_LOGO_SIZE) — fast slot = den gamla
-    // loggans storlek, så guest-labelns position inte flyttar sig.
-    alignItems: 'center',
-    justifyContent: 'center',
+    top: Spacing.sm,
+    left: Spacing.sm,
+    opacity: 0.45,
   },
   roomCodeStack: { alignItems: 'center' },
-  roomLabel: { ...Typography.overline, color: Colors.textSecondary, marginBottom: Spacing.sm },
+  roomLabel: { ...Typography.overline, color: BrandUi.textMuted, marginBottom: Spacing.xs },
   // Guest-label position och utseende. Pinnas absolut i Card:ens övre del
   // så vertikalpositionen blir helt deterministisk (oberoende av flex/
   // line-height-quirks). top är beräknat så label-mitten landar på
@@ -10977,17 +11031,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   guestInvitedBadge: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.surface,
     borderRadius: Radius.full,
     paddingHorizontal: Spacing.md,
     paddingVertical: 4,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
+    borderColor: BrandUi.border,
   },
   guestInvitedBadgeText: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: BrandUi.textMuted,
   },
   reconnectingRow: {
     flexDirection: 'row',
@@ -11004,31 +11058,42 @@ const styles = StyleSheet.create({
   // Cell-rad för rumskoden — speglar Join-modalens "Enter Room Code"-cells
   // i fyllt läge. Storleken (36×50) håller raden tillräckligt smal för att
   // logga + cell-rad ska få plats sida vid sida i den centrerade stacken.
-  roomCodeCellsRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
-  roomCodeCell: {
-    width: 36,
-    height: 50,
-    borderRadius: Radius.md,
+  roomCodeCellsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  // En grupp av koden (t.ex. "EN") — tecknen tätt ihop, streck mellan grupper.
+  roomCodeGroup: { flexDirection: 'row', gap: 3 },
+  // En ruta per tecken — liten, mörk, svag guldkant (premium, inte biljett).
+  roomCodeCharBox: {
+    width: 28,
+    height: 38,
+    borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: 'rgba(245,166,35,0.35)',
+    backgroundColor: CHOICE_BG,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Lobby v2: koden som ren typografi — ingen ruta per tecken.
+  roomCodeCell: {
+    width: 26,
+    height: 46,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  // Koden som vanlig, välläst text inne i kortet — inte en rubrik.
   roomCodeCellText: {
-    fontSize: FontSize.xxl,
+    fontSize: 22,
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   roomCodeCellDash: {
-    fontSize: FontSize.xxl,
-    fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
+    fontSize: 18,
+    fontWeight: FontWeight.medium,
+    color: 'rgba(255,255,255,0.3)',
     marginHorizontal: 2,
   },
-  shareBtn: { marginTop: Spacing.md, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.full, backgroundColor: Colors.primaryMuted, borderWidth: 1, borderColor: Colors.primaryBorder },
-  shareBtnText: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, color: Colors.textPrimary },
+  shareBtn: { marginTop: Spacing.sm, height: 36, justifyContent: 'center', paddingHorizontal: Spacing.lg, borderRadius: Radius.md, backgroundColor: BrandUi.surface, borderWidth: 1, borderColor: BrandUi.border },
+  shareBtnText: { fontSize: FontSize.xs, fontWeight: FontWeight.semibold, color: 'rgba(255,255,255,0.85)' },
   // Brand-tagline i room code-kortet — speglar startskärmens tagline-format
   // (textSecondary, letterSpacing 0.2) men i större font (20 vs 15).
   // marginTop = kortets bottenpadding (Spacing.xl) så avståndet text→Share invite
@@ -11036,8 +11101,9 @@ const styles = StyleSheet.create({
   // Glowing gold tagline — guld-text (Colors.warning) med matchande
   // text-shadow-glow. Opacity-pulsen ovanpå ger en levande "glödande" känsla.
   roomTagline: {
-    marginTop: 0,
-    marginBottom: 0,
+    // Lite tätare mot Game Lobby-rubriken och rumskortet (Lobby v2).
+    marginTop: -Spacing.sm,
+    marginBottom: -Spacing.sm,
     fontSize: 19,
     fontWeight: FontWeight.semibold,
     color: Colors.textSecondary,
@@ -11046,6 +11112,14 @@ const styles = StyleSheet.create({
   },
 
   section: { gap: Spacing.sm },
+  // Spotify Type-raden — speglar ProfileScreen 1:1.
+  spotifyTypeInline: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  spotifyTypeHeader: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textSecondary },
+  spotifyTypeInlineLabel: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: BrandUi.textMuted },
+  spotifyTypeRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginTop: 2 },
+  spotifyTypeLabel: { width: 42, textAlign: 'left', fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: BrandUi.textMuted },
+  // Lite extra luft (8 pt) mellan slutet av en utfälld sektion och nästa rubrik.
+  sectionAfterExpanded: { marginTop: 8 },
 
   // Wrapper-container runt Game Mode + Game Connections — markerar dem som
   // en sammanhängande "spelregler"-grupp. Använder samma kort-bakgrund
@@ -11054,19 +11128,22 @@ const styles = StyleSheet.create({
   // definedByHostBadge:n förankras till ramen för icke-host.
   gameSettingsBorder: {
     position: 'relative',
-    backgroundColor: Colors.card,
+    backgroundColor: LOBBY_PANEL_BG,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     padding: Spacing.lg,
-    gap: Spacing.lg,
+    // Lobby v2: lite mer luft mellan delsektionerna (var Spacing.lg).
+    gap: Spacing.lg + 6,
   },
   // Guest host: grön låst ram runt hela Game Settings-sektionen (ersätter
   // per-sektion-grön på mixerboarden). Hänglås-badgen sitter i top-right där
   // "DEFINED BY HOST" annars sitter.
   gameSettingsBorderGuest: {
-    borderColor: Colors.success,
-    borderWidth: 2,
+    // Lobby v2 final: dämpad guldton i stället för den gröna 2 pt-ramen —
+    // låst-signalen bärs av hänglåset, panelen ska inte lysa.
+    borderColor: 'rgba(245,166,35,0.22)',
+    borderWidth: 1,
   },
   // Kant-skärande hänglås-badge i Game Settings-sektionens övre högra hörn —
   // IDENTISK stil med single-player-rutans lockBadge (opak cardElevated-
@@ -11075,8 +11152,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -10,
     right: Spacing.md,
-    backgroundColor: Colors.cardElevated,
-    borderColor: Colors.primary,
+    backgroundColor: LOBBY_PANEL_BG,
+    borderColor: BrandUi.border,
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 5,
@@ -11095,12 +11172,13 @@ const styles = StyleSheet.create({
   // top-border när non-host.
   quizSettingsBorder: {
     position: 'relative',
-    backgroundColor: Colors.card,
+    backgroundColor: LOBBY_PANEL_BG,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     padding: Spacing.lg,
-    gap: Spacing.lg,
+    // = Profile Quiz Settings (preview gap xl).
+    gap: Spacing.xl,
   },
 
   // "DEFINED BY HOST"-badge som skär gameSettingsBorder/quizSettingsBorder:s
@@ -11111,17 +11189,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: Spacing.md,
-    backgroundColor: Colors.primary,
+    backgroundColor: LOBBY_PANEL_BG,
     borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(245,166,35,0.45)',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
     zIndex: 10,
     elevation: 4,
   },
   definedByHostBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontSize: 8,
+    fontWeight: '600',
+    color: 'rgba(245,166,35,0.9)',
     letterSpacing: 0.6,
   },
 
@@ -11200,27 +11280,27 @@ const styles = StyleSheet.create({
   // Inaktiv ruta — svag grå kantlinje, transparent bg. Används för båda alternativen
   // när de inte är valda (samt för Individual Devices så länge premium saknas).
   modeOptionInactive: {
-    borderColor: Colors.borderStrong,
-    backgroundColor: 'transparent',
+    borderColor: CHOICE_BORDER,
+    backgroundColor: CHOICE_BG,
   },
   // Dämpad variant — appliceras på Pass-the-Phone-rutan när
   // singlePlayerDefault-checkboxen är på. Matchar modeOptionInactive
   // (samma grå border) så Pass-the-Phone i låst läge ser likadant ut
   // som Individual Devices i sitt inaktiva läge.
   modeOptionDimmed: {
-    borderColor: Colors.borderStrong,
-    backgroundColor: 'transparent',
+    borderColor: CHOICE_BORDER,
+    backgroundColor: CHOICE_BG,
   },
   // Pass-the-Phone aktiv (gratis-läge) — grön kant, muted bg.
   modeOptionPassActive: {
-    borderColor: Colors.success,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: CHOICE_SELECTED_BORDER,
+    backgroundColor: CHOICE_SELECTED_BG,
   },
   // Individual Devices aktiv MED premium — "lit" blå kant (samma som
   // startskärmens primary-knappar), muted bg.
   modeOptionIndivActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: CHOICE_SELECTED_BORDER,
+    backgroundColor: CHOICE_SELECTED_BG,
   },
   // Guld-tonad aktiv variant — Individual Devices för host med premium-paket
   // OCH läget är aktivt valt. Speglar PREMIUM-badge:s guldfärg så toggle-
@@ -11228,8 +11308,18 @@ const styles = StyleSheet.create({
   // Host kan ha Premium men ändå köra Pass-the-Phone eller Single Play —
   // i de fallen renderas IndDev-rutan grå (modeOptionInactive) trots Premium.
   modeOptionPremiumActive: {
-    borderColor: '#F5A623',
-    backgroundColor: Colors.primaryMuted,
+    borderColor: CHOICE_SELECTED_BORDER,
+    backgroundColor: CHOICE_SELECTED_BG,
+  },
+  // Vald-bock i rutans övre högra hörn (= Profile v2 / Home v2: ingen FREE-badge,
+  // guldkant + guld ✓ = vald).
+  modeCheck: {
+    position: 'absolute',
+    top: 6,
+    right: 10,
+    fontSize: 9,
+    fontWeight: '700',
+    color: Colors.warning,
   },
   // FREE-badge som skär den gröna kantlinjen — samma teknik som HOST-taggen i
   // PlayerRow och Register-knappen i Profile-menyn.
@@ -11237,17 +11327,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: Spacing.sm,
-    backgroundColor: Colors.success,
+    backgroundColor: LOBBY_PANEL_BG,
     borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
     zIndex: 10,
     elevation: 4,
   },
   freeBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontSize: 8,
+    fontWeight: '600',
+    color: BrandUi.textMuted,
     letterSpacing: 0.6,
   },
   // Kant-skärande hänglås-badge i vänsterkanten av re-match-rutan — visuell
@@ -11260,8 +11352,8 @@ const styles = StyleSheet.create({
     // renderas ~Colors.card) så badgen läses som en fylld pill i stället för att
     // smälta in och se genomskinlig ut mot border-linjen den skär (Peter
     // 2026-08-28).
-    backgroundColor: Colors.cardElevated,
-    borderColor: Colors.primary,
+    backgroundColor: LOBBY_PANEL_BG,
+    borderColor: BrandUi.border,
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 5,
@@ -11276,10 +11368,10 @@ const styles = StyleSheet.create({
   // när singlePlayerDefault är på, så badgen signalerar "låst" istället
   // för "tillgängligt gratis".
   freeBadgeDimmed: {
-    backgroundColor: '#6B7280',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   freeBadgeTextDimmed: {
-    color: '#FFF',
+    color: 'rgba(255,255,255,0.35)',
   },
   // PREMIUM-badge i guld — markerar att Individual Devices kräver paketet.
   // Försvinner när användaren har premium aktivt.
@@ -11287,26 +11379,28 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: Spacing.sm,
-    backgroundColor: '#F5A623',
+    backgroundColor: LOBBY_PANEL_BG,
     borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(245,166,35,0.45)',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
     zIndex: 10,
     elevation: 4,
   },
   premiumBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#000',
+    fontSize: 8,
+    fontWeight: '600',
+    color: 'rgba(245,166,35,0.9)',
     letterSpacing: 0.6,
   },
   // Grå variant av PREMIUM-badge — appliceras när host inte köpt paketet än.
   // Guld signalerar "tillgängligt", grått signalerar "låst tills du köper".
   premiumBadgeGrey: {
-    backgroundColor: '#6B7280',
+    borderColor: BrandUi.border,
   },
   premiumBadgeTextGrey: {
-    color: '#FFF',
+    color: BrandUi.textMuted,
   },
   modeLabel: {
     fontSize: FontSize.sm,
@@ -11314,18 +11408,18 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   modeLabelActive: {
-    color: Colors.primary,
+    color: Colors.textPrimary,
     fontWeight: FontWeight.semibold,
   },
   // Guld-tonad aktiv label — Individual Devices för host med premium-paket.
   modeLabelActivePremium: {
-    color: '#F5A623',
+    color: Colors.textPrimary,
     fontWeight: FontWeight.semibold,
   },
   // Aktiv label-stil för Pass-the-Phone när läget är gratis (grön pill).
   // Vit text för bättre kontrast mot den muted bakgrunden + grön kantlinje.
   modeLabelActiveFree: {
-    color: '#FFF',
+    color: Colors.textPrimary,
     fontWeight: FontWeight.semibold,
   },
   // Dämpad text-label på Pass-the-Phone när singlePlayerDefault är på.
@@ -11405,7 +11499,9 @@ const styles = StyleSheet.create({
     // höger-justeras med marginLeft:'auto'.
     alignItems: 'stretch',
     gap: Spacing.sm,
-    paddingHorizontal: Spacing.xs,
+    // Profile-paritet (2026-10-21): ingen extra sidoluft — Quiz Mixer får
+    // samma bredd som i Profile → Host default settings.
+    paddingHorizontal: 0,
   },
   connectionRow: {
     flexDirection: 'row',
@@ -11556,22 +11652,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   spotifyAvailPillOn: {
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.success,
+    backgroundColor: CHOICE_SELECTED_BG,
+    borderColor: CHOICE_SELECTED_BORDER,
   },
   spotifyAvailPillOff: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderColor: Colors.border,
+    backgroundColor: CHOICE_BG,
+    borderColor: CHOICE_BORDER,
   },
   spotifyAvailPillText: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
-    color: Colors.success,
+    color: Colors.textPrimary,
     letterSpacing: 0.4,
     textAlign: 'center',
   },
   spotifyAvailPillTextOff: {
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
   },
   // "Profiles"-förälder-rubrik över Images/Sketch-under-togglarna.
   connectionSubHeading: {
@@ -11643,12 +11739,6 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   // Switchen är default ganska stor; krymp till 80% så den passar i list-raden.
-  // marginLeft:'auto' pressar switchen till höger kant — övriga element
-  // (ikon, label, ev. status-pill) hålls grupperade till vänster.
-  connectionSwitch: {
-    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
-    marginLeft: 'auto',
-  },
   // YouTube-källan använder nu YouTube:s officiella play-button-ikon
   // (`YouTubeBrandIcon`-komponenten) per deras Branding Guidelines —
   // röd rounded-rect + vit triangel, oförändrad färg/proportion. Den
@@ -11807,7 +11897,7 @@ const styles = StyleSheet.create({
   // insättningar (switch-högerkanterna linjerar via spotifySwitchMR).
   mixerboardBox: {
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     borderRadius: Radius.md,
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.xs,
@@ -11815,13 +11905,12 @@ const styles = StyleSheet.create({
   },
   // Guest host: yttre mixerboard-boxen blir borderless — den gröna låsta ramen
   // sitter i stället runt HELA Game Settings-sektionen (gameSettingsBorderGuest).
-  mixerboardBoxGuest: {
-    borderWidth: 0,
-  },
+  // Profile-paritet (2026-10-21): mixern behåller sin ram även för guest host.
+  mixerboardBoxGuest: {},
   // Grått streck inuti mixerboarden mellan Spotify-delen och YouTube-delen.
   mixerboardDivider: {
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: BrandUi.border,
     marginVertical: Spacing.xs,
   },
   pkgSourceBlock: {
@@ -11871,11 +11960,11 @@ const styles = StyleSheet.create({
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
     marginBottom: Spacing.xs,
   },
   smDataShift: {
-    paddingLeft: 3,
+    paddingLeft: 4,
   },
   // Data-kolumnernas (Music/Film) switch-celler: nudgas höger så switchen
   // hamnar centrerad UNDER sin kolumnrubrik. iOS-<Switch>:en renderar vänster-
@@ -11923,14 +12012,11 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
-  // Matrix-switch: centrerad (ingen marginLeft:'auto' som connectionSwitch har).
-  sourceMatrixSwitch: {
-    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
-  },
   // Vertikal separator-linje mellan kolumnerna (Actors och Athletes får borderLeft).
   sourceMatrixColSep: {
     borderLeftWidth: 1,
-    borderLeftColor: Colors.borderStrong,
+    // Dämpad avdelare Music | Film/TV (som Profile).
+    borderLeftColor: 'rgba(255,255,255,0.07)',
   },
   // "Auto-sync"-text i Actors/Athletes-kolumnerna.
   autoActivationLabel: {
@@ -11942,8 +12028,8 @@ const styles = StyleSheet.create({
   },
   // Q-ikon för Images-källan: ringen + svansen i SVG med "?"-Text ovanpå.
   imagesIconWrap: {
-    width: 22,
-    height: 22,
+    width: 20,
+    height: 20,
     position: 'relative',
   },
   imagesQMark: {
@@ -11952,9 +12038,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
-    lineHeight: 22,
-    color: Colors.primary,
-    fontSize: 10,
+    lineHeight: 20,
+    color: BrandUi.iconMuted,
+    fontSize: 9,
     fontWeight: FontWeight.bold,
   },
   // Use Packages — sub-block för musikpaket-val. Vänsterställt mot
@@ -11965,8 +12051,8 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.xs,
     paddingBottom: Spacing.xs,
     // Extra luft ovanför så "Customized Host packages"-rubriken inte
-    // hamnar för nära Images-radens switch ovanför.
-    marginTop: Spacing.md,
+    // hamnar för nära Images-radens switch ovanför. Lobby v2: lg (var md).
+    marginTop: Spacing.lg,
   },
   // Parent Control-rad längst ner i Source Mixerboard (ovanför Customized
   // Host packages). Extra luft ovanför så den lossnar från matrisen.
@@ -11974,7 +12060,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     gap: Spacing.sm,
-    marginTop: Spacing.md,
+    // Lobby v2: lite mer luft ovanför (var Spacing.md) — egen logisk grupp.
+    marginTop: Spacing.lg,
   },
   usePackagesLabel: {
     fontSize: FontSize.sm,
@@ -12003,23 +12090,24 @@ const styles = StyleSheet.create({
     // Tjockare kantlinje (3 px → bumpat från 2 → ursprungligen 1) så
     // knappen sticker ut tydligt mot omgivande paket-rader (1 px-borders).
     // Synkat med Profile-vyns addPackageBtn.
-    borderWidth: 3,
-    borderColor: Colors.borderStrong,
-    backgroundColor: 'transparent',
+    // Lobby v2: 1 pt neutral kant (var 3 pt), speglar Profile v2.
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    backgroundColor: CHOICE_BG,
     position: 'relative',
   },
   // Aktiv-look för Generic — grön kantlinje + muted bg (samma palett
   // som Pass-the-Phone aktiv i Game Mode-toggle:n).
   genericBtnActive: {
-    borderColor: Colors.success,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: CHOICE_SELECTED_BORDER,
+    backgroundColor: CHOICE_SELECTED_BG,
   },
   // Aktiv-stil för "Activate Extra package"-knappen (2026-07-07): guld
   // kant när Premium-hostens paket är aktiva — Generic/Activate bildar
   // ett grönt⟷guld-par som speglar Max 4 / Max 12-rutorna.
   activatePackageBtnActive: {
-    borderColor: '#F5A623',
-    backgroundColor: Colors.primaryMuted,
+    borderColor: CHOICE_SELECTED_BORDER,
+    backgroundColor: CHOICE_SELECTED_BG,
   },
   // "+ Add package"-knapp under paketlistan — öppnar hela-katalogen-modalen.
   addPackageCatalogBtn: {
@@ -12029,17 +12117,17 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
-    backgroundColor: Colors.cardElevated,
+    borderColor: 'rgba(245,166,35,0.3)',
+    backgroundColor: BrandUi.surface,
   },
   addPackageCatalogBtnText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: 'rgba(245,166,35,0.9)',
   },
   // "+ Add package"-modalens bottom-sheet — speglar guestLeaveSheet.
   addPkgSheet: {
-    backgroundColor: Colors.card,
+    backgroundColor: LOBBY_PANEL_BG,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: Spacing.xl,
@@ -12065,14 +12153,16 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     height: 48,
     borderRadius: Radius.md,
-    backgroundColor: Colors.primary,
+    backgroundColor: BrandUi.surface,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   addPkgDoneText: {
     fontSize: FontSize.md,
-    fontWeight: FontWeight.bold,
-    color: '#FFF',
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
   },
   // Yttre wrapper kring sub-rubriken, paketlistan och Buy CTA. Geometrin
   // (padding 3, gap 4, Radius.md, 1px Colors.border, Colors.background-bg)
@@ -12080,7 +12170,7 @@ const styles = StyleSheet.create({
   // från ramen som Individual Devices har, och så att svart-bakgrunden runt
   // om har samma bredd som modeToggle ovanför.
   extraPackagesWrapper: {
-    backgroundColor: Colors.background,
+    backgroundColor: CHOICE_BG,
     borderRadius: Radius.md,
     paddingHorizontal: 3,
     paddingTop: 3,
@@ -12101,8 +12191,11 @@ const styles = StyleSheet.create({
   extraPackagesHeadingRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: Spacing.sm,
     paddingLeft: Spacing.xs,
-    paddingRight: 0,
+    // = paketradernas högerkant (paddingHorizontal md + 1 pt kant) så
+    // Select all-switchen står rakt ovanför paket-switcharna.
+    paddingRight: Spacing.md + 1,
     paddingTop: Spacing.md,
     marginBottom: Spacing.sm,
   },
@@ -12110,9 +12203,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
     color: Colors.textPrimary,
-    // translateY puttar rubrikens visuella glyfer uppåt så de linjerar med
-    // switchens visuella mitt.
-    transform: [{ translateY: -1 }],
+    flexShrink: 1,
   },
   // "Select all"-gruppen (label + switch) pushas till höger via marginLeft:'auto'.
   selectAllGroup: {
@@ -12140,6 +12231,47 @@ const styles = StyleSheet.create({
   // så det startar vid Buy CTA:s vänsterkant) + Switch (höger via
   // connectionSwitch.marginLeft:'auto'). Ingen border på själva raden —
   // bara text-boxen är inramad.
+  // Paketrad (= Profile v2): yta + svag guldkant när paketet är på.
+  packageListRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    minHeight: 44,
+    paddingHorizontal: Spacing.md,
+    paddingLeft: Spacing.xs + 2,
+    paddingVertical: Spacing.xs,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
+  },
+  packageListRowOn: {
+    borderColor: 'rgba(245,166,35,0.2)',
+  },
+  packageNameWrap: {
+    flex: 1,
+    minWidth: 0,
+    position: 'relative',
+  },
+  packageRowText: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  packageRowTextInactive: {
+    color: 'rgba(255,255,255,0.75)',
+  },
+  infoIconBtnSubtle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderColor: BrandUi.border,
+  },
+  infoIconTextSubtle: {
+    fontSize: 12,
+    lineHeight: 14,
+    color: BrandUi.iconMuted,
+  },
   purchasedPackageRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -12168,8 +12300,8 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
   },
   purchasedPackageBoxActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.cardElevated,
+    borderColor: CHOICE_SELECTED_BORDER,
+    backgroundColor: CHOICE_SELECTED_BG,
   },
   purchasedPackageName: {
     fontSize: FontSize.sm,
@@ -12255,21 +12387,23 @@ const styles = StyleSheet.create({
   // Kollapsbar sektionsrubrik — speglar Profile-vyns header-mönster (ledande
   // ikon + Typography.title bold + +/−-toggle-box). paddingHorizontal: xs så
   // rubriken linjerar i vänsterkant med övriga sektioner. 2026-06-01.
+  // Lobby v2: samma rubrikmönster som Profile — ingen egen kort-yta,
+  // +/− i högerkanten.
   customizeSectionHeader: {
-    backgroundColor: Colors.card,
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.xs,
     paddingVertical: Spacing.sm,
-    borderRadius: Radius.md,
-    marginTop: Spacing.md,
+    // Glappet mot Players in Lobby bärs av innehållets gap (Spacing.xl);
+    // ingen extra marginal (Lobby v2 final, minskat 2026-10-21).
+    marginTop: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
   },
   customizeSectionHeaderText: {
-    fontSize: FontSize.lg,
+    ...Typography.title,
     fontWeight: FontWeight.bold,
     color: '#FFFFFF',
-    letterSpacing: 0.5,
+    flex: 1,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -12283,7 +12417,15 @@ const styles = StyleSheet.create({
   // Wrap för SVG-ikon i sektionsrubrik — samma höjd som emoji-varianten
   // så raden centreras likadant.
   sectionHeaderSvg: { width: 24, height: 26, alignItems: 'center', justifyContent: 'center' },
-  sectionHeaderTitle: { ...Typography.title, color: Colors.textPrimary, fontWeight: FontWeight.bold },
+  // flex: 1 → +/−-rutan hamnar i högerkanten, som i Profile.
+  sectionHeaderTitle: { ...Typography.title, color: Colors.textPrimary, fontWeight: FontWeight.bold, flex: 1 },
+  // Underrubrik inom Customize QuizVibe (Game Settings / Quiz Tuning) —
+  // mindre och lättare än sektionsrubrikerna så de läses som delsektioner.
+  subSectionHeaderTitle: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textPrimary, flex: 1 },
+  subSectionHeaderRow: { paddingLeft: Spacing.sm },
+  subSectionTitleRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4, marginRight: Spacing.md },
+  subSectionHeaderTitleInline: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
+  subSectionLockIcon: { fontSize: 13, lineHeight: 18, opacity: 0.75 },
   // Röd "Players Waiting"-signal i Players in Lobby-rubriken (vid väntande spelare).
   playersWaitingLabel: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.error },
   sectionToggleBox: {
@@ -12297,16 +12439,21 @@ const styles = StyleSheet.create({
   },
   sectionChevron: { fontSize: 18, fontWeight: FontWeight.bold, color: Colors.textSecondary, lineHeight: 20 },
   // Tunn linje under kollapsad rubrik (visuell separation), som i Profile.
-  sectionDivider: { height: 1, backgroundColor: Colors.border, marginHorizontal: Spacing.xs },
+  sectionDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginHorizontal: Spacing.xs },
   // Approved-räknare + "+ Add Guest" på egen rad under "Players in Lobby"-
   // rubriken — högerställd med lite toppluft (2026-06-01).
   playersMetaRow: { justifyContent: 'flex-start', marginTop: Spacing.sm, gap: Spacing.sm },
+  // Readiness-rad (Lobby v2): "Approved 1 / 4 · 1 waiting".
+  readinessWrap: { flex: 1, flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', columnGap: 6 },
+  readinessText: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: BrandUi.textMuted },
+  readinessCount: { color: Colors.textPrimary, fontWeight: FontWeight.semibold },
+  readinessWaiting: { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.45)' },
   // "Approved"-rubrik vänster om kapacitetsrutorna.
   approvedLabel: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textSecondary,
-    letterSpacing: 0.5,
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
+    color: 'rgba(255,255,255,0.5)',
+    letterSpacing: 0.3,
   },
   // Kapacitetsruts-grid — kolumn av rader (4 rutor i bredd per rad). flex:1 så
   // den fyller mitten; marginRight ger "viss avstånd" till "+ Add Guest".
@@ -12317,22 +12464,22 @@ const styles = StyleSheet.create({
   // Enskild ruta — speglar GetReady:s progressDot/progressDotFilled.
   approvedBox: {
     flex: 1,
-    height: 24,
+    height: 20,
     borderRadius: 4,
-    borderWidth: 1.5,
-    borderColor: Colors.borderStrong,
-    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: CHOICE_BORDER,
+    backgroundColor: CHOICE_BG,
     alignItems: 'center',
     justifyContent: 'center',
   },
   approvedBoxFilled: {
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.primary,
+    backgroundColor: 'rgba(245,166,35,0.04)',
+    borderColor: 'rgba(245,166,35,0.24)',
   },
   approvedBoxNumber: {
     fontSize: 11,
-    fontWeight: '700',
-    color: Colors.primary,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.45)',
     lineHeight: 13,
     includeFontPadding: false,
     paddingHorizontal: 1,
@@ -12341,20 +12488,22 @@ const styles = StyleSheet.create({
   approvedBoxMaxStack: { alignItems: 'center', justifyContent: 'center' },
   approvedBoxMaxLabel: {
     fontSize: 8,
-    fontWeight: '700',
-    color: Colors.primary,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.45)',
     lineHeight: 9,
     includeFontPadding: false,
   },
   approvedBoxMaxNum: {
     fontSize: 10,
-    fontWeight: '700',
-    color: Colors.primary,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.45)',
     lineHeight: 11,
     includeFontPadding: false,
   },
   sectionRowRight: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  sectionLabel: { ...Typography.overline, color: Colors.textSecondary },
+  // Lobby v2: något ljusare än övrig sekundärtext så delsektionernas
+  // rubriker (Game Mode, Players, Quiz Mixer, Parent Control …) bär strukturen.
+  sectionLabel: { ...Typography.overline, color: 'rgba(255,255,255,0.78)' },
   sectionHint: { fontSize: FontSize.xs, color: Colors.textSecondary, fontStyle: 'italic' },
   sectionMeta: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.primary },
   // Stack:ar "Approved:"-labeln över räknar-raden för en två-rads-look.
@@ -12362,10 +12511,12 @@ const styles = StyleSheet.create({
   // mittlinje istället för höger-justering).
   sectionMetaStack: { alignItems: 'center' },
   sectionMetaTop: { fontSize: FontSize.xs, fontWeight: FontWeight.medium, color: Colors.textSecondary },
-  addBtn: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.md, backgroundColor: Colors.primaryMuted, borderWidth: 1, borderColor: Colors.primaryBorder },
-  addBtnText: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
+  addBtn: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.md, backgroundColor: BrandUi.surface, borderWidth: 1, borderColor: 'rgba(245,166,35,0.2)' },
+  addBtnText: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: 'rgba(245,166,35,0.78)' },
 
-  playerBoard: { backgroundColor: Colors.card, borderRadius: Radius.lg, borderWidth: 1, borderColor: Colors.border, padding: Spacing.md, gap: Spacing.xs },
+  // Lobby v2 final: diskret yttre ram (ingen egen fyllning) så spelarraden
+  // läses som en rad i sektionen, inte ett kort i ett kort.
+  playerBoard: { backgroundColor: 'transparent', borderRadius: Radius.lg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', paddingHorizontal: Spacing.sm, paddingTop: Spacing.md, paddingBottom: 0, gap: Spacing.xs },
   turnOrderHint: {
     fontSize: FontSize.xs,
     color: Colors.textSecondary,
@@ -12381,10 +12532,10 @@ const styles = StyleSheet.create({
   // "Waiting to be approved by Host" — separator + grupp under approved-listan
   waitingSection: { gap: Spacing.xs, marginTop: Spacing.md },
   approveAllRow: {
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: BrandUi.surface,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm + 2,
     marginBottom: Spacing.xs,
@@ -12416,24 +12567,25 @@ const styles = StyleSheet.create({
   eraDisplayDash: { fontSize: 28, fontWeight: '300', color: Colors.textSecondary },
   // Non-host Game Era — speglar in-game year-selector-rutan från app/quiz.tsx
   // (BOX_COLOR='#F5A623', BOX_BG='rgba(26,48,80,0.92)'). Ingen årtalslinje här.
-  eraGuestBoxWrap: { alignItems: 'center', paddingTop: Spacing.xl, paddingBottom: Spacing.sm },
+  eraGuestBoxWrap: { alignItems: 'center', paddingTop: Spacing.sm, paddingBottom: Spacing.xs },
   eraGuestBox: {
+    // Speglar Profile v2 1:1.
     paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.md,
-    borderWidth: 3,
-    borderRadius: 10,
-    borderColor: '#F5A623',
-    backgroundColor: 'rgba(26,48,80,0.92)',
-    shadowColor: '#F5A623',
+    paddingVertical: Spacing.xs + 2,
+    borderWidth: 1.5,
+    borderRadius: Radius.md,
+    borderColor: Colors.warning,
+    backgroundColor: Colors.background,
+    shadowColor: Colors.warning,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.85,
-    shadowRadius: 18,
-    elevation: 8,
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   eraGuestBoxText: {
-    fontSize: 28,
+    fontSize: 25,
     fontWeight: '700',
     color: '#F5A623',
     fontVariant: ['tabular-nums'],
@@ -12445,11 +12597,11 @@ const styles = StyleSheet.create({
   roundsGuestBoxWrap: { alignItems: 'center', paddingVertical: Spacing.sm },
   roundsGuestBox: {
     paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.md,
-    borderWidth: 2,
-    borderRadius: 10,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    paddingVertical: Spacing.sm,
+    borderWidth: 1.5,
+    borderRadius: Radius.md,
+    borderColor: Colors.warning,
+    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     minWidth: 80,
@@ -12457,7 +12609,7 @@ const styles = StyleSheet.create({
   roundsGuestBoxText: {
     fontSize: 28,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.warning,
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.5,
   },
@@ -12466,6 +12618,8 @@ const styles = StyleSheet.create({
   // Knapparna är 44x44 (Apple HIG min hit-target) med brand-blå border som
   // matchar rutans border. paddingVertical ger samma vertikala luft som
   // roundsGuestBoxWrap så raden står balanserat över RoundsRuler:n.
+  // + och PREMIUM tätt ihop (= Profile).
+  roundsPlusGroup: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   roundsStepperRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -12477,20 +12631,20 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: Radius.md,
-    borderWidth: 2,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   roundsStepperBtnDisabled: {
-    borderColor: Colors.borderStrong,
+    borderColor: 'rgba(255,255,255,0.06)',
     backgroundColor: 'transparent',
   },
   roundsStepperBtnText: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.textPrimary,
     lineHeight: 26,
   },
   roundsStepperBtnTextDisabled: {
@@ -12547,7 +12701,8 @@ const styles = StyleSheet.create({
   responseRow: {
     flexDirection: 'row',
     gap: Spacing.sm,
-    marginTop: Spacing.sm,
+    // = Profile (tätt under rubriken).
+    marginTop: 4,
   },
   responseBtn: {
     flex: 1,
@@ -12558,11 +12713,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   responseBtnActive: {
-    borderColor: Colors.primaryBorder,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: CHOICE_SELECTED_BORDER,
+    backgroundColor: CHOICE_SELECTED_BG,
   },
   responseBtnInactive: {
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     backgroundColor: 'transparent',
   },
   responseBtnText: {
@@ -12658,7 +12813,7 @@ const styles = StyleSheet.create({
   startStickyBar: {
     position: 'relative',
     borderTopWidth: 1,
-    borderTopColor: Colors.warning,
+    borderTopColor: BrandUi.border,
     backgroundColor: Colors.background,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
@@ -12769,12 +12924,13 @@ const styles = StyleSheet.create({
   bottomPad: { height: Spacing.xl },
   toTopBtn: { alignItems: 'center', paddingVertical: Spacing.md },
   toTopBox: {
-    backgroundColor: Colors.borderStrong,
-    borderRadius: Radius.sm,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.xs,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 4,
   },
-  toTopLabel: { fontSize: FontSize.sm, color: Colors.textPrimary, letterSpacing: 0.5 },
+  toTopLabel: { fontSize: FontSize.xs, color: BrandUi.textMuted, fontWeight: FontWeight.medium },
   // ── Game Sequence ──────────────────────────────────────────────────────────
   // Ingen topp-badge längre — bara botten-badge (kategori) skär kantlinjen.
   // rowGap 16 räcker: botten-badge 9 px under + 7 px luft till nästa rads topkant.
@@ -12792,7 +12948,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: Colors.border,
     borderRadius: Radius.sm,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: CHOICE_BG,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -12823,14 +12979,14 @@ const styles = StyleSheet.create({
     right: 0,
     textAlign: 'center',
     lineHeight: 13,
-    color: Colors.primary,
+    color: BrandUi.iconMuted,
     fontSize: 6,
     fontWeight: FontWeight.bold,
   },
   // Fristående "?"-glyf för guest-hostens randomiserade Game Sequence-
   // slots (källan avgörs först vid spelstart av den viktade dragningen).
   gsRandomMark: {
-    color: Colors.primary,
+    color: BrandUi.iconMuted,
     fontSize: 13,
     fontWeight: FontWeight.bold,
   },
@@ -12865,7 +13021,7 @@ const modal = StyleSheet.create({
   // över skärmen när PlayerName:s custom CodeKeyboard tar plats nedanför
   // ScrollView:n. ScrollView:n inuti har flexShrink: 1 så den krymper
   // när chrome+keyboard sammanlagt skulle överskrida sheet:s maxhöjd.
-  container: { backgroundColor: Colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: Spacing.xl, gap: Spacing.md, borderWidth: 1, borderColor: Colors.border, maxHeight: '90%' },
+  container: { backgroundColor: LOBBY_PANEL_BG, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: Spacing.xl, gap: Spacing.md, borderWidth: 1, borderColor: BrandUi.border, maxHeight: '90%' },
   title: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
   subtitle: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
   fieldGroup: { gap: Spacing.xs },
@@ -12874,12 +13030,12 @@ const modal = StyleSheet.create({
   input: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg, fontSize: 16, color: Colors.textPrimary },
   inputText: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.borderStrong, paddingHorizontal: Spacing.lg, fontSize: 16, fontWeight: '500', color: Colors.textPrimary },
   skillRow: { flexDirection: 'row', gap: Spacing.sm },
-  skillBtn: { flex: 1, height: 44, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background },
-  skillBtnActive: { backgroundColor: Colors.primaryMuted, borderColor: Colors.primaryBorder },
+  skillBtn: { flex: 1, height: 44, borderRadius: Radius.md, borderWidth: 1, borderColor: CHOICE_BORDER, alignItems: 'center', justifyContent: 'center', backgroundColor: CHOICE_BG },
+  skillBtnActive: { backgroundColor: CHOICE_SELECTED_BG, borderColor: CHOICE_SELECTED_BORDER },
   skillBtnText: { fontSize: FontSize.sm, color: Colors.textSecondary, fontWeight: FontWeight.medium },
   skillBtnTextActive: { color: Colors.textPrimary, fontWeight: FontWeight.bold },
-  previewBox: { backgroundColor: Colors.primaryMuted, borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: Colors.primaryBorder, alignItems: 'center' },
-  previewText: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.primary },
+  previewBox: { backgroundColor: BrandUi.surface, borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: BrandUi.border, alignItems: 'center' },
+  previewText: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: BrandUi.textMuted },
   cancelBtn: { alignItems: 'center', paddingVertical: Spacing.xs },
   cancelText: { fontSize: 14, color: Colors.textSecondary },
 
@@ -12899,13 +13055,15 @@ const modal = StyleSheet.create({
     paddingHorizontal: 2,
   },
   playerNameInputDisabled: { opacity: 0.45 },
-  playerNameInputActive: { borderColor: Colors.primary },
+  playerNameInputActive: { borderColor: CHOICE_SELECTED_BORDER },
   checkBtn: {
     minWidth: 72,
     height: 52,
     paddingHorizontal: Spacing.md,
     borderRadius: Radius.md,
-    backgroundColor: Colors.primary,
+    backgroundColor: BrandUi.surface,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -12930,8 +13088,8 @@ const modal = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.cardElevated,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
   },
   nameActionBtnDisabled: { opacity: 0.4 },
   nameActionBtnText: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary },
@@ -12947,9 +13105,11 @@ const modal = StyleSheet.create({
   statusHintError: { color: Colors.error, fontWeight: '600' },
 
   // Submit-knapp (Add to Lobby)
-  joinBtn: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
-  joinBtnDisabled: { backgroundColor: 'rgba(255,255,255,0.06)' },
-  joinBtnText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  // Primär CTA = metallisk guld när giltig (MetallicGoldFill ritas i JSX).
+  joinBtn: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.warning, borderWidth: 1, borderColor: METALLIC_GOLD_EDGE, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  joinBtnDisabled: { backgroundColor: 'rgba(255,255,255,0.06)', borderColor: BrandUi.border },
+  joinBtnText: { fontSize: 16, fontWeight: '700', color: '#000' },
+  joinBtnTextDisabled: { color: BrandUi.textMuted, fontWeight: '600' },
 
   // Year of birth — drop-down trigger (för Add Player)
   yearTrigger: {
@@ -12958,16 +13118,16 @@ const modal = StyleSheet.create({
     justifyContent: 'space-between',
     height: 52,
     borderRadius: Radius.md,
-    backgroundColor: Colors.background,
+    backgroundColor: CHOICE_BG,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     paddingHorizontal: Spacing.lg,
   },
   // Active-state lyser triggern blå när den är "nästa steg" (yearUnlocked
   // men inget år valt än) — speglar Join-as-Guest-formen.
   yearTriggerActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: CHOICE_SELECTED_BORDER,
+    backgroundColor: CHOICE_SELECTED_BG,
   },
   yearTriggerText: { fontSize: 16, fontWeight: '500', color: Colors.textPrimary },
   yearTriggerPlaceholder: { color: Colors.textDisabled, fontWeight: '400' },
@@ -12981,7 +13141,7 @@ const modal = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   yearPickerSheet: {
-    backgroundColor: Colors.card,
+    backgroundColor: LOBBY_PANEL_BG,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: Spacing.xl,
@@ -13004,17 +13164,17 @@ const modal = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderRadius: Radius.md,
   },
-  yearItemSelected: { backgroundColor: Colors.primaryMuted },
+  yearItemSelected: { backgroundColor: CHOICE_SELECTED_BG },
   yearItemText: { fontSize: 17, color: Colors.textPrimary, fontVariant: ['tabular-nums'] },
-  yearItemTextSelected: { color: Colors.primary, fontWeight: '700' },
-  yearItemCheck: { fontSize: 16, color: Colors.primary, fontWeight: '700' },
+  yearItemTextSelected: { color: Colors.textPrimary, fontWeight: '700' },
+  yearItemCheck: { fontSize: 16, color: Colors.warning, fontWeight: '700' },
 });
 
 const playerEditSheet = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)' },
   container: {
-    backgroundColor: Colors.card,
+    backgroundColor: LOBBY_PANEL_BG,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: Spacing.xl,
@@ -13022,7 +13182,7 @@ const playerEditSheet = StyleSheet.create({
     paddingBottom: Spacing.xxl,
     gap: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     maxHeight: '90%',
   },
   handle: {
@@ -13051,9 +13211,9 @@ const playerEditSheet = StyleSheet.create({
     justifyContent: 'space-between',
     height: 52,
     borderRadius: Radius.md,
-    backgroundColor: Colors.background,
+    backgroundColor: CHOICE_BG,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     paddingHorizontal: Spacing.lg,
   },
   yearTriggerText: { fontSize: 16, fontWeight: '500', color: Colors.textPrimary },
@@ -13064,10 +13224,10 @@ const playerEditSheet = StyleSheet.create({
   skillRow: { flexDirection: 'row', gap: Spacing.sm },
   skillBtn: {
     flex: 1, height: 44, borderRadius: Radius.md, borderWidth: 1,
-    borderColor: Colors.border, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Colors.background,
+    borderColor: CHOICE_BORDER, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: CHOICE_BG,
   },
-  skillBtnActive: { backgroundColor: Colors.primaryMuted, borderColor: Colors.primaryBorder },
+  skillBtnActive: { backgroundColor: CHOICE_SELECTED_BG, borderColor: CHOICE_SELECTED_BORDER },
   // Disallowed assistance-transition — knappen är fortfarande tappbar så
   // popup:en kan informera, men dimmas så host ser att det inte är ett
   // giltigt val.
@@ -13100,8 +13260,8 @@ const playerEditSheet = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  saveBtn: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
-  saveBtnText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+  saveBtn: { height: 52, borderRadius: Radius.md, backgroundColor: Colors.warning, borderWidth: 1, borderColor: METALLIC_GOLD_EDGE, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  saveBtnText: { fontSize: 16, fontWeight: '700', color: '#000' },
   cancelBtn: { alignItems: 'center', paddingVertical: Spacing.xs },
   cancelBtnText: { fontSize: 14, color: Colors.textSecondary },
 
@@ -13112,7 +13272,7 @@ const playerEditSheet = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   yearPickerSheet: {
-    backgroundColor: Colors.card,
+    backgroundColor: LOBBY_PANEL_BG,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: Spacing.xl,
@@ -13135,10 +13295,10 @@ const playerEditSheet = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderRadius: Radius.md,
   },
-  yearItemSelected: { backgroundColor: Colors.primaryMuted },
+  yearItemSelected: { backgroundColor: CHOICE_SELECTED_BG },
   yearItemText: { fontSize: 17, color: Colors.textPrimary, fontVariant: ['tabular-nums'] },
-  yearItemTextSelected: { color: Colors.primary, fontWeight: '700' },
-  yearItemCheck: { fontSize: 16, color: Colors.primary, fontWeight: '700' },
+  yearItemTextSelected: { color: Colors.textPrimary, fontWeight: '700' },
+  yearItemCheck: { fontSize: 16, color: Colors.warning, fontWeight: '700' },
 });
 
 const shareSheet = StyleSheet.create({
@@ -13258,7 +13418,7 @@ const shareSheet = StyleSheet.create({
     color: Colors.textSecondary,
     paddingHorizontal: 2,
   },
-  addPlayerNameInputActive: { borderColor: Colors.primary },
+  addPlayerNameInputActive: { borderColor: CHOICE_SELECTED_BORDER },
   addPlayerNameInputDisabled: { opacity: 0.45 },
   addBtn: {
     height: 44,

@@ -1,0 +1,160 @@
+import { Alert } from 'react-native';
+
+// Drop-in ersättare för Alert.alert i navy/guld-systemet (Lobby v2,
+// 2026-10-21). Samma signatur som RN:s Alert.alert så call-sites bara byter
+// funktionsnamn; renderingen sker av <QuizVibeAlertHost /> via
+// QuizVibeDialogOverlay.
+//
+// Hostar: en per skärm som använder quizVibeAlert (vanlig vy sist i skärmens
+// träd), en inuti varje RN-Modal som kan visa en dialog (active = Modal:ens
+// visible) och en reserv i app/_layout.tsx (i egen Modal). Den SENAST
+// registrerade aktiva hosten visar dialogen.
+//
+// Skyddsnät: en dialog som ingen host har ritat inom FALLBACK_MS visas som
+// vanlig iOS-alert i stället — en kontroll får aldrig se trasig ut.
+
+export type QuizVibeAlertButton = {
+  text?: string;
+  onPress?: () => void;
+  style?: 'default' | 'cancel' | 'destructive';
+};
+
+export interface QuizVibeAlertRequest {
+  id: number;
+  title: string;
+  message?: string;
+  buttons: QuizVibeAlertButton[];
+}
+
+type Listener = () => void;
+
+const FALLBACK_MS = 300;
+const USE_IN_APP_DIALOG = false;
+
+// Tillståndet ligger på globalThis, inte i modul-variabler: när koden laddas
+// om (Fast Refresh) skapas en ny kopia av den här modulen medan redan
+// monterade hostar (t.ex. rot-hosten i _layout) håller kvar den gamla. Med
+// separata köer hamnade dialoger i en kö som ingen synlig host läste.
+interface AlertStore {
+  listeners: Set<Listener>;
+  queue: QuizVibeAlertRequest[];
+  hosts: number[];
+  displayed: Set<number>;
+  nextId: number;
+}
+const g = globalThis as unknown as { __quizVibeAlertStore?: AlertStore };
+const store: AlertStore = (g.__quizVibeAlertStore ??= {
+  listeners: new Set<Listener>(),
+  queue: [],
+  hosts: [],
+  displayed: new Set<number>(),
+  nextId: 1,
+});
+const { listeners, queue, hosts, displayed } = store;
+
+function emit() {
+  listeners.forEach((fn) => fn());
+}
+
+/** Kontrollerar att aktuell dialog faktiskt ritats; annars native-fallback. */
+function scheduleFallbackCheck() {
+  const current = queue[0];
+  if (!current) return;
+  setTimeout(() => {
+    if (queue[0] !== current || displayed.has(current.id)) return;
+    // Ingen host ritade dialogen → visa den som vanlig iOS-alert.
+    queue.shift();
+    emit();
+    Alert.alert(
+      current.title,
+      current.message,
+      current.buttons.map((b) => ({ text: b.text, style: b.style, onPress: b.onPress })),
+    );
+    scheduleFallbackCheck();
+  }, FALLBACK_MS);
+}
+
+/** Samma anrop som Alert.alert(title, message?, buttons?, options?). */
+export function quizVibeAlert(
+  title: string,
+  message?: string,
+  buttons?: QuizVibeAlertButton[],
+  // Alert.alert:s options (cancelable m.m.) — dialogen stängs ändå bara via
+  // en knapp, precis som en iOS-alert.
+  _options?: unknown,
+): void {
+  // ⚠ TILLFÄLLIGT (2026-10-21): den mörka in-app-dialogen ritades inte på
+  // Peters telefon — bara skyddsnätets native-alert syntes, 0,3 s för sent.
+  // Tills orsaken är hittad visas native-alerten DIREKT (samma hastighet som
+  // innan bytet). Sätt USE_IN_APP_DIALOG = true för att felsöka vidare.
+  if (!USE_IN_APP_DIALOG) {
+    Alert.alert(
+      title,
+      message,
+      buttons?.map((b) => ({ text: b.text, style: b.style, onPress: b.onPress })),
+    );
+    return;
+  }
+  // Upprepade tryck på samma kontroll ska inte stapla identiska dialoger
+  // (OK skulle då bara visa nästa likadana).
+  if (queue.some((a) => a.title === title && (a.message ?? '') === (message ?? ''))) return;
+  queue.push({
+    id: store.nextId++,
+    title,
+    message,
+    buttons: buttons && buttons.length > 0 ? buttons : [{ text: 'OK' }],
+  });
+  emit();
+  if (queue.length === 1) scheduleFallbackCheck();
+}
+
+export function getCurrentAlert(): QuizVibeAlertRequest | null {
+  return queue[0] ?? null;
+}
+
+/** Anropas av hosten när den faktiskt har ritat dialogen. */
+export function markAlertDisplayed(id: number): void {
+  displayed.add(id);
+}
+
+/** Stänger aktuell dialog och kör knappens handler (efter stängning, som iOS). */
+export function resolveCurrentAlert(button: QuizVibeAlertButton | undefined): void {
+  const done = queue.shift();
+  if (done) displayed.delete(done.id);
+  emit();
+  scheduleFallbackCheck();
+  if (button?.onPress) setTimeout(() => button.onPress?.(), 0);
+}
+
+export function registerAlertHost(): number {
+  const id = store.nextId++;
+  hosts.push(id);
+  emit();
+  return id;
+}
+
+/** Självläkning: en host som fortfarande är monterad men saknas i registret
+ *  (t.ex. efter en Fast Refresh som laddat om den här modulen) läggs tillbaka. */
+export function ensureAlertHost(id: number): void {
+  if (!hosts.includes(id)) {
+    hosts.push(id);
+    emit();
+  }
+}
+
+export function unregisterAlertHost(id: number): void {
+  const i = hosts.indexOf(id);
+  if (i >= 0) hosts.splice(i, 1);
+  emit();
+}
+
+export function isTopAlertHost(id: number): boolean {
+  return hosts[hosts.length - 1] === id;
+}
+
+export function subscribeAlerts(listener: Listener): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}

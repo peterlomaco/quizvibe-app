@@ -6,10 +6,11 @@ import { CappedText as Text } from './CappedText';
 import { Pressable } from '@/src/components/haptic';
 import Svg, { Path } from 'react-native-svg';
 import type { PeerHealth } from '../lib/realtime/lobbyHealthChannel';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
 import { Avatar } from './Avatar';
+import { ChevronIcon } from './ChevronIcon';
 import { HCPShield, HCPShieldCard } from './HCPShield';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { WifiFanIcon } from './WifiFanIcon';
@@ -33,6 +34,12 @@ interface PlayerRowProps {
   age?: number;
   assistance?: AssistanceLevel;
   isHostPlayer?: boolean;
+  /** Dölj HOST-taggen (inloggad single player — användaren är ensam i sitt
+   *  eget spel). Påverkar bara taggen, inte kortets layout. */
+  hideHostTag?: boolean;
+  /** Extra luft under kortet när Details är utfällt (registrerad värd i
+   *  multiplayer). 0 = oförändrat. */
+  expandedExtraBottom?: number;
   // När spelaren är gäst: visa "Guest HCP"-badge istället för räknad HCP.
   // Hur Guest HCP faktiskt räknas är inte definierat ännu.
   isGuest?: boolean;
@@ -101,6 +108,8 @@ export function PlayerRow({
   age,
   assistance,
   isHostPlayer,
+  hideHostTag,
+  expandedExtraBottom = 0,
   isGuest,
   accountPlayerName,
   turnNumber,
@@ -148,7 +157,7 @@ export function PlayerRow({
   const metaIndent =
     turnNumber !== undefined ? (showTurnArrows ? 48 : 26) + Spacing.md : 0;
   return (
-    <View style={styles.cardWrapper}>
+    <View style={[styles.cardWrapper, detailsExpanded && expandedExtraBottom > 0 && { marginBottom: Spacing.sm + expandedExtraBottom }]}>
       <View
         style={[
           styles.card,
@@ -180,7 +189,7 @@ export function PlayerRow({
                   hitSlop={4}
                   style={[styles.turnArrowBtn, !canMoveUp && styles.turnArrowBtnDisabled]}
                 >
-                  <Text style={styles.turnArrowText}>↑</Text>
+                  <ChevronIcon direction="up" size={16} color="rgba(255,255,255,0.8)" strokeWidth={2.2} />
                 </Pressable>
                 <Pressable pressFeedback
                   onPress={onMoveDown}
@@ -188,7 +197,7 @@ export function PlayerRow({
                   hitSlop={4}
                   style={[styles.turnArrowBtn, !canMoveDown && styles.turnArrowBtnDisabled]}
                 >
-                  <Text style={styles.turnArrowText}>↓</Text>
+                  <ChevronIcon direction="down" size={16} color="rgba(255,255,255,0.8)" strokeWidth={2.2} />
                 </Pressable>
               </View>
             )}
@@ -200,7 +209,7 @@ export function PlayerRow({
             emoji={player.emoji}
             name={player.name}
             size={54}
-            useBrandFallback={!isGuest}
+            useBrandFallback
           />
           {/* HCP-sköld fäst i avatarens nedre högra hörn — Total (= snittet
               Music + Film). Bara när kortet är HOPFÄLLT; vid "Details" flyttas
@@ -220,23 +229,18 @@ export function PlayerRow({
               // PlayerName-format [Letters]-[Digits]: bryt vid bindestrecket så
               // bokstäverna + "-" står på rad 1 och siffrorna under. Saknar
               // namnet bindestreck (inga siffror) visas det på en rad.
-              const dashIdx = player.name.indexOf('-');
-              if (dashIdx === -1) {
-                return (
-                  <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>
-                    {player.name}
-                  </Text>
-                );
-              }
+              // Lobby v2 (2026-10-21): namnet på EN rad — korta namn som
+              // "O-2819688" ska inte brytas i onödan. Längre namn krymper
+              // något i stället för att delas på två rader.
               return (
-                <View style={styles.nameSplit}>
-                  <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>
-                    {player.name.slice(0, dashIdx + 1)}
-                  </Text>
-                  <Text style={[styles.name, hasLeft && styles.textLeft]} numberOfLines={1}>
-                    {player.name.slice(dashIdx + 1)}
-                  </Text>
-                </View>
+                <Text
+                  style={[styles.name, hasLeft && styles.textLeft, { flexShrink: 1 }]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.8}
+                >
+                  {player.name}
+                </Text>
               );
             })()}
           </View>
@@ -445,7 +449,7 @@ export function PlayerRow({
       </View>
 
       {/* ── HOST-tag som skär kantlinjen ──────────────────────── */}
-      {isHostPlayer && (
+      {isHostPlayer && !hideHostTag && (
         <View style={styles.hostBorderTag} pointerEvents="none">
           <Text style={styles.hostBorderTagText}>HOST</Text>
         </View>
@@ -486,6 +490,10 @@ export function PlayerRow({
   );
 }
 
+// Lobby v2 (2026-10-21): mörkt gunmetal-kort. Opak så kant-skärande badges
+// (HOST/GUEST/QuizVibe/Spotify) kan dela kortets fyllning och skära kanten.
+const CARD_BG = '#0F1624';
+
 const styles = StyleSheet.create({
   // Wrapper-vy så att HOST-rutan kan position:absolute överlappa kortets
   // kantlinje utan att klippas av kortets overflow:hidden.
@@ -495,19 +503,19 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: Radius.md,
-    backgroundColor: Colors.card,
+    backgroundColor: CARD_BG,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255,255,255,0.08)',
     overflow: 'hidden',
   },
   cardHost: {
-    borderColor: '#F5A623',
+    borderColor: 'rgba(245,166,35,0.24)',
   },
   cardApproved: {
-    borderColor: Colors.success,
+    borderColor: 'rgba(82,200,122,0.24)',
   },
   cardWaiting: {
-    borderColor: Colors.error,
+    borderColor: 'rgba(255,107,107,0.45)',
   },
   // hasLeft-stil: neutral grå border + dämpad bakgrund. Override:ar
   // approved/waiting/host-borderfärger så kortet visuellt nedprioriteras
@@ -540,6 +548,9 @@ const styles = StyleSheet.create({
   // avatar-layout.
   avatarWrap: {
     position: 'relative',
+    // Lite extra luft mellan avatar/sköld-klustret och namnet (sköld-
+    // badgen sticker ut 10 pt åt höger).
+    marginRight: 6,
   },
   // HCP-sköld fäst som liten badge i avatarens ÖVRE HÖGRA hörn (hopfällt kort) —
   // sticker ut något upp/åt höger så den överlappar avatar-kanten (som mockupen).
@@ -557,8 +568,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-start',
-    marginTop: Spacing.sm,
-    marginBottom: Spacing.md,
+    // Lobby v2: tätare utfälld HCP-rad (marginBottom räcker fortfarande åt
+    // de kant-skärande etikett-badgarna, bottom: -9).
+    marginTop: 2,
+    marginBottom: Spacing.sm + 4,
     paddingHorizontal: Spacing.sm,
   },
   // Avatar-wrapper när spelaren har left: dimmas via opacity så själva
@@ -578,7 +591,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: Colors.card,
+    borderColor: CARD_BG,
   },
   healthDotOk: {
     backgroundColor: Colors.success,
@@ -594,17 +607,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     left: Spacing.lg,
-    backgroundColor: '#F5A623',
+    backgroundColor: CARD_BG,
     borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(245,166,35,0.32)',
+    paddingHorizontal: 5,
+    paddingVertical: 0,
     zIndex: 10,
     elevation: 4,
   },
   hostBorderTagText: {
-    fontSize: 9,
+    fontSize: 7.5,
     fontWeight: FontWeight.semibold,
-    color: '#000',
+    color: 'rgba(245,166,35,0.75)',
     letterSpacing: 0.5,
   },
 
@@ -614,34 +629,32 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     left: Spacing.lg,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: CARD_BG,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    borderColor: BrandUi.border,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
     zIndex: 10,
     elevation: 4,
   },
   guestBorderTagText: {
-    fontSize: 9,
+    fontSize: 7.5,
     fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
+    color: BrandUi.textMuted,
     letterSpacing: 0.5,
   },
 
-  // QuizVibe user-tagg — registrerade non-host. Blå-tema identiskt med
-  // "+ Add Guest"-knappen (primaryMuted bg + primaryBorder + primary text).
+  // QuizVibe user-tagg — registrerade non-host. Dämpad neutral (Lobby v2):
+  // opak kortfyllning så kortets kantlinje inte skiner igenom badgen.
   quizUserBorderTag: {
     position: 'absolute',
     top: -8,
     left: Spacing.lg,
-    // Opak blå fyllning + opak blå kant (ersätter translucenta primaryMuted/
-    // primaryBorder) så kortets kantlinje inte skiner igenom badgen.
-    backgroundColor: '#16294A',
+    backgroundColor: CARD_BG,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: BrandUi.border,
     // paddingRight något större än vänster: RN klipper annars sista glyfen när
     // letterSpacing reserverar trailing-space efter sista tecknet (sista "R").
     paddingLeft: 8,
@@ -651,9 +664,9 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   quizUserBorderTagText: {
-    fontSize: 9,
+    fontSize: 7.5,
     fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
+    color: BrandUi.textMuted,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
@@ -661,9 +674,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: Spacing.md,
+    // Lobby v2: något lägre kort, mer luft mellan avatar/sköld och namn.
+    paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.lg,
-    gap: Spacing.md,
+    gap: Spacing.lg,
   },
 
   // Wrapper kring approve-toggle. alignSelf: 'flex-start' pinnar toggleln
@@ -689,42 +703,44 @@ const styles = StyleSheet.create({
   // numbered badge on top, ↑↓ reorder arrows directly underneath.
   turnColumn: {
     alignItems: 'center',
-    gap: Spacing.xs,
+    gap: 2,
   },
   turnBadge: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: Colors.cardElevated,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   turnBadgeFirst: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    backgroundColor: 'rgba(245,166,35,0.06)',
+    borderColor: 'rgba(245,166,35,0.35)',
   },
   turnBadgeText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: BrandUi.textMuted,
     fontVariant: ['tabular-nums'],
   },
   turnBadgeTextFirst: {
-    color: '#FFF',
+    color: 'rgba(245,166,35,0.8)',
   },
   turnArrows: {
     flexDirection: 'row',
     gap: 4,
   },
+  // Lobby v2: något större, tydliga chevron-ikoner (lika vikt som Profile)
+  // så kontrollen inte ser avstängd ut — fortfarande dämpad/sekundär.
   turnArrowBtn: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: Colors.cardElevated,
+    width: 24,
+    height: 24,
+    borderRadius: Radius.sm,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -734,7 +750,7 @@ const styles = StyleSheet.create({
   turnArrowText: {
     fontSize: 13,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: BrandUi.iconMuted,
     lineHeight: 14,
   },
 
@@ -742,7 +758,7 @@ const styles = StyleSheet.create({
   // och lämnar kortets nedre högra hörn fritt åt approve-toggeln (approved
   // non-host) — annars hamnar en vertikalt centrerad "Details" i vägen för
   // toggeln på den höga sköld-raden.
-  info: { flex: 1, minWidth: 0, alignSelf: 'flex-start', paddingTop: Spacing.xs },
+  info: { flex: 1, minWidth: 0, alignSelf: 'flex-start', paddingTop: 2 },
   // Wifi-ikon-rad direkt under playername. marginTop bara tillräckligt
   // för subtil separation från namnet utan att skapa stor luftig gap.
   healthIconRow: {
@@ -777,7 +793,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: FontSize.md,
-    fontWeight: FontWeight.medium,
+    fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
 
@@ -794,7 +810,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
+    paddingBottom: Spacing.sm,
   },
   hcpRowLeft: {
     flex: 1,
@@ -819,14 +835,15 @@ const styles = StyleSheet.create({
   },
   hcpPill: {
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
   hcpPillText: {
     fontSize: FontSize.xs,
-    color: Colors.textPrimary,
+    color: BrandUi.textMuted,
     fontWeight: FontWeight.medium,
   },
   // Diskret opacity-dim på meta-raden när host tappar för att öppna
@@ -836,13 +853,15 @@ const styles = StyleSheet.create({
   },
   // "Details +/-"-toggle under PlayerName — diskret muted-grå text i appens
   // befintliga färgtema (samma som meta-pillarnas text).
+  // Linjerar med namnblockets vänsterkant (ingen egen indragning).
   detailsToggle: {
-    marginTop: 2,
+    marginTop: 4,
     alignSelf: 'flex-start',
+    paddingVertical: 1,
   },
   detailsToggleText: {
-    fontSize: FontSize.sm,
-    color: Colors.textSecondary,
+    fontSize: FontSize.xs,
+    color: BrandUi.textMuted,
     fontWeight: FontWeight.medium,
   },
 
@@ -865,10 +884,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: CARD_BG,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: BrandUi.border,
     paddingLeft: 6,
     paddingRight: 8,
     paddingVertical: 2,
@@ -876,13 +895,13 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   spotifyBorderTagConnected: {
-    fontSize: 9,
-    fontWeight: FontWeight.semibold,
-    color: '#1DB954',
+    fontSize: 8,
+    fontWeight: FontWeight.medium,
+    color: 'rgba(29,185,84,0.75)',
   },
   spotifyBorderTagNone: {
-    fontSize: 9,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textSecondary,
+    fontSize: 8,
+    fontWeight: FontWeight.medium,
+    color: BrandUi.textMuted,
   },
 });

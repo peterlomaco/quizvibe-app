@@ -66,8 +66,11 @@ const CELEBRATION_START_DELAY_MS = 550;
 const Q_SIZE = Math.round(SCREEN_W * 0.9);
 const TROPHY_SIZE = Math.round(Q_SIZE * 0.4);
 
-/** Vattenstämpelns opacitet — sluttillståndet för märket. */
-const WATERMARK_OPACITY = 0.22;
+/** Sluttillstånd för märket (Q + pokal). Final Leaderboard har sedan 2026-10-21
+ *  en ANNAN vattenstämpel (det nya Q:t, QuizVibeWatermark), så märket tonas
+ *  ut helt i stället för att landa på den gamla vattenstämpelns 0.22 —
+ *  annars hade bilden hoppat när slöjan försvinner. */
+const WATERMARK_OPACITY = 0;
 
 const COMPACT = SCREEN_H < 700;
 

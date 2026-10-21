@@ -8,6 +8,7 @@ import {
 } from '@/src/lib/iap';
 import { BottomBanner } from '@/src/components/BottomBanner';
 import { GlobalOverlay } from '@/src/components/GlobalOverlay';
+import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 import { Colors } from '@/src/theme';
 import { refreshOfferConfig, refreshPromoGrants } from '@/src/utils/promoPremium';
 import { clearPremiumSubscription, refreshPremiumMirror, setPremiumActive } from '@/src/utils/subscriptionStorage';
@@ -142,6 +143,8 @@ export default function RootLayout() {
           utanför Stack:en så den överlever router.replace och täcker banner +
           transition. Se src/utils/globalOverlay.ts. */}
       <GlobalOverlay />
+      {/* quizVibeAlert-dialoger (Lobby v2) — rot-host; RN-Modals har egna. */}
+      <QuizVibeAlertHost inModal />
     </GestureHandlerRootView>
   );
 }

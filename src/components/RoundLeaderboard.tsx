@@ -18,6 +18,7 @@ import Svg, { Circle, G, Path } from 'react-native-svg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { HostTypeOptions, type HostLobbyType } from './HostTypeOptions';
 import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+import { QuizVibeWatermark } from './QuizVibeWatermark';
 import { VersusIcon } from './VersusIcon';
 import { aggregateLabel, type AggregateLeaderboardData } from '../utils/aggregateLeaderboard';
 import { containsProfanity } from '../utils/profanity';
@@ -966,52 +967,10 @@ export function RoundLeaderboard({
           säkerställer att leaderboard-text + statistik förblir läsbara genom
           vattenstämpeln. */}
       {isLastRound && (
-        <View style={styles.bgFinalWrap} pointerEvents="none">
-          <Svg
-            width={BG_Q_SIZE}
-            height={BG_Q_SIZE}
-            viewBox="19 19 36 36"
-          >
-            {/* G-wrap med opacity istället för per-element opacity — där
-                Q-ringen och svansen tangerar varandra ackumuleras annars
-                stroke-opacity vid overlap och området får en tydligt
-                mörkare nyans. Med opacity på G-nivå komponeras gruppen
-                som en enhet efter att stroke-pixlarna ritats → enhetlig
-                ton över hela Q-formen. Färgsatt i Colors.warning (gold)
-                för att signalera "vinnar-skärm" passande för Final
-                Leaderboard. */}
-            <G opacity={0.22}>
-              <Circle
-                cx={37}
-                cy={37}
-                r={13}
-                fill="none"
-                stroke={Colors.warning}
-                strokeWidth={3}
-              />
-              <Path
-                d="M46 46 L52 52"
-                stroke={Colors.warning}
-                strokeWidth={3}
-                strokeLinecap="round"
-              />
-            </G>
-          </Svg>
-          <Text style={styles.bgFinalTrophy} numberOfLines={1}>
-            🏆
-          </Text>
-          {/* "QuizVibe"-brand-text under Q+pokal-loggan. Naturligt flöde
-              under SVG:n (trophy är absolute så påverkar inte). Matchar
-              startskärmens appName-typografi (fontSize 38, weight 700,
-              letterSpacing -0.5, Nunito_700Bold) men i gold och med samma
-              transparens som Q+pokal (opacity 0.22). */}
-          <Text
-            style={[styles.bgFinalBrand, brandFont && { fontFamily: brandFont }]}
-            numberOfLines={1}
-          >
-            QuizVibe
-          </Text>
-        </View>
+        // Vattenstämpel (2026-10-21): det nya QuizVibe-Q:t, dämpat guld på
+        // mycket låg opacitet — ersätter Q + pokal + "QuizVibe"-texten.
+        // Delad med lobbyn (QuizVibeWatermark). pointerEvents none.
+        <QuizVibeWatermark size={BG_Q_SIZE} />
       )}
 
       {/* Sticky footer-rad — flex-baserad pinning vid skärmens nederkant så

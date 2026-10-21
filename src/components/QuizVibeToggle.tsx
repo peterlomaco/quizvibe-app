@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { AccessibilityInfo, Animated, Dimensions, Easing, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Dimensions, Easing, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import { BrandUi, Colors } from '../theme';
 import { MetallicGoldFill } from './MetallicGoldFill';
@@ -32,6 +32,12 @@ interface Props {
   /** Ikon i knoppen (t.ex. MusicNoteIcon). Får färgen för aktuellt läge. */
   icon?: (color: string, size: number) => React.ReactNode;
   accessibilityLabel: string;
+  /** Layout/opacitet på spåret (t.ex. marginLeft, låst-dimning). Läggs sist,
+   *  så en opacity här ERSÄTTER disabled-dimningen i stället för att staplas. */
+  style?: StyleProp<ViewStyle>;
+  /** Låst kontroll (t.ex. gäst-host): tappet går fortfarande till
+   *  onValueChange (som visar låst-popupen) men knoppen flippar inte. */
+  locked?: boolean;
 }
 
 // Smala skärmar (iPhone SE / Display Zoom = 320 pt): mixer-kolumnerna i
@@ -47,6 +53,8 @@ const SIZES = {
 
 const PAD = 2; // luft mellan knopp och spårkant (innanför 1 pt-kanten)
 const DURATION = 160;
+// Utan nytt värde inom denna tid (guard/bekräftelse avböjde) glider knoppen tillbaka.
+const REVERT_AFTER_MS = 900;
 
 export function QuizVibeToggle({
   value,
@@ -55,6 +63,8 @@ export function QuizVibeToggle({
   disabled = false,
   icon,
   accessibilityLabel,
+  style,
+  locked = false,
 }: Props) {
   const s = SIZES[variant];
   const travel = s.w - 2 - s.knob - PAD * 2; // 2 = spårets kant (1 pt × 2)
@@ -75,14 +85,64 @@ export function QuizVibeToggle({
     };
   }, []);
 
-  useEffect(() => {
+  // Omedelbar respons (2026-10-21): togglen är kontrollerad, så den rörde
+  // sig först när föräldern ritats om med nytt värde — på Lobby (en mycket
+  // tung skärm) kändes tappet oregistrerat. Nu visas det nya läget DIREKT
+  // (optimistiskt) och animationen startas native innan föräldern
+  // uppdateras; onValueChange körs först nästa frame. Kommer inget nytt
+  // värde (guard/bekräftelse-dialog avböjde) glider den tillbaka.
+  const [optimistic, setOptimistic] = useState<boolean | null>(null);
+  const valueRef = useRef(value);
+  const revertTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shown = optimistic ?? value;
+
+  const animateTo = (on: boolean) => {
     Animated.timing(progress, {
-      toValue: value ? 1 : 0,
+      toValue: on ? 1 : 0,
       duration: reduceMotion ? 0 : DURATION,
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
     }).start();
-  }, [value, reduceMotion, progress]);
+  };
+
+  useEffect(() => {
+    valueRef.current = value;
+    if (optimistic !== null && value === optimistic) {
+      setOptimistic(null);
+      if (revertTimer.current) {
+        clearTimeout(revertTimer.current);
+        revertTimer.current = null;
+      }
+    }
+    animateTo(optimistic ?? value);
+    // animateTo läser bara stabila värden + reduceMotion (i deps).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, optimistic, reduceMotion, progress]);
+
+  useEffect(
+    () => () => {
+      if (revertTimer.current) clearTimeout(revertTimer.current);
+    },
+    [],
+  );
+
+  const handlePress = () => {
+    if (!onValueChange) return;
+    if (locked) {
+      onValueChange(!value);
+      return;
+    }
+    const next = !shown;
+    animateTo(next);
+    setOptimistic(next);
+    if (revertTimer.current) clearTimeout(revertTimer.current);
+    revertTimer.current = setTimeout(() => {
+      revertTimer.current = null;
+      if (valueRef.current !== next) setOptimistic(null);
+    }, REVERT_AFTER_MS);
+    // Låt animationen starta innan den tunga föräldra-uppdateringen.
+    requestAnimationFrame(() => onValueChange(next));
+  };
 
   const translateX = progress.interpolate({ inputRange: [0, 1], outputRange: [0, travel] });
   // Frilagd sida visar aktuellt läge: OFF syns till höger när knoppen står
@@ -91,27 +151,28 @@ export function QuizVibeToggle({
   const onLabelOpacity = progress;
 
   // Ikonen syns i båda lägen: dämpad i OFF, mörk högkontrast på guldet i ON.
-  const iconColor = value ? BrandUi.toggleIconOn : BrandUi.iconMuted;
+  const iconColor = shown ? BrandUi.toggleIconOn : BrandUi.iconMuted;
 
   return (
     <Pressable
-      onPress={disabled || !onValueChange ? undefined : () => onValueChange(!value)}
+      onPress={disabled || !onValueChange ? undefined : handlePress}
       disabled={disabled}
       hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}
       accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ checked: value, disabled }}
+      accessibilityState={{ checked: shown, disabled }}
       style={({ pressed }) => [
         styles.track,
         {
           width: s.w,
           height: s.h,
           borderRadius: s.h / 2,
-          backgroundColor: value ? BrandUi.toggleOnTrack : BrandUi.toggleOffTrack,
-          borderColor: value ? BrandUi.toggleOnBorder : BrandUi.toggleOffBorder,
+          backgroundColor: shown ? BrandUi.toggleOnTrack : BrandUi.toggleOffTrack,
+          borderColor: shown ? BrandUi.toggleOnBorder : BrandUi.toggleOffBorder,
         },
         disabled && styles.disabled,
         pressed && !disabled && styles.pressed,
+        style,
       ]}
     >
       {/* Läges-etiketter i spåret (under knoppen i z-ordning). */}
@@ -139,8 +200,8 @@ export function QuizVibeToggle({
             transform: [{ translateX }],
             // Diskret guldglöd bara i ON (iOS-skugga; Android får ingen färgad glöd).
             shadowColor: BrandUi.toggleOnGlow,
-            shadowOpacity: value ? s.glow : 0,
-            shadowRadius: value ? 4 : 0,
+            shadowOpacity: shown ? s.glow : 0,
+            shadowRadius: shown ? 4 : 0,
             shadowOffset: { width: 0, height: 0 },
           },
         ]}
@@ -153,7 +214,7 @@ export function QuizVibeToggle({
               height: s.knob,
               borderRadius: s.knob / 2,
               backgroundColor: BrandUi.toggleKnobOff,
-              borderColor: value ? 'transparent' : BrandUi.toggleKnobOffBorder,
+              borderColor: shown ? 'transparent' : BrandUi.toggleKnobOffBorder,
             },
           ]}
         >

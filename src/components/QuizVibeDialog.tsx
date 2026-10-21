@@ -43,6 +43,12 @@ interface Props {
     busy: boolean;
     accessibilityHint?: string;
   };
+  /** Egen handler för sekundär-knappen (default = onClose). Används av
+   *  quizVibeAlert där backdrop-tap inte ska stänga men Cancel ska. */
+  onSecondary?: () => void;
+  /** Tre eller fler val (quizVibeAlert): staplade knappar i stället för
+   *  primär/sekundär-raden. */
+  stackedActions?: { label: string; onPress: () => void; kind: 'gold' | 'secondary' | 'destructive' }[];
 }
 
 export function QuizVibeDialog({ visible, onClose, ...rest }: Props) {
@@ -71,6 +77,8 @@ export function QuizVibeDialogOverlay({
   destructiveIcon,
   slideToConfirm,
   primaryLoading = false,
+  onSecondary,
+  stackedActions,
 }: Omit<Props, 'visible'>) {
   const busy = (slideToConfirm?.busy ?? false) || primaryLoading;
   return (
@@ -85,7 +93,7 @@ export function QuizVibeDialogOverlay({
         <Text style={styles.title} accessibilityRole="header">
           {title}
         </Text>
-        <Text style={styles.message}>{message}</Text>
+        {message ? <Text style={styles.message}>{message}</Text> : null}
         {warning ? (
           <>
             <View style={styles.warningDivider} />
@@ -113,12 +121,32 @@ export function QuizVibeDialogOverlay({
               accessibilityHint={slideToConfirm.accessibilityHint}
             />
           </View>
+        ) : stackedActions ? (
+          <View style={styles.slideActions}>
+            {stackedActions.map((a, i) =>
+              a.kind === 'destructive' ? (
+                <Pressable
+                  key={i}
+                  onPress={a.onPress}
+                  accessibilityRole="button"
+                  style={({ pressed }) => [
+                    styles.destructiveBtn,
+                    pressed && { opacity: 0.82, transform: [{ scale: 0.985 }] },
+                  ]}
+                >
+                  <Text style={styles.destructiveLabel}>{a.label}</Text>
+                </Pressable>
+              ) : (
+                <Button key={i} label={a.label} onPress={a.onPress} variant={a.kind} size="compact" />
+              ),
+            )}
+          </View>
         ) : (
         <View style={[styles.actions, destructive && styles.actionsDestructive]}>
           {secondaryLabel ? (
             <Button
               label={secondaryLabel}
-              onPress={onClose}
+              onPress={onSecondary ?? onClose}
               disabled={busy}
               variant="secondary"
               size="compact"
@@ -187,6 +215,12 @@ const styles = StyleSheet.create({
     borderColor: BrandUi.border,
     padding: Spacing.lg,
     gap: Spacing.md,
+    // Mjuk skugga (ingen glöd) så kortet lyfter från den dimmade ytan.
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
+    elevation: 10,
   },
   title: {
     fontSize: FontSize.lg,

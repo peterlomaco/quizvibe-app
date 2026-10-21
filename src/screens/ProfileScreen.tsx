@@ -5384,7 +5384,8 @@ const styles = StyleSheet.create({
   responseBtnActive: { borderColor: Colors.warning, backgroundColor: Colors.warningMuted },
   responseBtnInactive: { borderColor: BrandUi.border, backgroundColor: 'transparent' },
   responseBtnText: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textSecondary },
-  responseBtnTextActive: { color: Colors.warning, fontWeight: FontWeight.bold },
+  // Vald = vit text, guldkanten bär "vald"-signalen (färgregel 2026-10-21, = Lobby).
+  responseBtnTextActive: { color: Colors.textPrimary, fontWeight: FontWeight.bold },
   selector: {
     flexDirection: 'row',
     alignItems: 'center',

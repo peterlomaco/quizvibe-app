@@ -725,7 +725,9 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     let cancelled = false;
     let channel: ReturnType<typeof supabase.channel> | null = null;
     (async () => {
-      const { data: userResp } = await supabase.auth.getUser();
+      // Lokal session (ingen nätverksrunda / inget auth-lås) — bara uid behövs;
+      // servern validerar JWT:n vid varje skrivning ändå (2026-10-21).
+      const userResp = { user: (await supabase.auth.getSession()).data.session?.user ?? null };
       const userId = userResp.user?.id;
       if (!userId || cancelled) return;
       const topic = `realtime:waiting_invites:${userId}`;

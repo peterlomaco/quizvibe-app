@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, StyleSheet, Text, View } from 'react-native';
-import { WaveDots } from './WaveDots';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { ActivityIndicator, Modal, StyleSheet, Text, View } from 'react-native';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import {
   GlobalOverlayState,
   getGlobalOverlay,
@@ -25,9 +24,11 @@ export function GlobalOverlay() {
     <Modal visible={state.visible} transparent animationType="fade" onRequestClose={() => {}}>
       <View style={styles.overlay}>
         <View style={styles.card}>
+          {/* Lobby v2: appens standard-spinner + text (ersatte WaveDots, vars
+              prickar krockade med texten på smala skärmar). */}
           <View style={styles.textRow}>
+            <ActivityIndicator size="small" color={BrandUi.textMuted} />
             <Text style={styles.text}>{state.text}</Text>
-            <WaveDots />
           </View>
         </View>
       </View>
@@ -47,13 +48,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.lg,
-    borderRadius: Radius.md,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
+    maxWidth: 320,
   },
   textRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    gap: Spacing.sm,
   },
   text: {
     fontSize: FontSize.md,

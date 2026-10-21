@@ -298,9 +298,24 @@ function profileToRow(userId: string, email: string, p: ProfileData): ProfileRow
 // annars byggde en fantom-profil med tomt playerName → Home/BottomBanner
 // visade inloggat läge för guests som ejectats tillbaka till Home).
 async function getCurrentUser() {
-  const { data } = await supabase.auth.getUser();
-  if (data.user?.is_anonymous) return null;
-  return data.user;
+  // Lokal session först (ingen nätverksrunda). Saknas session, eller är den
+  // anonym (gäst), finns ingen profil att hämta — svara direkt.
+  //
+  // Varför (2026-10-21): getUser() är ett nätverksanrop som håller Supabase-
+  // klientens auth-lås under hela rundan. Home + gästformuläret anropar
+  // loadProfile många gånger; för gäster köades de i följd, och
+  // ensureAuthSession (Start Game – Guest login) fick vänta bakom alla —
+  // 27 s på ett långsamt nät.
+  //
+  // Samma gäller registrerade users (loggen 2026-10-21: dussintals köade
+  // getUser-rundor när en inloggad user startade ett spel). Användar-id:t
+  // räcker här — profiles-läsningen skyddas ändå av RLS mot JWT:n, och
+  // klienten förnyar/validerar sessionen själv (autoRefreshToken). Därför
+  // läses användaren ur den lokala sessionen även för inloggade.
+  const { data: sessionData } = await supabase.auth.getSession();
+  const sessionUser = sessionData.session?.user;
+  if (!sessionUser || sessionUser.is_anonymous) return null;
+  return sessionUser;
 }
 
 // ── Synkron profil-spegel (login-state utan flimmer) ────────────────────

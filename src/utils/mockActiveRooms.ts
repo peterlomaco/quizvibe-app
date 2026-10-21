@@ -126,7 +126,9 @@ function normalizeCode(code: string): string {
  */
 export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<boolean> {
   const normalized = normalizeCode(code);
-  const { data: userResp } = await supabase.auth.getUser();
+  // Lokal session (ingen nätverksrunda / inget auth-lås) — bara uid behövs;
+  // servern validerar JWT:n vid varje skrivning ändå (2026-10-21).
+  const userResp = { user: (await supabase.auth.getSession()).data.session?.user ?? null };
   const user = userResp.user;
   if (!user) {
     console.warn('[activeRooms] registerActiveRoom called without session — host must be signed in.');

@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from '@/src/components/haptic';
 import { LoadingContent } from './LoadingContent';
-import { Colors, Radius } from '../theme';
+import { BrandUi, Colors, Radius } from '../theme';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from './MetallicGoldFill';
 
 interface Props {
@@ -16,6 +16,8 @@ interface Props {
   locked?: boolean;
   /** Innehåll efter labeln, t.ex. <SequentialDots /> i ett vänteläge. */
   trailing?: React.ReactNode;
+  /** Innehåll före labeln, t.ex. appens spinner i "Preparing lobby…". */
+  leading?: React.ReactNode;
   accessibilityLabel?: string;
   /** Asynkront anrop pågår: spinner i stället för labeln, tap avstängt. */
   loading?: boolean;
@@ -28,7 +30,7 @@ interface Props {
  * Q-play-loggorna på Lobby:s Start Game och Get Ready:s Press Play
  * (Peter 2026-10-15).
  */
-export function GoldCtaButton({ label, onPress, locked = false, trailing, accessibilityLabel, loading = false }: Props) {
+export function GoldCtaButton({ label, onPress, locked = false, trailing, leading, accessibilityLabel, loading = false }: Props) {
   const [fontsLoaded] = useFonts({ Nunito_700Bold });
   const pulse = useRef(new Animated.Value(1)).current;
 
@@ -61,6 +63,7 @@ export function GoldCtaButton({ label, onPress, locked = false, trailing, access
         {!locked && <MetallicGoldFill />}
         <LoadingContent loading={loading} color="#000000">
         <View style={styles.row}>
+          {leading}
           <Text
             style={[
               styles.text,
@@ -95,9 +98,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
+  // Låst/väntande (Lobby v2): mörk gunmetal + svag kant i stället för den
+  // gamla blå cardElevated-ytan.
   btnLocked: {
-    backgroundColor: Colors.cardElevated,
-    borderColor: Colors.borderStrong,
+    backgroundColor: '#141C2B',
+    borderColor: BrandUi.border,
   },
   row: {
     flexDirection: 'row',
@@ -110,6 +115,6 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   textLocked: {
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
   },
 });
