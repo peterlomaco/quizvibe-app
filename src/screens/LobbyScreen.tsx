@@ -631,8 +631,9 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
     prevVisibleRef.current = visible;
     if (visible && !wasVisible && name === '') {
       // "Guest"-prefix → "GuestA-1234567" (6 letters totalt + 7 digits).
+      // En slumpad bokstav, unik i lobbyn: "A-1234567" (2026-10-21).
       const generated = generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, {
-        prefix: 'Guest',
+        singleLetter: true,
         excludeLetters: takenGuestLetters,
       });
       setName(generated);
@@ -698,7 +699,7 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
           { text: 'Cancel', style: 'cancel' },
           {
             text: 'Replace all',
-            onPress: () => applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest', excludeLetters: takenGuestLetters })),
+            onPress: () => applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { singleLetter: true, excludeLetters: takenGuestLetters })),
           },
           {
             text: 'Keep letters',
@@ -708,7 +709,7 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
       );
       return;
     }
-    applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { prefix: 'Guest', excludeLetters: takenGuestLetters }));
+    applyAddGenerated(generatePlayerName(TAKEN_PLAYER_NAMES_LOBBY, { singleLetter: true, excludeLetters: takenGuestLetters }));
   };
 
   // CodeKeyboard skickar tecknet hit. Helpers upprätthåller format per

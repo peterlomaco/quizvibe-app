@@ -7792,7 +7792,7 @@ export default function QuizScreen() {
     // Guest-identitet: auto-genererat GuestX-1234567-namn (samma format som
     // Home:s guest-host-form auto-fyller). Birth year tas från profilen så
     // age-baserad content-filtrering förblir rimlig; fallback 30 år.
-    const guestHostName = generatePlayerName(new Set(), { prefix: 'Guest' });
+    const guestHostName = generatePlayerName(new Set(), { singleLetter: true });
     const guestBirthYear =
       profile?.birthYear ?? new Date().getFullYear() - 30;
     track('guest_name_created', { autofilled: true, assistance: 'full' });

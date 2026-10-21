@@ -266,6 +266,14 @@ export interface GeneratePlayerNameOptions {
    */
   prefixOnly?: boolean;
   /**
+   * Gästnamn med EN slumpad versal som bokstavsdel: "A-1234567" (Peter
+   * 2026-10-21, ersätter "Guest-1234567"/"GuestA-1234567"). Respekterar
+   * `excludeLetters` så två gäster i samma lobby får olika bokstav. Unikhet
+   * vilar på bokstav + 7 siffror (26 × 10⁷) + `taken` + anroparens
+   * server-kontroll, precis som förut.
+   */
+  singleLetter?: boolean;
+  /**
    * Bevarar exakt dessa bokstäver utan att randomisera dem. Endast digit-
    * sektionen blir slumpad. Typiskt användning: "Try to keep PlayerName
    * letters?" → Yes-branchen passar in användarens typade bokstäver.
@@ -291,7 +299,8 @@ export interface GeneratePlayerNameOptions {
 export function extractTakenGuestLetters(names: string[]): Set<string> {
   const letters = new Set<string>();
   for (const name of names) {
-    const m = /^Guest([A-Z])/.exec(name);
+    // Nuvarande format "A-1234567" (bara en bokstav) + äldre "GuestA-…".
+    const m = /^([A-Z])(?:-\d|$)/.exec(name) ?? /^Guest([A-Z])/.exec(name);
     if (m) letters.add(m[1]);
   }
   return letters;
@@ -319,6 +328,19 @@ export function generatePlayerName(
 
   const buildLetters = (): string => {
     if (normalizedKeep.length > 0) return normalizedKeep;
+    if (options.singleLetter) {
+      const excluded = options.excludeLetters;
+      if (excluded && excluded.size > 0) {
+        const available: string[] = [];
+        for (const c of LETTERS) {
+          if (!excluded.has(c)) available.push(c);
+        }
+        if (available.length > 0) {
+          return available[Math.floor(Math.random() * available.length)];
+        }
+      }
+      return randomUpperLetter();
+    }
     if (normalizedPrefix.length > 0) {
       // Lägg på exakt EN versal random-bokstav efter prefix (var tidigare
       // upp till MAX_LETTERS = 5 random tecken för "Guest"-prefixet). Versal

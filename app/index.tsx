@@ -38,6 +38,7 @@ import {
   backspacePlayerNameLetters,
   containsBlockedLetterSubstring,
   containsReservedTakenSubstring,
+  extractTakenGuestLetters,
   generatePlayerName,
   getPlayerNameDigits,
   getPlayerNameLetters,
@@ -1023,7 +1024,10 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       : null;
     const taken = new Set(TAKEN_PLAYER_NAMES);
     for (const p of lobbyPlayers ?? []) taken.add(p.name.trim().toLowerCase());
-    let candidate = generatePlayerName(taken, { prefix: 'Guest', prefixOnly: true });
+    // En slumpad bokstav ("A-1234567", 2026-10-21) — undvik bokstäver som
+    // andra gäster i lobbyn redan har.
+    const excludeLetters = extractTakenGuestLetters((lobbyPlayers ?? []).filter((p) => !p.hasLeft).map((p) => p.name));
+    let candidate = generatePlayerName(taken, { singleLetter: true, excludeLetters });
     for (let attempt = 0; attempt < 4; attempt++) {
       let exists = false;
       try {
@@ -1033,7 +1037,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
       }
       if (!exists) return candidate;
       taken.add(candidate.toLowerCase());
-      candidate = generatePlayerName(taken, { prefix: 'Guest', prefixOnly: true });
+      candidate = generatePlayerName(taken, { singleLetter: true, excludeLetters });
     }
     return candidate;
   };
@@ -1203,7 +1207,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     // Auto-fill-detektion: format `GuestA-1234567` — "Guest"-prefix + 1
     // versal random + dash + 7 digits. Om användaren ändrat namnet
     // manuellt blir flaggan false.
-    const autofilled = /^Guest[A-Z]?-\d{7}$/.test(guestName.trim());
+    const autofilled = /^(?:Guest[A-Z]?|[A-Z])-\d{7}$/.test(guestName.trim());
     track('guest_name_created', { autofilled, assistance: guestAssistance });
     onClose();
     router.push({
@@ -1280,7 +1284,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
     clearLobbySettings(newCode);
     clearEjected(newCode);
     clearGameStarted(newCode);
-    const autofilled = /^Guest[A-Z]?-\d{7}$/.test(guestName.trim());
+    const autofilled = /^(?:Guest[A-Z]?|[A-Z])-\d{7}$/.test(guestName.trim());
     track('guest_name_created', { autofilled, assistance: guestAssistance });
     track('room_code_created', { guestHost: true });
     onClose();
@@ -3569,7 +3573,9 @@ export default function HomeScreen() {
                       numberOfLines={1}
                       adjustsFontSizeToFit
                     >
-                      Start New Game
+                      {/* Inloggad: knappen under Play as guest-rubriken heter
+                          Play as Guest (skiljer den från egna Start New Game). */}
+                      {isLoggedIn ? 'Play as Guest' : 'Start New Game'}
                     </Text>
                     {/* Inga badges på Home-knapparna (Home v2): FREE togs bort
                         från Register or Login 2026-10-16. */}
