@@ -17,10 +17,12 @@ import { HostTypeOptions, type HostLobbyType } from '@/src/components/HostTypeOp
 import { BrandUi, Colors, Radius, Spacing } from '@/src/theme';
 import { markSeriesContinues } from '@/src/utils/aggregateLeaderboard';
 import { identify, resetIdentity, track } from '@/src/utils/analytics';
+import { performLogout } from '@/src/utils/logout';
+import { QuizVibeDialogOverlay } from '@/src/components/QuizVibeDialog';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearLeftPlayers } from '@/src/utils/leftPlayers';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
-import { clearLobbyPlayers, getLobbyPlayers, leaveAllActiveMembershipsForUser } from '@/src/utils/mockLobbyPlayers';
+import { clearLobbyPlayers, getLobbyPlayers } from '@/src/utils/mockLobbyPlayers';
 import { clearLobbySettings, getLobbySettings } from '@/src/utils/mockLobbySettings';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { getRoomMeta, isActiveRoom, isLobbyFull, isOwnLobby, registerActiveRoom } from '@/src/utils/mockActiveRooms';
@@ -47,7 +49,7 @@ import {
 } from '@/src/utils/playerName';
 import { ensureAuthSession, resendActivationByName, signInWithPlayerName } from '@/src/utils/auth';
 import { containsProfanity } from '@/src/utils/profanity';
-import { clearProfile, emailExists, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
+import { emailExists, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { checkSpotifyInstalled } from '@/src/utils/spotifyDJ';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
@@ -3160,35 +3162,26 @@ export default function HomeScreen() {
   };
 
   // Bekräftar och loggar ut. Rensar Supabase-sessionen + AsyncStorage-cachen.
-  const handleLogout = () => {
-    Alert.alert(
-      'Log out?',
-      'Your profile will be removed from this device.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Log out',
-          style: 'destructive',
-          onPress: async () => {
-            // FÖRE signOut (kräver levande session): städa bort kontots aktiva
-            // lobby-deltaganden så en annan enhet med samma konto inte längre
-            // blockeras av "redan aktiv login"-guarden. Best-effort.
-            await leaveAllActiveMembershipsForUser();
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-              // Forsätt med lokal cleanup ändå — session kan ha gått ut server-side
-              // utan att klienten vet. Logga för diagnostik.
-              console.warn('supabase signOut error:', error.message);
-            }
-            await clearProfile();
-            setProfile(null);
-            track('user_logged_out');
-            resetIdentity();
-            setProfileMenuVisible(false);
-          },
-        },
-      ],
-    );
+  // Logout (2026-10-21): bekräftelsen är en QuizVibeDialogOverlay INUTI
+  // profileMenu-Modalen — en native Alert över en öppen RN-Modal kunde sväljas
+  // på iOS ("Log out gör ingenting"). Själva utloggningen går via delade
+  // performLogout() (tidstak på lobby-städningen) med "Logging out…"-läge.
+  const [logoutConfirmVisible, setLogoutConfirmVisible] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const handleLogout = () => setLogoutConfirmVisible(true);
+  const handleConfirmLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await performLogout();
+      setProfile(null);
+      track('user_logged_out');
+      resetIdentity();
+    } finally {
+      setLoggingOut(false);
+      setLogoutConfirmVisible(false);
+      setProfileMenuVisible(false);
+    }
   };
 
   const appNameFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
@@ -3823,9 +3816,10 @@ export default function HomeScreen() {
                   style={profileMenu.logoutRow}
                   activeOpacity={0.6}
                   onPress={handleLogout}
+                  disabled={loggingOut}
                 >
                   <LogoutIcon size={22} color={BrandUi.iconMuted} />
-                  <Text style={profileMenu.logoutRowText}>Log out</Text>
+                  <Text style={profileMenu.logoutRowText}>{loggingOut ? 'Logging out…' : 'Log out'}</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -4611,6 +4605,18 @@ export default function HomeScreen() {
           )}
 
         </KeyboardAvoidingView>
+        {/* Logout-bekräftelse inuti samma Modal (två samtidiga RN-Modals /
+            Alert över Modal kan sväljas på iOS). */}
+        {logoutConfirmVisible && (
+          <QuizVibeDialogOverlay
+            title="Log out?"
+            message="Your profile will be removed from this device."
+            secondaryLabel="Cancel"
+            primaryLabel={loggingOut ? 'Logging out…' : 'Log out'}
+            onPrimary={() => { void handleConfirmLogout(); }}
+            onClose={() => { if (!loggingOut) setLogoutConfirmVisible(false); }}
+          />
+        )}
       </Modal>
 
       {/* ── QuizVibe user vs Guest ─────────────────────────────

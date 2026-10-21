@@ -75,7 +75,6 @@ const sectionIconColor = (_expanded: boolean) => BrandUi.iconMuted;
 import { resetIdentity, track } from '../utils/analytics';
 import { deleteAccount } from '../utils/auth';
 import { TRACK_VIEWPORT_W } from '../utils/responsive';
-import { supabase } from '../utils/supabase';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import {
     addFriend,
@@ -85,7 +84,6 @@ import {
 } from '../utils/friendsStorage';
 import { PURCHASED_PACKAGES, parentRestrictedPackageMessage, type MusicPackage } from '../utils/mockPurchasedPackages';
 import {
-    clearProfile,
     getCachedProfile,
     loadProfile,
     playerNameExists,
@@ -118,7 +116,8 @@ import { clearEjected } from '../utils/ejectedPlayers';
 import { clearLeftPlayers } from '../utils/leftPlayers';
 import { registerActiveRoom } from '../utils/mockActiveRooms';
 import { checkActiveElsewhere } from '../utils/activeLobbyGuard';
-import { clearLobbyPlayers, leaveAllActiveMembershipsForUser } from '../utils/mockLobbyPlayers';
+import { clearLobbyPlayers } from '../utils/mockLobbyPlayers';
+import { performLogout } from '../utils/logout';
 import { clearLobbySettings } from '../utils/mockLobbySettings';
 import { clearGameStarted } from '../utils/mockStartedGames';
 import { generateRoomCode } from '../utils/roomCode';
@@ -1401,6 +1400,7 @@ export default function ProfileScreen() {
   // profileMenu (header med avatar+playerName+"Logged in"-status, röd
   // Log out-knapp, Cancel) — samma visuella behandling så användaren
   // får konsistent UX oavsett varifrån de loggar ut.
+  const [loggingOut, setLoggingOut] = useState(false);
   const handleConfirmLogout = async () => {
     // supabase.auth.signOut() MÅSTE köras innan clearProfile() — annars
     // lever Supabase-sessionen vidare i AsyncStorage även när profil-cachen
@@ -1409,18 +1409,19 @@ export default function ProfileScreen() {
     // dök upp 2026-05-23). Speglar Home-skärmens handleLogout-pattern.
     // FÖRE signOut (kräver levande session): städa bort kontots aktiva
     // lobby-deltaganden så en annan enhet med samma konto inte längre
-    // blockeras av "redan aktiv login"-guarden. Best-effort.
-    await leaveAllActiveMembershipsForUser();
+    // blockeras av "redan aktiv login"-guarden. Best-effort, med tidstak
+    // (performLogout, 2026-10-21) så utloggningen aldrig ser ut att hänga.
+    if (loggingOut) return;
+    setLoggingOut(true);
     try {
-      await supabase.auth.signOut();
-    } catch (err) {
-      console.warn('[ProfileScreen] supabase.auth.signOut failed:', err);
+      await performLogout();
+      track('user_logged_out');
+      resetIdentity();
+    } finally {
+      setLoggingOut(false);
+      setLogoutModalVisible(false);
+      router.replace('/');
     }
-    await clearProfile();
-    track('user_logged_out');
-    resetIdentity();
-    setLogoutModalVisible(false);
-    router.replace('/');
   };
 
   // Permanent account deletion — Apple App Store Guideline 5.1.1(v)
@@ -3541,10 +3542,10 @@ export default function ProfileScreen() {
                 pressed && { opacity: 0.6 },
               ]}
               onPress={handleConfirmLogout}
-              disabled={deletingAccount}
+              disabled={deletingAccount || loggingOut}
             >
               <LogoutIcon size={22} color={BrandUi.iconMuted} />
-              <Text style={styles.logoutBtnText}>Log out</Text>
+              <Text style={styles.logoutBtnText}>{loggingOut ? 'Logging out…' : 'Log out'}</Text>
             </Pressable>
 
             {/* Danger zone (UI 2026-10-20) — Delete Account avskild från Log
