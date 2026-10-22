@@ -38,6 +38,7 @@ import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
 import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeGoldMark } from '../components/QuizVibeGoldMark';
+import { QuizVibeDefaultAvatar } from '../components/QuizVibeDefaultAvatar';
 import { BRAND_TAGLINE } from '../components/brand/QuizVibeBrandSvg';
 import { GoldCtaButton } from '../components/GoldCtaButton';
 import { GroupOutlineIcon } from '../components/GroupOutlineIcon';
@@ -52,6 +53,7 @@ import { QuizVibeDialogOverlay } from '../components/QuizVibeDialog';
 import { quizVibeAlert } from '../utils/quizVibeAlert';
 import { ClapperboardIcon, MusicNoteIcon } from '../components/CategoryIcons';
 import { YouTubeBrandIcon } from '../components/YouTubeBrandIcon';
+import { HintsIcon } from '../components/HintsIcon';
 import { SpotifyBrandIcon } from '../components/SpotifyBrandIcon';
 // Spotify OAuth-imports borttagna (Plan B 2026-07-22) — handleConnectSpotify/
 // applySpotifyDisconnect är numera lokala self-attest-handlers utan API.
@@ -1648,7 +1650,9 @@ export default function LobbyScreen() {
             ? stored?.roundsCount ?? ROUNDS_DEFAULT
             : stored?.roundsCount ?? profile?.roundsDefault ?? ROUNDS_DEFAULT;
           const isIndivPremium =
-            premium && seedGameMode === 'individual-devices' && !seedSinglePlayer;
+            premium &&
+            ((seedGameMode === 'individual-devices' && !seedSinglePlayer) ||
+              seedGameMode === 'remote-1v1');
           const initialMax = isIndivPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
           setRoundsCount(
             Math.max(ROUNDS_MIN, Math.min(initialMax, savedRounds)),
@@ -2628,7 +2632,12 @@ export default function LobbyScreen() {
   // Max rundor beror på spelläge: IndDev → 20, PtP/Single → 4.
   // Premium ger INTE fler rundor i PtP — premium-host i PtP hänvisas till
   // att byta till IndDev för att nå 20 rundor (se onPremiumPress-alertet).
-  const roundsMax = gameMode === 'individual-devices' && !singlePlayerDefault ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+  // Head-to-head (remote-1v1) får också upp till 20 rundor med Premium
+  // (Peter 2026-10-22) — båda spelar på egna enheter, som IndDev.
+  const roundsMax =
+    (gameMode === 'individual-devices' && !singlePlayerDefault) || gameMode === 'remote-1v1'
+      ? ROUNDS_MAX_INDIV
+      : ROUNDS_MAX_PASS;
   // stepperMax är taket för +/−-knapparna — kräver premium för >4 rundor.
   // RoundsRuler:s gameModeMax=roundsMax (20) behålls för att visa bracketets
   // fulla span med låsta tickar ovanför stepperMax.
@@ -2649,7 +2658,7 @@ export default function LobbyScreen() {
   }, []);
   const handleIncrementRounds = useCallback(() => {
     if (roundsCount >= stepperMax) {
-      if (singlePlayerDefault || gameMode === 'pass-the-phone' || gameMode === 'remote-1v1') {
+      if (singlePlayerDefault || gameMode === 'pass-the-phone') {
         quizVibeAlert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
       }
       return;
@@ -2666,7 +2675,9 @@ export default function LobbyScreen() {
   // "Subscription-styling (host-vyn)".
   const handleRoundsPremiumPress = useCallback(() => {
     if (hasPremium) {
-      if (gameMode === 'individual-devices' && !singlePlayerDefault) {
+      if (gameMode === 'remote-1v1') {
+        quizVibeAlert('Premium active', 'You have QuizVibe Premium — up to 20 rounds are unlocked in Head-to-head.');
+      } else if (gameMode === 'individual-devices' && !singlePlayerDefault) {
         quizVibeAlert('Premium active', 'You have QuizVibe Premium — up to 20 rounds are unlocked in Individual device mode.');
       } else {
         quizVibeAlert('Individual device required', 'Switch to Individual device mode to host up to 20 rounds. Premium is already active on your account.');
@@ -7358,7 +7369,9 @@ export default function LobbyScreen() {
               crossfade / "You are invited") → Share som sekundär action.
               Q-märket är en liten, dämpad signatur i övre vänstra hörnet. */}
           <View style={styles.roomCodeLogoWrap} pointerEvents="none">
-            <QuizVibeGoldMark size={26} />
+            {/* Nya rena Q:t (default-avatarens, utan wifi-bågar) — samma
+                som Get Ready-headern. Gäller multiplayer + H2H (single har inget rumskort). */}
+            <QuizVibeDefaultAvatar size={30} framed />
           </View>
           <Text style={styles.roomLabel}>Room Code</Text>
           {/* Koden i tre grupper (bokstäver · siffror · bokstäver) med EN ruta
@@ -7733,12 +7746,8 @@ export default function LobbyScreen() {
                 onPress={lockedModeAlert}
                 activeOpacity={0.7}
               >
-                {/* Stängt hänglås — lobbytypen är LÅST (1vs1 väljs på Home och
-                    kan inte bytas här). Samma signal som single/re-match-rutan
-                    (Peter 2026-08-28). */}
-                <View style={styles.lockBadge} pointerEvents="none">
-                  <Text style={styles.lockBadgeText}>🔒</Text>
-                </View>
+                {/* Inget hänglås i H2H-rutan (Peter 2026-10-22) — läget är
+                    fortfarande låst (tap → lockedModeAlert), bara ikonen är borta. */}
                 <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
                   Head-to-head
                 </Text>
@@ -8355,11 +8364,8 @@ export default function LobbyScreen() {
                 <View style={styles.smAutoCell} />
                 <View style={styles.smLabelSourceCell}>
                   <View style={styles.imagesIconWrap}>
-                    <Svg width={20} height={20} viewBox="24 22 32 32">
-                      <Circle cx="40" cy="38" r="13" fill="none" stroke={BrandUi.iconMuted} strokeWidth="2.5" />
-                      <Path d="M49 47 L53 51" stroke={BrandUi.iconMuted} strokeWidth="2.5" strokeLinecap="round" />
-                    </Svg>
-                    <Text style={styles.imagesQMark}>?</Text>
+                    {/* Hints-ikon (Q-familjen) — guld när någon Hints-källa är på. */}
+                    <HintsIcon size={20} color={imagesEnabledCategories.length > 0 ? Colors.warning : BrandUi.iconMuted} />
                   </View>
                   <Text style={styles.sourceMatrixSourceText}>Hints</Text>
                   <Pressable
@@ -8444,11 +8450,7 @@ export default function LobbyScreen() {
                 </View>
                 <View style={styles.pkgSourceRow}>
                   <View style={styles.imagesIconWrap}>
-                    <Svg width={20} height={20} viewBox="24 22 32 32">
-                      <Circle cx="40" cy="38" r="13" fill="none" stroke={BrandUi.iconMuted} strokeWidth="2.5" />
-                      <Path d="M49 47 L53 51" stroke={BrandUi.iconMuted} strokeWidth="2.5" strokeLinecap="round" />
-                    </Svg>
-                    <Text style={styles.imagesQMark}>?</Text>
+                    <HintsIcon size={20} color={pkgHintsActive ? Colors.warning : BrandUi.iconMuted} />
                   </View>
                   <Text style={styles.sourceMatrixSourceText}>Hints</Text>
                   <View style={{ flex: 1 }} />
@@ -9135,7 +9137,7 @@ export default function LobbyScreen() {
                     <View style={styles.roundsPlusGroup}>
                     <TouchableOpacity
                       style={[styles.roundsStepperBtn, roundsCount >= stepperMax && styles.roundsStepperBtnDisabled]}
-                      onPress={roundsCount >= stepperMax && !hasPremium && gameMode !== 'remote-1v1'
+                      onPress={roundsCount >= stepperMax && !hasPremium
                         ? () => quizVibeAlert(
                             'Premium feature',
                             'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
@@ -9144,18 +9146,14 @@ export default function LobbyScreen() {
                               { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
                             ],
                           )
-                        // Remote 1v1 vid cap → handleIncrementRounds visar den
-                        // ärliga "More rounds not available"-alerten (Premium
-                        // ger INTE fler rundor i 1vs1).
                         : handleIncrementRounds}
                       activeOpacity={0.7}
                     >
                       <Text style={[styles.roundsStepperBtnText, roundsCount >= stepperMax && styles.roundsStepperBtnTextDisabled]}>+</Text>
                     </TouchableOpacity>
-                    {/* PREMIUM-badgen göms i 1v1-lobbyn — remote är hårt
-                        cappad på 4 rundor oavsett Premium (upsell vore
-                        missvisande). */}
-                    {roundsCount >= stepperMax && gameMode !== 'remote-1v1' && (
+                    {/* PREMIUM-badgen visas även i H2H — Premium ger upp till
+                        20 rundor där (Peter 2026-10-22). */}
+                    {roundsCount >= stepperMax && (
                       <TouchableOpacity
                         onPress={handleRoundsPremiumPress}
                         activeOpacity={0.7}
@@ -9176,10 +9174,9 @@ export default function LobbyScreen() {
                       value={roundsCount}
                       min={ROUNDS_MIN}
                       gameModeMax={stepperMax}
-                      // 1v1: ingen premium-klammer/badge (onPremiumPress
-                      // utelämnad → RoundsRuler döljer dem) — remote är
-                      // alltid max 4 rundor, ingen Premium-väg förbi.
-                      onPremiumPress={gameMode === 'remote-1v1' ? undefined : handleRoundsPremiumPress}
+                      onPremiumPress={handleRoundsPremiumPress}
+                      // H2H kräver bara Premium (inte Individual device).
+                      requirementPrefix={gameMode === 'remote-1v1' ? '' : undefined}
                       hasSubscription={hasPremium}
                       indivActive={!singlePlayerDefault && gameMode === 'individual-devices'}
                       // Profile-stil (2026-10-21): ingen grön FREE-/stor Premium-
@@ -9284,11 +9281,8 @@ export default function LobbyScreen() {
                         <YouTubeBrandIcon size={14} />
                       ) : slot.source === 'image' ? (
                         <View style={styles.gsSourceQWrap}>
-                          <Svg width={13} height={13} viewBox="24 22 32 32">
-                            <Circle cx="40" cy="38" r="13" fill="none" stroke={BrandUi.iconMuted} strokeWidth="2.5" />
-                            <Path d="M49 47 L53 51" stroke={BrandUi.iconMuted} strokeWidth="2.5" strokeLinecap="round" />
-                          </Svg>
-                          <Text style={styles.gsSourceQMark}>?</Text>
+                          {/* Förenklad Hints-ikon (samma familj som mixern). */}
+                          <HintsIcon size={17} simplified />
                         </View>
                       ) : null}
                     </View>
@@ -10526,7 +10520,7 @@ const CHOICE_BG = '#111826';
 const CHOICE_BORDER = 'rgba(255,255,255,0.10)';
 // Profile är facit (Lobby v2, 2026-10-21): vald = guldkant + svag guldton.
 const CHOICE_SELECTED_BORDER = Colors.warning;
-const CHOICE_SELECTED_BG = Colors.warningMuted;
+const CHOICE_SELECTED_BG = BrandUi.selectedFill;
 
 const styles = StyleSheet.create({
   // ── Guest leave-room sheet (speglar ProfileScreen.logout-sheet —
@@ -12968,8 +12962,8 @@ const styles = StyleSheet.create({
   // samma viewBox och stroke som Source Dashboard:s Hints-rad men primär-blå
   // (synligt mot den mörka box-bakgrunden Colors.cardElevated).
   gsSourceQWrap: {
-    width: 13,
-    height: 13,
+    width: 17,
+    height: 17,
     position: 'relative',
   },
   gsSourceQMark: {

@@ -16,12 +16,17 @@ import {
 // brödtext) → capped mot Dynamic Type.
 import { CappedText as Text } from './CappedText';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { MainCategory, mainCategoryDisplay } from '../utils/mainCategory';
 import type { PlayedMediaSource } from '../utils/mediaSource';
 import { MediaSourceIcon } from './MediaSourceIcon';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { QuizVibeGoldMark } from './QuizVibeGoldMark';
+import { SectionToggle } from './SectionToggle';
+import { TrophyIcon } from './TrophyIcon';
+import { HintsIcon } from './HintsIcon';
+import Svg, { Path } from 'react-native-svg';
+import { QuizVibeDefaultAvatar } from './QuizVibeDefaultAvatar';
 import { GoldCtaButton } from './GoldCtaButton';
 import { SequentialDots } from './SequentialDots';
 import { ConnectionUnstableOverlay } from './ConnectionUnstableOverlay';
@@ -81,7 +86,7 @@ const ASSISTANCE_LABEL: Record<'minimal' | 'standard' | 'full', string> = {
 // Rad-höjd för leaderboard-spelarrader — något högre än rubriken så långa
 // PlayerNames ryms på två rader (bokstäver+"-" / siffror).
 const LB_ROW_H = 66;
-const LB_HEADER_H = 52;
+const LB_HEADER_H = 44;
 
 /** Renderar ett PlayerName i leaderboard-kolumnen. Format [Letters]-[Digits]:
  *  bryt vid bindestrecket → bokstäver+"-" på rad 1, siffror på rad 2, så första
@@ -316,9 +321,9 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 // hur mycket spelaren behöver scrolla för att nå play-knappen.
 const COMPACT = SCREEN_HEIGHT < 700;
 const VERY_COMPACT = SCREEN_HEIGHT < 600;
-// Brand-logon i Game settings-blocket. Mindre än tidigare corner-logo
-// (140) eftersom den nu sitter inline med settings-text till höger.
-const LOGO_SIZE = Math.min(COMPACT ? 76 : 96, SCREEN_WIDTH - 200);
+// Q-märket i Game settings-raden (UI v2 2026-10-22): litet inline-märke
+// så "Game settings" är fokus — samma diskreta Q som Lobby:s rumskort.
+const LOGO_SIZE = COMPACT ? 30 : 34;
 // Storleken på Q-play-loggan + halo:n bakom. SVG:n har transparent padding så
 // halo-insetten räknas mot den synliga square-kanten (~16px-margin runt logon).
 const PLAY_BUTTON_SIZE = VERY_COMPACT ? 108 : COMPACT ? 122 : 140;
@@ -541,15 +546,19 @@ export function GetReadyIntro({
     const renderDot = (globalIdx: number) => {
       const isFilled = globalIdx < filled;
       const isCurrent = label === 'Question' && globalIdx === filled - 1;
+      // Aktiv ruta (UI v2): guldkant + svag guldyta + vit siffra. Avklarade
+      // rutor får en neutral ton; kommande är mörka med grå kant/siffra.
+      const isActive = globalIdx === filled - 1;
       const icon = iconsByDot?.[globalIdx] ?? null;
       const style = [
         styles.progressDot,
         isFilled && styles.progressDotFilled,
+        isActive && styles.progressDotActive,
         icon != null && styles.progressDotRow,
       ];
       const content = (
         <>
-          <Text style={styles.progressDotNumber}>{globalIdx + 1}</Text>
+          <Text style={[styles.progressDotNumber, isActive && styles.progressDotNumberActive]}>{globalIdx + 1}</Text>
           {icon != null && <MediaSourceIcon source={icon} size={14} />}
         </>
       );
@@ -948,12 +957,11 @@ export function GetReadyIntro({
           knapparna). Layouten är en row som alignSelf:'center' så hela
           gruppen sitter i mitten av skärmen. */}
       <View style={styles.settingsBlock}>
-        {/* Guld-Q:t (2026-10-15). PNG:en är tight beskuren, medan den gamla
-            SVG:n hade luft runt kvadraterna — 0.8 ger ungefär samma synliga
-            storlek. Wrappern behåller LOGO_SIZE så settings-texten bredvid
-            inte flyttar sig. */}
+        {/* Litet guld-Q inline med rubriken (UI v2 2026-10-22) — tidigare
+            ett stort 96 pt-märke som dominerade och sköt ned resten. */}
         <View style={styles.logoSlot}>
-          <QuizVibeGoldMark size={Math.round(LOGO_SIZE * 0.8)} />
+          {/* Nya rena Q:t (samma som default-avataren), utan wifi-bågar. */}
+          <QuizVibeDefaultAvatar size={LOGO_SIZE} framed />
         </View>
         <View style={styles.settingsTextWrap}>
           <TouchableOpacity
@@ -962,11 +970,8 @@ export function GetReadyIntro({
             activeOpacity={0.7}
           >
             <Text style={styles.settingsTitle}>Game settings</Text>
-            <View style={styles.settingsToggleBox}>
-              <Text style={styles.settingsToggleGlyph}>
-                {settingsExpanded ? '−' : '+'}
-              </Text>
-            </View>
+            {/* Delad +/−-kontroll (samma som Profile v2-sektionerna). */}
+            <SectionToggle expanded={settingsExpanded} />
           </TouchableOpacity>
           {settingsExpanded && (
             <>
@@ -1073,14 +1078,15 @@ export function GetReadyIntro({
             onPress={() => setLeaderboardOpen((v) => !v)}
             activeOpacity={0.7}
           >
-            <Text style={styles.leaderboardHeaderTitle}>
-              {`🏆  Current Leaderboard - ${playerCount} ${playerCount === 1 ? 'Player' : 'Players'}`}
-            </Text>
-            <View style={styles.leaderboardToggleBox}>
-              <Text style={styles.leaderboardToggleGlyph}>
-                {leaderboardOpen ? '−' : '+'}
+            {/* Vektor-pokal i guld (UI v2) i stället för 🏆-emoji. */}
+            <View style={styles.leaderboardHeaderLeft}>
+              <TrophyIcon height={18} color={Colors.warning} />
+              <Text style={styles.leaderboardHeaderTitle} numberOfLines={1}>
+                {`Current Leaderboard - ${playerCount} ${playerCount === 1 ? 'Player' : 'Players'}`}
               </Text>
             </View>
+            {/* Delad +/−-kontroll (samma som Game settings). */}
+            <SectionToggle expanded={leaderboardOpen} />
           </TouchableOpacity>
           {leaderboardOpen && (() => {
             // D-iii: dela upp i två sektioner. Disconnected (men inte hasLeft)
@@ -1458,6 +1464,7 @@ export function GetReadyIntro({
             {canStartGame ? (
               startLocked ? (
                 <GoldCtaButton
+                  compact
                   locked
                   label="Connecting players"
                   trailing={<SequentialDots color={Colors.textSecondary} />}
@@ -1465,7 +1472,15 @@ export function GetReadyIntro({
                 />
               ) : (
                 <GoldCtaButton
+                  compact
                   label="Press Play"
+                  // Liten svart play-triangel efter labeln — del av etiketten,
+                  // ingen egen bakgrund/cirkel (Peter 2026-10-22).
+                  trailing={
+                    <Svg width={11} height={12} viewBox="0 0 11 12" style={{ marginLeft: 1 }}>
+                      <Path d="M1.5 1.2 L10 6 L1.5 10.8 Z" fill="#000000" stroke="#000000" strokeWidth={1.2} strokeLinejoin="round" />
+                    </Svg>
+                  }
                   onPress={handlePlayPress}
                   accessibilityLabel={`${playerName} press to start your turn`}
                 />
@@ -1497,11 +1512,15 @@ export function GetReadyIntro({
 
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
               <View style={[styles.colPlayer, styles.cellHeader]}>
-                <Text style={styles.headerCellText}>
-                  {isSinglePlayer
-                    ? `Player name: ${playerName}`
-                    : 'Next:'}
-                </Text>
+                {isSinglePlayer ? (
+                  // Etiketten dämpad, själva namnet vitt och tydligare (UI v2).
+                  <Text style={styles.headerCellText} numberOfLines={1}>
+                    {'Player name: '}
+                    <Text style={styles.headerCellName}>{playerName}</Text>
+                  </Text>
+                ) : (
+                  <Text style={styles.headerCellText}>Next:</Text>
+                )}
               </View>
             </View>
 
@@ -1588,11 +1607,8 @@ export function GetReadyIntro({
                     activeOpacity={0.7}
                   >
                     <Text style={styles.queueToggleLabel}>Playing queue</Text>
-                    <View style={styles.settingsToggleBox}>
-                      <Text style={styles.settingsToggleGlyph}>
-                        {queueExpanded ? '−' : '+'}
-                      </Text>
-                    </View>
+                    {/* Delad +/−-kontroll (samma som Game settings). */}
+                    <SectionToggle expanded={queueExpanded} />
                   </TouchableOpacity>
                   {queueExpanded && questionDataPending ? (
                     // Non-host väntar på host:s fråge-sekvens — chips skulle
@@ -1619,6 +1635,9 @@ export function GetReadyIntro({
                               </Text>
                               {isSpotify ? (
                                 <SpotifyBrandIcon size={14} variant="white" />
+                              ) : source === 'image' ? (
+                                // Samma Hints-ikon som lobbyns Game Mixer/Sequence.
+                                <HintsIcon size={16} simplified />
                               ) : (
                                 <MediaSourceIcon source={source} size={16} />
                               )}
@@ -1711,7 +1730,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm + 2,
+    // Kompaktare band (UI v2 2026-10-22).
+    paddingVertical: Spacing.xs + 2,
     backgroundColor: Colors.card,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
@@ -1740,13 +1760,15 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.textSecondary,
   },
+  // UI v2: mörk, diskret bakgrund + tunn dämpad röd kant — fortfarande
+  // tydligt destruktiv via den röda texten, ingen glöd.
   quitBtn: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.errorMuted,
-    backgroundColor: 'rgba(255,107,107,0.08)',
+    borderColor: 'rgba(255,107,107,0.35)',
+    backgroundColor: 'rgba(255,107,107,0.06)',
   },
   quitBtnText: {
     fontSize: FontSize.sm,
@@ -1874,13 +1896,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     alignSelf: 'center',
-    gap: Spacing.sm,
+    gap: Spacing.md,
+    // Q:t lite längre ut åt vänster (Peter 2026-10-22).
+    marginLeft: -Spacing.lg,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
   },
   logoSlot: {
     width: LOGO_SIZE,
     height: LOGO_SIZE,
+    // Samma dämpade guld-signatur som rumskortets Q i Lobby (opacity 0.45).
+    opacity: 0.45,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1896,6 +1922,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     marginBottom: 4,
+    // Samma höjd som Q-märket så titel + märke står på en linje.
+    minHeight: LOGO_SIZE,
   },
   queueToggleRow: {
     flexDirection: 'row',
@@ -1926,7 +1954,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   settingsTitle: {
-    fontSize: FontSize.lg,
+    fontSize: FontSize.xl,
     fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
     letterSpacing: 0.4,
@@ -1981,8 +2009,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    // Vald-läge = lobbyns guld (UI v2): guldkant + svag guldyta, vit text.
+    borderColor: Colors.warning,
+    backgroundColor: BrandUi.selectedFill,
   },
   responseDropdownTriggerLocked: {
     borderColor: Colors.borderStrong,
@@ -1991,7 +2020,7 @@ const styles = StyleSheet.create({
   responseDropdownTriggerText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
   responseDropdownTriggerTextLocked: {
@@ -1999,7 +2028,7 @@ const styles = StyleSheet.create({
   },
   responseDropdownChevron: {
     fontSize: 10,
-    color: Colors.primary,
+    color: Colors.textPrimary,
   },
   // Remote-Audio-radens högtalar-glyf. Egen fontSize — chevron-stilens 10 px
   // är för litet för en emoji (den ärver ändå inte color).
@@ -2011,7 +2040,7 @@ const styles = StyleSheet.create({
   responseDropdownReadOnlyText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
   // ── Current Leaderboard ──────────────────────────────────────────────
@@ -2032,11 +2061,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    backgroundColor: Colors.cardElevated,
+    // UI v2: lite tätare + mörk navy i stället för den tunga blå ytan.
+    paddingVertical: Spacing.xs + 2,
+    backgroundColor: Colors.card,
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: Radius.md,
+  },
+  leaderboardHeaderLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginRight: Spacing.sm,
   },
   // När open: header får bara rundade top-corners så den knyter visuellt
   // ihop med body-panelen direkt under (som har rundade bottom-corners).
@@ -2046,8 +2083,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   leaderboardHeaderTitle: {
+    flexShrink: 1,
     fontSize: FontSize.md,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
     letterSpacing: 0.4,
   },
@@ -2103,12 +2141,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    // Subtilare radavdelare (UI v2).
+    borderBottomColor: Colors.separator,
   },
   // Header-cell ärver lbCell + bg-toning så den sticker ut från data-rader.
   lbHeaderCell: {
     height: LB_HEADER_H,
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: 'rgba(255,255,255,0.03)',
   },
   lbHeaderText: {
     fontSize: FontSize.xs,
@@ -2133,9 +2172,11 @@ const styles = StyleSheet.create({
   lbPos: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: Colors.textSecondary,
     fontVariant: ['tabular-nums'],
     width: 16,
+    // Lite mer luft mellan placeringen och avataren (UI v2).
+    marginRight: 4,
   },
   // Stack:ar namn ovanpå meta-rad (assistance + ålder) — namnet i textPrimary,
   // meta i textSecondary mindre storlek så det läses som en sub-info-rad.
@@ -2171,7 +2212,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomColor: Colors.separator,
   },
   lbMidCell: {
     fontSize: FontSize.sm,
@@ -2192,8 +2233,9 @@ const styles = StyleSheet.create({
   // ryms inom initial mid-scroll-vyn på iPhone-bredd utan horisontell
   // scroll. 22 räcker för 2-siffriga värden (max ~20 questions/correct/wrong)
   // i tabular-nums + xs-header.
-  lbColR: { width: 22 },
-  lbColCheck: { width: 22 },
+  // 26 (var 22) — lite luftigare mellan Q / ✓ / ✗.
+  lbColR: { width: 26 },
+  lbColCheck: { width: 26 },
   lbColTime: { width: 60 },
   lbColLast5: { width: 96 },
   lbColConnErr: { width: 36 },
@@ -2242,6 +2284,7 @@ const styles = StyleSheet.create({
   // Samma bredd (16) som lbPos så namn-stacken börjar på samma x-position.
   lbDisconnectedIconSlot: {
     width: 16,
+    marginRight: 4, // = lbPos, så namnen linjerar
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -2314,7 +2357,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    // Guld i stället för blått (UI v2).
+    color: Colors.warning,
     fontVariant: ['tabular-nums'],
     textAlign: 'right',
   },
@@ -2355,7 +2399,9 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
   },
   dropdownOptionActive: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
+    borderWidth: 1,
+    borderColor: Colors.warning,
   },
   dropdownOptionText: {
     fontSize: FontSize.lg,
@@ -2363,7 +2409,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   dropdownOptionTextActive: {
-    color: Colors.primary,
+    color: Colors.textPrimary,
   },
   voiceOptionLeft: {
     flexDirection: 'row',
@@ -2379,12 +2425,12 @@ const styles = StyleSheet.create({
   },
   voicePreviewIcon: {
     fontSize: FontSize.md,
-    color: Colors.primary,
+    color: Colors.warning,
   },
   dropdownOptionCheck: {
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: Colors.warning,
   },
 
   // ── Turordningstabell ────────────────────────────────────────────────
@@ -2456,6 +2502,12 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.5,
   },
+  headerCellName: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    letterSpacing: 0.3,
+  },
   numText: {
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
@@ -2501,8 +2553,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.md,
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.primary,
+    // UI v2: samma aktiv/vald-guld som lobbyn (guldkant + svag guldyta).
+    backgroundColor: BrandUi.selectedFill,
+    borderColor: Colors.warning,
     borderWidth: 1.5,
     borderRadius: Radius.md,
     paddingVertical: Spacing.sm,
@@ -2519,7 +2572,7 @@ const styles = StyleSheet.create({
     left: Spacing.xxl,
     fontSize: FontSize.lg,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   // Tar inte flex:1 — då skulle texten sträcka sig över hela bredden och
@@ -2570,7 +2623,7 @@ const styles = StyleSheet.create({
     // även vid 4 rondor × 3+ spelare (chip-grid:n wrappar då till flera rader).
     paddingVertical: Spacing.xs,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomColor: Colors.separator,
   },
   // Slutmarkör inline efter sista chip:en — speglar endOfGameText:s
   // typografi men kompaktare (xs istället för sm) så den ryms efter
@@ -2630,9 +2683,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -9,
     right: Spacing.md,
-    backgroundColor: Colors.primary,
+    // YEAR/NAME (UI v2): sval navy/gunmetal + tunn dämpad guldkant, ljus text.
+    backgroundColor: BrandUi.selectedFill,
+    borderWidth: 1,
+    borderColor: 'rgba(245,166,35,0.55)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 1,
     borderRadius: 4,
     zIndex: 10,
     elevation: 4,
@@ -2656,10 +2712,11 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 6,
     paddingVertical: 4,
+    // UI v2: mörk gunmetal-yta + subtil kant (som lobbyns sekundära rutor).
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: 'rgba(255,255,255,0.10)',
     borderRadius: Radius.sm,
-    backgroundColor: Colors.background,
+    backgroundColor: '#141C2B',
   },
   // Spotify DJ-chip: grön kant + mörkgrön bakgrund markerar tydligt
   // att den frågan är en speciell DJ-runda.
@@ -2685,7 +2742,7 @@ const styles = StyleSheet.create({
   queueChipNumber: {
     fontSize: 10,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.textSecondary,
     minWidth: 12,
     textAlign: 'center',
   },
@@ -2698,7 +2755,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
     fontSize: 11,
     fontWeight: '500',
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.82)',
     letterSpacing: -0.2,
   },
 
@@ -2752,9 +2809,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Avklarad (före den aktiva): neutral, ingen blå.
   progressDotFilled: {
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.primary,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: Colors.borderStrong,
+  },
+  // Aktiv: QuizVibe-guld (samma vald-stil som lobbyn), ingen glöd.
+  progressDotActive: {
+    backgroundColor: BrandUi.selectedFill,
+    borderColor: Colors.warning,
   },
   // Rad-layout när mediaikonen visas inuti dot:en (Rounds-baren).
   progressDotRow: {
@@ -2768,9 +2831,12 @@ const styles = StyleSheet.create({
   progressDotNumber: {
     fontSize: 11,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.textSecondary,
     lineHeight: 13,
     includeFontPadding: false,
+  },
+  progressDotNumberActive: {
+    color: Colors.textPrimary,
   },
 
   // "Round X"-separator infogas mellan kö-rader vid varje rondbyte. Spänner

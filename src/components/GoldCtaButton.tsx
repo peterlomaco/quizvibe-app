@@ -21,6 +21,8 @@ interface Props {
   accessibilityLabel?: string;
   /** Asynkront anrop pågår: spinner i stället för labeln, tap avstängt. */
   loading?: boolean;
+  /** Lägre (50 pt) + dämpad guldmitt — Get Ready:s Press Play. */
+  compact?: boolean;
 }
 
 /**
@@ -30,7 +32,7 @@ interface Props {
  * Q-play-loggorna på Lobby:s Start Game och Get Ready:s Press Play
  * (Peter 2026-10-15).
  */
-export function GoldCtaButton({ label, onPress, locked = false, trailing, leading, accessibilityLabel, loading = false }: Props) {
+export function GoldCtaButton({ label, onPress, locked = false, trailing, leading, accessibilityLabel, loading = false, compact = false }: Props) {
   const [fontsLoaded] = useFonts({ Nunito_700Bold });
   const pulse = useRef(new Animated.Value(1)).current;
 
@@ -52,7 +54,7 @@ export function GoldCtaButton({ label, onPress, locked = false, trailing, leadin
   return (
     <Animated.View style={{ transform: [{ scale: pulse }] }}>
       <TouchableOpacity
-        style={[styles.btn, locked && styles.btnLocked]}
+        style={[styles.btn, compact && styles.btnCompact, locked && styles.btnLocked]}
         activeOpacity={0.85}
         onPress={onPress}
         disabled={locked || loading || !onPress}
@@ -60,7 +62,7 @@ export function GoldCtaButton({ label, onPress, locked = false, trailing, leadin
         accessibilityState={{ disabled: locked, busy: loading }}
         accessibilityLabel={accessibilityLabel ?? label}
       >
-        {!locked && <MetallicGoldFill />}
+        {!locked && <MetallicGoldFill tone={compact ? 'soft' : 'default'} />}
         <LoadingContent loading={loading} color="#000000">
         <View style={styles.row}>
           {leading}
@@ -97,6 +99,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
+  },
+  btnCompact: {
+    height: 50,
   },
   // Låst/väntande (Lobby v2): mörk gunmetal + svag kant i stället för den
   // gamla blå cardElevated-ytan.

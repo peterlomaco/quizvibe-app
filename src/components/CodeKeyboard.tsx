@@ -40,6 +40,13 @@ const VPADDING = COMPACT ? 8 : 12;
 const HPADDING = 8;
 const MARGIN_TOP = COMPACT ? Spacing.sm : Spacing.md;
 const LETTER_COLS = 6;
+
+// UI v2-färger: mörk navy-panel, nästan svarta tangenter med subtil kant,
+// sekundära knappar (Delete/Cancel/123) en nyans ljusare men fortfarande dämpade.
+const KB_PANEL_BG = '#0F1828';
+const KB_KEY_BG = '#0B1220';
+const KB_KEY_BORDER = 'rgba(255,255,255,0.08)';
+const KB_SECONDARY_BG = '#141C2B';
 const DIGIT_COLS = 5;  // 10 digits / 5 cols = 2 rows ("12345" / "67890")
 
 interface Props {
@@ -263,8 +270,9 @@ export function CodeKeyboard({
 }
 
 const styles = StyleSheet.create({
+  // Mörk navy-panel (UI v2) — tidigare cardElevated gav en för blå yta.
   container: {
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: KB_PANEL_BG,
     paddingHorizontal: HPADDING,
     paddingVertical: VPADDING,
     borderRadius: Radius.md,
@@ -284,9 +292,9 @@ const styles = StyleSheet.create({
   key: {
     flex: 1,
     borderRadius: Radius.sm,
-    backgroundColor: Colors.card,
+    backgroundColor: KB_KEY_BG,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: KB_KEY_BORDER,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -294,9 +302,10 @@ const styles = StyleSheet.create({
     flex: 1,
     // Osynlig — tar samma flex-bredd som en knapp men ingen border/bg/press.
   },
+  // Neutral tryck-feedback (ingen blå, ingen guld per tangent).
   keyPressed: {
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.primary,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(255,255,255,0.18)',
   },
   keyText: {
     fontSize: 20,
@@ -308,7 +317,7 @@ const styles = StyleSheet.create({
   // färg + mindre fontstorlek så den läses som en funktionsknapp bland
   // bokstavs-/siffer-cellerna istället för som ett tecken att skriva.
   toggleKey: {
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: KB_SECONDARY_BG,
   },
   toggleKeyText: {
     fontSize: 13,
@@ -324,9 +333,9 @@ const styles = StyleSheet.create({
   bottomBtn: {
     flex: 1,
     borderRadius: Radius.sm,
-    backgroundColor: Colors.card,
+    backgroundColor: KB_SECONDARY_BG,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: KB_KEY_BORDER,
     alignItems: 'center',
     justifyContent: 'center',
   },

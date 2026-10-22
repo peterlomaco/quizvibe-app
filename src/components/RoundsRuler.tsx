@@ -51,7 +51,7 @@ const RULER_WIDTH = TRACK_VIEWPORT_W;
  * också allt unlocked eftersom IndDev:s rounds-cap är 20 och locked-zonen
  * inte renderas.
  */
-export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false, applicable = true, indivActive = false, brandV2 = false }: {
+export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false, applicable = true, indivActive = false, brandV2 = false, requirementPrefix = 'Individual device +' }: {
   value: number;
   min: number;
   gameModeMax: number;
@@ -65,6 +65,8 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
    * Lobby kör fortfarande legacy-stilen tills den görs om.
    */
   brandV2?: boolean;
+  /** brandV2-hintens krav före PREMIUM-badgen. Tom sträng = bara PREMIUM (H2H). */
+  requirementPrefix?: string;
 }) {
   const accent = brandV2 ? Colors.warning : Colors.primary;
   // Klammer + ticks visas "unlocked" bara när BÅDA villkoren stämmer:
@@ -156,7 +158,9 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
         <View style={roundsRulerStyles.v2Hint}>
           <Text style={roundsRulerStyles.v2HintText}>More than 4 rounds requires:</Text>
           <View style={roundsRulerStyles.v2HintRow}>
-            <Text style={roundsRulerStyles.v2HintStrong}>Individual device +</Text>
+            {!!requirementPrefix && (
+              <Text style={roundsRulerStyles.v2HintStrong}>{requirementPrefix}</Text>
+            )}
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={onPremiumPress}

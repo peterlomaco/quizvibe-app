@@ -45,4 +45,10 @@ export const BrandUi = {
   toggleLabelMuted: 'rgba(255,255,255,0.35)',
   /** Card surface for Profile sections (slightly lighter navy). */
   card: 'rgba(255,255,255,0.04)',
+  /**
+   * Fyllning för valda/aktiva rutor med guldkant (UI v2 2026-10-22): sval
+   * mörk navy/gunmetal. Ersätter Colors.warningMuted som fyllning — den
+   * genomskinliga guldtonen blev brunaktig mot navy-bakgrunden.
+   */
+  selectedFill: '#172234',
 } as const;

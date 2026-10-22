@@ -11,6 +11,7 @@ import { EyeIcon } from '@/src/components/EyeIcon';
 import { ChevronIcon } from '@/src/components/ChevronIcon';
 import { LogoutIcon } from '@/src/components/LogoutIcon';
 import { ProfileOutlineIcon } from '@/src/components/ProfileOutlineIcon';
+import { EnvelopeOutlineIcon, KeyOutlineIcon } from '@/src/components/SectionIcons';
 import { WaveDots } from '@/src/components/WaveDots';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { HostTypeOptions, type HostLobbyType } from '@/src/components/HostTypeOptions';
@@ -207,7 +208,7 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
  */
 const PREMIUM_FEATURES: { premium: string; basic: string }[] = [
   { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
-  { premium: '20 rounds per game (Individual device)', basic: 'Max 4 rounds per game' },
+  { premium: '20 rounds per game (Individual device & H2H)', basic: 'Max 4 rounds per game' },
   { premium: 'Invite 12 players per game (Individual device)', basic: 'Max 4 players' },
   { premium: 'All Extra Host packages included', basic: 'Generic content only' },
 ];
@@ -419,7 +420,9 @@ async function resolveInviteGameMode(code: string): Promise<InviteGameMode> {
   return 'multiplayer';
 }
 
-function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'multiplayer', onRemoteAccountRequired, initialGuestDraft, hasNewInvite = false, onInvitesSeen }: JoinModalProps) {
+// Exporterad så Profile kan visa samma Join-formulär ovanpå sin egen
+// konto-meny (Cancel → tillbaka till menyn i stället för Home).
+export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false, currentPlayerName, guestHostLobbyType = 'multiplayer', onRemoteAccountRequired, initialGuestDraft, hasNewInvite = false, onInvitesSeen }: JoinModalProps) {
   const [step, setStep] = useState<JoinStep>(initialStep);
   // Spinner + dubbeltrycks-skydd för formulärets backend-knappar (Join,
   // Join as Guest, Start as Guest, Accept invite) — de kedjar flera
@@ -1373,13 +1376,13 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
               <Text style={modal.subtitle}>Pick how you want to join</Text>
               <View style={modal.choiceList}>
                 <ChoiceRow
-                  icon="🔑"
+                  icon={(c) => <KeyOutlineIcon size={22} color={c ?? Colors.warning} />}
                   label="Join with Room Code"
                   subtitle="Enter a code shared by the host"
                   onPress={() => setStep('code')}
                 />
                 <ChoiceRow
-                  icon="📨"
+                  icon={(c) => <EnvelopeOutlineIcon size={22} color={c ?? Colors.textSecondary} />}
                   label="Join Waiting Invites"
                   subtitle="See invites hosts have sent you"
                   disabled={invites.length === 0}
@@ -1397,7 +1400,7 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                 />
                 {!hideGuest && (
                   <ChoiceRow
-                    icon="👤"
+                    icon={(c) => <ProfileOutlineIcon size={22} color={c ?? Colors.textSecondary} />}
                     label="Join as Guest"
                     subtitle="No account — just pick a Player Name"
                     onPress={() => setStep('guest')}
@@ -1467,18 +1470,31 @@ function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest = false
                   onBackspace={handleCustomBackspace}
                 />
               )}
-              <TouchableOpacity
-                style={[
-                  modal.joinBtn,
-                  code.length < ROOM_CODE_LENGTH && modal.joinBtnDisabled,
-                ]}
-                onPress={() => joinAction.run('join-code', handleJoinWithCode)}
-                disabled={code.length < ROOM_CODE_LENGTH || joinAction.busy}
-              >
-                <LoadingContent loading={joinAction.isBusy('join-code')} color="#fff">
-                  <Text style={modal.joinBtnText}>Join Game Lobby</Text>
-                </LoadingContent>
-              </TouchableOpacity>
+              {/* Guld primär-CTA (som Log in / Register / gästformuläret)
+                  när koden är komplett; dämpad navy annars. Samma
+                  aktiveringsvillkor som förut. */}
+              {(() => {
+                const ready = code.length >= ROOM_CODE_LENGTH;
+                return (
+                  <TouchableOpacity
+                    style={[modal.joinBtn, ready ? modal.joinBtnGold : modal.joinBtnDisabled]}
+                    onPress={() => joinAction.run('join-code', handleJoinWithCode)}
+                    disabled={!ready || joinAction.busy}
+                  >
+                    {ready && <MetallicGoldFill />}
+                    <LoadingContent loading={joinAction.isBusy('join-code')} color="#000000">
+                      <Text
+                        style={[
+                          modal.joinBtnText,
+                          ready ? modal.joinBtnGoldText : modal.joinBtnTextDisabled,
+                        ]}
+                      >
+                        Join Game Lobby
+                      </Text>
+                    </LoadingContent>
+                  </TouchableOpacity>
+                );
+              })()}
             </>
           )}
 
@@ -2114,7 +2130,9 @@ function useBlink(active: boolean, duration = 600): Animated.Value {
 function ChoiceRow({
   icon, label, subtitle, onPress, disabled = false, showUpdate = false,
 }: {
-  icon: string; label: string; subtitle: string;
+  // Vektor-ikon (UI v2, ersätter emoji). Får dämpad färg när raden är
+  // disabled; annars undefined → ikonens egen färg.
+  icon: (disabledColor?: string) => React.ReactNode; label: string; subtitle: string;
   onPress: () => void; disabled?: boolean;
   // Blinkande guld "New update"-märke till vänster om pilen (samma signal som
   // Home:s Join-knapp) — driver flash för "Join Waiting Invites" när en ny
@@ -2128,7 +2146,7 @@ function ChoiceRow({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <Text style={[modal.choiceIcon, disabled && modal.choiceTextDisabled]}>{icon}</Text>
+      <View style={modal.choiceIcon}>{icon(disabled ? Colors.textDisabled : undefined)}</View>
       <View style={{ flex: 1 }}>
         <Text style={[modal.choiceLabel, disabled && modal.choiceTextDisabled]}>{label}</Text>
         <Text style={[modal.choiceSubtitle, disabled && modal.choiceTextDisabled]}>{subtitle}</Text>
@@ -2143,15 +2161,12 @@ function ChoiceRow({
       )}
       {/* Pilen delar samma blink-opacity som "New update" (samma Animated.Value)
           så de blinkar i exakt takt — precis som H2H. */}
-      <Animated.Text
-        style={[
-          modal.choiceArrow,
-          disabled && modal.choiceTextDisabled,
-          showUpdate && { color: Colors.warning, opacity: blink },
-        ]}
-      >
-        ›
-      </Animated.Text>
+      <Animated.View style={showUpdate ? { opacity: blink } : undefined}>
+        <ChevronIcon
+          size={18}
+          color={showUpdate ? Colors.warning : disabled ? Colors.textDisabled : undefined}
+        />
+      </Animated.View>
     </TouchableOpacity>
   );
 }
@@ -5284,7 +5299,7 @@ const modal = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
   },
-  choiceIcon: { fontSize: 22, width: 28, textAlign: 'center' },
+  choiceIcon: { width: 28, alignItems: 'center', justifyContent: 'center' },
   choiceLabel: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
   choiceSubtitle: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
   choiceArrow: { fontSize: 22, color: Colors.textSecondary },
@@ -5585,7 +5600,8 @@ const modal = StyleSheet.create({
   // Ifylld ruta + nästa tomma ruta: guldram (guld = aktiv), samma som
   // gästformulärets codeCellGuestFilled/-Active.
   codeCellFilled: {
-    borderColor: Colors.warning,
+    // Dämpad guld — den aktiva (nästa tomma) rutan bär full guld.
+    borderColor: 'rgba(245,166,35,0.55)',
   },
   // Highlight på nästa tomma cell — visar var användaren förväntas skriva
   codeCellActive: {

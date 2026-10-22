@@ -184,3 +184,23 @@ export function RocketOutlineIcon({ size = 24, color = BrandUi.iconMuted, stroke
     </Svg>
   );
 }
+
+/** Join with Room Code — nyckel. */
+export function KeyOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx={7.5} cy={15.5} r={4} {...common(color, strokeWidth)} />
+      <Path d="M10.4 12.6 L20 3 M16.5 6.5 L19 9 M14 9 L16 11" {...common(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+/** Join Waiting Invites — kuvert. */
+export function EnvelopeOutlineIcon({ size = 24, color = BrandUi.iconMuted, strokeWidth = 1.8 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Rect x={3} y={5.5} width={18} height={13} rx={2} {...common(color, strokeWidth)} />
+      <Path d="M3.5 7 L12 13 L20.5 7" {...common(color, strokeWidth)} />
+    </Svg>
+  );
+}

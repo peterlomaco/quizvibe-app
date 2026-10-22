@@ -21,12 +21,24 @@ const STOPS: [number, string][] = [
   [1, '#CB6A02'],
 ];
 
+// "soft": samma metall men med dämpad mitt-highlight — för CTA:er som ska
+// kännas lugnare (Get Ready:s Press Play, Peter 2026-10-22).
+const SOFT_STOPS: [number, string][] = [
+  [0, '#C96A06'],
+  [0.2, '#E58E0C'],
+  [0.42, '#F3A61E'],
+  [0.52, '#F6B02C'],
+  [0.62, '#F2A51E'],
+  [0.82, '#E58E0C'],
+  [1, '#C96A06'],
+];
+
 /**
  * Metallisk guld-bakgrund — fyller sin förälder (absolute). Rendera som
  * FÖRSTA barn i en knapp med `overflow: 'hidden'` eller matchande radie.
  * Ren react-native-svg (redan installerad) → ingen native-modul, OTA-säker.
  */
-export function MetallicGoldFill({ radius = Radius.md }: { radius?: number }) {
+export function MetallicGoldFill({ radius = Radius.md, tone = 'default' }: { radius?: number; tone?: 'default' | 'soft' }) {
   // Unikt gradient-id per instans — flera knappar på samma skärm får annars
   // dela id och iOS kan rendera fel gradient.
   const id = `metallicGold${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
@@ -47,7 +59,7 @@ export function MetallicGoldFill({ radius = Radius.md }: { radius?: number }) {
         <Svg width={size.w} height={size.h}>
           <Defs>
             <LinearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-              {STOPS.map(([offset, color]) => (
+              {(tone === 'soft' ? SOFT_STOPS : STOPS).map(([offset, color]) => (
                 <Stop key={offset} offset={offset} stopColor={color} />
               ))}
             </LinearGradient>

@@ -128,6 +128,8 @@ import { resolveDisplayHcp } from '../utils/hcpEngine';
 import { DEFAULT_VOICE_ID, isValidVoiceId, SILENT_VOICE_ID, VOICE_OPTIONS } from '../utils/voicePacks';
 import { playVoiceClip } from '../utils/voicePlayback';
 import { loadOwnHcpBundle, refreshOwnHcpDecay } from '../utils/hcpProgress';
+import { useWaitingInviteSignal } from '../hooks/useWaitingInviteSignal';
+import { JoinModal } from '../../app/index';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -580,6 +582,20 @@ export default function ProfileScreen() {
   const [regionPickerOpen, setRegionPickerOpen] = useState(false);
   const [answerResponsePickerOpen, setAnswerResponsePickerOpen] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  // "Join with Room code" från konto-menyn öppnar Home:s Join-formulär
+  // HÄR, ovanpå Profile — Cancel tar användaren tillbaka till menyn.
+  const [joinVisible, setJoinVisible] = useState(false);
+  const inviteSignal = useWaitingInviteSignal();
+  // Synkron fokus-spegel: JoinModal anropar onClose även efter en lyckad
+  // join (då har /lobby redan pushats och Profile tappat fokus) — menyn
+  // ska bara öppnas igen vid Cancel, dvs. när Profile fortfarande har fokus.
+  const profileFocusedRef = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      profileFocusedRef.current = true;
+      return () => { profileFocusedRef.current = false; };
+    }, []),
+  );
   // Lobbytyp-utfällning under "Start New Game" i logout-sheet:n — samma
   // inline-väljare (Single Game / Multiplayer Game / Head-to-head) som Home:s
   // "Start New Game" (Peter 2026-08-29). Kollapsas när sheet:en stängs.
@@ -3460,10 +3476,13 @@ export default function ProfileScreen() {
       >
         <View style={styles.logoutOverlay}>
           <Pressable
-            style={styles.logoutBackdrop}
+            style={[styles.logoutBackdrop, joinVisible && styles.logoutHiddenBehindJoin]}
             onPress={() => { setHostTypeExpanded(false); setLogoutModalVisible(false); }}
           />
-          <View style={styles.logoutSheet}>
+          <View
+            style={[styles.logoutSheet, joinVisible && { opacity: 0 }]}
+            pointerEvents={joinVisible ? 'none' : 'auto'}
+          >
             <View style={styles.logoutHeader}>
               {selectedAvatarId && source !== 'default' ? (
                 <Text style={styles.logoutHeaderEmoji}>
@@ -3502,7 +3521,14 @@ export default function ProfileScreen() {
             </Pressable>
             {hostTypeExpanded && (
               <HostTypeOptions
-                accentColor={Colors.warning}
+                // Samma utseende som Home:s inloggade "Start New Game"-
+                // utfällning (rubrik + BrandUi-ikoner, guld bara vid tryck).
+                heading="Choose how to play"
+                accentColor={BrandUi.border}
+                iconColor={BrandUi.icon}
+                iconAccentColor={BrandUi.icon}
+                arrowColor={BrandUi.iconMuted}
+                pressedBorderColor={Colors.warning}
                 onSelect={(lobbyType) => {
                   // Kollapsa INTE panelen här — då blinkar meny-vyn förbi
                   // medan handleCreateGame:s async-arbete (profil/premium/
@@ -3533,8 +3559,11 @@ export default function ProfileScreen() {
                 pressed && { opacity: 0.85 },
               ]}
               onPress={() => guardedNavigate(() => {
-                router.push('/?openJoinRegistered=1');
-                void closeSheetBehindNav();
+                // Join-formuläret öppnas NÄSTLAT i den här sheet:ens Modal
+                // (iOS presenterar det ovanpå) medan sheet:en döljs. Cancel
+                // visar då sheet:en direkt igen — ingen stäng/öppna-växling
+                // där Profile-vyn hinner synas emellan.
+                setJoinVisible(true);
               })}
             >
               <Text style={styles.logoutCreateGameBtnText}>Join with Room code</Text>
@@ -3580,6 +3609,16 @@ export default function ProfileScreen() {
               <Text style={styles.logoutBtnText}>Log out</Text>
             </Pressable>
 
+            {/* Cancel hör till de vanliga konto-åtgärderna — direkt under
+                Log out, före Danger zone (UI v2 2026-10-22). */}
+            <Pressable pressFeedback
+              style={[styles.logoutCancelBtn, styles.logoutCancelInMenu]}
+              onPress={() => setLogoutModalVisible(false)}
+              disabled={deletingAccount}
+            >
+              <Text style={styles.logoutCancelText}>Cancel</Text>
+            </Pressable>
+
             {/* Danger zone (UI 2026-10-20) — Delete Account avskild från Log
                 out, samma dämpade röda stil som Profile-skärmens Danger
                 zone. Öppnar SAMMA slide-to-delete-dialog (källa 'sheet'
@@ -3608,21 +3647,40 @@ export default function ProfileScreen() {
               </>
             )}
 
-            <Pressable pressFeedback
-              style={styles.logoutCancelBtn}
-              onPress={() => {
-                // Utfälld väljare → kollapsa tillbaka till menyn; annars
-                // stäng hela sheet:en.
-                if (hostTypeExpanded) { setHostTypeExpanded(false); return; }
-                setLogoutModalVisible(false);
-              }}
-              disabled={deletingAccount}
-            >
-              <Text style={styles.logoutCancelText}>{hostTypeExpanded ? 'Back' : 'Cancel'}</Text>
-            </Pressable>
+            {/* Utfälld lobbytyp-väljare → "Back" längst ned kollapsar
+                tillbaka till menyn. (I menyläget ligger Cancel direkt under
+                Log out, ovanför Danger zone.) */}
+            {hostTypeExpanded && (
+              <Pressable pressFeedback
+                style={styles.logoutCancelBtn}
+                onPress={() => setHostTypeExpanded(false)}
+                disabled={deletingAccount}
+              >
+                <Text style={styles.logoutCancelText}>Back</Text>
+              </Pressable>
+            )}
           </View>
           {deleteConfirmSource === 'sheet' && <QuizVibeDialogOverlay {...deleteConfirmProps} />}
         </View>
+        {/* Nästlad i konto-sheet:ens Modal så den presenteras ovanpå den. */}
+        <JoinModal
+          visible={joinVisible}
+          onClose={() => {
+            setJoinVisible(false);
+            // Cancel → sheet:en syns igen direkt (den har legat kvar under).
+            // Efter en lyckad join har Profile redan tappat fokus (lobbyn
+            // pushad) → stäng även sheet:en.
+            if (!profileFocusedRef.current) {
+              setHostTypeExpanded(false);
+              setLogoutModalVisible(false);
+            }
+          }}
+          initialStep="choose"
+          hideGuest
+          currentPlayerName={playerName.trim() || null}
+          hasNewInvite={inviteSignal.hasNewInvite}
+          onInvitesSeen={inviteSignal.markInvitesSeen}
+        />
       </Modal>
 
       <QuizVibeDialog visible={deleteConfirmSource === 'screen'} {...deleteConfirmProps} />
@@ -3930,6 +3988,9 @@ const styles = StyleSheet.create({
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
+  // Join-formuläret har egen dimning — sheet:ens backdrop blir genomskinlig
+  // medan det är öppet så det inte dubbeldimmas.
+  logoutHiddenBehindJoin: { backgroundColor: 'transparent' },
   logoutSheet: {
     backgroundColor: Colors.card,
     borderTopLeftRadius: 24,
@@ -4046,8 +4107,9 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.78)',
   },
   sheetDangerZone: {
-    // + sheet:ens gap (md) ≈ 20 pt luft mellan Log out och avdelaren.
-    marginTop: Spacing.sm,
+    // Tydlig separation mellan vanliga konto-åtgärder (… Log out, Cancel)
+    // och Delete Account: + sheet:ens gap (md) ≈ 36 pt luft till avdelaren.
+    marginTop: Spacing.xl,
     paddingTop: Spacing.md,
     borderTopWidth: 1,
     borderTopColor: BrandUi.border,
@@ -4067,6 +4129,10 @@ const styles = StyleSheet.create({
   logoutCancelBtn: {
     alignItems: 'center',
     paddingVertical: Spacing.sm,
+  },
+  // Cancel i menyläget: lite extra luft från Log out-raden ovanför.
+  logoutCancelInMenu: {
+    marginTop: Spacing.xs,
   },
   logoutCancelText: {
     fontSize: 14,
@@ -5381,7 +5447,7 @@ const styles = StyleSheet.create({
   responseRow: { flexDirection: 'row', gap: Spacing.sm },
   responseBtn: { flex: 1, height: 44, borderRadius: Radius.md, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   // Profile v2: vald = guld kant + svag guldton; ovald = neutral.
-  responseBtnActive: { borderColor: Colors.warning, backgroundColor: Colors.warningMuted },
+  responseBtnActive: { borderColor: Colors.warning, backgroundColor: BrandUi.selectedFill },
   responseBtnInactive: { borderColor: BrandUi.border, backgroundColor: 'transparent' },
   responseBtnText: { fontSize: FontSize.md, fontWeight: FontWeight.semibold, color: Colors.textSecondary },
   // Vald = vit text, guldkanten bär "vald"-signalen (färgregel 2026-10-21, = Lobby).
