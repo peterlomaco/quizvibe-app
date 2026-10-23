@@ -9218,6 +9218,9 @@ export default function LobbyScreen() {
                       value={roundsCount}
                       min={ROUNDS_MIN}
                       gameModeMax={roundsMax}
+                      // Read-only (ingen onPremiumPress → ingen hint), men
+                      // samma guld-accent som host-vyn i stället för blått.
+                      brandV2
                     />
                   </View>
                 </>
@@ -9282,7 +9285,7 @@ export default function LobbyScreen() {
                       ) : slot.source === 'image' ? (
                         <View style={styles.gsSourceQWrap}>
                           {/* Förenklad Hints-ikon (samma familj som mixern). */}
-                          <HintsIcon size={17} simplified />
+                          <HintsIcon size={17} color={Colors.warning} />
                         </View>
                       ) : null}
                     </View>

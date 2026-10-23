@@ -559,7 +559,10 @@ export function GetReadyIntro({
       const content = (
         <>
           <Text style={[styles.progressDotNumber, isActive && styles.progressDotNumberActive]}>{globalIdx + 1}</Text>
-          {icon != null && <MediaSourceIcon source={icon} size={14} />}
+          {icon === 'image' ? (
+            // Samma Hints-ikon som kön + lobbyns Game Sequence (UI v2).
+            <HintsIcon size={14} color={Colors.warning} />
+          ) : icon != null && <MediaSourceIcon source={icon} size={14} />}
         </>
       );
       if (isCurrent) {
@@ -1548,10 +1551,14 @@ export function GetReadyIntro({
                     </View>
                   ) : (
                     <>
-                      <MediaSourceIcon
-                        source={mediaSourceByQuestion?.[currentQuestion - 1]}
-                        size={28}
-                      />
+                      {mediaSourceByQuestion?.[currentQuestion - 1] === 'image' ? (
+                        <HintsIcon size={26} color={Colors.warning} />
+                      ) : (
+                        <MediaSourceIcon
+                          source={mediaSourceByQuestion?.[currentQuestion - 1]}
+                          size={28}
+                        />
+                      )}
                       <Text style={styles.mediaLabel} numberOfLines={1}>
                         {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
                       </Text>
@@ -1637,7 +1644,7 @@ export function GetReadyIntro({
                                 <SpotifyBrandIcon size={14} variant="white" />
                               ) : source === 'image' ? (
                                 // Samma Hints-ikon som lobbyns Game Mixer/Sequence.
-                                <HintsIcon size={16} simplified />
+                                <HintsIcon size={16} color={Colors.warning} />
                               ) : (
                                 <MediaSourceIcon source={source} size={16} />
                               )}
@@ -2523,8 +2530,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.md,
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.primary,
+    // UI v2: samma guldkant + selectedFill som currentMediaBox (IndDev/Single).
+    backgroundColor: BrandUi.selectedFill,
+    borderColor: Colors.warning,
     borderWidth: 1.5,
     borderRadius: Radius.md,
     paddingVertical: Spacing.sm,
