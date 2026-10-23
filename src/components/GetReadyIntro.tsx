@@ -738,12 +738,8 @@ export function GetReadyIntro({
               onPress={() => setQueueExpanded((v) => !v)}
               activeOpacity={0.7}
             >
-              <Text style={styles.queueToggleLabel}>Playing queue</Text>
-              <View style={styles.settingsToggleBox}>
-                <Text style={styles.settingsToggleGlyph}>
-                  {queueExpanded ? '−' : '+'}
-                </Text>
-              </View>
+              <Text style={styles.queueToggleLabel}>Queue</Text>
+              <SectionToggle expanded={queueExpanded} tone="neutral" style={styles.headerToggle} />
             </TouchableOpacity>
             {queueExpanded && (
               <>
@@ -974,7 +970,7 @@ export function GetReadyIntro({
           >
             <Text style={styles.settingsTitle}>Game settings</Text>
             {/* Delad +/−-kontroll (samma som Profile v2-sektionerna). */}
-            <SectionToggle expanded={settingsExpanded} />
+            <SectionToggle expanded={settingsExpanded} tone="neutral" style={styles.headerToggle} />
           </TouchableOpacity>
           {settingsExpanded && (
             <>
@@ -1083,13 +1079,13 @@ export function GetReadyIntro({
           >
             {/* Vektor-pokal i guld (UI v2) i stället för 🏆-emoji. */}
             <View style={styles.leaderboardHeaderLeft}>
-              <TrophyIcon height={18} color={Colors.warning} />
+              <TrophyIcon height={15} color={BrandUi.iconMuted} />
               <Text style={styles.leaderboardHeaderTitle} numberOfLines={1}>
                 {`Current Leaderboard - ${playerCount} ${playerCount === 1 ? 'Player' : 'Players'}`}
               </Text>
             </View>
             {/* Delad +/−-kontroll (samma som Game settings). */}
-            <SectionToggle expanded={leaderboardOpen} />
+            <SectionToggle expanded={leaderboardOpen} tone="neutral" style={styles.headerToggle} />
           </TouchableOpacity>
           {leaderboardOpen && (() => {
             // D-iii: dela upp i två sektioner. Disconnected (men inte hasLeft)
@@ -1491,6 +1487,7 @@ export function GetReadyIntro({
             ) : (
               <GoldCtaButton
                 locked
+                smallLabel
                 label="Waiting - Host will start quiz"
                 trailing={<SequentialDots color={Colors.textSecondary} />}
               />
@@ -1507,7 +1504,7 @@ export function GetReadyIntro({
           // med IndDev eftersom rond-konceptet är meningslöst med en spelare
           // (questions = rounds) — bara header-labeln skiljer sig: IndDev
           // visar "Next:", Single Player visar "Player name: {playerName}".
-          <View style={styles.tableBlock}>
+          <View style={[styles.tableBlock, styles.tableBlockBelowPlay]}>
             {/* Bara Question-bar (ingen Round-uppdelning — varje fråga är
                 egen runda i IndDev, och i Single Player finns bara en
                 spelare så Rounds = Questions). */}
@@ -1518,7 +1515,7 @@ export function GetReadyIntro({
                 {isSinglePlayer ? (
                   // Etiketten dämpad, själva namnet vitt och tydligare (UI v2).
                   <Text style={styles.headerCellText} numberOfLines={1}>
-                    {'Player name: '}
+                    {'Next player: '}
                     <Text style={styles.headerCellName}>{playerName}</Text>
                   </Text>
                 ) : (
@@ -1613,9 +1610,9 @@ export function GetReadyIntro({
                     onPress={() => setQueueExpanded((v) => !v)}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.queueToggleLabel}>Playing queue</Text>
+                    <Text style={styles.queueToggleLabel}>Queue</Text>
                     {/* Delad +/−-kontroll (samma som Game settings). */}
-                    <SectionToggle expanded={queueExpanded} />
+                    <SectionToggle expanded={queueExpanded} tone="neutral" style={styles.headerToggle} />
                   </TouchableOpacity>
                   {queueExpanded && questionDataPending ? (
                     // Non-host väntar på host:s fråge-sekvens — chips skulle
@@ -1687,7 +1684,7 @@ export function GetReadyIntro({
         ) : (
           // Pass-the-Phone: dot-bars (Rounds + Question) + spelarkö.
           // Deklarerad ovanför så spectator-läget kan rendera samma block.
-          ptpProgressBlock
+          <View style={[styles.tableBlock, styles.tableBlockBelowPlay]}>{ptpProgressBlock}</View>
         )}
       </View>
       </ScrollView>
@@ -1739,9 +1736,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     // Kompaktare band (UI v2 2026-10-22).
     paddingVertical: Spacing.xs + 2,
-    backgroundColor: Colors.card,
+    // Tonat ned (Peter 2026-10-23): Press Play är fokus, inte top-baren.
+    backgroundColor: 'transparent',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
   },
   // IndDev: enhetens spelarnamn i bannerns högerkant — ren grå text utan
   // ram/bakgrund. maxWidth skyddar mot överlapp med Quit/Leave-knappen
@@ -1774,13 +1772,13 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,107,107,0.35)',
-    backgroundColor: 'rgba(255,107,107,0.06)',
+    borderColor: 'rgba(255,107,107,0.22)',
+    backgroundColor: 'transparent',
   },
   quitBtnText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.error,
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
+    color: 'rgba(255,107,107,0.75)',
     letterSpacing: 0.4,
   },
   // Remote 1v1: spelar-pill i bannerns högerkant — spegel av
@@ -1912,8 +1910,8 @@ const styles = StyleSheet.create({
   logoSlot: {
     width: LOGO_SIZE,
     height: LOGO_SIZE,
-    // Samma dämpade guld-signatur som rumskortets Q i Lobby (opacity 0.45).
-    opacity: 0.45,
+    // Ännu mer dämpad (Peter 2026-10-23) så Press Play är fokus.
+    opacity: 0.3,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1960,10 +1958,17 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     lineHeight: 22,
   },
+  // Mindre +/− i den nedtonade övre delen (GetReady).
+  headerToggle: {
+    width: 24,
+    height: 24,
+    opacity: 0.8,
+  },
   settingsTitle: {
-    fontSize: FontSize.xl,
-    fontWeight: FontWeight.bold,
-    color: Colors.textPrimary,
+    // Tonat ned (Peter 2026-10-23): sekundär info, Press Play är fokus.
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
     letterSpacing: 0.4,
   },
   settingsRow: {
@@ -2069,10 +2074,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.md,
     // UI v2: lite tätare + mörk navy i stället för den tunga blå ytan.
-    paddingVertical: Spacing.xs + 2,
-    backgroundColor: Colors.card,
+    paddingVertical: Spacing.xs,
+    // Tonat ned (Peter 2026-10-23): transparent + svag kant.
+    backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255,255,255,0.06)',
     borderRadius: Radius.md,
   },
   leaderboardHeaderLeft: {
@@ -2091,9 +2097,9 @@ const styles = StyleSheet.create({
   },
   leaderboardHeaderTitle: {
     flexShrink: 1,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
     letterSpacing: 0.4,
   },
   leaderboardToggleBox: {
@@ -2449,6 +2455,11 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'stretch',
   },
+  // Host-vyn: extra luft mellan Press Play och Question → Queue-sektionen.
+  // Gäller INTE spectator-vyn.
+  tableBlockBelowPlay: {
+    marginTop: SCREEN_HEIGHT < 700 ? 18 : 40,
+  },
   tableRow: {
     flexDirection: 'row',
     alignItems: 'stretch',
@@ -2497,7 +2508,9 @@ const styles = StyleSheet.create({
   // via container) men inner-box-wrappen behöver flex 1 så boxen sträcker
   // sig över hela kolumnens bredd minus ev. spacing.
   colPlayerCurrentWrap: {
-    paddingVertical: Spacing.xs,
+    // Plats för de kant-skärande badgarna ovanför kortet.
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xs,
     paddingHorizontal: 0,
   },
   cellHeader: {
@@ -2534,9 +2547,12 @@ const styles = StyleSheet.create({
     backgroundColor: BrandUi.selectedFill,
     borderColor: Colors.warning,
     borderWidth: 1.5,
-    borderRadius: Radius.md,
-    paddingVertical: Spacing.sm,
+    borderRadius: Radius.lg,
+    // Mer vertikal luft (Peter 2026-10-23) så badges, nummer, ikon och
+    // etikett läses som EN sammanhållen premiumkomponent.
+    paddingVertical: Spacing.lg + 2,
     paddingHorizontal: Spacing.md,
+    minHeight: 76,
     position: 'relative',
   },
   currentPlayerName: {
@@ -2565,9 +2581,12 @@ const styles = StyleSheet.create({
     backgroundColor: BrandUi.selectedFill,
     borderColor: Colors.warning,
     borderWidth: 1.5,
-    borderRadius: Radius.md,
-    paddingVertical: Spacing.sm,
+    borderRadius: Radius.lg,
+    // Mer vertikal luft (Peter 2026-10-23) så badges, nummer, ikon och
+    // etikett läses som EN sammanhållen premiumkomponent.
+    paddingVertical: Spacing.lg + 2,
     paddingHorizontal: Spacing.md,
+    minHeight: 76,
     position: 'relative',
   },
   // Fråge-sekvensnummer i box:ens vänsterkant. Absolut-positionerad så
@@ -2666,11 +2685,11 @@ const styles = StyleSheet.create({
   // vänster=kategori/höger=svarstyp-vokabulär på båda skärmarna.
   categoryBadge: {
     position: 'absolute',
-    top: -9,
-    left: Spacing.md,
+    top: -10,
+    left: Spacing.lg,
     backgroundColor: Colors.warning,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: 4,
     zIndex: 10,
     elevation: 4,
@@ -2689,14 +2708,14 @@ const styles = StyleSheet.create({
   // Höger=svarstyp/blå matchar CountdownIntro:s Year/Name-kolumn.
   answerTypeBadge: {
     position: 'absolute',
-    top: -9,
-    right: Spacing.md,
+    top: -10,
+    right: Spacing.lg,
     // YEAR/NAME (UI v2): sval navy/gunmetal + tunn dämpad guldkant, ljus text.
     backgroundColor: BrandUi.selectedFill,
     borderWidth: 1,
     borderColor: 'rgba(245,166,35,0.55)',
-    paddingHorizontal: 8,
-    paddingVertical: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 2,
     borderRadius: 4,
     zIndex: 10,
     elevation: 4,
@@ -2910,8 +2929,12 @@ const styles = StyleSheet.create({
     // Dubbelt utrymme ovanför och under (Peter 2026-10-15): marginalerna
     // läggs OVANPÅ containerns paddingTop (ovanför) resp. gap (under), så
     // båda avstånden dubblas och knappen ligger kvar i mitten mellan dem.
-    marginTop: COMPACT ? 20 : 40,
-    marginBottom: COMPACT ? Spacing.lg : Spacing.xxl,
+    // Press Play + allt under flyttat ned mot skärmens visuella mitt
+    // (Peter 2026-10-23, var 20/40).
+    // Bara Press Play upp en bit — det som tas från marginTop läggs på
+    // marginBottom så Question → Queue-sektionen står kvar.
+    marginTop: COMPACT ? 48 : 120,
+    marginBottom: COMPACT ? Spacing.lg + 20 : Spacing.xxl + 60,
     // gap: Spacing.sm (var Spacing.lg) — tightare spacing mellan "Tap Here"-
     // texten och Play-loggan. Påverkar bara host-branchen; non-host:s
     // waitingForHostBlock är en enskild child så gap:n har ingen effekt där.

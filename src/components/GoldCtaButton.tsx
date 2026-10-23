@@ -23,6 +23,9 @@ interface Props {
   loading?: boolean;
   /** Lägre (50 pt) + dämpad guldmitt — Get Ready:s Press Play. */
   compact?: boolean;
+  /** Mindre label-text (14 pt) för långa vänte-texter, t.ex. non-host:s
+   *  "Waiting - Host will start quiz" i Get Ready. */
+  smallLabel?: boolean;
 }
 
 /**
@@ -32,7 +35,7 @@ interface Props {
  * Q-play-loggorna på Lobby:s Start Game och Get Ready:s Press Play
  * (Peter 2026-10-15).
  */
-export function GoldCtaButton({ label, onPress, locked = false, trailing, leading, accessibilityLabel, loading = false, compact = false }: Props) {
+export function GoldCtaButton({ label, onPress, locked = false, trailing, leading, accessibilityLabel, loading = false, compact = false, smallLabel = false }: Props) {
   const [fontsLoaded] = useFonts({ Nunito_700Bold });
   const pulse = useRef(new Animated.Value(1)).current;
 
@@ -69,6 +72,7 @@ export function GoldCtaButton({ label, onPress, locked = false, trailing, leadin
           <Text
             style={[
               styles.text,
+              smallLabel && styles.textSmall,
               locked && styles.textLocked,
               { fontFamily: fontsLoaded ? 'Nunito_700Bold' : undefined },
             ]}
@@ -118,6 +122,10 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     color: '#000000',
+  },
+  textSmall: {
+    fontSize: 14,
+    flexShrink: 1,
   },
   textLocked: {
     color: BrandUi.textMuted,

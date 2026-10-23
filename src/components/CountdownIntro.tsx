@@ -10,12 +10,14 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '../theme';
 import { type MainCategory, mainCategoryDisplay } from '../utils/mainCategory';
 import { DEFAULT_VOICE_ID, resolveVoicePack, SILENT_VOICE_ID, type VoiceToken } from '../utils/voicePacks';
 import { ensureVoiceAudioMode } from '../utils/voicePlayback';
+import { HintsIcon } from './HintsIcon';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
-import { QuizVibeGoldQCentered } from './QuizVibeGoldMark';
+import { QuizVibeMarkArcsSvg, QuizVibeMarkQOnlySvg } from './brand/QuizVibeBrandSvg';
+import { MARK_VIEWBOX } from './brand/quizVibeBrandGeometry';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
 
 interface Props {
@@ -74,6 +76,19 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 // Q-loggan dominerar bilden så användaren omedelbart läser hela skärmen som
 // "QuizVibe-frågesignal". Capad mot skärmbredd minus liten edge-gutter.
 const LOGO_SIZE = Math.min(360, SCREEN_WIDTH - 40);
+// Q-marken (Home:s QuizVibeMarkSvg) i nedräkningen. Bredden 0.734 × LOGO_SIZE
+// ger samma ringstorlek som det tidigare bågfria Q:t (0.62 × LOGO_SIZE).
+// Ringhålets mitt som andel av viewBoxen (ring-center 425.93, 523.93).
+const MARK_W = Math.round(LOGO_SIZE * 0.734);
+const MARK_H = (MARK_W * MARK_VIEWBOX.height) / MARK_VIEWBOX.width;
+const MARK_HOLE_FX = 425.93 / MARK_VIEWBOX.width;
+const MARK_HOLE_FY = 523.93 / MARK_VIEWBOX.height;
+// Wifi-bågarna börjar grå och lyses upp i guld en i taget: innersta (index 2)
+// → mitten (1) → yttersta (0), med 1 s mellanrum (Peter 2026-10-23).
+const ARC_LIGHT_ORDER = [2, 1, 0] as const;
+const ARC_LIGHT_INTERVAL_MS = 1000;
+const ARC_LIGHT_FADE_MS = 350;
+const ARC_UNLIT = 'rgba(255,255,255,0.22)';
 
 // MODUL-nivå (delas av ALLA CountdownIntro-instanser): wall-clock (ms) för det
 // senaste faktiskt spelade röstklippet. En komponent-ref räcker inte om
@@ -108,7 +123,7 @@ function sourceBorderColor(source: MediaSourceType | null | undefined): string {
   switch (source) {
     case 'spotify': return SPOTIFY_GREEN;
     case 'youtube': return YOUTUBE_RED;
-    case 'image': return Colors.primary;
+    case 'image': return Colors.warning; // Hints: guld (UI v2)
     default: return Colors.primary;
   }
 }
@@ -121,9 +136,9 @@ interface TagAccent {
 /** Kategori (Music/Film/Sport) — guld, samma vokabulär som GetReadyIntro:s
  *  categoryBadge. Alla tre kategorier delar MEDVETET en enda färg;
  *  per-kategori-färgning har testats tidigare och gav splittrad känsla. */
-const CATEGORY_ACCENT: TagAccent = { border: Colors.warning, text: Colors.warning };
-/** Svarstyp (Year/Name) — blå, samma blå som den ersatta badge:n. */
-const ANSWER_ACCENT: TagAccent = { border: Colors.primary, text: Colors.primary };
+const CATEGORY_ACCENT: TagAccent = { border: Colors.warning, text: Colors.textPrimary };
+/** Svarstyp (Year/Name) — UI v2: guldkant + vit text (Peter 2026-10-23). */
+const ANSWER_ACCENT: TagAccent = { border: Colors.warning, text: Colors.textPrimary };
 /** Inaktiv sido-ruta. */
 const MUTED_ACCENT: TagAccent = { border: Colors.borderStrong, text: Colors.textDisabled };
 
@@ -206,7 +221,12 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
       </View>
 
       <View style={[styles.mediaSourceBox, { borderColor: sourceBorderColor(mediaSource) }]}>
-        <MediaSourceIcon source={mediaSource} size={80} />
+        {mediaSource === 'image' ? (
+          // Hints: nya guld-ikonen (UI v2), samma som Get Ready + lobbyn.
+          <HintsIcon size={76} color={Colors.warning} />
+        ) : (
+          <MediaSourceIcon source={mediaSource} size={80} />
+        )}
       </View>
 
       <View style={styles.sideColRight}>
@@ -233,6 +253,9 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
   const numberOpacity = useRef(new Animated.Value(0)).current;
   const qmarkScale = useRef(new Animated.Value(1.4)).current;
   const qmarkOpacity = useRef(new Animated.Value(0)).current;
+  // En opacity per wifi-båge (i ARC_LIGHT_ORDER-ordning). Rent visuellt.
+  const arcLit = useRef(ARC_LIGHT_ORDER.map(() => new Animated.Value(0))).current;
+  const arcsStartedRef = useRef(false);
 
   // useRef för callbacken så ev. ny prop-identitet inte ändrar deps.
   const onCompleteRef = useRef(onComplete);
@@ -430,6 +453,19 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
     return () => { loopAnim?.stop(); };
   }, [count, numberScale, numberOpacity]);
 
+  // Tänd wifi-bågarna när nedräkningen startar (första siffran) — innersta
+  // först, sedan med 1 s mellanrum. Påverkar ingen timing/logik.
+  useEffect(() => {
+    if (count === null || arcsStartedRef.current) return;
+    arcsStartedRef.current = true;
+    Animated.stagger(
+      ARC_LIGHT_INTERVAL_MS,
+      arcLit.map((v) =>
+        Animated.timing(v, { toValue: 1, duration: ARC_LIGHT_FADE_MS, useNativeDriver: true }),
+      ),
+    ).start();
+  }, [count, arcLit]);
+
 
   // "?" pop:as in när count går 1 → 0 + samma puls-loop som siffrorna ovan.
   // Separat Animated.Value så vi kan rendera båda elementen samtidigt under
@@ -507,47 +543,37 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
           </View>
         ) : null}
         <View style={styles.logoStack}>
-          {/* Guld-Q:t utan wifi-bågar (2026-10-15). Positioneras så
+          {/* Guld-marken (Q + wifi-bågar). Positioneras så
               ringhålets mitt hamnar i logoStack-mitten — exakt där glyph-
               overlay:ns flex-centrerade siffra/? landar. */}
           <View style={styles.qFill} pointerEvents="none">
             {/* offsetY flyttar Q:t lite uppåt så siffran/? hamnar något
                 lägre i ringen (Peter 2026-10-15, empiriskt). */}
-            <QuizVibeGoldQCentered
-              box={LOGO_SIZE}
-              width={Math.round(LOGO_SIZE * 0.62)}
-              offsetY={-Math.round(LOGO_SIZE * 0.035)}
-            />
+            {/* UI v2 (Peter 2026-10-23): samma metalliska Q-mark (med
+                wifi-bågar) som Home. Ringens storlek = tidigare bågfria Q. */}
+            <View
+              style={{
+                position: 'absolute',
+                left: LOGO_SIZE / 2 - MARK_W * MARK_HOLE_FX,
+                top: LOGO_SIZE / 2 - MARK_H * MARK_HOLE_FY - Math.round(LOGO_SIZE * 0.035),
+              }}
+            >
+              {/* Lager: guld-Q utan bågar → grå bågar → tre guld-bågar som
+                  tonas in en i taget (innersta först) när räkningen startar. */}
+              <QuizVibeMarkQOnlySvg size={MARK_H} />
+              <View style={StyleSheet.absoluteFill}>
+                <QuizVibeMarkArcsSvg size={MARK_H} color={ARC_UNLIT} />
+              </View>
+              {ARC_LIGHT_ORDER.map((arcIdx, i) => (
+                <Animated.View key={arcIdx} style={[StyleSheet.absoluteFill, { opacity: arcLit[i] }]}>
+                  <QuizVibeMarkArcsSvg size={MARK_H} arcs={[arcIdx]} />
+                </Animated.View>
+              ))}
+            </View>
           </View>
-          {/* Glyph-overlay centrerad i logoStack — samverkar med ovanstående
-              Q-shift så siffran/? landar exakt i Q-ringens visuella center. */}
-          <View pointerEvents="none" style={styles.glyphOverlay}>
-            {count !== null && count > 0 ? (
-              <Animated.Text
-                style={[
-                  styles.glyphText,
-                  {
-                    opacity: numberOpacity,
-                    transform: [{ scale: numberScale }],
-                  },
-                ]}
-              >
-                {count}
-              </Animated.Text>
-            ) : count === 0 ? (
-              <Animated.Text
-                style={[
-                  styles.glyphText,
-                  {
-                    opacity: qmarkOpacity,
-                    transform: [{ scale: qmarkScale }],
-                  },
-                ]}
-              >
-                ?
-              </Animated.Text>
-            ) : null}
-          </View>
+          {/* Inga glyfer i ringen längre (Peter 2026-10-23): varken 3-2-1
+              eller "?" visas — wifi-bågarna som tänds bär nedräkningen.
+              Timing, röst och qmark-/number-animationerna är orörda. */}
         </View>
       </View>
     </SafeAreaView>
@@ -606,8 +632,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.primary,
+    // UI v2: guldkant + selectedFill, samma som GetReadyIntro:s currentPlayerBox.
+    backgroundColor: BrandUi.selectedFill,
+    borderColor: Colors.warning,
     borderWidth: 1.5,
     borderRadius: Radius.md,
     paddingVertical: Spacing.sm,

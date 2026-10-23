@@ -90,6 +90,42 @@ export function QuizVibeMarkSvg({ size, variant = 'metallic' }: { size: number; 
 }
 
 /**
+ * Bara de tre signalbågarna (samma låsta geometri + samma viewBox som
+ * QuizVibeMarkSvg, så lagren kan staplas exakt ovanpå varandra). `arcs` =
+ * vilka bågar som ritas (index i MARK_PATHS.arcs: 0 = yttersta, 2 = innersta).
+ * `color` = platt färg (t.ex. grå "släckt"); utelämnad = metalliskt guld.
+ */
+export function QuizVibeMarkArcsSvg({ size, arcs = [0, 1, 2], color }: { size: number; arcs?: number[]; color?: string }) {
+  const id = useSvgId('qvArc');
+  const { width: vw, height: vh } = MARK_VIEWBOX;
+  const paths = arcs.map((i) => MARK_PATHS.arcs[i]);
+  return (
+    <Svg width={(size * vw) / vh} height={size} viewBox={`0 0 ${vw} ${vh}`}>
+      {color ? (
+        <MarkShapes fill={color} paths={paths} />
+      ) : (
+        <>
+          <Defs>
+            <LinearGradient id={`${id}g`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={vw} y2={vh}>
+              {MARK_GOLD_STOPS.map(([o, c]) => (
+                <Stop key={o} offset={o} stopColor={c} />
+              ))}
+            </LinearGradient>
+            <LinearGradient id={`${id}s`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={vw * 0.6} y2={vh * 0.6}>
+              <Stop offset={0} stopColor="#FFFFFF" stopOpacity={0.35} />
+              <Stop offset={1} stopColor="#FFFFFF" stopOpacity={0} />
+            </LinearGradient>
+          </Defs>
+          <MarkShapes fill={DEPTH} dy={vh * 0.008} paths={paths} />
+          <MarkShapes fill={`url(#${id}g)`} paths={paths} />
+          <MarkShapes fill={`url(#${id}s)`} paths={paths} />
+        </>
+      )}
+    </Svg>
+  );
+}
+
+/**
  * The Q symbol WITHOUT the three signal arcs (ring + connector + handle from
  * the locked geometry). Used only for the default profile avatar. `size` =
  * height in pt. `color` paints it in one flat colour (e.g. muted inactive
