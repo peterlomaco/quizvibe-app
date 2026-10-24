@@ -8545,10 +8545,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "0ikz6tENMONtK6qGkOrU3c",
     "youtubeClips": [
       {
-        "videoId": "YfAF92Z3iFw",
+        "videoId": "pIgZ7gMze7A",
         "startSec": 0,
         "endSec": 30,
-        "channelTitle": "Bad Boy Edd",
+        "channelTitle": "WhamVEVO",
         "license": "standard",
         "notes": "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Wham! - Wake Me Up Before You Go-Go [Official Music Video]' — inget ar i titeln. Ersatte LatinHype-uppladdningen (score 10)."
       }
@@ -13234,10 +13234,10 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "27LuGw8pE0WSELYYuptRjK",
     "youtubeClips": [
       {
-        "videoId": "0oi1fGhaJl8",
+        "videoId": "vabnZ9-ex7o",
         "startSec": 30,
         "endSec": 45,
-        "channelTitle": "Nirvana - Topic",
+        "channelTitle": "NirvanaVEVO",
         "license": "standard",
         "notes": "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
       }

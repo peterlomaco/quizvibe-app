@@ -121,10 +121,10 @@ items:
     spotifyTrackId: "0ikz6tENMONtK6qGkOrU3c"
     genrePackages: ["Disco & Pop"]
     youtubeClips:
-      - videoId: "YfAF92Z3iFw"
+      - videoId: "pIgZ7gMze7A"
         startSec: 0
         endSec: 30
-        channelTitle: "Bad Boy Edd"
+        channelTitle: "WhamVEVO"
         notes: "Peter-kurerad 2026-08-14. Videotitel verifierad: 'Wham! - Wake Me Up Before You Go-Go [Official Music Video]' — inget ar i titeln. Ersatte LatinHype-uppladdningen (score 10)."
   - id: van-halen-jump
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
@@ -857,10 +857,10 @@ items:
     spotifyTrackId: "27LuGw8pE0WSELYYuptRjK"
     genrePackages: ["Rock"]
     youtubeClips:
-      - videoId: "0oi1fGhaJl8"
+      - videoId: "vabnZ9-ex7o"
         startSec: 30
         endSec: 45
-        channelTitle: "Nirvana - Topic"
+        channelTitle: "NirvanaVEVO"
         notes: "Auto-curerad 2026-05-31 via batch-pick-clips. Top-scored kandidat (100)."
     region: ["global"]
   - id: lili-sussie-oh-mama
