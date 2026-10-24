@@ -14,10 +14,13 @@ on:
   pull_request:
     types: [closed]
     branches: [master]
+  # Manuell körning: publicerar master till preview (t.ex. om en tidigare
+  # körning failade efter en clip-fix-merge).
+  workflow_dispatch:
 
 jobs:
   ota:
-    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'bot/clip-fix' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'bot/clip-fix') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -40,5 +43,7 @@ jobs:
 
       - name: Publish OTA (iOS, preview channel)
         env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: npx eas update --branch preview --platform ios --environment preview --non-interactive --message "$PR_TITLE"
+          PR_TITLE: ${{ github.event.pull_request.title || 'Manual preview OTA from master' }}
+        # eas-cli installeras globalt av expo-github-action ovan och finns inte
+        # som projekt-beroende, så `npx eas` hittar ingen körbar fil.
+        run: eas update --branch preview --platform ios --environment preview --non-interactive --message "$PR_TITLE"
