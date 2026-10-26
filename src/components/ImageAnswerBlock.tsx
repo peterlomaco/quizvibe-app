@@ -152,9 +152,12 @@ function FullNamesView({
             cardStyle = styles.nameCardPending;
             textStyle = styles.fullNameTextActive;
           } else if (isPlayerRow && isLocked) {
-            cardStyle = styles.nameCardConfirmed;
-            // Reveal-matris (Peter 2026-10-15): mitt rätta svar = vit text,
-            // mitt fel svar = blå text. Kantlinjen är guld i båda fallen.
+            // Reveal-matris (Peter 2026-10-26): mitt rätta svar = guld kant
+            // + vit text, mitt fel svar = RÖD kant + blå text — samma regel
+            // för Music, Film/TV och Hints.
+            cardStyle = confirmedName && !wasPlayerCorrect
+              ? styles.nameCardWrong
+              : styles.nameCardConfirmed;
             textStyle = confirmedName && wasPlayerCorrect
               ? styles.fullNameTextWhite
               : styles.fullNameTextActive;
@@ -426,8 +429,13 @@ function PrefixView({
           // Reveal-matris (Peter 2026-10-15): mitt rätta svar = vit text.
           const isPlayerCorrectLocked =
             isPlayerRow && isLocked && !!confirmedName && wasPlayerCorrect;
+          const isPlayerWrongLocked =
+            isPlayerRow && isLocked && !!confirmedName && !wasPlayerCorrect;
           if (isPlayerRow && isLocked) {
-            nameCardStyle = styles.nameCardConfirmed;
+            // Mitt fel svar = röd kant (reveal-matris 2026-10-26).
+            nameCardStyle = isPlayerWrongLocked
+              ? styles.nameCardWrong
+              : styles.nameCardConfirmed;
             nameTextStyle = isPlayerCorrectLocked
               ? styles.nameTextWhite
               : styles.nameTextConfirmed;
@@ -488,6 +496,7 @@ function PrefixView({
                     styles.prefixButton,
                     isPrefixSelected && !isLocked && styles.prefixButtonActive,
                     isPrefixSelected && isLocked && styles.prefixButtonLocked,
+                    isPrefixSelected && isPlayerWrongLocked && styles.prefixButtonLockedWrong,
                     isPrefixCorrectReveal && styles.prefixButtonCorrectReveal,
                     isWrongRevealRow && styles.prefixButtonWrongReveal,
                     pressed && styles.prefixButtonPressed,
@@ -610,6 +619,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryMuted,
     borderColor: Colors.warning,
     borderWidth: 2,
+  },
+  // Mitt låsta FEL svar — röd kant (reveal-matris 2026-10-26).
+  prefixButtonLockedWrong: {
+    borderColor: QUIZ_ERROR_RED,
   },
   // Reveal-phase correct answer (visad separat när spelaren svarade fel
   // eller tiden tog slut) — grön border, blå bg (samma logik som locked).

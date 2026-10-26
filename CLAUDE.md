@@ -1586,7 +1586,7 @@ Edge cases:
 | Rad | Kant | Text | Badge |
 |---|---|---|---|
 | Mitt svar, rätt | guld | **vit** | grön "✓ Correct Answer" |
-| Mitt svar, fel | guld (Spotify/Hints) / **röd** (Film) | blå | röd "✗ Wrong Answer" |
+| Mitt svar, fel | **röd** (alla kategorier — Music, Film/TV, Hints; Peter 2026-10-26) | blå | röd "✗ Wrong Answer" |
 | Rätta svaret (facit, när jag svarat fel) | grön | blå | grön "✓ Correct" |
 | Inget svar: rätta raden | grön | blå | grön "✓ Correct" |
 | Inget svar: övriga rader | röd | grå | röd ✗ |

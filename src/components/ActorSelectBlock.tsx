@@ -113,9 +113,8 @@ export function ActorSelectBlock({
         const isConfirmedRow = isLocked && confirmedName === name;
         const isSelected = isPending || isConfirmedRow;
 
-        // Reveal-matris (Peter 2026-10-15) — gemensam för alla Name-svar,
-        // enda Film-avvikelsen är RÖD kant på mitt fel svar (Spotify/Hints:
-        // guld). Spelarens EGEN låsta rad graderas redan vid 'awaiting';
+        // Reveal-matris (Peter 2026-10-26) — gemensam för ALLA Name-svar
+        // (Music, Film/TV, Hints), ingen kategori-skillnad. Spelarens EGEN låsta rad graderas redan vid 'awaiting';
         // facit-raderna (separat correct + time-out-röd) hålls till 'reveal'.
         //   • mitt rätta svar     → guld kant, vit text, grön "Correct"
         //   • mitt fel svar       → röd kant,  blå text, röd "Wrong"
