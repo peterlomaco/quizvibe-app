@@ -231,6 +231,8 @@ function FullNamesView({
                     styles.fullNameText,
                     textStyle,
                     isDimmed && styles.fullNameTextDimmed,
+                    // Rätt svar ALLTID vit text, oavsett annan styling.
+                    isRevealing && name.isCorrect && styles.fullNameTextWhite,
                   ]}
                   numberOfLines={1}
                 >
@@ -519,6 +521,8 @@ function PrefixView({
                       isPrefixCorrectReveal && styles.prefixTextWhite,
                       isWrongRevealRow && styles.prefixTextWrongReveal,
                       isPrefixDimmed && styles.prefixTextDimmed,
+                      // Rätt svar ALLTID vit text.
+                      isRevealing && opt.prefix === variant.correctPrefix && styles.prefixTextWhite,
                     ]}
                     // "XXX XXX" ska alltid stå på EN rad (Peter 2026-10-15).
                     numberOfLines={1}
@@ -543,7 +547,12 @@ function PrefixView({
                       (Peter 2026-10-15). Raden är stretch + prefix-knappen har
                       flexGrow, så knapp och namnkort är alltid lika höga. */}
                   <Text
-                    style={[styles.nameText, styles.nameTextFit, nameTextStyle]}
+                    style={[
+                      styles.nameText,
+                      styles.nameTextFit,
+                      nameTextStyle,
+                      isRevealing && !!nameOpt?.isCorrect && styles.nameTextWhite,
+                    ]}
                     numberOfLines={2}
                     adjustsFontSizeToFit
                     minimumFontScale={0.8}
