@@ -166,7 +166,9 @@ function FullNamesView({
             cardStyle = styles.nameCardCorrect;
             textStyle = styles.fullNameTextWhite;
           } else if (isWrongRevealRow) {
-            cardStyle = styles.nameCardWrong;
+            // Time-out, övriga fel alternativ: grå kant + grå text, bara
+            // röd ✗-badge (reveal-matris 2026-10-26).
+            cardStyle = styles.nameCardTimeoutWrong;
             // Grå text (textDisabled) — speglar prefix-mode:s dämpning.
             // Röd border + ✗-badge bär status:en visuellt; text:en behöver
             // inte tävla med correct-revealens blå.
@@ -640,7 +642,7 @@ const styles = StyleSheet.create({
   // badgens absolute-position anchorar till knappen.
   prefixButtonWrongReveal: {
     backgroundColor: BrandUi.selectedFill,
-    borderColor: QUIZ_ERROR_RED,
+    borderColor: Colors.border,
     borderWidth: 2,
     position: 'relative',
   },
@@ -714,6 +716,11 @@ const styles = StyleSheet.create({
   // Wrong-reveal (time-out, fullnames-mode) — röd border + selectedFill-bg.
   // Speglar nameCardCorrect men i QUIZ_ERROR_RED. Visar tydligt vilka
   // alternativ som var felaktiga när spelaren inte hann svara.
+  // Time-out, övriga fel alternativ — grå kant (bara ✗-badgen är röd).
+  nameCardTimeoutWrong: {
+    backgroundColor: BrandUi.selectedFill,
+    borderColor: Colors.border,
+  },
   nameCardWrong: {
     backgroundColor: BrandUi.selectedFill,
     borderColor: QUIZ_ERROR_RED,

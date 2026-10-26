@@ -119,13 +119,13 @@ export function ActorSelectBlock({
         //   • mitt rätta svar     → grön kant, vit text, grön "Correct Answer"
         //   • mitt fel svar       → röd kant,  vit text, röd "Wrong Answer"
         //   • rätta svaret (facit)→ grön kant, vit text, grön "Correct"
-        //   • time-out, fel rader → röd kant,  grå text, röd ✗
+        //   • time-out, fel rader → grå kant,  grå text, röd ✗
         const isCorrectFacitRow = isCorrectRevealRow && !isPlayerRow;
         let borderColor: string = Colors.border;
         if (isPending) borderColor = Colors.primary;
         else if (isConfirmedRow) borderColor = wasPlayerCorrect ? Colors.success : QUIZ_ERROR_RED;
         else if (isCorrectRevealRow) borderColor = Colors.success;
-        else if (showWrongTimeout) borderColor = QUIZ_ERROR_RED;
+        else if (showWrongTimeout) borderColor = Colors.border;
 
         let textColor: string = Colors.textPrimary;
         if (isConfirmedRow || isCorrectFacitRow) textColor = Colors.textPrimary;

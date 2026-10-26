@@ -1678,7 +1678,7 @@ Edge cases:
 | Mitt svar, fel | röd | vit | röd "✗ Wrong Answer" |
 | Rätta svaret (facit, när jag svarat fel) | grön | vit | grön "✓ Correct" |
 | Inget svar: rätta raden | grön | vit | grön "✓ Correct" |
-| Inget svar: övriga felaktiga alternativ | röd | grå | röd ✗ |
+| Inget svar: övriga felaktiga alternativ | grå | grå | röd ✗ |
 
 Rutornas fyllning (namnkort + prefix-knapp, alla tillstånd) = `BrandUi.selectedFill` (`#172234`) — ingen blå `primaryMuted` (Peter 2026-10-26). Spelarens egen rad graderas redan vid `awaiting` (grön/röd kant syns direkt när svaret låsts); facit-raderna väntar till `reveal`. Film behåller grå `movieMeta`-undertext (titel · år) under skådespelaren. Bullet-listan nedan är historik där den motsäger matrisen (t.ex. "Texten konstant blå"). Blink-animationen (svarsalternativen pulserar före svar) MÅSTE återställas till `opacity: 1` när den stoppar — annars fastnar en rad på blinkens momentana opacitet och facit-raden kan bli utgråad. ⚠ Blinken kör med `useNativeDriver: false` med flit: med native driver behöll vyn sin senaste blink-opacitet trots `opacity: 1` i JS, så spelarens valda rad kunde fastna halvgrå vid reveal. Byt inte tillbaka till native driver.
 
