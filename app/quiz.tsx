@@ -3951,10 +3951,6 @@ export default function QuizScreen() {
   // svaret poppa in. Kopierad logik från den borttagna RevealScreen-komponenten.
   const revealScale = useRef(new Animated.Value(0.6)).current;
   const revealOpacity = useRef(new Animated.Value(0)).current;
-  // Pulserande QuizVibe-logo i reveal-boxen medan en spelare som bekräftat
-  // tidigt väntar på att sista spelaren ska svara (IndDev-multiplayer). Loopas
-  // bara under 'awaiting'; vid 'reveal' göms logon och facit-texten tonar in.
-  const revealWaitPulse = useRef(new Animated.Value(1)).current;
   // One-shot-guard så reveal-boxens spring-in bara körs EN gång per fråga.
   // Boxen blir synlig redan vid 'awaiting' (efter confirm) och ska inte
   // poppa om vid 'awaiting' → 'reveal'-övergången när facit-texten fylls i.
@@ -5325,26 +5321,6 @@ export default function QuizScreen() {
       glowLoop.stop();
     };
   }, [phase, timerRingPulse, timerRingGlow]);
-
-  // Vänte-logons puls i reveal-boxen. Körs bara medan en spelare som bekräftat
-  // väntar på övriga i IndDev-multiplayer ('awaiting'). Single/PtP och reveal-
-  // fasen står still (gameMode är aldrig 'individual-devices' i single/PtP).
-  useEffect(() => {
-    const isWaiting = phase === 'awaiting' && gameMode === 'individual-devices';
-    if (!isWaiting) {
-      revealWaitPulse.stopAnimation();
-      revealWaitPulse.setValue(1);
-      return;
-    }
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(revealWaitPulse, { toValue: 1.06, duration: 700, useNativeDriver: true }),
-        Animated.timing(revealWaitPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
-      ]),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [phase, gameMode, revealWaitPulse]);
 
   // Next-tab:ens kontinuerliga scale-pulse (1 ↔ 1.03 over 900ms each way) —
   // speglar startskärmens primary-CTA-pulse exakt. Körs på mount och framåt
@@ -12000,22 +11976,26 @@ export default function QuizScreen() {
                     {/* Facit-texten (år + låt/artist) hålls tillbaka tills
                         sista spelaren bekräftat. Under 'awaiting' renderas texten
                         DOLD (opacity 0) så kortet reserverar EXAKT samma höjd som
-                        vid reveal. I IndDev-multiplayer överlagras då en pulserande
-                        QuizVibe-logo där facit-värdet snart hamnar — den är
+                        vid reveal. I IndDev-multiplayer överlagras då vänte-texten
+                        (ingen Q-logga, Peter 2026-10-26) — den är
                         absolut-positionerad (explicit position:'absolute', INTE
                         StyleSheet.absoluteFillObject-spread som föll ur flow på
                         Fabric-dev-builden) så den centreras i den reserverade ytan
-                        utan att ändra layouten. Vid 'reveal' göms logon och facit-
+                        utan att ändra layouten. Vid 'reveal' göms vänte-texten och facit-
                         texten tonar in. */}
                     <View style={rv.feedbackBody}>
                       {phase === 'awaiting' && gameMode === 'individual-devices' && (
-                        <Animated.View
-                          style={[rv.feedbackWaitLogo, { transform: [{ scale: revealWaitPulse }] }]}
-                          pointerEvents="none"
-                        >
-                          {/* UI v2: samma förenklade Q som bottom bannerns Home-ikon, i guld. */}
-                          <QuizVibeAvatarQ size={34} color={Colors.warning} />
-                        </Animated.View>
+                        <View style={rv.feedbackWaitLogo} pointerEvents="none">
+                          {/* Vänte-text med samma fyllande punkter som non-host:s
+                              "Waiting - Host will start quiz" i Get Ready
+                              (Peter 2026-10-26). */}
+                          <View style={rv.feedbackWaitTextRow}>
+                            <Text style={rv.feedbackWaitText} numberOfLines={1}>
+                              Waiting - all players to answer
+                            </Text>
+                            <SequentialDots color={Colors.textSecondary} />
+                          </View>
+                        </View>
                       )}
                       <Text
                         style={[
@@ -13614,8 +13594,20 @@ const rv = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+  },
+  feedbackWaitTextRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+  },
+  feedbackWaitText: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    flexShrink: 1,
   },
   feedbackCorrectYear: {
     fontSize: FontSize.md,
