@@ -445,6 +445,13 @@ export interface RoundScore {
    * kategori-/källkorten men räknas fortfarande i totaler och snittider.
    */
   questionIndex?: number;
+  /**
+   * Spelarens inskickade svar som visningstext — namn (Name-frågor) eller
+   * år/årsintervall (Year-frågor). Används ENBART av reveal-fasens "All
+   * Players"-facit. Saknas vid timeout/ingen uppkoppling och på poster från
+   * äldre klienter (optional, additivt — påverkar ingen poängräkning).
+   */
+  answer?: string;
 }
 
 export interface HcpChange {

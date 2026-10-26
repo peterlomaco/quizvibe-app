@@ -391,6 +391,9 @@ export interface PlayerScoreRecordedPayload {
   points: number;
   correct: boolean;
   time_used: number;
+  /** Svaret som visningstext (namn eller år/årsintervall) för reveal-facitet.
+   *  Optional — äldre klienter skickar det inte. */
+  answer?: string;
 }
 
 /**
@@ -896,6 +899,11 @@ function vPlayerScoreRecorded(raw: unknown): PlayerScoreRecordedPayload | null {
     points: raw.points,
     correct: raw.correct,
     time_used: raw.time_used,
+    // Ren visningstext — droppas tyst om den är malformed i stället för att
+    // kasta hela poäng-posten.
+    ...(typeof raw.answer === 'string' && raw.answer.length > 0 && raw.answer.length <= 80
+      ? { answer: raw.answer }
+      : {}),
   };
 }
 

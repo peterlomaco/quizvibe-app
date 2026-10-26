@@ -1409,22 +1409,46 @@ type TurnOrderPlayer = {
   type?: 'registered' | 'guest';
 };
 
-// En rad i reveal-fasens "Correct/Wrong answers"-listor (Individual
-// Devices). Avatar + namn + svarstid, med samma avatar-fallback-mönster som
-// timer-bar:ens markörer (avatarUri → bild, annars emoji i cirkel).
+// "No Answer" = spelaren låste aldrig ett svar: timeout (registreras med full
+// svarstid och utan svarstext) eller tappad uppkoppling. En post som SAKNAR
+// svarstext men har kortare tid kommer från en äldre klient som inte skickar
+// `answer` — den är ett riktigt felsvar och ska ligga kvar under Wrong.
+function isNoAnswerScore(score: RoundScore, responseSeconds: number): boolean {
+  if (score.correct || score.answer) return false;
+  return !!score.connectionError || score.timeUsed >= responseSeconds - 0.001;
+}
+
+type AnswerSummaryStatus = 'correct' | 'wrong' | 'none';
+
+// En rad i reveal-fasens "All Players"-facit (Individual Devices):
+// [Avatar] Namn [YOU] | Svar | Svarstid — alltid EN rad. Status bärs av en
+// smal accent-list till vänster; svarstexten färgas MEDVETET aldrig grön/röd.
 function AnswerSummaryRow({
   player,
   score,
   isSelf,
-  correct,
+  status,
 }: {
   player: TurnOrderPlayer;
   score: RoundScore;
   isSelf: boolean;
-  correct: boolean;
+  status: AnswerSummaryStatus;
 }) {
+  const answerText =
+    status === 'none'
+      ? score.connectionError
+        ? 'No connection'
+        : 'No answer'
+      : (score.answer ?? '—');
   return (
-    <View style={rv.answerRow}>
+    <View
+      style={[
+        rv.answerRow,
+        status === 'correct' && rv.answerRowCorrect,
+        status === 'wrong' && rv.answerRowWrong,
+        status === 'none' && rv.answerRowNone,
+      ]}
+    >
       {player.avatarUri ? (
         <Image source={{ uri: player.avatarUri }} style={rv.answerAvatar} />
       ) : (
@@ -1432,20 +1456,29 @@ function AnswerSummaryRow({
           <Text style={rv.answerAvatarEmoji}>{player.emoji ?? '👤'}</Text>
         </View>
       )}
-      <Text style={rv.answerName} numberOfLines={1} ellipsizeMode="tail">
-        {player.name}
-        {isSelf ? ' (You)' : ''}
-      </Text>
-      {/* connectionError = frågan missades pga dålig uppkoppling, inte ett
-          faktiskt felsvar — visa det istället för en svarstid som aldrig
-          representerade ett svar. */}
+      <View style={rv.answerNameCell}>
+        <Text
+          style={[rv.answerName, status === 'none' && rv.answerNameNone]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {player.name}
+        </Text>
+        {isSelf && (
+          <View style={rv.answerYouBadge}>
+            <Text style={rv.answerYouBadgeText}>YOU</Text>
+          </View>
+        )}
+      </View>
       <Text
-        style={[
-          rv.answerTime,
-          correct ? rv.answerTimeCorrect : rv.answerTimeWrong,
-        ]}
+        style={[rv.answerValue, status === 'none' && rv.answerValueNone]}
+        numberOfLines={1}
+        ellipsizeMode="tail"
       >
-        {score.connectionError ? 'no connection' : `${score.timeUsed.toFixed(2)}s`}
+        {answerText}
+      </Text>
+      <Text style={rv.answerTime}>
+        {status === 'none' ? '—' : `${score.timeUsed.toFixed(2)}s`}
       </Text>
     </View>
   );
@@ -3898,20 +3931,28 @@ export default function QuizScreen() {
     if (byPlayer.size === 0 && !dj) return null;
     const correct: { player: TurnOrderPlayer; score: RoundScore }[] = [];
     const wrong: { player: TurnOrderPlayer; score: RoundScore }[] = [];
+    const noAnswer: { player: TurnOrderPlayer; score: RoundScore }[] = [];
     turnOrder.forEach((p) => {
       if (leftPlayerIds.has(p.id)) return;
       if (dj && p.id === dj.id) return; // DJ visas i egen sektion, aldrig under Wrong
       const score = byPlayer.get(p.id);
       if (!score) return;
-      (score.correct ? correct : wrong).push({ player: p, score });
+      if (score.correct) correct.push({ player: p, score });
+      else if (isNoAnswerScore(score, responseSeconds)) noAnswer.push({ player: p, score });
+      else wrong.push({ player: p, score });
     });
     // Snabbast först inom varje lista — samma tie-break-logik som
     // leaderboardens avg-kolumn använder.
-    correct.sort((a, b) => a.score.timeUsed - b.score.timeUsed);
-    wrong.sort((a, b) => a.score.timeUsed - b.score.timeUsed);
-    if (correct.length === 0 && wrong.length === 0 && !dj) return null;
-    return { correct, wrong, dj };
-  }, [gameMode, turnOrder, allRoundScoresHistory, questionIndex, leftPlayerIds, isSpotifyQuestion, effectiveDJId]);
+    const byTime = (
+      a: { score: RoundScore },
+      b: { score: RoundScore },
+    ) => a.score.timeUsed - b.score.timeUsed;
+    correct.sort(byTime);
+    wrong.sort(byTime);
+    noAnswer.sort(byTime);
+    if (correct.length === 0 && wrong.length === 0 && noAnswer.length === 0 && !dj) return null;
+    return { correct, wrong, noAnswer, dj };
+  }, [gameMode, turnOrder, allRoundScoresHistory, questionIndex, leftPlayerIds, isSpotifyQuestion, effectiveDJId, responseSeconds]);
 
   const timerRef = useRef<any>(null);
   // pulseAnim driver opacity:n på timer-progress-baren när tiden
@@ -4938,7 +4979,15 @@ export default function QuizScreen() {
   // mock-motspelare auto-genereras inte eftersom alla spelare är riktiga
   // och delar denna enhet (en spelare i taget). Direkt-nav till /quiz utan
   // turnOrder simulerar fortfarande mock-motspelare för gameplay-testning.
-  const recordRoundScore = (yourPoints: number, yourCorrect: boolean, yourTimeUsed: number, connectionError?: boolean) => {
+  const recordRoundScore = (
+    yourPoints: number,
+    yourCorrect: boolean,
+    yourTimeUsed: number,
+    connectionError?: boolean,
+    // Svaret som visningstext (namn / år / årsintervall) — bara för reveal-
+    // facitet "All Players". Utelämnas vid timeout.
+    answerText?: string,
+  ) => {
     // PtP-spectatorn spelar inte — dess poäng kommer via host:s broadcasts.
     // Belt-and-suspenders: enhetens phase når aldrig 'question', så varken
     // timeout-vägen eller någon handleConfirm* kan fyra här. Utan guarden
@@ -4989,6 +5038,7 @@ export default function QuizScreen() {
       timeUsed: yourTimeUsed,
       questionIndex: scoredQuestionIndex,
       ...(connectionError ? { connectionError: true } : {}),
+      ...(answerText ? { answer: answerText } : {}),
     };
     let allScores: RoundScore[] = [yourScore];
     // Mock-motspelare genereras BARA vid direkt-nav (tom turnOrder).
@@ -5036,6 +5086,7 @@ export default function QuizScreen() {
         points: yourPoints,
         correct: yourCorrect,
         time_used: yourTimeUsed,
+        ...(answerText ? { answer: answerText } : {}),
       };
       // Spara alltid i pending-kön — vid reconnect skickas alla om.
       // Dedup-nyckeln player_id+question_index på mottagarsidan gör re-send säkert.
@@ -5653,7 +5704,16 @@ export default function QuizScreen() {
     // Registrera score:n för aktuell spelare (och i direkt-nav-fallet
     // även mock-motspelarnas auto-genererade poäng). Skickar 2-decimals-
     // exakt elapsed så leaderboardens AVG/LAST-kolumner visar variation.
-    recordRoundScore(pts, correct, exactElapsedSec);
+    const yearRange = getAnswerRange(year, interval, eraFrom, eraTo);
+    recordRoundScore(
+      pts,
+      correct,
+      exactElapsedSec,
+      undefined,
+      yearRange.start === yearRange.end
+        ? String(yearRange.start)
+        : `${yearRange.start}–${yearRange.end}`,
+    );
     // Markera own confirm lokalt + broadcast till andra devices så deras
     // timer-bar uppdaterar avatar-positionen för denna spelare. Gated på
     // IndDev — i Pass-the-Phone delar alla samma enhet/markör.
@@ -5888,7 +5948,7 @@ export default function QuizScreen() {
         timeUsed: exactElapsedSec,
       },
     ]);
-    recordRoundScore(pts, correct, exactElapsedSec);
+    recordRoundScore(pts, correct, exactElapsedSec, undefined, opt.displayName);
     // Frys own avatar-markör lokalt i alla non-PtP-lägen (IndDev + remote-1v1;
     // PtP delar enhet/markör via confirmedTimeUsed). Broadcasten är däremot
     // IndDev-only — remote-1v1 har ingen quiz_sync-kanal, så self-markören där
@@ -5941,7 +6001,7 @@ export default function QuizScreen() {
         timeUsed: exactElapsedSec,
       },
     ]);
-    recordRoundScore(pts, correct, exactElapsedSec);
+    recordRoundScore(pts, correct, exactElapsedSec, undefined, name);
     // Frys own avatar-markör lokalt i alla non-PtP-lägen (IndDev + remote-1v1;
     // PtP delar enhet/markör via confirmedTimeUsed). Broadcasten är däremot
     // IndDev-only — remote-1v1 har ingen quiz_sync-kanal, så self-markören där
@@ -6820,6 +6880,7 @@ export default function QuizScreen() {
         points: payload.points,
         correct: payload.correct,
         timeUsed: payload.time_used,
+        ...(payload.answer ? { answer: payload.answer } : {}),
         // Bevaras (användes tidigare bara till dedup-nyckeln ovan) så
         // match highlights kan joina peer-svar mot rätt fråga. Posten
         // appendas i ankomstordning, så detta är ENDA kopplingen till
@@ -12043,49 +12104,46 @@ export default function QuizScreen() {
                         </View>
                       )}
                       <Text style={rv.answersHeadingDJInline}>DJ</Text>
-                      <Text style={rv.answerName} numberOfLines={1} ellipsizeMode="tail">
+                      <Text style={[rv.answerName, rv.answerNameDJ]} numberOfLines={1} ellipsizeMode="tail">
                         {revealAnswerSummary.dj.name}
                         {revealAnswerSummary.dj.id === selfPlayerId ? ' (You)' : ''}
                       </Text>
                       <SpotifyBrandIcon size={16} variant="white" />
                     </View>
                   )}
-                  <View>
-                    <Text style={[rv.answersHeading, rv.answersHeadingCorrect]}>
-                      Correct
-                    </Text>
-                    {revealAnswerSummary.correct.length === 0 ? (
-                      <Text style={rv.answersEmpty}>No one</Text>
-                    ) : (
-                      revealAnswerSummary.correct.map(({ player, score }) => (
-                        <AnswerSummaryRow
-                          key={`c-${player.id}`}
-                          player={player}
-                          score={score}
-                          isSelf={player.id === selfPlayerId}
-                          correct
-                        />
-                      ))
-                    )}
-                  </View>
-                  <View>
-                    <Text style={[rv.answersHeading, rv.answersHeadingWrong]}>
-                      Wrong
-                    </Text>
-                    {revealAnswerSummary.wrong.length === 0 ? (
-                      <Text style={rv.answersEmpty}>No one</Text>
-                    ) : (
-                      revealAnswerSummary.wrong.map(({ player, score }) => (
-                        <AnswerSummaryRow
-                          key={`w-${player.id}`}
-                          player={player}
-                          score={score}
-                          isSelf={player.id === selfPlayerId}
-                          correct={false}
-                        />
-                      ))
-                    )}
-                  </View>
+                  {/* Grupper renderas bara när de har minst en spelare —
+                      inga tomma rubriker eller "No one"-platshållare. */}
+                  {(
+                    [
+                      { key: 'correct', title: 'Correct', rows: revealAnswerSummary.correct },
+                      { key: 'wrong', title: 'Wrong', rows: revealAnswerSummary.wrong },
+                      { key: 'none', title: 'No Answer', rows: revealAnswerSummary.noAnswer },
+                    ] as const
+                  ).map((group) =>
+                    group.rows.length === 0 ? null : (
+                      <View key={group.key}>
+                        <Text
+                          style={[
+                            rv.answersHeading,
+                            group.key === 'correct' && rv.answersHeadingCorrect,
+                            group.key === 'wrong' && rv.answersHeadingWrong,
+                            group.key === 'none' && rv.answersHeadingNone,
+                          ]}
+                        >
+                          {group.title}
+                        </Text>
+                        {group.rows.map(({ player, score }) => (
+                          <AnswerSummaryRow
+                            key={`${group.key}-${player.id}`}
+                            player={player}
+                            score={score}
+                            isSelf={player.id === selfPlayerId}
+                            status={group.key}
+                          />
+                        ))}
+                      </View>
+                    ),
+                  )}
                   </>
                   )}
                 </View>
@@ -13689,6 +13747,9 @@ const rv = StyleSheet.create({
   answersHeadingWrong: {
     color: QUIZ_ERROR_RED,
   },
+  answersHeadingNone: {
+    color: Colors.textSecondary,
+  },
   // "DJ"-etikett inline med spelarnamnet på DJ-raden i All Players-facitet.
   // Grå (Colors.textSecondary), ingen marginBottom (sitter i en center-radad
   // flex-row, inte som heading ovanför).
@@ -13710,6 +13771,23 @@ const rv = StyleSheet.create({
     gap: Spacing.sm,
     paddingVertical: 3,
   },
+  // Statusaccent: en smal vänsterlist i stället för färgad text — svaret och
+  // namnet förblir neutrala, raden bär bara en subtil grön/röd/grå markering.
+  answerRowCorrect: {
+    borderLeftWidth: 2,
+    borderLeftColor: 'rgba(82,200,122,0.6)',
+    paddingLeft: Spacing.sm,
+  },
+  answerRowWrong: {
+    borderLeftWidth: 2,
+    borderLeftColor: 'rgba(255,59,48,0.6)',
+    paddingLeft: Spacing.sm,
+  },
+  answerRowNone: {
+    borderLeftWidth: 2,
+    borderLeftColor: 'rgba(255,255,255,0.14)',
+    paddingLeft: Spacing.sm,
+  },
   answerAvatar: {
     width: qh(24),
     height: qh(24),
@@ -13723,22 +13801,58 @@ const rv = StyleSheet.create({
   answerAvatarEmoji: {
     fontSize: qf(13),
   },
+  // Namn + ev. YOU-badge. Krymper före svarskolumnen så långa namn trunkeras
+  // med … i stället för att trycka ut svaret/tiden.
+  answerNameCell: {
+    flex: 1.2,
+    minWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   answerName: {
-    flex: 1,
+    flexShrink: 1,
     fontSize: FontSize.sm,
-    fontWeight: FontWeight.medium,
+    fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
-  answerTime: {
+  answerNameDJ: {
+    flex: 1,
+  },
+  answerNameNone: {
+    color: Colors.textSecondary,
+  },
+  answerYouBadge: {
+    flexShrink: 0,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.warning,
+  },
+  answerYouBadgeText: {
+    fontSize: 9,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.6,
+    color: Colors.warning,
+  },
+  answerValue: {
+    flex: 1,
+    minWidth: 0,
     fontSize: FontSize.xs,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.medium,
+    color: 'rgba(255,255,255,0.82)',
+  },
+  answerValueNone: {
+    color: Colors.textDisabled,
+  },
+  answerTime: {
+    minWidth: 46,
+    textAlign: 'right',
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
     fontVariant: ['tabular-nums'],
     letterSpacing: 0.2,
-  },
-  answerTimeCorrect: {
-    color: Colors.success,
-  },
-  answerTimeWrong: {
     color: Colors.textSecondary,
   },
   // Wrapper för Next-tab UTANFÖR feedback-kortet — sträcker sig full bredd
