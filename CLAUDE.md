@@ -894,6 +894,8 @@ Allt i [app/quiz.tsx](app/quiz.tsx); ingen logik ändrad.
 
 ### UI v2 — Share invite + kant-taggar (2026-10-26)
 
+- **H2H History-skärmen** ([MyMatchesScreen.tsx](src/screens/MyMatchesScreen.tsx)): rubrikens `VersusIcon` använder v2-färgerna (`color={BrandUi.icon} accentColor={BrandUi.icon}` — vita silhuetter + vita wifi-bågar), samma som Home:s "H2H History"-knapp (`MyMatchesSection` v2). Den blå/guld-defaulten i `VersusIcon` är legacy.
+
 - **Share invite-sheeten** (Lobby, `shareSheet`-styles): v2-språket — dämpad `GroupOutlineIcon` i stället för blå friends-logga, neutral räknar-pill, inputs på `CHOICE_BG`/`CHOICE_BORDER` (guldkant på fokuserat fält), Add = guldkant + `selectedFill` + vit text (neutral när ej tappbar), tunn hårlinje i stället för tjock avdelare, neutrala namn-pills med vit text, kryssruta vald = guldkant + `selectedFill` + guld ✓ (aldrig grönt), "Send invite" = `GoldCtaButton` (locked tills någon är ibockad). `closeBtn*`-styles är död CSS.
 - **Kant-skärande taggar på spelarkortet** ([PlayerRow.tsx](src/components/PlayerRow.tsx)): HOST/GUEST/QuizVibe user/Spotify har EN fast höjd `BORDER_TAG_H = 14` och `top: BORDER_TAG_TOP` (= −höjd/2 + 0,5) så tagg-mitten alltid ligger exakt på kortets 1 pt-kant. Sätt aldrig `paddingVertical` + hårdkodat `top: -8` på en ny tagg — HOST hamnade ovanför kanten av just det skälet.
 

@@ -63,7 +63,7 @@ import { NewUpdateBadge } from '../components/NewUpdateBadge';
 import { RemoteMatchResultPanel } from '../components/RemoteMatchResultPanel';
 import type { AssistanceLevel } from '../components/RoundLeaderboard';
 import { VersusIcon } from '../components/VersusIcon';
-import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
 import { getLobbyPlayers } from '../utils/mockLobbyPlayers';
 import { getRoomMeta } from '../utils/mockActiveRooms';
@@ -679,11 +679,12 @@ export default function MyMatchesScreen() {
     <SafeAreaView style={styles.safe}>
       <TopUserBanner onBackPress={() => router.replace(backTo)} backLabel="Back" />
       <ScrollView ref={scrollRef} contentContainerStyle={styles.content}>
-        {/* Rubrik + 1vs1-märket (två blå silhuetter förbundna av prickar)
-            direkt efter — samma ikon som Home:s "1vs1"-knapp. */}
+        {/* Rubrik + H2H-märket direkt efter — UI v2 (2026-10-26): samma
+            vita silhuetter + vita wifi-bågar som Home:s "H2H History"-knapp
+            (MyMatchesSection v2), inte längre den blå/guld legacy-varianten. */}
         <View style={styles.screenTitleRow}>
           <Text style={styles.screenTitle}>H2H History</Text>
-          <VersusIcon height={30} />
+          <VersusIcon height={30} color={BrandUi.icon} accentColor={BrandUi.icon} />
         </View>
         <Text style={styles.screenSubtitle}>
           Head-to-head duels — each player answers on their own device within 48 hours.
