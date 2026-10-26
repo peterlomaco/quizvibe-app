@@ -98,8 +98,12 @@ function FullNamesView({
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(blinkAnim, { toValue: 0.35, duration: 750, useNativeDriver: true }),
-        Animated.timing(blinkAnim, { toValue: 1,    duration: 750, useNativeDriver: true }),
+        // JS-driven MED FLIT (Peter 2026-10-15): med native driver behöll den
+        // native vyn sin senaste blink-opacitet när raden slutade blinka
+        // (vald/låst) — trots `opacity: 1` i JS — så spelarens rad kunde
+        // fastna halvgrå vid reveal. JS-driven låter `1` alltid slå igenom.
+        Animated.timing(blinkAnim, { toValue: 0.35, duration: 750, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 1,    duration: 750, useNativeDriver: false }),
       ]),
     );
     loop.start();
@@ -148,11 +152,18 @@ function FullNamesView({
             cardStyle = styles.nameCardPending;
             textStyle = styles.fullNameTextActive;
           } else if (isPlayerRow && isLocked) {
-            cardStyle = styles.nameCardConfirmed;
-            textStyle = styles.fullNameTextActive;
+            // Reveal-matris (Peter 2026-10-26, samma för Music, Film/TV och
+            // Hints): mitt rätta svar = grön kant, mitt fel svar = röd kant,
+            // vit text i båda fallen. Inget blått efter att svaret låsts.
+            cardStyle = confirmedName && !wasPlayerCorrect
+              ? styles.nameCardWrong
+              : confirmedName
+                ? styles.nameCardCorrect
+                : styles.nameCardConfirmed;
+            textStyle = styles.fullNameTextWhite;
           } else if (isCorrectRevealRow) {
             cardStyle = styles.nameCardCorrect;
-            textStyle = styles.fullNameTextActive;
+            textStyle = styles.fullNameTextWhite;
           } else if (isWrongRevealRow) {
             cardStyle = styles.nameCardWrong;
             // Grå text (textDisabled) — speglar prefix-mode:s dämpning.
@@ -198,7 +209,7 @@ function FullNamesView({
           return (
             <Animated.View
               key={name.itemId}
-              style={shouldBlink ? { opacity: blinkAnim } : undefined}
+              style={{ opacity: shouldBlink ? blinkAnim : 1 }}
             >
               <Pressable
                 onPress={() => handleNamePress(name)}
@@ -221,12 +232,12 @@ function FullNamesView({
                 </Text>
                 {badgeType === 'correct' && (
                   <Text style={[styles.revealBadge, styles.revealBadgeCorrect]}>
-                    Correct
+                    {isPlayerRow ? '✓ Correct Answer' : '✓ Correct'}
                   </Text>
                 )}
                 {badgeType === 'wrong' && (
                   <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
-                    Wrong
+                    ✗ Wrong Answer
                   </Text>
                 )}
                 {badgeType === 'wrongReveal' && (
@@ -270,8 +281,12 @@ function PrefixView({
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(blinkAnim, { toValue: 0.35, duration: 750, useNativeDriver: true }),
-        Animated.timing(blinkAnim, { toValue: 1,    duration: 750, useNativeDriver: true }),
+        // JS-driven MED FLIT (Peter 2026-10-15): med native driver behöll den
+        // native vyn sin senaste blink-opacitet när raden slutade blinka
+        // (vald/låst) — trots `opacity: 1` i JS — så spelarens rad kunde
+        // fastna halvgrå vid reveal. JS-driven låter `1` alltid slå igenom.
+        Animated.timing(blinkAnim, { toValue: 0.35, duration: 750, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 1,    duration: 750, useNativeDriver: false }),
       ]),
     );
     loop.start();
@@ -283,7 +298,8 @@ function PrefixView({
   //      Skydd mot edge case där distractor-pool-namn med kort displayName ger
   //      kortare prefix än target.
   //   2. Word-count-filter: alla prefix-knappar måste matcha rätta svarets
-  //      ord-count. Om rätt svar är "Astrid Lindgren" (2 ord, "AS LI") visas
+  //      ord-klass. getPrefixForItem kapar till max två ord, så klassen är
+  //      1 eller 2 ("1-ordssvar ↔ 1-ordsalternativ, 2+ ↔ 2+"). Om rätt svar är "Astrid Lindgren" (2 ord, "AS LI") visas
   //      bara 2-ord-distractors — inte 1-ord items som "AV" (Avicii). Garanterar
   //      visuell konsistens.
   //   3. Dedupering: max EN prefix-knapp per begynnelsebokstav. Vid dubbletter
@@ -410,12 +426,23 @@ function PrefixView({
           //   • correctReveal (reveal, separate correct) → grön border
           let nameCardStyle: ViewStyle = styles.nameCardPending;
           let nameTextStyle: TextStyle = styles.nameTextPending;
+          // Reveal-matris (Peter 2026-10-15): mitt rätta svar = vit text.
+          const isPlayerCorrectLocked =
+            isPlayerRow && isLocked && !!confirmedName && wasPlayerCorrect;
+          const isPlayerWrongLocked =
+            isPlayerRow && isLocked && !!confirmedName && !wasPlayerCorrect;
           if (isPlayerRow && isLocked) {
-            nameCardStyle = styles.nameCardConfirmed;
-            nameTextStyle = styles.nameTextConfirmed;
+            // Reveal-matris 2026-10-26: rätt = grön kant, fel = röd kant,
+            // vit text i båda fallen.
+            nameCardStyle = isPlayerWrongLocked
+              ? styles.nameCardWrong
+              : isPlayerCorrectLocked
+                ? styles.nameCardCorrect
+                : styles.nameCardConfirmed;
+            nameTextStyle = styles.nameTextWhite;
           } else if (isCorrectRevealRow) {
             nameCardStyle = styles.nameCardCorrect;
-            nameTextStyle = styles.nameTextCorrect;
+            nameTextStyle = styles.nameTextWhite;
           }
 
           // Badge-state — visas BARA i reveal-fas:
@@ -462,7 +489,7 @@ function PrefixView({
 
           return (
             <View key={opt.prefix} style={styles.prefixRow}>
-              <Animated.View style={shouldBlink ? { opacity: blinkAnim } : undefined}>
+              <Animated.View style={{ opacity: shouldBlink ? blinkAnim : 1 }}>
                 <Pressable
                   onPress={() => handlePrefixPress(opt.prefix)}
                   disabled={isPrefixLocked}
@@ -470,6 +497,8 @@ function PrefixView({
                     styles.prefixButton,
                     isPrefixSelected && !isLocked && styles.prefixButtonActive,
                     isPrefixSelected && isLocked && styles.prefixButtonLocked,
+                    isPrefixSelected && isPlayerWrongLocked && styles.prefixButtonLockedWrong,
+                    isPrefixSelected && isPlayerCorrectLocked && styles.prefixButtonCorrectReveal,
                     isPrefixCorrectReveal && styles.prefixButtonCorrectReveal,
                     isWrongRevealRow && styles.prefixButtonWrongReveal,
                     pressed && styles.prefixButtonPressed,
@@ -480,10 +509,15 @@ function PrefixView({
                       styles.prefixText,
                       isPrefixSelected && !isLocked && styles.prefixTextActive,
                       isPrefixSelected && isLocked && styles.prefixTextLocked,
-                      isPrefixCorrectReveal && styles.prefixTextCorrectReveal,
+                      isPrefixSelected && isLocked && styles.prefixTextWhite,
+                      isPrefixCorrectReveal && styles.prefixTextWhite,
                       isWrongRevealRow && styles.prefixTextWrongReveal,
                       isPrefixDimmed && styles.prefixTextDimmed,
                     ]}
+                    // "XXX XXX" ska alltid stå på EN rad (Peter 2026-10-15).
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.8}
                   >
                     {opt.prefix}
                   </Text>
@@ -499,17 +533,25 @@ function PrefixView({
               </Animated.View>
               {nameOpt && (
                 <View style={[styles.nameCard, nameCardStyle]}>
-                  <Text style={[styles.nameText, nameTextStyle]}>
+                  {/* Långa svar får gå på två rader och krymper bara måttligt
+                      (Peter 2026-10-15). Raden är stretch + prefix-knappen har
+                      flexGrow, så knapp och namnkort är alltid lika höga. */}
+                  <Text
+                    style={[styles.nameText, styles.nameTextFit, nameTextStyle]}
+                    numberOfLines={2}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.8}
+                  >
                     {nameOpt.displayName}
                   </Text>
                   {badgeType === 'correct' && (
                     <Text style={[styles.revealBadge, styles.revealBadgeCorrect]}>
-                      Correct
+                      {isPlayerRow ? '✓ Correct Answer' : '✓ Correct'}
                     </Text>
                   )}
                   {badgeType === 'wrong' && (
                     <Text style={[styles.revealBadge, styles.revealBadgeWrong]}>
-                      Wrong
+                      ✗ Wrong Answer
                     </Text>
                   )}
                 </View>
@@ -552,7 +594,11 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   prefixButton: {
-    width: 96,
+    // 120 rymmer "XXX XXX" (max två ord à 3 bokstäver) på en rad.
+    width: 120,
+    // Fyller radens höjd (prefixRow = stretch) så knappen och namnkortet
+    // alltid är lika höga.
+    flexGrow: 1,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.sm,
     backgroundColor: Colors.cardElevated,
@@ -575,6 +621,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryMuted,
     borderColor: Colors.warning,
     borderWidth: 2,
+  },
+  // Mitt låsta FEL svar — röd kant (reveal-matris 2026-10-26).
+  prefixButtonLockedWrong: {
+    borderColor: QUIZ_ERROR_RED,
   },
   // Reveal-phase correct answer (visad separat när spelaren svarade fel
   // eller tiden tog slut) — grön border, blå bg (samma logik som locked).
@@ -614,6 +664,10 @@ const styles = StyleSheet.create({
   },
   prefixTextCorrectReveal: {
     color: Colors.primary,
+  },
+  // Spelarens låsta RÄTTA svar — vit text (reveal-matris 2026-10-15).
+  prefixTextWhite: {
+    color: Colors.textPrimary,
   },
   // Wrong-reveal-text vid time-out — dämpad grå (textDisabled), samma färg
   // som irrelevanta rader får vid rätt-svar-fallet (`prefixTextDimmed`).
@@ -673,9 +727,17 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.primary,
   },
+  // Tätare radavstånd så två rader ryms nära prefix-knappens höjd.
+  nameTextFit: {
+    lineHeight: 19,
+  },
   nameTextPending: {},
   nameTextConfirmed: {},
   nameTextCorrect: {},
+  // Spelarens låsta RÄTTA svar — vit text (reveal-matris 2026-10-15).
+  nameTextWhite: {
+    color: Colors.textPrimary,
+  },
   // Border-cutting badge — sitter på namn-kortets övre kantlinje (top: -10)
   // istället för inuti kortet. Solid bg matchar borderColor så taggen
   // visuellt "är en del av" ramen. Speglar HOST/GUEST-taggen på PlayerRow
@@ -770,6 +832,10 @@ const styles = StyleSheet.create({
   },
   fullNameTextDimmed: {
     color: Colors.textDisabled,
+  },
+  // Spelarens låsta RÄTTA svar — vit text (reveal-matris 2026-10-15).
+  fullNameTextWhite: {
+    color: Colors.textPrimary,
   },
 
   // "click"-etikett till höger om prefix-knapper som ännu inte valts.
