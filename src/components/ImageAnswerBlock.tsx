@@ -166,7 +166,10 @@ function FullNamesView({
                 : styles.nameCardConfirmed;
             textStyle = styles.fullNameTextWhite;
           } else if (isCorrectRevealRow) {
-            cardStyle = styles.nameCardCorrect;
+            // Inget svar → facit-raden får GULD kant (Peter 2026-10-26):
+            // grön kant + grön badge + röda kryss på övriga lästes som att
+            // spelaren svarat rätt. Grön kant bara när spelaren svarat fel.
+            cardStyle = confirmedName ? styles.nameCardCorrect : styles.nameCardConfirmed;
             textStyle = styles.fullNameTextWhite;
           } else if (isWrongRevealRow) {
             // Time-out, övriga fel alternativ: grå kant + grå text, bara
@@ -455,7 +458,8 @@ function PrefixView({
                 : styles.nameCardConfirmed;
             nameTextStyle = styles.nameTextWhite;
           } else if (isCorrectRevealRow) {
-            nameCardStyle = styles.nameCardCorrect;
+            // Inget svar → guld kant på facit (se FullNamesView).
+            nameCardStyle = confirmedName ? styles.nameCardCorrect : styles.nameCardConfirmed;
             nameTextStyle = styles.nameTextWhite;
           }
 
@@ -513,7 +517,8 @@ function PrefixView({
                     isPrefixSelected && isLocked && styles.prefixButtonLocked,
                     isPrefixSelected && isPlayerWrongLocked && styles.prefixButtonLockedWrong,
                     isPrefixSelected && isPlayerCorrectLocked && styles.prefixButtonCorrectReveal,
-                    isPrefixCorrectReveal && styles.prefixButtonCorrectReveal,
+                    isPrefixCorrectReveal &&
+                      (confirmedName ? styles.prefixButtonCorrectReveal : styles.prefixButtonLocked),
                     isWrongRevealRow && styles.prefixButtonWrongReveal,
                     pressed && styles.prefixButtonPressed,
                   ]}

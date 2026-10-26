@@ -224,7 +224,7 @@ export function resolveHintText(
     // Klubbnamnet/filmtiteln kortas men årtalen behålls — de bär kronologin
     // i Career History / Film History-grupperingen (se hintsGenerator.ts).
     const fitted = hint.type === 'club' ? fitClubText(censored, subMaxChars) : fitFilmText(censored, subMaxChars);
-    return hasSubstance(fitted) ? fitted : null;
+    return hasSubstance(fitted) ? capitalizeFirst(fitted) : null;
   }
 
   let raw: string;
@@ -245,7 +245,17 @@ export function resolveHintText(
   // Sista, defensiva substanskoll: fitHintText/truncateWords kan i extrema
   // edge-cases (mycket kort maxChars) landa på en ren skiljetecken-rad.
   const fitted = fitHintText(censored, maxChars);
-  return hasSubstance(fitted) ? fitted : null;
+  return hasSubstance(fitted) ? capitalizeFirst(fitted) : null;
+}
+
+/**
+ * Varje ledtråd börjar med versal (Peter 2026-10-26) — Wikidata ger ofta
+ * gemener ("pop music", "guitar"). Bara en INLEDANDE bokstav lyfts (ev. efter
+ * citattecken/parentes) — '"21" album' och '7 Grammys' lämnas orörda, annars
+ * hade "album" blivit "Album" mitt i raden.
+ */
+export function capitalizeFirst(text: string): string {
+  return text.replace(/^(["'“‘(]*)(\p{L})/u, (_, lead: string, ch: string) => lead + ch.toUpperCase());
 }
 
 /**

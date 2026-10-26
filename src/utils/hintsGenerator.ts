@@ -177,7 +177,27 @@ export function formatHintText(hint: HintItem): string {
     case 'lead_singer':   return `Singer: ${hint.value}`;
     case 'creation_year': return `Created: ${hint.value}`;
     case 'producer':      return `Creator: ${hint.value}`;
+    case 'characteristic': return formatCharacteristic(hint);
     default:              return hint.value;
+  }
+}
+
+/**
+ * Wikidata-genererade 'characteristic'-ledtrådar är ofta ett ensamt, generiskt
+ * ord ("voice", "guitar", "pop music", "EMI") som säger lite utan sin etikett.
+ * Ge dem en beskrivande ram (Peter 2026-10-26). Bara exakta etiketter från
+ * fetch-hints-data.ts påverkas — manuellt kuraterade värden lämnas orörda.
+ */
+function formatCharacteristic(hint: HintItem): string {
+  const v = hint.value.trim();
+  switch (hint.label) {
+    case 'Instrument':
+      return /^(voice|vocals?)$/i.test(v) ? 'Famous voice' : `Plays ${v}`;
+    case 'Genre':        return `Known for ${v}`;
+    case 'Record label': return `Signed to ${v}`;
+    case 'Formed in':    return `Formed in ${v}`;
+    case 'Disbanded':    return `Disbanded ${v}`;
+    default:             return v;
   }
 }
 
@@ -322,7 +342,7 @@ export type SingleEntry = { kind: 'single'; hint: ResolvedHint; index: number };
 export type GroupEntry = { kind: 'group'; label: string; items: { hint: ResolvedHint; index: number }[] };
 export type RenderEntry = SingleEntry | GroupEntry;
 
-type GroupKind = 'birth' | 'career' | 'film' | 'titles' | 'trophies';
+type GroupKind = 'birth' | 'career' | 'film' | 'songs' | 'albums' | 'titles' | 'trophies';
 
 const GROUP_LABELS: Record<GroupKind, string> = {
   birth: 'Birth',
@@ -330,6 +350,10 @@ const GROUP_LABELS: Record<GroupKind, string> = {
   film: 'Film History',
   titles: 'Titles',
   trophies: 'Trophies',
+  // Artister (Peter 2026-10-26): låtar och album grupperas som en idrottares
+  // karriär — rubrik + grå underrader, kronologiskt, separat per typ.
+  songs: 'Song titles',
+  albums: 'Albums',
 };
 
 // Etiketter som redan pekar ut TÄVLINGS-/lag-titlar entydigt (curator-satta,
@@ -368,6 +392,10 @@ function groupKindOf(hint: HintItem): GroupKind | null {
     case 'birth_place': return 'birth';
     case 'club':         return 'career';
     case 'movie':         return 'film';
+    case 'song':          return 'songs';
+    case 'album':         return 'albums';
+    // Debutalbum ("19" album (2008)) hör hemma bland övriga album.
+    case 'debut':         return /\balbum\b/i.test(`${hint.label} ${hint.value}`) ? 'albums' : null;
     case 'merit':         return classifyMerit(hint) === 'title' ? 'titles' : 'trophies';
     default:              return null;
   }
@@ -414,7 +442,7 @@ export function buildRenderEntries(hints: ResolvedHint[]): RenderEntry[] {
       const idxs = indicesByKind.get(kind)!;
       const items = idxs.map((idx) => ({ hint: hints[idx], index: idx }));
       if (kind === 'career') items.sort((a, b) => extractYearFromValue(a.hint.hint) - extractYearFromValue(b.hint.hint));
-      else if (kind === 'film') items.sort((a, b) => extractYearFromValue(a.hint.hint) - extractYearFromValue(b.hint.hint));
+      else if (kind === 'film' || kind === 'songs' || kind === 'albums') items.sort((a, b) => extractYearFromValue(a.hint.hint) - extractYearFromValue(b.hint.hint));
       else if (kind === 'birth') items.sort((a, b) => birthSortKey(a.hint.hint) - birthSortKey(b.hint.hint));
       // 'titles'/'trophies' behåller redan sin prioritets-ordning (idxs är scan-ordnad).
       entries.push({ kind: 'group', label: GROUP_LABELS[kind], items });

@@ -94,7 +94,7 @@ export interface SpotifyNameCandidate {
 export const MIN_SPOTIFY_NAME_DISTRACTORS = 4;
 
 function wordClass(name: string, prefixLength: number): number {
-  const prefix = getPrefixForItem(name, prefixLength);
+  const prefix = getPrefixForItem(name, prefixLength, 1);
   return prefix ? prefix.split(' ').length : 0;
 }
 
@@ -105,7 +105,7 @@ export function countUsableDistractors(
   layer: readonly SpotifyNameCandidate[],
   prefixLength: number,
 ): number {
-  const correctPrefix = getPrefixForItem(correctName, prefixLength);
+  const correctPrefix = getPrefixForItem(correctName, prefixLength, 1);
   if (!correctPrefix) return 0;
   const correctClass = correctPrefix.split(' ').length;
   const correctKey = correctName.trim().toLowerCase();
@@ -113,7 +113,7 @@ export function countUsableDistractors(
   let usable = 0;
   for (const c of layer) {
     if (c.item.displayName.trim().toLowerCase() === correctKey) continue;
-    const prefix = getPrefixForItem(c.item.displayName, prefixLength);
+    const prefix = getPrefixForItem(c.item.displayName, prefixLength, 1);
     if (!prefix || prefix === correctPrefix) continue;
     if (wordClass(c.item.displayName, prefixLength) !== correctClass) continue;
     if (letters.has(prefix.charAt(0))) continue;

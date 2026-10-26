@@ -35,12 +35,18 @@ export const DEFAULT_TOTAL_OPTIONS = 10;
  * ord-klassen blir därmed 1 eller 2 — så ord-count-filtren nedan och i
  * ImageAnswerBlock betyder "1-ordssvar ↔ 1-ordsalternativ, 2+ ↔ 2+".
  */
-export function getPrefixForItem(displayName: string, length: number): string {
+export function getPrefixForItem(
+  displayName: string,
+  length: number,
+  // Spotify/Name (Peter 2026-10-26): bara FÖRSTA ordet — "Maroon 5 feat.
+  // Christina Aguilera" → "MAR", inte "MAR FEA". Default 2 = Hints oförändrat.
+  maxWords: number = 2,
+): string {
   return displayName
     .split(/\s+/)
     .map((part) => part.replace(/[^\p{L}]/gu, '').slice(0, length).toUpperCase())
     .filter((p) => p.length > 0)
-    .slice(0, 2)
+    .slice(0, maxWords)
     .join(' ');
 }
 
@@ -88,6 +94,7 @@ function getCategoryFallbackPool(
 interface BuildLetterGridArgs {
   correctItem: ImageQuizQuestion;
   prefixLength: number;
+  prefixMaxWords?: number;
   audienceSet: ReadonlySet<ImageQuestionAudience>;
   allItems: readonly ImageQuizQuestion[];
   distractorNames: readonly string[];
@@ -106,6 +113,7 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
   const {
     correctItem,
     prefixLength,
+    prefixMaxWords = 2,
     audienceSet,
     allItems,
     distractorNames,
@@ -113,7 +121,7 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
     rng = Math.random,
   } = args;
 
-  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength);
+  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength, prefixMaxWords);
   // Ord-count-filter: distraktorprefixer måste matcha correctPrefix ord-count,
   // annars filtreras de bort av ImageAnswerBlock.sortedGrid.
   const correctWordCount = correctPrefix.split(' ').length;
@@ -128,7 +136,7 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
   function pickFromPool(pool: readonly ImageQuizQuestion[]): void {
     for (const item of shuffle(pool, rng)) {
       if (item.id === correctItem.id) continue;
-      const prefix = getPrefixForItem(item.displayName, prefixLength);
+      const prefix = getPrefixForItem(item.displayName, prefixLength, prefixMaxWords);
       if (!prefix) continue;
       if (seen.has(prefix)) continue;
       if (prefix.split(' ').length !== correctWordCount) continue;
@@ -142,7 +150,7 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
 
   function pickFromDistractorPool(): void {
     for (const name of shuffle(distractorNames, rng)) {
-      const prefix = getPrefixForItem(name, prefixLength);
+      const prefix = getPrefixForItem(name, prefixLength, prefixMaxWords);
       if (!prefix) continue;
       if (seen.has(prefix)) continue;
       if (prefix.split(' ').length !== correctWordCount) continue;
@@ -175,6 +183,7 @@ interface BuildNameOptionsArgs {
   correctItem: ImageQuizQuestion;
   selectedPrefix: string;
   prefixLength: number;
+  prefixMaxWords?: number;
   audienceSet: ReadonlySet<ImageQuestionAudience>;
   allItems: readonly ImageQuizQuestion[];
   distractorNames: readonly string[];
@@ -192,6 +201,7 @@ function buildNameOptions(args: BuildNameOptionsArgs): ImageNameOption[] {
     correctItem,
     selectedPrefix,
     prefixLength,
+    prefixMaxWords = 2,
     audienceSet,
     allItems,
     distractorNames,
@@ -199,7 +209,7 @@ function buildNameOptions(args: BuildNameOptionsArgs): ImageNameOption[] {
     rng = Math.random,
   } = args;
 
-  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength);
+  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength, prefixMaxWords);
   const isCorrectPrefix = selectedPrefix === correctPrefix;
   const targetDistractorCount = isCorrectPrefix ? totalOptions - 1 : totalOptions;
 
@@ -211,7 +221,7 @@ function buildNameOptions(args: BuildNameOptionsArgs): ImageNameOption[] {
     for (const item of shuffle(pool, rng)) {
       if (distractors.length >= targetDistractorCount) return;
       if (seenIds.has(item.id)) continue;
-      const prefix = getPrefixForItem(item.displayName, prefixLength);
+      const prefix = getPrefixForItem(item.displayName, prefixLength, prefixMaxWords);
       if (prefix !== selectedPrefix) continue;
       seenIds.add(item.id);
       seenNamesLower.add(item.displayName.toLowerCase());
@@ -229,7 +239,7 @@ function buildNameOptions(args: BuildNameOptionsArgs): ImageNameOption[] {
       if (distractors.length >= targetDistractorCount) return;
       const lower = name.toLowerCase();
       if (seenNamesLower.has(lower)) continue;
-      const prefix = getPrefixForItem(name, prefixLength);
+      const prefix = getPrefixForItem(name, prefixLength, prefixMaxWords);
       if (prefix !== selectedPrefix) continue;
       seenNamesLower.add(lower);
       distractors.push({
@@ -381,22 +391,26 @@ export function buildImageVariant(
   }
 
   const prefixLength = forcePrefixLength ?? (assistance === 'minimal' ? 1 : 2);
+  // Spotify/Name (forcePrefixLength satt) visar bara F�RSTA ordets prefix.
+  const prefixMaxWords = forcePrefixLength !== undefined ? 1 : 2;
   const letterGrid = buildLetterGrid({
     correctItem,
     prefixLength,
+    prefixMaxWords,
     audienceSet,
     allItems,
     distractorNames,
     totalOptions,
     rng,
   });
-  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength);
+  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength, prefixMaxWords);
   const optionsByPrefix: Record<string, ImageNameOption[]> = {};
   for (const opt of letterGrid) {
     optionsByPrefix[opt.prefix] = buildNameOptions({
       correctItem,
       selectedPrefix: opt.prefix,
       prefixLength,
+      prefixMaxWords,
       audienceSet,
       allItems,
       distractorNames,

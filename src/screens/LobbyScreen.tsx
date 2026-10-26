@@ -7223,7 +7223,11 @@ export default function LobbyScreen() {
         Music: ['song'],
         Film: ['movie'],
       };
-      const ytCatEntries: YtCatEntry[] = effYtCats
+      // Fast ordning Music → Film (MAIN_CATEGORIES), INTE toggle-arrayens
+      // ordning — den kan bli ['Film','Music'] efter av/på, men spelet spelar
+      // alltid YT-Music före YT-Film (orderedCategories i quiz.tsx).
+      const ytCatEntries: YtCatEntry[] = MAIN_CATEGORIES
+        .filter((cat) => effYtCats.includes(cat))
         .map((cat) => ({
           cat,
           items: pureYtPool.filter((q) => subjectForCat[cat]?.includes(q.contentSubject ?? '')),
@@ -7248,7 +7252,8 @@ export default function LobbyScreen() {
         Music: ['artist', 'band'],
         Film: ['actor', 'character'],
       };
-      const imgCatEntries = (imagesEnabledCategories as MainCategory[])
+      const imgCatEntries = MAIN_CATEGORIES
+        .filter((cat) => (imagesEnabledCategories as MainCategory[]).includes(cat))
         .map((cat) => ({
           cat,
           items: imagePool.filter((q) => imgSubjectForCat[cat]?.includes(q.contentSubject ?? '')),

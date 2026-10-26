@@ -74,11 +74,13 @@ describe('prefix — max två ord', () => {
   it('kapar tre ord till två', () => {
     expect(getPrefixForItem('Swedish House Mafia', 3)).toBe('SWE HOU');
     expect(getPrefixForItem('Lana Del Rey', 3)).toBe('LAN DEL');
+    // Spotify/Name: bara första ordet (Peter 2026-10-26).
+    expect(getPrefixForItem('Maroon 5 feat. Christina Aguilera', 3, 1)).toBe('MAR');
   });
 });
 
 describe('Spotify/Name-alternativ', () => {
-  it('Swedish House Mafia får 4 alternativ från samma paket, alla 2-ords', () => {
+  it('Swedish House Mafia får 4 alternativ från samma paket, bara första ordet', () => {
     const tags = getArtistPackages('Swedish House Mafia');
     expect(tags.size).toBeGreaterThan(0);
     const { pool, variant } = buildOptions('Swedish House Mafia', 3, 'shm');
@@ -86,9 +88,9 @@ describe('Spotify/Name-alternativ', () => {
     const inPackage = (name: string) =>
       [...getArtistPackages(name)].some((t) => tags.has(t));
     for (const c of pool) expect([...c.packages].some((t) => tags.has(t))).toBe(true);
-    const poolByPrefix = new Map(pool.map((c) => [getPrefixForItem(c.item.displayName, 3), c]));
+    const poolByPrefix = new Map(pool.map((c) => [getPrefixForItem(c.item.displayName, 3, 1), c]));
     for (const opt of variant.letterGrid) {
-      expect(opt.prefix.split(' ')).toHaveLength(2);
+      expect(opt.prefix.split(' ')).toHaveLength(1);
       if (!opt.isCorrect) {
         const cand = poolByPrefix.get(opt.prefix);
         expect(cand && inPackage(cand.item.displayName)).toBe(true);

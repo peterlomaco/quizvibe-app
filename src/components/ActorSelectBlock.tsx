@@ -140,7 +140,9 @@ export function ActorSelectBlock({
         let borderColor: string = Colors.primaryBorder;
         if (isPending) borderColor = Colors.primary;
         else if (isConfirmedRow) borderColor = wasPlayerCorrect ? Colors.success : QUIZ_ERROR_RED;
-        else if (isCorrectRevealRow) borderColor = Colors.success;
+        // Inget svar → facit får GULD kant (Peter 2026-10-26), annars läses
+        // grön kant + grön badge som att spelaren svarat rätt.
+        else if (isCorrectRevealRow) borderColor = confirmedName ? Colors.success : Colors.warning;
         else if (showWrongTimeout) borderColor = Colors.border;
 
         // Samma tema som Hints (ImageAnswerBlock): valt men EJ låst = blå
