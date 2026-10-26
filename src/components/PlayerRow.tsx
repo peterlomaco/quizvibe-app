@@ -494,6 +494,13 @@ export function PlayerRow({
 // (HOST/GUEST/QuizVibe/Spotify) kan dela kortets fyllning och skära kanten.
 const CARD_BG = '#0F1624';
 
+// Kant-skärande taggar (HOST/GUEST/QuizVibe user/Spotify) har EN fast höjd
+// och top = −höjd/2 + halva kortkanten, så tagg-mitten alltid ligger exakt
+// på kortets 1 pt-kantlinje oavsett text/padding (Peter 2026-10-26 — HOST
+// hade paddingVertical 0 och hamnade ovanför kanten med top: −8).
+const BORDER_TAG_H = 14;
+const BORDER_TAG_TOP = -(BORDER_TAG_H / 2) + 0.5;
+
 const styles = StyleSheet.create({
   // Wrapper-vy så att HOST-rutan kan position:absolute överlappa kortets
   // kantlinje utan att klippas av kortets overflow:hidden.
@@ -605,19 +612,21 @@ const styles = StyleSheet.create({
   // HOST-tagg som sitter på kortets övre kantlinje
   hostBorderTag: {
     position: 'absolute',
-    top: -8,
+    top: BORDER_TAG_TOP,
+    height: BORDER_TAG_H,
+    justifyContent: 'center',
     left: Spacing.lg,
     backgroundColor: CARD_BG,
     borderRadius: 4,
     borderWidth: 1,
     borderColor: 'rgba(245,166,35,0.32)',
     paddingHorizontal: 5,
-    paddingVertical: 0,
     zIndex: 10,
     elevation: 4,
   },
   hostBorderTagText: {
     fontSize: 7.5,
+    lineHeight: 10,
     fontWeight: FontWeight.semibold,
     color: 'rgba(245,166,35,0.75)',
     letterSpacing: 0.5,
@@ -627,19 +636,21 @@ const styles = StyleSheet.create({
   // för att skilja sig tydligt från HOST (gold).
   guestBorderTag: {
     position: 'absolute',
-    top: -8,
+    top: BORDER_TAG_TOP,
+    height: BORDER_TAG_H,
+    justifyContent: 'center',
     left: Spacing.lg,
     backgroundColor: CARD_BG,
     borderRadius: 4,
     borderWidth: 1,
     borderColor: BrandUi.border,
     paddingHorizontal: 6,
-    paddingVertical: 1,
     zIndex: 10,
     elevation: 4,
   },
   guestBorderTagText: {
     fontSize: 7.5,
+    lineHeight: 10,
     fontWeight: FontWeight.semibold,
     color: BrandUi.textMuted,
     letterSpacing: 0.5,
@@ -649,7 +660,9 @@ const styles = StyleSheet.create({
   // opak kortfyllning så kortets kantlinje inte skiner igenom badgen.
   quizUserBorderTag: {
     position: 'absolute',
-    top: -8,
+    top: BORDER_TAG_TOP,
+    height: BORDER_TAG_H,
+    justifyContent: 'center',
     left: Spacing.lg,
     backgroundColor: CARD_BG,
     borderRadius: 4,
@@ -659,12 +672,12 @@ const styles = StyleSheet.create({
     // letterSpacing reserverar trailing-space efter sista tecknet (sista "R").
     paddingLeft: 8,
     paddingRight: 11,
-    paddingVertical: 2,
     zIndex: 10,
     elevation: 4,
   },
   quizUserBorderTagText: {
     fontSize: 7.5,
+    lineHeight: 10,
     fontWeight: FontWeight.semibold,
     color: BrandUi.textMuted,
     letterSpacing: 0.5,
@@ -879,7 +892,9 @@ const styles = StyleSheet.create({
   },
   spotifyBorderTag: {
     position: 'absolute',
-    top: -8,
+    top: BORDER_TAG_TOP,
+    height: BORDER_TAG_H,
+    justifyContent: 'center',
     right: Spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
@@ -890,17 +905,18 @@ const styles = StyleSheet.create({
     borderColor: BrandUi.border,
     paddingLeft: 6,
     paddingRight: 8,
-    paddingVertical: 2,
     zIndex: 10,
     elevation: 4,
   },
   spotifyBorderTagConnected: {
     fontSize: 8,
+    lineHeight: 10,
     fontWeight: FontWeight.medium,
     color: 'rgba(29,185,84,0.75)',
   },
   spotifyBorderTagNone: {
     fontSize: 8,
+    lineHeight: 10,
     fontWeight: FontWeight.medium,
     color: BrandUi.textMuted,
   },

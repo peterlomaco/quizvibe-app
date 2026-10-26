@@ -36,10 +36,9 @@ import { PlayerNameInput } from '@/src/components/PlayerNameInput';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
-import { QuizVibeFriendsLogo } from '../components/QuizVibeFriendsLogo';
 import { QuizVibeGoldMark } from '../components/QuizVibeGoldMark';
 import { QuizVibeDefaultAvatar } from '../components/QuizVibeDefaultAvatar';
-import { BRAND_TAGLINE } from '../components/brand/QuizVibeBrandSvg';
+import { RotatingTagline } from '../components/RotatingTagline';
 import { GoldCtaButton } from '../components/GoldCtaButton';
 import { GroupOutlineIcon } from '../components/GroupOutlineIcon';
 import { LockOutlineIcon } from '../components/SectionIcons';
@@ -7339,25 +7338,12 @@ export default function LobbyScreen() {
               </View>
             </Pressable>
           )}
-          {/* Non-host: den låsta Brand Master-taglinen (BRAND_TAGLINE) på
-              samma rad som "Game Lobby", uppe i högra hörnet (host saknar
-              credits-pill där så utrymmet är fritt). Host visar den ovanför
-              room code-kortet. Krymper hellre än klipps — texten är längre
-              än den gamla "Music. Film/TV. Play.". */}
-          {!hostMode && (
-            <Text style={styles.headerTagline} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
-              {BRAND_TAGLINE}
-            </Text>
-          )}
         </View>
 
-        {/* Brand-tagline — host visar den OVANFÖR room code-kortet; non-host
-            visar den i headern (se ovan). Samma låsta text som Home. */}
-        {hostMode && (
-          <Text style={styles.roomTagline}>
-            {BRAND_TAGLINE}
-          </Text>
-        )}
+        {/* Brand-tagline — egen rad under "Game Lobby", centrerad över hela
+            bredden för BÅDE host och non-host (Peter 2026-10-26). Samma
+            roterande text som Home. */}
+        <RotatingTagline style={styles.roomTaglineWrap} textStyle={styles.roomTagline} singleLine />
 
         {/* Room code-kortet döljs helt i single-player-lobbyn — ett solospel
             har ingen kod att dela, inga andra spelare som kan ansluta och
@@ -9665,7 +9651,7 @@ export default function LobbyScreen() {
                 friendsCount, så räknaren ser identisk ut på båda ställena. */}
             <View style={shareSheet.sectionLabelRow}>
               <View style={shareSheet.sectionLabelCluster}>
-                <QuizVibeFriendsLogo size={28} />
+                <GroupOutlineIcon size={20} color={BrandUi.iconMuted} />
                 <Text style={shareSheet.sectionLabel}>QuizVibe friends</Text>
               </View>
               <View style={shareSheet.friendsCount}>
@@ -9750,7 +9736,14 @@ export default function LobbyScreen() {
                 ]}
               >
                 <LoadingContent loading={addFriendChecking} color={Colors.textPrimary}>
-                  <Text style={shareSheet.addBtnText}>Add</Text>
+                  <Text
+                    style={[
+                      shareSheet.addBtnText,
+                      (!newFriendPlayerName.trim() || addFriendChecking) && shareSheet.addBtnTextDisabled,
+                    ]}
+                  >
+                    Add
+                  </Text>
                 </LoadingContent>
               </Pressable>
             </View>
@@ -9907,25 +9900,14 @@ export default function LobbyScreen() {
                 och stänger modalen. Disabled tills minst en är ibockad;
                 backdrop-tap/hardware-back stänger fortfarande utan att
                 skicka något. */}
-            <TouchableOpacity
-              onPress={() => startAction.run('send-invites', handleSendInvites)}
-              disabled={selectedFriendIds.size === 0 || startAction.busy}
-              style={[
-                shareSheet.closeBtn,
-                selectedFriendIds.size === 0 && shareSheet.closeBtnDisabled,
-              ]}
-            >
-              <LoadingContent loading={startAction.isBusy('send-invites')} color={Colors.textPrimary}>
-              <Text
-                style={[
-                  shareSheet.closeBtnText,
-                  selectedFriendIds.size === 0 && shareSheet.closeBtnTextDisabled,
-                ]}
-              >
-                Send invite
-              </Text>
-              </LoadingContent>
-            </TouchableOpacity>
+            <View style={shareSheet.sendWrap}>
+              <GoldCtaButton
+                label="Send invite"
+                onPress={() => startAction.run('send-invites', handleSendInvites)}
+                locked={selectedFriendIds.size === 0 || (startAction.busy && !startAction.isBusy('send-invites'))}
+                loading={startAction.isBusy('send-invites')}
+              />
+            </View>
           </View>
         </KeyboardAvoidingView>
         <QuizVibeAlertHost active={shareModalOpen} />
@@ -10765,15 +10747,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     rowGap: Spacing.sm,
   },
-  // Non-host: tagline (BRAND_TAGLINE) på samma rad som Game Lobby (höger).
-  headerTagline: {
-    flexShrink: 1,
-    fontSize: 19,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textSecondary,
-    letterSpacing: 0.2,
-    textAlign: 'right',
-  },
   // Speglar Profile:s creditsPill 1:1 (samma styling, samma layout) så
   // pillen ser identisk ut i båda vyerna och användaren känner igen den.
   creditsPill: {
@@ -11097,10 +11070,12 @@ const styles = StyleSheet.create({
   // matchar avståndet text→kortets nederkant (border).
   // Glowing gold tagline — guld-text (Colors.warning) med matchande
   // text-shadow-glow. Opacity-pulsen ovanpå ger en levande "glödande" känsla.
-  roomTagline: {
-    // Lite tätare mot Game Lobby-rubriken och rumskortet (Lobby v2).
+  // Lite tätare mot Game Lobby-rubriken och rumskortet (Lobby v2).
+  roomTaglineWrap: {
     marginTop: -Spacing.sm,
     marginBottom: -Spacing.sm,
+  },
+  roomTagline: {
     fontSize: 19,
     fontWeight: FontWeight.semibold,
     color: Colors.textSecondary,
@@ -13310,7 +13285,7 @@ const shareSheet = StyleSheet.create({
     paddingBottom: Spacing.xxl,
     gap: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: BrandUi.border,
     // Bounder sheet:en till viewport så toppen aldrig spiller över skärmen
     // när CodeKeyboard:et (Add by Player Name) tar plats — samma mönster
     // som modal.container ovan (AddPlayerModal).
@@ -13322,10 +13297,16 @@ const shareSheet = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: Spacing.sm,
   },
-  title: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
-  subtitle: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center', marginBottom: Spacing.sm },
+  title: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
+  subtitle: {
+    fontSize: FontSize.sm,
+    lineHeight: 19,
+    color: BrandUi.textMuted,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
 
-  // Rad med QuizVibeFriendsLogo bredvid "QuizVibe friends"-labeln —
+  // Rad med friends-ikonen (UI v2: GroupOutlineIcon, dämpad) bredvid "QuizVibe friends"-labeln —
   // samma ikon som på Profile-skärmens friends-kort. justifyContent:
   // space-between skjuter antal-badgen (friendsCount) till radens
   // högerkant, samma layout som Profile:s friendsHeader-rad.
@@ -13351,21 +13332,21 @@ const shareSheet = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: Radius.full,
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.surface,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
+    borderColor: BrandUi.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   friendsCountText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   sectionLabel: {
     ...Typography.overline,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
   },
 
   // Add-by-Player-Name-label + split-field-rad (2026-08-27) — samma
@@ -13377,7 +13358,7 @@ const shareSheet = StyleSheet.create({
   addFieldLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
     letterSpacing: 0.4,
     textTransform: 'uppercase',
     paddingHorizontal: Spacing.xs,
@@ -13390,9 +13371,9 @@ const shareSheet = StyleSheet.create({
   addInput: {
     height: 48,
     borderRadius: Radius.md,
-    backgroundColor: Colors.background,
+    backgroundColor: CHOICE_BG,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
+    borderColor: CHOICE_BORDER,
     paddingHorizontal: Spacing.lg,
     fontSize: 15,
     color: Colors.textPrimary,
@@ -13412,28 +13393,34 @@ const shareSheet = StyleSheet.create({
   addPlayerNameSeparator: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.textSecondary,
+    color: BrandUi.iconMuted,
     paddingHorizontal: 2,
   },
   addPlayerNameInputActive: { borderColor: CHOICE_SELECTED_BORDER },
   addPlayerNameInputDisabled: { opacity: 0.45 },
+  // UI v2: aktiv Add = guldkant + selectedFill + vit text, ej tappbar =
+  // neutral gunmetal + dämpad text.
   addBtn: {
-    height: 44,
+    height: 48,
     borderRadius: Radius.md,
-    backgroundColor: Colors.primary,
+    backgroundColor: BrandUi.selectedFill,
+    borderWidth: 1,
+    borderColor: CHOICE_SELECTED_BORDER,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.lg,
   },
   addBtnDisabled: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: CHOICE_BG,
+    borderColor: CHOICE_BORDER,
   },
   addBtnText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    color: '#fff',
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
     letterSpacing: 0.3,
   },
+  addBtnTextDisabled: { color: Colors.textDisabled },
   // Inline felmeddelande under Add-raden — visas när playerNameExists()
   // inte hittar någon registrerad user med det inskrivna Player Name.
   addErrorText: {
@@ -13450,7 +13437,7 @@ const shareSheet = StyleSheet.create({
   emptyText: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
   emptySubtext: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: BrandUi.textMuted,
     textAlign: 'center',
     paddingHorizontal: Spacing.lg,
   },
@@ -13522,17 +13509,17 @@ const shareSheet = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: Radius.full,
     borderWidth: 1,
-    backgroundColor: Colors.primaryMuted,
-    borderColor: Colors.primaryBorder,
-    maxWidth: 200,
+    backgroundColor: CHOICE_BG,
+    borderColor: BrandUi.border,
+    maxWidth: 220,
     flexShrink: 1,
   },
   friendPillIcon: { fontSize: 14 },
-  friendPillText: { fontSize: 12, fontWeight: '600', color: Colors.primary, flexShrink: 1 },
+  friendPillText: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary, flexShrink: 1 },
   // Gråtonad pill när personen redan är i lobbyn (Peter 2026-09-22).
   friendNamePillInLobby: {
-    backgroundColor: 'rgba(107,114,128,0.10)',
-    borderColor: '#6B7280',
+    backgroundColor: 'transparent',
+    borderColor: CHOICE_BORDER,
   },
   friendPillTextInLobby: {
     fontSize: 12,
@@ -13549,40 +13536,42 @@ const shareSheet = StyleSheet.create({
   checkbox: {
     width: 24,
     height: 24,
-    borderRadius: 5,
+    borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: Colors.borderStrong,
-    backgroundColor: 'transparent',
+    borderColor: 'rgba(255,255,255,0.22)',
+    backgroundColor: CHOICE_BG,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // UI v2: vald = guldkant + selectedFill + guld ✓ (aldrig grönt).
   checkboxChecked: {
-    backgroundColor: Colors.success,
-    borderColor: Colors.success,
+    backgroundColor: BrandUi.selectedFill,
+    borderColor: CHOICE_SELECTED_BORDER,
   },
   // Låst kryssruta för friends som redan är i lobbyn (Peter 2026-09-22) —
   // dämpad så den inte ser tappbar ut.
   checkboxInLobby: {
     opacity: 0.35,
-    borderColor: '#6B7280',
+    borderColor: CHOICE_BORDER,
   },
   checkmark: {
-    color: '#fff',
+    color: Colors.warning,
     fontSize: 15,
     fontWeight: '700',
     lineHeight: 15,
   },
 
-  divider: { height: 1, backgroundColor: Colors.separator },
+  divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.06)' },
   // Tjock sektions-avdelare mellan Add-raden/CodeKeyboard och friend-listan
   // (2026-08-27) — bredare + starkare färg än den tunna friend-till-friend-
   // dividern ovan, så övergången "lägga till" → "lista" läses tydligt.
+  // UI v2: tunn neutral hårlinje i stället för den tjocka grå balken.
   addSectionDivider: {
-    height: 3,
-    borderRadius: 1.5,
-    backgroundColor: Colors.borderStrong,
+    height: 1,
+    backgroundColor: BrandUi.border,
     marginVertical: Spacing.xs,
   },
+  sendWrap: { marginTop: Spacing.sm },
 
   closeBtn: {
     height: 48,

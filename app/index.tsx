@@ -1,6 +1,7 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
 import { PlayerNameInput } from '@/src/components/PlayerNameInput';
-import { BRAND_TAGLINE, QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
+import { RotatingTagline } from '@/src/components/RotatingTagline';
+import { QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
 import * as WebBrowser from 'expo-web-browser';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicGoldFill';
 import { Avatar } from '@/src/components/Avatar';
@@ -3399,20 +3400,12 @@ export default function HomeScreen() {
               variant="metallic"
             />
           </View>
-          {/* Låst Brand Master-tagline (Peter 2026-10-16) — EN statisk text,
-              samma för inloggad och gäst. Ingen rotation/cross-fade och
-              ingen växling per state; ersätter de tidigare tre roterande
-              taglinesen. Underordnad ordmärket: samma diskreta typografi. */}
+          {/* Home-tagline (Peter 2026-10-26): cross-fade mellan två fraser.
+              Delad RotatingTagline — samma som i Lobby. */}
           <View style={styles.taglineWrap}>
-            <Text
-              style={[
-                styles.tagline,
-                styles.taglineCentered,
-                { fontFamily: taglineFont },
-              ]}
-            >
-              {BRAND_TAGLINE}
-            </Text>
+            <RotatingTagline
+              textStyle={[styles.tagline, styles.taglineCentered, { fontFamily: taglineFont }]}
+            />
           </View>
         </View>
 
