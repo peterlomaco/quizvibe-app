@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { QuizVibeQuestionMarkLogo } from './QuizVibeQuestionMarkLogo';
+import { HintsIcon } from './HintsIcon';
+import { Colors } from '../theme';
 import { RevealProfile } from '../utils/revealCurve';
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
@@ -164,9 +165,11 @@ export function ProgressiveCover({
           <Block key={i} hidden={revealedSet.has(i)} />
         ))}
       </View>
-      {/* Q-logga centrerad ovanpå mosaiken */}
+      {/* Q-logga centrerad ovanpå mosaiken — UI v2 (2026-10-26): guld
+          HintsIcon (Home-Q:t med "?" i ringen) i stället för gamla
+          QuizVibeQuestionMarkLogo. `logoSize` = ikonens höjd i pt. */}
       <View style={[styles.logoCenter, { opacity: logoOpacity }]}>
-        <QuizVibeQuestionMarkLogo size={logoSize} />
+        <HintsIcon size={logoSize} color={Colors.warning} />
       </View>
     </View>
   );

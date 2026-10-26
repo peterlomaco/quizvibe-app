@@ -285,7 +285,7 @@ function HintsQuizCardBase({
               totalSeconds={totalSeconds}
               assistance="standard"
               isRevealed={isRevealed}
-              logoSize={90}
+              logoSize={44}
               active={mosaicEverStarted || (mosaicActive ?? hintsActive)}
             />
           </View>
