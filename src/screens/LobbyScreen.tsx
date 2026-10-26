@@ -1210,6 +1210,10 @@ export default function LobbyScreen() {
     parentControl,
     carryPackages,
     seedGameMode,
+    carrySpotifyYear,
+    carrySpotifyName,
+    carryPkgYoutube,
+    carryPkgHints,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
@@ -1264,7 +1268,23 @@ export default function LobbyScreen() {
      *  async seeden (getLobbySettings/loadProfile) landat. Undefined = fresh
      *  lobby (ej carry-over) → seeden faller på stored/profil. */
     seedGameMode?: string;
+    /** Play Again carry-over: host:s Spotify Year/Name-val ('true'/'false').
+     *  Persisteras inte i lobby_settings (ingen DB-kolumn), så utan params
+     *  skulle en re-match alltid öppna med båda på. Undefined = fresh lobby. */
+    carrySpotifyYear?: string;
+    carrySpotifyName?: string;
+    /** Play Again carry-over: paketets YT-/Hints-aggregat-toggles. */
+    carryPkgYoutube?: string;
+    carryPkgHints?: string;
   }>();
+  // Spotify Year/Name ur carry-over-params. Ogiltigt par (båda av) ignoreras —
+  // minst en måste vara aktiv.
+  const carriedSpotifyAnswers = useMemo(() => {
+    if (carrySpotifyYear === undefined || carrySpotifyName === undefined) return undefined;
+    const year = carrySpotifyYear === 'true';
+    const name = carrySpotifyName === 'true';
+    return year || name ? { year, name } : undefined;
+  }, [carrySpotifyYear, carrySpotifyName]);
   // Start Game väntar på flera Supabase-skrivningar (spelare, settings,
   // credits, match-raden) innan navigationen — spinner + dubbeltrycks-skydd.
   const startAction = useAsyncAction();
@@ -1690,6 +1710,14 @@ export default function LobbyScreen() {
             // 1v1 + single: Spotify är aldrig tillgängligt (kortet göms i
             // båda lobbytyperna) — forcera av så inget carry-over läcker in.
             setSpotifyEnabled(is1v1Lobby || seedSinglePlayer ? false : stored.spotifyEnabled);
+            // Paketets YT/Hints-aggregat: carry-over-param vinner (skrivs bara
+            // villkorat till DB), annars stored.
+            setPackageYoutubeEnabled(
+              carryPkgYoutube !== undefined ? carryPkgYoutube === 'true' : stored.packageYoutubeEnabled,
+            );
+            setPackageHintsEnabled(
+              carryPkgHints !== undefined ? carryPkgHints === 'true' : stored.packageHintsEnabled,
+            );
           } else if (premium) {
             // Fresh lobby öppnar på Generic — profilens enabled paket ERBJUDS
             // i listan men aktiveras INTE automatiskt.
@@ -1741,6 +1769,11 @@ export default function LobbyScreen() {
           setParentControlEnabled(
             carriedParentControl ?? profile?.parentControlEnabled ?? true,
           );
+          // Spotify Year/Name — carry-over-param vinner (persisteras inte i DB).
+          if (carriedSpotifyAnswers) {
+            setSpotifyAnswerYear(carriedSpotifyAnswers.year);
+            setSpotifyAnswerName(carriedSpotifyAnswers.name);
+          }
           // Tillåt debounce-effekten att skriva till setLobbySettings nu när
           // alla initiala värden är satta. Utan denna guard kan debounce:n
           // hinna skriva med default-värden (spotifyEnabled=false) INNAN
@@ -2002,7 +2035,7 @@ export default function LobbyScreen() {
       if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
     return () => { cancelled = true; };
-  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType, parentControl, carryPackages]);
+  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType, parentControl, carryPackages, carriedSpotifyAnswers, carryPkgYoutube, carryPkgHints]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
@@ -2061,8 +2094,16 @@ export default function LobbyScreen() {
                 ? false
                 : lobbySt?.spotifyEnabled ?? prof?.spotifyDefaultEnabled ?? false;
               setSpotifyEnabled(shouldEnable);
-              setSpotifyAnswerYear(lobbySt?.spotifyAnswerYear ?? prof?.spotifyAnswerYear ?? true);
-              setSpotifyAnswerName(lobbySt?.spotifyAnswerName ?? prof?.spotifyAnswerName ?? true);
+              // Carry-over-param vinner: stored.spotifyAnswer* är alltid true
+              // (ingen DB-kolumn) och fick tidigare re-matchen att återgå
+              // till båda på trots att förra spelet bara körde t.ex. Name.
+              if (carriedSpotifyAnswers) {
+                setSpotifyAnswerYear(carriedSpotifyAnswers.year);
+                setSpotifyAnswerName(carriedSpotifyAnswers.name);
+              } else {
+                setSpotifyAnswerYear(prof?.spotifyAnswerYear ?? true);
+                setSpotifyAnswerName(prof?.spotifyAnswerName ?? true);
+              }
             });
           }
         });
@@ -2166,7 +2207,7 @@ export default function LobbyScreen() {
       return () => {
         active = false;
       };
-    }, [roomCode, isGuestHost]),
+    }, [roomCode, isGuestHost, carriedSpotifyAnswers]),
   );
   const [addModalVisible, setAddModalVisible] = useState(false);
   // Lobby-wide settings — defaults speglar generic-fallback-spec (används

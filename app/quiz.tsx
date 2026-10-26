@@ -7812,6 +7812,13 @@ export default function QuizScreen() {
               parentControl: String(parentControlEnabled),
               carryPackages: JSON.stringify(selectedExtraPackages),
               seedGameMode: gameMode,
+              // Spotify Year/Name + paketets YT/Hints-aggregat persisteras inte
+              // (eller bara villkorat) i lobby_settings → bär host:s exakta val
+              // som params, annars återgår re-matchen till "båda på".
+              carrySpotifyYear: String(spotifyAnswerYear),
+              carrySpotifyName: String(spotifyAnswerName),
+              carryPkgYoutube: String(packageYoutubeEnabled),
+              carryPkgHints: String(packageHintsEnabled),
             }
           : {}),
       },
