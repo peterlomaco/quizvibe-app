@@ -213,16 +213,8 @@ function FullNamesView({
           const shouldBlink = !isPlayerRow && !isLocked && phase === 'question';
 
           return (
-            <Animated.View
-              // key byter när blinken slutar → vyn monteras om med
-              // opacity 1. Annars kan den native vyn behålla blinkens
-              // momentana gråa opacitet om valet/låsningen sker mitt i en
-              // blink (Peter 2026-10-26) — `opacity: 1` i JS slår inte alltid
-              // igenom efter en Animated-driven uppdatering.
-              key={`${name.itemId}-${shouldBlink ? 'blink' : 'still'}`}
-              style={{ opacity: shouldBlink ? blinkAnim : 1 }}
-            >
               <Pressable
+                key={name.itemId}
                 onPress={() => handleNamePress(name)}
                 disabled={isLocked || isTimedOut}
                 style={({ pressed }) => [
@@ -231,6 +223,15 @@ function FullNamesView({
                   pressed && !isLocked && styles.fullNameCardPressed,
                 ]}
               >
+                {/* Bara TEXTEN blinkar före val — rutan (kant/bakgrund) står
+                    still (Peter 2026-10-26). key byter när blinken slutar →
+                    ommontering med opacity 1, så en text som väljs/låses mitt
+                    i en blink aldrig fastnar grå (native-vyn behåller annars
+                    blinkens momentana opacitet). */}
+                <Animated.View
+                  key={shouldBlink ? 'blink' : 'still'}
+                  style={[styles.blinkTextWrap, { opacity: shouldBlink ? blinkAnim : 1 }]}
+                >
                 <Text
                   style={[
                     styles.fullNameText,
@@ -243,6 +244,7 @@ function FullNamesView({
                 >
                   {name.displayName}
                 </Text>
+                </Animated.View>
                 {badgeType === 'correct' && (
                   <Text style={[styles.revealBadge, styles.revealBadgeCorrect]}>
                     {isPlayerRow ? '✓ Correct Answer' : '✓ Correct'}
@@ -259,7 +261,6 @@ function FullNamesView({
                   </Text>
                 )}
               </Pressable>
-            </Animated.View>
           );
         })}
       </View>
@@ -502,12 +503,7 @@ function PrefixView({
 
           return (
             <View key={opt.prefix} style={styles.prefixRow}>
-              {/* key byter när blinken slutar → ommontering med opacity 1
-                  (se FullNamesView) så vald/låst rad aldrig fastnar grå. */}
-              <Animated.View
-                key={shouldBlink ? 'blink' : 'still'}
-                style={{ opacity: shouldBlink ? blinkAnim : 1 }}
-              >
+              <View>
                 <Pressable
                   onPress={() => handlePrefixPress(opt.prefix)}
                   disabled={isPrefixLocked}
@@ -522,6 +518,11 @@ function PrefixView({
                     pressed && styles.prefixButtonPressed,
                   ]}
                 >
+                  {/* Bara texten blinkar (se FullNamesView). */}
+                  <Animated.View
+                    key={shouldBlink ? 'blink' : 'still'}
+                    style={[styles.blinkPrefixWrap, { opacity: shouldBlink ? blinkAnim : 1 }]}
+                  >
                   <Text
                     style={[
                       styles.prefixText,
@@ -541,6 +542,7 @@ function PrefixView({
                   >
                     {opt.prefix}
                   </Text>
+                  </Animated.View>
                   {/* ×-badge på prefix-knappen själv (inget nameCard renderas
                       för wrong-reveal-rader i prefix-mode). Border-cutting via
                       top:-8/right:-6 så badgen sitter på knappens hörn. */}
@@ -550,7 +552,7 @@ function PrefixView({
                     </Text>
                   )}
                 </Pressable>
-              </Animated.View>
+              </View>
               {nameOpt && (
                 <View style={[styles.nameCard, nameCardStyle]}>
                   {/* Långa svar får gå på två rader och krymper bara måttligt
@@ -595,6 +597,13 @@ function PrefixView({
 }
 
 const styles = StyleSheet.create({
+  // Wrappers för text-blinken (bara texten blinkar, inte rutan).
+  blinkTextWrap: {
+    flex: 1,
+  },
+  blinkPrefixWrap: {
+    alignSelf: 'stretch',
+  },
   card: {
     backgroundColor: Colors.card,
     borderRadius: Radius.md,

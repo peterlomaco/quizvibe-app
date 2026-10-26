@@ -169,18 +169,21 @@ export function ActorSelectBlock({
             : Colors.cardElevated;
           const showMovieMeta = isCorrectRevealRow && movieTitle;
           return (
-            <Animated.View
-              key={`${name}-${shouldBlink ? 'blink' : 'still'}`}
-              style={{ opacity: shouldBlink ? blinkAnim : 1 }}
-            >
             <Pressable pressFeedback
+              key={name}
               onPress={onPress}
               style={[styles.nameButton, { borderColor, backgroundColor: bg }]}
             >
-              <View style={showMovieMeta ? styles.nameStack : undefined}>
+              <View style={showMovieMeta ? styles.nameStack : styles.blinkTextWrap}>
+                {/* Bara TEXTEN blinkar före val, inte rutan (som Hints). */}
+                <Animated.View
+                  key={shouldBlink ? 'blink' : 'still'}
+                  style={{ opacity: shouldBlink ? blinkAnim : 1 }}
+                >
                 <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
                   {name}
                 </Text>
+                </Animated.View>
                 {showMovieMeta && (
                   <Text style={styles.movieMeta} numberOfLines={1}>
                     {movieTitle}{movieYear ? ` · ${movieYear}` : ''}
@@ -203,7 +206,6 @@ export function ActorSelectBlock({
                 </View>
               )}
             </Pressable>
-            </Animated.View>
           );
         }
 
@@ -220,11 +222,7 @@ export function ActorSelectBlock({
 
         return (
           <Pressable pressFeedback key={name} onPress={onPress} style={styles.prefixRow}>
-            {/* Prefix-knapp — blinkar före val (samma som Hints) */}
-            <Animated.View
-              key={shouldBlink ? 'blink' : 'still'}
-              style={{ opacity: shouldBlink ? blinkAnim : 1 }}
-            >
+            {/* Prefix-knapp — bara texten blinkar före val (samma som Hints) */}
             <View
               style={[
                 styles.prefixButton,
@@ -234,9 +232,13 @@ export function ActorSelectBlock({
                 },
               ]}
             >
-              <Text style={[styles.prefixText, { color: prefixColor }]}>{prefix}</Text>
+              <Animated.View
+                key={shouldBlink ? 'blink' : 'still'}
+                style={{ opacity: shouldBlink ? blinkAnim : 1 }}
+              >
+                <Text style={[styles.prefixText, { color: prefixColor }]}>{prefix}</Text>
+              </Animated.View>
             </View>
-            </Animated.View>
 
             {/* Namnkort — expanderas vid val/reveal */}
             {showNameCard && (
@@ -339,6 +341,9 @@ const styles = StyleSheet.create({
   nameText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
+    flex: 1,
+  },
+  blinkTextWrap: {
     flex: 1,
   },
   nameStack: {

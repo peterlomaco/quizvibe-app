@@ -1674,7 +1674,7 @@ Edge cases:
 
 | Rad | Kant | Text | Badge |
 |---|---|---|---|
-| Ovald rad (före val) | svagt blå (`primaryBorder`) | vit (även prefix-knappen) | – (raden blinkar) |
+| Ovald rad (före val) | svagt blå (`primaryBorder`) | vit (även prefix-knappen) | – (bara TEXTEN blinkar, rutan står still) |
 | Valt men ej låst | blå | blå | – |
 | Mitt svar, rätt | grön | vit | grön "✓ Correct Answer" |
 | Mitt svar, fel | röd | vit | röd "✗ Wrong Answer" |
