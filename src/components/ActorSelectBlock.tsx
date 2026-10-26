@@ -11,8 +11,8 @@
 //   • reveal    → se reveal-matrisen vid borderColor nedan (rätt = guld/vit,
 //                 fel = röd/blå, facit = grön/blå, time-out-fel = röd/grå)
 
-import { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useEffect, useMemo, useRef } from 'react';
+import { Animated, StyleSheet, View } from 'react-native';
 // Svarsalternativ (prefix + korta namn) + reveal-badges → capped mot Dynamic Type.
 import { CappedText as Text } from './CappedText';
 import { Pressable } from '@/src/components/haptic';
@@ -93,6 +93,21 @@ export function ActorSelectBlock({
 
   const isRevealing = phase === 'reveal';
   const isLocked = phase === 'awaiting' || isRevealing;
+
+  // Blink före val — samma affordance som Hints/Spotify Name
+  // (ImageAnswerBlock). JS-driven med flit + key-ommontering när blinken
+  // slutar, så en rad som väljs/låses mitt i en blink aldrig fastnar grå.
+  const blinkAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnim, { toValue: 0.35, duration: 750, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 1,    duration: 750, useNativeDriver: false }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [blinkAnim]);
   const isFullMode = assistance === 'full';
   // Prefix-längd: standard=2, minimal=1 (ignoreras i full-mode)
   const prefixLen = assistance === 'minimal' ? 1 : 2;
@@ -121,7 +136,8 @@ export function ActorSelectBlock({
         //   • rätta svaret (facit)→ grön kant, vit text, grön "Correct"
         //   • time-out, fel rader → grå kant,  grå text, röd ✗
         const isCorrectFacitRow = isCorrectRevealRow && !isPlayerRow;
-        let borderColor: string = Colors.border;
+        // Ovald rad: svagt blå kant (Colors.primaryBorder), samma som Hints.
+        let borderColor: string = Colors.primaryBorder;
         if (isPending) borderColor = Colors.primary;
         else if (isConfirmedRow) borderColor = wasPlayerCorrect ? Colors.success : QUIZ_ERROR_RED;
         else if (isCorrectRevealRow) borderColor = Colors.success;
@@ -144,6 +160,7 @@ export function ActorSelectBlock({
           if (isLocked) return;
           onNameSelect(pendingName === name ? null : name);
         };
+        const shouldBlink = !isPending && !isLocked && phase === 'question';
 
         // ── Full mode ──────────────────────────────────────────────────
         if (isFullMode) {
@@ -152,8 +169,11 @@ export function ActorSelectBlock({
             : Colors.cardElevated;
           const showMovieMeta = isCorrectRevealRow && movieTitle;
           return (
+            <Animated.View
+              key={`${name}-${shouldBlink ? 'blink' : 'still'}`}
+              style={{ opacity: shouldBlink ? blinkAnim : 1 }}
+            >
             <Pressable pressFeedback
-              key={name}
               onPress={onPress}
               style={[styles.nameButton, { borderColor, backgroundColor: bg }]}
             >
@@ -183,6 +203,7 @@ export function ActorSelectBlock({
                 </View>
               )}
             </Pressable>
+            </Animated.View>
           );
         }
 
@@ -191,15 +212,19 @@ export function ActorSelectBlock({
         const showNameCard = isSelected || isRevealing;
         const prefix = prefixOf(name, prefixLen);
         // Prefix-texten följer namnkortets färg på graderade rader (mitt svar,
-        // facit, time-out-fel); övriga rader behåller blå/dämpad grå.
+        // facit, time-out-fel) och valt-ej-låst (blå); ovalda = vit, dimmade = grå.
         const prefixColor =
-          isConfirmedRow || isCorrectFacitRow || showWrongTimeout
+          isPending || isConfirmedRow || isCorrectFacitRow || showWrongTimeout
             ? textColor
-            : isDimmed ? Colors.textDisabled : Colors.primary;
+            : isDimmed ? Colors.textDisabled : Colors.textPrimary;
 
         return (
           <Pressable pressFeedback key={name} onPress={onPress} style={styles.prefixRow}>
-            {/* Prefix-knapp */}
+            {/* Prefix-knapp — blinkar före val (samma som Hints) */}
+            <Animated.View
+              key={shouldBlink ? 'blink' : 'still'}
+              style={{ opacity: shouldBlink ? blinkAnim : 1 }}
+            >
             <View
               style={[
                 styles.prefixButton,
@@ -211,6 +236,7 @@ export function ActorSelectBlock({
             >
               <Text style={[styles.prefixText, { color: prefixColor }]}>{prefix}</Text>
             </View>
+            </Animated.View>
 
             {/* Namnkort — expanderas vid val/reveal */}
             {showNameCard && (
