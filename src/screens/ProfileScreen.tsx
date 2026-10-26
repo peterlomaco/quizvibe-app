@@ -4707,7 +4707,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: Radius.md,
     borderColor: Colors.warning,
-    backgroundColor: Colors.background,
+    // Samma navy som valda val-rutor (4 rounds / 30s), 2026-10-26.
+    backgroundColor: BrandUi.selectedFill,
     shadowColor: Colors.warning,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.18,

@@ -1172,19 +1172,8 @@ function TimelineSelector({
   return (
     <View style={[tl.wrapper, disabled && { opacity: 0.35 }]}>
 
-      {/* Assist label */}
-      <View style={tl.assistRow}>
-        <View style={[tl.assistLine, { backgroundColor: assistanceColor + '50' }]} />
-        <View style={[tl.assistBadge, { backgroundColor: assistanceColor + '20', borderColor: assistanceColor + '50' }]}>
-          <Text style={[tl.assistText, { color: assistanceColor }]}>
-            {assistance.toUpperCase()} ASSIST
-          </Text>
-        </View>
-        <Text style={[tl.assistDesc, { color: assistanceColor + 'bb' }]}>
-          {interval === 0 ? 'Pick the exact year' : `Select a ${interval}-year interval`}
-        </Text>
-        <View style={[tl.assistLine, { backgroundColor: assistanceColor + '50' }]} />
-      </View>
+      {/* Assist-raden ("FULL ASSIST — Select a 5-year interval") är borttagen
+          (Peter 2026-10-26); intervallet syns ändå på svarsrutans bredd. */}
 
       {/* Timeline container */}
       <View style={{ height: CONTAINER_HEIGHT, position: 'relative' }}>
