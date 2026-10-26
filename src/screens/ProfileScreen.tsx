@@ -4789,22 +4789,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     position: 'relative',
   },
+  // Samma färgtema som Lobbyns val-rutor (CHOICE_BG / CHOICE_BORDER), 2026-10-26.
   modeOptionInactive: {
-    borderColor: BrandUi.border,
-    backgroundColor: 'transparent',
+    borderColor: 'rgba(255,255,255,0.10)',
+    backgroundColor: '#111826',
   },
   // Dämpad variant — appliceras på Pass-the-Phone-rutan när
   // singlePlayerDefault-checkboxen är på. Matchar Individual Devices
   // inaktiva/låsta look (Colors.borderStrong border + grå badge) så
   // båda alternativen ser likadant ut i sitt "låsta" tillstånd.
   modeOptionDimmed: {
-    borderColor: Colors.borderStrong,
-    backgroundColor: 'transparent',
+    borderColor: 'rgba(255,255,255,0.10)',
+    backgroundColor: '#111826',
   },
-  // Profile v2: vald = guld kant + svag guldton (var grön kant).
+  // Vald = guld kant + navy fyllning (samma som Lobby; den genomskinliga
+  // guldtonen blev brun mot navy), 2026-10-26.
   modeOptionPassActive: {
     borderColor: Colors.warning,
-    backgroundColor: 'rgba(245,166,35,0.08)',
+    backgroundColor: BrandUi.selectedFill,
   },
   // Guld ✓ i övre högra hörnet på vald ruta.
   modeCheck: {
@@ -4825,15 +4827,15 @@ const styles = StyleSheet.create({
     opacity: 0.55,
   },
   modeOptionIndivActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.warning,
+    backgroundColor: BrandUi.selectedFill,
   },
   // Guld-tonad aktiv variant — Individual Devices när det är valt och
   // host har Premium. Speglar PREMIUM-badge:s guldfärg så toggle-rutan,
   // badge:n och texten bildar ett samlat "premium-läge"-uttryck.
   modeOptionPremiumActive: {
-    borderColor: '#F5A623',
-    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.warning,
+    backgroundColor: BrandUi.selectedFill,
   },
   modeLabel: {
     fontSize: FontSize.sm,
@@ -5394,7 +5396,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: Radius.md,
     borderColor: Colors.warning,
-    backgroundColor: Colors.background,
+    // Samma navy som Game era-rutan och valda val-rutor, 2026-10-26.
+    backgroundColor: BrandUi.selectedFill,
     alignItems: 'center',
     justifyContent: 'center',
     minWidth: 80,

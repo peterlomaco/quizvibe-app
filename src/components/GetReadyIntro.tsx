@@ -21,7 +21,6 @@ import { MainCategory, mainCategoryDisplay } from '../utils/mainCategory';
 import type { PlayedMediaSource } from '../utils/mediaSource';
 import { MediaSourceIcon } from './MediaSourceIcon';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
-import { QuizVibeGoldMark } from './QuizVibeGoldMark';
 import { SectionToggle } from './SectionToggle';
 import { TrophyIcon } from './TrophyIcon';
 import { HintsIcon } from './HintsIcon';

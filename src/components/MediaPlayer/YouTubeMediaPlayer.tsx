@@ -36,7 +36,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import { QuizVibeGoldMark, QuizVibeGoldWordmark } from '@/src/components/QuizVibeGoldMark';
+import {
+  QuizVibeMarkSvg,
+  QuizVibeWordmarkSvg,
+  WORDMARK_LOGO_SCALE,
+} from '@/src/components/brand/QuizVibeBrandSvg';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import type { YoutubeClip } from '@/src/utils/mediaSource';
 import { QUIZ_MEDIA_H, QUIZ_MEDIA_W } from '@/src/utils/quizLayout';
@@ -64,11 +68,14 @@ interface Props {
 // Ha ALDRIG en lokal kopia av formeln här.
 const PLAYER_W = QUIZ_MEDIA_W;
 const PLAYER_H = QUIZ_MEDIA_H;
-// End-of-clip-brandingen (guld-Q + guld-ordmärke, 2026-10-15) skalas mot
-// spelarhöjden så den ryms även i den minsta 16:9-rutan (~180 pt):
-// Q 50 % av höjden + ordmärket (~0.24 × bredd hög) + gap.
-const ENDED_MARK_H = Math.round(PLAYER_H * 0.5);
-const ENDED_WORDMARK_W = Math.round(PLAYER_H * 0.8);
+// End-of-clip-brandingen = Home:s låsta Brand Master (metallisk vektor-Q +
+// Manrope-ordmärke, 2026-10-26) i EXAKT Home:s proportioner — symbol 116 pt,
+// ordmärke 220 × WORDMARK_LOGO_SCALE, ~16 pt luft — skalad mot spelarhöjden
+// så den ryms även i den minsta 16:9-rutan (~180 pt): totalt ~66 % av höjden.
+const ENDED_SCALE = (PLAYER_H * 0.42) / 116;
+const ENDED_MARK_H = Math.round(116 * ENDED_SCALE);
+const ENDED_WORDMARK_W = Math.round(220 * WORDMARK_LOGO_SCALE * ENDED_SCALE);
+const ENDED_GAP = Math.round(16 * ENDED_SCALE);
 
 /**
  * Stänger av YouTubes textning i spelaren.
@@ -280,9 +287,9 @@ export function YouTubeMediaPlayer({
           QuizVibe-loggan här matchar startskärmens brand-mark exakt. */}
       {hasEnded && (
         <View style={styles.endedOverlay} pointerEvents="none">
-          <QuizVibeGoldMark size={ENDED_MARK_H} />
+          <QuizVibeMarkSvg size={ENDED_MARK_H} variant="metallic" />
           <View style={styles.endedWordmarkWrap}>
-            <QuizVibeGoldWordmark width={ENDED_WORDMARK_W} />
+            <QuizVibeWordmarkSvg width={ENDED_WORDMARK_W} variant="metallic" />
           </View>
         </View>
       )}
@@ -339,10 +346,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // Samma guld-ordmärke som på Home. PNG:erna är tight beskurna, så ett
-  // litet positivt gap räcker (den gamla SVG:n behövde negativ marginal).
+  // Samma luft symbol → ordmärke som på Home, skalad med loggan.
   endedWordmarkWrap: {
-    marginTop: Spacing.sm,
+    marginTop: ENDED_GAP,
   },
   // Bara visuell hint — pointerEvents="none" så taps når iframen under.
   // Lägg ej position absolute som täcker hela frame:n för att inte skymma

@@ -13,8 +13,8 @@ import {
 // react-native-svg. Geometry comes from the generated quizVibeBrandGeometry.ts;
 // this file only adds paint. Mark, Manrope Bold wordmark and composition B are
 // final — do not edit shapes or proportions here or in the generated file.
-// Rollout status (2026-10-16): Home brand block (Home v2, locked). Other
-// screens still use the PNG QuizVibeGoldMark.
+// Rollout status (2026-10-26): used by Home and the YouTube end-of-clip
+// screen. The PNG QuizVibeGoldMark has no remaining call-sites.
 
 export type BrandVariant = 'metallic' | 'flatGold' | 'white' | 'mono';
 

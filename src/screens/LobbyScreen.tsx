@@ -36,7 +36,6 @@ import { PlayerNameInput } from '@/src/components/PlayerNameInput';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
-import { QuizVibeGoldMark } from '../components/QuizVibeGoldMark';
 import { QuizVibeDefaultAvatar } from '../components/QuizVibeDefaultAvatar';
 import { RotatingTagline } from '../components/RotatingTagline';
 import { GoldCtaButton } from '../components/GoldCtaButton';
@@ -12574,7 +12573,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: Radius.md,
     borderColor: Colors.warning,
-    backgroundColor: Colors.background,
+    // Samma navy som Game era-rutan och valda val-rutor, 2026-10-26.
+    backgroundColor: BrandUi.selectedFill,
     alignItems: 'center',
     justifyContent: 'center',
     minWidth: 80,
