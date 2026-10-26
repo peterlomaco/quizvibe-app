@@ -1581,17 +1581,17 @@ Edge cases:
 
 **Full-names-mode** (klient, Full assistance): ImageAnswerBlock dispatch:ar på `variant.mode` — när `'full-names'` renderas en vertikal lista med ~10 fullnamn-kort under varandra (`fullNameCard`-style). Spelaren tappar direkt på rätt namn — ingen prefix-pussel. Default-stilen (oselected) är `cardElevated`-bg + `primaryBorder` (samma vokabulär som prefix-knappens default). Selected-state delar exakt samma blå pending / gold confirmed / grön correct-vokabulär som prefix-mode:s `nameCard` (bara kantlinjen byter färg över faser; bg konstant `primaryMuted`). Correct/Wrong-badges, dimning av irrelevanta rader och separate-correct-rendering vid fel/time-out funkar identiskt som i prefix-mode. Två interna komponenter (`FullNamesView`, `PrefixView`) delar gemensamt styles-objekt — ImageAnswerBlock-toppen är bara en dispatcher.
 
-**Reveal-färgmatris för ALLA Name-svar (Peter 2026-10-15)** — gäller Spotify/Name + Hints (`ImageAnswerBlock`) och Film/YT (`ActorSelectBlock`). Badge-text alltid vit.
+**Reveal-färgmatris för ALLA Name-svar (Peter 2026-10-15, omgjord 2026-10-26)** — gäller Spotify/Name + Hints (`ImageAnswerBlock`) och Film/YT (`ActorSelectBlock`), INGEN kategori-skillnad. Blått hör till gamla UI:t: efter att svaret låsts är all graderad text vit. Badge-text alltid vit.
 
 | Rad | Kant | Text | Badge |
 |---|---|---|---|
-| Mitt svar, rätt | guld | **vit** | grön "✓ Correct Answer" |
-| Mitt svar, fel | **röd** (alla kategorier — Music, Film/TV, Hints; Peter 2026-10-26) | blå | röd "✗ Wrong Answer" |
-| Rätta svaret (facit, när jag svarat fel) | grön | blå | grön "✓ Correct" |
-| Inget svar: rätta raden | grön | blå | grön "✓ Correct" |
-| Inget svar: övriga rader | röd | grå | röd ✗ |
+| Mitt svar, rätt | grön | vit | grön "✓ Correct Answer" |
+| Mitt svar, fel | röd | vit | röd "✗ Wrong Answer" |
+| Rätta svaret (facit, när jag svarat fel) | grön | vit | grön "✓ Correct" |
+| Inget svar: rätta raden | grön | vit | grön "✓ Correct" |
+| Inget svar: övriga felaktiga alternativ | röd | grå | röd ✗ |
 
-Film behåller grå `movieMeta`-undertext (titel · år) under skådespelaren. Bullet-listan nedan är historik där den motsäger matrisen (t.ex. "Texten konstant blå"). Blink-animationen (svarsalternativen pulserar före svar) MÅSTE återställas till `opacity: 1` när den stoppar — annars fastnar en rad på blinkens momentana opacitet och facit-raden kan bli utgråad. ⚠ Blinken kör med `useNativeDriver: false` med flit: med native driver behöll vyn sin senaste blink-opacitet trots `opacity: 1` i JS, så spelarens valda rad kunde fastna halvgrå vid reveal. Byt inte tillbaka till native driver.
+Spelarens egen rad graderas redan vid `awaiting` (grön/röd kant syns direkt när svaret låsts); facit-raderna väntar till `reveal`. Film behåller grå `movieMeta`-undertext (titel · år) under skådespelaren. Bullet-listan nedan är historik där den motsäger matrisen (t.ex. "Texten konstant blå"). Blink-animationen (svarsalternativen pulserar före svar) MÅSTE återställas till `opacity: 1` när den stoppar — annars fastnar en rad på blinkens momentana opacitet och facit-raden kan bli utgråad. ⚠ Blinken kör med `useNativeDriver: false` med flit: med native driver behöll vyn sin senaste blink-opacitet trots `opacity: 1` i JS, så spelarens valda rad kunde fastna halvgrå vid reveal. Byt inte tillbaka till native driver.
 
 **Reveal-fas-beteende** (redesign 2026-05-21):
 - Alla prefix-knappar förblir synliga genom hela faskedjan (`question → awaiting → reveal`). Tidigare retur:ade ImageAnswerBlock `null` vid reveal; den early-returnen är borttagen.

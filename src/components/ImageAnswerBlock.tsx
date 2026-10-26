@@ -152,18 +152,18 @@ function FullNamesView({
             cardStyle = styles.nameCardPending;
             textStyle = styles.fullNameTextActive;
           } else if (isPlayerRow && isLocked) {
-            // Reveal-matris (Peter 2026-10-26): mitt rätta svar = guld kant
-            // + vit text, mitt fel svar = RÖD kant + blå text — samma regel
-            // för Music, Film/TV och Hints.
+            // Reveal-matris (Peter 2026-10-26, samma för Music, Film/TV och
+            // Hints): mitt rätta svar = grön kant, mitt fel svar = röd kant,
+            // vit text i båda fallen. Inget blått efter att svaret låsts.
             cardStyle = confirmedName && !wasPlayerCorrect
               ? styles.nameCardWrong
-              : styles.nameCardConfirmed;
-            textStyle = confirmedName && wasPlayerCorrect
-              ? styles.fullNameTextWhite
-              : styles.fullNameTextActive;
+              : confirmedName
+                ? styles.nameCardCorrect
+                : styles.nameCardConfirmed;
+            textStyle = styles.fullNameTextWhite;
           } else if (isCorrectRevealRow) {
             cardStyle = styles.nameCardCorrect;
-            textStyle = styles.fullNameTextActive;
+            textStyle = styles.fullNameTextWhite;
           } else if (isWrongRevealRow) {
             cardStyle = styles.nameCardWrong;
             // Grå text (textDisabled) — speglar prefix-mode:s dämpning.
@@ -432,16 +432,17 @@ function PrefixView({
           const isPlayerWrongLocked =
             isPlayerRow && isLocked && !!confirmedName && !wasPlayerCorrect;
           if (isPlayerRow && isLocked) {
-            // Mitt fel svar = röd kant (reveal-matris 2026-10-26).
+            // Reveal-matris 2026-10-26: rätt = grön kant, fel = röd kant,
+            // vit text i båda fallen.
             nameCardStyle = isPlayerWrongLocked
               ? styles.nameCardWrong
-              : styles.nameCardConfirmed;
-            nameTextStyle = isPlayerCorrectLocked
-              ? styles.nameTextWhite
-              : styles.nameTextConfirmed;
+              : isPlayerCorrectLocked
+                ? styles.nameCardCorrect
+                : styles.nameCardConfirmed;
+            nameTextStyle = styles.nameTextWhite;
           } else if (isCorrectRevealRow) {
             nameCardStyle = styles.nameCardCorrect;
-            nameTextStyle = styles.nameTextCorrect;
+            nameTextStyle = styles.nameTextWhite;
           }
 
           // Badge-state — visas BARA i reveal-fas:
@@ -497,6 +498,7 @@ function PrefixView({
                     isPrefixSelected && !isLocked && styles.prefixButtonActive,
                     isPrefixSelected && isLocked && styles.prefixButtonLocked,
                     isPrefixSelected && isPlayerWrongLocked && styles.prefixButtonLockedWrong,
+                    isPrefixSelected && isPlayerCorrectLocked && styles.prefixButtonCorrectReveal,
                     isPrefixCorrectReveal && styles.prefixButtonCorrectReveal,
                     isWrongRevealRow && styles.prefixButtonWrongReveal,
                     pressed && styles.prefixButtonPressed,
@@ -507,8 +509,8 @@ function PrefixView({
                       styles.prefixText,
                       isPrefixSelected && !isLocked && styles.prefixTextActive,
                       isPrefixSelected && isLocked && styles.prefixTextLocked,
-                      isPlayerCorrectLocked && styles.prefixTextWhite,
-                      isPrefixCorrectReveal && styles.prefixTextCorrectReveal,
+                      isPrefixSelected && isLocked && styles.prefixTextWhite,
+                      isPrefixCorrectReveal && styles.prefixTextWhite,
                       isWrongRevealRow && styles.prefixTextWrongReveal,
                       isPrefixDimmed && styles.prefixTextDimmed,
                     ]}

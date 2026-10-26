@@ -116,20 +116,19 @@ export function ActorSelectBlock({
         // Reveal-matris (Peter 2026-10-26) — gemensam för ALLA Name-svar
         // (Music, Film/TV, Hints), ingen kategori-skillnad. Spelarens EGEN låsta rad graderas redan vid 'awaiting';
         // facit-raderna (separat correct + time-out-röd) hålls till 'reveal'.
-        //   • mitt rätta svar     → guld kant, vit text, grön "Correct"
-        //   • mitt fel svar       → röd kant,  blå text, röd "Wrong"
-        //   • rätta svaret (facit)→ grön kant, blå text, grön "Correct"
+        //   • mitt rätta svar     → grön kant, vit text, grön "Correct Answer"
+        //   • mitt fel svar       → röd kant,  vit text, röd "Wrong Answer"
+        //   • rätta svaret (facit)→ grön kant, vit text, grön "Correct"
         //   • time-out, fel rader → röd kant,  grå text, röd ✗
         const isCorrectFacitRow = isCorrectRevealRow && !isPlayerRow;
         let borderColor: string = Colors.border;
         if (isPending) borderColor = Colors.primary;
-        else if (isConfirmedRow) borderColor = wasPlayerCorrect ? Colors.warning : QUIZ_ERROR_RED;
+        else if (isConfirmedRow) borderColor = wasPlayerCorrect ? Colors.success : QUIZ_ERROR_RED;
         else if (isCorrectRevealRow) borderColor = Colors.success;
         else if (showWrongTimeout) borderColor = QUIZ_ERROR_RED;
 
         let textColor: string = Colors.textPrimary;
-        if (isConfirmedRow) textColor = wasPlayerCorrect ? Colors.textPrimary : Colors.primary;
-        else if (isCorrectFacitRow) textColor = Colors.primary;
+        if (isConfirmedRow || isCorrectFacitRow) textColor = Colors.textPrimary;
         else if (showWrongTimeout || isDimmed) textColor = Colors.textDisabled;
         const showCorrectBadge =
           (isPlayerRow && wasPlayerCorrect && isLocked) || isCorrectFacitRow;
