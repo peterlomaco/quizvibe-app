@@ -87,9 +87,12 @@ function FullNamesView({
     [variant.nameList],
   );
 
-  // Vid awaiting/reveal: pendingName fryses som confirmedName-ekvivalent.
   // Pre-confirm: pendingName styr highlight. Post-confirm: confirmedName.
-  const selectedName = confirmedName ?? pendingName;
+  // Ett tappat-men-EJ-bekräftat namn räknas INTE som svar när tiden gått ut
+  // (samma regel som prefix-läget och Film) — annars fick raden guld kant +
+  // ✗ i stället för facit-raden gröna "✓ Correct" (Peter 2026-10-26).
+  const selectedName =
+    confirmedName ?? (phase === 'question' ? pendingName : null);
 
   // Blink-animation för namn-kort som ännu inte valts — speglar PrefixView:s
   // prefix-knapp-blink så full-names-läget (Hints / Spotify Name) lockar
