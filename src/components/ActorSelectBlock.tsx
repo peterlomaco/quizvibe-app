@@ -174,22 +174,29 @@ export function ActorSelectBlock({
               onPress={onPress}
               style={[styles.nameButton, { borderColor, backgroundColor: bg }]}
             >
-              <View style={showMovieMeta ? styles.nameStack : styles.blinkTextWrap}>
-                {/* Bara TEXTEN blinkar före val, inte rutan (som Hints). */}
+              {/* Samma layout som före blink-ändringen (Peter 2026-10-26):
+                  texten ligger direkt i en stil-lös vy — INGEN extra flex-
+                  wrapper, som gjorde raderna lika låga som Hints före valet.
+                  Den vyn ÄR blink-vyn, så bara texten blinkar (inte rutan). */}
+              {showMovieMeta ? (
+                <View style={styles.nameStack}>
+                  <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
+                    {name}
+                  </Text>
+                  <Text style={styles.movieMeta} numberOfLines={1}>
+                    {movieTitle}{movieYear ? ` · ${movieYear}` : ''}
+                  </Text>
+                </View>
+              ) : (
                 <Animated.View
                   key={shouldBlink ? 'blink' : 'still'}
                   style={{ opacity: shouldBlink ? blinkAnim : 1 }}
                 >
-                <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
-                  {name}
-                </Text>
-                </Animated.View>
-                {showMovieMeta && (
-                  <Text style={styles.movieMeta} numberOfLines={1}>
-                    {movieTitle}{movieYear ? ` · ${movieYear}` : ''}
+                  <Text style={[styles.nameText, { color: textColor }]} numberOfLines={1}>
+                    {name}
                   </Text>
-                )}
-              </View>
+                </Animated.View>
+              )}
               {showCorrectBadge && (
                 <View style={styles.correctBadge}>
                   <Text style={styles.correctBadgeText}>{isPlayerRow ? '✓ Correct Answer' : '✓ Correct'}</Text>
@@ -341,9 +348,6 @@ const styles = StyleSheet.create({
   nameText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
-    flex: 1,
-  },
-  blinkTextWrap: {
     flex: 1,
   },
   nameStack: {
