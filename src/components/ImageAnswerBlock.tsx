@@ -214,7 +214,12 @@ function FullNamesView({
 
           return (
             <Animated.View
-              key={name.itemId}
+              // key byter när blinken slutar → vyn monteras om med
+              // opacity 1. Annars kan den native vyn behålla blinkens
+              // momentana gråa opacitet om valet/låsningen sker mitt i en
+              // blink (Peter 2026-10-26) — `opacity: 1` i JS slår inte alltid
+              // igenom efter en Animated-driven uppdatering.
+              key={`${name.itemId}-${shouldBlink ? 'blink' : 'still'}`}
               style={{ opacity: shouldBlink ? blinkAnim : 1 }}
             >
               <Pressable
@@ -497,7 +502,12 @@ function PrefixView({
 
           return (
             <View key={opt.prefix} style={styles.prefixRow}>
-              <Animated.View style={{ opacity: shouldBlink ? blinkAnim : 1 }}>
+              {/* key byter när blinken slutar → ommontering med opacity 1
+                  (se FullNamesView) så vald/låst rad aldrig fastnar grå. */}
+              <Animated.View
+                key={shouldBlink ? 'blink' : 'still'}
+                style={{ opacity: shouldBlink ? blinkAnim : 1 }}
+              >
                 <Pressable
                   onPress={() => handlePrefixPress(opt.prefix)}
                   disabled={isPrefixLocked}
