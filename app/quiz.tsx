@@ -4005,6 +4005,12 @@ export default function QuizScreen() {
         : resolveSpotifyAnswerType(questionIndex))
     : null;
   const isSpotifyNameQuestion = isSpotifyQuestion && currentSpotifyAnswerType === 'name';
+  // Multiplayer på egna enheter (Peter 2026-10-26): när en spelare låst sitt
+  // Name-svar visar knappen "Waiting - all players to answer" i stället för
+  // "Answer Locked" tills alla svarat. Gäller Hints, Spotify/Name och Film/Name.
+  const deferNameGrading = gameMode === 'individual-devices';
+  const isNameAnswerQuestion =
+    isImageQuestion || question.type === 'actor-select' || isSpotifyNameQuestion;
 
   // Artistnamn extraherat från hint-fältet (format "Title — Artist").
   const derivedArtistName: string | null =
@@ -12202,9 +12208,25 @@ export default function QuizScreen() {
           )}
           {phase === 'awaiting' && (
             <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
-              <Text style={styles.actionBtnAwaitingText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
-                Answer Locked
-              </Text>
+              {deferNameGrading && isNameAnswerQuestion ? (
+                // Name-fråga i multiplayer: vänta på övriga i stället för
+                // "Answer Locked" — samma fyllande punkter som non-host:s
+                // "Waiting - Host will start quiz" (Peter 2026-10-26).
+                <View style={styles.actionBtnWaitRow}>
+                  <Text
+                    style={[styles.actionBtnAwaitingText, styles.actionBtnWaitText]}
+                    maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}
+                    numberOfLines={1}
+                  >
+                    Waiting - all players to answer
+                  </Text>
+                  <SequentialDots color={Colors.textSecondary} />
+                </View>
+              ) : (
+                <Text style={styles.actionBtnAwaitingText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
+                  Answer Locked
+                </Text>
+              )}
             </View>
           )}
             </>
@@ -13447,6 +13469,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: 'rgba(255,255,255,0.78)',
     letterSpacing: 0.4,
+  },
+  actionBtnWaitRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
+  },
+  // Grå (som SequentialDots) i stället för nästan-vit "Answer Locked".
+  actionBtnWaitText: {
+    color: Colors.textSecondary,
+    flexShrink: 1,
   },
   actionBtnText: {
     fontSize: 17,
