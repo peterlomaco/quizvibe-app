@@ -127,8 +127,11 @@ export function ActorSelectBlock({
         else if (isCorrectRevealRow) borderColor = Colors.success;
         else if (showWrongTimeout) borderColor = Colors.border;
 
+        // Samma tema som Hints (ImageAnswerBlock): valt men EJ låst = blå
+        // kant + blå text; först när svaret låsts blir texten vit.
         let textColor: string = Colors.textPrimary;
-        if (isConfirmedRow || isCorrectFacitRow) textColor = Colors.textPrimary;
+        if (isPending) textColor = Colors.primary;
+        else if (isConfirmedRow || isCorrectFacitRow) textColor = Colors.textPrimary;
         else if (showWrongTimeout || isDimmed) textColor = Colors.textDisabled;
         // Rätt svar ALLTID vit text vid reveal (reveal-matris 2026-10-26).
         if (isRevealing && isCorrectName) textColor = Colors.textPrimary;
