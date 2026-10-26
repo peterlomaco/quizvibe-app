@@ -23,6 +23,7 @@ import {
 import { CappedText as Text } from './CappedText';
 import { Pressable } from '@/src/components/haptic';
 import {
+  BrandUi,
   Colors,
   FontSize,
   FontWeight,
@@ -610,15 +611,15 @@ const styles = StyleSheet.create({
   },
   // Question-phase selected — blå border (pending).
   prefixButtonActive: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
     borderColor: Colors.primary,
     borderWidth: 2,
   },
-  // Awaiting/reveal-phase selected — gold border, men behåller primaryMuted-bg
+  // Awaiting/reveal-phase selected — gold border, men behåller selectedFill-bg
   // från Active så bakgrunden känns konsistent över faser. Bara kantlinjen
   // skiftar färg för att signalera confirmation-state.
   prefixButtonLocked: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
     borderColor: Colors.warning,
     borderWidth: 2,
   },
@@ -629,7 +630,7 @@ const styles = StyleSheet.create({
   // Reveal-phase correct answer (visad separat när spelaren svarade fel
   // eller tiden tog slut) — grön border, blå bg (samma logik som locked).
   prefixButtonCorrectReveal: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
     borderColor: Colors.success,
     borderWidth: 2,
   },
@@ -638,7 +639,7 @@ const styles = StyleSheet.create({
   // som "9 röda fel + 1 grön rätt" vid time-out. Position: relative så ✗-
   // badgens absolute-position anchorar till knappen.
   prefixButtonWrongReveal: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
     borderColor: QUIZ_ERROR_RED,
     borderWidth: 2,
     position: 'relative',
@@ -694,27 +695,27 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     position: 'relative',
   },
-  // Alla tre name-card-tillstånd delar samma primaryMuted (blå) bakgrund —
+  // Alla tre name-card-tillstånd delar samma marinfyllning (BrandUi.selectedFill, v2 — ingen blå) —
   // bara kantlinjens färg signalerar state (blå pending → gold confirmed →
   // grön correct). Konsistent bg gör att svarsrutorna ser ut som "samma
   // ruta som under spelets gång" oavsett fas.
   nameCardPending: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
     borderColor: Colors.primary,
   },
   nameCardConfirmed: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
     borderColor: Colors.warning,
   },
   nameCardCorrect: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
     borderColor: Colors.success,
   },
-  // Wrong-reveal (time-out, fullnames-mode) — röd border + primaryMuted bg.
+  // Wrong-reveal (time-out, fullnames-mode) — röd border + selectedFill-bg.
   // Speglar nameCardCorrect men i QUIZ_ERROR_RED. Visar tydligt vilka
   // alternativ som var felaktiga när spelaren inte hann svara.
   nameCardWrong: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
     borderColor: QUIZ_ERROR_RED,
   },
   // Text-färgen är konstant blå över alla tillstånd — bara kantlinjen

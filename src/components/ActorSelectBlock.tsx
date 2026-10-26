@@ -16,7 +16,7 @@ import { StyleSheet, View } from 'react-native';
 // Svarsalternativ (prefix + korta namn) + reveal-badges → capped mot Dynamic Type.
 import { CappedText as Text } from './CappedText';
 import { Pressable } from '@/src/components/haptic';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '@/src/theme';
 import { createSeededRng } from '@/src/utils/seededRandom';
 
 type Phase = 'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard';
@@ -143,7 +143,7 @@ export function ActorSelectBlock({
         // ── Full mode ──────────────────────────────────────────────────
         if (isFullMode) {
           const bg = isSelected || isCorrectRevealRow || showWrongTimeout
-            ? Colors.primaryMuted
+            ? BrandUi.selectedFill
             : Colors.cardElevated;
           const showMovieMeta = isCorrectRevealRow && movieTitle;
           return (
@@ -200,7 +200,7 @@ export function ActorSelectBlock({
                 styles.prefixButton,
                 {
                   borderColor,
-                  backgroundColor: isSelected ? Colors.primaryMuted : Colors.cardElevated,
+                  backgroundColor: isSelected ? BrandUi.selectedFill : Colors.cardElevated,
                 },
               ]}
             >
@@ -212,7 +212,7 @@ export function ActorSelectBlock({
               <View
                 style={[
                   styles.nameCard,
-                  { borderColor, backgroundColor: Colors.primaryMuted },
+                  { borderColor, backgroundColor: BrandUi.selectedFill },
                 ]}
               >
                 {isCorrectRevealRow && movieTitle ? (
