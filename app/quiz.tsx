@@ -20,10 +20,11 @@ import { SequentialDots } from '@/src/components/SequentialDots';
 import FinalCelebration from '@/src/components/FinalCelebration';
 import { RemoteMatchResultPanel } from '@/src/components/RemoteMatchResultPanel';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
+import { SwipeHandIcon } from '@/src/components/SwipeHandIcon';
 import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
 import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload, type PlayerHcpChangedPayload, type QuestionAdvancePayload } from '@/src/lib/realtime/syncChannel';
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
-import { Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '@/src/theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_SCALE } from '@/src/theme';
 import { track } from '@/src/utils/analytics';
 import { checkYoutubeClipsAlive } from '@/src/utils/youtubeLiveness';
 import { checkClipsOnServer, reportClipError } from '@/src/utils/clipErrorReport';
@@ -173,6 +174,7 @@ import {
   View,
 } from 'react-native';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
+import { QuizVibeAvatarQ } from '@/src/components/QuizVibeDefaultAvatar';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import { runBehindGlobalOverlay } from '@/src/utils/globalOverlay';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -1014,7 +1016,7 @@ const BOX_BG_OPAQUE = '#1A3050';   // helt ogenomskinlig variant av BOX_BG (reve
 // ─── Timeline Selector ────────────────────────────────────────────────────────
 
 function TimelineSelector({
-  assistance, onYearChange, disabled, eraFrom, eraTo,
+  assistance, onYearChange, disabled, eraFrom, eraTo, showSwipeHint = false,
 }: {
   assistance: AssistanceLevel;
   // Notifierar parent om vald-år-ändring vid varje scroll-tick. Confirm-knappen
@@ -1024,6 +1026,8 @@ function TimelineSelector({
   // Game Era från Lobby — låser tidslinjens span exakt till det årsspann
   // host valde. Spelaren kan inte scrolla till år utanför era-perioden.
   eraFrom: number; eraTo: number;
+  /** Visa swipe-handen (bara fråga 1 i spelet). */
+  showSwipeHint?: boolean;
 }) {
   // Dynamisk celltätlhet per assistance-nivå (smalare celler = fler år syns på skärmen)
   const ITEM_WIDTH =
@@ -1084,6 +1088,47 @@ function TimelineSelector({
       scaleLoop.stop();
     };
   }, [disabled, arrowPulse, arrowScale]);
+
+  // Swipe-guide (Peter 2026-10-26): en diskret hand som "drar" årtalsintervallet.
+  // Visas bara på fråga 1 i spelet (showSwipeHint), rör sig 2 gånger och tonas
+  // sedan ut. Försvinner direkt när spelaren rör tidslinjen (onTouchStart).
+  const [userTouched, setUserTouched] = useState(false);
+  const [handDone, setHandDone] = useState(false);
+  const handX = useRef(new Animated.Value(0)).current;
+  const handOpacity = useRef(new Animated.Value(1)).current;
+  const hintPulse = useRef(new Animated.Value(1)).current;
+  const showSwipeGuide = showSwipeHint && !disabled && !userTouched && !handDone;
+  useEffect(() => {
+    if (!showSwipeGuide) {
+      handX.stopAnimation();
+      handOpacity.stopAnimation();
+      hintPulse.stopAnimation();
+      hintPulse.setValue(1);
+      return;
+    }
+    const sweep = Animated.sequence([
+      Animated.timing(handX, { toValue: -22, duration: 600, useNativeDriver: true }),
+      Animated.timing(handX, { toValue: 22, duration: 1000, useNativeDriver: true }),
+      Animated.timing(handX, { toValue: 0, duration: 600, useNativeDriver: true }),
+      Animated.delay(200),
+    ]);
+    const handAnim = Animated.sequence([
+      Animated.loop(sweep, { iterations: 2 }),
+      Animated.timing(handOpacity, { toValue: 0, duration: 450, useNativeDriver: true }),
+    ]);
+    const textLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(hintPulse, { toValue: 0.5, duration: 700, useNativeDriver: true }),
+        Animated.timing(hintPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    handAnim.start(({ finished }) => { if (finished) setHandDone(true); });
+    textLoop.start();
+    return () => {
+      handAnim.stop();
+      textLoop.stop();
+    };
+  }, [showSwipeGuide, handX, handOpacity, hintPulse]);
 
   const years = Array.from({ length: max - min + 1 }, (_, i) => min + i);
   const half = Math.floor(interval / 2);
@@ -1161,6 +1206,8 @@ function TimelineSelector({
           }}
           scrollEventThrottle={16}
           scrollEnabled={!disabled}
+          onTouchStart={() => { if (!userTouched) setUserTouched(true); }}
+          onScrollBeginDrag={() => { if (!userTouched) setUserTouched(true); }}
           style={StyleSheet.absoluteFill}
         >
           {/* Horisontell linje – sträcker sig genom hela det scrollbara området */}
@@ -1286,13 +1333,27 @@ function TimelineSelector({
           }}>
             <Text style={tl.swipeArrow} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>›</Text>
           </Animated.View>
+
+          {/* Hand som "drar" årtalsintervallet: fingertoppen vilar på rutans
+              underkant och glider i sidled. pointerEvents none så den aldrig
+              stjäl touchen från ScrollView:n. */}
+          {showSwipeGuide && (
+            <View pointerEvents="none" style={tl.swipeHandWrap}>
+              <Animated.View style={{ opacity: handOpacity, transform: [{ translateX: handX }] }}>
+                <SwipeHandIcon size={24} color="rgba(255,255,255,0.7)" strokeWidth={1.6} />
+              </Animated.View>
+            </View>
+          )}
         </View>
       </View>
 
       {!disabled && (
-        <Text style={[tl.hint, { color: Colors.textSecondary }]}>
+        <Animated.Text
+          style={[tl.hint, { opacity: hintPulse }]}
+          maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}
+        >
           Swipe to move
-        </Text>
+        </Animated.Text>
       )}
     </View>
   );
@@ -1310,7 +1371,23 @@ const tl = StyleSheet.create({
   assistText: { fontSize: 10, fontWeight: FontWeight.semibold, letterSpacing: 0.5 },
   assistDesc: { fontSize: 11, fontWeight: FontWeight.medium },
 
-  hint: { textAlign: 'center', fontSize: 10, fontStyle: 'italic' },
+  // Tydligare hint (Peter 2026-10-26): större, ljusare, pulserande.
+  hint: {
+    textAlign: 'center',
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+    letterSpacing: 0.4,
+    marginTop: 2,
+  },
+  // Handen ligger centrerad med fingertoppen på svarsrutans underkant.
+  swipeHandWrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: SELECTOR_TOP + SELECTOR_H - 12,
+    alignItems: 'center',
+  },
   // Pulserande gold-pilar utanför selector-rutan. textShadow ger en mjuk
   // glow som matchar rutans gold-shadow så elementen hör visuellt ihop.
   swipeArrow: {
@@ -11795,6 +11872,8 @@ export default function QuizScreen() {
               <TimelineSelector
                 key={`${questionIndex}-${currentAssistance}`}
                 assistance={currentAssistance}
+                // Swipe-handen bara på spelets första fråga.
+                showSwipeHint={questionIndex === 0}
                 eraFrom={eraFrom}
                 eraTo={eraTo}
                 onYearChange={setPendingYear}
@@ -11934,7 +12013,8 @@ export default function QuizScreen() {
                           style={[rv.feedbackWaitLogo, { transform: [{ scale: revealWaitPulse }] }]}
                           pointerEvents="none"
                         >
-                          <QuizVibeLogo size={48} />
+                          {/* UI v2: samma förenklade Q som bottom bannerns Home-ikon, i guld. */}
+                          <QuizVibeAvatarQ size={34} color={Colors.warning} />
                         </Animated.View>
                       )}
                       <Text
@@ -12079,7 +12159,7 @@ export default function QuizScreen() {
           egen Next-tab i bottom-right (absolute-positionerad nedan).
           Fas-medveten action-knapp:
             • question  → Confirm (blå glow + pulse)
-            • awaiting  → låst "Confirmed — waiting for time" */}
+            • awaiting  → låst "Answer Locked" */}
       {(phase === 'question' || phase === 'awaiting' || (phase === 'reveal' && isSpotifyQuestion && isCurrentPlayerDJ)) &&
         /* Dölj sticky-bar för icke-DJ Spotify pre-timer när det inte finns
            något att visa (reguljär gissare har ingen action-knapp förrän
@@ -12174,28 +12254,12 @@ export default function QuizScreen() {
                       bågens rotation-bbox. SVG-dimensionerna bumpade till
                       24 för att kompensera så Q-glyfens visuella storlek
                       är ungefär densamma som tidigare. */}
-                  {/* "Select + " framför brand-Q:t — knappen bär båda
-                      stegen (välj svar, bekräfta) så spelaren inte tror att
-                      Qonfirm ensamt räcker. Samma gold-stil som "onfirm" så
-                      hela etiketten läses som en enhet. */}
-                  <Text style={styles.actionBtnPrefix} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>Select +</Text>
-                  <Svg width={24} height={24} viewBox="23 18 34 37">
-                    <Circle cx="40" cy="38" r="13" fill="none" stroke={Colors.warning} strokeWidth="6.5" />
-                    <Path d="M49 47 L53 51" stroke={Colors.warning} strokeWidth="6.5" strokeLinecap="round" />
-                    <G transform="rotate(25 40 38)">
-                      {/* Topp-båge (utanför Q-ringens topp-kant) — chord 20,
-                          radius bumpad från 12 → 16 så bågen är flatare
-                          och mer parallell med Q-ringens kantlinje. Mindre
-                          sagitta minskar också rotation-bbox så bågen inte
-                          klipps av viewBox:s topp efter 25°-rotationen. */}
-                      <Path d="M 30 22 A 16 16 0 0 1 50 22" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
-                      {/* Mitten-båge (inne i Q-ringen) */}
-                      <Path d="M 34 33 A 9 9 0 0 1 46 33" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
-                      {/* Botten-båge (inne i Q-ringen) */}
-                      <Path d="M 36 35 A 6 6 0 0 1 44 35" fill="none" stroke={Colors.warning} strokeWidth="1.6" strokeLinecap="round" />
-                    </G>
-                  </Svg>
-                  <Text style={styles.actionBtnText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>onfirm</Text>
+                  {/* "Qonfirm Answer" (Peter 2026-10-23): Q:t = samma
+                      förenklade guld-Q som bottom bannerns Home-ikon. */}
+                  <View style={styles.confirmQMark}>
+                    <QuizVibeAvatarQ size={25} color={Colors.warning} />
+                  </View>
+                  <Text style={styles.actionBtnText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>onfirm Answer</Text>
                 </View>
               </TouchableOpacity>
             </Animated.View>
@@ -12203,7 +12267,7 @@ export default function QuizScreen() {
           {phase === 'awaiting' && (
             <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
               <Text style={styles.actionBtnAwaitingText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
-                ✓ Confirmed — waiting for time
+                Answer Locked
               </Text>
             </View>
           )}
@@ -13396,16 +13460,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 3,
   },
+  // Lite extra luft efter Q:t så det läses som branding, inte ett tecken i ordet.
+  confirmQMark: {
+    marginRight: 4,
+  },
   // Confirm-knappens stil: blue + iOS shadow för glow-effekten. Halo:n bakom
   // (confirmHalo) ger cross-platform glow på Android som saknar shadow-color.
   // Confirm-knappen delar färgschema med rv.nextTab (outline blå border på
   // Colors.cardElevated-bg). Den separata confirmHalo-View:n bakom knappen
   // bär fortfarande den pulserande blå glow:en — så Confirm har samma fyll-
   // färger som Next, men extra glow för CTA-fokus.
+  // "Qonfirm Answer" (UI v2, Peter 2026-10-23): mörk navy + tunn guldram,
+  // vit text, guld Q-symbol.
   actionBtnConfirm: {
-    backgroundColor: Colors.cardElevated,
+    backgroundColor: BrandUi.selectedFill,
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: Colors.warning,
   },
   // Wrap runt Confirm-knappen för scale-pulse + halo-positionering.
   // position: relative så confirmHalo (absolute) ankrars hit istället för
@@ -13420,7 +13490,8 @@ const styles = StyleSheet.create({
     right: -8,
     bottom: -8,
     borderRadius: Radius.md + 4,
-    backgroundColor: Colors.primary,
+    // Mjuk guldglöd i stället för den tidigare blå halon (UI v2).
+    backgroundColor: 'rgba(245,166,35,0.16)',
   },
   actionBtnDisabled: {
     opacity: 0.5,
@@ -13428,21 +13499,23 @@ const styles = StyleSheet.create({
   // Awaiting-state-knapp: passiv pillar med subtila brand-toner — signalerar
   // "låst, vänta på tiden" utan att se klickbar ut. Speglar Lobby:s
   // waitingForHostBox-styling (primaryMuted bg + primaryBorder).
+  // "Answer Locked" (UI v2): dämpad mörk/grå, ingen accent.
   actionBtnAwaiting: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: '#141C2B',
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
+    // Diskret grå outline — avslutat knapp-state, inte en försvunnen knapp.
+    borderColor: 'rgba(255,255,255,0.22)',
   },
   actionBtnAwaitingText: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.78)',
     letterSpacing: 0.4,
   },
   actionBtnText: {
     fontSize: 17,
     fontWeight: '700',
-    color: Colors.warning,
+    color: Colors.textPrimary,
     letterSpacing: 0.5,
   },
   // "Select +"-prefixet före Q-glyfen. Samma typografi som actionBtnText;
@@ -13465,10 +13538,13 @@ const rv = StyleSheet.create({
   container: { paddingHorizontal: Spacing.lg },
   feedbackCard: {
     borderRadius: Radius.lg,
-    borderWidth: 2,
-    paddingVertical: Spacing.xs,
+    // Tunnare ram (UI v2, Peter 2026-10-23) — status bärs främst av badge + text.
+    borderWidth: 1,
+    // Mer vertikal luft (Peter 2026-10-23) så Låt — Artist inte ligger mot kanten.
+    paddingTop: Spacing.sm + 2,
+    paddingBottom: Spacing.md,
     paddingHorizontal: Spacing.sm,
-    gap: 2,
+    gap: 3,
     // marginTop ger badgen (top: -8, border-cutting) andrum att protruda
     // uppåt utan att krocka med fråge-kortet ovanför.
     marginTop: Spacing.sm,
@@ -13478,11 +13554,15 @@ const rv = StyleSheet.create({
   // för en "alarm-ruta". Status-färgen bärs på badge + border.
   feedbackCorrect: {
     backgroundColor: Colors.card,
-    borderColor: Colors.success,
+    // Dämpad grön ram i stället för full statusgrön ("mindre system alert").
+    borderColor: 'rgba(82,200,122,0.4)',
   },
   feedbackWrong: {
     backgroundColor: Colors.card,
-    borderColor: Colors.border,
+    // Röd ram på samma nivå som den dämpade gröna vid rätt svar (Peter
+    // 2026-10-23). Facit-värdet förblir vitt — rött beskriver spelarens
+    // prestation, inte det rätta svaret.
+    borderColor: 'rgba(255,59,48,0.45)',
   },
   // Border-cutting badge: sitter på kortets övre kantlinje (top: -8) istället
   // för inuti kortet. Speglar HOST/GUEST-taggen på PlayerRow och FREE/PREMIUM-
@@ -13503,8 +13583,11 @@ const rv = StyleSheet.create({
     zIndex: 10,
     elevation: 4,
   },
+  // Grön statusaccent: fyllning = kantens gröna (Peter 2026-10-26); vit text.
   feedbackBadgeCorrect: {
     backgroundColor: Colors.success,
+    borderWidth: 1,
+    borderColor: Colors.success,
   },
   feedbackBadgeWrong: {
     backgroundColor: QUIZ_ERROR_RED,
