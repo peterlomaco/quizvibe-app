@@ -862,6 +862,37 @@ const SELECTOR_H = SELECTOR_BOTTOM - SELECTOR_TOP; // = 42px
 // vidare (Peter 2026-08-24).
 const REVEAL_NEXT_LOCK_SECONDS = 5;
 
+// Progress-ring runt Next-knappens nedräkning. Ren SVG utan egen animation —
+// bågen hoppar ett steg per sekund i takt med siffran (ingen extra timer).
+const NEXT_RING_SIZE = 34;
+const NEXT_RING_STROKE = 2;
+const NEXT_RING_R = (NEXT_RING_SIZE - NEXT_RING_STROKE) / 2;
+const NEXT_RING_C = 2 * Math.PI * NEXT_RING_R;
+const NextCountdownRing = React.memo(function NextCountdownRing({
+  remaining,
+  total,
+}: { remaining: number; total: number }) {
+  const frac = Math.max(0, Math.min(1, remaining / total));
+  const mid = NEXT_RING_SIZE / 2;
+  return (
+    <Svg width={NEXT_RING_SIZE} height={NEXT_RING_SIZE} style={{ position: 'absolute' }}>
+      <Circle cx={mid} cy={mid} r={NEXT_RING_R} stroke="rgba(245,166,35,0.18)" strokeWidth={NEXT_RING_STROKE} fill="none" />
+      <Circle
+        cx={mid}
+        cy={mid}
+        r={NEXT_RING_R}
+        stroke="#F5A623"
+        strokeWidth={NEXT_RING_STROKE}
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray={`${NEXT_RING_C} ${NEXT_RING_C}`}
+        strokeDashoffset={NEXT_RING_C * (1 - frac)}
+        transform={`rotate(-90 ${mid} ${mid})`}
+      />
+    </Svg>
+  );
+});
+
 // ── IndDev: readiness-gate på host:s Play-knapp (fråga 0) ──────────────────
 // MIN_GREY är ren UX — den garanterar en läsbar grå→guld-beat även när alla
 // peers redan hunnit hälsa, i stället för en flimrande omfärgning.
@@ -5393,12 +5424,12 @@ export default function QuizScreen() {
     const loop = Animated.loop(
       Animated.sequence([
         Animated.parallel([
-          Animated.timing(nextCtaPulse, { toValue: 1.08, duration: 650, useNativeDriver: true }),
-          Animated.timing(nextCtaGlow, { toValue: 0.55, duration: 650, useNativeDriver: true }),
+          Animated.timing(nextCtaPulse, { toValue: 1.03, duration: 650, useNativeDriver: true }),
+          Animated.timing(nextCtaGlow, { toValue: 0.35, duration: 650, useNativeDriver: true }),
         ]),
         Animated.parallel([
           Animated.timing(nextCtaPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
-          Animated.timing(nextCtaGlow, { toValue: 0.15, duration: 650, useNativeDriver: true }),
+          Animated.timing(nextCtaGlow, { toValue: 0.08, duration: 650, useNativeDriver: true }),
         ]),
       ]),
     );
@@ -12400,6 +12431,7 @@ export default function QuizScreen() {
               <TouchableOpacity
                 style={[
                   rv.nextTab,
+                  isNextCtaLocked && rv.nextTabLocked,
                   shouldLockForUnstable && { opacity: 0.4 },
                 ]}
                 onPress={
@@ -12420,9 +12452,12 @@ export default function QuizScreen() {
                     {isLastQuestion ? '🏆  Final Leaderboard' : 'Next  →'}
                   </Text>
                   {isNextCtaLocked && (
-                    <Text style={[rv.nextTabText, rv.nextTabCountdownText]} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
-                      {revealNextCountdown}
-                    </Text>
+                    <View style={rv.nextTabCountdownWrap} pointerEvents="none">
+                      <NextCountdownRing remaining={revealNextCountdown} total={REVEAL_NEXT_LOCK_SECONDS} />
+                      <Text style={[rv.nextTabText, rv.nextTabCountdownText]} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>
+                        {revealNextCountdown}
+                      </Text>
+                    </View>
                   )}
                 </View>
               </TouchableOpacity>
@@ -13946,16 +13981,22 @@ const rv = StyleSheet.create({
   nextTabWrap: {
     position: 'relative',
   },
-  // Guld-halo bakom Next-tab:en. Opacity sätts av nextCtaGlow (0.15 ↔ 0.55)
+  // Ring runt Next-tab:en. Opacity sätts av nextCtaGlow (0.08 ↔ 0.35)
   // — sätt ingen statisk opacity här, den skulle ändå överskuggas.
+  // Ingen fylld halo längre (Peter 2026-10-27): den guldfyllda ytan bakom
+  // knappen blev en brun/orange aura. Kvar är en tunn guldring tätt intill
+  // kanten (2 px luft, 1 px linje, ingen fyllning) som andas svagt — premium-
+  // känslan bärs av den skarpa kanten + typografin, inte av ett glöd-moln.
   nextTabHalo: {
     position: 'absolute',
-    top: -9,
-    left: -9,
-    right: -9,
-    bottom: -9,
-    borderRadius: 19,
-    backgroundColor: BOX_COLOR,
+    top: -3,
+    left: -3,
+    right: -3,
+    bottom: -3,
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: BOX_COLOR,
+    backgroundColor: 'transparent',
   },
   nextTabText: {
     fontSize: 17,
@@ -13974,9 +14015,25 @@ const rv = StyleSheet.create({
   nextTabTextHidden: {
     opacity: 0,
   },
+  // Vänte-läget under 5 → 1 (Peter 2026-10-27): mörk navy/gunmetal fyllning,
+  // tunn dämpad guldkant, ingen glow. Kanten är 1.5 i stället för 3 — padding
+  // kompenserar så knappens yttre mått är identiska med aktiva läget.
+  nextTabLocked: {
+    borderWidth: 1.5,
+    borderColor: 'rgba(245,166,35,0.4)',
+    backgroundColor: '#141C2B',
+    paddingHorizontal: Spacing.lg + 1.5,
+  },
+  // Siffra + progress-ring, centrerade ovanpå den osynliga riktiga etiketten.
+  nextTabCountdownWrap: {
+    position: 'absolute',
+    width: NEXT_RING_SIZE,
+    height: NEXT_RING_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   // Countdown-siffran. tabular-nums så 5 → 1 inte wobblar i sidled.
   nextTabCountdownText: {
-    position: 'absolute',
     fontVariant: ['tabular-nums'],
   },
   // Non-host:s "Waiting for host…"-pill i IndDev — sitter i samma position
