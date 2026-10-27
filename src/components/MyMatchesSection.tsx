@@ -284,8 +284,8 @@ export function MyMatchesSection({
       >
         <VersusIcon
           height={compact ? 22 : 30}
-          color={v2 ? BrandUi.icon : undefined}
-          accentColor={v2 ? BrandUi.icon : undefined}
+          color={BrandUi.icon}
+          accentColor={BrandUi.icon}
         />
         {compact && <Text style={styles.compactLabel}>H2H</Text>}
       </View>
