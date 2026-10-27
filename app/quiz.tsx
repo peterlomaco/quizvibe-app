@@ -21,6 +21,7 @@ import FinalCelebration from '@/src/components/FinalCelebration';
 import { RemoteMatchResultPanel } from '@/src/components/RemoteMatchResultPanel';
 import { StopwatchIcon } from '@/src/components/StopwatchIcon';
 import { SwipeHandIcon } from '@/src/components/SwipeHandIcon';
+import { NameSwipeHint } from '@/src/components/NameSwipeHint';
 import { useConnectionStatus } from '@/src/lib/network/connectionMonitor';
 import { subscribeSyncChannel, type SyncChannel, type PlayerScoreRecordedPayload, type PlayerHcpChangedPayload, type QuestionAdvancePayload } from '@/src/lib/realtime/syncChannel';
 import type { LobbyPlayer } from '@/src/screens/LobbyScreen';
@@ -4052,6 +4053,26 @@ export default function QuizScreen() {
   const deferNameGrading = gameMode === 'individual-devices';
   const isNameAnswerQuestion =
     isImageQuestion || question.type === 'actor-select' || isSpotifyNameQuestion;
+  // Swipe-handen (Year + Name): visas första gången SPELAREN får en fråga av
+  // den svarstypen. I Pass-the-Phone besvaras fråga N av spelare N % antal,
+  // så varje spelare ser handen på sin egen första Year- resp. Name-fråga.
+  // Övriga lägen: en spelare per enhet → spelets första fråga av typen.
+  const isFirstAnswerTypeForPlayer = (type: 'Year' | 'Name'): boolean => {
+    const types = effectiveAnswerTypeByQuestion;
+    if (types[questionIndex] !== type) return false;
+    const n = turnOrder.length;
+    const perPlayer = gameMode === 'pass-the-phone' && n > 1;
+    for (let i = 0; i < questionIndex; i++) {
+      if (types[i] === type && (!perPlayer || i % n === questionIndex % n)) return false;
+    }
+    return true;
+  };
+  const showNameSwipeHint = isNameAnswerQuestion && isFirstAnswerTypeForPlayer('Name');
+  // Fallback: sekvensen inte inne än (non-host före broadcast) → spelets första fråga.
+  const showYearSwipeHint = effectiveAnswerTypeByQuestion.length > 0
+    ? isFirstAnswerTypeForPlayer('Year')
+    : questionIndex === 0;
+  const nameSwipeHintActive = phase === 'question' && !shouldLockForUnstable;
 
   // Artistnamn extraherat från hint-fältet (format "Title — Artist").
   const derivedArtistName: string | null =
@@ -11857,6 +11878,7 @@ export default function QuizScreen() {
                 pointerEvents={shouldLockForUnstable ? 'none' : 'auto'}
                 style={shouldLockForUnstable ? { opacity: 0.4 } : undefined}
               >
+                <NameSwipeHint key={`name-hint-${questionIndex}`} enabled={showNameSwipeHint} active={nameSwipeHintActive}>
                 <ImageAnswerBlock
                   question={spotifyNameVariant}
                   phase={phase}
@@ -11866,13 +11888,14 @@ export default function QuizScreen() {
                   onNameSelect={setPendingNameOption}
                   resetKey={`spotify-name-${questionIndex}-${currentAssistance}`}
                 />
+                </NameSwipeHint>
               </View>
             ) : question.type === 'timeline' && !isCurrentPlayerDJ && !isSpotifyNameQuestion && (!isSpotifyQuestion || spotifyDJStarted || effectiveDJId === null) ? (
               <TimelineSelector
                 key={`${questionIndex}-${currentAssistance}`}
                 assistance={currentAssistance}
-                // Swipe-handen bara på spelets första fråga.
-                showSwipeHint={questionIndex === 0}
+                // Swipe-handen på spelarens första Year-fråga.
+                showSwipeHint={showYearSwipeHint}
                 eraFrom={eraFrom}
                 eraTo={eraTo}
                 onYearChange={setPendingYear}
@@ -11889,6 +11912,7 @@ export default function QuizScreen() {
                 pointerEvents={shouldLockForUnstable ? 'none' : 'auto'}
                 style={shouldLockForUnstable ? { opacity: 0.4 } : undefined}
               >
+                <NameSwipeHint key={`name-hint-${questionIndex}`} enabled={showNameSwipeHint} active={nameSwipeHintActive}>
                 <ActorSelectBlock
                   correctNames={question.correctNames}
                   distractorNames={question.distractorNames}
@@ -11903,6 +11927,7 @@ export default function QuizScreen() {
                   movieYear={question.correctYear}
                   optionsSeed={seedForSyncedQuestion(question.id)}
                 />
+                </NameSwipeHint>
               </View>
             ) : imageVariant ? (
               // Variant byggdes runtime via `imageVariant`-useMemo ovan.
@@ -11914,6 +11939,7 @@ export default function QuizScreen() {
                 pointerEvents={shouldLockForUnstable ? 'none' : 'auto'}
                 style={shouldLockForUnstable ? { opacity: 0.4 } : undefined}
               >
+                <NameSwipeHint key={`name-hint-${questionIndex}`} enabled={showNameSwipeHint} active={nameSwipeHintActive}>
                 <ImageAnswerBlock
                   question={imageVariant}
                   phase={phase}
@@ -11923,6 +11949,7 @@ export default function QuizScreen() {
                   onNameSelect={setPendingNameOption}
                   resetKey={`${questionIndex}-${currentAssistance}`}
                 />
+                </NameSwipeHint>
               </View>
             ) : null}
 
