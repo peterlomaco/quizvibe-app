@@ -77,8 +77,15 @@ export function buildHintsDistractorPool(
       })
     : null;
 
+  // "Tillräckligt" = minst 5 OLIKA begynnelsebokstäver, inte bara 5 items:
+  // gridden visar max en knapp per bokstav. Kanadensiska kvinnliga artister
+  // var 5 items men Carly + Celine delar "C" → bara 4 alternativ (2026-10-27).
+  const distinctFirstLetters = (pool: readonly ImageQuizQuestion[]): number =>
+    new Set(
+      pool.map((q) => q.displayName.replace(/[^\p{L}]/gu, '').charAt(0).toUpperCase()),
+    ).size;
   const enough = (pool: ImageQuizQuestion[] | null): pool is ImageQuizQuestion[] =>
-    pool !== null && pool.length >= POOL_THRESHOLD;
+    pool !== null && distinctFirstLetters(pool) >= POOL_THRESHOLD;
 
   if (correctItem.contentSubject === 'athlete') {
     const correctSport = correctLib ? inferSport(correctLib) : null;
@@ -98,11 +105,11 @@ export function buildHintsDistractorPool(
     if (enough(sameSportNationalityGender)) return { itemPool: sameSportNationalityGender, genderLocked };
     if (enough(sameNationalityAndGender)) return { itemPool: sameNationalityAndGender, genderLocked };
     if (enough(sameSportAndGender)) return { itemPool: sameSportAndGender, genderLocked };
-    if (sameGender.length >= POOL_THRESHOLD) return { itemPool: sameGender, genderLocked };
+    if (enough(sameGender)) return { itemPool: sameGender, genderLocked };
     return { itemPool: floor, genderLocked };
   }
 
   if (enough(sameNationalityAndGender)) return { itemPool: sameNationalityAndGender, genderLocked };
-  if (sameGender.length >= POOL_THRESHOLD) return { itemPool: sameGender, genderLocked };
+  if (enough(sameGender)) return { itemPool: sameGender, genderLocked };
   return { itemPool: floor, genderLocked };
 }

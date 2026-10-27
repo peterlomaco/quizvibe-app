@@ -36,6 +36,7 @@ import {
   ImagePrefixOption,
   ImagePrefixVariant,
 } from '@/src/utils/quizImageQuestions';
+import { visibleLetterGrid } from '@/src/utils/imageQuestionBuilder';
 
 type Phase = 'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard';
 
@@ -310,52 +311,13 @@ function PrefixView({
     return () => loop.stop();
   }, [blinkAnim]);
 
-  // Letter Grid-bygge med tre filter (i ordning):
-  //   1. Längd-filter: prefixens första ord måste ha ≥ variantens prefixLength.
-  //      Skydd mot edge case där distractor-pool-namn med kort displayName ger
-  //      kortare prefix än target.
-  //   2. Word-count-filter: alla prefix-knappar måste matcha rätta svarets
-  //      ord-klass. getPrefixForItem kapar till max två ord, så klassen är
-  //      1 eller 2 ("1-ordssvar ↔ 1-ordsalternativ, 2+ ↔ 2+"). Om rätt svar är "Astrid Lindgren" (2 ord, "AS LI") visas
-  //      bara 2-ord-distractors — inte 1-ord items som "AV" (Avicii). Garanterar
-  //      visuell konsistens.
-  //   3. Dedupering: max EN prefix-knapp per begynnelsebokstav. Vid dubbletter
-  //      prefererar vi rätt prefix; annars alfabetiskt först.
-  //
-  // Resultatet sorteras alfabetiskt så spelaren kan lokalisera prefix snabbt.
-  const sortedGrid = useMemo(() => {
-    const expectedLen = variant.prefixLength;
-    const correctOpt = variant.letterGrid.find((p) => p.isCorrect);
-    const correctWordCount = correctOpt
-      ? correctOpt.prefix.split(' ').length
-      : null;
-
-    const validOptions = variant.letterGrid.filter((opt) => {
-      const words = opt.prefix.split(' ');
-      if (words[0].length < expectedLen) return false;
-      if (correctWordCount !== null && words.length !== correctWordCount) {
-        return false;
-      }
-      return true;
-    });
-
-    const byFirstLetter: Record<string, ImagePrefixOption> = {};
-    for (const opt of validOptions) {
-      const firstLetter = opt.prefix.charAt(0);
-      const existing = byFirstLetter[firstLetter];
-      if (
-        !existing ||
-        (opt.isCorrect && !existing.isCorrect) ||
-        (opt.isCorrect === existing.isCorrect &&
-          opt.prefix.localeCompare(existing.prefix, 'sv') < 0)
-      ) {
-        byFirstLetter[firstLetter] = opt;
-      }
-    }
-    return Object.values(byFirstLetter).sort((a, b) =>
-      a.prefix.localeCompare(b.prefix, 'sv'),
-    );
-  }, [variant]);
+  // Synliga prefix-knappar — reglerna bor i visibleLetterGrid
+  // (imageQuestionBuilder.ts) så testerna kör exakt samma filter. Rätt svar
+  // filtreras aldrig bort; sorterat alfabetiskt för snabb lokalisering.
+  const sortedGrid = useMemo(
+    () => visibleLetterGrid(variant.letterGrid, variant.prefixLength),
+    [variant],
+  );
 
   // Plocka ETT namn per prefix:
   //   • För spelarens prefix: rätt namn om prefix matchar correctPrefix,

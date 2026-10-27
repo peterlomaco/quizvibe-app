@@ -93,29 +93,27 @@ export interface SpotifyNameCandidate {
 
 export const MIN_SPOTIFY_NAME_DISTRACTORS = 4;
 
-function wordClass(name: string, prefixLength: number): number {
-  const prefix = getPrefixForItem(name, prefixLength, 1);
-  return prefix ? prefix.split(' ').length : 0;
-}
-
 /** Hur många alternativ ett lager faktiskt kan ge efter buildLetterGrid:s
- *  regler (samma ord-klass, unik förstabokstav skild från rätt svars). */
+ *  regler i ledande-bokstavsläget (tillräckligt många bokstäver, unik
+ *  förstabokstav skild från rätt svars). Ingen ord-klass — "DJ S" och "MAR"
+ *  får blandas fritt (Peter 2026-10-27). */
 export function countUsableDistractors(
   correctName: string,
   layer: readonly SpotifyNameCandidate[],
   prefixLength: number,
 ): number {
-  const correctPrefix = getPrefixForItem(correctName, prefixLength, 1);
+  const correctPrefix = getPrefixForItem(correctName, prefixLength, 'leading-letters');
   if (!correctPrefix) return 0;
-  const correctClass = correctPrefix.split(' ').length;
   const correctKey = correctName.trim().toLowerCase();
   const letters = new Set<string>([correctPrefix.charAt(0)]);
   let usable = 0;
   for (const c of layer) {
     if (c.item.displayName.trim().toLowerCase() === correctKey) continue;
-    const prefix = getPrefixForItem(c.item.displayName, prefixLength, 1);
+    const prefix = getPrefixForItem(c.item.displayName, prefixLength, 'leading-letters');
     if (!prefix || prefix === correctPrefix) continue;
-    if (wordClass(c.item.displayName, prefixLength) !== correctClass) continue;
+    // Namn med färre bokstäver än prefixet ("U2" på Full=3) väljs bort i
+    // buildLetterGrid — räkna inte med dem.
+    if (prefix.replace(/ /g, '').length < prefixLength) continue;
     if (letters.has(prefix.charAt(0))) continue;
     letters.add(prefix.charAt(0));
     usable++;

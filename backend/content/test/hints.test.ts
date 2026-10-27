@@ -23,8 +23,9 @@ import {
   buildHintsDistractorPool,
   resolveItemGender,
 } from '../../../src/utils/hintsDistractorPool';
-import { buildImageVariant } from '../../../src/utils/imageQuestionBuilder';
-import { IMAGE_QUIZ_QUESTIONS } from '../../../src/utils/quizImageQuestions';
+import { buildImageVariant, getPrefixForItem, visibleLetterGrid } from '../../../src/utils/imageQuestionBuilder';
+import { DISTRACTOR_POOL_NAMES, IMAGE_QUIZ_QUESTIONS } from '../../../src/utils/quizImageQuestions';
+import { createSeededRng } from '../../../src/utils/seededRandom';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '../../../src/utils/regionScope';
 
 const OPTIONS_PER_QUESTION = 5;
@@ -271,4 +272,39 @@ describe('karriärhistorik', () => {
       }
     }
   });
+});
+
+// Peter 2026-10-27: Hints använder samma prefixregel som Spotify/Name — de N
+// första bokstäverna även över ordgränser ("DJ Snake" → "DJ S"), och varje
+// fråga ska visa alla 5 alternativ med rätt svar.
+describe('Hints-prefix (Standard/Minimal)', () => {
+  for (const [assistance, len] of [['standard', 2], ['minimal', 1]] as const) {
+    it(`${assistance}: 5 synliga alternativ, rätt svar med, ${len} bokstäver`, () => {
+      const problems: string[] = [];
+      for (const q of playable) {
+        const { itemPool, genderLocked } = buildHintsDistractorPool(q, IMAGE_QUIZ_QUESTIONS);
+        const variant = buildImageVariant(
+          q,
+          assistance,
+          ALL_AUDIENCES as unknown as ReadonlySet<never>,
+          itemPool,
+          genderLocked ? [] : DISTRACTOR_POOL_NAMES[q.category] ?? [],
+          OPTIONS_PER_QUESTION,
+          createSeededRng(`hints-${q.id}-${len}`),
+        );
+        if (variant.mode !== 'prefix') { problems.push(`${q.id}: ${variant.mode}`); continue; }
+        const visible = visibleLetterGrid(variant.letterGrid, len);
+        const correct = visible.find((o) => o.isCorrect);
+        if (!correct) problems.push(`${q.id}: rätt svar saknas`);
+        else if (correct.prefix !== getPrefixForItem(q.displayName, len, 'leading-letters')) {
+          problems.push(`${q.id}: prefix ${correct.prefix}`);
+        }
+        if (visible.length !== OPTIONS_PER_QUESTION) problems.push(`${q.id}: ${visible.length} alternativ`);
+        for (const o of visible) {
+          if (!o.isCorrect && o.prefix.replace(/ /g, '').length !== len) problems.push(`${q.id}: kort ${o.prefix}`);
+        }
+      }
+      expect(problems).toEqual([]);
+    });
+  }
 });

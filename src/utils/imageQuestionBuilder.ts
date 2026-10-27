@@ -35,19 +35,38 @@ export const DEFAULT_TOTAL_OPTIONS = 10;
  * ord-klassen blir därmed 1 eller 2 — så ord-count-filtren nedan och i
  * ImageAnswerBlock betyder "1-ordssvar ↔ 1-ordsalternativ, 2+ ↔ 2+".
  */
+export type PrefixMode = 'per-word' | 'leading-letters';
+
 export function getPrefixForItem(
   displayName: string,
   length: number,
-  // Spotify/Name (Peter 2026-10-26): bara FÖRSTA ordet — "Maroon 5 feat.
-  // Christina Aguilera" → "MAR", inte "MAR FEA". Default 2 = Hints oförändrat.
-  maxWords: number = 2,
+  // 'per-word' (Hints, default): `length` bokstäver per ord, max två ord.
+  // 'leading-letters' (Spotify/Name, Peter 2026-10-27): de `length` FÖRSTA
+  // bokstäverna i namnet, även över ordgränser, med mellanslaget kvar —
+  // "Maroon 5 feat. Christina Aguilera" → "MAR", "DJ Snake" → "DJ S".
+  // Kortare bara när hela namnet har färre bokstäver ("U2" → "U").
+  mode: PrefixMode = 'per-word',
 ): string {
-  return displayName
+  const words = displayName
     .split(/\s+/)
-    .map((part) => part.replace(/[^\p{L}]/gu, '').slice(0, length).toUpperCase())
-    .filter((p) => p.length > 0)
-    .slice(0, maxWords)
-    .join(' ');
+    .map((part) => part.replace(/[^\p{L}]/gu, '').toUpperCase())
+    .filter((p) => p.length > 0);
+  if (mode === 'per-word') {
+    return words.map((w) => w.slice(0, length)).slice(0, 2).join(' ');
+  }
+  const out: string[] = [];
+  let remaining = length;
+  for (const w of words) {
+    if (remaining <= 0) break;
+    out.push(w.slice(0, remaining));
+    remaining -= Math.min(w.length, remaining);
+  }
+  return out.join(' ');
+}
+
+/** Antal bokstäver i ett prefix (mellanslag räknas inte). */
+function prefixLetterCount(prefix: string): number {
+  return prefix.replace(/ /g, '').length;
 }
 
 function shuffle<T>(arr: readonly T[], rng: () => number): T[] {
@@ -94,7 +113,7 @@ function getCategoryFallbackPool(
 interface BuildLetterGridArgs {
   correctItem: ImageQuizQuestion;
   prefixLength: number;
-  prefixMaxWords?: number;
+  prefixMode?: PrefixMode;
   audienceSet: ReadonlySet<ImageQuestionAudience>;
   allItems: readonly ImageQuizQuestion[];
   distractorNames: readonly string[];
@@ -113,7 +132,7 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
   const {
     correctItem,
     prefixLength,
-    prefixMaxWords = 2,
+    prefixMode = 'per-word',
     audienceSet,
     allItems,
     distractorNames,
@@ -121,10 +140,14 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
     rng = Math.random,
   } = args;
 
-  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength, prefixMaxWords);
+  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength, prefixMode);
   // Ord-count-filter: distraktorprefixer måste matcha correctPrefix ord-count,
   // annars filtreras de bort av ImageAnswerBlock.sortedGrid.
   const correctWordCount = correctPrefix.split(' ').length;
+  // För kort prefix = namnet ger inte `prefixLength` tecken. Per ord: första
+  // ordet för kort. Ledande bokstäver: hela namnet har för få bokstäver.
+  const isShortPrefix = (p: string): boolean =>
+    prefixMode === 'per-word' ? p.split(' ')[0].length < prefixLength : prefixLetterCount(p) < prefixLength;
   // Första-bokstavs-dedup: ImageAnswerBlock.sortedGrid tillåter MAX EN prefix
   // per begynnelsebokstav. Vi speglar regeln här så att vi aldrig slösar
   // ett slot på t.ex. "TH WH" (The Who) när rätt svar är "TH AR" (The Ark)
@@ -136,10 +159,13 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
   function pickFromPool(pool: readonly ImageQuizQuestion[]): void {
     for (const item of shuffle(pool, rng)) {
       if (item.id === correctItem.id) continue;
-      const prefix = getPrefixForItem(item.displayName, prefixLength, prefixMaxWords);
+      const prefix = getPrefixForItem(item.displayName, prefixLength, prefixMode);
       if (!prefix) continue;
       if (seen.has(prefix)) continue;
-      if (prefix.split(' ').length !== correctWordCount) continue;
+      // Ord-klass gäller bara per-ord-läget (Hints) — i ledande-bokstavsläget
+      // blandas "DJ S" och "MAR" fritt.
+      if (prefixMode === 'per-word' && prefix.split(' ').length !== correctWordCount) continue;
+      if (isShortPrefix(prefix)) continue;
       if (usedFirstLetters.has(prefix.charAt(0))) continue; // dedup per begynnelsebokstav
       seen.add(prefix);
       usedFirstLetters.add(prefix.charAt(0));
@@ -150,10 +176,13 @@ function buildLetterGrid(args: BuildLetterGridArgs): ImagePrefixOption[] {
 
   function pickFromDistractorPool(): void {
     for (const name of shuffle(distractorNames, rng)) {
-      const prefix = getPrefixForItem(name, prefixLength, prefixMaxWords);
+      const prefix = getPrefixForItem(name, prefixLength, prefixMode);
       if (!prefix) continue;
       if (seen.has(prefix)) continue;
-      if (prefix.split(' ').length !== correctWordCount) continue;
+      // Ord-klass gäller bara per-ord-läget (Hints) — i ledande-bokstavsläget
+      // blandas "DJ S" och "MAR" fritt.
+      if (prefixMode === 'per-word' && prefix.split(' ').length !== correctWordCount) continue;
+      if (isShortPrefix(prefix)) continue;
       if (usedFirstLetters.has(prefix.charAt(0))) continue; // dedup per begynnelsebokstav
       seen.add(prefix);
       usedFirstLetters.add(prefix.charAt(0));
@@ -183,7 +212,7 @@ interface BuildNameOptionsArgs {
   correctItem: ImageQuizQuestion;
   selectedPrefix: string;
   prefixLength: number;
-  prefixMaxWords?: number;
+  prefixMode?: PrefixMode;
   audienceSet: ReadonlySet<ImageQuestionAudience>;
   allItems: readonly ImageQuizQuestion[];
   distractorNames: readonly string[];
@@ -201,7 +230,7 @@ function buildNameOptions(args: BuildNameOptionsArgs): ImageNameOption[] {
     correctItem,
     selectedPrefix,
     prefixLength,
-    prefixMaxWords = 2,
+    prefixMode = 'per-word',
     audienceSet,
     allItems,
     distractorNames,
@@ -209,7 +238,7 @@ function buildNameOptions(args: BuildNameOptionsArgs): ImageNameOption[] {
     rng = Math.random,
   } = args;
 
-  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength, prefixMaxWords);
+  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength, prefixMode);
   const isCorrectPrefix = selectedPrefix === correctPrefix;
   const targetDistractorCount = isCorrectPrefix ? totalOptions - 1 : totalOptions;
 
@@ -221,7 +250,7 @@ function buildNameOptions(args: BuildNameOptionsArgs): ImageNameOption[] {
     for (const item of shuffle(pool, rng)) {
       if (distractors.length >= targetDistractorCount) return;
       if (seenIds.has(item.id)) continue;
-      const prefix = getPrefixForItem(item.displayName, prefixLength, prefixMaxWords);
+      const prefix = getPrefixForItem(item.displayName, prefixLength, prefixMode);
       if (prefix !== selectedPrefix) continue;
       seenIds.add(item.id);
       seenNamesLower.add(item.displayName.toLowerCase());
@@ -239,7 +268,7 @@ function buildNameOptions(args: BuildNameOptionsArgs): ImageNameOption[] {
       if (distractors.length >= targetDistractorCount) return;
       const lower = name.toLowerCase();
       if (seenNamesLower.has(lower)) continue;
-      const prefix = getPrefixForItem(name, prefixLength, prefixMaxWords);
+      const prefix = getPrefixForItem(name, prefixLength, prefixMode);
       if (prefix !== selectedPrefix) continue;
       seenNamesLower.add(lower);
       distractors.push({
@@ -349,6 +378,40 @@ function buildFullNamesList(args: BuildFullNamesListArgs): ImageNameOption[] {
 }
 
 /**
+ * De prefix-knappar spelaren faktiskt ser — EN källa för ImageAnswerBlock och
+ * testerna. Ord-klass- och längdreglerna tillämpas redan i buildLetterGrid
+ * (olika per läge, se PrefixMode), så här återstår ett defensivt längdgolv
+ * (färre bokstäver än `prefixLength`) + max en knapp per begynnelsebokstav
+ * (rätt svar vinner, annars alfabetiskt först). Sorterat A→Ö.
+ *
+ * RÄTT SVAR FILTRERAS ALDRIG BORT (Peter 2026-10-27): "DJ Snake feat. Justin
+ * Bieber" försvann annars helt och spelaren fick 4 alternativ utan rätt svar.
+ */
+export function visibleLetterGrid(
+  letterGrid: readonly ImagePrefixOption[],
+  prefixLength: number,
+): ImagePrefixOption[] {
+  const validOptions = letterGrid.filter((opt) => {
+    if (!opt.isCorrect && prefixLetterCount(opt.prefix) < prefixLength) return false;
+    return true;
+  });
+
+  const byFirstLetter: Record<string, ImagePrefixOption> = {};
+  for (const opt of validOptions) {
+    const firstLetter = opt.prefix.charAt(0);
+    const existing = byFirstLetter[firstLetter];
+    if (
+      !existing ||
+      (opt.isCorrect && !existing.isCorrect) ||
+      (opt.isCorrect === existing.isCorrect && opt.prefix.localeCompare(existing.prefix, 'sv') < 0)
+    ) {
+      byFirstLetter[firstLetter] = opt;
+    }
+  }
+  return Object.values(byFirstLetter).sort((a, b) => a.prefix.localeCompare(b.prefix, 'sv'));
+}
+
+/**
  * Build runtime variant för en image-fråga utifrån spelarens assistance:
  *   • full      → full-names (ingen prefix-pussel)
  *   • standard  → prefix-2 (2-bokstavs prefix)
@@ -391,26 +454,28 @@ export function buildImageVariant(
   }
 
   const prefixLength = forcePrefixLength ?? (assistance === 'minimal' ? 1 : 2);
-  // Spotify/Name (forcePrefixLength satt) visar bara F�RSTA ordets prefix.
-  const prefixMaxWords = forcePrefixLength !== undefined ? 1 : 2;
+  // Både Spotify/Name och Hints visar de N första bokstäverna, även över
+  // ordgränser (Peter 2026-10-27): "DJ Snake" → "DJ S", "Astrid Lindgren" → "AS".
+  // 'per-word' finns kvar i getPrefixForItem men används inte längre här.
+  const prefixMode: PrefixMode = 'leading-letters';
   const letterGrid = buildLetterGrid({
     correctItem,
     prefixLength,
-    prefixMaxWords,
+    prefixMode,
     audienceSet,
     allItems,
     distractorNames,
     totalOptions,
     rng,
   });
-  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength, prefixMaxWords);
+  const correctPrefix = getPrefixForItem(correctItem.displayName, prefixLength, prefixMode);
   const optionsByPrefix: Record<string, ImageNameOption[]> = {};
   for (const opt of letterGrid) {
     optionsByPrefix[opt.prefix] = buildNameOptions({
       correctItem,
       selectedPrefix: opt.prefix,
       prefixLength,
-      prefixMaxWords,
+      prefixMode,
       audienceSet,
       allItems,
       distractorNames,
