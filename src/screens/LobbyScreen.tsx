@@ -1360,6 +1360,13 @@ export default function LobbyScreen() {
   // hann clamp:a → 3 mock-rader stannade i DB och host:s Realtime-fetchNewJoiners
   // ärvde in dem igen vid varje fresh lobby-entry.
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
+  // Guest-hostad lobby (Peter 2026-11-02): host själv ELLER en joiner vars
+  // host-rad är type 'guest' (samma signal som quiz.tsx:s storedHostIsGuest).
+  // Driver den avskalade guest-layouten: ingen "Customize QuizVibe"-rubrik,
+  // ingen Game Settings, Quiz Tuning alltid utfälld utan Answer response
+  // time, Players in Lobby alltid utfälld. Gäller host OCH joiners.
+  const isGuestHostedLobby =
+    isGuestHost || (!hostMode && players.some((p) => p.isHost && p.type === 'guest'));
 
   // Eget player-id (host:s seed-id för host, eller den auto-tillagda
   // guest/joiner-id:n för non-hosts). Används av leave-flödet för att
@@ -1549,17 +1556,9 @@ export default function LobbyScreen() {
         setSinglePlayerDefault(seedSinglePlayer);
         setMaxPlayers(is1v1Lobby ? 2 : 4);
         setRegion('Sweden');
-        // Clampa mot utbudet {30, 45, 60} — defensivt mot oväntade värden
-        // (och mot 15s-alternativet som togs bort 2026-06-08). Fresh guest-
-        // lobby defaultar till 30s (Peter 2026-08-08); carry-over av 45/60
-        // från föregående guest-lobby respekteras.
-        setAnswerResponseSeconds(
-          stored?.answerResponseSeconds === 45
-            ? 45
-            : stored?.answerResponseSeconds === 60
-              ? 60
-              : 30,
-        );
+        // Svarstiden är ALLTID 30s för guest host (Peter 2026-11-02) — raden
+        // är borttagen ur guest-lobbyn, så carry-over av 45/60 ignoreras.
+        setAnswerResponseSeconds(30);
         // Fresh guest-lobby: [födelseår, idag]. Carry-over (Play Again) läser
         // stored.eraFrom/To. Clampa som i registrerade grenen: to golvas till
         // ERA_TO_MIN (1980), from till [ERA_MIN, to − intervall].
@@ -1591,7 +1590,9 @@ export default function LobbyScreen() {
         // barnvänlig. Switchen renderas disabled nedan. Persisteras aldrig i DB.
         setParentControlEnabled(true);
         setYoutubeEnabledCategories(defaultEnabledMainCategories());
-        setImagesEnabledCategories(defaultEnabledMainCategories());
+        // Hints AV för guest host (Peter 2026-11-02): guest-spel är enbart
+        // YouTube (Music + Film). Quiz Mixer döljs i guest-lobbyn.
+        setImagesEnabledCategories([]);
         // Släpp debounce-skrivningen till lobby_settings så non-hosts ser
         // de fasta värdena via sin settings-sync.
         lobbySeededRef.current = true;
@@ -2782,7 +2783,8 @@ export default function LobbyScreen() {
   // ihop (Peter 2026-10-21) — spelarkortet ska synas direkt, oavsett om host
   // är inloggad, guest host, eller utloggad guest. isSingleLobby läser
   // lobbyType-paramet synkront, så kortet syns redan första framen.
-  const playersSectionOpen = isSingleLobby || playersExpanded;
+  // Guest-hostad lobby (single OCH multiplayer): likaså alltid utfälld.
+  const playersSectionOpen = isSingleLobby || isGuestHostedLobby || playersExpanded;
   const [newPlayerJoined, setNewPlayerJoined] = useState(false);
   const [quizTuningExpanded, setQuizTuningExpanded] = useState(false);
   const [customizeExpanded, setCustomizeExpanded] = useState(false);
@@ -7489,7 +7491,7 @@ export default function LobbyScreen() {
           {/* Kollapsbar sektionsrubrik (samma +/− mönster som Profile). */}
           <TouchableOpacity
             onPress={() => setPlayersExpanded(!playersExpanded)}
-            disabled={isSingleLobby}
+            disabled={isSingleLobby || isGuestHostedLobby}
             activeOpacity={0.7}
             style={styles.sectionHeaderRow}
             hitSlop={8}
@@ -7510,7 +7512,7 @@ export default function LobbyScreen() {
                 New Player joined
               </BlinkingLabel>
             )}
-            {!isSingleLobby && <SectionToggle expanded={playersExpanded} />}
+            {!isSingleLobby && !isGuestHostedLobby && <SectionToggle expanded={playersExpanded} />}
           </TouchableOpacity>
           {!playersSectionOpen && <View style={styles.sectionDivider} />}
           {playersSectionOpen && (<>
@@ -7695,7 +7697,10 @@ export default function LobbyScreen() {
             ScrollView:n (se efter </ScrollView>) så den alltid är synlig
             under scroll. */}
 
-        {/* ── Customize QuizVibe — kollapsbar, synlig för host OCH non-host ── */}
+        {/* ── Customize QuizVibe — kollapsbar, synlig för host OCH non-host ──
+            Guest-hostad lobby: rubriken visas inte alls, Quiz Tuning står
+            ensam och alltid utfälld (Peter 2026-11-02). */}
+        {!isGuestHostedLobby && (<>
         <TouchableOpacity
           onPress={() => setCustomizeExpanded((v) => !v)}
           activeOpacity={0.7}
@@ -7707,8 +7712,12 @@ export default function LobbyScreen() {
           <SectionToggle expanded={customizeExpanded} />
         </TouchableOpacity>
         {!customizeExpanded && <View style={styles.sectionDivider} />}
+        </>)}
 
-        {customizeExpanded && (<>
+        {(customizeExpanded || isGuestHostedLobby) && (<>
+        {/* Game Settings — DOLD i guest-hostad lobby (Peter 2026-11-02):
+            läget är låst, Quiz Mixer = YouTube-only, Parent Control alltid på. */}
+        {!isGuestHostedLobby && (<>
 
         {/* Game Settings — sitter mellan room code-kortet och Game Mode-kortet.
             Wrappad i styles.section (samma som Players/Quiz Tuning) så header→
@@ -8898,6 +8907,7 @@ export default function LobbyScreen() {
         </View>
         )}{/* /gameSettingsBorder */}
         </View>{/* /Game Settings section */}
+        </>)}{/* /!isGuestHostedLobby */}
 
         {/* ── Quiz Settings ─────────────────────────────────────
             Game Era + Number of Rounds delar en gemensam ram
@@ -8909,6 +8919,7 @@ export default function LobbyScreen() {
           {/* Kollapsbar sektionsrubrik (samma +/− mönster som Profile). */}
           <TouchableOpacity
             onPress={() => setQuizTuningExpanded(!quizTuningExpanded)}
+            disabled={isGuestHostedLobby}
             activeOpacity={0.7}
             style={[styles.sectionHeaderRow, styles.subSectionHeaderRow]}
             hitSlop={8}
@@ -8927,11 +8938,12 @@ export default function LobbyScreen() {
               </Svg>
             </View>
             <Text style={styles.subSectionHeaderTitle}>Quiz Tuning</Text>
-            <SectionToggle expanded={quizTuningExpanded} tone="neutral" />
+            {/* Guest-hostad lobby: alltid utfälld, går ej att fälla ihop. */}
+            {!isGuestHostedLobby && <SectionToggle expanded={quizTuningExpanded} tone="neutral" />}
           </TouchableOpacity>
-          {!quizTuningExpanded && <View style={styles.sectionDivider} />}
+          {!quizTuningExpanded && !isGuestHostedLobby && <View style={styles.sectionDivider} />}
 
-          {quizTuningExpanded && (
+          {(quizTuningExpanded || isGuestHostedLobby) && (
           <View style={[styles.quizSettingsBorder, { marginTop: -Spacing.xs, paddingTop: Spacing.sm }]}>
             {/* Inloggad single player: ingen DEFINED BY HOST — användaren ställer in sitt eget spel. */}
             {!hostMode && (
@@ -9280,11 +9292,11 @@ export default function LobbyScreen() {
                   <Text style={styles.infoIconText}>i</Text>
                 </Pressable>
               </View>
-              {/* Guest host: källorna slumpas per fråga vid spelstart (viktad
-                  dragning i quiz.tsx) — previewn KAN inte veta utfallet, så
+              {/* Guest-hostad lobby: YouTube-only sedan 2026-11-02; Music/Film
+                  slumpas per fråga vid spelstart (viktad dragning i quiz.tsx) — previewn KAN inte veta utfallet, så
                   slots renderas som "?" + en förklarande not. Ärligare än
                   att spegla en fördelning som inte kommer stämma. */}
-              {isGuestHost ? (
+              {isGuestHostedLobby ? (
                 <>
                   <View style={styles.gsGrid}>
                     {Array.from({ length: roundsCount }, (_, idx) => (
@@ -9300,7 +9312,7 @@ export default function LobbyScreen() {
                     ))}
                   </View>
                   <Text style={styles.guestHostNote}>
-                    Sources randomized for Guest games
+                    YouTube Music & Film clips, randomized for Guest games
                   </Text>
                 </>
               ) : (
@@ -9334,7 +9346,9 @@ export default function LobbyScreen() {
             </View>
             )}
 
-            {/* Answer response time */}
+            {/* Answer response time — DOLD i guest-hostad lobby: alltid 30s
+                (Peter 2026-11-02), seedas i guest-grenen. */}
+            {!isGuestHostedLobby && (
             <View>
               <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Answer response time</Text>
@@ -9350,8 +9364,7 @@ export default function LobbyScreen() {
                   non-host ser host:s val i real-tid; bara host kan ändra
                   (disabled={!hostMode}). Default-värdet seeds från host:s
                   profil via host-seed-effekten ovan.
-                  Guest host har SAMMA val sedan 2026-08-08 (Peter) — tidigare
-                  var raden låst till 60s. */}
+                  Guest-hostad lobby renderar inte raden (alltid 30s). */}
               <View style={styles.responseRow}>
                 {([30, 45, 60] as const).map((sec) => {
                   const isActive = answerResponseSeconds === sec;
@@ -9377,6 +9390,7 @@ export default function LobbyScreen() {
                 })}
               </View>
             </View>
+            )}
           </View>
           )}
         </View>

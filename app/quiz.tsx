@@ -2436,9 +2436,8 @@ export default function QuizScreen() {
       if (fullSpotifyEligible && guestSpotifyCount === totalRounds) {
         return spotifyByFreshness.slice(0, totalRounds);
       }
-      // Källvariation i guest-spel (Peter 2026-09-09):
-      //   • ANTALET YouTube- vs Hints-frågor är GARANTERAT jämnt delat per
-      //     spel — 4 rundor utan Spotify → exakt 2 YT + 2 Hints.
+      // Källvariation i guest-spel (Peter 2026-09-09, Hints borttaget 2026-11-02):
+      //   • ALLA frågor är YouTube (ytCount = weightedTotal nedan).
       //   • Music vs Film är en VIKTAD 75/25-sannolikhet INOM varje källa
       //     (förväntad proportion över många spel; får skilja sig mellan
       //     enskilda spel). Sport utgår i v1.
@@ -2505,13 +2504,13 @@ export default function QuizScreen() {
       // Partiellt Spotify-spel: reservera slots för Spotify-frågorna —
       // den jämna YT/Hints-delningen gäller bara de kvarvarande frågorna.
       const weightedTotal = guestTotal - guestSpotifyCount;
-      // Jämn YT/Hints-delning: jämnt weightedTotal (t.ex. 4 rundor utan
-      // Spotify) → exakt hälften var; udda → myntkast om vem som får
-      // extra-slotten, rättvist över många spel.
-      const ytCount =
-        Math.floor(weightedTotal / 2) +
-        (weightedTotal % 2 === 1 && Math.random() < 0.5 ? 1 : 0);
-      const hintsCount = weightedTotal - ytCount;
+      // Guest-spel är ENBART YouTube sedan 2026-11-02 (Peter): Hints är
+      // borttaget för guest host (Quiz Mixer dold i guest-lobbyn). Tidigare
+      // tvingades en jämn YT/Hints-delning här oavsett mixerboard-läget.
+      // Faller YouTube-poolen tom drar drawFromCells inget → kortare spel,
+      // aldrig Hints.
+      const ytCount = weightedTotal;
+      const hintsCount = 0;
       const picked = new Set<string>();
       const guestYtDrawn = drawFromCells(ytCells, ytCount, pureYoutubePool, picked);
       const guestImgDrawn = drawFromCells(hintsCells, hintsCount, imagePool, picked);
