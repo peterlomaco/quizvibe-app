@@ -192,7 +192,9 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
   { label: 'Friends list & in-app invites', user: true, guest: false },
   { label: 'Custom Game era', user: true, guest: true },
   { label: 'Select categories (Quiz mixer)', user: true, guest: false },
-  { label: 'YouTube and Hints', user: true, guest: true },
+  { label: 'YouTube', user: true, guest: true },
+  // Hints är avstängt i guest-hostade spel sedan 2026-11-02 (YouTube-only).
+  { label: 'Hints', user: true, guest: false },
   { label: 'Spotify', user: true, guest: false },
   { label: 'Host games per day', user: '4 free', guest: 'Trial' },
   { label: 'Replay & Marathon table', user: true, guest: false },
