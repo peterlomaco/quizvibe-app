@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, G, Path, Rect } from 'react-native-svg';
+import { MARK_RING } from './brand/quizVibeBrandGeometry';
 import { Colors } from '../theme';
 
 /**
@@ -39,9 +40,34 @@ const VB_X = 19;
 const VB_SIZE = 36;
 const CX = 37;
 const CY = 37;
-const R = 13;
-const TAIL_FROM = 46;
-const TAIL_TO = 52;
+
+// ── Q-märke v2 (Brand Master 2026-11-02) ─────────────────────────────────
+// Tunn, sluten ring + handtag helt UTANFÖR ringen, lika tjockt som ringen.
+// Mått ur MARK_RING (genererad brand-geometri), skalat så ringens ytterkant
+// behåller v1-märkets storlek (14.5 enheter) — pokal, ordmärke och halo
+// ligger kvar på samma plats. Inga signalbågar: pokalen fyller ringhålet.
+const BRAND_S = 14.5 / MARK_RING.outer;
+/** Ringens mittlinje-radie (streck-centrum). */
+const R = ((MARK_RING.outer + MARK_RING.inner) / 2) * BRAND_S;
+/** Ringens (och handtagets) tjocklek. */
+const STROKE = (MARK_RING.outer - MARK_RING.inner) * BRAND_S;
+/** Ringhålets diameter som andel av `size` (för skivan bakom pokalen). */
+export const RING_HOLE_FRACTION = (2 * MARK_RING.inner * BRAND_S) / VB_SIZE;
+/** Ringens över-/underkant som andel av `size` (från rutans topp). */
+export const RING_TOP_FRACTION = (CY - MARK_RING.outer * BRAND_S - VB_X) / VB_SIZE;
+export const RING_BOTTOM_FRACTION = (CY + MARK_RING.outer * BRAND_S - VB_X) / VB_SIZE;
+/** Ringens ytterdiameter som andel av `size`. */
+export const RING_OUTER_FRACTION = (2 * MARK_RING.outer * BRAND_S) / VB_SIZE;
+// Handtaget i brand-enheter (härlett ur MARK_PATHS.handle, build-mark.py):
+// inre ände (695.72, 710.61), längd 200, vinkel 46.4°, hörnradie 24.
+const HANDLE_X = CX + (695.72 - MARK_RING.cx) * BRAND_S;
+const HANDLE_Y = CY + (710.61 - MARK_RING.cy) * BRAND_S;
+const HANDLE_LEN = 200 * BRAND_S;
+const HANDLE_ANGLE = 46.4;
+const HANDLE_RX = 24 * BRAND_S;
+// Gnist-/spetsbanan längs handtaget (diagonal approximation, ±1.4°).
+const TAIL_FROM = CX + ((695.72 + 710.61) / 2 - MARK_RING.cx) * BRAND_S;
+const TAIL_TO = CX + ((833.65 + 855.43) / 2 - MARK_RING.cy) * BRAND_S;
 
 /** Hur stor del av ritningen som är ringen; resten är svansen. */
 const CIRCLE_END = 0.78;
@@ -399,7 +425,30 @@ function arcPath(deg: number): string {
   return `M${CX + R} ${CY} A${R} ${R} 0 ${deg > 180 ? 1 : 0} 1 ${x.toFixed(3)} ${y.toFixed(3)}`;
 }
 
-const TAIL_D = `M${TAIL_FROM} ${TAIL_FROM} L${TAIL_TO} ${TAIL_TO}`;
+/** Handtaget som rundad rektangel längs sin axel; `t` = andel ritad (0–1).
+ *  Vid t = 1 är det exakt brand-handtaget. `glow` ger det bredare,
+ *  flimrande glödlagret i stället för själva märket. */
+function Handle({ t, glow }: { t: number; glow?: number }) {
+  const len = Math.max(STROKE * 0.6, HANDLE_LEN * t);
+  return (
+    <G transform={`translate(${HANDLE_X} ${HANDLE_Y}) rotate(${HANDLE_ANGLE})`}>
+      <Rect
+        x={0}
+        y={-STROKE / 2}
+        width={len}
+        height={STROKE}
+        rx={HANDLE_RX}
+        ry={HANDLE_RX}
+        fill={Colors.warning}
+        fillOpacity={glow ?? 1}
+        stroke={glow !== undefined ? Colors.warning : 'none'}
+        strokeWidth={glow !== undefined ? 5 : 0}
+        strokeOpacity={glow ?? 0}
+        strokeLinejoin="round"
+      />
+    </G>
+  );
+}
 
 /**
  * Glödlagrets flimmer. En sågtand som fasas ut mot slutet — ⚠ den MÅSTE
@@ -495,9 +544,9 @@ export default function SparkleDrawQ({
             r={R}
             fill="none"
             stroke={Colors.warning}
-            strokeWidth={3}
+            strokeWidth={STROKE}
           />
-          <Path d={TAIL_D} stroke={Colors.warning} strokeWidth={3} strokeLinecap="round" />
+          <Handle t={1} />
         </Svg>
       </View>
     );
@@ -510,10 +559,6 @@ export default function SparkleDrawQ({
   // så sista graderna renderas som en hel cirkel i stället.
   const fullRing = deg >= 359.5;
   const ringD = deg > 0.5 ? arcPath(Math.min(deg, 359.4)) : null;
-  const tailD =
-    tailT > 0
-      ? `M${TAIL_FROM} ${TAIL_FROM} L${(TAIL_FROM + (TAIL_TO - TAIL_FROM) * tailT).toFixed(3)} ${(TAIL_FROM + (TAIL_TO - TAIL_FROM) * tailT).toFixed(3)}`
-      : null;
   const glow = glowAt(progress);
 
   return (
@@ -540,15 +585,7 @@ export default function SparkleDrawQ({
             strokeOpacity={glow}
           />
         ) : null}
-        {tailD && (
-          <Path
-            d={tailD}
-            stroke={Colors.warning}
-            strokeWidth={8}
-            strokeLinecap="round"
-            strokeOpacity={glow}
-          />
-        )}
+        {tailT > 0 && <Handle t={tailT} glow={glow} />}
 
         {/* Själva märket. */}
         {fullRing ? (
@@ -558,20 +595,18 @@ export default function SparkleDrawQ({
             r={R}
             fill="none"
             stroke={Colors.warning}
-            strokeWidth={3}
+            strokeWidth={STROKE}
           />
         ) : ringD ? (
           <Path
             d={ringD}
             fill="none"
             stroke={Colors.warning}
-            strokeWidth={3}
+            strokeWidth={STROKE}
             strokeLinecap="round"
           />
         ) : null}
-        {tailD && (
-          <Path d={tailD} stroke={Colors.warning} strokeWidth={3} strokeLinecap="round" />
-        )}
+        {tailT > 0 && <Handle t={tailT} />}
       </Svg>
 
       {sparkle && <SparkLayer size={size} compact={compact} progress={sparkProgress} />}

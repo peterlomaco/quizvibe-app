@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Path, Rect as SvgRect } from 'react-native-svg';
+import Svg, { Defs, LinearGradient, Path, Rect as SvgRect, Stop } from 'react-native-svg';
 import { Colors } from '../theme';
 
 /** Competition-ikonen (Home:s "Competition"-knapp): en enkel, fylld pokal i
@@ -7,11 +7,30 @@ import { Colors } from '../theme';
  *  1vs1-knappens silhuetter (VersusIcon) så de två Home-knapparna läser som
  *  ett par. Handtagen är strokade bågar i samma blå; kupa/stjälk/fot är
  *  fyllda. `height`-prop + viewBox-konvention som VersusIcon/SoloIcon. */
-export function TrophyIcon({ height = 22, color = Colors.primary }: { height?: number; color?: string }) {
+export function TrophyIcon({
+  height = 22,
+  color = Colors.primary,
+  gradient,
+}: {
+  height?: number;
+  color?: string;
+  /** Valfri vertikal toning (topp → fot) i stället för platt `color` —
+   *  används av prisutdelningens stora guldpokal. */
+  gradient?: { from: string; to: string };
+}) {
   // viewBox 40×46 → bredd/höjd-kvot ~0.87 (pokal är högre än bred).
   const width = height * (40 / 46);
+  if (gradient) color = 'url(#trophyGrad)';
   return (
     <Svg width={width} height={height} viewBox="0 0 40 46">
+      {gradient && (
+        <Defs>
+          <LinearGradient id="trophyGrad" x1="0" y1="6" x2="0" y2="43" gradientUnits="userSpaceOnUse">
+            <Stop offset="0" stopColor={gradient.from} />
+            <Stop offset="1" stopColor={gradient.to} />
+          </LinearGradient>
+        </Defs>
+      )}
       {/* Handtag — strokade bågar som buktar ut från kupans sidor. */}
       <Path
         d="M 9 8 C 2 9, 2 20, 10 20"

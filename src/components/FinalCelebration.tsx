@@ -12,12 +12,19 @@ import {
   View,
 } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
-import { useFonts, Nunito_700Bold } from '@expo-google-fonts/nunito';
-import { Colors, FontSize, FontWeight, Radius, Spacing, Typography, TIGHT_TEXT_MAX_SCALE } from '../theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import Confetti from './Confetti';
-import SparkleDrawQ, { DRAW_MS } from './SparkleDrawQ';
+import SparkleDrawQ, {
+  DRAW_MS,
+  RING_BOTTOM_FRACTION,
+  RING_HOLE_FRACTION,
+  RING_OUTER_FRACTION,
+  RING_TOP_FRACTION,
+} from './SparkleDrawQ';
 import SparklerSound from './SparklerSound';
 import { MediaSourceIcon } from './MediaSourceIcon';
+import { QuizVibeWordmarkSvg } from './brand/QuizVibeBrandSvg';
+import { WORDMARK_VIEWBOX } from './brand/quizVibeBrandGeometry';
 import type { HighlightCard } from '../utils/matchHighlights';
 import { mainCategoryDisplay } from '../utils/mainCategory';
 
@@ -62,9 +69,45 @@ const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 // beat EFTER att spelaren nått slutskärmen. Se `ready`-effekten nedan. (Peter 2026-09-22.)
 const CELEBRATION_START_DELAY_MS = 550;
 
-// Speglar BG_Q_SIZE / BG_TROPHY_SIZE i RoundLeaderboard.tsx.
-const Q_SIZE = Math.round(SCREEN_W * 0.9);
-const TROPHY_SIZE = Math.round(Q_SIZE * 0.4);
+// Logo-lockup (Peter 2026-11-02, tredje passet): Q:t är det dominanta
+// märket, pokalen fyller ringhålet och ordmärket sitter tätt under ringen —
+// en sammanhållen logga, inte tre lösa delar.
+const Q_SIZE = Math.round(Math.min(SCREEN_W * 0.88, SCREEN_H * 0.46));
+// Pokalen = EXAKT samma källa som "Final Leaderboard"-knappen i quiz.tsx
+// ('🏆  Final Leaderboard'): systemets 🏆-emoji, bara uppskalad (Peter
+// 2026-11-02). Rita INTE en egen pokal och byt inte till TrophyIcon.
+export const FINAL_LEADERBOARD_TROPHY = '🏆';
+const RING_HOLE_R = (Q_SIZE * RING_HOLE_FRACTION) / 2;
+// Emojins glyf fyller ~85 % av em-rutan; storleken väljs så hörnen landar
+// strax innanför ringhålet.
+const TROPHY_FONT = Math.round(RING_HOLE_R * 1.5);
+// Ordmärket (det riktiga Manrope-ordmärket från Brand Master). Smalare än
+// ringen så det ryms under ringen till vänster om handtagets spets.
+const WORDMARK_W = Math.round(Q_SIZE * 0.64);
+const WORDMARK_H = (WORDMARK_W * WORDMARK_VIEWBOX.height) / WORDMARK_VIEWBOX.width;
+// Glyferna börjar ~24/185 ned i ordmärkets viewBox och slutar ~160/185.
+const WORDMARK_GLYPH_TOP = (WORDMARK_H * 24) / WORDMARK_VIEWBOX.height;
+const WORDMARK_GLYPH_BOTTOM = (WORDMARK_H * 160) / WORDMARK_VIEWBOX.height;
+// Luft mellan ringens underkant och bokstävernas överkant.
+// ~16 pt synlig luft mellan ringen och bokstäverna (Peter 2026-11-02). Talet
+// är större än luften eftersom glyf-insetten ovan underskattar ordmärkets
+// tomma överkant något — med 0 överlappade bokstäverna ringen.
+const LOCKUP_GAP = 22;
+// Dra upp ordmärket över qBox:ens tomma botten (under ringen) och glyfernas
+// inre luft, så avståndet ring → text blir exakt LOCKUP_GAP.
+const WORDMARK_MARGIN_TOP = -(Q_SIZE * (1 - RING_BOTTOM_FRACTION)) - WORDMARK_GLYPH_TOP + LOCKUP_GAP;
+// Kolumnens synliga innehåll: ringens överkant → glyfernas underkant. Vi
+// centrerar DET (inte layout-boxarna) genom att förskjuta kolumnen.
+const COLUMN_H = Q_SIZE + WORDMARK_MARGIN_TOP + WORDMARK_H;
+const VISIBLE_TOP_IN_COLUMN = Q_SIZE * RING_TOP_FRACTION;
+const VISIBLE_BOTTOM_IN_COLUMN = Q_SIZE + WORDMARK_MARGIN_TOP + WORDMARK_GLYPH_BOTTOM;
+const LOCKUP_SHIFT = Math.round(
+  COLUMN_H / 2 - (VISIBLE_TOP_IN_COLUMN + VISIBLE_BOTTOM_IN_COLUMN) / 2,
+);
+// Ringens överkant på skärmen — konfettin håller sig ovanför/utanför den.
+// Ringens halva ytterbredd — konfettins sidobanor håller sig utanför den.
+const RING_OUTER_HALF = (Q_SIZE * RING_OUTER_FRACTION) / 2;
+const MARK_TOP = Math.round((SCREEN_H - COLUMN_H) / 2 + LOCKUP_SHIFT + VISIBLE_TOP_IN_COLUMN);
 
 /** Sluttillstånd för märket (Q + pokal). Final Leaderboard har sedan 2026-10-21
  *  en ANNAN vattenstämpel (det nya Q:t, QuizVibeWatermark), så märket tonas
@@ -142,8 +185,6 @@ export default function FinalCelebration({
   onDone,
   muted = false,
 }: FinalCelebrationProps) {
-  const [fontsLoaded] = useFonts({ Nunito_700Bold });
-  const brandFont = fontsLoaded ? 'Nunito_700Bold' : undefined;
 
   const [stage, setStage] = useState<Stage>('celebration');
   const [pageIndex, setPageIndex] = useState(0);
@@ -270,7 +311,7 @@ export default function FinalCelebration({
           // ringen slutits.
           Animated.delay(t.markIn),
           Animated.timing(haloOpacity, {
-            toValue: 0.35,
+            toValue: 0.25,
             duration: Math.max(1, DRAW_MS - t.markIn),
             easing: Easing.in(Easing.quad),
             useNativeDriver: true,
@@ -278,12 +319,12 @@ export default function FinalCelebration({
           Animated.loop(
             Animated.sequence([
               Animated.timing(haloOpacity, {
-                toValue: 0.8,
+                toValue: 0.5,
                 duration: 800,
                 useNativeDriver: true,
               }),
               Animated.timing(haloOpacity, {
-                toValue: 0.35,
+                toValue: 0.25,
                 duration: 800,
                 useNativeDriver: true,
               }),
@@ -544,7 +585,7 @@ export default function FinalCelebration({
           knappar de inte ser. */}
       <Pressable style={styles.veil} onPress={() => {}} />
 
-      {confettiOn && <Confetti active />}
+      {confettiOn && <Confetti active avoidTop={MARK_TOP} avoidHalfWidth={RING_OUTER_HALF + 24} />}
 
       {/* Sprakljudet. Monterat bara under celebration-fasen — WebView:n
           rivs när korten tar över, vilket också är all städning som
@@ -557,35 +598,39 @@ export default function FinalCelebration({
       <Animated.View
         style={[
           styles.markWrap,
-          { opacity: markOpacity, transform: [{ scale: markScale }] },
+          // translateY centrerar det SYNLIGA märket (ring → ordmärke).
+          { opacity: markOpacity, transform: [{ translateY: LOCKUP_SHIFT }, { scale: markScale }] },
         ]}
         pointerEvents="none"
       >
+        {/* Symbolen i egen Q_SIZE-ruta så glöd, skiva och pokal centreras på
+            RINGENS mitt — inte på hela kolumnen (ring + ordmärke). */}
+        <View style={styles.qBox}>
+          <Animated.View
+            style={[styles.halo, { opacity: stage === 'celebration' ? haloOpacity : 0 }]}
+          />
+          {/* Mörk skiva i ringhålet: ger guldpokalen kontrast mot glöden. */}
+          <View style={styles.trophyDisc} />
+          <SparkleDrawQ size={Q_SIZE} active={ready} sparkle={sparkle} compact={COMPACT} />
+          <Animated.View
+            style={[
+              styles.trophy,
+              { opacity: contentOpacity, transform: [{ scale: contentScale }] },
+            ]}
+          >
+            <Text style={styles.trophyGlyph} allowFontScaling={false}>
+              {FINAL_LEADERBOARD_TROPHY}
+            </Text>
+          </Animated.View>
+        </View>
         <Animated.View
-          style={[styles.halo, { opacity: stage === 'celebration' ? haloOpacity : 0 }]}
-        />
-        <SparkleDrawQ size={Q_SIZE} active={ready} sparkle={sparkle} compact={COMPACT} />
-        <Animated.Text
-          style={[
-            styles.trophy,
-            { opacity: contentOpacity, transform: [{ scale: contentScale }] },
-          ]}
-          numberOfLines={1}
-        >
-          🏆
-        </Animated.Text>
-        <Animated.Text
           style={[
             styles.brand,
-            brandFont ? { fontFamily: brandFont } : null,
             { opacity: contentOpacity, transform: [{ scale: contentScale }] },
           ]}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}
         >
-          QuizVibe
-        </Animated.Text>
+          <QuizVibeWordmarkSvg width={WORDMARK_W} variant="metallic" />
+        </Animated.View>
       </Animated.View>
 
       {showHighlights && (
@@ -773,32 +818,42 @@ const styles = StyleSheet.create({
   },
   // Guldglöd bakom märket under celebration-fasen. iOS-skugga; Android får
   // den mjuka fyllningen (elevation ger ingen färgad glow på RN).
+  qBox: {
+    width: Q_SIZE,
+    height: Q_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   halo: {
     position: 'absolute',
-    width: Q_SIZE * 0.62,
-    height: Q_SIZE * 0.62,
+    width: Q_SIZE * RING_OUTER_FRACTION,
+    height: Q_SIZE * RING_OUTER_FRACTION,
     borderRadius: Q_SIZE,
     backgroundColor: Colors.warning,
     shadowColor: Colors.warning,
-    shadowOpacity: 0.9,
-    shadowRadius: 40,
+    shadowOpacity: 0.55,
+    shadowRadius: 18,
     shadowOffset: { width: 0, height: 0 },
   },
-  // Speglar bgFinalTrophy.
+  trophyDisc: {
+    position: 'absolute',
+    width: Q_SIZE * RING_HOLE_FRACTION + 2,
+    height: Q_SIZE * RING_HOLE_FRACTION + 2,
+    borderRadius: Q_SIZE,
+    backgroundColor: Colors.background,
+  },
+  // Pokalen centrerad i ringhålet.
   trophy: {
     position: 'absolute',
-    fontSize: TROPHY_SIZE,
-    lineHeight: TROPHY_SIZE,
+  },
+  trophyGlyph: {
+    fontSize: TROPHY_FONT,
+    lineHeight: Math.round(TROPHY_FONT * 1.18),
     textAlign: 'center',
   },
-  // Speglar bgFinalBrand (utan dess opacity — den ligger på markWrap här).
+  // Ordmärket tätt under ringen — se WORDMARK_MARGIN_TOP.
   brand: {
-    fontSize: 52,
-    fontWeight: '700',
-    color: Colors.warning,
-    letterSpacing: -0.5,
-    textAlign: 'center',
-    marginTop: -Spacing.xxl,
+    marginTop: WORDMARK_MARGIN_TOP,
   },
   // Enda IN-FLOW-barnet i overlayen (slöja, märke och konfetti är alla
   // absolut positionerade), så overlayens alignItems/justifyContent center
