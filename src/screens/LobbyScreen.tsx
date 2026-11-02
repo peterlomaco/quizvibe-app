@@ -912,21 +912,8 @@ function AddPlayerModal({ visible, onClose, onAdd, takenGuestLetters, existingNa
               </TouchableOpacity>
             </View>
 
-            {/* Assistance level: host-tillagda gäster är LÅSTA till Full —
-                samma guest-setup som guest host (2026-09-12). Ingen väljare,
-                bara en statisk Full-chip + not. handleAddPlayer forcerar
-                dessutom 'full' oavsett så värdet aldrig kan bli något annat. */}
-            <View style={modal.fieldGroup}>
-              <Text style={modal.fieldLabel}>Assistance Level</Text>
-              <View style={modal.skillRow}>
-                <View style={[modal.skillBtn, modal.skillBtnActive]}>
-                  <Text style={[modal.skillBtnText, modal.skillBtnTextActive]}>
-                    Full
-                  </Text>
-                </View>
-              </View>
-              <Text style={modal.statusHint}>Guests play on Full assistance.</Text>
-            </View>
+            {/* Assistance level visas INTE (Peter 2026-11-02): host-tillagda
+                gäster är alltid Full — handleAddPlayer forcerar 'full'. */}
           </ScrollView>
 
           {playerNameFocused && (
