@@ -60,7 +60,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'Do I need an account to play?',
-        a: 'No. You can join a game as a guest with a Room Code + a Player Name, and you can even host a game as a guest — a trial version with default settings. To save game history, host with your own settings, play Head-to-head, or get Premium, you need to register an account.',
+        a: 'No. You can join a game as a guest with a Room Code + a Player Name, and you can even host a game as a guest — a trial version with fixed settings (YouTube clips only, 30 seconds to answer). To save game history, host with your own settings, play Head-to-head, or get Premium, you need to register an account.',
       },
       {
         q: 'What is the age minimum?',
@@ -99,7 +99,11 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What is a Guest?',
-        a: 'A Guest is a player who is not a registered QuizVibe user. You can join a game as a Guest with just a Player Name and Year of birth, or host a trial game as a Guest — but Guest games don\'t save any Player history or HCP, and some features (Head-to-head, Extra packages, more rounds) require a registered account. A Guest can be either the Host or a non-host in a room.',
+        a: 'A Guest is a player who is not a registered QuizVibe user. You can join a game as a Guest with just a Player Name and Year of birth, or host a trial game as a Guest — but Guest games don\'t save any Player history or HCP, and some features (Head-to-head, Hints, Extra packages, more rounds) require a registered account. A Guest can be either the Host or a non-host in a room.',
+      },
+      {
+        q: 'What settings does a guest-hosted game use?',
+        a: 'A game hosted as a Guest is a trial with fixed settings, so the Lobby only shows Players in Lobby and Quiz Tuning:\n• Questions: YouTube clips only (music and film) — no Hints or Spotify.\n• Answer time: always 30 seconds.\n• Assistance level: always Full.\n• Rounds: 2 or 4. You can still choose the Game Era.\n• Multiplayer is Pass-the-Phone only, up to 4 players.\n• Parent Control is always on, so mature content is kept out.\nRegister a free QuizVibe account to unlock all settings.',
       },
       {
         q: 'How many players can be in one room?',
@@ -142,7 +146,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     items: [
       {
         q: 'Why do some questions play a clip and others show hints?',
-        a: 'QuizVibe has two question types: song and movie clips from YouTube/Spotify (answer = the release year, or for films one of the main actors) and Hints — a country flag plus progressive clues about a person or band (answer = the name). The Host tunes which sources are used in the Lobby\'s Source Mixerboard, but at least one source must always be active.',
+        a: 'QuizVibe has two question types: song and movie clips from YouTube/Spotify (answer = the release year, or for films one of the main actors) and Hints — a country flag plus progressive clues about a person or band (answer = the name). The Host tunes which sources are used in the Lobby\'s Quiz Mixer, but at least one source must always be active. Hints are only available when a registered QuizVibe user hosts the game — guest-hosted games use YouTube clips only.',
       },
       {
         q: 'Can questions be based on Spotify?',
