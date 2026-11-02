@@ -26,7 +26,7 @@ import {
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import type { HintCategoryLabel, HintLibrary } from '../utils/hintsData';
 import { countryToFlagEmoji } from '../utils/hintsData';
-import { buildRenderEntries, HINT_MAX_CHARS, HINT_SUB_MAX_CHARS, selectHints, type GroupEntry, type SingleEntry } from '../utils/hintsGenerator';
+import { buildRenderEntries, headingModelFor, HINT_MAX_CHARS, HINT_SUB_MAX_CHARS, selectHints, type GroupEntry, type SingleEntry } from '../utils/hintsGenerator';
 import { resolveHints } from '../utils/hintsText';
 import { createSeededRng } from '../utils/seededRandom';
 import { ProgressiveCover } from './ProgressiveCover';
@@ -178,7 +178,13 @@ function HintsQuizCardBase({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [resetKey, library, hintsSeed, displayName, primaryLabel],
   );
-  const renderEntries = useMemo(() => buildRenderEntries(hints), [hints]);
+  // Artister/Band + Skådespelare: fast rubrikmodell (allt under en rubrik,
+  // resten under "Other"). Idrottare: oförändrad gruppering.
+  const headingModel = headingModelFor(primaryLabel);
+  const renderEntries = useMemo(
+    () => buildRenderEntries(hints, headingModel),
+    [hints, headingModel],
+  );
 
   // Monotont ökande maximum — aldrig minskar inom en frågecykel.
   // Måste ligga EFTER hints-useMemo eftersom displayRevealedCount använder hints.length.
@@ -430,7 +436,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   scroll: { flex: 1 },
-  scrollContent: { gap: 0, paddingBottom: 2 },
+  // Jämn rytm: samma avstånd mellan alla topp-nivå-poster (bullet/grupp).
+  scrollContent: { gap: 4, paddingBottom: 2 },
   hintsPlaceholder: {
     flex: 1,
     textAlign: 'center',
@@ -443,7 +450,7 @@ const styles = StyleSheet.create({
   bulletRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingVertical: 2,
+    paddingVertical: 1,
     gap: 5,
   },
   bullet: {
@@ -460,16 +467,21 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     lineHeight: 22,
   },
+  // Grupprubrik (Birth, Film History, Trophies …) — tydligare och enhetlig:
+  // versaler + spärrning som kategori-etiketten, ljusare än underraderna.
   groupHeaderText: {
-    color: Colors.textSecondary,
-    fontWeight: FontWeight.bold,
+    color: 'rgba(255,255,255,0.78)',
+    fontWeight: FontWeight.semibold,
     fontSize: 12,
+    lineHeight: 22,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
 
   subRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingVertical: 1,
+    paddingVertical: 0,
     paddingLeft: 15,
     gap: 4,
   },

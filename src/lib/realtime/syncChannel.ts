@@ -183,6 +183,16 @@ export interface PlayerApprovedPlayAgainPayload {
  * `router.replace('/')` så non-host:s syncChannel hinner ta emot innan
  * host:s channel rivs vid component-unmount.
  */
+/**
+ * Host har hoppat över aktuell fråga (Host-only recovery för Spotify-frågor
+ * när host inte är DJ). Alla enheter avslutar frågan utan bedömning: inga
+ * poäng, ingen rätt/fel, scores för frågeindexet kastas. Host går sedan
+ * vidare via vanliga Next / Final Leaderboard (question_advance).
+ */
+export interface QuestionSkippedPayload {
+  question_index: number;
+}
+
 export interface LobbyDeletedPayload {
   /** Rumkoden som just stängts. Bara informativt — non-host vet redan
    *  vilken kod de är i; vi skickar koden för parity med övriga
@@ -484,6 +494,8 @@ export interface SyncChannelHandlers {
   /** Host har lämnat Final Leaderboard via Home → lobby permanent stängd.
    *  Non-host visar "Host has deleted this lobby"-popup + auto-nav Home. */
   onLobbyDeleted?: (payload: LobbyDeletedPayload) => void;
+  /** Host har hoppat över aktuell fråga — avsluta den utan bedömning. */
+  onQuestionSkipped?: (payload: QuestionSkippedPayload) => void;
   /** Spotify-fråga börjar. DJ:n visar "Starta i Spotify"-knapp;
    *  gissarna förbereder albumomslags-fetch. */
   onSpotifyQuestionReady?: (payload: SpotifyQuestionReadyPayload) => void;
@@ -596,6 +608,7 @@ export interface SyncChannel {
     payload: PlayerApprovedPlayAgainPayload,
   ) => Promise<void>;
   broadcastLobbyDeleted: (payload: LobbyDeletedPayload) => Promise<void>;
+  broadcastQuestionSkipped: (payload: QuestionSkippedPayload) => Promise<void>;
   /** Host broadcastar start av Spotify-fråga med DJ-tilldelning. */
   broadcastSpotifyQuestionReady: (payload: SpotifyQuestionReadyPayload) => Promise<void>;
   /** DJ:ns klient broadcastar att "Start track in Spotify" tryckts (innan timer). */
@@ -787,6 +800,10 @@ function vPlayAgainLobbyReady(raw: unknown): PlayAgainLobbyReadyPayload | null {
 function vPlayerApprovedPlayAgain(raw: unknown): PlayerApprovedPlayAgainPayload | null {
   if (!isObj(raw) || !str(raw.player_id)) return null;
   return { player_id: raw.player_id };
+}
+function vQuestionSkipped(raw: unknown): QuestionSkippedPayload | null {
+  if (!isObj(raw) || !index(raw.question_index)) return null;
+  return { question_index: raw.question_index };
 }
 function vLobbyDeleted(raw: unknown): LobbyDeletedPayload | null {
   if (!isObj(raw) || !str(raw.room_code)) return null;
@@ -1038,6 +1055,8 @@ export function subscribeSyncChannel(
       if (known(p.player_id, 'player_approved_play_again')) handlers.onPlayerApprovedPlayAgain!(p);
     });
   if (handlers.onLobbyDeleted) onEvent('lobby_deleted', vLobbyDeleted, handlers.onLobbyDeleted);
+  if (handlers.onQuestionSkipped)
+    onEvent('question_skipped', vQuestionSkipped, handlers.onQuestionSkipped);
   if (handlers.onSpotifyQuestionReady)
     onEvent('spotify_question_ready', vSpotifyQuestionReady, handlers.onSpotifyQuestionReady);
   if (handlers.onSpotifyDJOpenedApp)
@@ -1227,6 +1246,9 @@ export function subscribeSyncChannel(
         event: 'lobby_deleted',
         payload,
       });
+    },
+    broadcastQuestionSkipped: async (payload) => {
+      await channel.send({ type: 'broadcast', event: 'question_skipped', payload });
     },
     broadcastSpotifyQuestionReady: async (payload) => {
       await channel.send({ type: 'broadcast', event: 'spotify_question_ready', payload });

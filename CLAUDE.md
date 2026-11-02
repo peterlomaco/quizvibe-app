@@ -1793,6 +1793,20 @@ Text-pipelinen är utbruten ur komponenten till `hintsText.ts` (filter-konstante
 
 **Artist-grupper + versaler + generiska ord (Peter 2026-10-26)**: `buildRenderEntries` (hintsGenerator.ts) grupperar nu även `song` → **"Song titles"** och `album` (+ `debut` vars etikett/värde innehåller "album") → **"Albums"**, kronologiskt, rubrik + grå ↳-underrader precis som Career History (kräver ≥2 poster, annars vanlig bullet). `capitalizeFirst` (hintsText.ts) lyfter en INLEDANDE bokstav (ev. efter citattecken) på varje ledtråd — bara inledande, annars blir `"21" album` → `"21" Album`. `formatCharacteristic` ger Wikidata-genererade ensamord en ram: Instrument voice → "Famous voice", övriga → "Plays guitar", Genre → "Known for pop music", Record label → "Signed to EMI", "Formed in London", "Disbanded 1982".
 
+**Fast rubrikmodell för Artister/Band + Skådespelare (Peter 2026-11-02)** — ERSÄTTER grupperingen ovan för dessa kategorier. `headingModelFor(primaryLabel)` (hintsGenerator.ts) ger `'artist'` (Musikartist/Band), `'actor'` (Actor/Character) eller `null` (Athlete/Coach); `buildRenderEntries(hints, model)` lägger då VARJE ledtråd under en rubrik via `headedGroupOf`, i fast ordning:
+
+| Rubrik | Innehåll |
+|---|---|
+| Birth & Career | birth_date, birth_place, peak_year, creation_year, debut (ej album), characteristic "Formed in" |
+| Film History | movie, tv_show (bara actor) |
+| Song titles / Albums | song / album + debut-album (bara artist) |
+| Trophies | all merit (ingen Titles-split) |
+| Other | allt annat — genre, Family, bandmedlemmar först, sedan profession, height, club, record label, fun facts m.m.; låtar/album för actor, filmer för artist |
+
+**Ingenting tas bort**, rubriker visas även med EN post (inga lösa bullets), spelbarhets-gaten och poolen är oförändrade. Idrottare (`model` null) behåller den gamla grupperingen (Birth/Career History/Titles/Trophies, ≥2-regeln). Rubrikstil: versaler, spärrning 0.8, 78 % vit; jämn 4 pt-rytm mellan poster. Tester: [hintsHeadings.test.ts](backend/content/test/hintsHeadings.test.ts).
+
+**Lugnare dämpning på Name-svar (2026-10-28)**: ej valda/ej rätta alternativ i reveal använder `Colors.textSecondary` (inte 40 %-grå `textDisabled`) — i BÅDE ImageAnswerBlock (Hints + Spotify/Name) och ActorSelectBlock (Film/Name), så alla Name-frågor ser likadana ut. Vänte-texten heter nu **"Waiting for other players"** (var "Waiting - all players to answer").
+
 **Karriärhistorik alltid kronologisk (Peter 2026-08-12)**: `orderCareerHistory` i `selectHints` samlar ALLA `club`-hints i **ett** block sorterat på startår (odaterade sist), placerat där den första klubben låg. Fixar två fel: (a) klubbar ligger på olika prioritetsnivåer (ikonisk klubb = P4, övriga = P3) och splittades av prioritetssorteringen i två separata "Career History"-grupper; (b) inom en grupp var ordningen slumpad av `shuffleArray`. Körs i BÅDA `selectHints`-grenarna — även early-returnen för små bibliotek (`hints.length <= count`), som är den vanliga vägen för idrottare och var den som saknade sorteringen först.
 
 **Pool-urvalet är utbrutet** till [src/utils/hintsDistractorPool.ts](src/utils/hintsDistractorPool.ts) (`buildHintsDistractorPool(correctItem, allItems)` → `{ itemPool, genderLocked }`). Ren funktion utan React så regeln kan testas; quiz.tsx:s `imageVariant`-useMemo anropar den och skickar `genderLocked ? [] : DISTRACTOR_POOL_NAMES[...]` vidare till `buildImageVariant`.
@@ -1965,6 +1979,17 @@ const djStep = !spotifyDJOpenedApp ? 0
 **Reveal-fas scroll-zon för DJ** (när `!djDismissedOverlay`): Correct year-ruta direkt under question-card (utanför scroll-zonen som separat element), sedan scroll-zonen med: pulserande "Open Spotify"-knapp + "OR"-separator + pulserande "Track has been stopped in Spotify"-knapp. Båda knappar wrappar `<Animated.View style={{ transform: [{ scale: nextTabPulse }] }}>`.
 
 **Alla DJ-CTA:er pulsar (2026-08-28, Peter).** "Start track in Spotify" (djStep 0) via `djStartPulse`-loopen (scale 1↔1.05 + `djStartGlow`-halo); "Open Spotify" (BÅDE reveal-grenen OCH djStep 1/2 under frågan), "Track has been stopped in Spotify" och "End DJ — handover to Host" via `nextTabPulseStyle`. djStep 1/2:s "Open Spotify" saknade tidigare pulse — den är nu wrappad som de andra.
+
+**Spotify DJ — UI v2 (2026-10-27/28)**:
+- **Rollkortet `SpotifyRoleCard`** (quiz.tsx) delas av DJ och gissare: navy `BrandUi.selectedFill` + svag guldkant, Q-märket (`QuizVibeDefaultAvatar framed`, 50 pt) i övre vänstra hörnet som rumskortet i lobbyn. DJ: "You’re the DJ" / "Play in Spotify · Track X of Y"; gissare: "[Namn] is the DJ" / "Listen and answer · Track X of Y". **"Track X of Y" = spårets position i Spotify-albumet** (`SPOTIFY_ALBUM_CONTEXT`), INTE frågeordningen i spelet. DJ:n ser inget frågekort.
+- **"DJ not responding — skipping in Ns…"** visas som statusrad på gissarkortet under auto-skip-nedräkningen (45 s väntan + 60 s nedräkning → skip vid 105 s). Ta inte bort den — utan den försvinner frågan oväntat om en non-host-DJ lägger ifrån sig telefonen.
+- **DJ:ns vänteläge** efter återkomst från Spotify: pulserande "Players are answering" (opacitet 1↔0.4, 650 ms per håll) + kompakt spårkort + "Open Spotify again". Visa aldrig "Track playing" som bekräftad status — appen vet inte om musiken spelas.
+- **Spårkortet** (`DJTrackCard`) är navy/gunmetal, inte grönt; hjälptexten "Play this exact track in Spotify" ersatte den orange varningen.
+- **Activate Timer** syns från start på sin slutliga plats, grå och otappbar tills DJ:n öppnat Spotify ("Waiting for the DJ to start the track"), sedan grön ("DJ will play Track X of Y"). Övriga gissare ser en grå "Waiting for timer"-platshållare i Confirm-knappens storlek — ingen layout-hopp när timern startar.
+- **"End DJ & hand over →"** (non-host-DJ i reveal) har navy + guldkant + vit text, inte Spotify-grönt. Host:s "Force DJ to end" är fortfarande grön.
+- Timer-linjen har extra luft (16 pt ovan/under, `timerSectionSpotify`) **bara i DJ:ns vy**.
+
+**Host "Skip Question" (2026-10-27)** — host som INTE är DJ kan hoppa över en Spotify-fråga via en diskret knapp (tunn metallisk kant, ↷) under gissarkortet → `QuizVibeDialog` "Skip this question for everyone?" (`centered` + `destructiveFilled`). Bekräftat → `handleHostSkipQuestionConfirmed` broadcastar nytt event **`question_skipped`** ([syncChannel.ts](src/lib/realtime/syncChannel.ts), trippelsänt 0/600/1800 ms). `applyQuestionSkipped` på varje enhet: latchar scoring, rensar frågans poster ur `allRoundScoresHistory`/`currentRoundScores`/`rounds`/pending-broadcasts, sätter `questionSkipped` + `phase='reveal'`. Inga poäng, ingen rätt/fel, **ingen auto-advance** — host ser "Question skipped" + vanliga Next/Final Leaderboard, övriga "Question skipped by Host". Sena peer-scores för en skippad fråga ignoreras (`skippedQuestionIndicesRef`). Dialogen stängs om fasen lämnar question/awaiting så en redan avgjord fråga inte kan skippas i efterhand.
 
 **Reveal-kort per Spotify-svarstyp** (2026-07-03, i quiz.tsx scroll-zone):
 - **Spotify/Year (DJ + non-DJ)**: `"Correct year: [Year]"` + undertext `"Titel — Artist"` (från `question.hint`). DJ har ingen ✓/✗-badge (DJ svarar inte). Non-DJ har badge.

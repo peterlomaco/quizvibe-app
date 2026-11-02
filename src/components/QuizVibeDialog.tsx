@@ -49,6 +49,11 @@ interface Props {
   /** Tre eller fler val (quizVibeAlert): staplade knappar i stället för
    *  primär/sekundär-raden. */
   stackedActions?: { label: string; onPress: () => void; kind: 'gold' | 'secondary' | 'destructive' }[];
+  /** Centrerad rubrik + meddelande (t.ex. korta spel-bekräftelser). */
+  centered?: boolean;
+  /** Destruktiv knapp som dämpad mörkröd fyllning med vit text i stället för
+   *  röd kontur — tydligare än Cancel men mindre dramatisk än Delete Account. */
+  destructiveFilled?: boolean;
 }
 
 export function QuizVibeDialog({ visible, onClose, ...rest }: Props) {
@@ -79,6 +84,8 @@ export function QuizVibeDialogOverlay({
   primaryLoading = false,
   onSecondary,
   stackedActions,
+  centered = false,
+  destructiveFilled = false,
 }: Omit<Props, 'visible'>) {
   const busy = (slideToConfirm?.busy ?? false) || primaryLoading;
   return (
@@ -90,10 +97,10 @@ export function QuizVibeDialogOverlay({
       />
       <View style={[styles.card, slideToConfirm && styles.cardCompact]} accessibilityViewIsModal>
         {icon ? <View style={styles.iconWrap}>{icon}</View> : null}
-        <Text style={styles.title} accessibilityRole="header">
+        <Text style={[styles.title, centered && styles.textCentered]} accessibilityRole="header">
           {title}
         </Text>
-        {message ? <Text style={styles.message}>{message}</Text> : null}
+        {message ? <Text style={[styles.message, centered && styles.textCentered]}>{message}</Text> : null}
         {warning ? (
           <>
             <View style={styles.warningDivider} />
@@ -163,13 +170,14 @@ export function QuizVibeDialogOverlay({
               style={({ pressed }) => [
                 styles.actionBtn,
                 styles.destructiveBtn,
+                destructiveFilled && styles.destructiveBtnFilled,
                 pressed && !primaryLoading && { opacity: 0.82, transform: [{ scale: 0.985 }] },
               ]}
             >
-              <LoadingContent loading={primaryLoading} color={Colors.error}>
+              <LoadingContent loading={primaryLoading} color={destructiveFilled ? '#FFFFFF' : Colors.error}>
                 <View style={styles.destructiveInner}>
                   {destructiveIcon}
-                  <Text style={styles.destructiveLabel}>{primaryLabel}</Text>
+                  <Text style={[styles.destructiveLabel, destructiveFilled && styles.destructiveLabelFilled]}>{primaryLabel}</Text>
                 </View>
               </LoadingContent>
             </Pressable>
@@ -291,6 +299,16 @@ const styles = StyleSheet.create({
     gap: 6,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  destructiveBtnFilled: {
+    backgroundColor: '#5A1E24',
+    borderColor: 'rgba(255,107,107,0.45)',
+  },
+  destructiveLabelFilled: {
+    color: '#FFFFFF',
+  },
+  textCentered: {
+    textAlign: 'center',
   },
   destructiveInner: {
     flexDirection: 'row',

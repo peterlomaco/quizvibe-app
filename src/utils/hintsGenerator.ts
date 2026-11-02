@@ -7,7 +7,7 @@
 //
 // Kör en gång per runda (via useMemo med resetKey som dep).
 
-import type { HintItem, HintLibrary } from './hintsData';
+import type { HintCategoryLabel, HintItem, HintLibrary } from './hintsData';
 
 // ── Radlängd ────────────────────────────────────────────────────────────────
 //
@@ -417,7 +417,8 @@ function birthSortKey(hint: HintItem): number {
  * en filmografi där den mest ikoniska rollen medvetet ligger på P5 (visas
  * sist) från de tidigare rollerna på P3-P4.
  */
-export function buildRenderEntries(hints: ResolvedHint[]): RenderEntry[] {
+export function buildRenderEntries(hints: ResolvedHint[], model: HeadingModel = null): RenderEntry[] {
+  if (model) return buildHeadedEntries(hints, model);
   const kinds = hints.map((h) => groupKindOf(h.hint));
 
   const indicesByKind = new Map<GroupKind, number[]>();
@@ -449,6 +450,102 @@ export function buildRenderEntries(hints: ResolvedHint[]): RenderEntry[] {
       continue;
     }
     entries.push({ kind: 'single', hint: hints[i], index: i });
+  }
+  return entries;
+}
+
+// ── Fast rubrikmodell för Artister/Band + Skådespelare (Peter 2026-11-02) ────
+//
+// Varje ledtråd hamnar under en rubrik — inga lösa bullets och ingenting tas
+// bort. Det som inte hör till en specifik rubrik samlas under "Other".
+// Idrottare (model null) behåller den äldre grupperingen ovan oförändrad.
+
+export type HeadingModel = 'artist' | 'actor' | null;
+
+export function headingModelFor(label: HintCategoryLabel): HeadingModel {
+  if (label === 'Musikartist' || label === 'Band') return 'artist';
+  if (label === 'Actor' || label === 'Character') return 'actor';
+  return null;
+}
+
+type HeadedGroup = 'birthCareer' | 'film' | 'songs' | 'albums' | 'trophies' | 'other';
+
+const HEADED_LABELS: Record<HeadedGroup, string> = {
+  birthCareer: 'Birth & Career',
+  film: 'Film History',
+  songs: 'Song titles',
+  albums: 'Albums',
+  trophies: 'Trophies',
+  other: 'Other',
+};
+
+const HEADED_ORDER: HeadedGroup[] = ['birthCareer', 'film', 'songs', 'albums', 'trophies', 'other'];
+
+export function headedGroupOf(hint: HintItem, model: 'artist' | 'actor'): HeadedGroup {
+  switch (hint.type) {
+    case 'birth_date':
+    case 'birth_place':
+    case 'peak_year':
+    case 'creation_year':
+      return 'birthCareer';
+    case 'debut': {
+      const isAlbum = /\balbum\b/i.test(`${hint.label} ${hint.value}`);
+      if (!isAlbum) return 'birthCareer';
+      return model === 'artist' ? 'albums' : 'other';
+    }
+    case 'movie':
+    case 'tv_show':
+      return model === 'actor' ? 'film' : 'other';
+    case 'song':
+      return model === 'artist' ? 'songs' : 'other';
+    case 'album':
+      return model === 'artist' ? 'albums' : 'other';
+    case 'merit':
+      return 'trophies';
+    case 'characteristic':
+      return hint.label === 'Formed in' ? 'birthCareer' : 'other';
+    default:
+      return 'other';
+  }
+}
+
+// Sorteringsnyckel inom "Other": genre, familj, bandmedlemmar först.
+function otherRank(hint: HintItem): number {
+  if (hint.type === 'characteristic' && hint.label === 'Genre') return 0;
+  if (hint.type === 'characteristic' && hint.label === 'Family') return 1;
+  if (hint.type === 'lead_singer' || hint.type === 'band_member' || hint.type === 'member_count') return 2;
+  return 3;
+}
+
+function birthCareerRank(hint: HintItem): number {
+  if (hint.type === 'birth_date') return 0;
+  if (hint.type === 'birth_place') return 1;
+  return 2;
+}
+
+function buildHeadedEntries(hints: ResolvedHint[], model: 'artist' | 'actor'): RenderEntry[] {
+  const buckets = new Map<HeadedGroup, { hint: ResolvedHint; index: number }[]>();
+  hints.forEach((h, index) => {
+    const g = headedGroupOf(h.hint, model);
+    if (!buckets.has(g)) buckets.set(g, []);
+    buckets.get(g)!.push({ hint: h, index });
+  });
+  const byYear = (a: { hint: ResolvedHint }, b: { hint: ResolvedHint }) =>
+    extractYearFromValue(a.hint.hint) - extractYearFromValue(b.hint.hint);
+
+  const entries: RenderEntry[] = [];
+  for (const g of HEADED_ORDER) {
+    const items = buckets.get(g);
+    if (!items?.length) continue;
+    if (g === 'birthCareer') {
+      items.sort((a, b) => birthCareerRank(a.hint.hint) - birthCareerRank(b.hint.hint) || byYear(a, b));
+    } else if (g === 'film' || g === 'songs' || g === 'albums') {
+      items.sort(byYear);
+    } else if (g === 'other') {
+      items.sort((a, b) => otherRank(a.hint.hint) - otherRank(b.hint.hint) || a.index - b.index);
+    }
+    // trophies: prioritets-ordning (index-ordning) behålls.
+    entries.push({ kind: 'group', label: HEADED_LABELS[g], items });
   }
   return entries;
 }

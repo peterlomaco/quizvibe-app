@@ -676,12 +676,14 @@ const styles = StyleSheet.create({
   // konkurrera om uppmärksamhet. Tidigare blå primary gav "läs mig"-intryck
   // som tävlade med correct-revealen.
   prefixTextWrongReveal: {
-    color: Colors.textDisabled,
+    // Lugn dämpning (textSecondary) — inte 40 %-grå (Peter 2026-10-28).
+    color: Colors.textSecondary,
   },
   // Reveal — dimma text på irrelevanta prefix-knappar (alla utom spelarens
   // val + rätta svaret) så fokus ligger på de två relevanta raderna.
   prefixTextDimmed: {
-    color: Colors.textDisabled,
+    // Lugn dämpning (textSecondary) — inte 40 %-grå (Peter 2026-10-28).
+    color: Colors.textSecondary,
   },
   // Name-card är `position: 'relative'` så badge:n (absolute top:-8 right:8)
   // kan skära kortets övre kantlinje. Får INTE vara `overflow: 'hidden'`.
@@ -837,7 +839,8 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   fullNameTextDimmed: {
-    color: Colors.textDisabled,
+    // Lugn dämpning (textSecondary) — inte 40 %-grå (Peter 2026-10-28).
+    color: Colors.textSecondary,
   },
   // Spelarens låsta RÄTTA svar — vit text (reveal-matris 2026-10-15).
   fullNameTextWhite: {

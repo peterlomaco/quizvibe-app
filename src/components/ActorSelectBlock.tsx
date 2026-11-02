@@ -150,7 +150,7 @@ export function ActorSelectBlock({
         let textColor: string = Colors.textPrimary;
         if (isPending) textColor = Colors.primary;
         else if (isConfirmedRow || isCorrectFacitRow) textColor = Colors.textPrimary;
-        else if (showWrongTimeout || isDimmed) textColor = Colors.textDisabled;
+        else if (showWrongTimeout || isDimmed) textColor = Colors.textSecondary;
         // Rätt svar ALLTID vit text vid reveal (reveal-matris 2026-10-26).
         if (isRevealing && isCorrectName) textColor = Colors.textPrimary;
         const showCorrectBadge =
@@ -227,7 +227,7 @@ export function ActorSelectBlock({
         const prefixColor =
           isPending || isConfirmedRow || isCorrectFacitRow || showWrongTimeout
             ? textColor
-            : isDimmed ? Colors.textDisabled : Colors.textPrimary;
+            : isDimmed ? Colors.textSecondary : Colors.textPrimary;
 
         return (
           <Pressable pressFeedback key={name} onPress={onPress} style={styles.prefixRow}>
