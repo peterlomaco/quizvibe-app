@@ -1,28 +1,21 @@
 # QuizVibe brand master assets (SVG)
 
-> **LOCKED — QuizVibe Brand Master (final, 2026-10-16).**
-> Peter has approved, on-device:
-> - the mark geometry
-> - the Manrope Bold wordmark
-> - composition B (wordmark at 95 %, mark unchanged)
+> **QuizVibe Brand Master — mark v2 (2026-11-02).**
+> The wordmark and composition B were locked 2026-10-16. Peter reopened the
+> Q mark on 2026-11-02 and chose variant D from `../logo-validation/mark-v2.html`:
+> - the ring is a thin, CLOSED circle (no slot), stroke 80 (v1: 136.62), outer radius unchanged
+> - the ring is exactly as thick as the handle (both 80)
+> - the handle sits entirely OUTSIDE the ring on the 46.4° axis; the connector is gone
+> - all three signal arcs sit entirely INSIDE the ring; arc stroke = 0.65 × ring stroke
 >
-> The logo/brand exploration phase is closed: no Q redesign, no wordmark changes, no more font tests. Further work only applies this system consistently across the production UI.
+> The mark is built by `build-mark.py` (`apply` rewrites the SVGs + variants +
+> `quizvibe-mark-geometry.json`), then `generate-rn-geometry.py` produces
+> `src/components/brand/quizVibeBrandGeometry.ts` for the app. Do not hand-edit
+> the paths; change the parameters in `build-mark.py` instead, and only on
+> Peter's request. The Manrope Bold wordmark and its letterforms stay unchanged.
 >
-> Do not change any of the following:
-> - the Q geometry or the circle's proportions
-> - the connector or the handle
-> - the two inner signal arcs or the single outer arc
-> - the arcs' alignment or stroke weights
-> - the Manrope Bold wordmark geometry (unmodified letterforms)
-> - the proportions between the mark and the wordmark
->
-> Approved derived compositions:
-> - the "Q only" subset (ring + connector + handle)
-> - a separate overlay glyph such as Hints' "?"
->
-> Neither may alter the frozen geometry. App code gets its geometry from
-> `src/components/brand/quizVibeBrandGeometry.ts`, which is generated from
-> these files by `generate-rn-geometry.py`.
+> Approved derived compositions: the "Q only" subset (ring + handle) and a
+> separate overlay glyph such as Hints' "?".
 
 These are the final master assets for the "Navy + Metallic Gold" QuizVibe logo. In the app they are used:
 - on **Home** (A1, mark + wordmark)
@@ -35,7 +28,7 @@ Every other screen still renders the PNGs in `assets/brand/`.
 
 | File | Content |
 |---|---|
-| `quizvibe-mark.svg` | Q symbol: circular ring with a slot at the lower right, connector, handle, 2 inner signal arcs + 1 outer signal arc |
+| `quizvibe-mark.svg` | Q symbol (v2): thin closed ring, handle outside the ring, three signal arcs inside it |
 | `quizvibe-wordmark.svg` | "QuizVibe" in Manrope Bold, converted to paths (no font needed at runtime) |
 | `quizvibe-logo.svg` | Mark above wordmark, laid out with the Home screen's proportions |
 | `variants/*-flatGold.svg` | Same geometry in flat `#F5A623` |
@@ -50,19 +43,19 @@ Validation (master PNG vs SVG at 512–24 px on navy, black and white): `../logo
 - **Geometry and paint are separate.** In each SVG the shapes live in `<defs>` as a paint-free `<g id="…-geometry">`. Visible layers are `<use>` references that set the fill.
   - The metallic version has three layers: a dark depth copy, a gold gradient and a soft shine.
   - The variants use the same paths with a single solid fill.
-- **Mark** (viewBox `0 0 965.46 1000`, same frame as the master PNG):
-  - The ring is a true circle.
-  - The ring's gap is a straight channel along the handle axis (46.4°).
-  - The connector has the handle's width, so connector + handle read as one bar split by a thin channel.
-  - The three signal arcs are concentric: one shared centre and bisector, so the outer arc is centred on the inner two.
-  - Arc stroke is 0.34 × the ring stroke.
+- **Mark v2** (viewBox `0 0 862.61 883.02`, a tight box around ring + handle; units are v1's):
+  - The ring is a true, closed circle: outer radius 398.70, stroke 80, inner radius 318.70.
+  - The handle (80 × 200, corner radius 0.3 × width) starts 0.4 × ring stroke outside the ring, along 46.4°.
+  - The three signal arcs are concentric and open towards 311° (upper right). Their centre is 0.18 × inner radius down-left of the ring centre. Relative radii 1 : 2 : 3, spans 89.5° / 64.8° / 41.8° (from v1). They're scaled so the outermost clears the ring's inner edge by 0.5 × arc stroke.
+  - Arc stroke is 0.65 × the ring stroke.
+  - `build-mark.py` asserts that the handle doesn't touch the ring and that the arcs stay inside it.
 - **Wordmark**:
   - Manrope Bold outlines (variable font instanced at wght 700) with the font's own spacing and kerning. No reshaping.
   - Fitted to the 780×185 wordmark frame with a 6 px margin (ink 768×136). This is the same frame and fit rule the previous wordmark used.
 - **Full logo (composition B, frozen)** in a 2200-unit-wide layout:
-  - The mark is 1160 units high, followed by a 160-unit gap.
+  - The mark is 1024.30 units high (v2; keeps the ring the same size as in v1's 1160-high mark), followed by a 160-unit gap.
   - The wordmark is 95 % of the logo width (2090 units), centred.
-  - On Home this is mark 116 pt, gap 16 pt, wordmark 220 × 0.95 = 209 pt; compact screens use mark 83 pt and wordmark 161.5 pt.
+  - On Home this is mark 116 × `MARK_HEIGHT_FROM_V1` (≈ 102 pt), gap 16 pt, wordmark 220 × 0.95 = 209 pt; compact screens use 83 × `MARK_HEIGHT_FROM_V1` and wordmark 161.5 pt.
   - In app code the constant is `WORDMARK_LOGO_SCALE` in `src/components/brand/QuizVibeBrandSvg.tsx`.
   - The A/B comparison (100 % vs 95 %) is kept for reference in `../logo-validation/composition-ab.html`.
 

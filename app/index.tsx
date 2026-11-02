@@ -1,7 +1,7 @@
 import { CodeKeyboard } from '@/src/components/CodeKeyboard';
 import { PlayerNameInput } from '@/src/components/PlayerNameInput';
 import { RotatingTagline } from '@/src/components/RotatingTagline';
-import { QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
+import { MARK_HEIGHT_FROM_V1, QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
 import * as WebBrowser from 'expo-web-browser';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicGoldFill';
 import { Avatar } from '@/src/components/Avatar';
@@ -3392,9 +3392,10 @@ export default function HomeScreen() {
         {/* ── Brand ──────────────────────────────────────────── */}
         <View style={styles.brandSection}>
           {/* Låst Brand Master (design/brand/), Metallic Gold, renderad med
-              react-native-svg. Komposition B: symbolen oförändrad (116/83 pt),
+              react-native-svg. Komposition B: ringen lika stor som i v1
+              (116/83 pt v1-höjd → MARK_HEIGHT_FROM_V1, märke v2 2026-11-02),
               ordmärket (Manrope Bold) 95 % av den tidigare bredden 220/170 pt. */}
-          <QuizVibeMarkSvg size={SCREEN_HEIGHT < 600 ? 83 : 116} variant="metallic" />
+          <QuizVibeMarkSvg size={Math.round((SCREEN_HEIGHT < 600 ? 83 : 116) * MARK_HEIGHT_FROM_V1)} variant="metallic" />
           <View style={styles.appNameWrap}>
             <QuizVibeWordmarkSvg
               width={(SCREEN_HEIGHT < 600 ? 170 : 220) * WORDMARK_LOGO_SCALE}

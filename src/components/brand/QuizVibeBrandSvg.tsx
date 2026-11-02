@@ -3,16 +3,18 @@ import { View } from 'react-native';
 import Svg, { Defs, G, LinearGradient, Path, Stop } from 'react-native-svg';
 import { Colors } from '../../theme';
 import {
+  LOGO_MARK_HEIGHT,
   MARK_PATHS,
   MARK_VIEWBOX,
   WORDMARK_PATH,
   WORDMARK_VIEWBOX,
 } from './quizVibeBrandGeometry';
 
-// QuizVibe Brand Master (design/brand/, LOCKED 2026-10-16) rendered with
-// react-native-svg. Geometry comes from the generated quizVibeBrandGeometry.ts;
-// this file only adds paint. Mark, Manrope Bold wordmark and composition B are
-// final — do not edit shapes or proportions here or in the generated file.
+// QuizVibe Brand Master (design/brand/) rendered with react-native-svg.
+// Geometry comes from the generated quizVibeBrandGeometry.ts; this file only
+// adds paint. Mark v2 (Peter 2026-11-02): thin closed ring, handle outside the
+// ring, all three arcs inside it — built by design/brand/build-mark.py. Do not
+// edit shapes or proportions here or in the generated file.
 // Rollout status (2026-10-26): used by Home and the YouTube end-of-clip
 // screen. The PNG QuizVibeGoldMark has no remaining call-sites.
 
@@ -41,13 +43,12 @@ function useSvgId(prefix: string) {
 const MARK_D = [
   MARK_PATHS.ring,
   ...MARK_PATHS.arcs,
-  MARK_PATHS.connector,
   MARK_PATHS.handle,
 ];
 
 // Avatar-varianten (2026-10-20): SAMMA låsta geometri, men utan de tre
 // signalbågarna — läser rent i små storlekar. Inga nya former.
-const MARK_Q_ONLY_D = [MARK_PATHS.ring, MARK_PATHS.connector, MARK_PATHS.handle];
+const MARK_Q_ONLY_D = [MARK_PATHS.ring, MARK_PATHS.handle];
 
 function MarkShapes({ fill, dy = 0, paths = MARK_D }: { fill: string; dy?: number; paths?: string[] }) {
   return (
@@ -126,7 +127,7 @@ export function QuizVibeMarkArcsSvg({ size, arcs = [0, 1, 2], color }: { size: n
 }
 
 /**
- * The Q symbol WITHOUT the three signal arcs (ring + connector + handle from
+ * The Q symbol WITHOUT the three signal arcs (ring + handle from
  * the locked geometry). Used only for the default profile avatar. `size` =
  * height in pt. `color` paints it in one flat colour (e.g. muted inactive
  * state); omitted = the same metallic gold treatment as QuizVibeMarkSvg.
@@ -196,12 +197,19 @@ export function QuizVibeWordmarkSvg({ width, variant = 'metallic' }: { width: nu
 }
 
 // Complete logo layout, identical to design/brand/quizvibe-logo.svg — the
-// FROZEN composition B: mark 1160 high, gap 160, wordmark at 95 % of the
-// 2200-unit logo width, centred. (Home's own brand block uses the same rule:
-// mark 116 pt, wordmark 220 × 0.95 = 209 pt.)
+// composition B: gap 160, wordmark at 95 % of the 2200-unit logo width,
+// centred. The mark height (LOGO_MARK_HEIGHT, v2 = 1024.3) keeps the ring the
+// same size as in v1's 1160-high mark, whose frame also held the outer arc.
 const LOGO_W = 2200;
-const LOGO_MARK_H = 1160;
+const LOGO_MARK_H = LOGO_MARK_HEIGHT;
 const LOGO_GAP = 160;
+/**
+ * Mark v2's frame is tighter than v1's (the outer arc moved inside the ring),
+ * so the same pt height would render a bigger ring. Multiply a v1 mark height
+ * (e.g. Home's 116 pt) by this to keep the ring at its v1 on-screen size.
+ */
+export const MARK_HEIGHT_FROM_V1 = MARK_VIEWBOX.height / 1000;
+
 /** Frozen composition B: the wordmark is 95 % of the logo width. */
 export const WORDMARK_LOGO_SCALE = 0.95;
 

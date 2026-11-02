@@ -37,6 +37,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import {
+  MARK_HEIGHT_FROM_V1,
   QuizVibeMarkSvg,
   QuizVibeWordmarkSvg,
   WORDMARK_LOGO_SCALE,
@@ -73,7 +74,7 @@ const PLAYER_H = QUIZ_MEDIA_H;
 // ordmärke 220 × WORDMARK_LOGO_SCALE, ~16 pt luft — skalad mot spelarhöjden
 // så den ryms även i den minsta 16:9-rutan (~180 pt): totalt ~66 % av höjden.
 const ENDED_SCALE = (PLAYER_H * 0.42) / 116;
-const ENDED_MARK_H = Math.round(116 * ENDED_SCALE);
+const ENDED_MARK_H = Math.round(116 * MARK_HEIGHT_FROM_V1 * ENDED_SCALE);
 const ENDED_WORDMARK_W = Math.round(220 * WORDMARK_LOGO_SCALE * ENDED_SCALE);
 const ENDED_GAP = Math.round(16 * ENDED_SCALE);
 

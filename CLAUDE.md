@@ -855,12 +855,26 @@ Alla lobbyvarianter (guest host utloggad, inloggad som Guest, QuizVibe-user; Sin
 - **`QuizVibeToggle`** flippar optimistiskt (`shown`-state, återgår efter 900 ms om värdet inte bekräftas) och anropar `onValueChange` i `requestAnimationFrame`; `locked`- och `style`-props.
 - ⚠ **Prestanda — använd `getSession()`, aldrig `getUser()`, för uid** ([profileStorage.ts](src/utils/profileStorage.ts) `getCurrentUser`, `mockActiveRooms`, `useWaitingInviteSignal`, `app/index.tsx`). `getUser()` är ett nätverksanrop som håller Supabase-auth-låset och serialiserade alla `loadProfile` — inloggning tog upp till 27 s och lobby-switchar svarade sent. RLS sköter behörigheten ändå.
 
+### Q-märke v2 (2026-11-02)
+
+Peter öppnade Brand Master igen och valde variant D ur `design/logo-validation/mark-v2.html`. Ordmärket (Manrope Bold) och komposition B är oförändrade.
+- **Ringen** är en tunn, SLUTEN cirkel (ingen slits), stroke 80 (v1: 136.62), samma ytterradie 398.70 → hålet är större.
+- **Ringen är exakt lika tjock som handtaget** (båda 80).
+- **Handtaget** ligger helt UTANFÖR ringen längs 46.4°-axeln; **connectorn är borttagen** (`MARK_PATHS` har ingen `connector` längre).
+- **Alla tre signalbågar** ligger INNANFÖR ringen; bågstroke = 0.65 × ringen. `QuizVibeMarkArcsSvg`:s index är oförändrade (0 = yttersta).
+- **Källan är parametrisk**: [design/brand/build-mark.py](design/brand/build-mark.py) — `preview` bygger jämförelsesidan, `apply` skriver om mark-/logo-SVG:erna + variants (i både `design/brand/` och `design/logo-validation/`) + `quizvibe-mark-geometry.json`. Kör därefter `python -I design/brand/generate-rn-geometry.py` → `src/components/brand/quizVibeBrandGeometry.ts`. **Redigera aldrig paths för hand** — ändra parametrarna i build-mark.py, och bara på Peters begäran. Scriptet assertar att handtaget aldrig rör ringen och att bågarna håller sig inuti.
+- **Ny tät viewBox** `0 0 862.61 883.02` (v1:s 965×1000-ram formades av den yttre bågen). Därför:
+  - `MARK_RING` (cx/cy/outer/inner, genererad) är ENDA källan för ringens mått — CountdownIntro och HintsIcon läser den. Hårdkoda aldrig ringens center/radie igen.
+  - `MARK_HEIGHT_FROM_V1` (= viewBox-höjd / 1000) gör att Home (116/83 pt v1-höjd) och YouTube-slutskärmen behåller ringens skärmstorlek. Komposition B:s märkeshöjd är `LOGO_MARK_HEIGHT` = 1024.3.
+  - Q-only-användare (default-avatar, bottom-nav Home, lobby-vattenstämpeln) renderar Q:t ~13 % större vid samma `size` — godkänt på telefon av Peter.
+- **Ej uppdaterat än** (gamla ringen): PNG:erna i `assets/brand/`, e-postloggan `docs/assets/brand/quizvibe-logo-email.png`, webbsidans header, app-ikon + splash. `SparkleDrawQ` (prisutdelningen) ritar en egen enkel ring och är inte kopplad till brand-geometrin.
+
 ### UI v2 — Get Ready, Join, Hints, H2H (2026-10-22, commit `65583eb`)
 
 Fortsatt UI-polish i samma språk (navy/gunmetal + återhållsamt guld). Nyckelbeslut:
 
 - **`BrandUi.selectedFill` (`#172234`)** = fyllning för valda/aktiva rutor med guldkant. Ersätter `Colors.warningMuted` som fyllning (den genomskinliga guldtonen blev BRUN mot navy). Används av Lobby `CHOICE_SELECTED_BG`, Profile `responseBtnActive` och Get Ready (aktiv frågeruta, YEAR/NAME-badges, Question-rad, dropdowns). `warningMuted` lever kvar för VARNINGS-rutor (eraWarning, InfoBox) — byt inte dem. Några svagare guld-fyllningar (0.04–0.10) i Profile-listor/SegmentedControl/PlayerFilterPicker är ännu inte bytta.
-- **`HintsIcon`** ([src/components/HintsIcon.tsx](src/components/HintsIcon.tsx)) = bottom bannerns Home-Q (`MARK_PATHS` ring+connector+handle, enfärgad) med vektor-"?" i ringhålet. Används i Lobby Quiz Mixer (guld när någon Hints-källa är på, grå annars). **Sedan 2026-10-23 alltid GULD** (`color={Colors.warning}`) i Lobby Game Sequence, Get Ready (dot-bars, Queue, aktuella frågerutan) och CountdownIntro:s mediaruta. Bara FinalCelebration använder fortfarande `MediaSourceIcon`:s gamla blå Q+"?".
+- **`HintsIcon`** ([src/components/HintsIcon.tsx](src/components/HintsIcon.tsx)) = bottom bannerns Home-Q (`MARK_PATHS` ring+handle, enfärgad) med vektor-"?" i ringhålet (skalat mot `MARK_RING.inner`). Används i Lobby Quiz Mixer (guld när någon Hints-källa är på, grå annars). **Sedan 2026-10-23 alltid GULD** (`color={Colors.warning}`) i Lobby Game Sequence, Get Ready (dot-bars, Queue, aktuella frågerutan) och CountdownIntro:s mediaruta. Bara FinalCelebration använder fortfarande `MediaSourceIcon`:s gamla blå Q+"?".
 - **Rena Q:t** = `QuizVibeDefaultAvatar framed` (inga signalbågar) — rumskortet i Lobby (30 pt, opacity 0.45) och Get Ready:s Game settings-rubrik (34 pt, opacity 0.45). Använd det, inte `QuizVibeGoldMark` (bågarna), för små inline-märken.
 - **Get Ready-header**: kompakt Quit-banner (tunn dämpad röd kant), litet Q inline med "Game settings" (FontSize.xl), `SectionToggle` för Game settings / Current Leaderboard / Playing queue. Dropdowns: guldkant + selectedFill + vit text. Leaderboard: vektor-`TrophyIcon` i guld, PTS guld, placering grå, subtilare avdelare. Press Play: `GoldCtaButton compact` (50 pt + `MetallicGoldFill tone="soft"` — dämpad mitt) + svart play-triangel som `trailing`. Övriga guldknappar har kvar standard-guldet.
 - **Join Game-modal**: `ChoiceRow.icon` är en render-funktion (vektor-ikoner `KeyOutlineIcon` guld / `EnvelopeOutlineIcon` / `ProfileOutlineIcon`, dämpade vid disabled) + `ChevronIcon`. Rumskod-steget: guld Join-CTA när koden är komplett. **`CodeKeyboard` är omfärgad globalt** (mörk navy-panel, nästan svarta tangenter, neutral tryck-feedback) — påverkar även PlayerName-tangentbordet i Register/guest/Add Player.
@@ -870,7 +884,7 @@ Fortsatt UI-polish i samma språk (navy/gunmetal + återhållsamt guld). Nyckelb
 ### UI v2 — Countdown + Get Ready (2026-10-23, commits `138e636`, `f110fe3`)
 
 **Countdown** ([CountdownIntro.tsx](src/components/CountdownIntro.tsx)):
-- Stora Q:t = **Home:s metalliska vektormark** (`QuizVibeMarkQOnlySvg` + bågar), INTE guld-PNG:n. Ringhålets mitt centreras via `MARK_W`/`MARK_HOLE_FX/FY` (ring-center 425.93, 523.93 i `MARK_VIEWBOX`); bredd 0.734 × `LOGO_SIZE` = samma ringstorlek som det gamla bågfria Q:t.
+- Stora Q:t = **Home:s metalliska vektormark** (`QuizVibeMarkQOnlySvg` + bågar), INTE guld-PNG:n. Ringhålets mitt centreras via `MARK_HOLE_FX/FY`, som läses ur `MARK_RING` (geometrin, inga hårdkodade tal); ringens ytterdiameter = 0.606 × `LOGO_SIZE`.
 - **Wifi-bågarna tänds**: grå (`ARC_UNLIT`) → guld en i taget, innersta → mitten → yttersta, `ARC_LIGHT_INTERVAL_MS = 1000`, start när `count` först blir icke-null (= röstens första siffra). Ny delad komponent `QuizVibeMarkArcsSvg` ([QuizVibeBrandSvg.tsx](src/components/brand/QuizVibeBrandSvg.tsx), samma låsta geometri, `arcs`-index 0 = yttersta, 2 = innersta, `color` = platt annars metallic). Bågarna följer INTE rösten exakt (rösten tickar ~1,3 s).
 - **Inga glyfer i ringen** — varken 3-2-1 eller "?". Timing, röst och `number*`/`qmark*`-animationerna är orörda (döda men ofarliga).
 - Spelarrutan (PtP/Single) = guldkant + `BrandUi.selectedFill`. Music/Film- och Year/Name-sidorutorna: aktiv = **guldkant + VIT text**, inaktiv grå. Hints-mediarutan = guld `HintsIcon` + guldram (`sourceBorderColor('image')` = `Colors.warning`); YouTube röd / Spotify grön oförändrat.

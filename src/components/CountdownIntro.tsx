@@ -17,7 +17,7 @@ import { ensureVoiceAudioMode } from '../utils/voicePlayback';
 import { HintsIcon } from './HintsIcon';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
 import { QuizVibeMarkArcsSvg, QuizVibeMarkQOnlySvg } from './brand/QuizVibeBrandSvg';
-import { MARK_VIEWBOX } from './brand/quizVibeBrandGeometry';
+import { MARK_RING, MARK_VIEWBOX } from './brand/quizVibeBrandGeometry';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
 
 interface Props {
@@ -76,13 +76,14 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 // Q-loggan dominerar bilden så användaren omedelbart läser hela skärmen som
 // "QuizVibe-frågesignal". Capad mot skärmbredd minus liten edge-gutter.
 const LOGO_SIZE = Math.min(360, SCREEN_WIDTH - 40);
-// Q-marken (Home:s QuizVibeMarkSvg) i nedräkningen. Bredden 0.734 × LOGO_SIZE
-// ger samma ringstorlek som det tidigare bågfria Q:t (0.62 × LOGO_SIZE).
-// Ringhålets mitt som andel av viewBoxen (ring-center 425.93, 523.93).
-const MARK_W = Math.round(LOGO_SIZE * 0.734);
-const MARK_H = (MARK_W * MARK_VIEWBOX.height) / MARK_VIEWBOX.width;
-const MARK_HOLE_FX = 425.93 / MARK_VIEWBOX.width;
-const MARK_HOLE_FY = 523.93 / MARK_VIEWBOX.height;
+// Q-marken (Home:s QuizVibeMarkSvg) i nedräkningen. Ringens ytterdiameter =
+// 0.606 × LOGO_SIZE (samma ringstorlek som tidigare). Storlek och ringhålets
+// mitt läses ur geometrin (MARK_RING) så de följer med om märket ändras.
+const RING_DIAMETER = LOGO_SIZE * 0.606;
+const MARK_H = (RING_DIAMETER * MARK_VIEWBOX.height) / (2 * MARK_RING.outer);
+const MARK_W = (MARK_H * MARK_VIEWBOX.width) / MARK_VIEWBOX.height;
+const MARK_HOLE_FX = MARK_RING.cx / MARK_VIEWBOX.width;
+const MARK_HOLE_FY = MARK_RING.cy / MARK_VIEWBOX.height;
 // Wifi-bågarna börjar grå och lyses upp i guld en i taget: innersta (index 2)
 // → mitten (1) → yttersta (0), med 1 s mellanrum (Peter 2026-10-23).
 const ARC_LIGHT_ORDER = [2, 1, 0] as const;

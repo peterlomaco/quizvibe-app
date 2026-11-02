@@ -7,6 +7,7 @@ copies their paint-free geometry (path data + viewBoxes) into a TypeScript
 module so react-native-svg can render exactly the same shapes. Colours live
 in the React components, not here. Re-run after any change to the SVGs.
 """
+import json
 import os
 import re
 
@@ -27,7 +28,10 @@ mark = read('quizvibe-mark.svg')
 word = read('quizvibe-wordmark.svg')
 
 parts = dict(re.findall(r'<path id="qvm-([a-z0-9]+)" d="([^"]+)"', mark))
-ring, connector, handle = parts['ring'], parts['connector'], parts['handle']
+ring, handle = parts['ring'], parts['handle']
+assert 'connector' not in parts, 'v2 mark has no connector'
+geo = json.loads(read('quizvibe-mark-geometry.json'))
+rg = geo['ring']
 arcs = [parts[k] for k in sorted(p for p in parts if p.startswith('arc'))]
 word_d = re.search(r'<g id="qvw-geometry"[^>]*><path d="([^"]+)"', word).group(1)
 mvb, wvb = viewbox(mark), viewbox(word)
@@ -51,9 +55,15 @@ lines = [
     '  arcs: [',
     *[f'    {ts_str(a)},' for a in arcs],
     '  ],',
-    f'  connector: {ts_str(connector)},',
     f'  handle: {ts_str(handle)},',
     '} as const;',
+    '',
+    '/** Ring of the Q (viewBox units): centre, outer + inner radius. */',
+    'export const MARK_RING = { cx: %s, cy: %s, outer: %s, inner: %s } as const;' % (
+        rg['cx'], rg['cy'], rg['outer'], rg['inner']),
+    '',
+    '/** Composition B: mark height in the 2200-unit-wide logo (gap 160). */',
+    'export const LOGO_MARK_HEIGHT = %s;' % geo['logo']['markHeight'],
     '',
     'export const WORDMARK_VIEWBOX = { width: %s, height: %s } as const;' % (wvb[2], wvb[3]),
     '',
