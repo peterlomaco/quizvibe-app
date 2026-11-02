@@ -3201,7 +3201,7 @@ Vem som helst — utloggad ELLER inloggad — kan hosta ett spel under en anonym
 
 ## Home + Lobby — roterande tagline (2026-10-26)
 
-[RotatingTagline](src/components/RotatingTagline.tsx) är den ENDA taglinen i appen och delas av Home (under ordmärket) och Lobby (egen centrerad rad under "Game Lobby" för BÅDE host och non-host, ovanför rumskortet). Två fraser i `TAGLINES`: **"Play your way. Anytime. Anywhere."** ↔ **"Music. Film/TV. Play."**. Ersätter den låsta `BRAND_TAGLINE` ("Anyone. Anywhere. Let’s play.") som inte längre renderas någonstans (konstanten finns kvar i QuizVibeBrandSvg.tsx).
+[RotatingTagline](src/components/RotatingTagline.tsx) är den ENDA taglinen i appen och delas av Home (under ordmärket) och Lobby (egen centrerad rad under "Game Lobby" för BÅDE host och non-host, ovanför rumskortet). Två fraser i `TAGLINES`: **"Play your way. Anytime. Anywhere."** ↔ **"Music. Film/TV. Memories."** (ändrad från "…Play." 2026-11-02). Ersätter den låsta `BRAND_TAGLINE` ("Anyone. Anywhere. Let’s play.") som inte längre renderas någonstans (konstanten finns kvar i QuizVibeBrandSvg.tsx).
 - ⚠ **Växlingen är SEKVENTIELL, aldrig cross-fade**: gamla frasen tonas ut helt (600 ms) → 150 ms tom paus → nya tonas in (600 ms), håll 4 s. Peter vill inte att fraserna ligger över varandra — gå inte tillbaka till `Animated.parallel`.
 - Index 0 ligger i flow och sätter höjden, övriga absolut ovanpå. Props: `textStyle`, `style` (container), `singleLine` (krymper hellre än bryts — används i Lobby).
 - Ändra texten på ETT ställe (`TAGLINES`) så följer båda skärmarna med.

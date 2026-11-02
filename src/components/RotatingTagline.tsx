@@ -4,7 +4,7 @@ import { Animated, Easing, StyleProp, StyleSheet, TextStyle, View, ViewStyle } f
 // Delad tagline för Home + Lobby (Peter 2026-10-26): två fraser som
 // växlar i samma slot — den gamla tonas ut helt innan den nya tonas in. Index 0 ligger i flow och sätter höjden;
 // övriga ligger absolut ovanpå så layouten aldrig hoppar.
-export const TAGLINES = ['Play your way. Anytime. Anywhere.', 'Music. Film/TV. Play.'];
+export const TAGLINES = ['Play your way. Anytime. Anywhere.', 'Music. Film/TV. Memories.'];
 const HOLD_MS = 4000;
 const FADE_MS = 600;
 /** Tom paus mellan ut- och intoning. */
