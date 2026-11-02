@@ -471,7 +471,7 @@ export default function StoreScreen() {
         case 'already_used':
           Alert.alert(
             'Free month already used',
-            "You've already used your free month on this account. Redeem a voucher code below for another month.",
+            "You've already used your free month on this account. You continue on the free Basic plan.",
           );
           break;
         case 'not_registered':
@@ -1111,7 +1111,9 @@ function PromoTierCard({
           )}
           {!premiumActive && freeMonthUsed && (
             <Text style={styles.tierSubline}>
-              Free month already used — redeem a voucher below
+              {VOUCHER_ENABLED
+                ? 'Free month already used — redeem a voucher below'
+                : 'Free month used — you continue on the free Basic plan'}
             </Text>
           )}
         </View>
