@@ -1337,6 +1337,8 @@ export function RoundLeaderboard({
                 pressed && { opacity: 0.85 },
               ]}
             >
+              {/* Metallisk guld = samma primär-CTA som Start New Game. */}
+              <MetallicGoldFill />
               <Text style={styles.renameSaveBtnText}>Save</Text>
             </Pressable>
             <Pressable
@@ -1497,11 +1499,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // Vald flik: guld RAM + vit text, men BLÅ bakgrund (Peter 2026-08-26).
-  // Guld-fyllningen togs bort — den gav hela fliken en gul ton. Ramen bär
-  // "vald"-signalen, bakgrunden hör till appens vanliga blå vokabulär.
+  // Vald flik: guld RAM + vit text på BrandUi.selectedFill (Peter
+  // 2026-11-03, v2 — var blå primaryMuted). Ingen guld-fyllning.
   slideTabActive: {
-    backgroundColor: Colors.primaryMuted,
+    backgroundColor: BrandUi.selectedFill,
     borderWidth: 1,
     borderColor: Colors.warning,
   },
@@ -1521,19 +1522,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 0.3,
   },
+  // Neutral penna (Peter 2026-11-03, var blå).
   renameBtn: {
     width: 28,
     height: 28,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.primaryBorder,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: BrandUi.border,
+    backgroundColor: BrandUi.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   renameBtnGlyph: {
     fontSize: 14,
-    color: Colors.primary,
+    color: BrandUi.icon,
   },
   // Bottom-sheet — speglar ProfileScreen:s friendsModal 1:1.
   renameOverlay: {
@@ -1579,17 +1581,22 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: Colors.error,
   },
+  // Guld primär-CTA (Peter 2026-11-03, var blå) — MetallicGoldFill +
+  // metallisk kant som Start New Game.
   renameSaveBtn: {
     height: 48,
     borderRadius: Radius.md,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.warning,
+    borderWidth: 1,
+    borderColor: METALLIC_GOLD_EDGE,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
   renameSaveBtnText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
-    color: '#fff',
+    color: '#000000',
   },
   renameCancelBtn: {
     height: 48,

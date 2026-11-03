@@ -2446,6 +2446,8 @@ Sport-tabell-layout som driver både GetReadyIntro:s utfällbara leaderboard OCH
 - Kontrast: kolumnrubriker `rgba(255,255,255,0.78)`, stats medium, namn 15 pt bold, `ROW_H` 78.
 - Popupen: extra `marginBottom` under spelarinfo; delta-badgarna något större (13 pt, `top: -11`) och korten med badge får `boxWithDelta` (paddingTop 13) så det blir luft mellan badge och sköld — `deltaBadge` används BARA här; delta-badgar (HCPShieldCard) röd = sämre (+), grön = bättre (−), grå = 0; Close = guldkant (0.6) + guldtext på `BrandUi.selectedFill`.
 
+**Flikar + rename v2 (Peter 2026-11-03)**: vald "This game / Marathon"-flik = guldkant + `BrandUi.selectedFill` + vit text (ingen blå). Rename-pennan neutral (`BrandUi.surface`/`border`, vit glyf). Rename-sheetens Save = metallisk guld-CTA (`MetallicGoldFill` + `METALLIC_GOLD_EDGE`, svart text) som Start New Game. Home-knappen (guld Q + guldtext) och tabellpanelens färger är MEDVETET oförändrade.
+
 **Header**: `headerTitle` = `fontSize: 24, fontWeight: '700'` (matchar Lobby:s screenTitle exakt). `headerSubtitle` ("Round X of Y") renderas BARA när `!isLastRound` — Final-vyn visar enbart huvudrubriken. Tidigare "Final result"-undertitel borttagen för minimalistisk layout.
 
 **Final leaderboard-knappar** (när `isLastRound`, i sticky footer):
