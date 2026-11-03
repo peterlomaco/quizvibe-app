@@ -22,12 +22,10 @@ import SparkleDrawQ, {
   RING_TOP_FRACTION,
 } from './SparkleDrawQ';
 import SparklerSound from './SparklerSound';
-import { MediaSourceIcon } from './MediaSourceIcon';
 import HcpProgressSummary, { HCP_CARD_HOLD_MS } from './HcpProgressSummary';
 import { QuizVibeWordmarkSvg } from './brand/QuizVibeBrandSvg';
 import { WORDMARK_VIEWBOX } from './brand/quizVibeBrandGeometry';
 import type { HighlightCard } from '../utils/matchHighlights';
-import { mainCategoryDisplay } from '../utils/mainCategory';
 
 /**
  * Prisutdelnings-sekvensen mellan sista frågans reveal och Final Leaderboard.
@@ -179,12 +177,51 @@ interface FinalCelebrationProps {
    * aldrig en egen ljud-check här.
    */
   muted?: boolean;
+  /** Spelarnamnet under "Game Summary"-rubriken (denna enhets spelare). */
+  playerName?: string;
+}
+
+/**
+ * Top Game Performance: den snabbaste tiden när flera delar högsta antalet
+ * rätt — det är den som avgör vinnaren, så den lyfts fram i guld och pulserar
+ * (scale 1 ↔ 1.12, native driver).
+ */
+function PulsingFastestTime({ text }: { text: string }) {
+  const pulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 1.12,
+          duration: 600,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 600,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+  return (
+    <Animated.Text
+      style={[styles.rankSecondary, styles.rankSecondaryFastest, { transform: [{ scale: pulse }] }]}
+    >
+      {text}
+    </Animated.Text>
+  );
 }
 
 export default function FinalCelebration({
   highlights,
   onDone,
   muted = false,
+  playerName,
 }: FinalCelebrationProps) {
 
   const [stage, setStage] = useState<Stage>('celebration');
@@ -644,7 +681,14 @@ export default function FinalCelebration({
               därför tillsammans med korten när spelaren trycker "Leave
               summary". Slutskärmens egen "Final Leaderboard"-rubrik tar då
               över. */}
-          <Text style={styles.summaryHeading}>Game Summary</Text>
+          <Text style={[styles.summaryHeading, !!playerName && styles.summaryHeadingWithName]}>
+            Game Summary
+          </Text>
+          {playerName ? (
+            <Text style={styles.summaryPlayerName} numberOfLines={1}>
+              {playerName}
+            </Text>
+          ) : null}
 
           {highlights.length > 0 && (
             <ScrollView
@@ -657,38 +701,10 @@ export default function FinalCelebration({
               style={styles.pager}
               contentContainerStyle={styles.pagerContent}
             >
-              {highlights.map((card, cardIndex) => {
-                // Music/Film-korten visar bara EN vinnare, så "1." blir bara
-                // brus — dölj radnumret helt och ge titeln mer luft ner till
-                // spelarnamnet. Listkorten + Hints-korten behåller sitt nummer.
-                const isCategoryCard =
-                  card.id === 'best-music' || card.id === 'best-film';
-                return (
+              {highlights.map((card, cardIndex) => (
                 <View key={card.id} style={styles.page}>
                   <View style={styles.card}>
-                    {/* Kategori → appens kant-skärande guld-badge (samma
-                        vokabulär som GetReadyIntro:s categoryBadge). Alla tre
-                        kategorier delar MEDVETET en enda guldfärg. */}
-                    {card.category && (
-                      <View style={styles.categoryBadge} pointerEvents="none">
-                        <Text style={styles.categoryBadgeText}>{mainCategoryDisplay(card.category)}</Text>
-                      </View>
-                    )}
-                    {/* Källa → appens OFFICIELLA brand-ikon (YouTubes röda
-                        play-knapp, Spotify vit monokrom, Q+"?" för Hints).
-                        Aldrig emoji — MediaSourceIcon är enda källan för
-                        dessa så brand-reglerna hålls på ett ställe. */}
-                    {card.source ? (
-                      <MediaSourceIcon source={card.source} size={COMPACT ? 34 : 42} />
-                    ) : card.icon ? (
-                      <Text style={styles.cardIcon}>{card.icon}</Text>
-                    ) : null}
-                    <Text
-                      style={[
-                        styles.cardTitle,
-                        (card.hcp || card.performance) && styles.cardTitleSolo,
-                      ]}
-                    >
+                    <Text style={[styles.cardTitle, styles.cardTitleSolo]}>
                       {card.title}
                     </Text>
                     {card.hcp ? (
@@ -714,73 +730,43 @@ export default function FinalCelebration({
                         <Text style={styles.perfLabel}>Average Lock-in Time</Text>
                       </View>
                     ) : card.rows ? (
-                      /* Placeringslista — samma layout på ALLA korttyper.
-                         Listkorten tar med alla spelare, källkorten bara
-                         förstaplatsen (som kan delas av flera).
-
-                         Vertikal ScrollView inuti den horisontella pagern:
-                         ett 12-spelarspel ryms inte på en kort skärm, och
-                         att korta listan hade motsagt "alla spelare listas".
-                         Motsatt scroll-riktning gör att paging fortfarande
-                         fungerar. */
+                      /* Top Game Performance — bara de som delar högsta
+                         antalet rätt, sorterade på snittid (lägst vinner). */
                       <ScrollView
-                        style={[styles.rankList, isCategoryCard && styles.rankListSpaced]}
+                        style={styles.rankList}
                         contentContainerStyle={styles.rankListContent}
                         nestedScrollEnabled
                         showsVerticalScrollIndicator={false}
                       >
                         {card.rows.map((row) => (
-                          <View
-                            key={row.playerId}
-                            style={[styles.rankRow, isCategoryCard && styles.rankRowCentered]}
-                          >
-                            {/* place === null: spelaren lämnade mitt i
-                                matchen och rankas inte. Texten renderas ändå
-                                (tom) så `rankPlace`:ens fasta bredd håller
-                                namnkolumnen i linje. På Music/Film-korten
-                                (en enda vinnare) döljs numret helt. */}
-                            {!isCategoryCard && (
-                              <Text
-                                style={[
-                                  styles.rankPlace,
-                                  row.place === 1 && styles.rankPlaceTop,
-                                ]}
-                              >
-                                {row.place === null ? '' : `${row.place}.`}
-                              </Text>
-                            )}
+                          <View key={row.playerId} style={styles.rankRow}>
+                            <Text
+                              style={[styles.rankPlace, row.place === 1 && styles.rankPlaceTop]}
+                            >
+                              {`${row.place}.`}
+                            </Text>
                             {row.emoji ? (
                               <Text style={styles.rankEmoji}>{row.emoji}</Text>
                             ) : null}
-                            <Text
-                              style={isCategoryCard ? styles.rankNameCentered : styles.rankName}
-                              numberOfLines={1}
-                            >
+                            <Text style={styles.rankName} numberOfLines={1}>
                               {row.name}
                             </Text>
-                            <Text
-                              style={[
-                                styles.rankValue,
-                                row.place === null && styles.rankValueLeft,
-                              ]}
-                            >
-                              {row.value}
-                            </Text>
+                            <Text style={styles.rankValue}>{row.value}</Text>
+                            {row.fastest ? (
+                              <PulsingFastestTime text={row.secondary} />
+                            ) : (
+                              <Text style={styles.rankSecondary}>{row.secondary}</Text>
+                            )}
                           </View>
                         ))}
                       </ScrollView>
-                    ) : card.value ? (
-                      /* Solospel/personal — ingen att placera sig mot, så
-                         talet bär hela kortet. */
-                      <Text style={styles.cardValue}>{card.value}</Text>
                     ) : null}
                     {card.detail ? (
                       <Text style={styles.cardDetail}>{card.detail}</Text>
                     ) : null}
                   </View>
                 </View>
-                );
-              })}
+              ))}
             </ScrollView>
           )}
 
@@ -907,6 +893,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: COMPACT ? Spacing.md : Spacing.lg,
   },
+  // Med spelarnamn under: rubriken släpper sin luft till namnraden.
+  summaryHeadingWithName: {
+    marginBottom: 2,
+  },
+  summaryPlayerName: {
+    fontSize: COMPACT ? FontSize.md : FontSize.lg,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: COMPACT ? Spacing.md : Spacing.lg,
+  },
   // flexGrow: 0 så ScrollView:n tar kortets höjd i stället för att sträcka
   // sig över hela overlayen.
   pager: {
@@ -947,31 +944,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 8,
   },
-  // Kant-skärande kategoribadge — speglar GetReadyIntro:s categoryBadge
-  // 1:1. Kortet får INTE sättas till overflow: 'hidden', då klipps badgen
-  // (samma villkor som HOST/GUEST-badgen på PlayerRow).
-  categoryBadge: {
-    position: 'absolute',
-    top: -9,
-    left: Spacing.md,
-    backgroundColor: Colors.warning,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    zIndex: 10,
-    elevation: 4,
-  },
-  categoryBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    color: '#000',
-    textTransform: 'uppercase',
-  },
-  cardIcon: {
-    fontSize: COMPACT ? 30 : 38,
-    lineHeight: COMPACT ? 34 : 44,
-  },
   cardTitle: {
     ...Typography.overline,
     color: Colors.textSecondary,
@@ -992,11 +964,6 @@ const styles = StyleSheet.create({
     // sträcka ut kortet när det är få spelare.
     flexGrow: 0,
   },
-  // Music/Film-korten (en vinnarrad, inget radnummer) — mer luft mellan
-  // titeln och spelarnamnet.
-  rankListSpaced: {
-    marginTop: Spacing.lg,
-  },
   rankListContent: {
     gap: COMPACT ? 4 : 6,
   },
@@ -1004,11 +971,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-  },
-  // Music/Film-korten: en enda vinnarrad centreras som grupp (avatar + namn
-  // + poäng) i stället för namn vänster / poäng långt till höger.
-  rankRowCentered: {
-    justifyContent: 'center',
   },
   rankPlace: {
     width: 22,
@@ -1033,34 +995,25 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
   },
-  // Centrerad rad: självständig stil UTAN `flex` (att override:a flex-shorthanden
-  // med flexBasis är opålitligt i RN — namnet kollapsade till 0 bredd). Namnet
-  // tar sitt innehålls bredd så poängen sitter tätt intill, och flexShrink 1
-  // låter mycket långa namn trunkeras.
-  rankNameCentered: {
-    flexShrink: 1,
-    fontSize: COMPACT ? FontSize.sm : FontSize.md,
-    fontWeight: FontWeight.semibold,
-    color: Colors.textPrimary,
-  },
   rankValue: {
     fontSize: COMPACT ? FontSize.md : FontSize.lg,
     fontWeight: FontWeight.bold,
     color: Colors.warning,
     fontVariant: ['tabular-nums'],
   },
-  // "Left" i stället för ett resultat — grått, så raden läses som
-  // information och inte som en prestation att jämföra med de gyllene.
-  rankValueLeft: {
-    color: Colors.textSecondary,
-  },
-  cardValue: {
-    fontSize: COMPACT ? 28 : 34,
-    fontWeight: FontWeight.bold,
+  // Top Game Performance: snittiden — sekundär, grå.
+  // Snabbaste tiden vid lika antal rätt — avgör vinnaren.
+  rankSecondaryFastest: {
     color: Colors.warning,
-    letterSpacing: -0.5,
+    fontWeight: FontWeight.bold,
+  },
+  rankSecondary: {
+    minWidth: 58,
+    textAlign: 'right',
+    fontSize: COMPACT ? FontSize.sm : FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
     fontVariant: ['tabular-nums'],
-    marginTop: Spacing.xs,
   },
   // ── Game Performance (solospel) ──────────────────────────────────────
   perfBlock: {

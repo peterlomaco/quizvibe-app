@@ -95,7 +95,10 @@ import {
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
 import { filterByGenerationRecognition } from '@/src/utils/generationRecognition';
 import { isMainCategory, subjectToMainCategory, itemInEnabledCategories, displayCategoryForItem, defaultEnabledMainCategories, MAIN_CATEGORIES, YT_CATEGORY_WEIGHTS, type MainCategory } from '@/src/utils/mainCategory';
-import { buildMatchHighlights, buildSinglePlayerSummary } from '@/src/utils/matchHighlights';
+import {
+  buildMultiplayerSummary,
+  buildSinglePlayerSummary,
+} from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
 import { resolveActivePackageTags, itemInActivePackages, computePackageCoverage } from '@/src/utils/hostPackages';
@@ -9325,6 +9328,9 @@ export default function QuizScreen() {
   // cancelled). Då finns inget mer att vänta in även om motståndaren aldrig
   // spelade klart — "Start New Game" ska låsas upp.
   const [remoteMatchEnded, setRemoteMatchEnded] = useState(false);
+  // H2H: matchens host (den som skapade den) — turnOrder innehåller bara self
+  // i remote, så namnet läses ur match-raden. Visas under "Game Summary".
+  const [remoteHostName, setRemoteHostName] = useState<string | null>(null);
   useEffect(() => {
     if (!isRemote || !remoteMatchId || phase !== 'leaderboard') return;
     let cancelled = false;
@@ -9333,6 +9339,7 @@ export default function QuizScreen() {
       if (cancelled || !m || !myId) return;
       const opp = m.players.find((p) => p.userId !== myId) ?? null;
       setRemoteOpponentSummary(opp?.finishedAt ? opp : null);
+      setRemoteHostName(m.players.find((p) => p.isHost)?.playerName ?? null);
       setRemoteMatchEnded(m.status !== 'active');
     };
     void load();
@@ -9383,17 +9390,57 @@ export default function QuizScreen() {
   // visas bara celebration och sedan slutskärmen ("Waiting for opponent").
   const remoteSummaryReady = !isRemote || !!remoteOpponentSummary || remoteMatchEnded;
 
-  // Personal-läge när det inte finns någon att jämföra med: ensam spelare,
-  // eller remote där kategori-/källjämförelser saknar underlag.
-  const highlightMode =
-    isRemote || leaderboardPlayers.length < 2 ? 'personal' : 'competitive';
+  // Multiplayer-däcket (Peter 2026-11-03): HCP Progress för DENNA enhets
+  // inloggade spelare → Top Game Performance. Inget kort jämför allas HCP —
+  // det finns redan på Final Leaderboard. Remote 1v1 och guest-hostade spel
+  // bokför inget HCP och får därför inget HCP-kort.
+  const summaryShowsHcp = !isRemote && !isGuestHostGame;
+  const summaryGuestIds = useMemo(
+    () => new Set(turnOrder.filter((p) => p.type === 'guest').map((p) => p.id)),
+    [turnOrder],
+  );
+  // Registrerad self: sköldkortet är kort 1, så däcket väntar på det egna
+  // HCP-resultatet så kortet aldrig skjuts in framför ett kort som redan syns.
+  //  • Host / Individual devices: den egna bokföringen (selfHcpSettled, 4 s
+  //    skyddsnät nedan).
+  //  • Pass-the-Phone-follower: resultatet räknas på host:ens telefon och
+  //    anländer via player_hcp_changed — vänta på det (eller timeouten).
+  const waitForSelfHcp =
+    summaryShowsHcp && !!selfPlayerId && !summaryGuestIds.has(selfPlayerId);
+  const [followerHcpWaitDone, setFollowerHcpWaitDone] = useState(false);
+  const selfHcpReady = isPtPSpectator
+    ? (!!selfPlayerId && !!playerHcpChanges[selfPlayerId]) || followerHcpWaitDone
+    : selfHcpSettled;
+  useEffect(() => {
+    if (!isPtPSpectator || phase !== 'leaderboard' || !isLastQuestion) return;
+    if (followerHcpWaitDone) return;
+    const id = setTimeout(() => setFollowerHcpWaitDone(true), 5000);
+    return () => clearTimeout(id);
+  }, [isPtPSpectator, phase, isLastQuestion, followerHcpWaitDone]);
+
+  // Raden under "Game Summary" (Peter 2026-11-03): "Host: <namn>" i alla
+  // lägen (solo, Pass-the-Phone, H2H, guest-hostat) — UTOM Individual
+  // devices, där varje telefon visar sin egen spelares namn utan etikett.
+  // Host-raden är id '1' (LobbyScreen:s host-id); turnOrder[0] som fallback
+  // eftersom PtP-turordningen kan flyttas om.
+  const summaryPlayerLabel = useMemo(() => {
+    // Pass-the-Phone-follower (non-host som följer leaderboarden på egen
+    // telefon): sitt eget namn, inte host:ens.
+    if (!isRemote && (gameMode === 'individual-devices' || isPtPSpectator)) {
+      return (turnOrder.find((p) => p.id === selfPlayerId) ?? turnOrder[0])?.name;
+    }
+    const hostName = isRemote
+      ? remoteHostName ?? (isHost ? turnOrder[0]?.name : null)
+      : (turnOrder.find((p) => p.id === '1') ?? turnOrder[0])?.name;
+    return hostName ? `Host: ${hostName}` : undefined;
+  }, [isRemote, gameMode, isPtPSpectator, turnOrder, selfPlayerId, remoteHostName, isHost]);
 
   const matchHighlights = useMemo(() => {
     if (phase !== 'leaderboard' || !isLastQuestion || !remoteSummaryReady) return [];
     // Solospel: EXAKT två kort — HCP Progress → Game Performance (se
-    // buildSinglePlayerSummary). Inga kategori-/källkort. Väntar tills HCP-
-    // bokföringen är avgjord så HCP-kortet alltid är kort 1 och aldrig skjuts
-    // in framför ett kort som redan visas. Multiplayer: oförändrat.
+    // buildSinglePlayerSummary). Väntar tills HCP-bokföringen är avgjord så
+    // HCP-kortet alltid är kort 1 och aldrig skjuts in framför ett kort som
+    // redan visas.
     if (!isRemote && leaderboardPlayers.length === 1) {
       if (!selfHcpSettled) return [];
       const selfHcp = selfPlayerId ? playerHcpChanges[selfPlayerId] : undefined;
@@ -9403,12 +9450,16 @@ export default function QuizScreen() {
         hcp: selfHcp ?? null,
       });
     }
-    return buildMatchHighlights({
+    if (waitForSelfHcp && !selfHcpReady) return [];
+    return buildMultiplayerSummary({
       scores: allRoundScoresHistory,
       players: leaderboardPlayers,
-      categoryByQuestion: effectiveCategoryByQuestion,
-      mediaSourceByQuestion: effectiveMediaSourceByQuestion,
-      mode: highlightMode,
+      guestIds: summaryGuestIds,
+      selfPlayerId,
+      // Bara denna enhets eget resultat — aldrig ett påhittat värde för en
+      // gäst (guestIds-spärren i buildern) eller för ett spel utan HCP.
+      selfHcp:
+        summaryShowsHcp && selfPlayerId ? playerHcpChanges[selfPlayerId] ?? null : null,
     });
   }, [
     phase,
@@ -9416,13 +9467,14 @@ export default function QuizScreen() {
     remoteSummaryReady,
     allRoundScoresHistory,
     leaderboardPlayers,
-    effectiveCategoryByQuestion,
-    effectiveMediaSourceByQuestion,
-    highlightMode,
     isRemote,
     selfPlayerId,
     playerHcpChanges,
     selfHcpSettled,
+    waitForSelfHcp,
+    selfHcpReady,
+    summaryGuestIds,
+    summaryShowsHcp,
   ]);
 
   // Skyddsnät: hänger HCP-skrivningen (AsyncStorage) får solospelets summary
@@ -11060,6 +11112,7 @@ export default function QuizScreen() {
         {isLastQuestion && !summaryDone && (
           <FinalCelebration
             highlights={matchHighlights}
+            playerName={summaryPlayerLabel}
             onDone={handleSummaryDone}
             // Sprakljudet under Q-ritningen. Grindas ENBART på
             // isAudioMutedForSelf, precis som appens övriga ljudkällor.

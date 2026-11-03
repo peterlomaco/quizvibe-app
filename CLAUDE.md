@@ -2502,45 +2502,21 @@ Mellan sista frågans reveal och slutskärmen spelas en kort prisutdelning: guld
 
 **Gating**: `isLastQuestion && !summaryDone`. `phase` kan bli `'leaderboard'` även MELLAN ronder via footerns `Next Round →`-gren — där ska ingen prisutdelning fyra.
 
-**Däcket (omarbetat 2026-09-11, Peter — kategori-hinkar ersätter källkorten)** — upp till sex kort i FAST ordning. Ordningen är explicit begärd; ändra den inte utan nytt beslut (notera att **Music ligger före Film**, och att Hints splittas på kategori):
+**Multiplayer-däcket (omarbetat 2026-11-03, Peter — ERSÄTTER 2026-09-11-däcket med Correct answers / Best on Music/Film/Hints / Fastest fingers).** Byggs av `buildMultiplayerSummary` i [matchHighlights.ts](src/utils/matchHighlights.ts); `buildMatchHighlights` + kategori-/Hints-hinkarna är BORTTAGNA — återinför dem inte utan nytt beslut.
 
-| # | Kort | Innehåll | Villkor |
-|---|---|---|---|
-| 1 | Correct answers | **PLACERINGSLISTA över alla spelare** efter antal rätt | ≥2 spelare |
-| 2 | Best on Music | **enbart förstaplatsen** (flest rätt i hinken), samma radlayout | hinken spelad + någon fick ≥1 rätt |
-| 3 | Best on Film | ↑ | ↑ |
-| 4 | Best on Hints - Music | ↑ | ↑ |
-| 5 | Best on Hints - Film | ↑ | ↑ |
-| 6 | Fastest fingers | **PLACERINGSLISTA över alla spelare** efter snittsvarstid | ≥2 spelare med tidsunderlag |
+**Förenklat samma dag (Peter 2026-11-03): EXAKT två kort i båda multiplayer-lägena.**
 
-**Hinkarna byggs ur (källa × kategori) per fråga**, inte ur källan ensam. `mediaSourceByQuestion` och `categoryByQuestion` (f.d. dormant, nu LIVE) är index-alignade mot samma frågesekvens, så en frågas hink avgörs av båda tillsammans:
-- **Music** (kort 2) = alla Spotify-frågor (räknas ALLTID som Music — DJ:n serverar bara låtar) **+** YouTube-frågor med kategori Music, sammanslaget till EN hink.
-- **Film** (kort 3) = bara YouTube-frågor med kategori Film.
-- **Hints - Music / Hints - Film** (kort 4-5) = image/Hints-frågor splittade på kategori.
+| Spel | Kort, i fast ordning |
+|---|---|
+| Individual devices + Pass-the-Phone (host OCH follower-enhet) | 1. **HCP progress** — DENNA enhets inloggade spelare, samma sköld/myntsnurr-kort som solo · 2. **Top game performance** |
+| Remote 1v1 / guest-hostat spel | bara **Top game performance** (inget HCP bokförs) |
 
-**ALLA kort som namnger spelare använder SAMMA radlayout** (Peter 2026-08-25): `1. 🦊 Anna` till vänster, talet högerställt. Skillnaden är bara hur många rader som visas — listkorten (1 och 6) tar med alla spelare, hink-korten (2-5) bara förstaplatsen. Det finns alltså inget "stort namn + stort tal"-kort kvar; `HighlightCard.rows` är enda vägen till ett spelarnamn, och `value` används bara när det inte finns någon att placera sig mot.
+⚠ **Det finns INGET kort som jämför alla spelares HCP** — "All players HCP"/"HCP progress"-listan byggdes och togs bort samma dag. Allas HCP finns redan på Final Leaderboard ("HCP N (delta)" + "+"-popupen). Återinför inte ett HCP-jämförelsekort.
 
-**Ikon-treatment**: kategorikorten (Music/Film) bär en gold kant-skärande kategoribadge + en genre-emoji (🎵/🎬); Hints-korten bär Hints-källikonen (`source: 'image'`, Q+"?") PLUS en Music/Film-kategoribadge. Renderingen i FinalCelebration är oförändrad — den ritar redan badge + källikon/emoji per fältuppsättning.
+- **Vems HCP**: `selfPlayerId` på enheten. I PtP är det host-telefonens inloggade spelare; på en follower-enhet åskådarens egen. Gäst (`summaryGuestIds`) eller saknat resultat → kortet utelämnas, aldrig ett påhittat värde. `summaryShowsHcp = !isRemote && !isGuestHostGame` i [quiz.tsx](app/quiz.tsx).
+- **Väntan så kortet alltid är kort 1**: host/IndDev väntar på `selfHcpSettled` (4 s skyddsnät). PtP-followern räknar inget eget HCP — resultatet anländer via host:ens `player_hcp_changed`-relay, så den väntar på `playerHcpChanges[selfPlayerId]` eller 5 s (`followerHcpWaitDone`), därefter utan HCP-kort.
 
-**Talet i högerkolumnen** är `antal rätt/antal frågor` på kort 1-5 och snittiden på kort 6. ⚠ På hink-korten är **nämnaren hinkens storlek**, inte spelarens antal svar — alla delade vinnare har samma `correct`, men `answered` kan skilja om någon tappade uppkopplingen. Kort 1 använder däremot spelarens eget `answered`.
-
-**Delad placering är hela poängen med listkorten.** Standard competition ranking (**1, 1, 3** — inte 1, 1, 2): spelare med samma antal rätt delar plats. Det skiljer sig MEDVETET från Final Leaderboard, som bryter poänglika på snittsvarstid och därför alltid ger en unik ordning — korten firar prestationen, tabellen kör tävlingen. Hink-korten (2-5) visar bara förstaplatsen, men **flera spelare kan dela den och listas då båda på plats 1** (`detail`: "N players share first place").
-- Kort 1 delar plats på **antal rätt**, inte på träffprocent — "3/4" och "3/3" hamnar på samma plats.
-- Kort 6 delar plats på det **VISADE** talet (2 decimaler). Annars kan två rader som båda står på "8.42s" hamna på plats 1 och 2, vilket läses som en bugg.
-- Spelare som aldrig svarade är MED i kort 1 (sist, "0/0") men UTE ur kort 6 — de har inget tidsunderlag att placera.
-
-**Kort 6 mäter snittiden att låsa ett svar oavsett rätt/fel** — samma tal som tabellens `AVG`-kolumn och samma som redan avgör vid poänglika i sorteringen. Sekvensen förstärker alltså poängmodellen spelarna redan spelar efter. **Timeouts räknas MED** (registreras med full svarstid — man låste aldrig ett svar), **`connectionError` räknas BORT** (nätverkets fel; tabellen särredovisar dem redan). Ändra inte det utan att också ändra `AVG`, annars motsäger kortet tabellen under.
-
-⚠ **`MIN_QUESTIONS_PER_BUCKET = 1`** (sänkt från 2 den 2026-08-25). Regeln är "visa inte kort för hinkar som inte spelats" — en hink som spelats EN gång HAR spelats. Tröskeln 2 var dessutom oförenlig med däcket: standardspelet är 4 rundor och Hints-kvoten är `floor(N/4) = 1` fråga, så Hints-korten hade aldrig kunnat visas. Hinkar utan data hoppas fortfarande över automatiskt, liksom hinkar där **ingen** fick något rätt (sekvensen ska vara firande — "Best on Music — 0 of 3" är den inte). ⚠ En YouTube-fråga UTAN kategori-data hamnar i varken Music eller Film → inget kort; kategori-arrayen måste vara populerad (den kommer från `effectiveCategoryByQuestion` i quiz.tsx).
-
-**`mode`**: `competitive` ger hink-korten sina rader; `personal` utelämnar dem och låter talet bära kortet ("Music — 3 of 4", "Hints · Music — 2 of 2"). Personal används vid **enspelarläge och remote 1v1**.
-- ⚠ **Listkorten gatas på ANTALET SPELARE, inte på `mode`.** Remote 1v1 kör personal-läge (kategorijämförelser saknar underlag) men har två spelare med fullgott underlag för båda listkorten — de ska placeras mot varandra. Ett SOLOSPEL får value-layouten i stället, eftersom en lista med en enda rad inte är en placering.
-
-⚠ **`MAX_HIGHLIGHT_CARDS = 8`** (höjt från 6 när däcket blev sex kort) — taket binder inte i dag men står kvar som skyddsnät. `HighlightKind` är numera `most-correct | fastest-average | best-music | best-film | best-hints-music | best-hints-film`; de gamla `'source'`/`'category'`/`'fastest-single'`-kind:arna + `SOURCE_CARDS` är borttagna. `CATEGORY_CARDS = ['Music','Film']` behålls som dokumentation av de levande V1-kategorierna (Sport är borttaget som live-kategori).
-
-⚠ **"Bild"-frågor och "Hints" är SAMMA hink.** Personbilderna är juridiskt parkerade — det som spelas är flagga + ledtrådar. Kortet heter `Hints` (appens eget namn i Source Mixerboard). Lägg inte till ett separat bildkort.
-
-**`RoundScore.questionIndex`** (nytt, optional) är det som gör källkorten möjliga. ⚠ **Man kan INTE använda `allRoundScoresHistory`:s yttre index** — i IndDev appendas mottagna peer-scores som nya yttre poster i ankomstordning (`playerScoreRecordedHandlerRef`), så yttre index ≠ frågeindex så fort fler än en enhet spelar. Fältet sätts från `questionIndexRef.current` lokalt och från `payload.question_index` för peers (som tidigare bara användes till dedup-nyckeln). Joinas mot `effectiveCategoryByQuestion` / `effectiveMediaSourceByQuestion` — båda indexerade mot host:s auktoritativa sekvens och korrekta på alla enheter.
+**Top game performance**: bara spelarna som delar HÖGSTA antalet rätt. Varje rad: `1. 🦊 Anna   2/2   3.00s` — rätt svar guld (primärt), snittid grå (sekundär, `rankSecondary`), sorterat på snittiden: **lägst vinner** och får guld-1:an, näst snabbast plats 2 osv. Placeringarna är ALLTID unika (ingen delad plats). Spelare med färre rätt visas inte alls. Delar FLERA högsta antalet rätt får den snabbastes snittid `fastest: true` → renderas i GULD och PULSERAR (`PulsingFastestTime`, scale 1↔1.12 / 600 ms, native driver) — det är tiden som avgjorde. En ensam toppspelare får ingen markering. En ensam toppspelare → en rad. Snittiden = leaderboardens AVG: timeouts räknas MED, `connectionError` räknas BORT. Den som lämnade mitt i matchen är utesluten. Remote-motståndaren läses ur `summaryStats`.
 
 **Kort-slidern** — korten ligger i en horisontell `ScrollView` med `pagingEnabled` (en sida = full skärmbredd, krav för paging). **Placeringslistorna har en egen VERTIKAL `ScrollView`** med tak `RANK_LIST_MAX_H` (34 % av skärmhöjden): ett 12-spelarspel ryms inte på en kort skärm, och att korta listan hade motsagt "alla spelare listas". Motsatt scroll-riktning gör att paging fortfarande fungerar. Listkort får dessutom längre auto-hålltid (`cardHold + rader × RANK_ROW_HOLD_MS`) — en lista med tio namn hinner inte läsas på samma tid som ett kort med ett enda tal. Spelaren sveper själv; prick-indikatorn under visar vilket kort av hur många (döljs vid ett enda kort). **Auto-bläddringen stannar PERMANENT vid första egna svepet** (`userTookOver`) — annars slåss auto-framåt mot den som just svepte bakåt. **"Go to Final leaderboard"** sitter under prickarna, utanför kortet, och renderas ÄVEN när det inte finns några kort — den är enda vägen ut. Den är **gold med svart text och pulserar** (scale 1 ↔ 1.04 / 700 ms, samma cadens som `useCtaPulse` i RoundLeaderboard och Home:s `gameBtn`) — appens vokabulär för en aktiv, upplåst CTA. Hette "Leave summary" i grått t.o.m. 2026-08-25; grå-med-vitt är appens LÅSTA-signal och var fel för enda vägen vidare. Pulsen är en lokal kopia av loopen, inte en import — overlayen ska inte dra in hela RoundLeaderboard-modulen för fyra rader.
 
@@ -2551,13 +2527,14 @@ Mellan sista frågans reveal och slutskärmen spelas en kort prisutdelning: guld
 - ⚠ **En host som går till Home avbryter INTE en non-host som fortfarande bläddrar.** `lobby_deleted`-handlern köar i stället popupen: träffar eventet medan `celebrationVisibleRef.current` är true sätts `pendingLobbyDeletedRef` och `showLobbyDeletedAlert()` körs först i `handleSummaryDone`. `lobbyDeletedAlertedRef` sätts direkt (som förut) så eventet aldrig dubbelfyrar.
 
 **Sekvensen har sin EGEN rubrik: "Game Summary"** (Peter 2026-08-14), placerad ovanför korten inuti overlayen — den försvinner alltså tillsammans med korten när spelaren trycker "Go to Final leaderboard", varpå slutskärmens egen "Final Leaderboard"-rubrik tar över. Samma vikt och storlek (24 / 700 vit) så de två läser som samma nivå i hierarkin.
+- **Raden under rubriken** (Peter 2026-11-03) är `summaryPlayerLabel` i quiz.tsx → `playerName`-propen: **"Host: <namn>"** i solo, Pass-the-Phone, H2H och guest-hostade spel — men i **Individual devices** och på en **Pass-the-Phone-followers egen telefon** (non-host som följer leaderboarden) bara den egna spelarens namn utan etikett. Host = `turnOrder`-raden med id `'1'` (fallback `turnOrder[0]`, PtP-turordningen kan flyttas om); i H2H läses den ur match-raden (`remoteHostName` = `players.find(isHost)`), eftersom `turnOrder` där bara innehåller self. Grå semibold, en rad, mellan "Game Summary" och korten.
 - ⚠ **Försök INTE låta RoundLeaderboards rubrik lysa igenom slöjan.** Två utkast provade det: först en pixel-identisk kopia ritad i overlayen (gav en dubblett på fel plats), sedan en mätt `headerInset` via `onHeaderLayout` som slöjan började under (rubriken blev ändå aldrig tydligt vit). Båda är borttagna — `onHeaderLayout` finns inte längre på RoundLeaderboard. En egen rubrik som ägs av sekvensen är både enklare och tydligare.
 
 ⚠ **Uttoningen animerar BARA `veil` (overlayens rot) — lägg aldrig till fler värden i den.** Ett tidigare utkast animerade även `blockOpacity` i en `Animated.parallel`, men kort-slidern avmonterades i samma ögonblick som `stage` blev `'fading'`; en native-driven animation mot den avmonterade noden gjorde att parallellen (`stopTogether: true`) aldrig rapporterade `finished`, så `onDone` aldrig fyrade och den touch-blockerande slöjan låg kvar — skärmen frös. Slidern hålls numera monterad under `'fading'`, och en watchdog-timeout (`veilOut + 400 ms`) anropar `fireDone` oavsett, eftersom en kvarliggande slöja blockerar all input.
 
 ⚠ **Slöjan startar OPAK (`veil` initieras till 1), aldrig med en fade-in.** Fade-in lät leaderboard-tabellen synas först — och värre: `AccessibilityInfo.isReduceMotionEnabled()` await:as innan animationen ens startar, så glappet blev längre än de 400 ms man kodade. Det lästes som en blixt vid inträdet. Bara uttoningen i slutet animerar värdet.
 
-**Remote 1v1**: inget särfall längre för att lämna sekvensen (alla äger sin egen). Celebration visas alltid, men **highlights bara när matchen är avgjord** (`remoteSummaryReady`) — motståndarens rad kommer som färdigaggregerad `summaryStats` utan per-frågedata. Kort 1 och 2 fungerar ändå som riktiga dueller (`summaryStats` bär `correctAnswers` + `avgResponseSeconds`); kategori-/källkorten faller tillbaka på personlig form.
+**Remote 1v1**: inget särfall längre för att lämna sekvensen (alla äger sin egen). Celebration visas alltid, men **highlights bara när matchen är avgjord** (`remoteSummaryReady`) — motståndarens rad kommer som färdigaggregerad `summaryStats` utan per-frågedata. Top game performance fungerar ändå som riktig duell (`summaryStats` bär `correctAnswers` + `avgResponseSeconds`).
 
 **Konfettin är handrullad** — repot har varken konfetti- eller Lottie-modul, och resten av appens animationer använder RN:s `Animated` (Reanimated finns installerat men används ingenstans). **EN** `Animated.Value` driver alla bitar via per-bit-interpolation → en animation i stället för N. 40 bitar, 28 på skärmar under 700 px.
 
@@ -2569,11 +2546,11 @@ Mellan sista frågans reveal och slutskärmen spelas en kort prisutdelning: guld
 
 **Delning till sociala medier är INTE byggd** (steg 2). Kräver `react-native-view-shot` + `expo-sharing` + `expo-file-system` som direkt dep → nytt dev-/TestFlight-bygge. Se planen för delningskortets spec.
 
-Tester: [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts) (35 st) låser kortordningen (Music → Film → Hints-Music → Hints-Film), hink-logiken (Music = Spotify + YT-Music sammanslaget, Film = bara YT-Film, Hints splittad på kategori), radlayouten på hink-korten (plats 1 + rätt/frågor, nämnare = hinkens storlek), delad placering i båda listkorten (1, 1, 3 + delning på visat tal), delad förstaplats på hink-korten, ikon-treatment (Music/Film = kategori + emoji, Hints = source + kategori), 1-frågas-hinkar, hinkar utan kategori-data, autoskippade hinkar, solo/personal-fallbacken, remote-gaten på spelarantal och snittidens timeout-/connectionError-semantik.
+Tester: [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts) (17 st) låser däcket (HCP Progress → Top, inget jämförelsekort, gäst utan HCP), Top game performance (bara toppspelarna, lägst snittid först, delad plats på visat tal, avhoppare uteslutna, remote-`summaryStats`, timeout-/connectionError-semantik) och `buildSinglePlayerSummary`.
 
 ### Single Player Game Summary — EXAKT två kort (Peter 2026-11-03)
 
-Däcket ovan gäller **multiplayer**. Ett solospel (`!isRemote && leaderboardPlayers.length === 1` i [app/quiz.tsx](app/quiz.tsx)) bygger i stället sitt däck med `buildSinglePlayerSummary` ([matchHighlights.ts](src/utils/matchHighlights.ts)): **Celebration → HCP Progress → Game Performance → Final Leaderboard**. Inga Music/Film/Hints-kort och inga separata Correct answers-/Fastest fingers-kort i solo, oavsett vilka frågetyper som spelats. Multiplayer-däcket är orört (specas separat senare).
+Däcket ovan gäller **multiplayer**. Ett solospel (`!isRemote && leaderboardPlayers.length === 1` i [app/quiz.tsx](app/quiz.tsx)) bygger i stället sitt däck med `buildSinglePlayerSummary` ([matchHighlights.ts](src/utils/matchHighlights.ts)): **Celebration → HCP Progress → Game Performance → Final Leaderboard**. Inga Music/Film/Hints-kort och inga separata Correct answers-/Fastest fingers-kort i solo, oavsett vilka frågetyper som spelats. Multiplayer-däcket: se "Multiplayer-däcket (omarbetat 2026-11-03)" ovan.
 
 **Kort 1 — HCP Progress** ([HcpProgressSummary.tsx](src/components/HcpProgressSummary.tsx)): `[förändrings-sköld] → pil → [nytt HCP-sköld]` + guld TOTAL-badge under högra skölden. Alltid kort 1 — även vid oförändrat HCP (`0 →`).
 - **Vänster sköld** visar bara förändringen (`−3` / `+2` / `0`, utan "HCP"-etikett). Sifferfärg: **guld med glans = bättre, vit = oförändrat, röd (`Colors.error`) = sämre** (lägre HCP är bättre). Kanten: guld vid förbättring, annars neutral grå, förstärkt (`strokeScale 1.35`).
@@ -2757,12 +2734,7 @@ Lämnar man MITT i spelet är delresultatet ingen giltig slutställning — man 
 
 ⚠ **Avhoppare rankas INTE** (Peter 2026-08-26). `finalizeRows` sorterar `hasLeft` sist före alla andra kriterier, och `LeaderboardTable` renderar ingen placeringssiffra för dem (tom `lbPos`-text — elementet behålls så den fasta bredden håller kolumnen i linje). Utan det kunde någon som gick efter två rätta svar sluta **först** över en som spelade hela matchen och svarade fel på allt. Eftersom de sorteras sist förblir `index + 1` korrekt för dem som FÅR en siffra.
 
-⚠ **Prisutdelnings-sekvensen följer samma regel men VISAR dem ändå** (Peter 2026-08-26). `buildMatchHighlights` delar `input.players` i `players` (aktiva) och `departed`:
-- **Listkorten** (*Correct answers*, *Fastest fingers*) namnger ALLA spelare, så avhopparna hängs på sist via `appendDepartedRows` — `place: null` (ingen siffra) och `value: 'Left'` i grått (`rankValueLeft`). `HighlightRankRow.place` är därför `number | null`.
-- **Hink-korten** (*Best on Music* osv.) visar bara förstaplatsen — där ska en avhoppare inte kunna vinna, så de är borta ur `aggs` helt.
-- **`ranked`-gaten räknar bara aktiva.** Är bara EN kvar finns ingen lista att stå i, och korten faller tillbaka på value-layouten precis som i ett solospel — då syns avhopparen inte alls.
-
-Låst av fyra tester i [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts).
+⚠ **Prisutdelnings-sekvensen** (omarbetad 2026-11-03): avhoppare är uteslutna ur *Top game performance* (de kan aldrig vinna). Se Game Summary-sektionen.
 
 ⚠ **Avhopp mitt i spelet diskvalificerar HELA spelet ur Competition-serien** (Peter 2026-08-26) — varken lokalt eller server-side. `recordGameInSeries`-effekten early-returnar om någon i `gamePlayers` har `hasLeft`; då förblir `aggregate` `null`, och eftersom BARA den effekten sätter `aggregate` finns därmed ingen "Marathon table"-slide att välja på slutskärmen. Samma villkor styr båda, så de kan inte glida isär: står "Left the game" på någon rad — slidern finns inte.
 - **Popupen förklarar det direkt.** `${playerName} has left`-Alerten får en andra rad, *"Marathon table will not be updated with this game result."*, när avhoppet sker MITT i spelet OCH spelet faktiskt är en fortsättning på en serie (`partOfCompetitionSeriesRef` — träff när seriens `nextRoomCode === params.roomCode`, satt vid mount ur `loadAggregateSeries()`). Ett fristende spel (ingen serie än) får bara den vanliga raden — texten vore obegriplig annars. Avhopp EFTER slutsignalen påverkar inte serien och får ingen extra rad.
