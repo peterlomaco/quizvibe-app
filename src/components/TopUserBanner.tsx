@@ -7,7 +7,7 @@ import { TouchableOpacity } from '@/src/components/haptic';
 import { BrandUi, Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { getCachedProfile, loadProfile, type ProfileData } from '../utils/profileStorage';
-import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+import { QuizVibeAvatarQ } from './QuizVibeDefaultAvatar';
 import { QuizVibeDefaultAvatar } from './QuizVibeDefaultAvatar';
 import { ChevronIcon } from './ChevronIcon';
 import { BRAND_UI_INACTIVE } from './brand/QuizVibeBrandSvg';
@@ -159,7 +159,7 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
         >
           {/* wifi-variant matchar Final Leaderboard:s Home-knapp och
               start-skärmens QuizVibeLogo — brand-konsistent Q-mark. */}
-          <QuizVibeQAvatar size={20} variant="wifi" color={BRAND_UI_INACTIVE} />
+          <QuizVibeAvatarQ size={18} color={BRAND_UI_INACTIVE} />
           <Text style={styles.backLinkText}>{backLabel}</Text>
         </TouchableOpacity>
       ))}

@@ -15,9 +15,10 @@ import {
 import { Pressable } from '@/src/components/haptic';
 import { LoadingContent } from './LoadingContent';
 import Svg, { Circle, G, Path } from 'react-native-svg';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { HostTypeOptions, type HostLobbyType } from './HostTypeOptions';
-import { QuizVibeQAvatar } from './QuizVibeQAvatar';
+import { QuizVibeAvatarQ } from './QuizVibeDefaultAvatar';
+import { METALLIC_GOLD_EDGE, MetallicGoldFill } from './MetallicGoldFill';
 import { QuizVibeWatermark } from './QuizVibeWatermark';
 import { VersusIcon } from './VersusIcon';
 import { aggregateLabel, type AggregateLeaderboardData } from '../utils/aggregateLeaderboard';
@@ -1088,14 +1089,21 @@ export function RoundLeaderboard({
             disabled={busyAction != null}
             style={({ pressed }) => [
               styles.startNewGameBtn,
+              !startNewGameLocked && styles.startNewGameBtnMetallic,
               startNewGameLocked && styles.startNewGameBtnLocked,
               pressed && busyAction == null && { opacity: 0.85, transform: [{ scale: 0.985 }] },
             ]}
           >
+            {/* Metallisk guld som Home:s Start New Game (Peter 2026-11-03). */}
+            {!startNewGameLocked && <MetallicGoldFill />}
             <LoadingContent loading={busyAction === 'start-new'} color="#000000">
               <Text
                 style={[
                   styles.startNewGameBtnText,
+                  !startNewGameLocked && {
+                    fontFamily: fontsLoaded ? 'Nunito_700Bold' : undefined,
+                    fontWeight: '700',
+                  },
                   startNewGameLocked && styles.startNewGameBtnTextLocked,
                 ]}
               >
@@ -1106,7 +1114,13 @@ export function RoundLeaderboard({
           </Animated.View>
           {startNewGameExpanded && !startNewGameLocked && (
             <HostTypeOptions
-                accentColor={Colors.warning}
+                // Samma rubrik + färger som Home:s Start New Game-utfällning.
+                heading="Choose how to play"
+                accentColor={BrandUi.border}
+                iconColor={BrandUi.icon}
+                iconAccentColor={BrandUi.icon}
+                arrowColor={BrandUi.iconMuted}
+                pressedBorderColor={Colors.warning}
                 remoteMode={hideRemotePlay ? 'hidden' : 'available'}
                 onSelect={(lobbyType) => {
                   if (!isStartNewGameControlled) {
@@ -1181,9 +1195,9 @@ export function RoundLeaderboard({
                 pressed && { opacity: 0.7 },
               ]}
             >
-              <LoadingContent loading={busyAction === 'home'} color={Colors.primary}>
+              <LoadingContent loading={busyAction === 'home'} color={Colors.warning}>
                 <View style={styles.finalHomeBtnInner}>
-                  <QuizVibeQAvatar size={32} variant="wifi" />
+                  <QuizVibeAvatarQ size={26} color={Colors.warning} />
                   <Text style={styles.finalHomeBtnText}>Home</Text>
                 </View>
               </LoadingContent>
@@ -1693,6 +1707,10 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing.sm,
     alignItems: 'center',
   },
+  startNewGameBtnMetallic: {
+    overflow: 'hidden',
+    borderColor: METALLIC_GOLD_EDGE,
+  },
   startNewGameBtnText: {
     fontSize: 17,
     fontWeight: '600',
@@ -1731,7 +1749,7 @@ const styles = StyleSheet.create({
   finalHomeBtnText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.warning,
     letterSpacing: 0.3,
   },
   // Replay-begränsnings-not för guest hosts (omgång 1) — liten grå rad
