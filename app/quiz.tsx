@@ -11140,7 +11140,9 @@ export default function QuizScreen() {
           <View style={styles.playAgainModalOverlay}>
             <View style={styles.playAgainModalCard}>
               <Text style={styles.playAgainModalTitle}>
-                Pick {aggregateLabel(turnOrder.length)}
+                {/* Samma rubrik i single player och multiplayer (Peter
+                    2026-11-03) — dialogen ska se likadan ut i båda lägena. */}
+                Pick Marathon table
               </Text>
               <Text style={styles.playAgainModalBody}>
                 Select a Marathon table to continue playing.
