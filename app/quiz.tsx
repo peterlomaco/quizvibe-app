@@ -8610,9 +8610,6 @@ export default function QuizScreen() {
     }
     if (userIds.length === 0) return true;
 
-    const soloSeries = userIds.length <= 1;
-    const label = aggregateLabel(userIds.length);
-
     // Default-namn: nästa "Marathon N" över host:s ALLA egna sparade serier
     // (oavsett spelform/uppsättning — en gemensam sekvens). listMy... returnerar
     // serier host DELTAR i; vi filtrerar på created_by för host:s EGNA.
@@ -8675,69 +8672,44 @@ export default function QuizScreen() {
       return true;
     }
 
-    // Det finns sparade serier → "Add to existing?"-Alert. Loop så att en
-    // namn-Cancel återvänder hit (= stadiet strax före "start fresh" trycktes).
+    // Det finns sparade serier → DIREKT till pick-listan (Peter 2026-11-03:
+    // den extra "Add to existing?"-systemdialogen före listan är borttagen —
+    // "Start a fresh one" i listan täcker nej-svaret). Loop så en namn-Cancel
+    // återvänder till LISTAN.
+    // ⚠ Listan visas ALLTID, även vid exakt en träff (Peter 2026-08-26).
+    //   Tidigare auto-kopplades den enda träffen tyst — host fick då aldrig
+    //   se VILKEN serie spelet hamnade i, och hade ingen väg att ångra sig.
+    setSelectedAggregateId(null);
     while (true) {
-      // Alert är callback-baserad — await:a valet så id:t hinner sättas innan
-      // inbjudan broadcastas.
-      const picked = await new Promise<'new' | 'existing'>((resolve) => {
-        Alert.alert(
-          `Add to existing ${label}?`,
-          soloSeries
-            ? 'You already have a saved Marathon Score. Add these games to it, or start a fresh one?'
-            : `You have played together before. Add these games to a saved ${label}, or start a fresh one?`,
-          [
-            { text: 'No, start fresh', style: 'cancel', onPress: () => resolve('new') },
-            { text: 'Yes', onPress: () => resolve('existing') },
-          ],
-          { cancelable: false },
-        );
+      setPendingAggregatePick(existing);
+      const choice = await new Promise<AggregatePickChoice>((resolve) => {
+        aggregatePickResolveRef.current = resolve;
       });
-      if (picked === 'new') {
-        // Alert är redan borta (native) → namn-prompt öppnar utan modal-swap.
-        const name = await promptName();
-        if (name === null) continue; // Cancel → åter till Alert
-        await createWithName(name);
-        return true;
-      }
-
-      // picked === 'existing' → pick-listan. Loop så en namn-Cancel återvänder
-      // till LISTAN (inte till Alert:en ovan).
-      // ⚠ Listan visas ALLTID, även vid exakt en träff (Peter 2026-08-26).
-      //   Tidigare auto-kopplades den enda träffen tyst — host fick då aldrig
-      //   se VILKEN serie spelet hamnade i, och hade ingen väg att ångra sig.
-      setSelectedAggregateId(null);
-      while (true) {
-        setPendingAggregatePick(existing);
-        const choice = await new Promise<AggregatePickChoice>((resolve) => {
-          aggregatePickResolveRef.current = resolve;
-        });
-        aggregatePickResolveRef.current = null;
-        if (choice.kind === 'attach') {
-          setPendingAggregatePick(null);
-          await attach(choice.id);
-          return true;
-        }
-        if (choice.kind === 'cancel') {
-          // Cancel: ingenting skapat/kopplat. Host tillbaka på slutskärmen.
-          setPendingAggregatePick(null);
-          return false;
-        }
-        // choice.kind === 'fresh' → swap pick-list-modal → namn-modal.
-        // ⚠ Två RN <Modal> kan inte vara uppe samtidigt (modal-swap-fällan):
-        //   dölj listan, vänta ut fade:n, öppna sedan namn-prompten.
+      aggregatePickResolveRef.current = null;
+      if (choice.kind === 'attach') {
         setPendingAggregatePick(null);
-        await wait(MODAL_SWAP_DELAY_MS);
-        const name = await promptName();
-        if (name === null) {
-          // Cancel → åter till pick-listan (loopens topp re-visar den efter
-          // fade:n).
-          await wait(MODAL_SWAP_DELAY_MS);
-          continue;
-        }
-        await createWithName(name);
+        await attach(choice.id);
         return true;
       }
+      if (choice.kind === 'cancel') {
+        // Cancel: ingenting skapat/kopplat. Host tillbaka på slutskärmen.
+        setPendingAggregatePick(null);
+        return false;
+      }
+      // choice.kind === 'fresh' → swap pick-list-modal → namn-modal.
+      // ⚠ Två RN <Modal> kan inte vara uppe samtidigt (modal-swap-fällan):
+      //   dölj listan, vänta ut fade:n, öppna sedan namn-prompten.
+      setPendingAggregatePick(null);
+      await wait(MODAL_SWAP_DELAY_MS);
+      const name = await promptName();
+      if (name === null) {
+        // Cancel → åter till pick-listan (loopens topp re-visar den efter
+        // fade:n).
+        await wait(MODAL_SWAP_DELAY_MS);
+        continue;
+      }
+      await createWithName(name);
+      return true;
     }
   };
 
@@ -11060,9 +11032,18 @@ export default function QuizScreen() {
           replayNote={
             localRematchFlow && rematchNeedsApproval ? (
               rematchAllApproved ? (
-                <Text style={styles.playAgainModalStatusReadyText}>
-                  ✓ All players have approved
-                </Text>
+                // Host har tryckt Yes igen och nästa steg förbereds (Marathon-
+                // val + lobby-skapande) → "Preparing rematch..." i stället för
+                // den statiska godkänt-raden bredvid knappens spinner.
+                finalAction.busyKey === 'replay-yes' ? (
+                  <Text style={styles.playAgainModalStatusWaitingText}>
+                    Preparing rematch...
+                  </Text>
+                ) : (
+                  <Text style={styles.playAgainModalStatusReadyText}>
+                    ✓ All players have approved
+                  </Text>
+                )
               ) : (
                 <View style={styles.playAgainModalStatusWaitingRow}>
                   <Text style={styles.playAgainModalStatusWaitingText}>
@@ -11162,7 +11143,7 @@ export default function QuizScreen() {
                 Pick {aggregateLabel(turnOrder.length)}
               </Text>
               <Text style={styles.playAgainModalBody}>
-                These games will be added to the one you choose.
+                Select a Marathon table to continue playing.
               </Text>
               <ScrollView style={{ maxHeight: 260, alignSelf: 'stretch' }}>
                 {(pendingAggregatePick ?? []).map((item) => {
@@ -12944,10 +12925,10 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     marginBottom: Spacing.sm,
   },
-  // Markerad rad — samma blå "vald"-vokabulär som resten av appen.
+  // Markerad rad — v2 (Peter 2026-11-03): tunn guldram på navy, vit text.
   aggregatePickRowSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryMuted,
+    borderColor: Colors.warning,
+    backgroundColor: BrandUi.selectedFill,
   },
   aggregatePickName: {
     flex: 1,
@@ -12956,7 +12937,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   aggregatePickNameSelected: {
-    color: Colors.primary,
+    color: Colors.textPrimary,
     fontWeight: FontWeight.bold,
   },
   // Confirm — gold när den är tänd (appens "actionable"-färg på
