@@ -2440,6 +2440,12 @@ Sport-tabell-layout som driver både GetReadyIntro:s utfällbara leaderboard OCH
 
 **Renderas UTANFÖR quiz.tsx:s parent ScrollView** via en early-return i renderingen (`if (phase === 'leaderboard') return <SafeAreaView><RoundLeaderboard.../></SafeAreaView>`). Annars hade RoundLeaderboard:s sticky footer följt med uppåt vid scroll i parent och inte längre alltid varit synlig.
 
+**Tabell v2-polish (Peter 2026-11-03, [LeaderboardTable.tsx](src/components/LeaderboardTable.tsx))**:
+- **HCP-raden** (bara när `hcpChanges` skickas = slutskärmen): gäst → vit **"No HCP"** (`LeaderboardPlayer.isGuest` / `LeaderboardRow.isGuest`, satt i quiz.tsx `gamePlayers` ur `turnOrder.type === 'guest'`), QuizVibe user → vit **"HCP 88 (+1)"**. Har spelaren kategori-data är texten en tappbar pill (tunn ljus kant + `›`, guldkant när utfälld) som öppnar/stänger HCP Progression-popupen. "+"/"−"-knappen är BORTTAGEN.
+- **Vinnaren** (index 0, poäng > 0, ej avhoppare): placeringssiffra + PTS i `Colors.warning`. Bara `variant="default"` — Player history (`subtle`) oförändrad.
+- Kontrast: kolumnrubriker `rgba(255,255,255,0.78)`, stats medium, namn 15 pt bold, `ROW_H` 78.
+- Popupen: extra `marginBottom` under spelarinfo; delta-badgarna något större (13 pt, `top: -11`) och korten med badge får `boxWithDelta` (paddingTop 13) så det blir luft mellan badge och sköld — `deltaBadge` används BARA här; delta-badgar (HCPShieldCard) röd = sämre (+), grön = bättre (−), grå = 0; Close = guldkant (0.6) + guldtext på `BrandUi.selectedFill`.
+
 **Header**: `headerTitle` = `fontSize: 24, fontWeight: '700'` (matchar Lobby:s screenTitle exakt). `headerSubtitle` ("Round X of Y") renderas BARA när `!isLastRound` — Final-vyn visar enbart huvudrubriken. Tidigare "Final result"-undertitel borttagen för minimalistisk layout.
 
 **Final leaderboard-knappar** (när `isLastRound`, i sticky footer):

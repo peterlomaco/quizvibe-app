@@ -14,7 +14,7 @@ import { WifiOffIcon } from './WifiOffIcon';
 // ligger i linje.
 // Rad-höjd för spelar-raderna. Något högre än rubrikraden så långa PlayerNames
 // får plats på två rader (stats-kolumnerna hamnar då lägre/under namnet).
-const ROW_H = 74;
+const ROW_H = 78;
 const HEADER_H = 56;
 
 // Per-kategori-HCP-förändring efter spelet: nytt värde + delta (after − before).
@@ -72,6 +72,8 @@ export interface LeaderboardRow {
   lastFiveResults: boolean[];
   hasLeft: boolean;
   connectionErrors: number;
+  /** Gäst → "No HCP" i Player-kolumnen när tabellen visar HCP. */
+  isGuest?: boolean;
 }
 
 /**
@@ -159,6 +161,14 @@ export function LeaderboardTable({
             const hcpDelta = hcp ? hcp.after - hcp.before : 0;
             const catChange = hcpCategoryChanges?.[entry.playerId];
             const isExpanded = expandedId === entry.playerId;
+            // Vinnaren (1:a, med poäng) får placering + PTS diskret i guld.
+            // Bara slutskärmens default-variant — Player history är lugnare.
+            const isWinner =
+              variant === 'default' && index === 0 && !entry.hasLeft && entry.points > 0;
+            const hcpLabel = hcp
+              ? `HCP ${hcp.after}${hcpDelta !== 0 ? ` (${hcpDelta > 0 ? '+' : ''}${hcpDelta})` : ''}`
+              : null;
+            const canOpenHcp = !!hcpLabel && !!catChange && !entry.hasLeft;
             return (
               <View key={entry.playerId} style={[s.lbCell, s.lbLeftCell]}>
                 {/* Avhoppare får ingen placeringssiffra — de deltog inte
@@ -166,7 +176,7 @@ export function LeaderboardTable({
                     ändå (tom) så `lbPos`:ens fasta bredd håller kolumnen
                     i linje. Sorteringen lägger dem sist, så `index + 1`
                     förblir korrekt för de spelare som FÅR en siffra. */}
-                <Text style={s.lbPos} numberOfLines={1}>
+                <Text style={[s.lbPos, isWinner && s.lbWinnerText]} numberOfLines={1}>
                   {entry.hasLeft ? '' : index + 1}
                 </Text>
                 <Avatar
@@ -211,27 +221,29 @@ export function LeaderboardTable({
                       {meta}
                     </Text>
                   )}
-                  {hcp && (
-                    <View style={s.lbHcpLine}>
-                      <Text style={s.lbNameHcp} numberOfLines={1}>
-                        HCP {hcp.after}
-                        {hcpDelta !== 0 ? ` (${hcpDelta > 0 ? '+' : ''}${hcpDelta})` : ''}
-                      </Text>
-                      {/* "+"-knappen sitter direkt efter HCP-texten (inte som
-                          en bred syskon-cell som skulle bredda Player-kolumnen
-                          och trycka resultatet åt höger). Fäller ut kategori-
-                          sköldarna (Total/Music/Film) i popupen nedan. */}
-                      {catChange && !entry.hasLeft && (
-                        <Pressable pressFeedback
-                          onPress={() => setExpandedId((cur) => (cur === entry.playerId ? null : entry.playerId))}
-                          hitSlop={8}
-                          style={s.lbHcpExpandBtn}
-                        >
-                          <Text style={s.lbHcpExpandText}>{isExpanded ? '−' : '+'}</Text>
-                        </Pressable>
-                      )}
-                    </View>
-                  )}
+                  {/* HCP-raden (bara när tabellen visar HCP, dvs. hcpChanges
+                      skickas — slutskärmen). Gäst → "No HCP"; QuizVibe user →
+                      "HCP 88 (+1)". Har spelaren kategori-data är texten en
+                      tappbar pill (kant + chevron) som öppnar/stänger HCP
+                      Progression — ersätter den tidigare "+"/"−"-knappen. */}
+                  {hcpChanges && (entry.isGuest ? (
+                    <Text style={s.lbNameHcp} numberOfLines={1}>No HCP</Text>
+                  ) : hcpLabel ? (
+                    canOpenHcp ? (
+                      <Pressable pressFeedback
+                        onPress={() => setExpandedId((cur) => (cur === entry.playerId ? null : entry.playerId))}
+                        hitSlop={8}
+                        style={[s.lbHcpTap, isExpanded && s.lbHcpTapOpen]}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${hcpLabel}, show HCP progression`}
+                      >
+                        <Text style={s.lbNameHcp} numberOfLines={1}>{hcpLabel}</Text>
+                        <Text style={s.lbHcpTapChevron}>›</Text>
+                      </Pressable>
+                    ) : (
+                      <Text style={s.lbNameHcp} numberOfLines={1}>{hcpLabel}</Text>
+                    )
+                  ) : null)}
                 </View>
               </View>
             );
@@ -336,12 +348,18 @@ export function LeaderboardTable({
           <View style={[s.lbCell, s.lbHeaderCell, s.lbRightCell]}>
             <Text style={s.lbHeaderText}>PTS</Text>
           </View>
-          {entries.map((entry) => (
+          {entries.map((entry, index) => (
             <View
               key={entry.playerId}
               style={[s.lbCell, s.lbRightCell]}
             >
-              <Text style={s.lbPoints} numberOfLines={1}>
+              <Text
+                style={[
+                  s.lbPoints,
+                  variant === 'default' && index === 0 && !entry.hasLeft && entry.points > 0 && s.lbWinnerText,
+                ]}
+                numberOfLines={1}
+              >
                 {entry.hasLeft ? '—' : entry.points}
               </Text>
             </View>
@@ -416,7 +434,7 @@ const styles = StyleSheet.create({
   lbHeaderText: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.78)',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
@@ -448,8 +466,8 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   lbName: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
+    fontSize: 15,
+    fontWeight: FontWeight.bold,
     color: Colors.textPrimary,
   },
   // [Letters]-[Digits]-namn: en rad när det ryms, annars wrappar digit-delen
@@ -466,38 +484,41 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0,
   },
-  // §5 — HCP-raden i Player-kolumnen ("HCP 42 (-1)"). Blå + halvfet så den
-  // sticker ut lite mer än den grå meta-raden ovanför.
+  // §5 — HCP-raden i Player-kolumnen ("HCP 42 (-1)" / "No HCP"). Vit
+  // halvfet (Peter 2026-11-03, var blå).
   lbNameHcp: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.textPrimary,
     letterSpacing: 0,
   },
-  // HCP-text + "+"-knapp på SAMMA rad, under playername/meta.
-  lbHcpLine: {
+  // Tappbar HCP-pill: tunn ljus kant + chevron så det syns att den öppnar
+  // HCP Progression. Utfälld → guldkant (samma "aktiv"-guld som popupen).
+  lbHcpTap: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'flex-start',
     gap: 4,
-    marginTop: 1,
-  },
-  // "+"/"−"-knapp i Player-cellen som fäller ut kategori-sköldarna.
-  lbHcpExpandBtn: {
-    width: 20,
-    height: 20,
-    borderRadius: 5,
+    marginTop: 2,
+    paddingHorizontal: 7,
+    paddingVertical: 1,
+    borderRadius: Radius.full,
     borderWidth: 1,
-    borderColor: Colors.borderStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.cardElevated,
-    marginLeft: 2,
+    borderColor: 'rgba(255,255,255,0.28)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
-  lbHcpExpandText: {
+  lbHcpTapOpen: {
+    borderColor: Colors.warning,
+  },
+  lbHcpTapChevron: {
     fontSize: 14,
-    fontWeight: '800',
-    color: Colors.textSecondary,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.7)',
     lineHeight: 15,
+  },
+  // Vinnarens placering + PTS — diskret guld.
+  lbWinnerText: {
+    color: Colors.warning,
   },
   // Popup med den utfällda spelarens kategori-sköldar (Total/Music/Film).
   lbHcpModalBackdrop: {
@@ -521,6 +542,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   lbHcpModalTitleRow: {
+    // Lite extra luft mellan spelarinfo och sköldarna (utöver kortets gap).
+    marginBottom: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -564,13 +587,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.cardElevated,
+    borderColor: 'rgba(245,166,35,0.6)',
+    backgroundColor: BrandUi.selectedFill,
   },
   lbHcpModalCloseText: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
-    color: Colors.primary,
+    color: Colors.warning,
   },
   lbMidScroll: {
     flex: 1,
@@ -584,6 +607,7 @@ const styles = StyleSheet.create({
   },
   lbMidCell: {
     fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
     color: Colors.textPrimary,
     textAlign: 'center',
     fontVariant: ['tabular-nums'],
@@ -591,7 +615,7 @@ const styles = StyleSheet.create({
   lbMidHeader: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.bold,
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.78)',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
     textAlign: 'center',

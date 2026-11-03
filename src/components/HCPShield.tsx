@@ -261,7 +261,7 @@ export function HCPShieldCard({
         : Colors.error;
   const deltaText = deltaBadge === undefined ? '' : deltaBadge > 0 ? `+${deltaBadge}` : `${deltaBadge}`;
   return (
-    <View style={[cardStyles.box, { borderColor: color }, hideBox && cardStyles.boxBorderless]}>
+    <View style={[cardStyles.box, { borderColor: color }, hideBox && cardStyles.boxBorderless, hasDelta && cardStyles.boxWithDelta]}>
       {regionFlag ? (
         // Flaggan ligger till höger som standard; med delta-badge → vänster.
         <View style={hasDelta ? cardStyles.flagBadgeLeft : cardStyles.flagBadge}>
@@ -338,24 +338,31 @@ const cardStyles = StyleSheet.create({
     paddingBottom: 6,
     paddingHorizontal: 10,
   },
+  // Med förändrings-badge: skölden flyttas ned lite så den inte trängs med
+  // badgen (bara popupen använder deltaBadge).
+  boxWithDelta: {
+    paddingTop: 13,
+  },
   // hideBox: ta bort kantlinjen (behåll sköld + etikett + samma padding så
   // etikett-badgens position är oförändrad).
   boxBorderless: {
     borderWidth: 0,
   },
   // HCP-förändrings-badge i övre HÖGRA hörnet (0 / -x / +y).
+  // Förändrings-badgen (enda användare: HCP Progression-popupen). Något
+  // större (Peter 2026-11-03) och lyft högre så det blir luft mot skölden.
   deltaBadge: {
     position: 'absolute',
-    top: -8,
+    top: -11,
     right: 4,
-    borderRadius: 8,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
+    borderRadius: 9,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
     zIndex: 11,
     elevation: 7,
   },
   deltaBadgeText: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: FontWeight.bold,
     color: '#fff',
     fontVariant: ['tabular-nums'],

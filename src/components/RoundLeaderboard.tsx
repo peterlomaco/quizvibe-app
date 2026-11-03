@@ -422,6 +422,9 @@ export interface LeaderboardPlayer {
    *  Devices). Mid-row-stats ersätts av "Has left the game"-text och
    *  PTS-kolumnen visar streck. */
   hasLeft?: boolean;
+  /** Gäst (anon / host-tillagd / guest host) — har inget HCP. Final
+   *  Leaderboard visar "No HCP" på raden i stället för en HCP-siffra. */
+  isGuest?: boolean;
 }
 
 export interface RoundScore {
@@ -742,6 +745,7 @@ export function RoundLeaderboard({
           lastResponseSeconds: null as number | null,
           lastFiveResults: [] as boolean[],
           hasLeft: !!p.hasLeft,
+          isGuest: !!p.isGuest,
         };
       }
       const playerScores = allRoundScoresHistory.flatMap((round) =>
@@ -779,6 +783,7 @@ export function RoundLeaderboard({
         // slutsignalen får ingen markör alls och behåller sina siffror.
         // Tidpunkten avgörs där, inte här.
         hasLeft: !!p.hasLeft,
+        isGuest: !!p.isGuest,
       };
     });
     return finalizeRows(entries, trackConnectionErrors);

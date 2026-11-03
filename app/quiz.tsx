@@ -3809,6 +3809,7 @@ export default function QuizScreen() {
         isYou: selfPlayerId ? p.id === selfPlayerId : i === 0,
         isHost: i === 0,
         hasLeft: leftDuringGameIds.has(p.id),
+        isGuest: p.type === 'guest',
       }));
     }
     return [youPlayer, ...MOCK_OPPONENTS];
