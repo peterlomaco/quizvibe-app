@@ -15,6 +15,19 @@ interface HCPShieldProps {
   // Används av lobby-spelarkortets avatar-badge så avataren inte lyser igenom
   // skölden. Kantlinje + glöd + text behåller sin tier-färg.
   opaque?: boolean;
+  // Ersätter siffran (t.ex. "−3" på Game Summary:s förändrings-sköld).
+  valueText?: string;
+  // Färg (+ valfri glans) på siffran. Påverkar inte kantlinjen.
+  valueColor?: string;
+  valueGlow?: string;
+  // Döljer "HCP"-etiketten ovanför siffran.
+  hideLabel?: boolean;
+  // Tvingar en tier-färg oberoende av `hcp`: 'gold' = elit-guld, 'neutral' =
+  // dämpad grå. Används av förändrings-skölden där `hcp` inte är ett HCP-tal.
+  tone?: 'gold' | 'neutral';
+  // Multiplikator på kantlinjens tjocklek (1 = standard). Game Summary:s
+  // förändrings-sköld använder en lätt förstärkt kant.
+  strokeScale?: number;
 }
 
 // Neutral tier för Guest-sköld ("Not Defined") — grå, ingen elit-glöd.
@@ -78,6 +91,14 @@ export function getShieldTierColor(hcp: number, notDefined = false): string {
   return notDefined ? NOT_DEFINED_TIER.stroke : getTier(hcp).stroke;
 }
 
+/** Tier-rangen för ett HCP-tal: 0 = grå (nybörjare) … 3 = guld (elit).
+ *  Härleds ur getTier() så trösklarna bara finns på ETT ställe. */
+const TIER_ORDER_PROBES = [99, 59, 39, 19];
+export function getShieldTierRank(hcp: number): number {
+  const stroke = getTier(hcp).stroke;
+  return TIER_ORDER_PROBES.findIndex((probe) => getTier(probe).stroke === stroke);
+}
+
 /** Region scope → flagg-emoji (badgen ovan-höger på ett sköld-kort). V1 alltid
  *  Sweden; övriga breddnivåer får en placeholder tills fler länder finns. */
 export function regionFlagEmoji(region: string | undefined | null): string {
@@ -94,8 +115,24 @@ export function regionFlagEmoji(region: string | undefined | null): string {
   }
 }
 
-export function HCPShield({ hcp, size = 100, notDefined = false, opaque = false }: HCPShieldProps) {
-  const tier = notDefined ? NOT_DEFINED_TIER : getTier(hcp);
+export function HCPShield({
+  hcp,
+  size = 100,
+  notDefined = false,
+  opaque = false,
+  valueText,
+  valueColor,
+  valueGlow,
+  hideLabel = false,
+  tone,
+  strokeScale = 1,
+}: HCPShieldProps) {
+  const tier =
+    notDefined || tone === 'neutral'
+      ? NOT_DEFINED_TIER
+      : tone === 'gold'
+        ? getTier(1)
+        : getTier(hcp);
   // Solid mörk navy-fyllning (opaque) eller den genomskinliga tier-tinten.
   const fillColor = opaque ? Colors.cardElevated : tier.fill;
   // Bredden är något smalare än `size` (höjden oförändrad) → smäckrare sköld.
@@ -137,9 +174,9 @@ export function HCPShield({ hcp, size = 100, notDefined = false, opaque = false 
       <Svg width={w} height={h}>
         {/* Skenande kantlinje: en bredare, halvgenomskinlig stroke bakom den
             skarpa kanten bildar en mjuk gloria längs kanten. */}
-        <Path d={d} stroke={tier.stroke} strokeWidth={7} fill="none" opacity={0.35} />
-        <Path d={d} stroke={tier.stroke} strokeWidth={4.5} fill="none" opacity={0.55} />
-        <Path d={d} stroke={tier.stroke} strokeWidth={2.5} fill={fillColor} />
+        <Path d={d} stroke={tier.stroke} strokeWidth={7 * strokeScale} fill="none" opacity={0.35} />
+        <Path d={d} stroke={tier.stroke} strokeWidth={4.5 * strokeScale} fill="none" opacity={0.55} />
+        <Path d={d} stroke={tier.stroke} strokeWidth={2.5 * strokeScale} fill={fillColor} />
       </Svg>
 
       {/* Textöverlagring – Guest: bara "Guest" centrerat. Annars "HCP" över +
@@ -149,8 +186,19 @@ export function HCPShield({ hcp, size = 100, notDefined = false, opaque = false 
           <Text style={[styles.guestText, { fontSize: size * 0.18 }]}>Guest</Text>
         ) : (
           <>
-            <Text style={[styles.labelText, { fontSize: size * 0.14 }]}>HCP</Text>
-            <Text style={[styles.valueText, { fontSize: size * 0.34 }]}>{hcp}</Text>
+            {hideLabel ? null : (
+              <Text style={[styles.labelText, { fontSize: size * 0.14 }]}>HCP</Text>
+            )}
+            <Text
+              style={[
+                styles.valueText,
+                { fontSize: size * 0.34 },
+                valueColor ? { color: valueColor } : null,
+                valueGlow ? { textShadowColor: valueGlow, textShadowRadius: 6 } : null,
+              ]}
+            >
+              {valueText ?? hcp}
+            </Text>
           </>
         )}
       </View>

@@ -78,7 +78,12 @@ export type HighlightKind =
   | 'best-music'
   | 'best-film'
   | 'best-hints-music'
-  | 'best-hints-film';
+  | 'best-hints-film'
+  // Läggs till av quiz.tsx (inte buildMatchHighlights) — spelarens HCP före/
+  // efter spelet. I dag bara i solospel.
+  | 'hcp-progress'
+  // Solospel: rätt svar + snittid i ETT kort (buildSinglePlayerSummary).
+  | 'game-performance';
 
 /** En namngiven spelare på ett kort (källkortens förstaplats). */
 export interface HighlightPlayerRef {
@@ -139,6 +144,16 @@ export interface HighlightCard {
    * har källikonen som central ikon.
    */
   icon?: string;
+  /**
+   * HCP-progressionskortet: Total-HCP före och efter spelet (display-värden,
+   * heltal 1–99). Renderas som [förändrings-sköld] → [nytt HCP].
+   */
+  hcp?: { before: number; after: number };
+  /**
+   * Game Performance-kortet (solospel): rätt svar är primärt, snittiden att
+   * låsa ett svar sekundär. `avgSeconds` null = inget tidsunderlag.
+   */
+  performance?: { correct: number; total: number; avgSeconds: number | null };
 }
 
 export type HighlightMode = 'personal' | 'competitive';
@@ -517,4 +532,41 @@ export function buildMatchHighlights(
   }
 
   return cards.slice(0, MAX_HIGHLIGHT_CARDS);
+}
+
+/**
+ * Solospelets Game Summary — EXAKT två kort, i fast ordning:
+ *   1. HCP Progress   ([förändring] → [nytt HCP])
+ *   2. Game Performance (rätt svar + snittid i samma kort)
+ *
+ * Inga kategori-/källkort (Music, Film/TV, Hints) och inga separata kort för
+ * rätt svar eller snittid. `hcp` saknas när spelet inte grundar något HCP
+ * (gäst) — då visas bara Game Performance.
+ */
+export function buildSinglePlayerSummary(input: {
+  scores: RoundScore[][];
+  player: LeaderboardPlayer;
+  hcp?: { before: number; after: number } | null;
+}): HighlightCard[] {
+  const [agg] = aggregatePlayers(input.scores.flat(), [input.player]);
+  const cards: HighlightCard[] = [];
+  if (input.hcp) {
+    cards.push({
+      id: 'hcp-progress',
+      kind: 'hcp-progress',
+      title: 'HCP progress',
+      hcp: { before: input.hcp.before, after: input.hcp.after },
+    });
+  }
+  cards.push({
+    id: 'game-performance',
+    kind: 'game-performance',
+    title: 'Game performance',
+    performance: {
+      correct: agg?.correct ?? 0,
+      total: agg?.answered ?? 0,
+      avgSeconds: agg?.avgSeconds ?? null,
+    },
+  });
+  return cards;
 }

@@ -95,7 +95,7 @@ import {
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
 import { filterByGenerationRecognition } from '@/src/utils/generationRecognition';
 import { isMainCategory, subjectToMainCategory, itemInEnabledCategories, displayCategoryForItem, defaultEnabledMainCategories, MAIN_CATEGORIES, YT_CATEGORY_WEIGHTS, type MainCategory } from '@/src/utils/mainCategory';
-import { buildMatchHighlights } from '@/src/utils/matchHighlights';
+import { buildMatchHighlights, buildSinglePlayerSummary } from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
 import { resolveActivePackageTags, itemInActivePackages, computePackageCoverage } from '@/src/utils/hostPackages';
@@ -3637,6 +3637,11 @@ export default function QuizScreen() {
   const [currentRoundScores, setCurrentRoundScores] = useState<RoundScore[]>([]);
   const [allRoundScoresHistory, setAllRoundScoresHistory] = useState<RoundScore[][]>([]);
   const [playerHcpChanges, setPlayerHcpChanges] = useState<Record<string, HcpChange>>({});
+  // True när DENNA enhets egna HCP-bokföring vid game-end är avgjord — antingen
+  // skriven, eller inte tillämplig (gäst / inga svar / fel). Solospelets Game
+  // Summary väntar på den så HCP Progress alltid blir kort 1 i stället för att
+  // dyka upp framför ett kort som redan visas.
+  const [selfHcpSettled, setSelfHcpSettled] = useState(false);
   // §1.3 — per-spelare per-kategori-HCP-FÖRÄNDRING (efter spelet) för
   // leaderboardens "+"-utfällning: nytt värde + delta (after − before) per
   // Total/Music/Film/Sport. Bara spelare denna enhet räknat (self + PtP).
@@ -7256,6 +7261,7 @@ export default function QuizScreen() {
 
         if (gameMode === 'pass-the-phone') {
           void (async () => {
+            try {
             const changes: Record<string, HcpChange> = {};
             const catChanges: Record<string, HcpCategoryChange> = {};
             for (const p of turnOrder) {
@@ -7295,6 +7301,9 @@ export default function QuizScreen() {
                 }
               }
             }
+            } finally {
+              setSelfHcpSettled(true);
+            }
           })();
         } else {
           const selfEntry = turnOrder.find((p) => p.id === selfPlayerId);
@@ -7305,6 +7314,7 @@ export default function QuizScreen() {
               const beforeT = before.total;
               const afterT = after.total;
               setPlayerHcpChanges((prev) => ({ ...prev, [selfPlayerId]: { before: beforeT, after: afterT } }));
+              setSelfHcpSettled(true);
               setPlayerHcpCategoryChanges((prev) => ({ ...prev, [selfPlayerId]: buildHcpCategoryChange(before, after) }));
               // IndDev: dela self:s delta med peers så allas leaderboard visar
               // det (retries mot tappade broadcasts; mottagaren är idempotent).
@@ -7321,9 +7331,13 @@ export default function QuizScreen() {
                 setTimeout(send, 800);
                 setTimeout(send, 2000);
               }
-            });
+            }, () => setSelfHcpSettled(true));
+          } else {
+            setSelfHcpSettled(true);
           }
         }
+      } else {
+        setSelfHcpSettled(true);
       }
 
       saveFinalGame();
@@ -9376,6 +9390,19 @@ export default function QuizScreen() {
 
   const matchHighlights = useMemo(() => {
     if (phase !== 'leaderboard' || !isLastQuestion || !remoteSummaryReady) return [];
+    // Solospel: EXAKT två kort — HCP Progress → Game Performance (se
+    // buildSinglePlayerSummary). Inga kategori-/källkort. Väntar tills HCP-
+    // bokföringen är avgjord så HCP-kortet alltid är kort 1 och aldrig skjuts
+    // in framför ett kort som redan visas. Multiplayer: oförändrat.
+    if (!isRemote && leaderboardPlayers.length === 1) {
+      if (!selfHcpSettled) return [];
+      const selfHcp = selfPlayerId ? playerHcpChanges[selfPlayerId] : undefined;
+      return buildSinglePlayerSummary({
+        scores: allRoundScoresHistory,
+        player: leaderboardPlayers[0],
+        hcp: selfHcp ?? null,
+      });
+    }
     return buildMatchHighlights({
       scores: allRoundScoresHistory,
       players: leaderboardPlayers,
@@ -9392,7 +9419,19 @@ export default function QuizScreen() {
     effectiveCategoryByQuestion,
     effectiveMediaSourceByQuestion,
     highlightMode,
+    isRemote,
+    selfPlayerId,
+    playerHcpChanges,
+    selfHcpSettled,
   ]);
+
+  // Skyddsnät: hänger HCP-skrivningen (AsyncStorage) får solospelets summary
+  // ändå sina kort — då utan HCP-kortet hellre än inga kort alls.
+  useEffect(() => {
+    if (phase !== 'leaderboard' || !isLastQuestion || selfHcpSettled) return;
+    const id = setTimeout(() => setSelfHcpSettled(true), 4000);
+    return () => clearTimeout(id);
+  }, [phase, isLastQuestion, selfHcpSettled]);
 
   // Speglar om prisutdelnings-overlayen faktiskt är uppe. Läses av
   // lobby_deleted-handlern (registrerad EN gång vid mount) för att skjuta

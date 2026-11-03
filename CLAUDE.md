@@ -2571,6 +2571,32 @@ Mellan sista frågans reveal och slutskärmen spelas en kort prisutdelning: guld
 
 Tester: [backend/content/test/matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts) (35 st) låser kortordningen (Music → Film → Hints-Music → Hints-Film), hink-logiken (Music = Spotify + YT-Music sammanslaget, Film = bara YT-Film, Hints splittad på kategori), radlayouten på hink-korten (plats 1 + rätt/frågor, nämnare = hinkens storlek), delad placering i båda listkorten (1, 1, 3 + delning på visat tal), delad förstaplats på hink-korten, ikon-treatment (Music/Film = kategori + emoji, Hints = source + kategori), 1-frågas-hinkar, hinkar utan kategori-data, autoskippade hinkar, solo/personal-fallbacken, remote-gaten på spelarantal och snittidens timeout-/connectionError-semantik.
 
+### Single Player Game Summary — EXAKT två kort (Peter 2026-11-03)
+
+Däcket ovan gäller **multiplayer**. Ett solospel (`!isRemote && leaderboardPlayers.length === 1` i [app/quiz.tsx](app/quiz.tsx)) bygger i stället sitt däck med `buildSinglePlayerSummary` ([matchHighlights.ts](src/utils/matchHighlights.ts)): **Celebration → HCP Progress → Game Performance → Final Leaderboard**. Inga Music/Film/Hints-kort och inga separata Correct answers-/Fastest fingers-kort i solo, oavsett vilka frågetyper som spelats. Multiplayer-däcket är orört (specas separat senare).
+
+**Kort 1 — HCP Progress** ([HcpProgressSummary.tsx](src/components/HcpProgressSummary.tsx)): `[förändrings-sköld] → pil → [nytt HCP-sköld]` + guld TOTAL-badge under högra skölden. Alltid kort 1 — även vid oförändrat HCP (`0 →`).
+- **Vänster sköld** visar bara förändringen (`−3` / `+2` / `0`, utan "HCP"-etikett). Sifferfärg: **guld med glans = bättre, vit = oförändrat, röd (`Colors.error`) = sämre** (lägre HCP är bättre). Kanten: guld vid förbättring, annars neutral grå, förstärkt (`strokeScale 1.35`).
+- **Höger sköld** = nytt HCP, större, i sin vanliga tier-färg (även vid nedgång till lägre tier). Sifferfärgen är HCPShield:s standardvita för ALLA tiers — skicka aldrig `valueColor` hit (det finns inga tier-specifika sifferfärger).
+- **Avslöjandet**: skölden snurrar som ett mynt (`COIN_TURNS 5` / `COIN_SPIN_MS 1900`, Easing.out) och LANDAR — landningen är höjdpunkten. Ingen fylld bakgrundsplatta bakom skölden; pulsen är en ren konturring. Nivå per resultat (`RevealLevel`):
+
+| Resultat | Landning |
+|---|---|
+| Sämre (`worse`) | Bara snurret — ingen puls, inget studs, inga gnistor, ingen konfetti, ingen text |
+| Oförändrat (`subtle`) | Svag guldpuls + litet studs |
+| Bättre, samma tier (`strong`) | Starkare guldpuls + studs |
+| Bättre IN I högre tier (`newTier`) | Ring i nya tierns färg + släpande guldring, 6 ✦-gnistor, större studs, "NEW HCP / RANK!" (liten guldtext ovanför pilen) som studsar upp och vid full storlek spränger 14 konfettibitar (guld + tier-färg) |
+
+- ⚠ **Milstolpen kräver BÅDE förbättring OCH högre tier**: `improved && getShieldTierRank(after) > getShieldTierRank(before)`. `getShieldTierRank` ([HCPShield.tsx](src/components/HCPShield.tsx)) härleds ur `getTier()` — tier-trösklarna (99–60 grå, 59–40 blå, 39–20 brons, 19–1 guld) finns kvar på ETT ställe. Hitta inte på egna trösklar.
+- **Väntar på HCP-resultatet**: `selfHcpSettled` (quiz.tsx) sätts när game-end-bokföringen är avgjord (skriven, ej tillämplig, eller fel) — summaryn renderar inga kort förrän dess, så HCP-kortet aldrig skjuts in framför ett kort som redan syns. 4 s-skyddsnät om AsyncStorage hänger. Gäst-hostade solospel grundar inget HCP → bara Game Performance-kortet.
+- **Hålltid**: HCP-kortet står `HCP_CARD_HOLD_MS` (snurr + puls + 1,5 s ≈ 4 s) innan auto-bläddring — FinalCelebration använder den för kort med `card.hcp`. Hela milstolpen ryms inom den.
+
+**Kort 2 — Game Performance**: `8 / 10` (48 pt guld, primärt) "Correct Answers" → avdelare → `1.10s` (26 pt guld, sekundärt) "Average Lock-in Time"; etiketterna 13 pt grå. Snittiden = samma som tabellens AVG (timeouts med, connectionError bort). Sista kortet → ingen auto-timer, står tills "Go to Final leaderboard".
+
+**Rubrikerna** på solokorten är 15 pt (`cardTitleSolo`, ~36 % större än multiplayer-korten). Alla animationer kör på native driver.
+
+Tester: `buildSinglePlayerSummary`-blocket i [matchHighlights.test.ts](backend/content/test/matchHighlights.test.ts) (5 st) låser ordningen, kortantalet, sammanslagna performance-värden och gäst-fallet.
+
 ## Final Leaderboard: "Re-match with Aggregate Leaderboard?" → "Start New Game" — 2026-08-08, omarbetad 2026-08-24 (rev 3)
 
 Host:s **Play Again** är borttagen ur slutskärmen. I stället ställs **EN fråga i taget**; Home-raden ligger kvar längst ned hela tiden.

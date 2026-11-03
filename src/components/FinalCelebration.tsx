@@ -23,6 +23,7 @@ import SparkleDrawQ, {
 } from './SparkleDrawQ';
 import SparklerSound from './SparklerSound';
 import { MediaSourceIcon } from './MediaSourceIcon';
+import HcpProgressSummary, { HCP_CARD_HOLD_MS } from './HcpProgressSummary';
 import { QuizVibeWordmarkSvg } from './brand/QuizVibeBrandSvg';
 import { WORDMARK_VIEWBOX } from './brand/quizVibeBrandGeometry';
 import type { HighlightCard } from '../utils/matchHighlights';
@@ -475,7 +476,11 @@ export default function FinalCelebration({
     if (pageIndex >= highlights.length - 1) return;
     // Placeringskort får längre hålltid — de bär en hel lista, inte ett tal.
     const rowCount = highlights[pageIndex]?.rows?.length ?? 0;
-    const hold = timingRef.current.cardHold + rowCount * RANK_ROW_HOLD_MS;
+    // HCP-kortet står tills myntsnurret landat, pulsen klingat ut och
+    // resultatet hunnit läsas — annars bläddrar det mitt i avslöjandet.
+    const hold = highlights[pageIndex]?.hcp
+      ? Math.max(timingRef.current.cardHold, HCP_CARD_HOLD_MS)
+      : timingRef.current.cardHold + rowCount * RANK_ROW_HOLD_MS;
     const id = setTimeout(() => {
       const next = pageIndex + 1;
       scrollRef.current?.scrollTo({
@@ -652,7 +657,7 @@ export default function FinalCelebration({
               style={styles.pager}
               contentContainerStyle={styles.pagerContent}
             >
-              {highlights.map((card) => {
+              {highlights.map((card, cardIndex) => {
                 // Music/Film-korten visar bara EN vinnare, så "1." blir bara
                 // brus — dölj radnumret helt och ge titeln mer luft ner till
                 // spelarnamnet. Listkorten + Hints-korten behåller sitt nummer.
@@ -678,8 +683,37 @@ export default function FinalCelebration({
                     ) : card.icon ? (
                       <Text style={styles.cardIcon}>{card.icon}</Text>
                     ) : null}
-                    <Text style={styles.cardTitle}>{card.title}</Text>
-                    {card.rows ? (
+                    <Text
+                      style={[
+                        styles.cardTitle,
+                        (card.hcp || card.performance) && styles.cardTitleSolo,
+                      ]}
+                    >
+                      {card.title}
+                    </Text>
+                    {card.hcp ? (
+                      <HcpProgressSummary
+                        before={card.hcp.before}
+                        after={card.hcp.after}
+                        active={stage === 'highlights' && pageIndex === cardIndex}
+                      />
+                    ) : card.performance ? (
+                      /* Game Performance: rätt svar primärt, snittiden
+                         sekundär — samma kort, inte två. */
+                      <View style={styles.perfBlock}>
+                        <Text style={styles.perfPrimary}>
+                          {card.performance.correct} / {card.performance.total}
+                        </Text>
+                        <Text style={styles.perfLabel}>Correct Answers</Text>
+                        <View style={styles.perfDivider} />
+                        <Text style={styles.perfSecondary}>
+                          {card.performance.avgSeconds === null
+                            ? '—'
+                            : `${card.performance.avgSeconds.toFixed(2)}s`}
+                        </Text>
+                        <Text style={styles.perfLabel}>Average Lock-in Time</Text>
+                      </View>
+                    ) : card.rows ? (
                       /* Placeringslista — samma layout på ALLA korttyper.
                          Listkorten tar med alla spelare, källkorten bara
                          förstaplatsen (som kan delas av flera).
@@ -943,6 +977,12 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
   },
+  // Solospelets två kort (HCP Progress / Game Performance): ~36 % större
+  // rubrik, identisk på båda. Multiplayer-korten behåller cardTitle.
+  cardTitleSolo: {
+    fontSize: 15,
+    letterSpacing: 1,
+  },
   // ── Placeringslista — ALLA korttyper som namnger spelare ──────────────
   rankList: {
     alignSelf: 'stretch',
@@ -1021,6 +1061,37 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
     fontVariant: ['tabular-nums'],
     marginTop: Spacing.xs,
+  },
+  // ── Game Performance (solospel) ──────────────────────────────────────
+  perfBlock: {
+    alignItems: 'center',
+    marginTop: Spacing.sm,
+  },
+  perfPrimary: {
+    fontSize: COMPACT ? 40 : 48,
+    fontWeight: FontWeight.bold,
+    color: Colors.warning,
+    letterSpacing: -0.5,
+    fontVariant: ['tabular-nums'],
+  },
+  perfLabel: {
+    ...Typography.caption,
+    fontSize: FontSize.sm,
+    lineHeight: 18,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+  },
+  perfDivider: {
+    width: 48,
+    height: 1,
+    backgroundColor: Colors.border,
+    marginVertical: COMPACT ? Spacing.sm : Spacing.md,
+  },
+  perfSecondary: {
+    fontSize: COMPACT ? FontSize.xl : 26,
+    fontWeight: FontWeight.semibold,
+    color: Colors.warning,
+    fontVariant: ['tabular-nums'],
   },
   cardDetail: {
     ...Typography.caption,

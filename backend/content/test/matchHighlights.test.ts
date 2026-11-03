@@ -19,6 +19,7 @@ import {
   MAX_HIGHLIGHT_CARDS,
   MIN_QUESTIONS_PER_BUCKET,
   buildMatchHighlights,
+  buildSinglePlayerSummary,
   type BuildMatchHighlightsInput,
   type HighlightCard,
 } from '../../../src/utils/matchHighlights';
@@ -629,5 +630,45 @@ describe('Correct answers-kortets tie-not', () => {
       scores: [[score('p1', 0, true, 5)], [score('p2', 0, false, 7)]],
     });
     expect(card(cards)?.detail).toBeUndefined();
+  });
+});
+
+describe('buildSinglePlayerSummary', () => {
+  const scores = [
+    [score('p1', 0, true, 2)],
+    [score('p1', 1, false, 4)],
+    [score('p1', 2, true, 3, { connectionError: true })],
+  ];
+
+  it('gives exactly HCP Progress then Game Performance', () => {
+    const cards = buildSinglePlayerSummary({
+      scores,
+      player: ANNA,
+      hcp: { before: 99, after: 96 },
+    });
+    expect(cards.map((c) => c.kind)).toEqual(['hcp-progress', 'game-performance']);
+    expect(cards[0].hcp).toEqual({ before: 99, after: 96 });
+  });
+
+  it('keeps an unchanged HCP as its own card', () => {
+    const cards = buildSinglePlayerSummary({ scores, player: ANNA, hcp: { before: 80, after: 80 } });
+    expect(cards[0].kind).toBe('hcp-progress');
+    expect(cards).toHaveLength(2);
+  });
+
+  it('puts correct answers and average lock-in time on one card', () => {
+    const [, perf] = buildSinglePlayerSummary({ scores, player: ANNA, hcp: { before: 99, after: 98 } });
+    expect(perf.performance).toEqual({ correct: 2, total: 3, avgSeconds: 3 });
+  });
+
+  it('never emits category, source or separate stat cards', () => {
+    const cards = buildSinglePlayerSummary({ scores, player: ANNA, hcp: { before: 99, after: 98 } });
+    expect(cards.some((c) => c.category || c.source || c.rows)).toBe(false);
+    expect(cards.some((c) => c.kind === 'most-correct' || c.kind === 'fastest-average')).toBe(false);
+  });
+
+  it('shows only Game Performance when the game records no HCP (guest)', () => {
+    const cards = buildSinglePlayerSummary({ scores, player: ANNA, hcp: null });
+    expect(cards.map((c) => c.kind)).toEqual(['game-performance']);
   });
 });
