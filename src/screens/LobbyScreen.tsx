@@ -2395,6 +2395,19 @@ export default function LobbyScreen() {
   // fortfarande propagerar (vilket är hela skälet till att approved
   // överhuvudtaget syncas hit — se kommentaren vid syncNonHostFields).
   const pendingApprovalRef = useRef<Map<string, boolean>>(new Map());
+  // Host har tryckt Start Game och turnOrder är fruset. Lobby-skärmen ligger
+  // kvar monterad under /quiz (router.push), så utan denna spärr kunde
+  // auto-approve-watchern godkänna en sen joiner EFTER start → joinern fick
+  // "Follow leaderboard" men fanns inte i kön (Peter 2026-11-03).
+  const hostGameStartedRef = useRef(false);
+  // Alltid senaste handleStartGame — PtP-bekräftelsens "Yes" anropar via ref
+  // så turnOrder byggs ur aktuell state, inte ur closure:n från första tappet.
+  const handleStartGameRef = useRef<(ptpConfirmed?: boolean) => Promise<void>>(async () => {});
+  // Ny lobby (Play Again / Start New Game) kan återanvända samma skärm-instans
+  // — släpp startlåset när rumkoden byts.
+  useEffect(() => {
+    hostGameStartedRef.current = false;
+  }, [roomCode]);
   // True när non-host har upptäckt att rummet blivit deaktiverat (host
   // har raderat lobby:n). Triggar Alert:en "This Game Lobby has been
   // deleted by Host" → OK-knappen tar dem till Home.
@@ -4054,6 +4067,9 @@ export default function LobbyScreen() {
   // mount-fetchen OCH rejoin (hasLeft→false via syncNonHostFields) enhetligt.
   useEffect(() => {
     if (!hostMode) return;
+    // Spelet har startat: varken auto-approve eller join-popup (turnOrder är
+    // fruset; en sen joiner får "started without me" på sin enhet).
+    if (hostGameStartedRef.current) return;
     // Vänta tills friends-listan laddats — annars kan en friend hinna få
     // popupen pga en load-race.
     if (hostFriendsRef.current === null) return;
@@ -4263,6 +4279,8 @@ export default function LobbyScreen() {
   // blockerade (Alert visad). Join-popup-handlers använder returvärdet för
   // att hålla popupen öppen vid guard-block; ApproveToggle-sites ignorerar det.
   const handleSetApproved = (id: string, approved: boolean): boolean => {
+    // Spelet har redan startat — turnOrder är fruset (se hostGameStartedRef).
+    if (approved && hostGameStartedRef.current) return false;
     // Check 0: single player — lobbyn har ingen plats för fler spelare, så
     // ingen non-host får approvas (Peter 2026-08-24). Home:s join-gate
     // (checkSinglePlayerLobby) kan fail-open:a i host:s 300 ms-debounce-
@@ -4405,6 +4423,7 @@ export default function LobbyScreen() {
   // ingen re-prompt-loop uppstår.
   const handleJoinPopupLater = () => advanceJoinPopup();
   const handleApproveAll = () => {
+    if (hostGameStartedRef.current) return; // turnOrder fruset, se handleSetApproved
     // Check 0: single player — samma spärr som handleSetApproved.
     // ⚠ Denna master-toggle skriver setPlayers DIREKT och går ALDRIG via
     // handleSetApproved, så varje ny approve-guard måste speglas hit.
@@ -6422,6 +6441,7 @@ export default function LobbyScreen() {
     }
   };
 
+  // Tilldelas efter deklarationen nedan (function-expression hoistas inte).
   const handleStartGame = async (ptpConfirmed = false) => {
     // Seed-guard: en snabb replay-tap kan hinna fyra Start Game INNAN
     // seed-effekten (Promise.all → getLobbySettings) applicerat carry-over-
@@ -6429,6 +6449,28 @@ export default function LobbyScreen() {
     // spelar "helt slumpmässigt" media. Ref:en är synkron sanning vid tap;
     // knappen är dessutom visuellt låst tills seeden klar. Bara host seedar.
     if (hostMode && !lobbySeededRef.current) return;
+    // Join-limbo-guard (Peter 2026-11-03): en inbjuden/friend som just kommit
+    // in är dold i båda sektionerna under grace-fönstret tills auto-approven
+    // landat. Startade host i det fönstret byggdes turnOrder utan spelaren,
+    // medan Lobby-skärmen (kvar monterad under /quiz) approvade dem EFTER
+    // start → de fick "Follow leaderboard" men aldrig någon tur. Vänta in
+    // beslutet i stället för att starta förbi det.
+    if (
+      hostMode &&
+      players.some(
+        (p) =>
+          !p.isHost &&
+          !p.hasLeft &&
+          !p.approved &&
+          (joinGraceActiveRef.current.has(p.id) || willAutoApproveOnJoin(p)),
+      )
+    ) {
+      quizVibeAlert(
+        'Player joining',
+        'A player is entering the lobby — wait a moment, then press Start Game again.',
+      );
+      return;
+    }
     // Pool-preflight FÖRST — settings-issue ska upptäckas innan vi bryr
     // oss om spelar-state (approve/single-player-popups). Om host:s filter-
     // kombo (era + main-categories + source-toggles) ger noll matchande
@@ -6662,7 +6704,10 @@ export default function LobbyScreen() {
         'Are all players in the same room so you can share this device?',
         [
           { text: 'No', style: 'cancel' },
-          { text: 'Yes', onPress: () => startAction.run('start', () => handleStartGame(true)) },
+          // Via ref, INTE den fångade handleStartGame: dialogen kan stå
+          // öppen medan en joiner approvas, och den gamla closure:n byggde
+          // då turnOrder ur den inaktuella approvedPlayers-listan.
+          { text: 'Yes', onPress: () => startAction.run('start', () => handleStartGameRef.current(true)) },
         ],
       );
       return;
@@ -6889,6 +6934,10 @@ export default function LobbyScreen() {
       clearTimeout(hostBulkWriteTimerRef.current);
       hostBulkWriteTimerRef.current = null;
     }
+    // turnOrder är fruset från och med här — inga fler approves får landa
+    // (Lobby-skärmen ligger kvar monterad under /quiz). En sen joiner ska få
+    // "started without me", inte en Follow-prompt till ett spel utan tur.
+    hostGameStartedRef.current = true;
     await setLobbyPlayers(roomCode, players);
 
     // Remote 1v1: skapa den server-side matchen (remote_matches + 2 spelar-
@@ -6969,6 +7018,7 @@ export default function LobbyScreen() {
             }
           } catch { /* tyst — pillen självkorrigerar vid nästa load */ }
         }
+        hostGameStartedRef.current = false; // spelet startade aldrig
         quizVibeAlert('Cannot start match', 'The H2H match could not be created. Check your connection and try again.');
         return;
       }
@@ -7118,6 +7168,7 @@ export default function LobbyScreen() {
     // prompt (game-started-detection) är orörd — den saknar persist-beroendet.
     router.push(quizNav);
   };
+  handleStartGameRef.current = handleStartGame;
 
   // ── Game Sequence förhandsvisning ──────────────────────────────────────────
   // Speglar quiz.tsx:s 3-pool-block-logik (Spotify → YouTube → Image) och
