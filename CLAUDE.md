@@ -128,6 +128,7 @@ Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-on
 - [ ] App Store Connect, version 1.0: 6.9"-screenshots, välj build **#36**, App Review Information (kontakt + `Apple-1`/`Apple-1` + noter), **inga IAP bifogade** (`pkg_sub_monthly` utanför v1.0), bekräfta Pricing (Free, alla territorier).
 - [x] Add for Review → Submit — SUBMITTED 2026-09-24 23:41, build **#38** (ersatte #36/#37 pga Expo-template-ikon), submission `709a5a00-769d-441a-b3e5-9cf5bbd005c9`. **Bytt till MANUELL release 2026-09-26** (under Waiting for Review) — efter godkännande står den i "Pending Developer Release" tills Peter trycker Release. JS-/innehållsfixar före release går via `npx eas update --branch production --platform ios`; nytt binärbygge för 1.0 kräver Developer Reject (= ny review).
 - [ ] **Efter Apple-godkännande — återregistrerings-block (0060)**: kör `0060_deleted_account_tombstones.sql` i PROD SQL Editor → redeploya `delete-account` på PROD (Verify JWT OFF, verifiera Code-fliken) → läs + pusha privacy-raden till master → `npx eas update --branch production --platform ios` för Register-texten. Verifiera: radera ett testkonto i PROD → `select * from public.deleted_account_tombstones` ger en rad. Staging klart + verifierat 2026-10-19. ⚠ Ordningen: migrationen FÖRE funktionen (funktionen skriver till tabellen; utan den failar delete med `tombstone_failed`).
+- [ ] **Efter Apple-godkännande — Hints av för nya konton (0061)**: kör `0061_profiles_hints_default_off.sql` i PROD SQL Editor (en rad, ingen OTA). Staging klart 2026-11-04.
 - [ ] **Lanseringsdagen**: sätt `app_config.free_premium_promo.until` i PROD = go-live + 1 månad (placeholder 2026-12-31 nu).
 - [ ] **Betald prenumeration efter kampanjen** (planera ~1 mån efter lansering). Kampanjslut styrs av `free_premium_promo.until` — förläng med SQL om 1.0.1 dröjer (tak: `OFFER_BACKSTOP_UNTIL` 2026-12-31, senare kräver OTA). Förslag: kampanjslut = lansering + 5–6 v, submit 1.0.1 vecka 3–4. Ordning:
   1. **Starta NU**: LoMaCo AB-konverteringen + Paid Applications Agreement + bank/skatt i ASC (långsammast, styrs ej av oss).
@@ -434,7 +435,7 @@ Assistance and Region are NOT shown on the Register form (2026-09-16) — Year o
 - `gameMode: 'pass-the-phone'`, `singlePlayerDefault: false` — Pass-the-Phone är default-läge.
 - `roundsDefault: 4` (ROUNDS_DEFAULT) — 4 rundor.
 - `answerResponseSeconds: 30` — 30 sekunders svarstid.
-- `youtubeEnabledCategories` + `imagesEnabledCategories`: alla 3 (Music/Film/Sport) — allt aktiverat.
+- `youtubeEnabledCategories`: alla 3 (Music/Film/Sport). `imagesEnabledCategories`: **`[]` = Hints AV** (Peter 2026-11-03) — spelaren slår själv på Hints i Quiz Mixer. Sätts av DB-defaulten på `profiles.images_enabled_categories` (migration **0061**, manuell i SQL Editor på staging + PROD) eftersom `handle_new_user` inte skriver fältet; klienten bevarar `[]` som explicit val.
 - `spotifyDefaultEnabled: false` — Spotify av.
 - **`gameEraFrom`**: spelarens födelseår.
 - **`gameEraTo`**: slutet av spelarens generation + 2 steg framåt. Generationer (A–E): A=≤1964, B=1965–80, C=1981–96, D=1997–2012, E=2013–ERA_MAX. Exempel: född 1977 (gen B) → era_to = 2012 (D); född 1985 (gen C) → era_to = ERA_MAX (E). Implementerat via `_genEndYears=[1964,1980,1996,2012,currentYear]`, `min(genIdx+2, 4)`.
