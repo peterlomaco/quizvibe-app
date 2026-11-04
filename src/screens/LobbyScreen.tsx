@@ -7617,6 +7617,9 @@ export default function LobbyScreen() {
               speglar GetReady:s rounds-dots: filled (lit) = godkänd spelare (host
               alltid med = ruta 1), blinkande = väntar på godkännande, tom = ledig
               plats. Sista rutan visar "max N". */}
+          {/* Single player: ingen "Approved 1 / 1"-rad (Peter 2026-11-04) —
+              en spelare, inget att godkänna (+ Add Guest är också dold där). */}
+          {!isSingleLobby && (
           <View style={[styles.sectionRow, styles.playersMetaRow]}>
             {/* Lobby v2: kompakt readiness-rad i stället för N små rutor.
                 Samma underlag som förut (approvedCount / waitingCount / samma
@@ -7656,6 +7659,7 @@ export default function LobbyScreen() {
               </TouchableOpacity>
             )}
           </View>
+          )}
 
           {/* Turordnings-hinten är meningslös i single player-lobbyn — det
               finns en enda spelare och ingen ordning att ändra. (Lobbyn kör
@@ -8028,28 +8032,8 @@ export default function LobbyScreen() {
              indikator i samma vokabulär som 1vs1- och re-match-lobbyn ovan.
              Vill host spela multiplayer: radera lobbyn och välj Multiplayer
              Game på Home. Allt annat (rundor, era, Mixerboard) är kvar. */
-          <View style={[styles.section, { marginTop: Spacing.xs }]}>
-            <Text style={styles.sectionLabel}>Game Mode</Text>
-            <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
-              <TouchableOpacity
-                style={[styles.modeOption, styles.modeOptionPassActive]}
-                onPress={lockedModeAlert}
-                activeOpacity={0.7}
-              >
-                {/* Inget hänglås (Peter 2026-10-21): rutan är ändå fast — läget väljs
-                    på Home — och användaren konfigurerar sitt eget spel. */}
-                <Text style={[styles.modeLabel, { textAlign: 'center' }, styles.modeLabelActiveFree]}>
-                  Single player
-                </Text>
-                <Text style={styles.modeCheck} pointerEvents="none">✓</Text>
-              </TouchableOpacity>
-              <View style={{ flex: 1 }} />
-            </View>
-            <Text style={styles.guestHostNote}>
-              Multiplayer and Head-to-head games are started from Start New Game on
-              Home.
-            </Text>
-          </View>
+          /* Game Mode-indikatorn borttagen ur Single-lobbyn (Peter 2026-11-04). */
+          null
         ) : isGuestHost ? (
           /* Guest host MULTIPLAYER (Peter 2026-09-18): Pass-the-Phone only.
              Individual device döljs för guest host — det är den minst
