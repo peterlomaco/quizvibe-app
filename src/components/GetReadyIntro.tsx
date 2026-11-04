@@ -1548,16 +1548,19 @@ export function GetReadyIntro({
                   ) : (
                     <>
                       {mediaSourceByQuestion?.[currentQuestion - 1] === 'image' ? (
-                        <HintsIcon size={26} color={Colors.warning} />
+                        <HintsIcon size={isSinglePlayer ? 38 : 26} color={Colors.warning} />
                       ) : (
                         <MediaSourceIcon
                           source={mediaSourceByQuestion?.[currentQuestion - 1]}
-                          size={28}
+                          size={isSinglePlayer ? 40 : 28}
                         />
                       )}
-                      <Text style={styles.mediaLabel} numberOfLines={1}>
-                        {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
-                      </Text>
+                      {/* Single player: bara ikonen (Peter 2026-11-04). */}
+                      {!isSinglePlayer && (
+                        <Text style={styles.mediaLabel} numberOfLines={1}>
+                          {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
+                        </Text>
+                      )}
                     </>
                   )}
                   {nextDJName && (
@@ -1631,9 +1634,17 @@ export function GetReadyIntro({
                           return (
                             <View
                               key={`mchip-${i}`}
-                              style={[styles.queueChip, isSpotify && styles.queueChipSpotify]}
+                              style={[
+                                styles.queueChip,
+                                isSpotify && styles.queueChipSpotify,
+                                isSinglePlayer && styles.queueChipCentered,
+                              ]}
                             >
-                              <Text style={[styles.queueChipNumber, isSpotify && styles.queueChipNumberSpotify]}>
+                              <Text style={[
+                                styles.queueChipNumber,
+                                isSpotify && styles.queueChipNumberSpotify,
+                                isSinglePlayer && styles.queueChipNumberPinned,
+                              ]}>
                                 {q}
                               </Text>
                               {isSpotify ? (
@@ -1644,13 +1655,17 @@ export function GetReadyIntro({
                               ) : (
                                 <MediaSourceIcon source={source} size={16} />
                               )}
-                              <Text
-                                style={[styles.queueChipName, isSpotify && styles.queueChipNameSpotify]}
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                              >
-                                {isSpotify ? 'Spotify' : mediaSourceLabel(source)}
-                              </Text>
+                              {/* Single player: bara ikonen, ingen "YouTube"/"Hints"-text
+                                  (Peter 2026-11-04). Spotify finns inte i single. */}
+                              {!isSinglePlayer && (
+                                <Text
+                                  style={[styles.queueChipName, isSpotify && styles.queueChipNameSpotify]}
+                                  numberOfLines={1}
+                                  ellipsizeMode="tail"
+                                >
+                                  {isSpotify ? 'Spotify' : mediaSourceLabel(source)}
+                                </Text>
+                              )}
                             </View>
                           );
                         })}
@@ -2771,6 +2786,15 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     minWidth: 12,
     textAlign: 'center',
+  },
+  // Single player: ikonen centrerad i kortet, numret kvar i vänsterkanten
+  // (absolut så det inte skjuter ikonen ur mitten).
+  queueChipCentered: {
+    justifyContent: 'center',
+  },
+  queueChipNumberPinned: {
+    position: 'absolute',
+    left: 6,
   },
   // Mindre text + tighter letterSpacing så fler chars ryms innan ellipsen.
   // ellipsizeMode="tail" på <Text> ger "Guest..." för långa namn.
