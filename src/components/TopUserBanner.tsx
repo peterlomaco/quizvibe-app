@@ -118,7 +118,8 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
   // Utloggad / gäst: dämpad outline-profilikon (UI 2026-10-21) i stället för
   // den färgade 👤-emojin — samma ikon som bottom-navens Profile-tab.
   // Inloggad med default-avatar: ingen Q-ikon före PlayerName (Peter 2026-11-04).
-  const leadingIcon = showBrandAvatar ? null : !isLoggedIn ? (
+  // Gäst (guest host i lobbyn): ingen silhuett före namnet (Peter 2026-11-04).
+  const leadingIcon = showBrandAvatar || (!isLoggedIn && isGuest) ? null : !isLoggedIn ? (
     <ProfileOutlineIcon size={18} color={BrandUi.iconMuted} />
   ) : (
     <Text style={styles.loginPillIcon}>{iconTextFor(profile, isLoggedIn)}</Text>

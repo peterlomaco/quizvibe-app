@@ -1559,8 +1559,12 @@ export default function LobbyScreen() {
         );
         setEraValues([guestClampFrom, guestClampTo]);
         // Clampa mot guest-utbudet {2, 4} — defensivt mot oväntade värden.
+        // Guest Single Player: ALLTID 4 rundor (Peter 2026-11-04) — valet
+        // visas inte där, så även en carry-over av 2 tvingas till 4.
         setRoundsCount(
-          stored?.roundsCount === 2 ? 2 : stored?.roundsCount === 4 ? 4 : ROUNDS_DEFAULT,
+          seedSinglePlayer
+            ? 4
+            : stored?.roundsCount === 2 ? 2 : stored?.roundsCount === 4 ? 4 : ROUNDS_DEFAULT,
         );
         setSelectedExtraPackages([]);
         setSketchEnabled(false);
@@ -9205,6 +9209,9 @@ export default function LobbyScreen() {
             </View>
 
             {/* Number of Rounds */}
+            {/* Guest Single Player: rundor låsta till 4, ingen Number of Rounds-
+                sektion (Peter 2026-11-04). */}
+            {!(isGuestHostedLobby && isSingleLobby) && (
             <View>
               <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Number of Rounds</Text>
@@ -9367,6 +9374,7 @@ export default function LobbyScreen() {
                 </>
               )}
             </View>
+            )}
 
             {/* Game Sequence — ruta per rund med medie-källa och kategori.
                 Speglar quiz.tsx:s 3-pool-logik baserat på aktuella inställningar.
