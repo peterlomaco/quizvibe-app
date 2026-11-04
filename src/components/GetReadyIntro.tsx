@@ -25,7 +25,6 @@ import { SectionToggle } from './SectionToggle';
 import { TrophyIcon } from './TrophyIcon';
 import { HintsIcon } from './HintsIcon';
 import Svg, { Path } from 'react-native-svg';
-import { QuizVibeDefaultAvatar } from './QuizVibeDefaultAvatar';
 import { GoldCtaButton } from './GoldCtaButton';
 import { SequentialDots } from './SequentialDots';
 import { ConnectionUnstableOverlay } from './ConnectionUnstableOverlay';
@@ -957,10 +956,7 @@ export function GetReadyIntro({
       <View style={styles.settingsBlock}>
         {/* Litet guld-Q inline med rubriken (UI v2 2026-10-22) — tidigare
             ett stort 96 pt-märke som dominerade och sköt ned resten. */}
-        <View style={styles.logoSlot}>
-          {/* Nya rena Q:t (samma som default-avataren), utan wifi-bågar. */}
-          <QuizVibeDefaultAvatar size={LOGO_SIZE} framed />
-        </View>
+        {/* Q-märket vänster om "Game settings" borttaget (Peter 2026-11-04). */}
         <View style={styles.settingsTextWrap}>
           <TouchableOpacity
             style={styles.settingsTitleRow}

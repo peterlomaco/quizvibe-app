@@ -1882,10 +1882,15 @@ export default function ProfileScreen() {
               hitSlop={8}
               style={({ pressed }) => [styles.hcpCatHeaderRow, pressed && { opacity: 0.7 }]}
             >
-              <View style={styles.hcpCatToggleBox}>
-                <Text style={styles.gameConnectionsChevron}>
-                  {hcpCategoriesExpanded ? '−' : '+'}
-                </Text>
+              <View
+                style={[styles.hcpCatToggleBox, hcpCategoriesExpanded && { borderColor: 'rgba(245,166,35,0.55)' }]}
+              >
+                <ChevronIcon
+                  size={16}
+                  strokeWidth={2}
+                  color={hcpCategoriesExpanded ? Colors.warning : Colors.textSecondary}
+                  direction={hcpCategoriesExpanded ? 'up' : 'down'}
+                />
               </View>
               <Text style={styles.fieldLabelPlain}>HCP by category</Text>
             </Pressable>
@@ -3488,11 +3493,7 @@ export default function ProfileScreen() {
                 <Text style={styles.logoutHeaderEmoji}>
                   {getAvatarEmojiById(selectedAvatarId)}
                 </Text>
-              ) : (
-                <View style={styles.logoutHeaderBrandWrap}>
-                  <QuizVibeDefaultAvatar size={36} framed />
-                </View>
-              )}
+              ) : null /* Ingen Q-ikon före namnet (Peter 2026-11-04). */}
               <View style={{ flex: 1 }}>
                 <Text style={styles.logoutHeaderName}>
                   {playerName.trim() || 'Signed in'}
@@ -3504,90 +3505,13 @@ export default function ProfileScreen() {
             {/* Samma avdelare som Home:s konto-sheet (profileMenu.menuDivider). */}
             <View style={styles.logoutHeaderDivider} />
 
-            {/* Start New Game — fäller ut samma lobbytyp-väljare (Single
-                Game / Multiplayer Game / Head-to-head) som Home:s "Start New
-                Game" i stället för att skapa en standard-lobby direkt (Peter
-                2026-08-29). Credit-gaten körs i handleCreateGame när en
-                lobbytyp väljs; guardedNavigate ligger utanpå så osparade
-                profil-ändringar fångas på vägen ut. */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.logoutCreateGameBtn,
-                pressed && { opacity: 0.85 },
-              ]}
-              onPress={() => setHostTypeExpanded((prev) => !prev)}
-            >
-              <Text style={styles.logoutCreateGameBtnText}>Start New Game</Text>
-            </Pressable>
-            {hostTypeExpanded && (
-              <HostTypeOptions
-                // Samma utseende som Home:s inloggade "Start New Game"-
-                // utfällning (rubrik + BrandUi-ikoner, guld bara vid tryck).
-                heading="Choose how to play"
-                accentColor={BrandUi.border}
-                iconColor={BrandUi.icon}
-                iconAccentColor={BrandUi.icon}
-                arrowColor={BrandUi.iconMuted}
-                pressedBorderColor={Colors.warning}
-                onSelect={(lobbyType) => {
-                  // Kollapsa INTE panelen här — då blinkar meny-vyn förbi
-                  // medan handleCreateGame:s async-arbete (profil/premium/
-                  // rums-registrering) körs. handleCreateGame stänger själv
-                  // sheet:en + panelen precis före router.push, och lämnar
-                  // panelen utfälld om credit-gaten avbryter.
-                  guardedNavigate(() => {
-                    void createAction.run(lobbyType, () => handleCreateGame(lobbyType));
-                  });
-                }}
-                loadingType={createAction.busyKey as HostLobbyType | null}
-              />
-            )}
-
+            {/* "Start New Game", "Join with Room code" och "Store" borttagna ur
+                konto-menyn (Peter 2026-11-04) — nås via Home / bottom banner. */}
             {/* Övriga sheet-knappar döljs medan lobbytyp-väljaren är utfälld
                 så valet står ensamt (speglar Home) och sheet:en inte svämmar
                 över på korta skärmar. */}
             {!hostTypeExpanded && (
               <>
-            {/* Join Game — as registered user. Navigerar till Home med
-                ?openJoinRegistered=1 så Home auto-öppnar JoinModal i
-                'choose'-step med hideGuest:true (samma flöde som
-                "Join Game — as registered user"-knappen på Home). Speglar
-                Create Game-stylen så de visuellt grupperas som spel-CTAs. */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.logoutCreateGameBtn,
-                pressed && { opacity: 0.85 },
-              ]}
-              onPress={() => guardedNavigate(() => {
-                // Join-formuläret öppnas NÄSTLAT i den här sheet:ens Modal
-                // (iOS presenterar det ovanpå) medan sheet:en döljs. Cancel
-                // visar då sheet:en direkt igen — ingen stäng/öppna-växling
-                // där Profile-vyn hinner synas emellan.
-                setJoinVisible(true);
-              })}
-            >
-              <Text style={styles.logoutCreateGameBtnText}>Join with Room code</Text>
-            </Pressable>
-
-            {/* Store-genväg — utan focus-param följer Store sin default-
-                ordning (Basic → Credits → Packages → Subscriptions),
-                samma som direkt tab-tryck på Store. */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.logoutStoreBtn,
-                pressed && { opacity: 0.85 },
-              ]}
-              onPress={() => guardedNavigate(() => {
-                router.push('/store?from=/profile');
-                void closeSheetBehindNav();
-              })}
-            >
-              <ShoppingCartIcon size={22} color={BrandUi.iconMuted} />
-              <Text style={styles.logoutStoreBtnText}>Store</Text>
-              <View style={styles.logoutStoreChevron} pointerEvents="none">
-                <ChevronIcon size={18} />
-              </View>
-            </Pressable>
 
             <Pressable
               style={({ pressed }) => [
@@ -3603,7 +3527,7 @@ export default function ProfileScreen() {
                 {loggingOut ? (
                   <ActivityIndicator size="small" color={BrandUi.iconMuted} />
                 ) : (
-                  <LogoutIcon size={22} color={BrandUi.iconMuted} />
+                  <LogoutIcon size={22} color={Colors.error} />
                 )}
               </View>
               <Text style={styles.logoutBtnText}>Log out</Text>
@@ -3612,11 +3536,11 @@ export default function ProfileScreen() {
             {/* Cancel hör till de vanliga konto-åtgärderna — direkt under
                 Log out, före Danger zone (UI v2 2026-10-22). */}
             <Pressable pressFeedback
-              style={[styles.logoutCancelBtn, styles.logoutCancelInMenu]}
+              style={[styles.logoutCancelBtn, styles.logoutCancelInMenu, styles.menuCancelButton]}
               onPress={() => setLogoutModalVisible(false)}
               disabled={deletingAccount}
             >
-              <Text style={styles.logoutCancelText}>Cancel</Text>
+              <Text style={[styles.logoutCancelText, styles.menuCancelButtonText]}>Cancel</Text>
             </Pressable>
 
             {/* Danger zone (UI 2026-10-20) — Delete Account avskild från Log
@@ -4104,7 +4028,8 @@ const styles = StyleSheet.create({
   logoutBtnText: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.78)',
+    // Röd (Peter 2026-11-04), samma som Home:s konto-meny.
+    color: Colors.error,
   },
   sheetDangerZone: {
     // Tydlig separation mellan vanliga konto-åtgärder (… Log out, Cancel)
@@ -4137,6 +4062,22 @@ const styles = StyleSheet.create({
   logoutCancelText: {
     fontSize: 14,
     color: Colors.textSecondary,
+  },
+  // Konto-menyns Cancel som riktig knapp (Peter 2026-11-04) — neutral yta,
+  // samma som Home:s konto-meny.
+  menuCancelButton: {
+    height: 48,
+    justifyContent: 'center',
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    backgroundColor: BrandUi.surface,
+    borderColor: BrandUi.border,
+    marginTop: Spacing.sm,
+  },
+  menuCancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
   accountSection: {
     marginTop: Spacing.xl,

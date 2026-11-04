@@ -11,6 +11,7 @@ import {
 import { Pressable } from '@/src/components/haptic';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { SectionToggle } from '../components/SectionToggle';
+import { ChevronIcon } from '../components/ChevronIcon';
 import { MusicNoteIcon } from '../components/CategoryIcons';
 import {
   ControllerOutlineIcon,
@@ -413,7 +414,9 @@ export default function FAQScreen() {
                           ]}
                         >
                           <Text style={styles.questionText}>{item.q}</Text>
-                          <Text style={styles.questionChevron}>{isOpen ? '−' : '+'}</Text>
+                          <View style={{ width: 22, alignItems: 'center' }}>
+                            <ChevronIcon size={18} color={isOpen ? Colors.warning : BrandUi.iconMuted} direction={isOpen ? 'up' : 'down'} />
+                          </View>
                         </Pressable>
                         {isOpen && (
                           <View>

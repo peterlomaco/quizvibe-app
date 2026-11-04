@@ -101,7 +101,8 @@ interface Props {
 export default function HcpProgressSummary({ before, after, active }: Props) {
   const delta = after - before;
   const improved = delta < 0;
-  const deltaText = delta === 0 ? '0' : delta < 0 ? `−${-delta}` : `+${delta}`;
+  // Oförändrat visas som "+/-0" (Peter 2026-11-04).
+  const deltaText = delta === 0 ? '+/-0' : delta < 0 ? `−${-delta}` : `+${delta}`;
   // Pilen: guld vid förbättring, annars en ljusare grå än skölden så den
   // syns tydligt mot navy.
   const accent = improved ? Colors.warning : '#9CA3AF';
@@ -254,17 +255,22 @@ export default function HcpProgressSummary({ before, after, active }: Props) {
 
   return (
     <View style={styles.row}>
-      <HCPShield
-        hcp={after}
-        size={CHANGE_SIZE}
-        valueText={deltaText}
-        hideLabel
-        tone={improved ? 'gold' : 'neutral'}
-        strokeScale={1.35}
-        valueColor={deltaColor}
-        // Metallisk guldglans på förbättringssiffran.
-        valueGlow={improved ? 'rgba(255,214,120,0.75)' : undefined}
-      />
+      {/* Förändringen visas som ren siffra utan sköld (Peter 2026-11-04).
+          Samma bredd som den tidigare skölden så pil + höger sköld står kvar. */}
+      <View style={styles.deltaSlot}>
+        <Text
+          style={[
+            styles.deltaValue,
+            { color: deltaColor },
+            // Metallisk guldglans på förbättringssiffran.
+            improved && styles.deltaValueGlow,
+          ]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
+          {deltaText}
+        </Text>
+      </View>
 
       <View style={styles.arrowWrap}>
         <Svg width={40} height={24} viewBox="0 0 40 24" style={styles.arrow}>
@@ -404,6 +410,23 @@ export default function HcpProgressSummary({ before, after, active }: Props) {
 }
 
 const styles = StyleSheet.create({
+  // Ersätter vänstra skölden: samma bredd (sköldens w = size × 0.9) så
+  // pilen och högra skölden inte flyttas.
+  deltaSlot: {
+    width: CHANGE_SIZE * 0.9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deltaValue: {
+    fontSize: Math.round(CHANGE_SIZE * 0.42),
+    fontWeight: FontWeight.bold,
+    fontVariant: ['tabular-nums'],
+  },
+  deltaValueGlow: {
+    textShadowColor: 'rgba(255,214,120,0.75)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

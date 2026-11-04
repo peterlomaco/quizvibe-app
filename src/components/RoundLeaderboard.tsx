@@ -17,7 +17,7 @@ import { LoadingContent } from './LoadingContent';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { HostTypeOptions, type HostLobbyType } from './HostTypeOptions';
-import { QuizVibeAvatarQ } from './QuizVibeDefaultAvatar';
+import { HomeOutlineIcon } from './HomeOutlineIcon';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from './MetallicGoldFill';
 import { QuizVibeWatermark } from './QuizVibeWatermark';
 import { VersusIcon } from './VersusIcon';
@@ -1202,7 +1202,8 @@ export function RoundLeaderboard({
             >
               <LoadingContent loading={busyAction === 'home'} color={Colors.warning}>
                 <View style={styles.finalHomeBtnInner}>
-                  <QuizVibeAvatarQ size={26} color={Colors.warning} />
+                  {/* Hus-ikonen från bottom banner i stället för Q (Peter 2026-11-04). */}
+                  <HomeOutlineIcon size={24} color={Colors.warning} strokeWidth={1.8} />
                   <Text style={styles.finalHomeBtnText}>Home</Text>
                 </View>
               </LoadingContent>

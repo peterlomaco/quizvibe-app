@@ -34,7 +34,10 @@ const MODE_ICON_STROKE = 1.6;
 export function HostTypeOptions({
   accentColor, onSelect, remoteMode = 'available', onRemoteLockedPress, localBadge,
   iconColor, iconAccentColor, arrowColor, pressedBorderColor, heading, loadingType = null,
+  guestHost = false,
 }: {
+  /** Guest-host-panelen: Multiplayer-raden nämner bara Pass-the-Phone. */
+  guestHost?: boolean;
   accentColor: string;
   /** Optional title above the cards (Home: "Choose how to play"). */
   heading?: string;
@@ -110,7 +113,8 @@ export function HostTypeOptions({
         icon={<GroupOutlineIcon size={MODE_ICON_SIZE} color={iconColor ?? Colors.textPrimary} strokeWidth={MODE_ICON_STROKE} />}
         label="Multiplayer"
         subtitle="Play together here & now"
-        detail="Pass-the-Phone or individual devices"
+        // Guest host kan inte hosta Individual device (Peter 2026-11-04).
+        detail={guestHost ? 'Pass-the-Phone' : 'Pass-the-Phone or individual devices'}
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
         onPress={() => onSelect('multiplayer')}

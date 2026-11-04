@@ -154,11 +154,14 @@ export default function StoreScreen() {
   //     styckvis längre (Extra packages ingår i Premium-abonnemanget);
   //     stale packages-deeplinks mappas också till subscription.
   //   • default (utan param) — Basic → Credits → Packages → Subscriptions.
-  const { focus, from, fromCode } = useLocalSearchParams<{
+  const { focus, from, fromCode, via } = useLocalSearchParams<{
     focus?: string;
     from?: string;
     fromCode?: string;
+    /** 'tab' = nådd via bottom banner → ingen Back (Peter 2026-11-04). */
+    via?: string;
   }>();
+  const openedFromTab = via === 'tab';
   const focusMode: 'subscription' | 'default' =
     focus === 'credits' || focus === 'packages' || focus === 'packages-only' || focus === 'subscription'
       ? 'subscription'
@@ -863,7 +866,8 @@ export default function StoreScreen() {
     <SafeAreaView style={styles.safe}>
       {/* Sticky TopUserBanner med ← Back vänster + login-pillen höger.
           Back kör handleBack ovan (router.back() med Home-tab-fallback). */}
-      <TopUserBanner onBackPress={handleBack} backLabel="Back" />
+      {/* Via bottom banner: ingen Back — flikarna räcker för navigering. */}
+      <TopUserBanner onBackPress={openedFromTab ? undefined : handleBack} backLabel="Back" />
       <ScrollView
         ref={scrollRef}
         style={styles.scroll}

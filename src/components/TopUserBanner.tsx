@@ -8,7 +8,6 @@ import { BrandUi, Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { getCachedProfile, loadProfile, type ProfileData } from '../utils/profileStorage';
 import { QuizVibeAvatarQ } from './QuizVibeDefaultAvatar';
-import { QuizVibeDefaultAvatar } from './QuizVibeDefaultAvatar';
 import { ChevronIcon } from './ChevronIcon';
 import { BRAND_UI_INACTIVE } from './brand/QuizVibeBrandSvg';
 import { ProfileOutlineIcon } from './ProfileOutlineIcon';
@@ -118,9 +117,8 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
     isLoggedIn && (!profile?.selectedAvatarId || profile?.avatarSource === 'default');
   // Utloggad / gäst: dämpad outline-profilikon (UI 2026-10-21) i stället för
   // den färgade 👤-emojin — samma ikon som bottom-navens Profile-tab.
-  const leadingIcon = showBrandAvatar ? (
-    <QuizVibeDefaultAvatar size={20} framed />
-  ) : !isLoggedIn ? (
+  // Inloggad med default-avatar: ingen Q-ikon före PlayerName (Peter 2026-11-04).
+  const leadingIcon = showBrandAvatar ? null : !isLoggedIn ? (
     <ProfileOutlineIcon size={18} color={BrandUi.iconMuted} />
   ) : (
     <Text style={styles.loginPillIcon}>{iconTextFor(profile, isLoggedIn)}</Text>
@@ -165,8 +163,10 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
       ))}
       {onPress ? (
         <TouchableOpacity style={pillStyle} activeOpacity={0.7} onPress={onPress}>
-          {leadingIcon}
-          <Text style={[labelStyle, styles.loginPillTextFlex]} numberOfLines={1}>
+          {/* Utan leading-ikon: osynlig spegel av chevronen så namnet
+              centreras i hela rutan (Peter 2026-11-04). */}
+          {leadingIcon ?? <View style={styles.chevronMirror} />}
+          <Text style={[labelStyle, styles.loginPillTextFlex, styles.loginPillTextCentered]} numberOfLines={1}>
             {labelText}
           </Text>
           {/* Liten nedåt-chevron = pillen öppnar en meny. */}
@@ -175,7 +175,8 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
       ) : (
         <View style={pillStyle}>
           {leadingIcon}
-          <Text style={labelStyle} numberOfLines={1}>
+          {/* Read-only (t.ex. Store): namnet centrerat i rutan (Peter 2026-11-04). */}
+          <Text style={[labelStyle, styles.loginPillTextFlex, styles.loginPillTextCentered]} numberOfLines={1}>
             {labelText}
           </Text>
         </View>
@@ -266,5 +267,12 @@ const styles = StyleSheet.create({
   // Låt namnet ta resterande bredd så chevronen alltid sitter längst till höger.
   loginPillTextFlex: {
     flex: 1,
+  },
+  loginPillTextCentered: {
+    textAlign: 'center',
+  },
+  // Samma bredd som ChevronIcon (14) — balanserar chevronen till höger.
+  chevronMirror: {
+    width: 14,
   },
 });

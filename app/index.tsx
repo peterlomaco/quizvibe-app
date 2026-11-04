@@ -3,6 +3,7 @@ import { PlayerNameInput } from '@/src/components/PlayerNameInput';
 import { RotatingTagline } from '@/src/components/RotatingTagline';
 import { MARK_HEIGHT_FROM_V1, QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
 import * as WebBrowser from 'expo-web-browser';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicGoldFill';
 import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
@@ -82,6 +83,10 @@ import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { LoadingContent } from '@/src/components/LoadingContent';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+// Utloggads "Start New Game"-y (content-y) — inloggad lägger sin knapp på
+// samma skärmnivå. Device-lokalt (beror på skärmstorlek).
+const GUEST_START_BTN_Y_KEY = '@quizvibe/home/guestStartBtnY/v1';
+let guestStartBtnYCache: number | null = null;
 
 // ─── Join Modal ───────────────────────────────────────────────────────────────
 
@@ -2189,6 +2194,28 @@ export default function HomeScreen() {
   // handleCreateGame (registrerad) resp. guest-host-formen med
   // guestLobbyType satt (konsumeras av handleStartGameAsGuestHost via prop).
   const [hostTypeExpanded, setHostTypeExpanded] = useState<'none' | 'registered' | 'guest'>('none');
+  // Positioner mätta i IHOPFÄLLT läge (brand-sektionens underkant +
+  // actions-sektionens topp) så utloggad utfällning kan låsa knappen på samma
+  // y i stället för att låta space-between flytta den (Peter 2026-11-04).
+  const [guestPinLayout, setGuestPinLayout] = useState({ brandBottom: -1, actionsTop: -1, guestBtnY: -1 });
+  // Utloggads "Start New Game"-nivå (y i content-containern, = skärm-y då
+  // utloggad saknar TopUserBanner). Inloggad lägger sin Start New Game på
+  // samma skärmnivå (Peter 2026-11-04). Persisteras så nivån finns även
+  // när appen startas inloggad.
+  const [guestStartBtnY, setGuestStartBtnY] = useState<number | null>(guestStartBtnYCache);
+  const [bannerHeight, setBannerHeight] = useState(0);
+  useEffect(() => {
+    if (guestStartBtnYCache != null) return;
+    AsyncStorage.getItem(GUEST_START_BTN_Y_KEY)
+      .then((v) => {
+        const n = v != null ? Number(v) : NaN;
+        if (Number.isFinite(n)) {
+          guestStartBtnYCache = n;
+          setGuestStartBtnY(n);
+        }
+      })
+      .catch(() => {});
+  }, []);
   // In-flight-guard för registered "Start New Game"-flödet. Panelen kollapsas
   // INTE längre synkront vid valet (det gav ett synligt layout-hopp innan
   // /lobby pushats — se onSelect nedan), så den står kvar interaktiv under
@@ -2474,6 +2501,28 @@ export default function HomeScreen() {
   );
 
   const isLoggedIn = !!profile;
+  // Spara utloggads knappnivå när den mätts (ihopfällt läge).
+  useEffect(() => {
+    if (isLoggedIn || hostTypeExpanded !== 'none') return;
+    const { actionsTop, guestBtnY } = guestPinLayout;
+    if (actionsTop < 0 || guestBtnY < 0) return;
+    const y = Math.round(actionsTop + guestBtnY);
+    if (y === guestStartBtnYCache) return;
+    guestStartBtnYCache = y;
+    setGuestStartBtnY(y);
+    AsyncStorage.setItem(GUEST_START_BTN_Y_KEY, String(y)).catch(() => {});
+  }, [isLoggedIn, hostTypeExpanded, guestPinLayout]);
+  // + LOGGED_IN_EXTRA_DROP: inloggads knapp något lägre (Peter 2026-11-04).
+  const LOGGED_IN_EXTRA_DROP = Spacing.xxl;
+  const loggedInActionsMarginTop =
+    (guestStartBtnY != null && bannerHeight > 0 && guestPinLayout.brandBottom >= 0
+      ? Math.max(Spacing.md, guestStartBtnY - bannerHeight - guestPinLayout.brandBottom)
+      : Spacing.xxxl) + LOGGED_IN_EXTRA_DROP;
+  const guestPinActive =
+    !isLoggedIn &&
+    hostTypeExpanded === 'guest' &&
+    guestPinLayout.brandBottom >= 0 &&
+    guestPinLayout.actionsTop >= guestPinLayout.brandBottom;
 
   // Fäll ihop guest-sektionen automatiskt när spelaren loggar in — annars
   // kunde den stå kvar utfälld från en session där man tittade på den som
@@ -3377,22 +3426,36 @@ export default function HomeScreen() {
           primär CTA för utloggade. Visas när profil finns (login-pill med
           avatar + PlayerName → profil-menyn). */}
       {isLoggedIn && (
-        <TopUserBanner
-          profile={profile}
-          open={profileMenuVisible}
-          onPress={() => setProfileMenuVisible(true)}
-        />
+        <View onLayout={(e) => setBannerHeight(e.nativeEvent.layout.height)}>
+          <TopUserBanner
+            profile={profile}
+            open={profileMenuVisible}
+            onPress={() => setProfileMenuVisible(true)}
+          />
+        </View>
       )}
 
       <ScrollView
         style={styles.containerScroll}
-        contentContainerStyle={styles.container}
+        // Inloggad: knappsektionen ligger direkt under brand-blocket i stället
+        // för att space-between trycker ned den (Peter 2026-11-04).
+        contentContainerStyle={[
+          styles.container,
+          (guestPinActive || isLoggedIn) && { justifyContent: 'flex-start' },
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
 
         {/* ── Brand ──────────────────────────────────────────── */}
-        <View style={styles.brandSection}>
+        <View
+          style={styles.brandSection}
+          onLayout={(e) => {
+            if (hostTypeExpanded !== 'none') return;
+            const bottom = e.nativeEvent.layout.y + e.nativeEvent.layout.height;
+            setGuestPinLayout((prev) => (prev.brandBottom === bottom ? prev : { ...prev, brandBottom: bottom }));
+          }}
+        >
           {/* Låst Brand Master (design/brand/), Metallic Gold, renderad med
               react-native-svg. Komposition B: ringen lika stor som i v1
               (116/83 pt v1-höjd → MARK_HEIGHT_FROM_V1, märke v2 2026-11-02),
@@ -3420,7 +3483,22 @@ export default function HomeScreen() {
               Utloggad: Play as guest → Start New Game (metallisk guld) →
                 Join a Game → samtyckesrad → QuizVibe user / Register or Login.
             Pulse ligger på knapparna, aldrig på utfällda paneler. */}
-        <View style={styles.actionsSection}>
+        <View
+          style={[
+            styles.actionsSection,
+            // Utloggad + utfälld: lås sektionen på samma y som i ihopfällt
+            // läge så "← Back" hamnar exakt där "Start New Game" satt
+            // (Peter 2026-11-04). Containerns space-between skulle annars
+            // omfördela kolumnen när knapparna under döljs.
+            guestPinActive && { marginTop: guestPinLayout.actionsTop - guestPinLayout.brandBottom },
+            isLoggedIn && { marginTop: loggedInActionsMarginTop },
+          ]}
+          onLayout={(e) => {
+            if (hostTypeExpanded !== 'none') return;
+            const top = e.nativeEvent.layout.y;
+            setGuestPinLayout((prev) => (prev.actionsTop === top ? prev : { ...prev, actionsTop: top }));
+          }}
+        >
 
           {/* Create Game — döljs helt när utloggad (tidigare 🔒-låst variant).
               Gold-tema för inloggade users (samma vokabulär som appens
@@ -3460,7 +3538,13 @@ export default function HomeScreen() {
                       { fontFamily: fontsLoaded ? 'Nunito_700Bold' : undefined, fontWeight: '700' },
                     ]}
                   >
-                    Start New Game
+                    {/* Utfälld: knappen stänger panelen → "Go back" (Peter 2026-11-04). */}
+                    {hostTypeExpanded === 'registered' ? (
+                      <>
+                        <Text style={styles.homeBackArrow}>{'←  '}</Text>
+                        Back
+                      </>
+                    ) : 'Start New Game'}
                   </Text>
                 </TouchableOpacity>
               </Animated.View>
@@ -3521,9 +3605,14 @@ export default function HomeScreen() {
               tunat). Gästens knappar ligger under (Start New Game, Join a
               Game) — de döljs visuellt när Join-modalen är öppen så sheetens
               rundade ovankant inte avslöjar dem bakom. */}
-          {!isLoggedIn && hostTypeExpanded === 'none' && (
+          {/* Står kvar (osynlig) när panelen är utfälld så knappen under inte
+              flyttas uppåt. */}
+          {!isLoggedIn && (hostTypeExpanded === 'none' || guestPinActive) && (
             <>
-              <View style={[styles.sectionHeaderRow, { marginTop: Spacing.xl + Spacing.lg }]}>
+              <View
+                style={[styles.sectionHeaderRow, { marginTop: Spacing.xl + Spacing.lg }, guestPinActive && { opacity: 0 }]}
+                pointerEvents={guestPinActive ? 'none' : 'auto'}
+              >
                 <Text
                   style={[
                     styles.guestSectionHeader,
@@ -3533,15 +3622,8 @@ export default function HomeScreen() {
                 >
                   Play as guest
                 </Text>
-                <Pressable
-                  onPress={() => setCompareInfoVisible(true)}
-                  hitSlop={10}
-                  style={({ pressed }) => [styles.infoIconBtn, styles.mutedInfoIconBtn, pressed && { opacity: 0.7 }]}
-                  accessibilityRole="button"
-                  accessibilityLabel="What is included as a Guest compared to a QuizVibe user"
-                >
-                  <Text style={[styles.infoIconText, styles.mutedInfoIconText]}>i</Text>
-                </Pressable>
+                {/* Ingen info-ikon här i utloggat läge (Peter 2026-11-04) —
+                    jämförelsen nås via info-ikonen vid "QuizVibe user". */}
               </View>
             </>
           )}
@@ -3560,59 +3642,21 @@ export default function HomeScreen() {
           <View
             style={[
               joinVisible && { opacity: 0 },
-              isLoggedIn && hostTypeExpanded === 'none' && { marginTop: Spacing.xl },
+              isLoggedIn && hostTypeExpanded === 'none' && { marginTop: Spacing.xxxl + Spacing.lg },
             ]}
             pointerEvents={joinVisible ? 'none' : 'auto'}
+            onLayout={(e) => {
+              // Utloggad: gästknappens y inom actions-sektionen — används för
+              // att lägga inloggads Start New Game på samma nivå.
+              if (isLoggedIn || hostTypeExpanded !== 'none') return;
+              const y = e.nativeEvent.layout.y;
+              setGuestPinLayout((prev) => (prev.guestBtnY === y ? prev : { ...prev, guestBtnY: y }));
+            }}
           >
-            {/* Inloggat läge saknar guest-sektionens rubrik ovanför (den
-                renderas bara i !isLoggedIn-blocket) — utan den skulle en
-                ensam "Start Game"-knapp vara tvetydig intill de gyllene
-                user-knapparna. Rendera samma grå rubrik här. marginTop 0
-                eftersom wrappern redan bär sektions-separationen (xl);
-                marginBottom matchar actionsSection:s gap så rytmen blir
-                identisk med utloggat läge. */}
-            {isLoggedIn && hostTypeExpanded === 'none' && (
-              // Fold-header — bara inloggade users har något att fälla ihop
-              // (utloggade guests ser rubriken ovan, utan toggle, som förut).
-              // Toggle-boxen ("+"/"−") ligger FÖRST i raden så den hamnar
-              // längst till vänster på skärmen (Peter 2026-08-27), speglar
-              // Profile-skärmens kollapsbara sektioner men med rubriken
-              // vänsterjusterad istället för centrerad.
-              <View style={[styles.guestFoldHeaderRow, { marginBottom: Spacing.md }]}>
-                <Pressable
-                  onPress={() => setGuestSectionExpanded((prev) => !prev)}
-                  style={({ pressed }) => [styles.guestFoldToggleRow, pressed && { opacity: 0.7 }]}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={guestSectionExpanded ? 'Collapse guest options' : 'Expand guest options'}
-                >
-                  <View style={[styles.guestFoldToggleBox, { borderColor: BrandUi.border }]}>
-                    <Text style={[styles.guestFoldToggleText, { color: BrandUi.textMuted }]}>
-                      {guestSectionExpanded ? '−' : '+'}
-                    </Text>
-                  </View>
-                  <Text
-                    style={[
-                      styles.guestSectionHeader,
-                      styles.mutedSectionHeader,
-                      { fontFamily: appNameFont, marginTop: 0 },
-                    ]}
-                  >
-                    Play as guest
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => setCompareInfoVisible(true)}
-                  hitSlop={10}
-                  style={({ pressed }) => [styles.infoIconBtn, styles.mutedInfoIconBtn, pressed && { opacity: 0.7 }]}
-                  accessibilityRole="button"
-                  accessibilityLabel="What is included as a Guest compared to a QuizVibe user"
-                >
-                  <Text style={[styles.infoIconText, styles.mutedInfoIconText]}>i</Text>
-                </Pressable>
-              </View>
-            )}
-            {(!isLoggedIn || guestSectionExpanded) && (
+            {/* Inloggad: ingen "Play as guest"-rubrik/info-ikon/fold längre
+                (Peter 2026-11-04) — bara knappen, alltid synlig. Wrapperns
+                marginTop (xl) behåller avståndet uppåt. */}
+            {(
               <>
                 {/* Pulsen ligger BARA på knappen — utfälld panel står still. */}
                 <Animated.View
@@ -3646,7 +3690,13 @@ export default function HomeScreen() {
                     >
                       {/* Inloggad: knappen under Play as guest-rubriken heter
                           Play as Guest (skiljer den från egna Start New Game). */}
-                      {isLoggedIn ? 'Play as Guest' : 'Start New Game'}
+                      {/* Utfälld: knappen stänger panelen → "Go back" (Peter 2026-11-04). */}
+                      {hostTypeExpanded === 'guest' ? (
+                        <>
+                          <Text style={styles.homeBackArrow}>{'←  '}</Text>
+                          Back
+                        </>
+                      ) : isLoggedIn ? 'Play as Guest' : 'Start New Game'}
                     </Text>
                     {/* Inga badges på Home-knapparna (Home v2): FREE togs bort
                         från Register or Login 2026-10-16. */}
@@ -3663,6 +3713,7 @@ export default function HomeScreen() {
                     // Head-to-head visas aldrig i gästens utfällning (Peter
                     // 2026-10-16 — den låsta raden för utloggade är borttagen).
                     remoteMode="hidden"
+                    guestHost
                     onSelect={(lobbyType) => {
                       setHostTypeExpanded('none');
                       setGuestLobbyType(lobbyType);
@@ -3706,32 +3757,8 @@ export default function HomeScreen() {
         )}
 
         {/* ── Footer ─────────────────────────────────────────── */}
-        {/* "FAQ" är tappbar Pressable som öppnar /faq?from=/. About- och
-            ·-texterna är fortsatt plain Text (placeholder för framtida
-            About-skärm). Tappbar styling: aktiv färg (textPrimary) +
-            underline så det syns att raden är en länk även för logged-out
-            users som är skärmens primära FAQ-målgrupp. */}
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: BrandUi.textMuted }, { fontFamily: taglineFont }]}>About QuizVibe</Text>
-          <Text style={[styles.footerDot, { color: BrandUi.textMuted }, { fontFamily: taglineFont }]}>·</Text>
-          <Pressable
-            onPress={() => router.push('/faq?from=/')}
-            hitSlop={8}
-          >
-            {({ pressed }) => (
-              <Text
-                style={[
-                  styles.footerText,
-                  styles.footerLink,
-                  { fontFamily: taglineFont },
-                  pressed && { opacity: 0.6 },
-                ]}
-              >
-                FAQ
-              </Text>
-            )}
-          </Pressable>
-        </View>
+        {/* FAQ visas bara för utloggade, under samtyckesraden nedan. Inloggade
+            når FAQ via Profile (Peter 2026-11-04). */}
         {/* Juridisk samtyckesrad — ENBART gäst-Home (Peter 2026-10-16), längst
             ner under footern (Peter 2026-10-21).
             Ingen checkbox (gästspel ska vara friktionsfritt) och inte för
@@ -3760,6 +3787,25 @@ export default function HomeScreen() {
             </Text>
             .
           </Text>
+        )}
+        {/* Utloggad: FAQ under "By continuing…" (Peter 2026-11-04). */}
+        {!isLoggedIn && hostTypeExpanded === 'none' && (
+          <View style={[styles.footer, joinVisible && { opacity: 0 }]}>
+            <Pressable onPress={() => router.push('/faq?from=/')} hitSlop={8}>
+              {({ pressed }) => (
+                <Text
+                  style={[
+                    styles.footerText,
+                    styles.footerLink,
+                    { fontFamily: taglineFont },
+                    pressed && { opacity: 0.6 },
+                  ]}
+                >
+                  FAQ
+                </Text>
+              )}
+            </Pressable>
+          </View>
         )}
       </ScrollView>
 
@@ -3831,11 +3877,7 @@ export default function HomeScreen() {
                     <Text style={profileMenu.headerEmoji}>
                       {getAvatarEmojiById(profile?.selectedAvatarId)}
                     </Text>
-                  ) : (
-                    <View style={profileMenu.headerBrandWrap}>
-                      <QuizVibeDefaultAvatar size={36} framed />
-                    </View>
-                  )}
+                  ) : null /* Ingen Q-ikon före namnet (Peter 2026-11-04). */}
                   <View style={{ flex: 1 }}>
                     <Text style={profileMenu.headerName}>
                       {profile?.playerName?.trim() || 'Signed in'}
@@ -3846,45 +3888,8 @@ export default function HomeScreen() {
                   </View>
                 </View>
 
-                <View style={profileMenu.menuDivider} />
-
-                <TouchableOpacity
-                  style={profileMenu.menuRow}
-                  activeOpacity={0.6}
-                  onPress={() => {
-                    // scrollToTop=1 så Profile:s useFocusEffect snäpper
-                    // ScrollView:n till toppen — tab-navigatorn bevarar
-                    // annars senaste scroll-position mellan tab-byten.
-                    // Push FÖRST, stäng menyn när skärmen landat (ingen
-                    // Home-glimt) — se closeProfileMenuBehindNav.
-                    router.push({
-                      pathname: '/profile',
-                      params: { scrollToTop: '1' },
-                    });
-                    closeProfileMenuBehindNav();
-                  }}
-                >
-                  <ProfileOutlineIcon size={22} color={BrandUi.iconMuted} />
-                  <Text style={profileMenu.menuRowText}>Profile settings</Text>
-                  <ChevronIcon size={18} />
-                </TouchableOpacity>
-
-                {/* Store-genväg — utan focus-param följer Store sin default-
-                    ordning (Basic → Credits → Packages → Subscriptions),
-                    samma som direkt tab-tryck på Store. `from=/` så Store:s
-                    Back-knapp tar användaren tillbaka till Home. */}
-                <TouchableOpacity
-                  style={profileMenu.menuRow}
-                  activeOpacity={0.6}
-                  onPress={() => {
-                    router.push('/store?from=/');
-                    closeProfileMenuBehindNav();
-                  }}
-                >
-                  <ShoppingCartIcon size={22} color={BrandUi.iconMuted} />
-                  <Text style={profileMenu.menuRowText}>Store</Text>
-                  <ChevronIcon size={18} />
-                </TouchableOpacity>
+                {/* "Profile settings" + "Store" borttagna (Peter 2026-11-04) — nås
+                    via bottom banner. */}
 
                 <View style={profileMenu.menuDivider} />
 
@@ -3896,7 +3901,7 @@ export default function HomeScreen() {
                   onPress={handleLogout}
                   disabled={loggingOut}
                 >
-                  <LogoutIcon size={22} color={BrandUi.iconMuted} />
+                  <LogoutIcon size={22} color={Colors.error} />
                   <Text style={profileMenu.logoutRowText}>Log out</Text>
                 </TouchableOpacity>
               </>
@@ -4647,10 +4652,15 @@ export default function HomeScreen() {
             )}
 
             <TouchableOpacity
-              style={profileMenu.cancelBtn}
+              // Inloggad konto-meny: Cancel som riktig knapp (Peter 2026-11-04).
+              style={[profileMenu.cancelBtn, isLoggedIn && profileMenuStep === 'menu' && profileMenu.menuCancelButton]}
               onPress={handleAuthFormCancel}
             >
-              <Text style={profileMenu.cancelText}>Cancel</Text>
+              <Text
+                style={[profileMenu.cancelText, isLoggedIn && profileMenuStep === 'menu' && profileMenu.menuCancelButtonText]}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -4906,6 +4916,12 @@ const styles = StyleSheet.create({
   },
   gameBtnUserText: {
     color: '#000000',
+  },
+  // "← Back" på utfälld Start New Game (Peter 2026-11-04): nästlad Text så
+  // pil + text centreras som EN rad och ärver knappens färg/typsnitt; pilen
+  // bara något mindre.
+  homeBackArrow: {
+    fontSize: 15,
   },
   // Start New Game: metallisk gradient (MetallicGoldFill) klipps till
   // knappens rundade hörn; mörkare guldkant som på Lobby/Get Ready.
@@ -5790,18 +5806,20 @@ const profileMenu = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-    height: 36,
+    // Samma rad-höjd + avstånd till Cancel-knappen som Profile:s konto-meny
+    // (logoutBtn 40 + sheet-gap md + knappens marginTop sm, Peter 2026-11-04).
+    // På korta skärmar är sheet-gap sm → fyll upp till md här.
+    height: 40,
     paddingHorizontal: Spacing.lg,
-    // Drar upp den delade Cancel-raden så glappet Log out → Cancel krymper
-    // (sheet:ens gap gäller alla steg, så justeringen görs här).
-    marginBottom: -20,
+    marginBottom: SCREEN_HEIGHT < 700 ? Spacing.md - Spacing.sm : 0,
   },
   // UI 2026-10-20: neutral sekundär rad (ingen röd) — samma som Profile:s
   // konto-sheet; röd är reserverad för Delete Account.
   logoutRowText: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.78)',
+    // Röd (Peter 2026-11-04).
+    color: Colors.error,
   },
   logoutBtn: {
     height: 52,
@@ -5824,6 +5842,22 @@ const profileMenu = StyleSheet.create({
   cancelText: {
     fontSize: 14,
     color: Colors.textSecondary,
+  },
+  // Inloggad konto-menys Cancel som riktig knapp (Peter 2026-11-04) —
+  // neutral yta, samma som Profile:s konto-meny.
+  menuCancelButton: {
+    height: 48,
+    justifyContent: 'center',
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    backgroundColor: BrandUi.surface,
+    borderColor: BrandUi.border,
+    marginTop: Spacing.sm,
+  },
+  menuCancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
 
   // Login / Register sub-menu

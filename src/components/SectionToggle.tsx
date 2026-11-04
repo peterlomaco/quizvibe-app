@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import Svg, { Line } from 'react-native-svg';
 import { BrandUi, Colors, Radius } from '../theme';
+import { ChevronIcon } from './ChevronIcon';
 
 interface Props {
   expanded: boolean;
@@ -18,17 +18,16 @@ interface Props {
  * Ritat på 24-gridet med samma streckvikt (1.8) som övriga outline-ikoner,
  * så alla expand/collapse-kontroller har identisk storlek och vikt.
  */
-export function SectionToggle({ expanded, tone = 'accent', style }: Props) {
-  const accent = expanded && tone === 'accent';
+export function SectionToggle({ expanded, tone: _tone = 'accent', style }: Props) {
+  // Utfälld = ALLTID guldkant + guld chevron, även tone 'neutral'
+  // (Peter 2026-11-04). tone behålls i API:t men påverkar inte längre.
+  const accent = expanded;
   const color = accent ? Colors.warning : BrandUi.iconMuted;
   return (
     <View style={[styles.box, accent && styles.boxActive, style]}>
-      <Svg width={16} height={16} viewBox="0 0 24 24">
-        <Line x1={6} y1={12} x2={18} y2={12} stroke={color} strokeWidth={2} strokeLinecap="round" />
-        {!expanded && (
-          <Line x1={12} y1={6} x2={12} y2={18} stroke={color} strokeWidth={2} strokeLinecap="round" />
-        )}
-      </Svg>
+      {/* Chevron i stället för +/− (Peter 2026-11-04): ned = hopfälld,
+          upp = utfälld. */}
+      <ChevronIcon size={16} color={color} strokeWidth={2} direction={expanded ? 'up' : 'down'} />
     </View>
   );
 }

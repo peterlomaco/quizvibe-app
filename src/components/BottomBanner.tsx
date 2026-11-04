@@ -5,7 +5,7 @@ import { Pressable } from '@/src/components/haptic';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BRAND_UI_ACTIVE, BRAND_UI_INACTIVE } from './brand/QuizVibeBrandSvg';
 import { ProfileOutlineIcon } from './ProfileOutlineIcon';
-import { QuizVibeAvatarQ } from './QuizVibeDefaultAvatar';
+import { HomeOutlineIcon } from './HomeOutlineIcon';
 import { ShoppingCartIcon } from './ShoppingCartIcon';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 import { getCachedProfile, loadProfile, subscribeProfileChanges } from '../utils/profileStorage';
@@ -18,12 +18,10 @@ export const BOTTOM_BANNER_HEIGHT = 52;
 const SHOW_ON = ['/', '/profile', '/store', '/my-matches', '/competitions'];
 
 // Normalized nav icon set: every icon sits in the same 24 pt box and uses the
-// same visible stroke weight (1.8 pt). Home = det förenklade vektor-Q:t ur
-// Brand Master-geometrin (utan signalbågar, samma som default-avataren),
-// enfärgat i tab-färgen; 22.5 pt (+7 %) för att väga jämnt mot Profile/Store.
+// same visible stroke weight (1.8 pt). Home = hus-ikon (HomeOutlineIcon,
+// ersatte Q:t 2026-11-04).
 const NAV_ICON_BOX = 24;
 const NAV_STROKE_PT = 1.8;
-const NAV_Q_SIZE = 22.5;
 
 interface TabItemProps {
   icon: React.ReactNode;
@@ -34,9 +32,12 @@ interface TabItemProps {
 
 function TabItem({ icon, label, active, onPress }: TabItemProps) {
   return (
-    <Pressable pressFeedback
+    // Tryck på fliken man redan står på = ingenting (ingen replace/omladdning,
+    // ingen haptik/pressfeedback) — Peter 2026-11-04.
+    <Pressable pressFeedback={!active}
       style={[styles.tab, active && styles.tabActive]}
-      onPress={onPress}
+      onPress={active ? undefined : onPress}
+      disabled={active}
       hitSlop={4}
     >
       <View style={styles.iconBox}>{icon}</View>
@@ -111,7 +112,8 @@ export function BottomBanner() {
       <View style={styles.row}>
         <TabItem
           icon={
-            <QuizVibeAvatarQ size={NAV_Q_SIZE} color={col(isHome)} />
+            // Hus i stället för Q (Peter 2026-11-04).
+            <HomeOutlineIcon size={NAV_ICON_BOX} color={col(isHome)} strokeWidth={NAV_STROKE_PT} />
           }
           label="Home"
           active={isHome}
@@ -127,7 +129,7 @@ export function BottomBanner() {
           icon={<ShoppingCartIcon size={NAV_ICON_BOX} color={col(isStore)} />}
           label="Store"
           active={isStore}
-          onPress={() => runWithNavigationGuard(() => router.replace('/store'))}
+          onPress={() => runWithNavigationGuard(() => router.replace('/store?via=tab'))}
         />
       </View>
     </View>

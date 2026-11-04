@@ -305,9 +305,10 @@ export function PlayerRow({
               accessibilityRole="button"
               accessibilityLabel={detailsExpanded ? 'Hide player details' : 'Show player details'}
             >
-              <Text style={styles.detailsToggleText}>
-                {detailsExpanded ? 'Details −' : 'Details +'}
-              </Text>
+              <View style={styles.detailsToggleRow}>
+                <Text style={styles.detailsToggleText}>Details</Text>
+                <ChevronIcon size={12} strokeWidth={2} color={detailsExpanded ? Colors.warning : BrandUi.textMuted} direction={detailsExpanded ? 'up' : 'down'} />
+              </View>
             </Pressable>
           )}
         </View>
@@ -872,6 +873,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     paddingVertical: 1,
   },
+  detailsToggleRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   detailsToggleText: {
     fontSize: FontSize.xs,
     color: BrandUi.textMuted,

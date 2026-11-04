@@ -7324,6 +7324,58 @@ export default function LobbyScreen() {
   // Game Settings-kortet tätt under sin rubrik.
   const HEADING_TO_CONTROL = Spacing.md;
 
+  // Start Game-CTA:n delas av sticky-baren och den centrerade placeringen
+  // i inloggad Single Game-lobby (Peter 2026-11-04).
+  const startCtaElement = (
+    <>
+      {hostMode && !lobbySeeded ? (
+        /* Seed-lås: carry-over-settings (t.ex. Music-only) appliceras av en
+           async seed-effekt (Promise.all → getLobbySettings). Håll Start
+           Game LÅST tills dess så en snabb replay-tap inte startar spelet
+           med de OSEDDA default-källorna (all-3) → "helt slumpmässigt" media.
+           Fönstret är normalt sub-sekund. */
+        <GoldCtaButton
+          locked
+          label="Preparing lobby…"
+          leading={<ActivityIndicator size="small" color={BrandUi.textMuted} />}
+        />
+      ) : hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
+       approvedPlayers.filter((p) => !p.isHost).length === 0 ? (
+        /* Remote 1vs1 utan approved motståndare: Start Game ersätts av en
+           HELT PASSIV väntetext (Peter 2026-08-07). Host delar koden via
+           Share invite eller rumkoden i kortet ovan; baren byter till
+           Start Game så fort motståndaren joinat och godkänts. */
+        <GoldCtaButton
+          locked
+          label="Wait for friend to join"
+          trailing={<SequentialDots color={Colors.textSecondary} />}
+        />
+      ) : hostMode ? (
+        <GoldCtaButton
+          label={
+            isRematchLobby
+              ? singlePlayerDefault
+                ? 'Start Replay'
+                : 'Start Re-match'
+              : 'Start Game'
+          }
+          onPress={() => startAction.run('start', () => handleStartGame())}
+          loading={startAction.isBusy('start')}
+        />
+      ) : (
+        <GoldCtaButton
+          locked
+          label="Waiting for Host to Start Game"
+          trailing={<SequentialDots color={Colors.textSecondary} />}
+        />
+      )}
+    </>
+  );
+  // Inloggad Single Game, host, Customize ihopfälld: knappen ligger inne i
+  // scrollvyn, centrerad mellan "Customize QuizVibe" och skärmens nederkant.
+  // Utfälld Customize → tillbaka i sticky-baren som vanligt.
+  const startInlineCentered = hostMode && isSingleLobby && !isGuestHost && !customizeExpanded;
+
   return (
     <SafeAreaView style={styles.safe}>
       {/* Passiv brand-vattenstämpel (det nya Q:t) i ALLA värd-lobbyer (gäst och
@@ -7751,6 +7803,14 @@ export default function LobbyScreen() {
         </TouchableOpacity>
         {!customizeExpanded && <View style={styles.sectionDivider} />}
         </>)}
+
+        {/* Inloggad Single Game: Start Game centrerad mellan Customize-
+            rubriken och skärmens nederkant (Peter 2026-11-04). */}
+        {startInlineCentered && (
+          <View style={styles.startInlineWrap}>
+            <View style={styles.startCtaSlot}>{startCtaElement}</View>
+          </View>
+        )}
 
         {(customizeExpanded || isGuestHostedLobby) && (<>
         {/* Game Settings — DOLD i guest-hostad lobby (Peter 2026-11-02):
@@ -9435,19 +9495,7 @@ export default function LobbyScreen() {
 
         </>)}{/* /customizeExpanded */}
 
-        {/* Lobby v2: diskret "Back to top" — bara när Customize är utfälld
-            (då blir sidan lång nog att motivera den); ingen blink. */}
-        {customizeExpanded && (
-        <TouchableOpacity
-          onPress={() => mainScrollRef.current?.scrollTo({ y: 0, animated: true })}
-          activeOpacity={0.7}
-          style={[styles.toTopBtn, styles.sectionAfterExpanded]}
-        >
-          <View style={styles.toTopBox}>
-            <Text style={styles.toTopLabel}>↑ Back to top</Text>
-          </View>
-        </TouchableOpacity>
-        )}
+        {/* "Back to top" borttagen i alla lobbyer (Peter 2026-11-04). */}
 
         <View style={styles.bottomPad} />
       </ScrollView>
@@ -9458,54 +9506,16 @@ export default function LobbyScreen() {
           rad, logo 64 istället för 140) så baren tar minimal höjd.
           Host: tappbar → handleStartGame. Non-host: passiv väntetext med
           samma gold-glowing visuella språk. */}
+      {!startInlineCentered && (
       <View style={styles.startStickyBar}>
         {/* Guldknapp i samma stil som Home:s "Start New Game" (Peter
             2026-10-15) — ersatte Q-play-loggan + den pulserande guld-glöden
             över hela baren. Vänte-lägena är samma knappform, grå och låst. */}
         <View style={styles.startCtaSlot}>
-          {hostMode && !lobbySeeded ? (
-            /* Seed-lås: carry-over-settings (t.ex. Music-only) appliceras av en
-               async seed-effekt (Promise.all → getLobbySettings). Håll Start
-               Game LÅST tills dess så en snabb replay-tap inte startar spelet
-               med de OSEDDA default-källorna (all-3) → "helt slumpmässigt" media.
-               Fönstret är normalt sub-sekund. */
-            <GoldCtaButton
-              locked
-              label="Preparing lobby…"
-              leading={<ActivityIndicator size="small" color={BrandUi.textMuted} />}
-            />
-          ) : hostMode && gameMode === 'remote-1v1' && !singlePlayerDefault &&
-           approvedPlayers.filter((p) => !p.isHost).length === 0 ? (
-            /* Remote 1vs1 utan approved motståndare: Start Game ersätts av en
-               HELT PASSIV väntetext (Peter 2026-08-07). Host delar koden via
-               Share invite eller rumkoden i kortet ovan; baren byter till
-               Start Game så fort motståndaren joinat och godkänts. */
-            <GoldCtaButton
-              locked
-              label="Wait for friend to join"
-              trailing={<SequentialDots color={Colors.textSecondary} />}
-            />
-          ) : hostMode ? (
-            <GoldCtaButton
-              label={
-                isRematchLobby
-                  ? singlePlayerDefault
-                    ? 'Start Replay'
-                    : 'Start Re-match'
-                  : 'Start Game'
-              }
-              onPress={() => startAction.run('start', () => handleStartGame())}
-              loading={startAction.isBusy('start')}
-            />
-          ) : (
-            <GoldCtaButton
-              locked
-              label="Waiting for Host to Start Game"
-              trailing={<SequentialDots color={Colors.textSecondary} />}
-            />
-          )}
+          {startCtaElement}
         </View>
       </View>
+      )}
 
       {/* Scroll-hint-pil — guidar ner i lobby-innehållet. Samma som
           quiz.tsx:s namn-fråge-pil (blink-puls, auto-göm vid botten).
@@ -12899,6 +12909,11 @@ const styles = StyleSheet.create({
   startCtaSlot: {
     alignSelf: 'stretch',
   },
+  // Fyller resten av scrollvyn och centrerar knappen vertikalt.
+  startInlineWrap: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
   startStickyBarGlow: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: Colors.warning,
@@ -12993,15 +13008,6 @@ const styles = StyleSheet.create({
   },
   startHint: { fontSize: FontSize.xs, color: Colors.textSecondary, textAlign: 'center', lineHeight: 17 },
   bottomPad: { height: Spacing.xl },
-  toTopBtn: { alignItems: 'center', paddingVertical: Spacing.md },
-  toTopBox: {
-    borderRadius: Radius.full,
-    borderWidth: 1,
-    borderColor: BrandUi.border,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 4,
-  },
-  toTopLabel: { fontSize: FontSize.xs, color: BrandUi.textMuted, fontWeight: FontWeight.medium },
   // ── Game Sequence ──────────────────────────────────────────────────────────
   // Ingen topp-badge längre — bara botten-badge (kategori) skär kantlinjen.
   // rowGap 16 räcker: botten-badge 9 px under + 7 px luft till nästa rads topkant.

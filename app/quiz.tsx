@@ -1,4 +1,5 @@
 import { ConnectionUnstableOverlay } from '@/src/components/ConnectionUnstableOverlay';
+import { ChevronIcon } from '@/src/components/ChevronIcon';
 import { CountdownIntro } from '@/src/components/CountdownIntro';
 import { GetReadyIntro, type QuestionMediaType } from '@/src/components/GetReadyIntro';
 import { ActorSelectBlock } from '@/src/components/ActorSelectBlock';
@@ -183,7 +184,7 @@ import {
   View,
 } from 'react-native';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
-import { QuizVibeAvatarQ, QuizVibeDefaultAvatar } from '@/src/components/QuizVibeDefaultAvatar';
+import { QuizVibeDefaultAvatar } from '@/src/components/QuizVibeDefaultAvatar';
 import { QuizVibeDialog } from '@/src/components/QuizVibeDialog';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import { runBehindGlobalOverlay } from '@/src/utils/globalOverlay';
@@ -12274,10 +12275,15 @@ export default function QuizScreen() {
                     hitSlop={8}
                   >
                     <Text style={rv.answersTitle}>All Players</Text>
-                    <View style={rv.answersToggleBox}>
-                      <Text style={rv.answersToggleGlyph}>
-                        {answersExpanded ? '−' : '+'}
-                      </Text>
+                    <View
+                      style={[rv.answersToggleBox, answersExpanded && { borderColor: 'rgba(245,166,35,0.55)' }]}
+                    >
+                      <ChevronIcon
+                        size={16}
+                        strokeWidth={2}
+                        color={answersExpanded ? Colors.warning : Colors.textSecondary}
+                        direction={answersExpanded ? 'up' : 'down'}
+                      />
                     </View>
                   </TouchableOpacity>
                   {answersExpanded && (
@@ -12480,12 +12486,8 @@ export default function QuizScreen() {
                       bågens rotation-bbox. SVG-dimensionerna bumpade till
                       24 för att kompensera så Q-glyfens visuella storlek
                       är ungefär densamma som tidigare. */}
-                  {/* "Qonfirm Answer" (Peter 2026-10-23): Q:t = samma
-                      förenklade guld-Q som bottom bannerns Home-ikon. */}
-                  <View style={styles.confirmQMark}>
-                    <QuizVibeAvatarQ size={25} color={Colors.warning} />
-                  </View>
-                  <Text style={styles.actionBtnText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>onfirm Answer</Text>
+                  {/* "Confirm Answer" — Q-ikonen borttagen (Peter 2026-11-04). */}
+                  <Text style={styles.actionBtnText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>Confirm Answer</Text>
                 </View>
               </TouchableOpacity>
             </Animated.View>

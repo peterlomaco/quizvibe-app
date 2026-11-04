@@ -53,6 +53,7 @@ import {
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 
 import { TopUserBanner } from '../components/TopUserBanner';
+import { ChevronIcon } from '../components/ChevronIcon';
 import { BOTTOM_BANNER_HEIGHT } from '../components/BottomBanner';
 import {
   finalizeRows,
@@ -567,8 +568,8 @@ export default function MyMatchesScreen() {
             Game against: {oppName}
           </Text>
           {groupFlash && <NewUpdateBadge active style={styles.headerFlashBadge} />}
-          <View style={styles.subToggleBox}>
-            <Text style={styles.subChevron}>{isOpen ? '−' : '+'}</Text>
+          <View style={[styles.subToggleBox, isOpen && styles.toggleBoxOpen]}>
+            <ChevronIcon size={14} strokeWidth={2} color={isOpen ? Colors.warning : Colors.textSecondary} direction={isOpen ? 'up' : 'down'} />
           </View>
           <Text style={styles.sectionCount}>{rows.length}</Text>
         </Pressable>
@@ -647,8 +648,8 @@ export default function MyMatchesScreen() {
           {sectionFlash && <NewUpdateBadge active style={styles.headerFlashBadge} />}
           {/* +/−-boxen sitter direkt efter rubriken (som i Profile);
               antalet högerställs via marginLeft: 'auto'. */}
-          <View style={styles.sectionToggleBox}>
-            <Text style={styles.sectionChevron}>{isOpen ? '−' : '+'}</Text>
+          <View style={[styles.sectionToggleBox, isOpen && styles.toggleBoxOpen]}>
+            <ChevronIcon size={16} strokeWidth={2} color={isOpen ? Colors.warning : Colors.textSecondary} direction={isOpen ? 'up' : 'down'} />
           </View>
           <Text style={styles.sectionCount}>{total}</Text>
         </Pressable>
@@ -817,6 +818,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Utfälld: guldkant (samma som SectionToggle, Peter 2026-11-04).
+  toggleBoxOpen: { borderColor: 'rgba(245,166,35,0.55)' },
   sectionChevron: {
     fontSize: 18,
     fontWeight: FontWeight.bold,
