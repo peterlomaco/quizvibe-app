@@ -23,6 +23,7 @@ import { MediaSourceIcon } from './MediaSourceIcon';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { SectionToggle } from './SectionToggle';
 import { TrophyIcon } from './TrophyIcon';
+import { Avatar } from './Avatar';
 import { HintsIcon } from './HintsIcon';
 import Svg, { Path } from 'react-native-svg';
 import { GoldCtaButton } from './GoldCtaButton';
@@ -953,6 +954,8 @@ export function GetReadyIntro({
           Answer response time (justerbar — se RESPONSE_SECONDS_OPTIONS-
           knapparna). Layouten är en row som alignSelf:'center' så hela
           gruppen sitter i mitten av skärmen. */}
+      {/* Single player: inget Game settings-block (Peter 2026-11-04). */}
+      {!isSinglePlayer && (
       <View style={styles.settingsBlock}>
         {/* Litet guld-Q inline med rubriken (UI v2 2026-10-22) — tidigare
             ett stort 96 pt-märke som dominerade och sköt ned resten. */}
@@ -1056,13 +1059,15 @@ export function GetReadyIntro({
           )}
         </View>
       </View>
+      )}
 
       {/* ── Current Leaderboard (utfällbar) ────────────────────────────
           Header sitter alltid i normal-flow mellan settings och play.
           Body är absolute-positionerad och OVERLAY:ar play-knappen +
           turordningstabellen när expanded — innehållet under flyttas
           inte, det göms bara bakom panelen. Default COLLAPSED. */}
-      {leaderboard && leaderboard.length > 0 && (
+      {/* Single player: ingen Current Leaderboard (Peter 2026-11-04). */}
+      {!isSinglePlayer && leaderboard && leaderboard.length > 0 && (
         <View style={styles.leaderboardBlock}>
           <TouchableOpacity
             style={[
@@ -1454,6 +1459,25 @@ export function GetReadyIntro({
               läge (peers ansluter ännu) och non-host:s vänteläge är samma
               knappform, grå och utan puls: en pulserande knapp läses som
               "tryck här", och det går inte då. */}
+          {/* Single player: vem som spelar, i samma ruta som countdownens
+              "Pass-the-Phone to:" (Peter 2026-11-04). */}
+          {isSinglePlayer && (
+            <View style={styles.singlePlayerPlayBlock}>
+              <Text style={styles.singlePlayerPlayLabel}>Player below - Please Press Play:</Text>
+              <View style={styles.singlePlayerPlayBox}>
+                <Avatar
+                  uri={currentPlayer.avatarUri}
+                  emoji={currentPlayer.emoji}
+                  name={currentPlayer.name}
+                  size={40}
+                  useBrandFallback
+                />
+                <Text style={styles.singlePlayerPlayName} numberOfLines={1}>
+                  {currentPlayer.name}
+                </Text>
+              </View>
+            </View>
+          )}
           <View style={styles.playCtaSlot}>
             {canStartGame ? (
               startLocked ? (
@@ -1503,21 +1527,19 @@ export function GetReadyIntro({
             {/* Bara Question-bar (ingen Round-uppdelning — varje fråga är
                 egen runda i IndDev, och i Single Player finns bara en
                 spelare så Rounds = Questions). */}
-            {renderDotBar(totalQuestions, currentQuestion, 'Question')}
+            {/* Single player: Next-rutan ligger ÖVER Question-raden (Peter
+                2026-11-04) — dot-baren renderas då efter rutan nedan. */}
+            {!isSinglePlayer && renderDotBar(totalQuestions, currentQuestion, 'Question')}
 
-            <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <View style={[styles.colPlayer, styles.cellHeader]}>
-                {isSinglePlayer ? (
-                  // Etiketten dämpad, själva namnet vitt och tydligare (UI v2).
-                  <Text style={styles.headerCellText} numberOfLines={1}>
-                    {'Next player: '}
-                    <Text style={styles.headerCellName}>{playerName}</Text>
-                  </Text>
-                ) : (
+            {/* Single player: ingen "Next player: <namn>"-rubrik — spelaren
+                visas i rutan ovanför Press Play (Peter 2026-11-04). */}
+            {!isSinglePlayer && (
+              <View style={[styles.tableRow, styles.tableHeaderRow]}>
+                <View style={[styles.colPlayer, styles.cellHeader]}>
                   <Text style={styles.headerCellText}>Next:</Text>
-                )}
+                </View>
               </View>
-            </View>
+            )}
 
             {/* Current question-rad — primary-bordered box runt media-ikonen.
                 Kant-skärande kategori-badge ovanpå boxen visar V1-kategori
@@ -1586,6 +1608,12 @@ export function GetReadyIntro({
               </View>
             </View>
 
+            {isSinglePlayer && (
+              <View style={styles.singleDotBarBelowNext}>
+                {renderDotBar(totalQuestions, currentQuestion, 'Question')}
+              </View>
+            )}
+
             {/* Kö-chips (upp till 9 kommande frågor) — vänster-packade så
                 chips sitter tight intill varandra. flexWrap låter chips
                 gå till nya rader när alla 9 inte ryms på en rad (~3 chips
@@ -1596,7 +1624,9 @@ export function GetReadyIntro({
                   - + more questions-fallet (queue överstiger 9 chips) renderas
                     centrerat på egen rad UTAN ikon — separation gör att längre
                     text inte tvingar oönskad wrap inom chip-raden. */}
-            {currentQuestion < totalQuestions ? (() => {
+            {/* Single player: ingen Queue-rubrik eller kö-rutor — bara
+                Next-rutan ovan (Peter 2026-11-04). */}
+            {currentQuestion < totalQuestions ? (isSinglePlayer ? null : (() => {
               const queueQuestions = Array.from({
                 length: Math.min(9, totalQuestions - currentQuestion),
               }).map((_, i) => currentQuestion + i + 1);
@@ -1687,7 +1717,7 @@ export function GetReadyIntro({
                   ) : null}
                 </>
               );
-            })() : (
+            })()) : (
               <View style={styles.endOfGameRow}>
                 <Text style={styles.endOfGameText}>🏁  End of Game</Text>
               </View>
@@ -2949,6 +2979,42 @@ const styles = StyleSheet.create({
   // klampad så den aldrig går utanför skärmens sidomarginaler.
   playCtaSlot: {
     width: Math.min(260, SCREEN_WIDTH - Spacing.lg * 2),
+  },
+  // Single player: rubrik + spelar-ruta ovanför Press Play — samma ruta som
+  // CountdownIntro:s playerBox (guldkant + selectedFill).
+  // Luft mellan Next-rutan och Question-raden under den (single player).
+  singleDotBarBelowNext: {
+    marginTop: Spacing.md,
+  },
+  singlePlayerPlayBlock: {
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
+  },
+  singlePlayerPlayLabel: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.textSecondary,
+    letterSpacing: 0.4,
+  },
+  singlePlayerPlayBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    backgroundColor: BrandUi.selectedFill,
+    borderColor: Colors.warning,
+    borderWidth: 1.5,
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    maxWidth: '100%',
+  },
+  singlePlayerPlayName: {
+    flexShrink: 1,
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    letterSpacing: 0.4,
   },
   playBlock: {
     alignItems: 'center',

@@ -49,6 +49,8 @@ interface Props {
   /** Avatar-emoji för spelaren — renderas i playerName-boxen som visuellt
    *  matchar GetReadyIntro:s currentPlayerBox (avatar + namn på rad). PtP-only. */
   playerEmoji?: string;
+  /** Single player: ingen "Pass-the-Phone to:"-rubrik (Peter 2026-11-04). */
+  hidePlayerLabel?: boolean;
   /** Spelarens bild-avatar (om vald) — vinner över emoji. */
   playerAvatarUri?: string;
   /** Mediakälla för frågan som strax ska ställas — visas som ikon mellan
@@ -184,7 +186,7 @@ function SideTag({
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, playerAvatarUri, mediaSource, answerType = null, category = null, finalWord, silent = false, anchorT0, voice = DEFAULT_VOICE_ID }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, playerAvatarUri, hidePlayerLabel = false, mediaSource, answerType = null, category = null, finalWord, silent = false, anchorT0, voice = DEFAULT_VOICE_ID }: Props) {
   // Remote 1v1 delar IndDev:s headline ("Get Ready to QuizVibe") — varje
   // spelare sitter på egen enhet, ingen specifik spelare att namnge.
   const isIndDev = mode === 'individual-devices' || mode === 'remote-1v1';
@@ -532,7 +534,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
           </View>
         ) : playerName ? (
           <View style={styles.playerBlock}>
-            <Text style={styles.playerLabel}>Pass-the-Phone to:</Text>
+            {!hidePlayerLabel && <Text style={styles.playerLabel}>Pass-the-Phone to:</Text>}
             <View style={styles.playerBox}>
               {/* Spelarens avatar — samma komponent som spelarkorten i lobbyn
                   (default = Q med smiley i stället för silhuetten 👤,

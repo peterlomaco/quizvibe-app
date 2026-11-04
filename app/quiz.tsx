@@ -10762,6 +10762,7 @@ export default function QuizScreen() {
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         playerAvatarUri={countdownPlayer?.avatarUri}
+        hidePlayerLabel={isLocalSoloGame}
         mediaSource={effectiveMediaSourceByQuestion[questionIndex] ?? null}
         answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
         category={effectiveCategoryByQuestion[questionIndex] ?? null}
