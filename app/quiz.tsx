@@ -1,5 +1,6 @@
 import { ConnectionUnstableOverlay } from '@/src/components/ConnectionUnstableOverlay';
 import { ChevronIcon } from '@/src/components/ChevronIcon';
+import { QuizVibeMarkSvg } from '@/src/components/brand/QuizVibeBrandSvg';
 import { CountdownIntro } from '@/src/components/CountdownIntro';
 import { GetReadyIntro, type QuestionMediaType } from '@/src/components/GetReadyIntro';
 import { ActorSelectBlock } from '@/src/components/ActorSelectBlock';
@@ -624,7 +625,10 @@ function SpotifyRoleCard({
       {/* Samma rena Q-märke som rumskortet i lobbyn, i övre vänstra hörnet
           (samma top/left-princip som roomCodeLogoWrap). */}
       <View style={styles.spotifyDJLogo} pointerEvents="none">
-        <QuizVibeDefaultAvatar size={50} framed />
+        {/* Q MED wifi-bågar (Peter 2026-11-04), i samma navy-cirkel. */}
+        <View style={styles.spotifyDJLogoCircle}>
+          <QuizVibeMarkSvg size={30} variant="metallic" />
+        </View>
       </View>
       <Text style={styles.spotifyDJLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
         {title}
@@ -12493,7 +12497,18 @@ export default function QuizScreen() {
               </TouchableOpacity>
             </Animated.View>
           )}
-          {phase === 'awaiting' && (
+          {/* Single Player / Pass-the-Phone / H2H: awaiting varar bara en
+              bråkdel av en sekund (alla har svarat → reveal direkt), så
+              "Answer Locked" blinkade förbi. Behåll i stället Confirm-
+              knappens utseende (otappbar) tills reveal (Peter 2026-11-04). */}
+          {phase === 'awaiting' && gameMode !== 'individual-devices' && (
+            <View style={[styles.actionBtn, styles.actionBtnConfirm]} pointerEvents="none">
+              <View style={styles.actionBtnContent}>
+                <Text style={styles.actionBtnText} maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}>Confirm Answer</Text>
+              </View>
+            </View>
+          )}
+          {phase === 'awaiting' && gameMode === 'individual-devices' && (
             <View style={[styles.actionBtn, styles.actionBtnAwaiting]}>
               {deferNameGrading && isNameAnswerQuestion ? (
                 // Name-fråga i multiplayer: vänta på övriga i stället för
@@ -13091,6 +13106,17 @@ const styles = StyleSheet.create({
     top: Spacing.sm,
     left: Spacing.sm,
     opacity: 0.7,
+  },
+  // Samma ram som QuizVibeDefaultAvatar framed (50 pt navy-cirkel).
+  spotifyDJLogoCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#152238',
+    borderWidth: 1,
+    borderColor: 'rgba(245,166,35,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   spotifyDJLabel: {
     fontSize: FontSize.xl,
@@ -14336,7 +14362,9 @@ const rv = StyleSheet.create({
     borderRadius: Radius.sm,
     borderWidth: 1,
     borderColor: Colors.borderStrong,
-    backgroundColor: 'transparent',
+    // Opak bakgrund (Peter 2026-11-04) — samma neutrala navy som
+    // "Answer Locked"-knappen, så innehållet under inte lyser igenom.
+    backgroundColor: '#141C2B',
     gap: 4,
   },
   // Spotify-reveal "Waiting for DJ…": samma nivå som övriga sekundära

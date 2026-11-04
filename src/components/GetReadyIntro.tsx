@@ -1552,7 +1552,8 @@ export function GetReadyIntro({
                         />
                       )}
                       {/* Single player: bara ikonen (Peter 2026-11-04). */}
-                      {!isSinglePlayer && (
+                      {/* Spotify: bara loggan, ingen "Spotify"-text (Peter 2026-11-04). */}
+                      {!isSinglePlayer && mediaSourceByQuestion?.[currentQuestion - 1] !== 'spotify' && (
                         <Text style={styles.mediaLabel} numberOfLines={1}>
                           {mediaSourceLabel(mediaSourceByQuestion?.[currentQuestion - 1])}
                         </Text>
@@ -1566,7 +1567,7 @@ export function GetReadyIntro({
                     // Spotify-ikonen.
                     <View style={styles.nextDJWrap}>
                       <Text style={styles.nextDJPrefix}>Next DJ:</Text>
-                      <Text style={styles.nextDJLabel} numberOfLines={1}>
+                      <Text style={styles.nextDJLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
                         {nextDJName}
                       </Text>
                     </View>
@@ -1653,7 +1654,8 @@ export function GetReadyIntro({
                               )}
                               {/* Single player: bara ikonen, ingen "YouTube"/"Hints"-text
                                   (Peter 2026-11-04). Spotify finns inte i single. */}
-                              {!isSinglePlayer && (
+                              {/* Spotify-chip: bara loggan (Peter 2026-11-04). */}
+                              {!isSinglePlayer && !isSpotify && (
                                 <Text
                                   style={[styles.queueChipName, isSpotify && styles.queueChipNameSpotify]}
                                   numberOfLines={1}
@@ -1910,11 +1912,14 @@ const styles = StyleSheet.create({
   settingsBlock: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    alignSelf: 'center',
+    // Vänsterställt (Peter 2026-11-04) — tidigare centrerat med Q:t till
+    // vänster; Q:t är borttaget, så rubriken linjerar med vänsterkanten.
+    alignSelf: 'stretch',
+    // Linjerar med pokal-ikonen i Current Leaderboard-rutan under:
+    // leaderboardBlock-marginal (lg) + header-padding (md) + 1 pt kant.
+    marginHorizontal: Spacing.lg,
+    paddingLeft: Spacing.md + 1,
     gap: Spacing.md,
-    // Q:t lite längre ut åt vänster (Peter 2026-10-22).
-    marginLeft: -Spacing.lg,
-    paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
   },
   logoSlot: {
@@ -2631,13 +2636,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     flexShrink: 1,
   },
+  // Större text (Peter 2026-11-04): xs → sm / md.
   nextDJPrefix: {
-    fontSize: FontSize.xs,
+    fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: '#1DB954',
   },
   nextDJLabel: {
-    fontSize: FontSize.xs,
+    fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
     color: '#1DB954',
     textAlign: 'left',
@@ -2771,8 +2777,9 @@ const styles = StyleSheet.create({
     borderColor: '#1DB954',
     backgroundColor: 'rgba(29,185,84,0.12)',
   },
+  // Vit i stället för Spotify-grön (Peter 2026-11-04).
   currentMediaNumberSpotify: {
-    color: '#1DB954',
+    color: Colors.textPrimary,
   },
   // Siffran är frågenumret (queueQuestionNumbers[i]) — primary-blå för
   // att linka visuellt till Question-dot-bar:ens siffror ovan.
