@@ -1550,6 +1550,7 @@ export function GetReadyIntro({
               <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
                 <View style={[
                   styles.currentMediaBox,
+                  isSinglePlayer && styles.currentMediaBoxCompact,
                   (spotifyQuestionIndices?.includes(currentQuestion - 1) ?? false) && styles.currentMediaBoxSpotify,
                 ]}>
                   <Text style={[
@@ -2634,6 +2635,11 @@ const styles = StyleSheet.create({
     minHeight: 76,
     position: 'relative',
   },
+  // Single player: lägre Next-ruta (Peter 2026-11-04) — 76 → 60 pt.
+  currentMediaBoxCompact: {
+    paddingVertical: Spacing.sm + 2,
+    minHeight: 60,
+  },
   // Fråge-sekvensnummer i box:ens vänsterkant. Absolut-positionerad så
   // ikon+label kan vara CENTRERAT i boxen oavsett siffrans bredd —
   // annars hade nummret skuffat det centrerade innehållet åt höger.
@@ -2989,7 +2995,11 @@ const styles = StyleSheet.create({
   singlePlayerPlayBlock: {
     alignItems: 'center',
     gap: Spacing.sm,
-    marginBottom: Spacing.lg,
+    // Rutan flyttad UPP 24 pt medan Press Play står kvar (Peter 2026-11-04):
+    // negativ marginTop och lika mycket extra marginBottom tar ut varandra
+    // för knappens position → avståndet ruta↔knapp ökar till 56 pt.
+    marginTop: -Spacing.xl,
+    marginBottom: Spacing.xxl + Spacing.xl,
   },
   singlePlayerPlayLabel: {
     fontSize: FontSize.sm,
