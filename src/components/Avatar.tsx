@@ -62,7 +62,7 @@ export function Avatar({
           style={[styles.image, { borderRadius: size / 2 }]}
         />
       ) : showBrand ? (
-        <QuizVibeDefaultAvatar size={size} markScale={brandMarkScale} offsetY={brandOffsetY} />
+        <QuizVibeDefaultAvatar size={size} markScale={brandMarkScale} offsetY={brandOffsetY} smile />
       ) : emoji ? (
         <Text style={{ fontSize: size * 0.46, lineHeight: size * 0.58 }}>
           {emoji}

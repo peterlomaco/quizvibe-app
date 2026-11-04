@@ -5,10 +5,12 @@ import { QuizVibeMarkQOnlySvg } from './brand/QuizVibeBrandSvg';
 // Default-avatar (2026-10-20): EN källa för alla storlekar — vektor-Q:t ur
 // Brand Master-geometrin (QuizVibeMarkQOnlySvg = ring + handtag, utan de tre
 // signalbågarna). Ingen PNG. Huvudloggan (QuizVibeMarkSvg/Home) är orörd.
+// `smile` (Peter 2026-11-04): glad gubbe i ringen — används där Q:t är
+// SPELARENS avatar, inte där det är ett varumärkesmärke (rumskort, DJ-kort).
 
 /** Bara Q-silhuetten. `size` = höjd i pt. `color` = enfärgad (t.ex. dämpad) variant; utelämnad = metallguld. */
-export function QuizVibeAvatarQ({ size, color }: { size: number; color?: string }) {
-  return <QuizVibeMarkQOnlySvg size={size} color={color} />;
+export function QuizVibeAvatarQ({ size, color, smile = false }: { size: number; color?: string; smile?: boolean }) {
+  return <QuizVibeMarkQOnlySvg size={size} color={color} smile={smile} />;
 }
 
 /**
@@ -22,6 +24,7 @@ export function QuizVibeDefaultAvatar({
   color,
   markScale = 0.56,
   offsetY = 0,
+  smile = false,
 }: {
   size: number;
   framed?: boolean;
@@ -30,6 +33,8 @@ export function QuizVibeDefaultAvatar({
   markScale?: number;
   /** Lokal vertikal justering i pt (negativ = uppåt). */
   offsetY?: number;
+  /** Glad gubbe i ringen — spelarens default-avatar. */
+  smile?: boolean;
 }) {
   return (
     <View
@@ -44,7 +49,7 @@ export function QuizVibeDefaultAvatar({
       ]}
     >
       <View style={offsetY ? { transform: [{ translateY: offsetY }] } : undefined}>
-        <QuizVibeAvatarQ size={Math.round(size * markScale)} color={color} />
+        <QuizVibeAvatarQ size={Math.round(size * markScale)} color={color} smile={smile} />
       </View>
     </View>
   );

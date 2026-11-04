@@ -3825,7 +3825,7 @@ function AvatarPicker({
         {/* Default Image vald: centrerad förhandsvisning så vyn inte känns tom. */}
         {source === 'default' && (
           <View style={styles.apDefaultPreview}>
-            <QuizVibeDefaultAvatar size={128} framed />
+            <QuizVibeDefaultAvatar size={128} framed smile />
             <Text style={styles.apDefaultCaption}>QuizVibe default</Text>
           </View>
         )}
@@ -3886,7 +3886,7 @@ function SourceRow({
             QuizVibe Q-marken (samma som profil-avataren blir) i stället
             för en text-emoji. */}
         {icon === 'Q' ? (
-          <QuizVibeAvatarQ size={24} color={selected ? undefined : BrandUi.iconMuted} />
+          <QuizVibeAvatarQ size={24} color={selected ? undefined : BrandUi.iconMuted} smile />
         ) : (
           <AvatarGridIcon color={iconColor} />
         )}

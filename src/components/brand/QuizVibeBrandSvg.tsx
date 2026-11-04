@@ -1,10 +1,11 @@
 import React, { useId } from 'react';
 import { View } from 'react-native';
-import Svg, { Defs, G, LinearGradient, Path, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, G, LinearGradient, Path, Stop } from 'react-native-svg';
 import { Colors } from '../../theme';
 import {
   LOGO_MARK_HEIGHT,
   MARK_PATHS,
+  MARK_RING,
   MARK_VIEWBOX,
   WORDMARK_PATH,
   WORDMARK_VIEWBOX,
@@ -132,13 +133,41 @@ export function QuizVibeMarkArcsSvg({ size, arcs = [0, 1, 2], color }: { size: n
  * height in pt. `color` paints it in one flat colour (e.g. muted inactive
  * state); omitted = the same metallic gold treatment as QuizVibeMarkSvg.
  */
-export function QuizVibeMarkQOnlySvg({ size, color }: { size: number; color?: string }) {
+export function QuizVibeMarkQOnlySvg({
+  size,
+  color,
+  smile = false,
+}: {
+  size: number;
+  color?: string;
+  /** Glad gubbe (ögon + leende) i ringhålet — spelarens default-avatar
+   *  (Peter 2026-11-04). Samma färg/guld som Q:t. */
+  smile?: boolean;
+}) {
   const id = useSvgId('qvQ');
   const { width: vw, height: vh } = MARK_VIEWBOX;
+  // Ansiktet placeras relativt ringhålet (MARK_RING) så det följer geometrin.
+  const { cx, cy, inner } = MARK_RING;
+  const eyeDx = inner * 0.34;
+  const eyeY = cy - inner * 0.2;
+  const eyeR = inner * 0.12;
+  const mouthW = inner * 0.5;
+  const mouthY = cy + inner * 0.16;
+  const mouthD = `M ${cx - mouthW} ${mouthY} Q ${cx} ${mouthY + inner * 0.5} ${cx + mouthW} ${mouthY}`;
+  const face = (paint: string) => (
+    <G>
+      <Circle cx={cx - eyeDx} cy={eyeY} r={eyeR} fill={paint} />
+      <Circle cx={cx + eyeDx} cy={eyeY} r={eyeR} fill={paint} />
+      <Path d={mouthD} stroke={paint} strokeWidth={inner * 0.17} strokeLinecap="round" fill="none" />
+    </G>
+  );
   return (
     <Svg width={(size * vw) / vh} height={size} viewBox={`0 0 ${vw} ${vh}`}>
       {color ? (
-        <MarkShapes fill={color} paths={MARK_Q_ONLY_D} />
+        <>
+          <MarkShapes fill={color} paths={MARK_Q_ONLY_D} />
+          {smile && face(color)}
+        </>
       ) : (
         <>
           <Defs>
@@ -155,6 +184,7 @@ export function QuizVibeMarkQOnlySvg({ size, color }: { size: number; color?: st
           <MarkShapes fill={DEPTH} dy={vh * 0.008} paths={MARK_Q_ONLY_D} />
           <MarkShapes fill={`url(#${id}g)`} paths={MARK_Q_ONLY_D} />
           <MarkShapes fill={`url(#${id}s)`} paths={MARK_Q_ONLY_D} />
+          {smile && face(`url(#${id}g)`)}
         </>
       )}
     </Svg>
