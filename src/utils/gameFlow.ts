@@ -236,3 +236,40 @@ export function spotifyJoinBlock(
   if (joiner.deviceMode === 'host') return 'own-device-required';
   return null;
 }
+
+// ─── Device choice (Step 2) ───────────────────────────────────────────
+
+export function isDeviceMode(v: unknown): v is DeviceMode {
+  return v === 'host' || v === 'own';
+}
+
+/**
+ * The device mode a lobby_players row represents. The host is always 'own';
+ * a stored value wins; host-added guests (guest + no user_id, the existing
+ * addedByHost heuristic) are 'host'; anything else is legacy → undefined.
+ */
+export function deviceModeFromRow(row: {
+  is_host: boolean;
+  device_mode?: string | null;
+  type: string;
+  user_id: string | null;
+}): DeviceMode | undefined {
+  if (row.is_host) return 'own';
+  if (isDeviceMode(row.device_mode)) return row.device_mode;
+  if (row.type === 'guest' && row.user_id === null) return 'host';
+  return undefined;
+}
+
+/**
+ * Device mode a joiner publishes for its own row. An explicit choice (join UI
+ * in Step 6, or the carry-over param on Play Again) wins. In a Multiplayer v2
+ * room the default is 'own' — the joiner is on their own phone. In legacy
+ * rooms nothing is written, so old behaviour is untouched.
+ */
+export function resolveJoinDeviceMode(
+  param: string | undefined,
+  roomIsMultiplayerV2: boolean,
+): DeviceMode | undefined {
+  if (isDeviceMode(param)) return param;
+  return roomIsMultiplayerV2 ? 'own' : undefined;
+}

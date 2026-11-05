@@ -280,3 +280,63 @@ describe('feature gates + entitlements', () => {
     expect(r.gameMode).toBe(ONE_BY_ONE);
   });
 });
+
+// ─── Step 2: device choice data model ───
+import {
+  deviceModeFromRow,
+  isDeviceMode,
+  resolveJoinDeviceMode,
+} from '../../../src/utils/gameFlow';
+
+describe('deviceModeFromRow', () => {
+  const row = (o: Partial<{ is_host: boolean; device_mode: string | null; type: string; user_id: string | null }>) => ({
+    is_host: false,
+    device_mode: null,
+    type: 'registered',
+    user_id: 'u1',
+    ...o,
+  });
+
+  it('host is always own, even if a value is stored', () => {
+    expect(deviceModeFromRow(row({ is_host: true, device_mode: 'host' }))).toBe('own');
+  });
+  it('stored value wins for non-hosts', () => {
+    expect(deviceModeFromRow(row({ device_mode: 'host' }))).toBe('host');
+    expect(deviceModeFromRow(row({ device_mode: 'own' }))).toBe('own');
+  });
+  it('host-added guest (guest + no user_id) is host', () => {
+    expect(deviceModeFromRow(row({ type: 'guest', user_id: null }))).toBe('host');
+  });
+  it('self-joined guest without a stored value is legacy (undefined)', () => {
+    expect(deviceModeFromRow(row({ type: 'guest', user_id: 'anon' }))).toBeUndefined();
+  });
+  it('legacy registered row is undefined; garbage values are ignored', () => {
+    expect(deviceModeFromRow(row({}))).toBeUndefined();
+    expect(deviceModeFromRow(row({ device_mode: 'phone' }))).toBeUndefined();
+  });
+  it('missing column (pre-0063 row) behaves like null', () => {
+    expect(deviceModeFromRow({ is_host: false, type: 'registered', user_id: 'u' })).toBeUndefined();
+  });
+});
+
+describe('resolveJoinDeviceMode', () => {
+  it('explicit choice wins in any room', () => {
+    expect(resolveJoinDeviceMode('host', false)).toBe('host');
+    expect(resolveJoinDeviceMode('own', true)).toBe('own');
+  });
+  it('v2 room without a choice defaults to own', () => {
+    expect(resolveJoinDeviceMode(undefined, true)).toBe('own');
+  });
+  it('legacy room without a choice writes nothing', () => {
+    expect(resolveJoinDeviceMode(undefined, false)).toBeUndefined();
+  });
+  it('invalid param is ignored', () => {
+    expect(resolveJoinDeviceMode('banana', false)).toBeUndefined();
+    expect(resolveJoinDeviceMode('banana', true)).toBe('own');
+  });
+  it('isDeviceMode guards', () => {
+    expect(isDeviceMode('own')).toBe(true);
+    expect(isDeviceMode('host')).toBe(true);
+    expect(isDeviceMode(null)).toBe(false);
+  });
+});

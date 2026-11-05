@@ -27,6 +27,7 @@ import {
   forgetOwnMembership,
   recordOwnMembership,
 } from './ownLobbyLedger';
+import { deviceModeFromRow, type DeviceMode } from './gameFlow';
 import { supabase } from './supabase';
 import type { LobbyPlayer } from '../screens/LobbyScreen';
 
@@ -74,6 +75,10 @@ interface LobbyPlayerRow {
   // (PlayerRow/leaderboard) läser dessa; NULL → kategori-sköld faller till 99.
   hcp_music?: number | null;
   hcp_film?: number | null;
+  // Multiplayer v2 device choice (migration 0063). Optional — legacy rows /
+  // non-applied migration lack it. Written ONLY by publishOwnDeviceMode
+  // (targeted UPDATE) — never part of playerToRow, so host cannot clobber it.
+  device_mode?: string | null;
   // hcp_sport-kolumnen (migration 0050) finns kvar i DB men läses inte längre
   // (Sport borttaget ur modellen 2026-09).
   // OBS: kolumnen `seen_question_ids` (migration 0026) ingår MEDVETET INTE
@@ -103,6 +108,7 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     hcp: row.hcp ?? undefined,
     hcpMusic: row.hcp_music ?? undefined,
     hcpFilm: row.hcp_film ?? undefined,
+    deviceMode: deviceModeFromRow(row),
     // Host-added guests har user_id=null i DB eftersom host saknar deras
     // auth-session vid upsert (setLobbyPlayers strippar dessutom user_id ur
     // non-host-payload:en). Self-joined guests sätter user_id=auth.uid() via
@@ -645,6 +651,36 @@ export async function publishOwnAccountName(
     .eq('user_id', userId);
   if (error) {
     console.warn('[lobbyPlayers] publishOwnAccountName failed:', error.message);
+  }
+}
+
+/**
+ * Multiplayer v2 (migration 0063): publicerar spelarens EGET device-val
+ * ('own' | 'host') till sin egen lobby_players-rad. Samma targeted-UPDATE-
+ * mönster som publishOwnAccountName — ingår ALDRIG i host:s bulk-UPSERT, så
+ * host kan inte skriva över ett låst val. MÅSTE anropas efter att egen rad
+ * finns (kedja på upsert-promisen). Fel loggas men kastas aldrig — en
+ * icke-applicerad migration ska inte bryta lobby-join:en.
+ */
+export async function publishOwnDeviceMode(
+  code: string,
+  playerId: string,
+  deviceMode: DeviceMode,
+): Promise<void> {
+  if (!code || !playerId) return;
+  const normalized = normalizeCode(code);
+  await ensureAuthSession();
+  const { data: userResp } = await supabase.auth.getUser();
+  const userId = userResp.user?.id;
+  if (!userId) return;
+  const { error } = await supabase
+    .from('lobby_players')
+    .update({ device_mode: deviceMode })
+    .eq('room_code', normalized)
+    .eq('player_id', playerId)
+    .eq('user_id', userId);
+  if (error) {
+    console.warn('[lobbyPlayers] publishOwnDeviceMode failed:', error.message);
   }
 }
 

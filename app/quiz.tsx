@@ -1459,6 +1459,10 @@ type TurnOrderPlayer = {
   // carry-over så raderna återskapas med korrekt type. Host-radens 'guest'
   // är non-host-enheternas detekteringssignal för guest-hostade spel.
   type?: 'registered' | 'guest';
+  // Multiplayer v2 device choice ('own' | 'host'), from lobby_players.
+  // Carried over on Play Again so a joiner keeps its choice. Not read by the
+  // quiz engine yet (Step 4).
+  deviceMode?: 'own' | 'host';
 };
 
 // "No Answer" = spelaren låste aldrig ett svar: timeout (registreras med full
@@ -7701,6 +7705,7 @@ export default function QuizScreen() {
           isHost: p.isHost ?? false,
           approved: true,
           spotifyConnected: turnEntry?.spotifyConnected ?? false,
+          deviceMode: turnEntry?.deviceMode,
         };
       });
       await savePendingLobbyPlayers(carryOverPlayers);
@@ -8793,11 +8798,15 @@ export default function QuizScreen() {
       // Supabase-replikering ännu inte synkat när non-host:s getLobbyPlayers
       // anropas, vilket annars ger ett ny joiner-DATE-id och två DB-rader.
       const carryOverParam = selfPlayerId ? `&carryOverPlayerId=${encodeURIComponent(selfPlayerId)}` : '';
+      // Multiplayer v2: keep the device choice into the re-match lobby.
+      // Legacy games have none → no param → nothing is written there.
+      const selfDeviceMode = turnOrder.find((t) => t.id === selfPlayerId)?.deviceMode;
+      const deviceModeParam = selfDeviceMode ? `&deviceMode=${selfDeviceMode}` : '';
       // rematchLocked: non-host når den här vägen ENBART via host:s
       // play_again_lobby_ready, dvs. alltid en re-match — så låst läge
       // renderas direkt på första framen i stället för efter en DB-läsning.
       router.replace(
-        `/lobby?code=${nextLobbyCode}&isHost=false${carryOverParam}&rematchLocked=true`,
+        `/lobby?code=${nextLobbyCode}&isHost=false${carryOverParam}${deviceModeParam}&rematchLocked=true`,
       );
     }
   }, [awaitingNewLobby, nextLobbyCode]);

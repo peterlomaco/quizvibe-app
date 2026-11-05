@@ -82,7 +82,8 @@ import { addLeftPlayer, clearLeftPlayers, getLeftPlayers, removeLeftPlayer } fro
 import { deactivateRoom, getRoomMeta, markRoomGameStarted, registerActiveRoom, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
-import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnHcp, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import { resolveJoinDeviceMode, type DeviceMode } from '../utils/gameFlow';
+import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnDeviceMode, publishOwnHcp, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
@@ -180,6 +181,11 @@ export interface LobbyPlayer extends Player {
   // ningen på spelarkortet. undefined → kategori-sköld faller till 99.
   hcpMusic?: number;
   hcpFilm?: number;
+  // Multiplayer v2 (migration 0063): 'own' = own phone, 'host' = plays on the
+  // host's phone. Locked at join. Host is always 'own'; host-added guests are
+  // 'host'. undefined = legacy row / room without Multiplayer v2 (treated as
+  // 'own' by gameFlow). Nothing in the lobby or quiz reads it yet (Step 2).
+  deviceMode?: DeviceMode;
 }
 
 type GameMode = 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
@@ -1040,6 +1046,20 @@ function publishOwnAccountAlias(roomCode: string, playerId: string): void {
  * stale om en samtidig loadProfile-cache-back skrivit över hcp-fältet, vilket
  * gjorde att en NY lobby publicerade ett gammalt HCP efter ett spel.
  */
+/**
+ * Multiplayer v2: publishes the joiner's device choice to its own row. Same
+ * fire-and-forget chaining as publishOwnAccountAlias — MUST run after the
+ * row exists. undefined (legacy room, no choice) → nothing is written.
+ */
+function publishOwnDeviceModeToLobby(
+  roomCode: string,
+  playerId: string,
+  deviceMode: DeviceMode | undefined,
+): void {
+  if (!deviceMode) return;
+  publishOwnDeviceMode(roomCode, playerId, deviceMode).catch(() => {});
+}
+
 function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
   const profile = getCachedProfile();
   if (!profile?.playerName) return; // gäster publicerar inte (kolumnen förblir null)
@@ -1201,6 +1221,7 @@ export default function LobbyScreen() {
     carrySpotifyName,
     carryPkgYoutube,
     carryPkgHints,
+    deviceMode: deviceModeParam,
   } = useLocalSearchParams<{
     code: string;
     isHost: string;
@@ -1263,6 +1284,10 @@ export default function LobbyScreen() {
     /** Play Again carry-over: paketets YT-/Hints-aggregat-toggles. */
     carryPkgYoutube?: string;
     carryPkgHints?: string;
+    /** Multiplayer v2: the joiner's device choice ('own' | 'host'). Carried
+     *  over on Play Again; set by the join UI from Step 6. Undefined → v2
+     *  rooms default to 'own', legacy rooms write nothing. */
+    deviceMode?: string;
   }>();
   // Spotify Year/Name ur carry-over-params. Ogiltigt par (båda av) ignoreras —
   // minst en måste vara aktiv.
@@ -1815,6 +1840,17 @@ export default function LobbyScreen() {
         }
         return { id: mintId() };
       };
+      // Multiplayer v2 device choice (Step 2). Explicit param (carry-over,
+      // later the join UI) wins; v2 rooms default to 'own'; legacy rooms
+      // write nothing. Read-only DB lookup — failure → treated as legacy.
+      const roomMetaForDevice = deviceModeParam || hostMode
+        ? undefined
+        : await withTimeout(getRoomMeta(roomCode), SYNC_TIMEOUT_MS, undefined, 'getRoomMeta(device)');
+      if (cancelled) return;
+      const joinDeviceMode = resolveJoinDeviceMode(
+        deviceModeParam,
+        roomMetaForDevice?.multiplayerV2 ?? false,
+      );
       if (guestMode && guestName) {
         const currentYear = new Date().getFullYear();
         const age = guestBirthYear ? currentYear - parseInt(guestBirthYear, 10) : undefined;
@@ -1841,6 +1877,7 @@ export default function LobbyScreen() {
           // (eller auto-approvar via friends-listan för registrerade). Vid
           // adopterad rad (re-entry) bevaras host:s ev. tidigare approval.
           approved: guestResolved.existing?.approved ?? false,
+          deviceMode: joinDeviceMode,
         };
         // Spara payloaden för self-heal om upsert:en nedan tyst misslyckas.
         ownPlayerRef.current = guestPlayer;
@@ -1861,6 +1898,7 @@ export default function LobbyScreen() {
           .then(() => {
             publishOwnAccountAlias(roomCode, guestPlayerId);
             publishOwnHcpToLobby(roomCode, guestPlayerId);
+            publishOwnDeviceModeToLobby(roomCode, guestPlayerId, joinDeviceMode);
           })
           .catch(() => { /* loggas i lobbyPlayers */ });
         // Publicera enhetens fråge-historik för cross-player-exkludering.
@@ -1953,6 +1991,7 @@ export default function LobbyScreen() {
           hcpComplete,
           approved: joinerApproved,
           spotifyConnected: ownSpotifyAttested,
+          deviceMode: joinDeviceMode,
         };
         // Spara payloaden för self-heal om upsert:en nedan tyst misslyckas.
         ownPlayerRef.current = joiner;
@@ -1997,6 +2036,7 @@ export default function LobbyScreen() {
             .then(() => {
               publishOwnAccountAlias(roomCode, joinerId);
               publishOwnHcpToLobby(roomCode, joinerId);
+              publishOwnDeviceModeToLobby(roomCode, joinerId, joinDeviceMode);
             })
             .catch(() => { /* loggas i lobbyPlayers */ });
         } else {
@@ -2004,6 +2044,7 @@ export default function LobbyScreen() {
             .then(() => {
               publishOwnAccountAlias(roomCode, joinerId);
               publishOwnHcpToLobby(roomCode, joinerId);
+              publishOwnDeviceModeToLobby(roomCode, joinerId, joinDeviceMode);
             })
             .catch(() => { /* loggas i lobbyPlayers */ });
         }
@@ -2027,7 +2068,7 @@ export default function LobbyScreen() {
       if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
     return () => { cancelled = true; };
-  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType, parentControl, carryPackages, carriedSpotifyAnswers, carryPkgYoutube, carryPkgHints]);
+  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType, parentControl, carryPackages, carriedSpotifyAnswers, carryPkgYoutube, carryPkgHints, deviceModeParam]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
@@ -4276,6 +4317,8 @@ export default function LobbyScreen() {
         assistance: 'full',
         hcpComplete: true,
         addedByHost: true,
+        // Manually added guests always play on the host's device.
+        deviceMode: 'host',
       },
     ]);
   };
@@ -5692,6 +5735,10 @@ export default function LobbyScreen() {
           const nextHcp = updated.hcp;
           const nextHcpMusic = updated.hcpMusic;
           const nextHcpFilm = updated.hcpFilm;
+          // Device choice is published right after the joiner's upsert (same
+          // convergence trap as the alias) — keep a known local value if the
+          // row hasn't got one yet.
+          const nextDeviceMode = updated.deviceMode ?? p.deviceMode;
           // age/assistance/hcpComplete/hcpOverride: pullas hit ENBART när host:s
           // lokala värde saknas. En Competition-rematch pre-seedar de inbjudnas
           // rader med age/assistance = null (host känner inte deras profil), och
@@ -5712,6 +5759,7 @@ export default function LobbyScreen() {
             p.hcp === nextHcp &&
             p.hcpMusic === nextHcpMusic &&
             p.hcpFilm === nextHcpFilm &&
+            p.deviceMode === nextDeviceMode &&
             p.age === nextAge &&
             p.assistance === nextAssistance &&
             !!p.hcpComplete === nextHcpComplete &&
@@ -5728,6 +5776,7 @@ export default function LobbyScreen() {
             hcp: nextHcp,
             hcpMusic: nextHcpMusic,
             hcpFilm: nextHcpFilm,
+            deviceMode: nextDeviceMode,
             age: nextAge,
             assistance: nextAssistance,
             hcpComplete: nextHcpComplete,
@@ -5923,6 +5972,7 @@ export default function LobbyScreen() {
               assistance: p.assistance ?? 'standard',
               age: p.age,
               spotifyConnected: p.spotifyConnected ?? false,
+              deviceMode: p.deviceMode,
               type: p.type,
             }));
           // Guest-hostat spel detekteras via host-radens type i lobby_players
@@ -6612,6 +6662,7 @@ export default function LobbyScreen() {
         assistance: p.assistance ?? 'standard',
         age: p.age,
         spotifyConnected: p.spotifyConnected ?? false,
+        deviceMode: p.deviceMode,
         // type följer med så goToNewLobby:s carry-over kan återskapa raderna
         // med korrekt guest/registered — host-radens 'guest' är non-host-
         // enheternas detekteringssignal för guest-hostade spel.
