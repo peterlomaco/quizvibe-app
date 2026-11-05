@@ -6689,33 +6689,10 @@ export default function LobbyScreen() {
       return;
     }
 
-    // Guard: Pass-the-Phone-bekräftelse innan host startar spel där alla
-    // spelare delar denna enhet. Förhindrar att host:s game-credit dras för
-    // ett spel som var tänkt med Individual Devices men där PtP-toggle:n
-    // glömts bort. Hoppar guarden i single-player-läge (irrelevant att
-    // fråga "är alla här?" när det bara är host) och i IndDev (varje
-    // spelare på egen enhet). `ptpConfirmed`-flaggan på rekursivt
-    // handleStartGame(true)-anrop hoppar guarden så Yes-grenen inte
-    // re-triggar samma popup.
-    if (
-      gameMode === 'pass-the-phone' &&
-      !singlePlayerDefault &&
-      approvedNonHosts.length > 0 &&
-      !ptpConfirmed
-    ) {
-      quizVibeAlert(
-        'Pass-the-Phone mode',
-        'Are all players in the same room so you can share this device?',
-        [
-          { text: 'No', style: 'cancel' },
-          // Via ref, INTE den fångade handleStartGame: dialogen kan stå
-          // öppen medan en joiner approvas, och den gamla closure:n byggde
-          // då turnOrder ur den inaktuella approvedPlayers-listan.
-          { text: 'Yes', onPress: () => startAction.run('start', () => handleStartGameRef.current(true)) },
-        ],
-      );
-      return;
-    }
+    // (PtP-bekräftelsen "Are all players in the same room…?" borttagen
+    // 2026-11-05 per Peter — host startar PtP-multiplayer direkt.
+    // `ptpConfirmed`-parametern är kvar men läses inte längre.)
+    void ptpConfirmed;
 
     // Spotify DJ — samma "är ni i samma rum?"-bekräftelse som PtP, men för
     // IndDev där varje spelare hör Spotify på sin egen enhet. Guarderna ovan
@@ -9214,7 +9191,9 @@ export default function LobbyScreen() {
                   (2/4) — stepper, ruler och game-mode quick-select renderas
                   inte alls. Single är cappad på 4 rundor oavsett premium
                   (roundsMax), så stepper + ruler vore bara brus. */}
-              {isGuestHost || isSingleLobby ? (
+              {/* Spelare som anslutit en guest-hostad lobby ser samma 2/4-rutor
+                  som guest host:ens enhet, read-only (Peter 2026-11-05). */}
+              {isGuestHostedLobby || isSingleLobby ? (
                 <>
                   <View style={[styles.modeRow, { marginTop: Spacing.sm }]}>
                     {([2, 4] as const).map((n) => {
@@ -9227,6 +9206,7 @@ export default function LobbyScreen() {
                             isActive ? styles.modeOptionPassActive : styles.modeOptionInactive,
                           ]}
                           onPress={() => setRoundsCount(n)}
+                          disabled={!hostMode}
                           activeOpacity={0.7}
                         >
                           <Text
@@ -9363,9 +9343,9 @@ export default function LobbyScreen() {
             {/* Game Sequence — ruta per rund med medie-källa och kategori.
                 Speglar quiz.tsx:s 3-pool-logik baserat på aktuella inställningar.
                 Synlig för alla (host + non-host) som read-only feedback. Döljs
-                HELT för guest host — både single player och multiplayer (Peter
-                2026-09-11). */}
-            {!isGuestHost && (
+                HELT i guest-hostade lobbies — för guest host (Peter 2026-09-11)
+                OCH för spelare som ansluter dit (Peter 2026-11-05). */}
+            {!isGuestHostedLobby && (
             <View>
               <View style={styles.regionLabelRow}>
                 <Text style={styles.sectionLabel}>Game Sequence</Text>

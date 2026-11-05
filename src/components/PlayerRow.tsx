@@ -481,9 +481,9 @@ export function PlayerRow({
         <View style={[styles.spotifyBorderTag, { borderColor: spotifyConnected ? '#1DB954' : Colors.borderStrong }]} pointerEvents="none">
           <SpotifyBrandIcon size={10} variant="white" />
           {spotifyConnected ? (
-            <Text style={styles.spotifyBorderTagConnected}>Spotify ready</Text>
+            <Text style={styles.spotifyBorderTagConnected}>Ready</Text>
           ) : (
-            <Text style={styles.spotifyBorderTagNone}>No Spotify</Text>
+            <Text style={styles.spotifyBorderTagNone}>Not ready</Text>
           )}
         </View>
       )}
