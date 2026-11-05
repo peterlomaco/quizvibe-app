@@ -55,7 +55,8 @@ with checks(migration, kind, obj) as (values
   ('0056_clip_playback_errors',          'table',  'public.clip_playback_errors'),
   ('0057_remote_match_answers_skipped',  'column', 'public.remote_match_answers.skipped'),
   ('0057 (forfeit ignores skipped)',     'funcbody','public.forfeit_remote_match|skipped'),
-  ('0060_deleted_account_tombstones',   'table',  'public.deleted_account_tombstones')
+  ('0060_deleted_account_tombstones',   'table',  'public.deleted_account_tombstones'),
+  ('0062_multiplayer_v2_gates',         'column', 'public.rooms.multiplayer_v2')
 )
 select * from (
 select

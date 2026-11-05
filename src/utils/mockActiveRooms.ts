@@ -19,6 +19,7 @@
 // Test-seeds finns kvar som in-memory fallback för dev/QA — joinar du med
 // dessa funkar det alltid, även utan att skapa rum mot DB:n.
 
+import { getCachedFeatureGates } from './featureGates';
 import { forgetRoomMemberships, recordOwnMembership } from './ownLobbyLedger';
 import { supabase } from './supabase';
 
@@ -61,6 +62,11 @@ export interface RoomMeta {
   // lobby_players.player_id för spelarna från föregående spel. Host:s
   // Start Game blockeras tills varje id finns i lobbyn utan hasLeft.
   rematchPlayerIds?: string[];
+  // Multiplayer v2 (1 by 1 / All at Once) active for this room — migration
+  // 0062. Captured at registerActiveRoom from app_config.feature_gates, so a
+  // live lobby never changes model when the flag flips. Optional: rooms
+  // created before 0062 (or while the flag was off) resolve to false.
+  multiplayerV2?: boolean;
 }
 
 // Dev/test-seeds som lagras lokalt i minnet (inte i DB) så de alltid är
@@ -90,6 +96,8 @@ interface RoomRow {
   // Optional: kolumnerna kom i migration 0037 — äldre rader saknar dem.
   rematch_locked?: boolean | null;
   rematch_player_ids?: string[] | null;
+  // Optional: kolumnen kom i migration 0062 — äldre rader saknar den.
+  multiplayer_v2?: boolean | null;
 }
 
 function rowToMeta(row: RoomRow): RoomMeta {
@@ -103,6 +111,7 @@ function rowToMeta(row: RoomRow): RoomMeta {
     expiresAt: row.expires_at,
     rematchLocked: row.rematch_locked ?? false,
     rematchPlayerIds: row.rematch_player_ids ?? [],
+    multiplayerV2: row.multiplayer_v2 ?? false,
   };
 }
 
@@ -147,39 +156,44 @@ export async function registerActiveRoom(code: string, meta: RoomMeta): Promise<
     is_remote_1v1: meta.isRemote1v1 ?? false,
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   };
-  const { error } = await supabase.from('rooms').upsert({
-    ...base,
-    // Re-match-låsningen (0037) skrivs på samma atomiska rad, av samma skäl
-    // som is_remote_1v1: en gate som i stället läser lobby_settings är
-    // fail-open i ~1s pga hostens 300ms-debounce.
+  // Re-match-låsningen (0037) skrivs på samma atomiska rad, av samma skäl
+  // som is_remote_1v1: en gate som i stället läser lobby_settings är
+  // fail-open i ~1s pga hostens 300ms-debounce.
+  const rematch = {
     rematch_locked: meta.rematchLocked ?? false,
     rematch_player_ids: meta.rematchPlayerIds ?? [],
-  });
-  if (!error) {
-    // Registrera att DENNA enhet blev host (host-radens player_id är alltid
-    // '1') så two-device-guarden känner igen ett eget övergivet rum som eget
-    // och städar det tyst i stället för att fyra "Still active"-popupen.
-    await recordOwnMembership(normalized, '1');
-    return true;
-  }
+  };
+  // Multiplayer v2 (0062) — fångas från remote-config vid skapandet.
+  const multiplayerV2 = meta.multiplayerV2 ?? getCachedFeatureGates().multiplayerV2;
   // ⚠ En upsert som NÄMNER en okörd kolumn failar HELA skrivningen — utan
-  // fallbacken hade en oapplicerad 0037 gjort det omöjligt att skapa rum
-  // överhuvudtaget. Skriv om raden utan 0037-fälten och fortsätt: allt utom
-  // re-match-låsningen fungerar då som förut (låsningen degraderar tyst,
-  // och lobbyn beter sig som en vanlig lobby).
-  if (isMissingColumnError(error.message)) {
-    console.warn(
-      '[activeRooms] rooms is missing the 0037 re-match columns — run migration 0037. Falling back to an unlocked room.',
-    );
-    const retry = await supabase.from('rooms').upsert(base);
-    if (retry.error) {
-      console.warn('[activeRooms] registerActiveRoom failed:', retry.error.message);
+  // fallback hade en oapplicerad migration gjort det omöjligt att skapa rum
+  // överhuvudtaget. Försök därför i ordning: allt → utan 0062 → utan
+  // 0037+0062. Varje steg degraderar tyst (lobbyn beter sig som förut).
+  const attempts: { payload: Record<string, unknown>; missing: string }[] = [
+    { payload: { ...base, ...rematch, multiplayer_v2: multiplayerV2 }, missing: '' },
+    { payload: { ...base, ...rematch }, missing: '0062 (multiplayer_v2)' },
+    { payload: base, missing: '0037 re-match + 0062' },
+  ];
+  for (let i = 0; i < attempts.length; i++) {
+    const { payload, missing } = attempts[i];
+    if (missing) {
+      console.warn(
+        `[activeRooms] rooms is missing the ${missing} columns — run the migration. Falling back.`,
+      );
+    }
+    const { error } = await supabase.from('rooms').upsert(payload);
+    if (!error) {
+      // Registrera att DENNA enhet blev host (host-radens player_id är alltid
+      // '1') så two-device-guarden känner igen ett eget övergivet rum som eget
+      // och städar det tyst i stället för att fyra "Still active"-popupen.
+      await recordOwnMembership(normalized, '1');
+      return true;
+    }
+    if (!isMissingColumnError(error.message) || i === attempts.length - 1) {
+      console.warn('[activeRooms] registerActiveRoom failed:', error.message);
       return false;
     }
-    await recordOwnMembership(normalized, '1');
-    return true;
   }
-  console.warn('[activeRooms] registerActiveRoom failed:', error.message);
   return false;
 }
 

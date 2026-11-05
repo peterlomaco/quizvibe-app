@@ -11,6 +11,7 @@ import { GlobalOverlay } from '@/src/components/GlobalOverlay';
 import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 import { Colors } from '@/src/theme';
 import { refreshOfferConfig, refreshPromoGrants } from '@/src/utils/promoPremium';
+import { refreshFeatureGates } from '@/src/utils/featureGates';
 import { clearPremiumSubscription, refreshPremiumMirror, setPremiumActive } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { ensureVoiceAudioMode } from '@/src/utils/voicePlayback';
@@ -48,6 +49,10 @@ export default function RootLayout() {
     // utvärderas vid läsning i hasPremiumSubscription(), aldrig genom att
     // skriva till samma nyckel (den skulle wipas av raderna nedan).
     void refreshOfferConfig();
+
+    // Multiplayer v2 feature gates (app_config.feature_gates, migration 0062).
+    // Fire-and-forget; utan rad/nätverk gäller defaults (multiplayerV2 av).
+    void refreshFeatureGates();
 
     // Kontots server-grant (gratismånad/voucher, migration 0047) speglas
     // lokalt så hasActiveFreePremium() blir korrekt vid nästa läsning. Rör
