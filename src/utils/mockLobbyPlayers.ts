@@ -27,7 +27,7 @@ import {
   forgetOwnMembership,
   recordOwnMembership,
 } from './ownLobbyLedger';
-import { deviceModeFromRow, parseServerRejection, type DeviceMode } from './gameFlow';
+import { deviceModeFromRow, parseServerRejection } from './gameFlow';
 import { supabase } from './supabase';
 import type { LobbyPlayer } from '../screens/LobbyScreen';
 
@@ -76,8 +76,8 @@ interface LobbyPlayerRow {
   hcp_music?: number | null;
   hcp_film?: number | null;
   // Multiplayer v2 device choice (migration 0063). Optional — legacy rows /
-  // non-applied migration lack it. Written ONLY by publishOwnDeviceMode
-  // (targeted UPDATE) — never part of playerToRow, so host cannot clobber it.
+  // non-applied migration lack it. Written ONLY by the joiner's own join write (upsertOwnLobbyPlayer)
+  // — never part of playerToRow, so host cannot clobber it.
   device_mode?: string | null;
   // hcp_sport-kolumnen (migration 0050) finns kvar i DB men läses inte längre
   // (Sport borttaget ur modellen 2026-09).
@@ -290,9 +290,23 @@ export async function upsertOwnLobbyPlayer(code: string, player: LobbyPlayer): P
   // FORTSATT omittar has_left ur payload:en — host får inte clobba
   // has_left för non-host:s rader vid varje state-sync.
   const row = { ...playerToRow(normalized, player, 999, userId), has_left: false };
-  const { error } = await supabase
+  // Multiplayer v2 (Step 6): the joiner's device choice is written IN the join
+  // write itself — never a follow-up UPDATE — so the server's join trigger
+  // validates device + capacity atomically (0067). Only the joiner's own row
+  // carries it; playerToRow (the host's bulk write) never does. Legacy rooms
+  // have no deviceMode → nothing is sent.
+  const withDevice =
+    player.deviceMode && !player.isHost ? { ...row, device_mode: player.deviceMode } : row;
+  let { error } = await supabase
     .from('lobby_players')
-    .upsert(row, { onConflict: 'room_code,player_id' });
+    .upsert(withDevice, { onConflict: 'room_code,player_id' });
+  // 0063 not applied: a payload naming an unknown column fails the WHOLE
+  // write, so retry without it (lobby join must never break on a migration).
+  if (error && withDevice !== row && /device_mode/.test(error.message)) {
+    ({ error } = await supabase
+      .from('lobby_players')
+      .upsert(row, { onConflict: 'room_code,player_id' }));
+  }
   if (error) {
     console.warn('[lobbyPlayers] upsertOwnLobbyPlayer failed:', error.message);
     emitJoinRejection(normalized, error.message);
@@ -685,37 +699,6 @@ export async function publishOwnAccountName(
     .eq('user_id', userId);
   if (error) {
     console.warn('[lobbyPlayers] publishOwnAccountName failed:', error.message);
-  }
-}
-
-/**
- * Multiplayer v2 (migration 0063): publicerar spelarens EGET device-val
- * ('own' | 'host') till sin egen lobby_players-rad. Samma targeted-UPDATE-
- * mönster som publishOwnAccountName — ingår ALDRIG i host:s bulk-UPSERT, så
- * host kan inte skriva över ett låst val. MÅSTE anropas efter att egen rad
- * finns (kedja på upsert-promisen). Fel loggas men kastas aldrig — en
- * icke-applicerad migration ska inte bryta lobby-join:en.
- */
-export async function publishOwnDeviceMode(
-  code: string,
-  playerId: string,
-  deviceMode: DeviceMode,
-): Promise<void> {
-  if (!code || !playerId) return;
-  const normalized = normalizeCode(code);
-  await ensureAuthSession();
-  const { data: userResp } = await supabase.auth.getUser();
-  const userId = userResp.user?.id;
-  if (!userId) return;
-  const { error } = await supabase
-    .from('lobby_players')
-    .update({ device_mode: deviceMode })
-    .eq('room_code', normalized)
-    .eq('player_id', playerId)
-    .eq('user_id', userId);
-  if (error) {
-    console.warn('[lobbyPlayers] publishOwnDeviceMode failed:', error.message);
-    emitJoinRejection(normalized, error.message);
   }
 }
 

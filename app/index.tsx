@@ -13,6 +13,15 @@ import { EyeIcon } from '@/src/components/EyeIcon';
 import { ChevronIcon } from '@/src/components/ChevronIcon';
 import { LogoutIcon } from '@/src/components/LogoutIcon';
 import { ProfileOutlineIcon } from '@/src/components/ProfileOutlineIcon';
+import { GroupOutlineIcon } from '@/src/components/GroupOutlineIcon';
+import { PhoneOutlineIcon } from '@/src/components/PhoneOutlineIcon';
+import {
+  evaluateDeviceChoice,
+  joinRejectionMessage,
+  lockedDeviceForRejoin,
+  needsDeviceStep,
+  type DeviceMode,
+} from '@/src/utils/gameFlow';
 import { EnvelopeOutlineIcon, KeyOutlineIcon } from '@/src/components/SectionIcons';
 import { WaveDots } from '@/src/components/WaveDots';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
@@ -105,7 +114,7 @@ let guestStartBtnYCache: number | null = null;
 
 // ─── Join Modal ───────────────────────────────────────────────────────────────
 
-type JoinStep = 'choose' | 'code' | 'invites' | 'guest' | 'guest-host';
+type JoinStep = 'choose' | 'code' | 'invites' | 'guest' | 'guest-host' | 'device';
 
 interface JoinModalProps {
   visible: boolean;
@@ -517,6 +526,124 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     resolve?.(abort);
   };
 
+  // ── Multiplayer v2 Step 6: device step ─────────────────────────────
+  // Rendered as a STEP of this Modal (never a second Modal — iOS swallows
+  // it). askDevice() resolves with the chosen device, or null = joiner
+  // backed out / joining isn't possible (the caller stops; the joiner is
+  // back on the step they came from). "Own Device Required" keeps them HERE.
+  const [deviceCtx, setDeviceCtx] = useState<{ code: string; isRegistered: boolean; returnStep: JoinStep } | null>(null);
+  const [deviceChecking, setDeviceChecking] = useState(false);
+  const deviceResolveRef = useRef<((d: DeviceMode | null) => void) | null>(null);
+
+  const finishDeviceStep = (choice: DeviceMode | null) => {
+    const resolve = deviceResolveRef.current;
+    deviceResolveRef.current = null;
+    // Chosen → stay on the step while the caller navigates (the modal closes
+    // behind the lobby); backed out → back to where the joiner came from.
+    if (choice === null && deviceCtx) setStep(deviceCtx.returnStep);
+    if (choice === null) setDeviceCtx(null);
+    resolve?.(choice);
+  };
+
+  /**
+   * Device for this join, or { proceed:false } when the joiner backed out.
+   * deviceMode undefined = no step needed (legacy / single / H2H / locked
+   * re-match) → LobbyScreen applies today's default.
+   */
+  const askDevice = async (
+    joinCode: string,
+    identityName: string | null | undefined,
+    isRegistered: boolean,
+  ): Promise<{ proceed: boolean; deviceMode?: DeviceMode }> => {
+    const [meta, settings] = await Promise.all([getRoomMeta(joinCode), getLobbySettings(joinCode)]);
+    if (
+      !meta ||
+      !needsDeviceStep({
+        multiplayerV2: !!meta.multiplayerV2,
+        isRemote1v1: meta.isRemote1v1,
+        rematchLocked: meta.rematchLocked,
+        singlePlayer: !!settings?.singlePlayerDefault,
+      })
+    ) {
+      return { proceed: true };
+    }
+    // Reconnection: a live row keeps its locked device — no step.
+    const roster = await getLobbyPlayers(joinCode);
+    const locked = lockedDeviceForRejoin(roster, identityName);
+    if (locked) return { proceed: true, deviceMode: locked };
+    // Guests can never join a Spotify lobby — say so before asking.
+    if (settings?.spotifyEnabled && !isRegistered) {
+      const m = joinRejectionMessage('spotify_guest');
+      Alert.alert(m.title, m.message);
+      return { proceed: false };
+    }
+    const choice = await new Promise<DeviceMode | null>((resolve) => {
+      deviceResolveRef.current = resolve;
+      setJoiningLobby(false); // invite flow: lift the "Waiting…" cover
+      setDeviceChecking(false);
+      setDeviceCtx({ code: joinCode, isRegistered, returnStep: step });
+      setStep('device');
+    });
+    return choice ? { proceed: true, deviceMode: choice } : { proceed: false };
+  };
+
+  const handleDeviceChoice = async (choice: DeviceMode) => {
+    if (!deviceCtx || deviceChecking) return;
+    setDeviceChecking(true);
+    // Cover the step right away so the joiner never sees the form again
+    // while we validate and the lobby slides in behind the modal. Lifted
+    // only when the join can't go ahead (before any Alert).
+    setJoiningLobby(true);
+    let proceeding = false;
+    try {
+      // Fresh read at tap time — the lobby can have filled up meanwhile.
+      const [meta, settings, roster] = await Promise.all([
+        getRoomMeta(deviceCtx.code),
+        getLobbySettings(deviceCtx.code),
+        getLobbyPlayers(deviceCtx.code),
+      ]);
+      if (!meta) {
+        setJoiningLobby(false);
+        Alert.alert('Room not found', 'There is no Room code activated with this combination');
+        finishDeviceStep(null);
+        return;
+      }
+      const result = evaluateDeviceChoice({
+        choice,
+        isRegistered: deviceCtx.isRegistered,
+        spotifyEnabled: !!settings?.spotifyEnabled,
+        // Read failure → 0 (fail-open); the join trigger is authoritative.
+        currentTotal: roster ? roster.filter((p) => !p.hasLeft).length : 0,
+        roomCapacity: meta.maxPlayers,
+      });
+      if (result.outcome === 'ok') {
+        proceeding = true;
+        finishDeviceStep(choice);
+        return;
+      }
+      setJoiningLobby(false);
+      if (result.reason === 'room_full') {
+        // Same copy as checkLobbyCapacity (Free vs Premium host).
+        Alert.alert(
+          'Lobby is full',
+          meta.hostIsPremium
+            ? 'Lobby is full. Host need to remove players from lobby for others to join'
+            : 'Lobby is full. Host either need to remove players from lobby or to upgrade',
+        );
+      } else {
+        const m = joinRejectionMessage(result.reason);
+        Alert.alert(m.title, m.message);
+      }
+      if (result.outcome === 'abort') finishDeviceStep(null);
+    } catch {
+      setJoiningLobby(false);
+    } finally {
+      // Keep the rows disabled while navigating; the modal's open-reset
+      // clears this for the next join.
+      if (!proceeding) setDeviceChecking(false);
+    }
+  };
+
   // Switchen ON → bekräfta profil-ändringen (samma copy som lobbyns
   // attest-toggle). Cancel lämnar switchen av; spelaren kan då trycka Cancel
   // i overlayen för att gå tillbaka till Join-formuläret.
@@ -683,8 +810,20 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       setStep(initialStep);
       setFocusedCodeIdx(null);
       prevGuestStepRef.current = !!initialGuestDraft;
+      setDeviceCtx(null);
+      setDeviceChecking(false);
     }
   }, [visible, initialStep, initialGuestDraft]);
+
+  // Modal closed while the device step was waiting → the join is abandoned.
+  useEffect(() => {
+    if (!visible && deviceResolveRef.current) {
+      const resolve = deviceResolveRef.current;
+      deviceResolveRef.current = null;
+      setDeviceCtx(null);
+      resolve(null);
+    }
+  }, [visible]);
 
   // Ladda invites när modalen öppnas — vi behöver längden redan på chooser-steget
   // för att kunna visa rätt enabled/disabled-läge på "Join Waiting Invites".
@@ -852,6 +991,11 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     // Spotify-lobby: bekräfta Spotify-appen innan vi joinar. No lämnar
     // inviten orörd (körs FÖRE addFriend/removeInvite).
     if (await checkSpotifyLobbyGate(invite.roomCode)) { setJoiningLobby(false); return; }
+    // Multiplayer v2 (Step 6): device choice BEFORE addFriend/removeInvite,
+    // so backing out leaves the invite in the list.
+    const inviteDevice = await askDevice(invite.roomCode, currentPlayerName, !!currentPlayerName);
+    if (!inviteDevice.proceed) { setJoiningLobby(false); return; }
+    setJoiningLobby(true);
     // Ömsesidig friend-add (Peter 2026-08-27): att acceptera lägger till
     // HOST:en på RECIPIENT:ens egna friends-lista också — host-sidans add
     // sker separat via LobbyScreen:s pending→confirmed-watcher när den här
@@ -879,6 +1023,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       params: {
         code: invite.roomCode,
         isHost: 'false',
+        ...(inviteDevice.deviceMode ? { deviceMode: inviteDevice.deviceMode } : {}),
         // Låst competition-rematch: spegla host:s lås-params (annars renderas
         // lobbyn som vanlig multiplayer) + claima den pre-seedade raden.
         ...(inviteIsRematchLocked
@@ -976,7 +1121,13 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     // Spotify-lobby: self-attest-fråga redan här (Plan B — ingen OAuth), så
     // host:s auto-approve inte blockeras av en saknad attest.
     if (await checkSpotifyLobbyGate(code)) return;
-    await navigateBehindModal({ pathname: '/lobby', params: { code, isHost: 'false' } });
+    // Multiplayer v2 (Step 6): device choice, written in the join itself.
+    const device = await askDevice(code, currentPlayerName, !!currentPlayerName);
+    if (!device.proceed) return;
+    await navigateBehindModal({
+      pathname: '/lobby',
+      params: { code, isHost: 'false', ...(device.deviceMode ? { deviceMode: device.deviceMode } : {}) },
+    });
   };
 
   // Parsea och validera birth year. Returnerar null om input inte är ett
@@ -1268,6 +1419,10 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     // istället för att skicka in gästen som ändå skulle få "lobby is full"
     // när de hamnade i Lobby-vyn.
     if (await checkLobbyCapacity(code)) return;
+    // Multiplayer v2 (Step 6): device choice. The guest form is guest mode
+    // (type 'guest') even on a device with a profile → isRegistered false.
+    const guestDevice = await askDevice(code, normalizePlayerName(guestIdentity), false);
+    if (!guestDevice.proceed) return;
     // Auto-fill-detektion: format `GuestA-1234567` — "Guest"-prefix + 1
     // versal random + dash + 7 digits. Om användaren ändrat namnet
     // manuellt blir flaggan false.
@@ -1284,6 +1439,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
         guestName: normalizePlayerName(guestName.trim()),
         guestBirthYear: String(parsedBirthYear),
         guestAssistance: guestAssistance,
+        ...(guestDevice.deviceMode ? { deviceMode: guestDevice.deviceMode } : {}),
       },
     });
   };
@@ -1383,7 +1539,9 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                 // andra alternativ (Room Code / Waiting Invites) är inte
                 // relevanta för någon som valt guest. Back stänger
                 // modalen istället för att leda tillbaka till chooser:n.
-                if (step === 'guest' || step === 'guest-host') {
+                if (step === 'device') {
+                  finishDeviceStep(null);
+                } else if (step === 'guest' || step === 'guest-host') {
                   onClose();
                 } else {
                   setStep('choose');
@@ -1522,6 +1680,41 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                 );
               })()}
             </>
+          )}
+
+          {step === 'device' && (
+            <View style={modal.deviceStep}>
+              <View style={modal.deviceHeader}>
+                <Text style={modal.deviceTitle}>How will you play?</Text>
+                <Text style={modal.subtitle}>Choose where you want to answer questions.</Text>
+              </View>
+              <View style={modal.deviceCards}>
+                <DeviceCard
+                  icon={(color) => <PhoneOutlineIcon size={34} color={color} />}
+                  label="On my own device"
+                  subtitle="Play and answer on this phone."
+                  disabled={deviceChecking}
+                  onPress={() => { void handleDeviceChoice('own'); }}
+                />
+                <DeviceCard
+                  icon={(color) => <GroupOutlineIcon size={34} color={color} />}
+                  label="On the host's device"
+                  subtitle="Take turns answering on the host's phone."
+                  disabled={deviceChecking}
+                  onPress={() => { void handleDeviceChoice('host'); }}
+                />
+              </View>
+              {/* Cancel = abandon the join (the modal's close path resolves
+                  the pending device step with null). Back stays above. */}
+              <TouchableOpacity
+                style={modal.deviceCancelBtn}
+                onPress={onClose}
+                disabled={deviceChecking}
+                activeOpacity={0.7}
+              >
+                <Text style={modal.deviceCancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           )}
 
           {step === 'invites' && (
@@ -2194,6 +2387,42 @@ function ChoiceRow({
         />
       </Animated.View>
     </TouchableOpacity>
+  );
+}
+
+// Multiplayer v2 device step: large, fully tappable card. Never preselected —
+// the pressed state borrows the "selected" vocabulary (gold edge + navy fill)
+// only while the finger is down.
+function DeviceCard({
+  icon, label, subtitle, onPress, disabled = false,
+}: {
+  icon: (color: string) => React.ReactNode;
+  label: string;
+  subtitle: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={`${label}. ${subtitle}`}
+      style={({ pressed }) => [modal.deviceCard, pressed && modal.deviceCardPressed]}
+    >
+      {({ pressed }) => (
+        <>
+          <View style={[modal.deviceIconWrap, pressed && modal.deviceIconWrapPressed]}>
+            {icon(Colors.warning)}
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={modal.deviceCardLabel}>{label}</Text>
+            <Text style={modal.deviceCardSubtitle}>{subtitle}</Text>
+          </View>
+          <ChevronIcon size={20} color={pressed ? Colors.warning : BrandUi.iconMuted} />
+        </>
+      )}
+    </Pressable>
   );
 }
 
@@ -5317,6 +5546,50 @@ const modal = StyleSheet.create({
 
   backBtn: { alignSelf: 'flex-start', paddingVertical: 4, paddingRight: Spacing.md },
   backText: { fontSize: 14, color: Colors.textSecondary, fontWeight: '500' },
+
+  // Multiplayer v2 device step (taller sheet, two large cards).
+  deviceStep: { gap: Spacing.xl, paddingTop: Spacing.sm, paddingBottom: Spacing.md },
+  deviceHeader: { gap: Spacing.sm },
+  deviceTitle: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center' },
+  deviceCards: { gap: Spacing.md },
+  deviceCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.lg,
+    minHeight: 104,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.lg,
+    backgroundColor: BrandUi.surface,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+    borderRadius: Radius.lg,
+  },
+  deviceCardPressed: { borderColor: Colors.warning, backgroundColor: BrandUi.selectedFill },
+  deviceIconWrap: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: BrandUi.selectedFill,
+    borderWidth: 1,
+    borderColor: 'rgba(245,166,35,0.35)',
+  },
+  deviceIconWrapPressed: { borderColor: Colors.warning },
+  deviceCardLabel: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary },
+  deviceCardSubtitle: { fontSize: 14, color: Colors.textSecondary, marginTop: 4, lineHeight: 19 },
+  deviceCancelBtn: {
+    alignSelf: 'center',
+    minWidth: 160,
+    height: 48,
+    paddingHorizontal: Spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: BrandUi.border,
+  },
+  deviceCancelText: { fontSize: 16, fontWeight: '600', color: Colors.textSecondary },
 
   // Choice list (chooser step)
   choiceList: { gap: Spacing.sm, marginTop: Spacing.xs },

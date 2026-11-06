@@ -103,7 +103,7 @@ import {
 } from '../utils/gameFlow';
 import { canUse } from '../utils/entitlements';
 import { getCachedFeatureGates } from '../utils/featureGates';
-import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnDeviceMode, publishOwnHcp, setLobbyPlayers, subscribeJoinRejections, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnHcp, setLobbyPlayers, subscribeJoinRejections, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
@@ -1070,20 +1070,6 @@ function publishOwnAccountAlias(roomCode: string, playerId: string): void {
  * stale om en samtidig loadProfile-cache-back skrivit över hcp-fältet, vilket
  * gjorde att en NY lobby publicerade ett gammalt HCP efter ett spel.
  */
-/**
- * Multiplayer v2: publishes the joiner's device choice to its own row. Same
- * fire-and-forget chaining as publishOwnAccountAlias — MUST run after the
- * row exists. undefined (legacy room, no choice) → nothing is written.
- */
-function publishOwnDeviceModeToLobby(
-  roomCode: string,
-  playerId: string,
-  deviceMode: DeviceMode | undefined,
-): void {
-  if (!deviceMode) return;
-  publishOwnDeviceMode(roomCode, playerId, deviceMode).catch(() => {});
-}
-
 function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
   const profile = getCachedProfile();
   if (!profile?.playerName) return; // gäster publicerar inte (kolumnen förblir null)
@@ -1630,6 +1616,11 @@ export default function LobbyScreen() {
         // och single forcerar redan PtP under huven. Guest host kan aldrig
         // vara 1v1 (handleStartGameAsGuestHost blockar det → is1v1Lobby alltid
         // false här), så en carry-overad 'individual-devices' coercas bort.
+        // Multiplayer v2 rooms (Step 6): this PtP seed is only the starting
+        // value — the resolver (flow init effect) takes over once the room is
+        // known to be v2, exactly as for a registered host. The carried mode
+        // seeds the host's 1 by 1 override. Legacy rooms stay PtP-locked.
+        carriedGameModeRef.current = stored?.gameMode;
         setGameMode('pass-the-phone');
         setSinglePlayerDefault(seedSinglePlayer);
         setMaxPlayers(is1v1Lobby ? 2 : 4);
@@ -1919,6 +1910,13 @@ export default function LobbyScreen() {
         deviceModeParam,
         roomMetaForDevice?.multiplayerV2 ?? false,
       );
+      // Step 6: the device is written IN the join write (upsertOwnLobbyPlayer)
+      // and is locked until the player leaves. Re-entering a LIVE row
+      // (reconnect / remount) keeps its stored device — a different value
+      // would be rejected by the server (device_locked). A left row is a real
+      // rejoin, so the new choice applies.
+      const lockedDevice = (row: LobbyPlayer | undefined): DeviceMode | undefined =>
+        row && !row.hasLeft ? row.deviceMode : undefined;
       if (guestMode && guestName) {
         const currentYear = new Date().getFullYear();
         const age = guestBirthYear ? currentYear - parseInt(guestBirthYear, 10) : undefined;
@@ -1945,7 +1943,7 @@ export default function LobbyScreen() {
           // (eller auto-approvar via friends-listan för registrerade). Vid
           // adopterad rad (re-entry) bevaras host:s ev. tidigare approval.
           approved: guestResolved.existing?.approved ?? false,
-          deviceMode: joinDeviceMode,
+          deviceMode: lockedDevice(guestResolved.existing) ?? joinDeviceMode,
         };
         // Spara payloaden för self-heal om upsert:en nedan tyst misslyckas.
         ownPlayerRef.current = guestPlayer;
@@ -1962,7 +1960,6 @@ export default function LobbyScreen() {
           .then(() => {
             publishOwnAccountAlias(roomCode, guestPlayerId);
             publishOwnHcpToLobby(roomCode, guestPlayerId);
-            publishOwnDeviceModeToLobby(roomCode, guestPlayerId, joinDeviceMode);
           })
           .catch(() => { /* loggas i lobbyPlayers */ });
         // Publicera enhetens fråge-historik för cross-player-exkludering.
@@ -2055,7 +2052,7 @@ export default function LobbyScreen() {
           hcpComplete,
           approved: joinerApproved,
           spotifyConnected: ownSpotifyAttested,
-          deviceMode: joinDeviceMode,
+          deviceMode: lockedDevice(existingMatch) ?? joinDeviceMode,
         };
         // Spara payloaden för self-heal om upsert:en nedan tyst misslyckas.
         ownPlayerRef.current = joiner;
@@ -2097,7 +2094,6 @@ export default function LobbyScreen() {
             .then(() => {
               publishOwnAccountAlias(roomCode, joinerId);
               publishOwnHcpToLobby(roomCode, joinerId);
-              publishOwnDeviceModeToLobby(roomCode, joinerId, joinDeviceMode);
             })
             .catch(() => { /* loggas i lobbyPlayers */ });
         } else {
@@ -2105,7 +2101,6 @@ export default function LobbyScreen() {
             .then(() => {
               publishOwnAccountAlias(roomCode, joinerId);
               publishOwnHcpToLobby(roomCode, joinerId);
-              publishOwnDeviceModeToLobby(roomCode, joinerId, joinDeviceMode);
             })
             .catch(() => { /* loggas i lobbyPlayers */ });
         }
@@ -2879,16 +2874,17 @@ export default function LobbyScreen() {
   // PtP/Single Player stöds inte (en delad enhet kan inte lämna + återvända).
   // ── Multiplayer v2 (Step 5): device-derived flow ──────────────────────
   // isV2Lobby: the room is persisted as v2 AND this is a standard multiplayer
-  // lobby. Single, H2H and Guest Host lobbies keep today's behaviour (Guest
-  // Host moves to the resolver in Step 6). Re-match lobbies ARE included: a
-  // carried gameMode must never bypass the device/entitlement rules.
+  // lobby. Single and H2H keep today's behaviour. Guest Host multiplayer
+  // lobbies ARE included since Step 6 — same resolver, indicator and 1 by 1
+  // override as a registered host (still max 4, YouTube-only, no Spotify:
+  // those come from the guest seed + hasPremium=false, not from the flow).
+  // Re-match lobbies are included too: a carried gameMode must never bypass
+  // the device/entitlement rules.
   const isV2Lobby =
     roomIsMultiplayerV2 === true &&
     !isSingleLobby &&
     gameMode !== 'remote-1v1' &&
-    !is1v1Lobby &&
-    !isGuestHost &&
-    !isGuestHostedLobby;
+    !is1v1Lobby;
   // Host's own "Play 1 by 1" choice. NEVER changed by the resolver forcing
   // 1 by 1 (a manual guest) — it is kept and applies again once the forcing
   // player leaves. Only enabling Spotify clears it.
@@ -4182,10 +4178,13 @@ export default function LobbyScreen() {
   // kvar i lobby_players med has_left=true (för audit/debug) men render-
   // pathen exkluderar dem. handleStartGame:s turnOrder-bygge filtrerar
   // redan oberoende så ingen risk att hasLeft hamnar i turn-order.
-  // Multiplayer v2: each non-host's device under the name (host row: none).
-  const deviceLabelFor = (p: LobbyPlayer): string | undefined => {
-    if (!isV2Lobby || p.isHost || !p.deviceMode) return undefined;
-    return p.deviceMode === 'host' ? "Plays on host's phone" : 'Plays on own phone';
+  // Multiplayer v2: device icon before the name. Host always plays on own
+  // device; host-added guests always on the host's device.
+  const deviceFor = (p: LobbyPlayer): 'own' | 'host' | undefined => {
+    if (!isV2Lobby) return undefined;
+    if (p.isHost) return 'own';
+    if (p.addedByHost) return 'host';
+    return p.deviceMode ?? undefined;
   };
   const isPlayerApproved = (p: LobbyPlayer) => !!p.approved || !!p.isHost;
   const approvedPlayers = players.filter((p) => isPlayerApproved(p) && !p.hasLeft);
@@ -4808,6 +4807,52 @@ export default function LobbyScreen() {
       ],
     );
   };
+
+  // Multiplayer v2 flow indicator (boxes + reason line). Shared by the
+  // registered lobby's Game Mode section and the stripped Guest Host lobby
+  // (Step 6), so both read and behave exactly the same.
+  const renderV2FlowBoxes = () => (
+    <>
+      {/* Multiplayer v2: the flow is DERIVED from devices. The boxes
+          show the result and are tappable for the host only —
+          confirmation popups in handleSelectFlow. */}
+      <View style={[styles.modeRow, { marginTop: HEADING_TO_CONTROL - Spacing.sm }]}>
+        {([
+          [ONE_BY_ONE, '1 by 1'],
+          [ALL_AT_ONCE, 'All at Once'],
+        ] as const).map(([mode, label]) => {
+          const active = gameMode === mode;
+          return (
+            <TouchableOpacity
+              key={mode}
+              style={[styles.modeOption, active ? styles.modeOptionPassActive : styles.modeOptionInactive]}
+              onPress={() => handleSelectFlow(mode)}
+              disabled={!hostMode}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[styles.modeLabel, { textAlign: 'center' }, { fontSize: FontSize.xs }, active && styles.modeLabelActiveFree]}
+                numberOfLines={1}
+              >
+                {label}
+              </Text>
+              {active && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
+              {/* Host-only: entitlement is the HOST's, a non-host's
+                  own premium status says nothing about this lobby. */}
+              {mode === ALL_AT_ONCE && hostMode && !allAtOnceEntitled && (
+                <View style={[styles.premiumBadge, styles.premiumBadgeGrey]} pointerEvents="none">
+                  <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>PREMIUM</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      {flowReasonText(flow.reason) && (hostMode || flow.reason !== 'not-entitled') && (
+        <Text style={styles.guestHostNote}>{flowReasonText(flow.reason)}</Text>
+      )}
+    </>
+  );
 
   // Papperskorg-flow: bara host kan radera, bara på waiting-spelare.
   // Visar confirm-popup; vid bekräftelse filtreras spelaren bort ur
@@ -7519,7 +7564,7 @@ export default function LobbyScreen() {
       if (metaForStart?.multiplayerV2) {
         // Resolve from THIS render's roster, not the gameMode state: a lobby
         // change right before the tap may not have run the resolver effect
-        // yet. Legacy-path v2 lobbies (Guest Host) keep their state value.
+        // yet (Guest Host lobbies use the resolver too since Step 6).
         const startMode = isV2Lobby ? flow.gameMode : gameMode;
         const result = await startLobbyGame(roomCode, {
           gameMode: startMode as 'pass-the-phone' | 'individual-devices',
@@ -8263,7 +8308,7 @@ export default function LobbyScreen() {
                 hcpNotDefined={player.type === 'guest'}
                 hideDetails={isGuestHost}
                 accountPlayerName={player.accountPlayerName}
-                deviceLabel={deviceLabelFor(player)}
+                device={deviceFor(player)}
                 turnNumber={
                   // Turnummer bara i PtP-MULTIPLAYER. Single kör PtP under
                   // huven, så gameMode-checken ensam räcker inte — en "1" på
@@ -8331,7 +8376,7 @@ export default function LobbyScreen() {
                     hcpNotDefined={player.type === 'guest'}
                     hideDetails={isGuestHost}
                     accountPlayerName={player.accountPlayerName}
-                    deviceLabel={deviceLabelFor(player)}
+                    device={deviceFor(player)}
                     showApproveToggle={hostMode && !isRematchLobby && !player.hasLeft}
                     approved={false}
                     onApproveChange={(next) => handleSetApproved(player.id, next)}
@@ -8698,46 +8743,7 @@ export default function LobbyScreen() {
               </View>
             </View>
           ) : isV2Lobby ? (
-            <>
-              {/* Multiplayer v2: the flow is DERIVED from devices. The boxes
-                  show the result and are tappable for the host only —
-                  confirmation popups in handleSelectFlow. */}
-              <View style={[styles.modeRow, { marginTop: HEADING_TO_CONTROL - Spacing.sm }]}>
-                {([
-                  [ONE_BY_ONE, '1 by 1'],
-                  [ALL_AT_ONCE, 'All at Once'],
-                ] as const).map(([mode, label]) => {
-                  const active = gameMode === mode;
-                  return (
-                    <TouchableOpacity
-                      key={mode}
-                      style={[styles.modeOption, active ? styles.modeOptionPassActive : styles.modeOptionInactive]}
-                      onPress={() => handleSelectFlow(mode)}
-                      disabled={!hostMode}
-                      activeOpacity={0.7}
-                    >
-                      <Text
-                        style={[styles.modeLabel, { textAlign: 'center' }, { fontSize: FontSize.xs }, active && styles.modeLabelActiveFree]}
-                        numberOfLines={1}
-                      >
-                        {label}
-                      </Text>
-                      {active && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
-                      {/* Host-only: entitlement is the HOST's, a non-host's
-                          own premium status says nothing about this lobby. */}
-                      {mode === ALL_AT_ONCE && hostMode && !allAtOnceEntitled && (
-                        <View style={[styles.premiumBadge, styles.premiumBadgeGrey]} pointerEvents="none">
-                          <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>PREMIUM</Text>
-                        </View>
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-              {flowReasonText(flow.reason) && (hostMode || flow.reason !== 'not-entitled') && (
-                <Text style={styles.guestHostNote}>{flowReasonText(flow.reason)}</Text>
-              )}
-            </>
+            renderV2FlowBoxes()
           ) : (
             <>
           <View style={[styles.modeRow, { marginTop: HEADING_TO_CONTROL - Spacing.sm }]}>
@@ -9625,6 +9631,33 @@ export default function LobbyScreen() {
         )}{/* /gameSettingsBorder */}
         </View>{/* /Game Settings section */}
         </>)}{/* /!isGuestHostedLobby */}
+
+        {/* Multiplayer v2 Guest Host lobby (Step 6): the one Game Settings
+            element a guest lobby shows — the same derived flow indicator and
+            1 by 1 override as a registered host. Legacy guest rooms keep the
+            fixed Pass-the-Phone (nothing rendered here, as before). */}
+        {isGuestHostedLobby && isV2Lobby && (
+          <View style={[styles.section, styles.sectionAfterExpanded]}>
+            <View style={styles.regionLabelRow}>
+              <Text style={styles.sectionLabel}>Game Mode</Text>
+              {hostMode && (
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() =>
+                    quizVibeAlert(
+                      'Multiplayer mode',
+                      "The mode follows the players' devices.\n\nAll at Once: everyone plays on their own phone and answers at the same time.\n\n1 by 1: players take turns, one question each. Used when someone plays on your phone (added with + Add Guest), or when you tap 1 by 1. Max 4 rounds.\n\nGuest games: max 4 players.",
+                    )
+                  }
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+              )}
+            </View>
+            {renderV2FlowBoxes()}
+          </View>
+        )}
 
         {/* ── Quiz Settings ─────────────────────────────────────
             Game Era + Number of Rounds delar en gemensam ram

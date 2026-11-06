@@ -411,3 +411,82 @@ describe('Spotify removal copy (C2)', () => {
     expect(joinRejectionMessage('removed').title).toBe('Removed from lobby');
   });
 });
+
+// ─── Step 6: join device step ───
+import {
+  evaluateDeviceChoice,
+  lockedDeviceForRejoin,
+  needsDeviceStep,
+} from '../../../src/utils/gameFlow';
+
+describe('needsDeviceStep', () => {
+  it('only standard multiplayer v2 rooms ask', () => {
+    expect(needsDeviceStep({ multiplayerV2: true })).toBe(true);
+    expect(needsDeviceStep({ multiplayerV2: false })).toBe(false);
+    expect(needsDeviceStep({ multiplayerV2: true, isRemote1v1: true })).toBe(false);
+    expect(needsDeviceStep({ multiplayerV2: true, rematchLocked: true })).toBe(false);
+    expect(needsDeviceStep({ multiplayerV2: true, singlePlayer: true })).toBe(false);
+  });
+});
+
+describe('lockedDeviceForRejoin (reconnection keeps the device)', () => {
+  const roster = [
+    { name: 'Host', isHost: true, deviceMode: 'own' as const },
+    { name: 'Anna-1', deviceMode: 'host' as const },
+    { name: 'Bo', hasLeft: true, deviceMode: 'host' as const },
+    { name: 'Cia' },
+  ];
+  it('live row with a device → that device (case-insensitive)', () => {
+    expect(lockedDeviceForRejoin(roster, ' anna-1 ')).toBe('host');
+  });
+  it('left row → no lock (leave + rejoin may change device)', () => {
+    expect(lockedDeviceForRejoin(roster, 'Bo')).toBeUndefined();
+  });
+  it('row without stored device, unknown name, host name, no roster → undefined', () => {
+    expect(lockedDeviceForRejoin(roster, 'Cia')).toBeUndefined();
+    expect(lockedDeviceForRejoin(roster, 'Zed')).toBeUndefined();
+    expect(lockedDeviceForRejoin(roster, 'Host')).toBeUndefined();
+    expect(lockedDeviceForRejoin(null, 'Anna-1')).toBeUndefined();
+    expect(lockedDeviceForRejoin(roster, '')).toBeUndefined();
+  });
+});
+
+describe('evaluateDeviceChoice', () => {
+  const base = { isRegistered: true, spotifyEnabled: false, currentTotal: 2, roomCapacity: 4 };
+  it('free lobby: both devices ok', () => {
+    expect(evaluateDeviceChoice({ ...base, choice: 'own' })).toEqual({ outcome: 'ok' });
+    expect(evaluateDeviceChoice({ ...base, choice: 'host' })).toEqual({ outcome: 'ok' });
+  });
+  it('4 players in a 12-cap lobby: host device → Own Device Required (stay), own ok', () => {
+    const s = { ...base, currentTotal: 4, roomCapacity: 12 };
+    expect(evaluateDeviceChoice({ ...s, choice: 'host' })).toEqual({ outcome: 'stay', reason: 'own_device_required' });
+    expect(evaluateDeviceChoice({ ...s, choice: 'own' })).toEqual({ outcome: 'ok' });
+  });
+  it('total capacity reached → Lobby is full for BOTH choices (never Own Device Required)', () => {
+    const s = { ...base, currentTotal: 4, roomCapacity: 4 };
+    expect(evaluateDeviceChoice({ ...s, choice: 'host' })).toEqual({ outcome: 'abort', reason: 'room_full' });
+    expect(evaluateDeviceChoice({ ...s, choice: 'own' })).toEqual({ outcome: 'abort', reason: 'room_full' });
+    const p = { ...base, currentTotal: 12, roomCapacity: 12 };
+    expect(evaluateDeviceChoice({ ...p, choice: 'host' })).toEqual({ outcome: 'abort', reason: 'room_full' });
+  });
+  it('Spotify on: registered host-device → stay; registered own ok; guest aborts', () => {
+    const s = { ...base, spotifyEnabled: true };
+    expect(evaluateDeviceChoice({ ...s, choice: 'host' })).toEqual({ outcome: 'stay', reason: 'spotify_own_device_required' });
+    expect(evaluateDeviceChoice({ ...s, choice: 'own' })).toEqual({ outcome: 'ok' });
+    expect(evaluateDeviceChoice({ ...s, isRegistered: false, choice: 'own' })).toEqual({ outcome: 'abort', reason: 'spotify_guest' });
+    expect(evaluateDeviceChoice({ ...s, isRegistered: false, choice: 'host' })).toEqual({ outcome: 'abort', reason: 'spotify_guest' });
+  });
+  it('full room wins over Spotify messages', () => {
+    expect(
+      evaluateDeviceChoice({ ...base, spotifyEnabled: true, currentTotal: 4, roomCapacity: 4, choice: 'host' }),
+    ).toEqual({ outcome: 'abort', reason: 'room_full' });
+  });
+  it('guest without Spotify: both devices follow the capacity rule', () => {
+    const s = { ...base, isRegistered: false };
+    expect(evaluateDeviceChoice({ ...s, choice: 'host' })).toEqual({ outcome: 'ok' });
+    expect(evaluateDeviceChoice({ ...s, currentTotal: 4, roomCapacity: 12, choice: 'host' })).toEqual({
+      outcome: 'stay',
+      reason: 'own_device_required',
+    });
+  });
+});

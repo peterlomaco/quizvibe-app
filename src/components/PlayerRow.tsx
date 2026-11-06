@@ -11,6 +11,8 @@ import type { AssistanceLevel } from '../utils/hcp';
 import { ApproveToggle } from './ApproveToggle';
 import { Avatar } from './Avatar';
 import { ChevronIcon } from './ChevronIcon';
+import { GroupOutlineIcon } from './GroupOutlineIcon';
+import { PhoneOutlineIcon } from './PhoneOutlineIcon';
 import { HCPShield, HCPShieldCard } from './HCPShield';
 import { SpotifyBrandIcon } from './SpotifyBrandIcon';
 import { WifiFanIcon } from './WifiFanIcon';
@@ -48,9 +50,9 @@ interface PlayerRowProps {
   // konto som sitter bakom guest-namnet. Jämförs mot player.name här så
   // display-regeln bor på ETT ställe: matchar de är det inget alias.
   accountPlayerName?: string;
-  /** Multiplayer v2: where this player plays ("Own phone" / "Host's phone").
-   *  Undefined → nothing rendered (legacy rooms, host row). */
-  deviceLabel?: string;
+  /** Multiplayer v2: where this player plays — rendered as the device-step
+   *  icon (phone / group) before the name. Undefined → no icon (legacy rooms). */
+  device?: 'own' | 'host';
   // Turn number 1..N. When set, a numbered badge is shown to indicate
   // play order in Pass-the-Phone mode. #1 = goes first.
   turnNumber?: number;
@@ -115,7 +117,7 @@ export function PlayerRow({
   expandedExtraBottom = 0,
   isGuest,
   accountPlayerName,
-  deviceLabel,
+  device,
   turnNumber,
   showApproveToggle,
   approved,
@@ -228,6 +230,17 @@ export function PlayerRow({
 
         <View style={styles.info}>
           <View style={styles.nameRow}>
+            {!!device && (
+              <View
+                style={[styles.deviceIcon, hasLeft && { opacity: 0.4 }]}
+                accessible
+                accessibilityLabel={device === 'host' ? "Plays on the host's phone" : 'Plays on own phone'}
+              >
+                {device === 'host'
+                  ? <GroupOutlineIcon size={17} color={Colors.textSecondary} />
+                  : <PhoneOutlineIcon size={17} color={Colors.textSecondary} />}
+              </View>
+            )}
             {(() => {
               // PlayerName-format [Letters]-[Digits]: bryt vid bindestrecket så
               // bokstäverna + "-" står på rad 1 och siffrorna under. Saknar
@@ -258,11 +271,6 @@ export function PlayerRow({
                 QuizVibe: {accountPlayerName.trim()}
               </Text>
             )}
-          {!!deviceLabel && !hasLeft && (
-            <Text style={styles.accountAlias} numberOfLines={1}>
-              {deviceLabel}
-            </Text>
-          )}
           {/* Wifi-ikon direkt under playername — connection-health-indikator
               för Individual Devices. Färg: grön (ok/self), gul (slow), röd
               (unstable). hasLeft-spelare slipper indikator (de signaleras
@@ -802,6 +810,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginTop: 1,
   },
+  deviceIcon: { alignItems: 'center', justifyContent: 'center' },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',

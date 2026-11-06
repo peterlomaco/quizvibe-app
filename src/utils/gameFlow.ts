@@ -274,6 +274,80 @@ export function resolveJoinDeviceMode(
   return roomIsMultiplayerV2 ? 'own' : undefined;
 }
 
+// ─── Join device step (Step 6) ────────────────────────────────────────
+
+/**
+ * Whether a joiner must pick a device before entering the lobby. Only
+ * standard multiplayer v2 rooms ask; legacy, Single Player, Remote 1v1 and
+ * locked re-match lobbies (line-up carried over) never do.
+ */
+export function needsDeviceStep(room: {
+  multiplayerV2: boolean;
+  isRemote1v1?: boolean;
+  rematchLocked?: boolean;
+  singlePlayer?: boolean;
+}): boolean {
+  return room.multiplayerV2 && !room.isRemote1v1 && !room.rematchLocked && !room.singlePlayer;
+}
+
+/**
+ * Reconnection: a joiner who still has a live (non-left) row in the lobby
+ * keeps its stored device — the choice is locked until they leave. Matched
+ * on the player name (case-insensitive), the same key the join path uses to
+ * inherit the row id. Returns undefined when there is no such row (or it
+ * predates device_mode), so the device step is shown.
+ */
+export function lockedDeviceForRejoin(
+  roster: readonly { name: string; isHost?: boolean; hasLeft?: boolean; deviceMode?: DeviceMode }[] | null | undefined,
+  playerName: string | null | undefined,
+): DeviceMode | undefined {
+  const name = playerName?.trim().toLowerCase();
+  if (!name || !roster) return undefined;
+  const row = roster.find((p) => !p.isHost && !p.hasLeft && p.name.trim().toLowerCase() === name);
+  return row?.deviceMode;
+}
+
+export type DeviceChoiceOutcome =
+  | { outcome: 'ok' }
+  /** Show the message and keep the joiner on the device step. */
+  | { outcome: 'stay'; reason: 'own_device_required' | 'spotify_own_device_required' }
+  /** Show the message and leave the device step (joining is not possible). */
+  | { outcome: 'abort'; reason: 'room_full' | 'spotify_guest' };
+
+/**
+ * Validates a device choice on the join step. Same rules as the 0064/0067
+ * join trigger, so the client normally answers before the server has to:
+ *   1. Room full even for an own-device join → "Lobby is full" (never
+ *      "Own Device Required" when the joiner could not join at all).
+ *   2. Spotify on: guests can't join; host-device joiners must switch.
+ *   3. A host-device joiner forces 1 by 1, so they fit only within its cap.
+ * `currentTotal` = non-left rows (host + waiting included), like the trigger.
+ */
+export function evaluateDeviceChoice(input: {
+  choice: DeviceMode;
+  isRegistered: boolean;
+  spotifyEnabled: boolean;
+  currentTotal: number;
+  roomCapacity: number;
+}): DeviceChoiceOutcome {
+  if (input.currentTotal + 1 > input.roomCapacity) return { outcome: 'abort', reason: 'room_full' };
+  const spotify = spotifyJoinBlock(
+    { isRegistered: input.isRegistered, deviceMode: input.choice },
+    input.spotifyEnabled,
+  );
+  if (spotify === 'guest-not-allowed') return { outcome: 'abort', reason: 'spotify_guest' };
+  if (spotify === 'own-device-required') return { outcome: 'stay', reason: 'spotify_own_device_required' };
+  const cap = canJoinWithDevice({
+    currentTotal: input.currentTotal,
+    deviceMode: input.choice,
+    roomCapacity: input.roomCapacity,
+  });
+  if (cap.allowed) return { outcome: 'ok' };
+  return cap.reason === 'own-device-required'
+    ? { outcome: 'stay', reason: 'own_device_required' }
+    : { outcome: 'abort', reason: 'room_full' };
+}
+
 // ─── Server rule errors (Step 3, migration 0064) ──────────────────────
 
 export type ServerRejectionKind = 'join' | 'start' | 'spotify';
