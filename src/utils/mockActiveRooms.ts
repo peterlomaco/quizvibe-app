@@ -20,6 +20,12 @@
 // dessa funkar det alltid, även utan att skapa rum mot DB:n.
 
 import { getCachedFeatureGates } from './featureGates';
+import {
+  parseFrozenGameConfig,
+  parseServerRejection,
+  type FrozenGameConfig,
+  type MultiplayerGameMode,
+} from './gameFlow';
 import { forgetRoomMemberships, recordOwnMembership } from './ownLobbyLedger';
 import { supabase } from './supabase';
 
@@ -67,6 +73,9 @@ export interface RoomMeta {
   // live lobby never changes model when the flag flips. Optional: rooms
   // created before 0062 (or while the flag was off) resolve to false.
   multiplayerV2?: boolean;
+  // Multiplayer v2 frozen start snapshot (migration 0064). Null until Start,
+  // and always null for legacy rooms.
+  gameConfig?: FrozenGameConfig | null;
 }
 
 // Dev/test-seeds som lagras lokalt i minnet (inte i DB) så de alltid är
@@ -98,6 +107,8 @@ interface RoomRow {
   rematch_player_ids?: string[] | null;
   // Optional: kolumnen kom i migration 0062 — äldre rader saknar den.
   multiplayer_v2?: boolean | null;
+  // Optional: kolumnen kom i migration 0064.
+  game_config?: unknown;
 }
 
 function rowToMeta(row: RoomRow): RoomMeta {
@@ -112,6 +123,7 @@ function rowToMeta(row: RoomRow): RoomMeta {
     rematchLocked: row.rematch_locked ?? false,
     rematchPlayerIds: row.rematch_player_ids ?? [],
     multiplayerV2: row.multiplayer_v2 ?? false,
+    gameConfig: parseFrozenGameConfig(row.game_config),
   };
 }
 
@@ -306,6 +318,73 @@ export async function markRoomGameStarted(code: string): Promise<void> {
   if (error) {
     console.warn('[activeRooms] markRoomGameStarted failed:', error.message);
   }
+}
+
+export type StartLobbyGameResult =
+  | { ok: true; config: FrozenGameConfig }
+  | { ok: false; reason: string };
+
+/**
+ * Multiplayer v2 (migration 0064): atomic Start. The server re-validates the
+ * roster + flow under the room lock, sets game_started and freezes
+ * game_config. Replaces markRoomGameStarted for v2 multiplayer rooms only.
+ * `reason` is the server's rejection code, or 'network' for anything else.
+ */
+export async function startLobbyGame(
+  code: string,
+  args: {
+    gameMode: MultiplayerGameMode;
+    participantIds: string[];
+    spotifyEnabled: boolean;
+    allAtOnceAllowed: boolean;
+  },
+): Promise<StartLobbyGameResult> {
+  const { data, error } = await supabase.rpc('start_lobby_game', {
+    p_room_code: normalizeCode(code),
+    p_game_mode: args.gameMode,
+    p_participant_ids: args.participantIds,
+    p_spotify_enabled: args.spotifyEnabled,
+    p_all_at_once_allowed: args.allAtOnceAllowed,
+  });
+  if (error) {
+    console.warn('[activeRooms] startLobbyGame failed:', error.message);
+    return { ok: false, reason: parseServerRejection(error.message)?.reason ?? 'network' };
+  }
+  const config = parseFrozenGameConfig(data);
+  if (!config) return { ok: false, reason: 'network' };
+  return { ok: true, config };
+}
+
+export type SetLobbySpotifyResult =
+  | { ok: true; removed: string[] }
+  | { ok: false; reason: string; unattested?: string[] };
+
+/**
+ * Multiplayer v2 (migration 0064): host turns Spotify on/off atomically.
+ * Enabling removes guests + host-device participants in the same
+ * transaction. Not wired into the lobby UI until Step 5.
+ */
+export async function setLobbySpotify(code: string, enabled: boolean): Promise<SetLobbySpotifyResult> {
+  const { data, error } = await supabase.rpc('set_lobby_spotify', {
+    p_room_code: normalizeCode(code),
+    p_enabled: enabled,
+  });
+  if (error) {
+    console.warn('[activeRooms] setLobbySpotify failed:', error.message);
+    const reason = parseServerRejection(error.message)?.reason ?? 'network';
+    let unattested: string[] | undefined;
+    if (reason === 'unattested' && error.details) {
+      try {
+        const parsed = JSON.parse(error.details);
+        if (Array.isArray(parsed)) unattested = parsed.filter((x): x is string => typeof x === 'string');
+      } catch { /* detail is best-effort */ }
+    }
+    return { ok: false, reason, unattested };
+  }
+  const removed = Array.isArray((data as { removed?: unknown })?.removed)
+    ? ((data as { removed: unknown[] }).removed.filter((x): x is string => typeof x === 'string'))
+    : [];
+  return { ok: true, removed };
 }
 
 /**

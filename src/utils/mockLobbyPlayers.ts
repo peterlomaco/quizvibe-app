@@ -27,7 +27,7 @@ import {
   forgetOwnMembership,
   recordOwnMembership,
 } from './ownLobbyLedger';
-import { deviceModeFromRow, type DeviceMode } from './gameFlow';
+import { deviceModeFromRow, parseServerRejection, type DeviceMode } from './gameFlow';
 import { supabase } from './supabase';
 import type { LobbyPlayer } from '../screens/LobbyScreen';
 
@@ -232,6 +232,35 @@ export async function setLobbyPlayers(code: string, players: LobbyPlayer[]): Pro
  * Använder turn_order = 999 som "queued"-placeholder; host:s setLobbyPlayers
  * kommer skriva över till rätt index när joinaren syncas in i host:s state.
  */
+// ── Multiplayer v2 join rejections (migration 0064) ──────────────────
+// The server trigger can reject the joiner's own row write. The write
+// promises stay fire-and-forget (callers chain .catch(() => {})), so the
+// rejection is surfaced through this tiny listener set instead — LobbyScreen
+// subscribes and shows the Alert.
+export interface JoinRejection {
+  roomCode: string;
+  reason: string;
+}
+type JoinRejectionListener = (r: JoinRejection) => void;
+const joinRejectionListeners = new Set<JoinRejectionListener>();
+
+export function subscribeJoinRejections(listener: JoinRejectionListener): () => void {
+  joinRejectionListeners.add(listener);
+  return () => {
+    joinRejectionListeners.delete(listener);
+  };
+}
+
+function emitJoinRejection(roomCode: string, message: string): void {
+  const rejection = parseServerRejection(message);
+  if (!rejection || rejection.kind !== 'join') return;
+  for (const l of joinRejectionListeners) {
+    try {
+      l({ roomCode, reason: rejection.reason });
+    } catch { /* a listener must never break the write path */ }
+  }
+}
+
 export async function upsertOwnLobbyPlayer(code: string, player: LobbyPlayer): Promise<void> {
   if (!code) return;
   const normalized = normalizeCode(code);
@@ -262,6 +291,7 @@ export async function upsertOwnLobbyPlayer(code: string, player: LobbyPlayer): P
     .upsert(row, { onConflict: 'room_code,player_id' });
   if (error) {
     console.warn('[lobbyPlayers] upsertOwnLobbyPlayer failed:', error.message);
+    emitJoinRejection(normalized, error.message);
     return;
   }
   // Registrera att DENNA enhet gick in i lobbyn (non-host-rad) så two-device-
@@ -681,6 +711,7 @@ export async function publishOwnDeviceMode(
     .eq('user_id', userId);
   if (error) {
     console.warn('[lobbyPlayers] publishOwnDeviceMode failed:', error.message);
+    emitJoinRejection(normalized, error.message);
   }
 }
 

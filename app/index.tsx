@@ -82,6 +82,21 @@ import {
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { LoadingContent } from '@/src/components/LoadingContent';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
+
+/**
+ * Late join (C5, 2026-11-06): isActiveRoom hides started rooms, so a code for
+ * a game in progress used to say "Room not found". When the room exists and
+ * its game has started, say so instead. Returns true if the Alert was shown.
+ * getRoomMeta (not roomExists, which fails open) → a network error falls
+ * through to the existing "Room not found" message.
+ */
+async function alertIfGameAlreadyStarted(code: string): Promise<boolean> {
+  const meta = await getRoomMeta(code);
+  if (!meta?.gameStarted) return false;
+  Alert.alert('Could not join', 'Game already started.');
+  return true;
+}
+
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 // Utloggads "Start New Game"-y (content-y) — inloggad lägger sin knapp på
 // samma skärmnivå. Device-lokalt (beror på skärmstorlek).
@@ -934,6 +949,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
           return;
         }
       }
+      if (await alertIfGameAlreadyStarted(code)) return;
       Alert.alert(
         'Room not found',
         'There is no Room code activated with this combination',
@@ -1188,6 +1204,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     // Existence-check mot Supabase rooms-tabellen. PlayerName-uniqueness
     // kollas redan vid Check (handleCheckPlayerName → player_name_exists).
     if (!(await isActiveRoom(code))) {
+      if (await alertIfGameAlreadyStarted(code)) return;
       Alert.alert(
         'Room not found',
         'There is no Room code activated with this combination',
@@ -3882,9 +3899,11 @@ export default function HomeScreen() {
                     <Text style={profileMenu.headerName}>
                       {profile?.playerName?.trim() || 'Signed in'}
                     </Text>
-                    {/* "Logged in" i stället för e-post — samma identitetsblock
-                        som Profile-skärmens konto-sheet (UI 2026-10-20). */}
-                    <Text style={profileMenu.headerStatus}>Logged in</Text>
+                    {/* E-post under namnet (återinförd 2026-11-06, Peter) — samma
+                        identitetsblock som Profile-skärmens konto-sheet. */}
+                    <Text style={profileMenu.headerStatus} numberOfLines={1}>
+                      {profile?.email?.trim() || 'Logged in'}
+                    </Text>
                   </View>
                 </View>
 

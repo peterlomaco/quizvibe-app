@@ -273,3 +273,105 @@ export function resolveJoinDeviceMode(
   if (isDeviceMode(param)) return param;
   return roomIsMultiplayerV2 ? 'own' : undefined;
 }
+
+// ─── Server rule errors (Step 3, migration 0064) ──────────────────────
+
+export type ServerRejectionKind = 'join' | 'start' | 'spotify';
+
+export interface ServerRejection {
+  kind: ServerRejectionKind;
+  reason: string;
+}
+
+/**
+ * Parses the 'qv_<kind>_rejected:<reason>' messages raised by the 0064
+ * trigger/RPCs. Anything else (network, RLS, missing migration) → null so
+ * callers keep their existing generic handling.
+ */
+export function parseServerRejection(message: string | null | undefined): ServerRejection | null {
+  if (!message) return null;
+  const m = /qv_(join|start|spotify)_rejected:([a-z_0-9]+)/.exec(message);
+  return m ? { kind: m[1] as ServerRejectionKind, reason: m[2] } : null;
+}
+
+/** Frozen snapshot written by start_lobby_game (rooms.game_config). */
+export interface FrozenGameConfig {
+  version: number;
+  gameMode: MultiplayerGameMode;
+  override: boolean;
+  spotifyEnabled: boolean;
+  allAtOnceAllowed: boolean;
+  participants: { playerId: string; isHost: boolean; deviceMode: DeviceMode; registered: boolean }[];
+}
+
+/** Tolerant reader for rooms.game_config. Unknown/invalid shape → null. */
+export function parseFrozenGameConfig(raw: unknown): FrozenGameConfig | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  if (o.gameMode !== ONE_BY_ONE && o.gameMode !== ALL_AT_ONCE) return null;
+  if (!Array.isArray(o.participants)) return null;
+  const participants: FrozenGameConfig['participants'] = [];
+  for (const p of o.participants) {
+    if (!p || typeof p !== 'object') return null;
+    const q = p as Record<string, unknown>;
+    if (typeof q.playerId !== 'string' || !q.playerId) return null;
+    participants.push({
+      playerId: q.playerId,
+      isHost: q.isHost === true,
+      deviceMode: isDeviceMode(q.deviceMode) ? q.deviceMode : 'own',
+      registered: q.registered === true,
+    });
+  }
+  if (participants.length === 0) return null;
+  return {
+    version: typeof o.version === 'number' ? o.version : 1,
+    gameMode: o.gameMode as MultiplayerGameMode,
+    override: o.override === true,
+    spotifyEnabled: o.spotifyEnabled === true,
+    allAtOnceAllowed: o.allAtOnceAllowed !== false,
+    participants,
+  };
+}
+
+/** User-facing copy for a rejected Start Game. */
+export function startRejectionMessage(reason: string): { title: string; message: string } {
+  switch (reason) {
+    case 'roster_changed':
+      return { title: 'Players changed', message: 'A player joined or left just now. Check the lobby and press Start Game again.' };
+    case 'host_device_requires_one_by_one':
+      return { title: 'Pass-the-Phone required', message: 'Someone is playing on your device, so this game has to be played Pass-the-Phone.' };
+    case 'too_many_for_one_by_one':
+      return { title: 'Too many players', message: 'Pass-the-Phone allows max 4 players.' };
+    case 'all_at_once_not_entitled':
+      return { title: 'Premium feature', message: 'Individual devices requires QuizVibe Premium.' };
+    case 'spotify_conflict':
+      return { title: 'Spotify DJ not applicable', message: 'Spotify DJ requires Individual devices and that every player is a QuizVibe user on their own device.' };
+    default:
+      return { title: 'Cannot start game', message: 'Check your connection and try again.' };
+  }
+}
+
+/** User-facing copy for a join rejected by the server. */
+export function joinRejectionMessage(reason: string): { title: string; message: string } {
+  switch (reason) {
+    case 'game_started':
+      return { title: 'Game already started', message: 'The Host has already started this game.' };
+    case 'room_full':
+      return { title: 'Lobby is full', message: 'This lobby is full.' };
+    case 'own_device_required':
+      return { title: 'Own Device Required', message: "This room requires you to play on your own device. Please select 'On my own device' to join." };
+    case 'spotify_own_device_required':
+      return {
+        title: 'Own Device Required',
+        message: "Spotify is enabled in this lobby. You must play from your own device to join.\n\nAsk the host to disable Spotify if you prefer to play on the host's device.",
+      };
+    case 'spotify_guest':
+      return { title: 'Spotify lobby', message: 'Spotify is enabled in this lobby. Only QuizVibe users playing on their own device can join.' };
+    case 'removed':
+      return { title: 'Removed from lobby', message: 'The Host enabled Spotify. Join again from your own device as a QuizVibe user.' };
+    case 'device_locked':
+      return { title: 'Device choice locked', message: 'Leave the lobby and join again to change device.' };
+    default:
+      return { title: 'Could not join', message: 'Check your connection and try again.' };
+  }
+}

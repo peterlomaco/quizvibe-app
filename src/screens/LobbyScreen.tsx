@@ -79,11 +79,18 @@ import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { resolveDisplayHcp } from '../utils/hcpEngine';
 import { loadOwnHcpBundle } from '../utils/hcpProgress';
 import { addLeftPlayer, clearLeftPlayers, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
-import { deactivateRoom, getRoomMeta, markRoomGameStarted, registerActiveRoom, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
+import { deactivateRoom, getRoomMeta, markRoomGameStarted, registerActiveRoom, startLobbyGame, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
-import { resolveJoinDeviceMode, type DeviceMode } from '../utils/gameFlow';
-import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnDeviceMode, publishOwnHcp, setLobbyPlayers, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
+import {
+  joinRejectionMessage,
+  resolveJoinDeviceMode,
+  startRejectionMessage,
+  type DeviceMode,
+} from '../utils/gameFlow';
+import { canUse } from '../utils/entitlements';
+import { getCachedFeatureGates } from '../utils/featureGates';
+import { claimCarryOverLobbyPlayer, clearLobbyPlayers, getLobbyPlayers, getLobbySeenQuestionIds, markOwnPlayerLeft, publishOwnAccountName, publishOwnDeviceMode, publishOwnHcp, setLobbyPlayers, subscribeJoinRejections, updateOwnSeenQuestionIds, upsertOwnLobbyPlayer } from '../utils/mockLobbyPlayers';
 import { loadLastSessionIds, loadSeenQuestionIds } from '../utils/hostQuestionHistory';
 import { setPendingPeerSeenIds } from '../utils/pendingSeenQuestions';
 import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemoteAssistance } from '../utils/mockLobbySettings';
@@ -1427,6 +1434,8 @@ export default function LobbyScreen() {
   // appen tvångsstängs). Sätts vid join, resetas vid rumkods-byte.
   const ownPlayerRef = useRef<LobbyPlayer | null>(null);
   const selfHealAttemptsRef = useRef(0);
+  // Set once the server rejected our own row (0064) — never heal/retry after.
+  const joinRejectedRef = useRef(false);
   // "Reconnecting…"-indikator (non-host): antal på varandra följande
   // players-sync-tickar där DB-läsningen failade/timeout:ade. Efter 3 (~6s)
   // visas en liten icke-blockerande indikator så användaren inte lämnas
@@ -1516,6 +1525,7 @@ export default function LobbyScreen() {
     selfEverInStoredRef.current = false;
     ownPlayerRef.current = null;
     selfHealAttemptsRef.current = 0;
+    joinRejectedRef.current = false;
     stalledTicksRef.current = 0;
     setReconnecting(false);
     navigatedToQuizRef.current = false;
@@ -5938,14 +5948,19 @@ export default function LobbyScreen() {
         if (!selfRow) {
           return;
         }
-        const selfApproved = !!selfRow.approved;
+        // Multiplayer v2: the frozen snapshot (start_lobby_game) is the
+        // authoritative roster — membership is "in the snapshot", not the
+        // live approved flag, so a late approve/leave can't change the game.
+        const frozenConfig = meta?.multiplayerV2 ? meta.gameConfig ?? null : null;
+        const frozenIds = frozenConfig ? frozenConfig.participants.map((p) => p.playerId) : null;
+        const selfApproved = frozenIds ? frozenIds.includes(ownId) : !!selfRow.approved;
         if (!selfApproved) {
           if (!cancelled) setStartedWithoutMeDetected(true);
           return;
         }
         // Använd settings från store där det finns; fall tillbaka till
         // local state för fält som inte syncas via lobby_settings än.
-        const effectiveGameMode = settingsStored?.gameMode ?? gameMode;
+        const effectiveGameMode = frozenConfig?.gameMode ?? settingsStored?.gameMode ?? gameMode;
         const effectiveAnswerResponseSeconds =
           settingsStored?.answerResponseSeconds ?? answerResponseSeconds;
         const effectiveEraFrom = settingsStored?.eraFrom ?? eraValues[0];
@@ -5962,8 +5977,15 @@ export default function LobbyScreen() {
         // lägena behöver EXAKT samma params (host:s settings + hela
         // turnOrder), skillnaden är bara att PtP frågar först.
         const goToQuizAsNonHost = () => {
-          const turnOrder = (playersStored ?? [])
-            .filter((p) => !!p.approved || !!p.isHost)
+          // v2: exactly the frozen participants, in the frozen order.
+          const rosterRows = frozenIds
+            ? frozenIds
+                .map((id) => (playersStored ?? []).find((p) => p.id === id))
+                .filter((p): p is LobbyPlayer => !!p)
+            : (playersStored ?? []).filter((p) => !!p.approved || !!p.isHost);
+          const frozenDevice = (id: string) =>
+            frozenConfig?.participants.find((p) => p.playerId === id)?.deviceMode;
+          const turnOrder = rosterRows
             .map((p) => ({
               id: p.id,
               name: p.name,
@@ -5972,7 +5994,7 @@ export default function LobbyScreen() {
               assistance: p.assistance ?? 'standard',
               age: p.age,
               spotifyConnected: p.spotifyConnected ?? false,
-              deviceMode: p.deviceMode,
+              deviceMode: frozenDevice(p.id) ?? p.deviceMode,
               type: p.type,
             }));
           // Guest-hostat spel detekteras via host-radens type i lobby_players
@@ -6020,7 +6042,8 @@ export default function LobbyScreen() {
               region: (settingsStored?.region ?? 'Sweden').toLowerCase(),
               // Spotify DJ-läge måste matchas med host:s värde så non-host
               // behandlar Spotify-frågor korrekt (timer gating, mediaSource).
-              spotifyEnabled: String(settingsStored?.spotifyEnabled ?? false),
+              // v2: the frozen snapshot wins over live lobby_settings (C4).
+              spotifyEnabled: String(frozenConfig?.spotifyEnabled ?? settingsStored?.spotifyEnabled ?? false),
               roomCode,
             },
           });
@@ -6202,6 +6225,7 @@ export default function LobbyScreen() {
         stored !== null &&
         !selfEverInStoredRef.current &&
         !stored?.some((p) => p.id === ownId) &&
+        !joinRejectedRef.current &&
         selfHealAttemptsRef.current < MAX_SELF_HEAL
       ) {
         selfHealAttemptsRef.current += 1;
@@ -6364,6 +6388,27 @@ export default function LobbyScreen() {
   // room-deletion-popupen ovan (cancelable:false + OK→Home) men ramad som
   // info istället för "deleted lobby" eftersom det rör en enskild spelare,
   // inte hela rummet.
+  // Multiplayer v2 (migration 0064): the server rejected this device's own
+  // row write (game already started, room full, Spotify rules, locked device
+  // choice). Stop self-healing, leave the lobby cleanly and explain why.
+  // Step 6 keeps the joiner on the device step instead of going Home.
+  useEffect(() => {
+    if (hostMode || !roomCode) return;
+    return subscribeJoinRejections(({ roomCode: rejectedCode, reason }) => {
+      if (rejectedCode !== roomCode.toUpperCase() || joinRejectedRef.current) return;
+      joinRejectedRef.current = true;
+      const ownId = ownPlayerIdRef.current;
+      if (ownId) markOwnPlayerLeft(roomCode, ownId).catch(() => {});
+      const { title, message } = joinRejectionMessage(reason);
+      quizVibeAlert(
+        title,
+        message,
+        [{ text: 'OK', onPress: () => router.replace('/') }],
+        { cancelable: false },
+      );
+    });
+  }, [hostMode, roomCode]);
+
   useEffect(() => {
     if (!playerEjectedDetected) return;
     quizVibeAlert(
@@ -6503,6 +6548,10 @@ export default function LobbyScreen() {
     // spelar "helt slumpmässigt" media. Ref:en är synkron sanning vid tap;
     // knappen är dessutom visuellt låst tills seeden klar. Bara host seedar.
     if (hostMode && !lobbySeededRef.current) return;
+    // Already started from this lobby — a repeated Start must never start
+    // (or charge for) the same game twice. In-flight double taps are already
+    // blocked by startAction.run; this covers a later tap after success.
+    if (hostMode && hostGameStartedRef.current) return;
     // Join-limbo-guard (Peter 2026-11-03): en inbjuden/friend som just kommit
     // in är dold i båda sektionerna under grace-fönstret tills auto-approven
     // landat. Startade host i det fönstret byggdes turnOrder utan spelaren,
@@ -6916,6 +6965,10 @@ export default function LobbyScreen() {
     // Guest host: HELA blocket skippas — ingen profil krävs ("Sign in
     // required" vore fel), inga credits förbrukas. Begränsningen ligger i
     // de låsta lobby-inställningarna + max 1 Play Again-replay.
+    // C1 (2026-11-06): balansen KONTROLLERAS här men credit:en DRAS först
+    // efter att starten accepterats (se chargeHostCreditAfterStart nedan),
+    // så en misslyckad start aldrig kostar något. Ingen refund behövs.
+    const chargeCredit = !isGuestHost && !hasPremium;
     if (!isGuestHost) {
       const profile = await loadProfile();
       if (!profile) {
@@ -6937,17 +6990,6 @@ export default function LobbyScreen() {
             ],
           );
           return;
-        }
-        const nextFree = free - 1;
-        try {
-          await saveProfile({ ...profile, freeGameCredits: nextFree });
-          // Lokal state-sync så pillen i lobby-headern uppdateras direkt
-          // (annars hade den gamla siffran legat kvar tills nästa fokus-load).
-          setFreeGameCredits(nextFree);
-        } catch {
-          // Tyst — låt spelet börja även om persist-write skulle failla. Nästa
-          // load reflekterar då fortfarande gamla värdet, vilket är säkrare än
-          // att blockera spelstart helt på en AsyncStorage-glitch.
         }
       }
     }
@@ -6982,6 +7024,7 @@ export default function LobbyScreen() {
       const hostIsAnonymous = await isAnonymousSession();
       const hostUserId = await getOwnUserId();
       if (!hostUserId) {
+        hostGameStartedRef.current = false; // spelet startade aldrig
         quizVibeAlert('Cannot start match', 'No active session. Check your connection and try again.');
         return;
       }
@@ -7038,21 +7081,58 @@ export default function LobbyScreen() {
         ],
       );
       if (!remoteMatchId) {
-        // Best-effort credit-återbetalning — matchen kunde inte skapas så
-        // spelet startar inte; hostens dragna credit ska inte gå förlorad.
-        if (!isGuestHost && !hasPremium) {
-          try {
-            const p2 = await loadProfile();
-            if (p2) {
-              const restored = (p2.freeGameCredits ?? 0) + 1;
-              await saveProfile({ ...p2, freeGameCredits: restored });
-              setFreeGameCredits(restored);
-            }
-          } catch { /* tyst — pillen självkorrigerar vid nästa load */ }
-        }
+        // Ingen credit har dragits än (C1) — inget att återbetala.
         hostGameStartedRef.current = false; // spelet startade aldrig
         quizVibeAlert('Cannot start match', 'The H2H match could not be created. Check your connection and try again.');
         return;
+      }
+    }
+
+    // Multiplayer v2 (Step 3, migration 0064): Start goes through the server
+    // so joins/leaves/Spotify racing this tap are resolved under the room
+    // lock, and the roster + flow are frozen in rooms.game_config. Legacy
+    // rooms, Single Player and Remote 1v1 keep the old path below.
+    let startedViaServer = false;
+    if (gameMode !== 'remote-1v1' && !singlePlayerDefault) {
+      const metaForStart = await withTimeout(getRoomMeta(roomCode), SYNC_TIMEOUT_MS, undefined, 'getRoomMeta(start)');
+      if (metaForStart?.multiplayerV2) {
+        const result = await startLobbyGame(roomCode, {
+          gameMode,
+          participantIds: turnOrder.map((p) => p.id),
+          spotifyEnabled,
+          allAtOnceAllowed: canUse(
+            'allAtOnce',
+            { isPremium: hasPremium, isGuestHost },
+            getCachedFeatureGates(),
+          ),
+        });
+        if (!result.ok) {
+          // No credit has been charged yet (C1) — nothing to refund.
+          hostGameStartedRef.current = false; // spelet startade aldrig
+          const { title, message } = startRejectionMessage(result.reason);
+          quizVibeAlert(title, message);
+          return;
+        }
+        startedViaServer = true;
+      }
+    }
+
+    // C1: the start is accepted from here on (nothing below aborts it), so
+    // this is the ONE place a Host Game Credit is charged. Re-read for a
+    // fresh balance; a failed write never blocks a game that already started.
+    // Limitation: the balance lives in AsyncStorage on this device, so the
+    // charge is NOT atomic with the server start — if the app dies between
+    // the start and this write, the game is free. Not exactly-once.
+    if (chargeCredit) {
+      try {
+        const latest = await loadProfile();
+        if (latest) {
+          const nextFree = Math.max(0, (latest.freeGameCredits ?? 0) - 1);
+          await saveProfile({ ...latest, freeGameCredits: nextFree });
+          setFreeGameCredits(nextFree);
+        }
+      } catch {
+        // Tyst — samma policy som tidigare: blockera aldrig en startad match.
       }
     }
 
@@ -7075,7 +7155,10 @@ export default function LobbyScreen() {
     // false för nya joiners (rummet är inte längre joinbart). Fire-and-forget
     // — UI:t väntar inte på roundtrip efter att vi redan explict awaitat
     // setLobbyPlayers ovan.
-    markRoomGameStarted(roomCode).catch(() => { /* loggas i mockActiveRooms */ });
+    // v2 rooms: start_lobby_game already set game_started atomically.
+    if (!startedViaServer) {
+      markRoomGameStarted(roomCode).catch(() => { /* loggas i mockActiveRooms */ });
+    }
     // Rensa pending invites för det här rummet — host startar spelet, så
     // alla mottagare som ännu inte accepterat ska INTE längre se inviten
     // som ett valbart alternativ på Home. Game-start raderar inte rooms-

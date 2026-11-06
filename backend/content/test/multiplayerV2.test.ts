@@ -340,3 +340,74 @@ describe('resolveJoinDeviceMode', () => {
     expect(isDeviceMode(null)).toBe(false);
   });
 });
+
+// ─── Step 3: server rule parsing ───
+import {
+  joinRejectionMessage,
+  parseFrozenGameConfig,
+  parseServerRejection,
+  startRejectionMessage,
+} from '../../../src/utils/gameFlow';
+
+describe('parseServerRejection', () => {
+  it('reads kind + reason from a Postgres exception message', () => {
+    expect(parseServerRejection('qv_join_rejected:game_started')).toEqual({ kind: 'join', reason: 'game_started' });
+    expect(parseServerRejection('ERROR: qv_start_rejected:roster_changed')).toEqual({ kind: 'start', reason: 'roster_changed' });
+    expect(parseServerRejection('qv_spotify_rejected:unattested')).toEqual({ kind: 'spotify', reason: 'unattested' });
+  });
+  it('ignores unrelated errors', () => {
+    expect(parseServerRejection('new row violates row-level security policy')).toBeNull();
+    expect(parseServerRejection(undefined)).toBeNull();
+  });
+});
+
+describe('parseFrozenGameConfig', () => {
+  const valid = {
+    version: 1,
+    gameMode: 'pass-the-phone',
+    override: true,
+    spotifyEnabled: false,
+    allAtOnceAllowed: true,
+    participants: [
+      { playerId: '1', isHost: true, deviceMode: 'own', registered: true },
+      { playerId: 'g1', isHost: false, deviceMode: 'host', registered: false },
+    ],
+  };
+  it('parses the RPC snapshot and keeps participant order', () => {
+    const c = parseFrozenGameConfig(valid)!;
+    expect(c.gameMode).toBe('pass-the-phone');
+    expect(c.participants.map((p) => p.playerId)).toEqual(['1', 'g1']);
+    expect(c.participants[1].deviceMode).toBe('host');
+  });
+  it('null / legacy / malformed → null', () => {
+    expect(parseFrozenGameConfig(null)).toBeNull();
+    expect(parseFrozenGameConfig({ ...valid, gameMode: 'remote-1v1' })).toBeNull();
+    expect(parseFrozenGameConfig({ ...valid, participants: [] })).toBeNull();
+    expect(parseFrozenGameConfig({ ...valid, participants: [{ isHost: true }] })).toBeNull();
+  });
+  it('unknown device falls back to own', () => {
+    const c = parseFrozenGameConfig({ ...valid, participants: [{ playerId: 'x', deviceMode: 'tv' }] })!;
+    expect(c.participants[0].deviceMode).toBe('own');
+  });
+});
+
+describe('rejection copy', () => {
+  it('uses the agreed Own Device Required texts', () => {
+    expect(joinRejectionMessage('own_device_required')).toEqual({
+      title: 'Own Device Required',
+      message: "This room requires you to play on your own device. Please select 'On my own device' to join.",
+    });
+    expect(joinRejectionMessage('spotify_own_device_required').message).toContain('Spotify is enabled in this lobby.');
+  });
+  it('unknown reasons fall back to a generic message', () => {
+    expect(startRejectionMessage('???').title).toBe('Cannot start game');
+    expect(joinRejectionMessage('???').title).toBe('Could not join');
+  });
+});
+
+describe('Spotify removal copy (C2)', () => {
+  it('a tombstoned player gets the removed message', () => {
+    expect(parseServerRejection('qv_join_rejected:removed')).toEqual({ kind: 'join', reason: 'removed' });
+    expect(joinRejectionMessage('removed').title).toBe('Removed from lobby');
+  });
+});
