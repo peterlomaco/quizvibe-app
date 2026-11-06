@@ -117,6 +117,10 @@ function rowToPlayer(row: LobbyPlayerRow): LobbyPlayer {
     // guests även efter lobby-remount (där state-flaggan annars går förlorad
     // — addedByHost finns inte som DB-kolumn).
     addedByHost: row.type === 'guest' && row.user_id === null,
+    // Multiplayer v2: whether a real account/session owns the row. A re-match
+    // pre-seed is written by the host with user_id null until the player
+    // claims it — set_lobby_spotify would treat such a row as a guest.
+    accountLinked: row.user_id !== null,
   };
 }
 

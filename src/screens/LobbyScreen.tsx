@@ -200,6 +200,10 @@ export interface LobbyPlayer extends Player {
   // Per-kategori-HCP (migration 0050), Total = `hcp` ovan. Driver "+"-utfäll-
   // ningen på spelarkortet. undefined → kategori-sköld faller till 99.
   hcpMusic?: number;
+  // Multiplayer v2: lobby_players.user_id is set (the player's own device owns
+  // the row). False for host-written rows not claimed yet (re-match pre-seed,
+  // manual guests). Undefined on local-only rows.
+  accountLinked?: boolean;
   hcpFilm?: number;
   // Multiplayer v2 (migration 0063): 'own' = own phone, 'host' = plays on the
   // host's phone. Locked at join. Host is always 'own'; host-added guests are
@@ -3444,7 +3448,7 @@ export default function LobbyScreen() {
   };
   // Plans an enable: returns 'blocked' (alert shown), 'confirm' (removal
   // dialog opened) or 'ok' (nothing to remove — safe to enable directly).
-  const planSpotifyEnableV2 = (showAlerts: boolean): 'blocked' | 'confirm' | 'ok' => {
+  const planSpotifyEnableV2 = (showAlerts: boolean): 'blocked' | 'confirm' | 'ok' | 'waiting' => {
     const plan = planSpotifyEnable(toFlowParticipants(players), {
       hostIsRegistered: !isGuestHost,
       allAtOnceEntitled,
@@ -3457,6 +3461,13 @@ export default function LobbyScreen() {
       if (showAlerts) alertPlayersNeedSpotify(plan.blockingUnattested.length);
       return 'blocked';
     }
+    // A registered player's row that their device hasn't claimed yet (re-match
+    // pre-seed: user_id still null) looks like a guest to set_lobby_spotify,
+    // which would DELETE it. Wait until everyone has rejoined.
+    const unclaimed = plan.remaining.filter(
+      (id) => players.find((p) => p.id === id)?.accountLinked === false,
+    );
+    if (unclaimed.length > 0) return 'waiting';
     if (plan.toRemove.length > 0) {
       setSpotifyRemovalPrompt({
         ids: plan.toRemove,
@@ -3499,10 +3510,13 @@ export default function LobbyScreen() {
       void enableSpotifyV2();
       return;
     }
+    // Carried-over players haven't claimed their rows yet — keep Spotify as
+    // intended and retry when the roster changes (Start stays blocked).
+    if (outcome === 'waiting') return;
     // 'blocked' or 'confirm' → stay off until the host decides.
     setSpotifyEnabled(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hostMode, isV2Lobby, flowInitDone, spotifyEnabled, spotifyRemovalPrompt, spotifySyncTick, roomCode]);
+  }, [hostMode, isV2Lobby, flowInitDone, spotifyEnabled, spotifyRemovalPrompt, spotifySyncTick, roomCode, players]);
   const handleConfirmSpotifyRemoval = async () => {
     setSpotifyEnabling(true);
     const ok = await enableSpotifyV2();
@@ -3527,7 +3541,11 @@ export default function LobbyScreen() {
       // v2: only the REMAINING players (registered, own device) must have
       // attested (D-B); guests + host-device players are removed after the
       // host confirms. Anything else → straight to the server.
-      if (planSpotifyEnableV2(true) === 'ok') void enableSpotifyV2();
+      const outcome = planSpotifyEnableV2(true);
+      if (outcome === 'ok') void enableSpotifyV2();
+      else if (outcome === 'waiting') {
+        quizVibeAlert('Waiting for players', 'Wait until every player has rejoined the lobby, then turn on Spotify DJ.');
+      }
       return;
     }
     if (val) {
@@ -4708,6 +4726,77 @@ export default function LobbyScreen() {
       .then(({ error }) => {
         if (error) console.warn('[lobbyPlayers] eject delete failed:', error.message);
       });
+  };
+
+  // Multiplayer v2: host taps a flow box. The flow is still DERIVED — the tap
+  // only changes what the host controls (removing host-device players, or the
+  // 1 by 1 override), each behind a confirmation.
+  const handleSelectFlow = (mode: 'pass-the-phone' | 'individual-devices') => {
+    if (!hostMode || !isV2Lobby || mode === gameMode) return;
+    if (mode === ALL_AT_ONCE) {
+      if (!allAtOnceEntitled) {
+        quizVibeAlert('Premium feature', 'All at Once requires QuizVibe Premium. Go to Store?', [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Go to Store',
+            onPress: () =>
+              router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }),
+          },
+        ]);
+        return;
+      }
+      const hostDeviceIds = players
+        .filter((p) => !p.isHost && !p.hasLeft && p.deviceMode === 'host')
+        .map((p) => p.id);
+      if (hostDeviceIds.length === 0) {
+        setHostOverrideOneByOne(false);
+        return;
+      }
+      if (isRematchLobby) {
+        quizVibeAlert(
+          'Line-up locked',
+          'A re-match keeps the exact same players as the previous game, so players on your device cannot be removed.',
+        );
+        return;
+      }
+      quizVibeAlert(
+        'Switch to All at Once?',
+        'Only players selected to play with their own device will play. Players selected to play with host device will be removed.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Switch & remove',
+            style: 'destructive',
+            onPress: () => {
+              hostDeviceIds.forEach((id) => ejectPlayer(id));
+              setHostOverrideOneByOne(false);
+            },
+          },
+        ],
+      );
+      return;
+    }
+    // → 1 by 1
+    if (spotifyEnabled) {
+      quizVibeAlert('Spotify DJ is on', 'Spotify DJ is played All at Once. Turn off Spotify DJ to play 1 by 1.');
+      return;
+    }
+    const total = players.filter((p) => !p.hasLeft).length;
+    if (total > ONE_BY_ONE_MAX_PLAYERS) {
+      quizVibeAlert(
+        '1 by 1',
+        `1 by 1 limited to ${ONE_BY_ONE_MAX_PLAYERS} players, please remove players in the lobby to a maximum of ${ONE_BY_ONE_MAX_PLAYERS} players`,
+      );
+      return;
+    }
+    quizVibeAlert(
+      'Switch to 1 by 1?',
+      `Please be aware that 1 by 1 is limited to ${ONE_BY_ONE_MAX_PLAYERS} players and 4 rounds`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'OK', onPress: () => setHostOverrideOneByOne(true) },
+      ],
+    );
   };
 
   // Papperskorg-flow: bara host kan radera, bara på waiting-spelare.
@@ -6040,6 +6129,7 @@ export default function LobbyScreen() {
           // convergence trap as the alias) — keep a known local value if the
           // row hasn't got one yet.
           const nextDeviceMode = updated.deviceMode ?? p.deviceMode;
+          const nextAccountLinked = updated.accountLinked ?? p.accountLinked;
           // age/assistance/hcpComplete/hcpOverride: pullas hit ENBART när host:s
           // lokala värde saknas. En Competition-rematch pre-seedar de inbjudnas
           // rader med age/assistance = null (host känner inte deras profil), och
@@ -6061,6 +6151,7 @@ export default function LobbyScreen() {
             p.hcpMusic === nextHcpMusic &&
             p.hcpFilm === nextHcpFilm &&
             p.deviceMode === nextDeviceMode &&
+            p.accountLinked === nextAccountLinked &&
             p.age === nextAge &&
             p.assistance === nextAssistance &&
             !!p.hcpComplete === nextHcpComplete &&
@@ -6078,6 +6169,7 @@ export default function LobbyScreen() {
             hcpMusic: nextHcpMusic,
             hcpFilm: nextHcpFilm,
             deviceMode: nextDeviceMode,
+            accountLinked: nextAccountLinked,
             age: nextAge,
             assistance: nextAssistance,
             hcpComplete: nextHcpComplete,
@@ -8566,7 +8658,7 @@ export default function LobbyScreen() {
                   isV2Lobby
                     ? quizVibeAlert(
                         'Multiplayer mode',
-                        "The mode follows the players' devices.\n\nAll at Once: everyone plays on their own phone and answers at the same time. Max 4 players on Basic, 12 with Premium.\n\n1 by 1: players take turns, one question each. Used when someone plays on your phone (added with + Add Guest), or when you turn on 'Play 1 by 1'. Max 4 players.\n\nSpotify DJ is played All at Once.",
+                        "The mode follows the players' devices.\n\nAll at Once: everyone plays on their own phone and answers at the same time. Max 4 players on Basic, 12 with Premium.\n\n1 by 1: players take turns, one question each. Used when someone plays on your phone (added with + Add Guest), or when you tap 1 by 1. Max 4 players and 4 rounds.\n\nSpotify DJ is played All at Once.",
                       )
                     :
                   quizVibeAlert(
@@ -8597,9 +8689,9 @@ export default function LobbyScreen() {
             </View>
           ) : isV2Lobby ? (
             <>
-              {/* Multiplayer v2: the flow is DERIVED from devices — read-only
-                  boxes show the result; the host's only control is the
-                  "Play 1 by 1" override below. */}
+              {/* Multiplayer v2: the flow is DERIVED from devices. The boxes
+                  show the result and are tappable for the host only —
+                  confirmation popups in handleSelectFlow. */}
               <View style={[styles.modeRow, { marginTop: HEADING_TO_CONTROL - Spacing.sm }]}>
                 {([
                   [ONE_BY_ONE, '1 by 1'],
@@ -8607,9 +8699,12 @@ export default function LobbyScreen() {
                 ] as const).map(([mode, label]) => {
                   const active = gameMode === mode;
                   return (
-                    <View
+                    <TouchableOpacity
                       key={mode}
                       style={[styles.modeOption, active ? styles.modeOptionPassActive : styles.modeOptionInactive]}
+                      onPress={() => handleSelectFlow(mode)}
+                      disabled={!hostMode}
+                      activeOpacity={0.7}
                     >
                       <Text
                         style={[styles.modeLabel, { textAlign: 'center' }, { fontSize: FontSize.xs }, active && styles.modeLabelActiveFree]}
@@ -8625,45 +8720,12 @@ export default function LobbyScreen() {
                           <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>PREMIUM</Text>
                         </View>
                       )}
-                    </View>
+                    </TouchableOpacity>
                   );
                 })}
               </View>
               {flowReasonText(flow.reason) && (hostMode || flow.reason !== 'not-entitled') && (
                 <Text style={styles.guestHostNote}>{flowReasonText(flow.reason)}</Text>
-              )}
-              {hostMode && (flow.reason === 'default' || flow.reason === 'override') && (
-                <View
-                  style={[
-                    styles.mutualAssistanceRow,
-                    { borderColor: hostOverrideOneByOne ? Colors.success : Colors.borderStrong },
-                  ]}
-                >
-                  <Text style={styles.mutualAssistanceLabel}>Play 1 by 1</Text>
-                  <Pressable
-                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    onPress={() =>
-                      quizVibeAlert(
-                        'Play 1 by 1',
-                        'Off: everyone answers at the same time on their own phone (All at Once).\n\nOn: players take turns, one question each, while the others watch (1 by 1). Max 4 players and 4 rounds.',
-                      )
-                    }
-                    hitSlop={8}
-                    accessibilityLabel="Play 1 by 1 info"
-                  >
-                    <Text style={styles.infoIconText}>i</Text>
-                  </Pressable>
-                  <QuizVibeToggle
-                    variant="mixer"
-                    value={hostOverrideOneByOne}
-                    onValueChange={setHostOverrideOneByOne}
-                    disabled={!flow.overrideAvailable && !hostOverrideOneByOne}
-                    accessibilityLabel="Play 1 by 1"
-                  />
-                </View>
-              )}
-              {hostMode && (flow.reason === 'default' || flow.reason === 'override') && !flow.overrideAvailable && (
-                <Text style={styles.guestHostNote}>1 by 1 allows max {ONE_BY_ONE_MAX_PLAYERS} players.</Text>
               )}
             </>
           ) : (
