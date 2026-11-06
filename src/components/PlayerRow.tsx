@@ -48,6 +48,9 @@ interface PlayerRowProps {
   // konto som sitter bakom guest-namnet. Jämförs mot player.name här så
   // display-regeln bor på ETT ställe: matchar de är det inget alias.
   accountPlayerName?: string;
+  /** Multiplayer v2: where this player plays ("Own phone" / "Host's phone").
+   *  Undefined → nothing rendered (legacy rooms, host row). */
+  deviceLabel?: string;
   // Turn number 1..N. When set, a numbered badge is shown to indicate
   // play order in Pass-the-Phone mode. #1 = goes first.
   turnNumber?: number;
@@ -112,6 +115,7 @@ export function PlayerRow({
   expandedExtraBottom = 0,
   isGuest,
   accountPlayerName,
+  deviceLabel,
   turnNumber,
   showApproveToggle,
   approved,
@@ -254,6 +258,11 @@ export function PlayerRow({
                 QuizVibe: {accountPlayerName.trim()}
               </Text>
             )}
+          {!!deviceLabel && !hasLeft && (
+            <Text style={styles.accountAlias} numberOfLines={1}>
+              {deviceLabel}
+            </Text>
+          )}
           {/* Wifi-ikon direkt under playername — connection-health-indikator
               för Individual Devices. Färg: grön (ok/self), gul (slow), röd
               (unstable). hasLeft-spelare slipper indikator (de signaleras

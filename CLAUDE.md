@@ -2146,6 +2146,7 @@ Ersätter på sikt det manuella valet Pass-the-Phone/Individual devices.
 | 2 | `lobby_players.device_mode`. Skrivs BARA av spelarens egen targeted UPDATE (`publishOwnDeviceMode`), aldrig i host:s bulk-upsert. Host = `own`, "+ Add Guest" = `host` (härlett). v2-joiners defaultar `own`; legacy-rum skriver inget. Följer med vid re-match (`deviceMode`-param). | 0063 | `dcb3799` |
 | 3 | Server-regler: join-trigger, `set_lobby_spotify`, `start_lobby_game` + fryst `rooms.game_config`. Credit dras först efter accepterad start. Sen join säger "Game already started". | 0064, 0065 | `054bdf2` |
 | 4 | Hybrid 1 by 1-motorn (nedan) | 0066 | se git log |
+| 5 | Lobby-UI: flödet härleds ur devices, "Play 1 by 1"-override, Spotify via RPC (nedan) | — | se git log |
 
 **Steg 3, server-reglerna (0064/0065):**
 - Trigger `enforce_lobby_join_eligibility` nekar:
@@ -2195,6 +2196,18 @@ Ersätter på sikt det manuella valet Pass-the-Phone/Individual devices.
   update lobby_players set device_mode = null where …;
   update lobby_players set device_mode = 'host' where …;
   ```
+
+**Steg 5 — lobby-UI** ([LobbyScreen.tsx](src/screens/LobbyScreen.tsx), [gameFlow.ts](src/utils/gameFlow.ts) "Lobby UI"-sektionen):
+- **Rummets flagga är auktoritativ**: `roomIsMultiplayerV2` läses ur `getRoomMeta().multiplayerV2` (aldrig den cachade gaten). `null` = ej läst → Game Mode visar en neutral platshållare, debounce-skrivningen av `lobby_settings` väntar, och alla v2-vägar är av. `isV2Lobby` = v2-rum + standard-multiplayer (inte Single, H2H eller Guest Host). **Re-match ingår** — en carry-over-gameMode kringgår aldrig resolvern eller entitlement.
+- **`gameMode` är en resolver-output** på host: `resolveGameFlow(toFlowParticipants(players), hostOverrideOneByOne, spotifyEnabled, canUse('allAtOnce'))` → `setGameMode`. maxPlayers, rundclamp och sync till non-hosts följer som förut. Väntande (ej approvade) host-device-rader tvingar inte 1 by 1.
+- **Indikatorn**: två read-only-rutor **1 by 1 / All at Once** + förklarande rad (`flowReasonText`) + host-switchen **"Play 1 by 1"** (bara när inget tvingar flödet; disabled vid > 4 spelare). PREMIUM-badge + not-entitled-raden visas bara för host. Lägesrutorna under Number of Rounds döljs i v2.
+- **Overriden ägs av host och ändras ALDRIG av resolvern.** En manuell gäst tvingar 1 by 1 men värdet ligger kvar: när gästen lämnar gäller override PÅ → 1 by 1, AV → All at Once. Det ENDA som nollar den är att Spotify slås på. Seedas vid carry-over från ett 1 by 1-spel som inte var tvingat av host-device-spelare.
+- **"+ Add Guest"** finns i båda flödena (+ info-ikon). Kapaciteten räknas mot det RESULTERANDE flödet: max 4 totalt (väntande inräknade) även om All at Once-taket är 12 — samma regel som join-triggern. Blockeras när Spotify är på.
+- **Spotify i v2 går bara via `set_lobby_spotify`.** Debounce-upserten skickar `omitSpotify` så en gammal skrivning aldrig kan återställa värdet. En reconcile-effekt (`serverSpotifyRef`) synkar varje lokal ändring (toggle av, R2-auto-av, seed, carry-over) mot servern. Påslag: `planSpotifyEnable` → bara KVARVARANDE spelare måste ha attesterat (D-B); gäster + host-device-spelare listas i dialogen "Turn on Spotify DJ?" och tas bort först när host bekräftar. **Ett ovetat påslag (carry-over/seed) tar aldrig bort någon** — det återställs till av och host får samma dialog. Auto-påslag efter attest är avstängt i v2. Borttagna enheter får befintliga `removed`-popupen via self-heal-avvisningen.
+- **Start** använder flödet från tap-ögonblickets roster (inte `gameMode`-state som kan ligga en effekt efter), navigerar med serverns `config.gameMode`, och `clampRoundsForFlow` capar 1 by 1 till 4 rundor på BÅDE host och non-host. Start blockeras ("Updating lobby") tills flödes-init och Spotify-serversynken är klara.
+- Spelarkortet visar "Plays on own phone" / "Plays on host's phone". Profile döljer "Multiplayer Game Mode" (+ rund-snabbvalet) när gaten är på; roundsMax = Premium ? 20 : 4.
+- **Kvar till Steg 6 (måste lösas före Steg 8)**: Guest Host-lobbyn är fortfarande låst till PtP utan resolver; joiners kan inte välja device förrän join-steget finns.
+- Känd risk: servern avgör själv vilka som tas bort vid Spotify-påslag — en host-device-joiner som kommer in mellan dialogen och bekräftelsen tas bort utan att ha listats.
 
 **PROD:** migrationerna 0062–0066 körs efter Apple-godkännandet (se checklistan överst). Flaggan förblir false i PROD till Steg 8.
 

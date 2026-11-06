@@ -253,10 +253,20 @@ function normalizeCode(code: string): string {
  * host:s session får skriva — UI:t måste oavsett gate:a anropet på
  * hostMode för att undvika onödiga rejected writes.
  */
-export async function setLobbySettings(code: string, settings: LobbySettings): Promise<void> {
+export async function setLobbySettings(
+  code: string,
+  settings: LobbySettings,
+  opts?: {
+    /** Multiplayer v2 rooms: spotify_enabled is owned by set_lobby_spotify
+     *  (migration 0064). Omitting it keeps a stale debounced upsert from
+     *  restoring an old value after the RPC wrote a new one. */
+    omitSpotify?: boolean;
+  },
+): Promise<void> {
   if (!code) return;
   const normalized = normalizeCode(code);
-  const row = settingsToRow(normalized, settings);
+  const row: Record<string, unknown> = { ...settingsToRow(normalized, settings) };
+  if (opts?.omitSpotify) delete row.spotify_enabled;
   const { error } = await supabase
     .from('lobby_settings')
     .upsert(row, { onConflict: 'room_code' });

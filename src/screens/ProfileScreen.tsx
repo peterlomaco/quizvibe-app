@@ -129,6 +129,7 @@ import { DEFAULT_VOICE_ID, isValidVoiceId, SILENT_VOICE_ID, VOICE_OPTIONS } from
 import { playVoiceClip } from '../utils/voicePlayback';
 import { loadOwnHcpBundle, refreshOwnHcpDecay } from '../utils/hcpProgress';
 import { useWaitingInviteSignal } from '../hooks/useWaitingInviteSignal';
+import { getCachedFeatureGates } from '../utils/featureGates';
 import { JoinModal } from '../../app/index';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -413,8 +414,14 @@ export default function ProfileScreen() {
   // 20 rundor kräver Premium OCH Individual Devices — speglar Lobby-logiken
   // exakt. PtP är alltid max 4 oavsett subscription. (Single player hanteras
   // inte här alls — det är ett per-spel-val på Home och alltid max 4.)
+  // Multiplayer v2: the lobby derives the mode from devices, so the profile
+  // has no mode choice — the default is All at Once (20 rounds with Premium;
+  // a 1 by 1 game is clamped to 4 in the lobby / at Start).
+  const multiplayerV2Profile = getCachedFeatureGates().multiplayerV2;
   const roundsMax =
-    hasPremium && gameMode === 'individual-devices' ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+    hasPremium && (multiplayerV2Profile || gameMode === 'individual-devices')
+      ? ROUNDS_MAX_INDIV
+      : ROUNDS_MAX_PASS;
   // Ej premium → klampas alltid till Max 4. Effekten körs både när hasPremium
   // ändras (t.ex. sub löper ut) OCH när maxPlayers sätts till 12 från sparad
   // profil (race-safe: efffekten fyrar vid maxPlayers-ändringen → sätter 4 →
@@ -463,7 +470,7 @@ export default function ProfileScreen() {
     }, []),
   );
   const handleSelectMaxPlayers = (n: 4 | 12) => {
-    if (n === 12 && gameMode !== 'individual-devices') {
+    if (n === 12 && !multiplayerV2Profile && gameMode !== 'individual-devices') {
       Alert.alert(
         'Individual device required',
         'Please activate Individual device mode to be able to select Max 12 players.',
@@ -492,7 +499,7 @@ export default function ProfileScreen() {
   };
   const handleIncrementRounds = () => {
     if (roundsCount >= roundsMax) {
-      if (gameMode === 'pass-the-phone' || gameMode === 'remote-1v1') {
+      if (!multiplayerV2Profile && (gameMode === 'pass-the-phone' || gameMode === 'remote-1v1')) {
         Alert.alert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
       }
       return;
@@ -1271,7 +1278,8 @@ export default function ProfileScreen() {
   const handleSave = async (section: 'defaults' | 'host' | 'packages') => {
     // Spotify DJ kräver Individual Devices-läge — blockera om Spotify är på
     // men mode-valet inte är IndDev.
-    if (spotifyEnabled && gameMode !== 'individual-devices') {
+    // v2: no mode default exists — the lobby forces All at Once for Spotify.
+    if (spotifyEnabled && !multiplayerV2Profile && gameMode !== 'individual-devices') {
       Alert.alert(
         'Spotify requires Individual Devices',
         'Spotify DJ mode is only available in Individual Devices mode. Please change the Game Mode or turn off Spotify.',
@@ -1964,6 +1972,9 @@ export default function ProfileScreen() {
                 klammern under rutorna — Profile v2, 2026-10-16). Single player
                 och Remote (1vs1) är INTE host-defaults: de väljs per spel via
                 "Start New Game" på Home (2026-08-26). */}
+            {/* Multiplayer v2: no mode default — the lobby derives it. */}
+            {!multiplayerV2Profile && (
+            <>
             <View style={styles.regionLabelRow}>
               <Text style={styles.sectionLabel}>Multiplayer Game Mode</Text>
               <Pressable
@@ -1983,6 +1994,8 @@ export default function ProfileScreen() {
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true)}
             </View>
+            </>
+            )}
             {/* Players — max antal spelare (Max 4 gratis / Max 12 Premium). */}
             <View style={styles.playersLabelRow}>
               <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
@@ -2500,7 +2513,7 @@ export default function ProfileScreen() {
                   ],
                 )}
                 hasSubscription={hasPremium}
-                indivActive={gameMode === 'individual-devices'}
+                indivActive={multiplayerV2Profile || gameMode === 'individual-devices'}
                 brandV2
               />
             </View>
@@ -2511,12 +2524,14 @@ export default function ProfileScreen() {
 
           {/* Game mode quick-select — under RoundsRuler för snabb mode-byte.
               EN rad med två rutor, som huvud-Game Mode-sektionen. */}
+          {!multiplayerV2Profile && (
           <View style={[styles.field, { marginTop: -Spacing.sm }]}>
             <View style={styles.modeRow}>
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true)}
             </View>
           </View>
+          )}
 
           {/* Answer response time — 4-knapps-rad (samma som i Lobby). */}
           <View style={styles.field}>

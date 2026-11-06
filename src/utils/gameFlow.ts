@@ -395,3 +395,56 @@ export function hybridQuizParams(
   const ids = hybridOwnDeviceIds(config);
   return ids.length > 0 ? { hybridOneByOne: 'true', hybridOwnDeviceIds: JSON.stringify(ids) } : {};
 }
+
+// ─── Lobby UI (Step 5) ───────────────────────────────────────────────
+
+/** Minimal lobby-player shape the flow rules need (LobbyPlayer satisfies it). */
+export interface LobbyFlowPlayer {
+  id: string;
+  isHost?: boolean;
+  deviceMode?: DeviceMode;
+  type?: string;
+  approved?: boolean;
+  hasLeft?: boolean;
+  spotifyConnected?: boolean;
+}
+
+/** Maps lobby players to resolver participants. */
+export function toFlowParticipants(players: readonly LobbyFlowPlayer[]): FlowParticipant[] {
+  return players.map((p) => ({
+    id: p.id,
+    isHost: !!p.isHost,
+    deviceMode: p.deviceMode,
+    isRegistered: p.type === 'registered',
+    // The host counts as approved; waiting rows are not part of the game yet.
+    approved: !!p.isHost || !!p.approved,
+    hasLeft: !!p.hasLeft,
+    spotifyAttested: !!p.spotifyConnected,
+  }));
+}
+
+/** 1 by 1 keeps the existing Pass-the-Phone round cap (decision D-C). */
+export const ONE_BY_ONE_MAX_ROUNDS = 4;
+
+/**
+ * Round count a game actually starts with. Applied at Start on BOTH host and
+ * non-host from the frozen game mode, so a flip to 1 by 1 right before Start
+ * can't leave a 20-round 1 by 1 game while the lobby's clamp effect is pending.
+ */
+export function clampRoundsForFlow(rounds: number, gameMode: string): number {
+  return gameMode === ONE_BY_ONE ? Math.min(rounds, ONE_BY_ONE_MAX_ROUNDS) : rounds;
+}
+
+/** One-line explanation under the flow indicator (null = nothing to explain). */
+export function flowReasonText(reason: GameFlowReason): string | null {
+  switch (reason) {
+    case 'host-device-participant':
+      return 'Someone is playing on your phone, so the game is played 1 by 1.';
+    case 'spotify':
+      return 'Spotify DJ needs every player on their own phone, so the game is played All at Once.';
+    case 'not-entitled':
+      return 'All at Once requires QuizVibe Premium.';
+    default:
+      return null;
+  }
+}

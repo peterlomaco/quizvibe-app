@@ -79,13 +79,23 @@ import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { resolveDisplayHcp } from '../utils/hcpEngine';
 import { loadOwnHcpBundle } from '../utils/hcpProgress';
 import { addLeftPlayer, clearLeftPlayers, getLeftPlayers, removeLeftPlayer } from '../utils/leftPlayers';
-import { deactivateRoom, getRoomMeta, markRoomGameStarted, registerActiveRoom, startLobbyGame, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
+import { deactivateRoom, getRoomMeta, markRoomGameStarted, registerActiveRoom, setLobbySpotify, startLobbyGame, roomExists, setRoomMaxPlayers, setRoomPlayerCount } from '../utils/mockActiveRooms';
 import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import {
+  ALL_AT_ONCE,
+  ONE_BY_ONE,
+  ONE_BY_ONE_MAX_PLAYERS,
+  canAddManualGuest,
+  clampRoundsForFlow,
+  flowReasonText,
   hybridOwnDeviceIds,
   hybridQuizParams,
   joinRejectionMessage,
+  planSpotifyEnable,
+  resolveGameFlow,
+  roomCapacity,
+  toFlowParticipants,
   resolveJoinDeviceMode,
   startRejectionMessage,
   type DeviceMode,
@@ -1360,6 +1370,38 @@ export default function LobbyScreen() {
       cancelled = true;
     };
   }, [rematchLocked, roomCode]);
+  // Multiplayer v2 (Step 5): the ROOM's persisted rooms.multiplayer_v2 decides
+  // which lobby UI renders — never the device's cached gate (a room can be
+  // registered without the column via the 0062 fallback). null = not read yet:
+  // the Game Mode section shows a neutral placeholder and every v2 path stays
+  // inactive, so a legacy room never flashes v2 UI (and vice versa).
+  const [roomIsMultiplayerV2, setRoomIsMultiplayerV2] = useState<boolean | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let attempts = 0;
+    setRoomIsMultiplayerV2(null);
+    const read = () => {
+      attempts += 1;
+      getRoomMeta(roomCode)
+        .then((meta) => {
+          if (cancelled) return;
+          if (meta) setRoomIsMultiplayerV2(meta.multiplayerV2 ?? false);
+          else if (attempts < 5) timer = setTimeout(read, 2000);
+          else setRoomIsMultiplayerV2(false);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          if (attempts < 5) timer = setTimeout(read, 2000);
+          else setRoomIsMultiplayerV2(false);
+        });
+    };
+    read();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [roomCode]);
   // Competition re-match från Home (/competitions): en låst re-match där de
   // inbjudna deltagarna joinar cross-device via inbjudan. Lägger till en
   // 5-minuters expiry + en "väntar på spelare"-banner ovanpå den vanliga
@@ -1458,6 +1500,13 @@ export default function LobbyScreen() {
   // källor och spelade "helt slumpmässigt" media trots att bara YT Music
   // var valt. Ref:en är den synkrona sanningen vid tap; state:n driver UI.
   const [lobbySeeded, setLobbySeeded] = useState(false);
+  // Multiplayer v2 (Step 5): what the registered-host seed asked for, applied
+  // once the room is confirmed v2 (the seed runs before the room flag is read).
+  //   carriedGameModeRef — stored (carry-over) gameMode; drives the override seed.
+  //   requestedRoundsRef — rounds before the flow clamp, re-clamped to the
+  //                        resolved flow (fresh v2 lobbies default to All at Once).
+  const carriedGameModeRef = useRef<GameMode | undefined>(undefined);
+  const requestedRoundsRef = useRef<number | null>(null);
   // Guard mot dubbel-navigation till /quiz när game_started detekteras.
   // Polling-effekten fyrar både via Realtime-tick OCH 2s-interval — utan
   // denna ref skulle vi anropa router.push flera gånger innan unmount.
@@ -1697,6 +1746,8 @@ export default function LobbyScreen() {
           const savedRounds = seedSinglePlayer
             ? stored?.roundsCount ?? ROUNDS_DEFAULT
             : stored?.roundsCount ?? profile?.roundsDefault ?? ROUNDS_DEFAULT;
+          carriedGameModeRef.current = stored?.gameMode;
+          requestedRoundsRef.current = savedRounds;
           const isIndivPremium =
             premium &&
             ((seedGameMode === 'individual-devices' && !seedSinglePlayer) ||
@@ -2822,7 +2873,86 @@ export default function LobbyScreen() {
   const [spotifyGuideVisible, setSpotifyGuideVisible] = useState(false);
   // Spotify DJ kräver Individual Devices — DJ lämnar appen till Spotify-appen.
   // PtP/Single Player stöds inte (en delad enhet kan inte lämna + återvända).
-  const isSpotifyAvailable = gameMode === 'individual-devices' && !singlePlayerDefault;
+  // ── Multiplayer v2 (Step 5): device-derived flow ──────────────────────
+  // isV2Lobby: the room is persisted as v2 AND this is a standard multiplayer
+  // lobby. Single, H2H and Guest Host lobbies keep today's behaviour (Guest
+  // Host moves to the resolver in Step 6). Re-match lobbies ARE included: a
+  // carried gameMode must never bypass the device/entitlement rules.
+  const isV2Lobby =
+    roomIsMultiplayerV2 === true &&
+    !isSingleLobby &&
+    gameMode !== 'remote-1v1' &&
+    !is1v1Lobby &&
+    !isGuestHost &&
+    !isGuestHostedLobby;
+  // Host's own "Play 1 by 1" choice. NEVER changed by the resolver forcing
+  // 1 by 1 (a manual guest) — it is kept and applies again once the forcing
+  // player leaves. Only enabling Spotify clears it.
+  const [hostOverrideOneByOne, setHostOverrideOneByOne] = useState(false);
+  const allAtOnceEntitled = canUse(
+    'allAtOnce',
+    { isPremium: hasPremium, isGuestHost },
+    getCachedFeatureGates(),
+  );
+  const flow = useMemo(
+    () =>
+      resolveGameFlow({
+        participants: toFlowParticipants(players),
+        hostOverrideOneByOne,
+        spotifyEnabled,
+        allAtOnceEntitled,
+      }),
+    [players, hostOverrideOneByOne, spotifyEnabled, allAtOnceEntitled],
+  );
+  // One-time v2 init (host): runs once the seed is done AND the room is known
+  // to be v2. Seeds the override from a carried 1 by 1 game (re-match/Play
+  // Again) — but only when no host-device player forced it, otherwise 1 by 1
+  // was not the host's choice. Then re-clamps the requested rounds to the
+  // resolved flow (the seed clamped against the profile's legacy mode).
+  const [flowInitDone, setFlowInitDone] = useState(false);
+  const flowInitRef = useRef(false);
+  useEffect(() => {
+    if (!hostMode || !isV2Lobby || !lobbySeeded || flowInitRef.current) return;
+    flowInitRef.current = true;
+    const forcedByHostDevice = players.some(
+      (p) => !p.isHost && !p.hasLeft && p.deviceMode === 'host',
+    );
+    const seedOverride = carriedGameModeRef.current === ONE_BY_ONE && !forcedByHostDevice;
+    setHostOverrideOneByOne(seedOverride);
+    const initialFlow = resolveGameFlow({
+      participants: toFlowParticipants(players),
+      hostOverrideOneByOne: seedOverride,
+      spotifyEnabled,
+      allAtOnceEntitled,
+    });
+    setGameMode(initialFlow.gameMode);
+    const requested = requestedRoundsRef.current;
+    if (requested !== null) {
+      const cap = initialFlow.gameMode === ALL_AT_ONCE && hasPremium ? ROUNDS_MAX_INDIV : ROUNDS_MAX_PASS;
+      setRoundsCount(Math.max(ROUNDS_MIN, Math.min(cap, requested)));
+    }
+    setFlowInitDone(true);
+  }, [hostMode, isV2Lobby, lobbySeeded, players, spotifyEnabled, allAtOnceEntitled, hasPremium]);
+  // Resolver → gameMode (host). maxPlayers, rounds clamp and the debounced
+  // lobby_settings sync to non-hosts all follow from gameMode as today.
+  useEffect(() => {
+    if (!hostMode || !isV2Lobby || !flowInitDone) return;
+    if (flow.gameMode !== gameMode) setGameMode(flow.gameMode);
+  }, [hostMode, isV2Lobby, flowInitDone, flow.gameMode, gameMode]);
+  // Spotify requires All at Once → it is the ONLY thing that clears the
+  // host's override (covers carry-over seeds and the toggle alike).
+  useEffect(() => {
+    if (!hostMode || !isV2Lobby || !spotifyEnabled) return;
+    setHostOverrideOneByOne(false);
+  }, [hostMode, isV2Lobby, spotifyEnabled]);
+  // Spotify DJ kräver Individual Devices — DJ lämnar appen till Spotify-appen.
+  // PtP/Single Player stöds inte (en delad enhet kan inte lämna + återvända).
+  // v2: enabling Spotify itself forces All at Once (removing host-device
+  // players after confirmation), so it is available in any multiplayer flow
+  // as long as All at Once is entitled.
+  const isSpotifyAvailable = isV2Lobby
+    ? !singlePlayerDefault && allAtOnceEntitled
+    : gameMode === 'individual-devices' && !singlePlayerDefault;
   // Kollapsbara Lobby-sektioner (samma +/− mönster som Profile-vyn). Default expanderade.
   // Alla (host OCH non-host) kommer in med Game Settings + Quiz Tuning REDAN
   // hopfällda (folded) och Players in Lobby utfälld.
@@ -2966,7 +3096,8 @@ export default function LobbyScreen() {
     setYoutubeEnabledCategories(value ? ['Music', 'Film'] : []);
     setImagesEnabledCategories(value ? ['Music', 'Film'] : []);
     // Slå även på Spotify om host har kopplat konto + IndDev är aktivt.
-    if (value && isSpotifyAvailable && spotifyConnected) {
+    // v2: never auto-enable — it may require removing players (host must confirm).
+    if (value && isSpotifyAvailable && spotifyConnected && !isV2Lobby) {
       setSpotifyEnabled(true);
     }
   };
@@ -3138,7 +3269,9 @@ export default function LobbyScreen() {
     // raden dök upp, och toggeln följde med som "på" in i IndDev innan någon
     // medspelare bekräftat Spotify. Host slår själv på DJ-toggeln när alla
     // approved spelare har bekräftat (handleToggleSpotifyEnabled kör guarden).
-    if (hostMode && isSpotifyAvailable) {
+    // v2: no auto-enable after attesting — the host turns Spotify on via the
+    // toggle so any removal goes through the confirmation dialog.
+    if (hostMode && isSpotifyAvailable && !isV2Lobby) {
       const someNonHostMissingSpotify = players.some(
         (p) => !p.isHost && !p.hasLeft && p.approved && !p.spotifyConnected,
       );
@@ -3265,6 +3398,119 @@ export default function LobbyScreen() {
    * Togglar Spotify DJ-läget. Om aktivering utan self-attest:
    * erbjud att bekräfta direkt.
    */
+  // ── Multiplayer v2 (Step 5): Spotify goes through set_lobby_spotify ────
+  // In a v2 room the server row is written ONLY by the RPC (the debounced
+  // settings upsert omits spotify_enabled), so a stale in-flight upsert can
+  // never restore an old value, and the join trigger sees the flag at once.
+  //   serverSpotifyRef — last value the server confirmed (null = unknown).
+  //   spotifyRemovalPrompt — host confirmation before anyone is removed.
+  const serverSpotifyRef = useRef<boolean | null>(null);
+  const spotifySyncInFlightRef = useRef(false);
+  const [spotifySyncTick, setSpotifySyncTick] = useState(0);
+  const [spotifyRemovalPrompt, setSpotifyRemovalPrompt] = useState<
+    { ids: string[]; names: string[] } | null
+  >(null);
+  const [spotifyEnabling, setSpotifyEnabling] = useState(false);
+  const alertPlayersNeedSpotify = (count: number) =>
+    quizVibeAlert(
+      'Players need Spotify',
+      `${count} approved player${count > 1 ? 's have' : ' has'} not confirmed the Spotify app. Everyone must confirm Spotify (in their settings row) before you can enable Spotify DJ mode.`,
+    );
+  // Server-confirmed enable. The server removes guests + host-device players
+  // in the same transaction; we drop them locally and mark them ejected. A
+  // removed device's self-heal is rejected ('removed') → existing popup.
+  const enableSpotifyV2 = async (): Promise<boolean> => {
+    spotifySyncInFlightRef.current = true;
+    try {
+      const res = await setLobbySpotify(roomCode, true);
+      if (!res.ok) {
+        setSpotifyEnabled(false);
+        if (res.reason === 'unattested') alertPlayersNeedSpotify(res.unattested?.length || 1);
+        else quizVibeAlert('Could not enable Spotify', 'Check your connection and try again.');
+        return false;
+      }
+      serverSpotifyRef.current = true;
+      if (res.removed.length > 0) {
+        res.removed.forEach((id) => markEjected(roomCode, id));
+        setPlayers((prev) => prev.filter((p) => !res.removed.includes(p.id)));
+      }
+      setHostOverrideOneByOne(false);
+      setSpotifyEnabled(true);
+      return true;
+    } finally {
+      spotifySyncInFlightRef.current = false;
+      setSpotifySyncTick((t) => t + 1);
+    }
+  };
+  // Plans an enable: returns 'blocked' (alert shown), 'confirm' (removal
+  // dialog opened) or 'ok' (nothing to remove — safe to enable directly).
+  const planSpotifyEnableV2 = (showAlerts: boolean): 'blocked' | 'confirm' | 'ok' => {
+    const plan = planSpotifyEnable(toFlowParticipants(players), {
+      hostIsRegistered: !isGuestHost,
+      allAtOnceEntitled,
+    });
+    if (plan.hostIneligible) {
+      if (showAlerts) quizVibeAlert('Premium feature', 'Spotify DJ requires All at Once, which requires QuizVibe Premium.');
+      return 'blocked';
+    }
+    if (plan.blockingUnattested.length > 0) {
+      if (showAlerts) alertPlayersNeedSpotify(plan.blockingUnattested.length);
+      return 'blocked';
+    }
+    if (plan.toRemove.length > 0) {
+      setSpotifyRemovalPrompt({
+        ids: plan.toRemove,
+        names: plan.toRemove.map((id) => players.find((p) => p.id === id)?.name ?? 'Player'),
+      });
+      return 'confirm';
+    }
+    return 'ok';
+  };
+  // Reconciles local spotifyEnabled with the server (v2 host). Covers every
+  // local path: toggle off, R2 auto-disable, carry-over seeds and auto-enable
+  // after attesting. An UN-VETTED enable (seed/carry-over/auto) never removes
+  // anyone: it is reverted and, if players would have to go, the host gets
+  // the removal dialog (final clarification 1).
+  useEffect(() => {
+    if (!hostMode || !isV2Lobby || !flowInitDone) return;
+    if (spotifySyncInFlightRef.current || spotifyRemovalPrompt) return;
+    if (serverSpotifyRef.current === spotifyEnabled) return;
+    if (!spotifyEnabled) {
+      spotifySyncInFlightRef.current = true;
+      setLobbySpotify(roomCode, false)
+        .then((res) => {
+          spotifySyncInFlightRef.current = false;
+          if (res.ok) {
+            serverSpotifyRef.current = false;
+            setSpotifySyncTick((t) => t + 1);
+          } else {
+            // Retry later (no tight loop on a network failure).
+            setTimeout(() => setSpotifySyncTick((t) => t + 1), 3000);
+          }
+        })
+        .catch(() => {
+          spotifySyncInFlightRef.current = false;
+          setTimeout(() => setSpotifySyncTick((t) => t + 1), 3000);
+        });
+      return;
+    }
+    const outcome = planSpotifyEnableV2(true);
+    if (outcome === 'ok') {
+      void enableSpotifyV2();
+      return;
+    }
+    // 'blocked' or 'confirm' → stay off until the host decides.
+    setSpotifyEnabled(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hostMode, isV2Lobby, flowInitDone, spotifyEnabled, spotifyRemovalPrompt, spotifySyncTick, roomCode]);
+  const handleConfirmSpotifyRemoval = async () => {
+    setSpotifyEnabling(true);
+    const ok = await enableSpotifyV2();
+    setSpotifyEnabling(false);
+    setSpotifyRemovalPrompt(null);
+    void ok;
+  };
+
   const handleToggleSpotifyEnabled = (val: boolean) => {
     if (val && !spotifyConnected) {
       quizVibeAlert(
@@ -3275,6 +3521,13 @@ export default function LobbyScreen() {
           { text: 'I have Spotify', onPress: () => { void handleSpotifyAttestToggle(true); } },
         ],
       );
+      return;
+    }
+    if (val && isV2Lobby) {
+      // v2: only the REMAINING players (registered, own device) must have
+      // attested (D-B); guests + host-device players are removed after the
+      // host confirms. Anything else → straight to the server.
+      if (planSpotifyEnableV2(true) === 'ok') void enableSpotifyV2();
       return;
     }
     if (val) {
@@ -3911,6 +4164,11 @@ export default function LobbyScreen() {
   // kvar i lobby_players med has_left=true (för audit/debug) men render-
   // pathen exkluderar dem. handleStartGame:s turnOrder-bygge filtrerar
   // redan oberoende så ingen risk att hasLeft hamnar i turn-order.
+  // Multiplayer v2: each non-host's device under the name (host row: none).
+  const deviceLabelFor = (p: LobbyPlayer): string | undefined => {
+    if (!isV2Lobby || p.isHost || !p.deviceMode) return undefined;
+    return p.deviceMode === 'host' ? "Plays on host's phone" : 'Plays on own phone';
+  };
   const isPlayerApproved = (p: LobbyPlayer) => !!p.approved || !!p.isHost;
   const approvedPlayers = players.filter((p) => isPlayerApproved(p) && !p.hasLeft);
   // Någon motståndare (approved ELLER väntande) redan i lobbyn — H2H:s enda
@@ -4289,6 +4547,26 @@ export default function LobbyScreen() {
       );
       return;
     }
+    // Multiplayer v2: a manual guest is allowed in either flow — it forces
+    // 1 by 1, so capacity is checked against the RESULTING flow (max 4 total,
+    // waiting rows included), never the current All at Once cap of 12. Same
+    // rule as the 0064 join trigger for host-device rows.
+    if (isV2Lobby) {
+      if (spotifyEnabled) {
+        quizVibeAlert(
+          'Spotify DJ is on',
+          "Guests can't play on your phone in a Spotify game. Turn Spotify DJ off first, or ask them to join with their own phone.",
+        );
+        return;
+      }
+      const activeTotal = players.filter((p) => !p.hasLeft).length;
+      if (!canAddManualGuest(activeTotal, roomCapacity(flow.gameMode, hasPremium))) {
+        quizVibeAlert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
+        return;
+      }
+      setAddModalVisible(true);
+      return;
+    }
     // Individual device + Remote 1v1 kräver egen enhet — host kan inte lägga
     // till guests manuellt. De måste joina med egen enhet via room code.
     if ((gameMode === 'individual-devices' || gameMode === 'remote-1v1') && !singlePlayerDefault) {
@@ -4310,6 +4588,14 @@ export default function LobbyScreen() {
   // 'full' här också så värdet aldrig kan bli något annat även om en väljare
   // återinförs i modalen. onAdd:s tredje arg (assistance) tas därför inte emot.
   const handleAddPlayer = (name: string, age: number) => {
+    if (
+      isV2Lobby &&
+      (spotifyEnabled ||
+        !canAddManualGuest(players.filter((p) => !p.hasLeft).length, roomCapacity(flow.gameMode, hasPremium)))
+    ) {
+      quizVibeAlert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
+      return;
+    }
     if (isLobbyAtCapacity()) {
       quizVibeAlert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
       return;
@@ -5450,6 +5736,9 @@ export default function LobbyScreen() {
     // INNAN Promise.all resolvar — skapar en "stored"-post med spotifyEnabled=false
     // som sedan vinner mot profil-defaults i seed-effektens if (!stored)-gren.
     if (!hostMode || !lobbySeededRef.current) return;
+    // Wait until we know whether the room is v2 — otherwise the first write
+    // could carry spotify_enabled into a room where only the RPC may set it.
+    if (roomIsMultiplayerV2 === null) return;
     const handle = setTimeout(() => {
       setLobbySettings(roomCode, {
         gameMode,
@@ -5474,7 +5763,7 @@ export default function LobbyScreen() {
         parentControlEnabled,
         remoteAssistance,
         mutualAssistanceEnabled,
-      }).catch(() => { /* loggas i mockLobbySettings */ });
+      }, { omitSpotify: isV2Lobby }).catch(() => { /* loggas i mockLobbySettings */ });
     }, 300);
     return () => clearTimeout(handle);
   }, [
@@ -5499,6 +5788,8 @@ export default function LobbyScreen() {
     parentControlEnabled,
     remoteAssistance,
     mutualAssistanceEnabled,
+    roomIsMultiplayerV2,
+    isV2Lobby,
   ]);
 
   // Realtime-tick: bumpas av lobby_players + lobby_settings-channel-
@@ -5965,7 +6256,11 @@ export default function LobbyScreen() {
           settingsStored?.answerResponseSeconds ?? answerResponseSeconds;
         const effectiveEraFrom = settingsStored?.eraFrom ?? eraValues[0];
         const effectiveEraTo = settingsStored?.eraTo ?? eraValues[1];
-        const effectiveRoundsCount = settingsStored?.roundsCount ?? roundsCount;
+        const storedRoundsCount = settingsStored?.roundsCount ?? roundsCount;
+        // v2: same clamp as the host applies from the frozen mode.
+        const effectiveRoundsCount = frozenConfig
+          ? clampRoundsForFlow(storedRoundsCount, frozenConfig.gameMode)
+          : storedRoundsCount;
         // Per-source categories — KRITISKT att non-host får samma värden
         // som host så båda enheter bygger identisk gameQuestions-pool.
         const effectiveYtCats =
@@ -6562,6 +6857,16 @@ export default function LobbyScreen() {
     // (or charge for) the same game twice. In-flight double taps are already
     // blocked by startAction.run; this covers a later tap after success.
     if (hostMode && hostGameStartedRef.current) return;
+    // Multiplayer v2: don't start while the flow init or a Spotify server
+    // write is still settling — the server must agree on spotify_enabled.
+    if (
+      hostMode &&
+      isV2Lobby &&
+      (!flowInitDone || spotifySyncInFlightRef.current || serverSpotifyRef.current !== spotifyEnabled || spotifyRemovalPrompt)
+    ) {
+      quizVibeAlert('Updating lobby', 'The lobby is still updating. Try again in a moment.');
+      return;
+    }
     // Join-limbo-guard (Peter 2026-11-03): en inbjuden/friend som just kommit
     // in är dold i båda sektionerna under grace-fönstret tills auto-approven
     // landat. Startade host i det fönstret byggdes turnOrder utan spelaren,
@@ -6824,7 +7129,10 @@ export default function LobbyScreen() {
     // health. Pass-the-Phone delar device → ingen peer-health-koncept
     // där, gateas bort. Host:s egen status är aldrig 'unstable' i
     // map:en (self exkluderas från useLobbyPeerHealth-returvärdet).
-    if (gameMode === 'individual-devices') {
+    // v2: judge the flow from this render's roster (the resolver effect may
+    // still be pending right after a lobby change) — same value as Start uses.
+    const guardMode = isV2Lobby ? flow.gameMode : gameMode;
+    if (guardMode === 'individual-devices') {
       // IndDev: host-tillagda guests saknar egen enhet och kan inte spela.
       // Självanslutna guests är OK (egen enhet, policy 2026-08-06). Defensiv
       // guard ifall en host-tillagd guest överlevt mode-bytet.
@@ -7107,8 +7415,12 @@ export default function LobbyScreen() {
     if (gameMode !== 'remote-1v1' && !singlePlayerDefault) {
       const metaForStart = await withTimeout(getRoomMeta(roomCode), SYNC_TIMEOUT_MS, undefined, 'getRoomMeta(start)');
       if (metaForStart?.multiplayerV2) {
+        // Resolve from THIS render's roster, not the gameMode state: a lobby
+        // change right before the tap may not have run the resolver effect
+        // yet. Legacy-path v2 lobbies (Guest Host) keep their state value.
+        const startMode = isV2Lobby ? flow.gameMode : gameMode;
         const result = await startLobbyGame(roomCode, {
-          gameMode,
+          gameMode: startMode as 'pass-the-phone' | 'individual-devices',
           participantIds: turnOrder.map((p) => p.id),
           spotifyEnabled,
           allAtOnceAllowed: canUse(
@@ -7200,7 +7512,8 @@ export default function LobbyScreen() {
         age: isGuestHost && guestBirthYear
           ? String(CURRENT_YEAR - parseInt(guestBirthYear, 10))
           : '32',
-        gameMode,
+        // v2: the server-approved frozen mode — never local state.
+        gameMode: startConfig?.gameMode ?? gameMode,
         // Multiplayer v2 Step 4: hybrid 1 by 1 engine params (empty unless
         // the frozen config has own-device participants in 1 by 1).
         ...hybridQuizParams(startConfig),
@@ -7245,7 +7558,11 @@ export default function LobbyScreen() {
             : turnOrder,
         ),
         ...(remoteMatchId ? { remoteMatchId } : {}),
-        roundsCount: String(roundsCount),
+        // v2: 1 by 1 is capped at 4 rounds even if the lobby's clamp effect
+        // hasn't run yet (same clamp on non-hosts from the frozen mode).
+        roundsCount: String(
+          startConfig ? clampRoundsForFlow(roundsCount, startConfig.gameMode) : roundsCount,
+        ),
         // Tidsgränsen per fråga från host:s profil (default 30 sek). Quiz
         // använder den för timer-bar:en + reveal-trigger.
         answerResponseSeconds: String(answerResponseSeconds),
@@ -7779,10 +8096,32 @@ export default function LobbyScreen() {
                   </View>
                 );
               })()}
-            {hostMode && gameMode === 'pass-the-phone' && !isRematchLobby && !isSingleLobby && (
+            {hostMode && gameMode === 'pass-the-phone' && !isRematchLobby && !isSingleLobby && !isV2Lobby && (
               <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
                 <Text style={styles.addBtnText}>+ Add Guest</Text>
               </TouchableOpacity>
+            )}
+            {/* Multiplayer v2: available in either flow — a manually added
+                guest plays on the host's phone and forces 1 by 1. */}
+            {hostMode && isV2Lobby && !isRematchLobby && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Pressable
+                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                  onPress={() =>
+                    quizVibeAlert(
+                      'Add Guest',
+                      `Guests added here play on your phone. The game is then played 1 by 1 (max ${ONE_BY_ONE_MAX_PLAYERS} players, 4 rounds).\n\nPlayers with their own phone can join with the room code instead.`,
+                    )
+                  }
+                  hitSlop={8}
+                  accessibilityLabel="Add Guest info"
+                >
+                  <Text style={styles.infoIconText}>i</Text>
+                </Pressable>
+                <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
+                  <Text style={styles.addBtnText}>+ Add Guest</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
           )}
@@ -7822,6 +8161,7 @@ export default function LobbyScreen() {
                 hcpNotDefined={player.type === 'guest'}
                 hideDetails={isGuestHost}
                 accountPlayerName={player.accountPlayerName}
+                deviceLabel={deviceLabelFor(player)}
                 turnNumber={
                   // Turnummer bara i PtP-MULTIPLAYER. Single kör PtP under
                   // huven, så gameMode-checken ensam räcker inte — en "1" på
@@ -7889,6 +8229,7 @@ export default function LobbyScreen() {
                     hcpNotDefined={player.type === 'guest'}
                     hideDetails={isGuestHost}
                     accountPlayerName={player.accountPlayerName}
+                    deviceLabel={deviceLabelFor(player)}
                     showApproveToggle={hostMode && !isRematchLobby && !player.hasLeft}
                     approved={false}
                     onApproveChange={(next) => handleSetApproved(player.id, next)}
@@ -8104,7 +8445,10 @@ export default function LobbyScreen() {
               </Text>
             )}
           </View>
-        ) : isRematchLobby ? (
+        ) : isRematchLobby && roomIsMultiplayerV2 === false ? (
+          /* Legacy re-match: static locked indicator. A v2 re-match (and one
+             whose room flag is still loading) falls through to the standard
+             branch below — the resolver + entitlement apply there too. */
           /* Re-match/Replay-lobby (Peter 2026-08-25): spelaruppsättningen är
              låst till exakt spelarna från förra spelet, så aggregatet förblir
              en rättvis serie. Därför INGA Game Mode-val och ingen
@@ -8219,6 +8563,12 @@ export default function LobbyScreen() {
                 <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                 onPress={() =>
+                  isV2Lobby
+                    ? quizVibeAlert(
+                        'Multiplayer mode',
+                        "The mode follows the players' devices.\n\nAll at Once: everyone plays on their own phone and answers at the same time. Max 4 players on Basic, 12 with Premium.\n\n1 by 1: players take turns, one question each. Used when someone plays on your phone (added with + Add Guest), or when you turn on 'Play 1 by 1'. Max 4 players.\n\nSpotify DJ is played All at Once.",
+                      )
+                    :
                   quizVibeAlert(
                     'Multiplayer mode',
                     'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or H2H? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Head-to-head".',
@@ -8237,6 +8587,87 @@ export default function LobbyScreen() {
               sedan 2026-08-26. ⚠ Flex-talen på bracket-raden MÅSTE spegla
               antalet rutor ovanför; det är just den kopplingen som gick
               sönder när Remote-rutan lades till/togs bort. */}
+          {roomIsMultiplayerV2 === null ? (
+            /* Room flag not read yet — neutral placeholder so a legacy room
+               never flashes v2 UI and a v2 room never flashes the old boxes. */
+            <View style={[styles.modeRow, { marginTop: HEADING_TO_CONTROL - Spacing.sm }]}>
+              <View style={[styles.modeOption, styles.modeOptionInactive]}>
+                <ActivityIndicator size="small" color={Colors.textSecondary} />
+              </View>
+            </View>
+          ) : isV2Lobby ? (
+            <>
+              {/* Multiplayer v2: the flow is DERIVED from devices — read-only
+                  boxes show the result; the host's only control is the
+                  "Play 1 by 1" override below. */}
+              <View style={[styles.modeRow, { marginTop: HEADING_TO_CONTROL - Spacing.sm }]}>
+                {([
+                  [ONE_BY_ONE, '1 by 1'],
+                  [ALL_AT_ONCE, 'All at Once'],
+                ] as const).map(([mode, label]) => {
+                  const active = gameMode === mode;
+                  return (
+                    <View
+                      key={mode}
+                      style={[styles.modeOption, active ? styles.modeOptionPassActive : styles.modeOptionInactive]}
+                    >
+                      <Text
+                        style={[styles.modeLabel, { textAlign: 'center' }, { fontSize: FontSize.xs }, active && styles.modeLabelActiveFree]}
+                        numberOfLines={1}
+                      >
+                        {label}
+                      </Text>
+                      {active && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
+                      {/* Host-only: entitlement is the HOST's, a non-host's
+                          own premium status says nothing about this lobby. */}
+                      {mode === ALL_AT_ONCE && hostMode && !allAtOnceEntitled && (
+                        <View style={[styles.premiumBadge, styles.premiumBadgeGrey]} pointerEvents="none">
+                          <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>PREMIUM</Text>
+                        </View>
+                      )}
+                    </View>
+                  );
+                })}
+              </View>
+              {flowReasonText(flow.reason) && (hostMode || flow.reason !== 'not-entitled') && (
+                <Text style={styles.guestHostNote}>{flowReasonText(flow.reason)}</Text>
+              )}
+              {hostMode && (flow.reason === 'default' || flow.reason === 'override') && (
+                <View
+                  style={[
+                    styles.mutualAssistanceRow,
+                    { borderColor: hostOverrideOneByOne ? Colors.success : Colors.borderStrong },
+                  ]}
+                >
+                  <Text style={styles.mutualAssistanceLabel}>Play 1 by 1</Text>
+                  <Pressable
+                    style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
+                    onPress={() =>
+                      quizVibeAlert(
+                        'Play 1 by 1',
+                        'Off: everyone answers at the same time on their own phone (All at Once).\n\nOn: players take turns, one question each, while the others watch (1 by 1). Max 4 players and 4 rounds.',
+                      )
+                    }
+                    hitSlop={8}
+                    accessibilityLabel="Play 1 by 1 info"
+                  >
+                    <Text style={styles.infoIconText}>i</Text>
+                  </Pressable>
+                  <QuizVibeToggle
+                    variant="mixer"
+                    value={hostOverrideOneByOne}
+                    onValueChange={setHostOverrideOneByOne}
+                    disabled={!flow.overrideAvailable && !hostOverrideOneByOne}
+                    accessibilityLabel="Play 1 by 1"
+                  />
+                </View>
+              )}
+              {hostMode && (flow.reason === 'default' || flow.reason === 'override') && !flow.overrideAvailable && (
+                <Text style={styles.guestHostNote}>1 by 1 allows max {ONE_BY_ONE_MAX_PLAYERS} players.</Text>
+              )}
+            </>
+          ) : (
+            <>
           <View style={[styles.modeRow, { marginTop: HEADING_TO_CONTROL - Spacing.sm }]}>
             {renderModeBox('ptp', 'Pass-the-Phone', true)}
             {renderModeBox('indiv', 'Individual device', true)}
@@ -8264,6 +8695,8 @@ export default function LobbyScreen() {
               </View>
             </View>
           </View>
+          )}
+            </>
           )}
 
           {/* Players — max antal spelare. Max 4 gratis, Max 12 Premium. Styr
@@ -9454,7 +9887,7 @@ export default function LobbyScreen() {
                       ⚠ Göms ÄVEN i re-match/replay-lobbyn — annars hade den
                       varit en bakväg förbi låsningen i Game Mode-sektionen
                       längre upp, och VARJE lägesbyte ejectar spelare. */}
-                  {gameMode !== 'remote-1v1' && !isRematchLobby && (
+                  {gameMode !== 'remote-1v1' && !isRematchLobby && roomIsMultiplayerV2 === false && (
                     <>
                       {/* Förklaringstext → lägesrutor = 16 pt, samma som Profile. */}
                       <View style={[styles.modeRow, { marginTop: Spacing.lg }]}>
@@ -10301,6 +10734,28 @@ export default function LobbyScreen() {
           Host väljer paket direkt ur HELA katalogen (allPackagesCatalog),
           oberoende av Profile-valet. PÅ = paketet blir tillgängligt i lobby-
           listan OCH aktivt i lobbyn (handleToggleCatalogPackage). */}
+      {/* Multiplayer v2: host confirms before Spotify removes guests and
+          players on the host's phone (set_lobby_spotify removes them). */}
+      <QuizVibeDialog
+        visible={spotifyRemovalPrompt !== null}
+        title="Turn on Spotify DJ?"
+        message={
+          spotifyRemovalPrompt
+            ? `Spotify DJ needs every player to be a QuizVibe user on their own phone. These players will be removed from the lobby:\n\n${spotifyRemovalPrompt.names.join('\n')}`
+            : ''
+        }
+        secondaryLabel="Keep Spotify off"
+        primaryLabel="Turn on & remove"
+        destructive
+        primaryLoading={spotifyEnabling}
+        onClose={() => {
+          if (!spotifyEnabling) setSpotifyRemovalPrompt(null);
+        }}
+        onPrimary={() => {
+          void handleConfirmSpotifyRemoval();
+        }}
+      />
+
       <QuizVibeDialog
         visible={pcBlocked !== null}
         title="Parent Control"
