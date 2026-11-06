@@ -1704,16 +1704,6 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                   onPress={() => { void handleDeviceChoice('host'); }}
                 />
               </View>
-              {/* Cancel = abandon the join (the modal's close path resolves
-                  the pending device step with null). Back stays above. */}
-              <TouchableOpacity
-                style={modal.deviceCancelBtn}
-                onPress={onClose}
-                disabled={deviceChecking}
-                activeOpacity={0.7}
-              >
-                <Text style={modal.deviceCancelText}>Cancel</Text>
-              </TouchableOpacity>
             </View>
           )}
 
@@ -5578,18 +5568,6 @@ const modal = StyleSheet.create({
   deviceIconWrapPressed: { borderColor: Colors.warning },
   deviceCardLabel: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary },
   deviceCardSubtitle: { fontSize: 14, color: Colors.textSecondary, marginTop: 4, lineHeight: 19 },
-  deviceCancelBtn: {
-    alignSelf: 'center',
-    minWidth: 160,
-    height: 48,
-    paddingHorizontal: Spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: BrandUi.border,
-  },
-  deviceCancelText: { fontSize: 16, fontWeight: '600', color: Colors.textSecondary },
 
   // Choice list (chooser step)
   choiceList: { gap: Spacing.sm, marginTop: Spacing.xs },
