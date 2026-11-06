@@ -4582,6 +4582,16 @@ export default function LobbyScreen() {
         quizVibeAlert('Lobby is full', 'Lobby is already full with waiting and approved players. Remove players if to add others');
         return;
       }
+      // All at Once → a guest on the host's phone forces 1 by 1: say so first.
+      // The Add Guest modal opens after the alert has closed (an RN Modal
+      // presented straight from an Alert callback can be swallowed on iOS).
+      if (flow.gameMode === ALL_AT_ONCE) {
+        quizVibeAlert('Add Guest', 'Add a guest will switch the game mode to "1 by 1".', [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Continue', onPress: () => setTimeout(() => setAddModalVisible(true), 350) },
+        ]);
+        return;
+      }
       setAddModalVisible(true);
       return;
     }
