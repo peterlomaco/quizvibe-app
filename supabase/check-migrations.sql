@@ -59,7 +59,8 @@ with checks(migration, kind, obj) as (values
   ('0062_multiplayer_v2_gates',         'column', 'public.rooms.multiplayer_v2'),
   ('0063_lobby_players_device_mode',    'column', 'public.lobby_players.device_mode'),
   ('0064_multiplayer_v2_server_rules',  'func',   'public.start_lobby_game'),
-  ('0065_multiplayer_v2_removals',      'table',  'public.lobby_removed_players')
+  ('0065_multiplayer_v2_removals',      'table',  'public.lobby_removed_players'),
+  ('0066_hybrid_turn_results',          'table',  'public.lobby_turn_results')
 )
 select * from (
 select

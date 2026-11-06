@@ -268,6 +268,13 @@ interface Props {
    *  utelämnas; parent renderar den alltid synliga leaderboard-tabellen
    *  under blocket. */
   spectator?: boolean;
+  /** Multiplayer v2 hybrid 1 by 1: this device is an own-device participant.
+   *  It never starts a question (the host does) and sees "Next to answer:". */
+  hybridParticipant?: boolean;
+  /** Multiplayer v2 hybrid 1 by 1 (host): the next turn is answered on the
+   *  player's own phone, so the header reads "Next:" instead of
+   *  "Pass-the-Phone to:". */
+  nextOnOwnDevice?: boolean;
 }
 
 /** Liten avatar-cell som visas före spelarnamnet — uri-bild om finns, annars
@@ -391,6 +398,8 @@ export function GetReadyIntro({
   selfAudioOn = true,
   onSelfAudioChange,
   spectator = false,
+  hybridParticipant = false,
+  nextOnOwnDevice = false,
 }: Props) {
   const isIndDev = mode === 'individual-devices';
   // Remote 1v1 (= onSaveExit satt): top-baren följer lobbyns mönster —
@@ -514,7 +523,8 @@ export function GetReadyIntro({
   // host som kan starta — non-host ser en passiv "Waiting for Host"-ruta i
   // samma position som Play-knappen skulle suttit. Remote 1v1 är self-paced
   // solo — BÅDA spelarna startar sina egna frågor oavsett isHost.
-  const canStartGame = mode === 'pass-the-phone' || mode === 'remote-1v1' || isHost;
+  const canStartGame =
+    (mode === 'pass-the-phone' && !hybridParticipant) || mode === 'remote-1v1' || isHost;
   // Answer response time-fältet är read-only för non-host i Individual
   // Devices (host bestämmer värdet i Lobby OCH justerar det här mellan
   // ronder). PtP-läget har alltid alla på samma device, så där spelar
@@ -683,7 +693,11 @@ export function GetReadyIntro({
       <View style={[styles.tableRow, styles.tableHeaderRow]}>
         <View style={[styles.colPlayer, styles.cellHeader]}>
           <Text style={styles.headerCellText}>
-            {spectator ? 'Next to answer:' : 'Pass-the-Phone to:'}
+            {spectator || hybridParticipant
+              ? 'Next to answer:'
+              : nextOnOwnDevice
+                ? 'Next:'
+                : 'Pass-the-Phone to:'}
           </Text>
         </View>
       </View>

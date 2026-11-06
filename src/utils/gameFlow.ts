@@ -375,3 +375,23 @@ export function joinRejectionMessage(reason: string): { title: string; message: 
       return { title: 'Could not join', message: 'Check your connection and try again.' };
   }
 }
+
+// ─── Hybrid 1 by 1 quiz params (Step 4) ──────────────────────────────
+
+/**
+ * Own-device non-host participants in a frozen 1 by 1 game. Non-empty =
+ * hybrid 1 by 1 (someone answers on their own phone). Empty for All at
+ * Once, for an all-host-device 1 by 1 game, and for legacy rooms (no config).
+ */
+export function hybridOwnDeviceIds(config: FrozenGameConfig | null | undefined): string[] {
+  if (!config || config.gameMode !== ONE_BY_ONE) return [];
+  return config.participants.filter((p) => !p.isHost && p.deviceMode === 'own').map((p) => p.playerId);
+}
+
+/** Quiz route params that switch the quiz engine into hybrid 1 by 1. */
+export function hybridQuizParams(
+  config: FrozenGameConfig | null | undefined,
+): { hybridOneByOne?: string; hybridOwnDeviceIds?: string } {
+  const ids = hybridOwnDeviceIds(config);
+  return ids.length > 0 ? { hybridOneByOne: 'true', hybridOwnDeviceIds: JSON.stringify(ids) } : {};
+}

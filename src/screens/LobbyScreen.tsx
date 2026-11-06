@@ -83,10 +83,13 @@ import { deactivateRoom, getRoomMeta, markRoomGameStarted, registerActiveRoom, s
 import { describeMissingPlayers, findMissingRematchPlayers } from '../utils/rematchLineup';
 import { clearEjected, isEjected, markEjected } from '../utils/ejectedPlayers';
 import {
+  hybridOwnDeviceIds,
+  hybridQuizParams,
   joinRejectionMessage,
   resolveJoinDeviceMode,
   startRejectionMessage,
   type DeviceMode,
+  type FrozenGameConfig,
 } from '../utils/gameFlow';
 import { canUse } from '../utils/entitlements';
 import { getCachedFeatureGates } from '../utils/featureGates';
@@ -6045,6 +6048,8 @@ export default function LobbyScreen() {
               // v2: the frozen snapshot wins over live lobby_settings (C4).
               spotifyEnabled: String(frozenConfig?.spotifyEnabled ?? settingsStored?.spotifyEnabled ?? false),
               roomCode,
+              // Multiplayer v2 Step 4: hybrid 1 by 1 engine params.
+              ...hybridQuizParams(frozenConfig),
             },
           });
         };
@@ -6062,6 +6067,14 @@ export default function LobbyScreen() {
           // tick:en) skulle annars stapla en ny popup varannan sekund.
           if (navigatedToQuizRef.current || cancelled) return;
           navigatedToQuizRef.current = true;
+          // Multiplayer v2 Step 4: an own-device participant in a hybrid
+          // 1 by 1 game PLAYS on this phone — no "Follow leaderboard" prompt,
+          // straight into the quiz (like All at Once). Host-device joiners
+          // keep the prompt below.
+          if (ownId && hybridOwnDeviceIds(frozenConfig).includes(ownId)) {
+            goToQuizAsNonHost();
+            return;
+          }
           // ⚠ "Follow" är FÖRVALT (Peter 2026-08-26). Skälet är inte bara
           // trevnad: en PtP-re-match kan sedan samma dag bara ta med host +
           // de som accepterat på sin EGEN enhet, och bara den som följer
@@ -7093,6 +7106,7 @@ export default function LobbyScreen() {
     // lock, and the roster + flow are frozen in rooms.game_config. Legacy
     // rooms, Single Player and Remote 1v1 keep the old path below.
     let startedViaServer = false;
+    let startConfig: FrozenGameConfig | null = null;
     if (gameMode !== 'remote-1v1' && !singlePlayerDefault) {
       const metaForStart = await withTimeout(getRoomMeta(roomCode), SYNC_TIMEOUT_MS, undefined, 'getRoomMeta(start)');
       if (metaForStart?.multiplayerV2) {
@@ -7114,6 +7128,7 @@ export default function LobbyScreen() {
           return;
         }
         startedViaServer = true;
+        startConfig = result.config;
       }
     }
 
@@ -7189,6 +7204,9 @@ export default function LobbyScreen() {
           ? String(CURRENT_YEAR - parseInt(guestBirthYear, 10))
           : '32',
         gameMode,
+        // Multiplayer v2 Step 4: hybrid 1 by 1 engine params (empty unless
+        // the frozen config has own-device participants in 1 by 1).
+        ...hybridQuizParams(startConfig),
         // Guest-hostat spel — quiz.tsx döljer Play Again på final
         // leaderboard + skippar Player history-skrivningen.
         guestHost: String(isGuestHost),

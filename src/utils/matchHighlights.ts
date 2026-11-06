@@ -73,6 +73,11 @@ export interface HighlightCard {
    */
   hcp?: { before: number; after: number };
   /**
+   * Hybrid 1 by 1 (host device): one HCP progression per player who played
+   * on the host's phone, stacked in ONE taller, scrollable HCP card.
+   */
+  hcpList?: { playerId: string; name: string; before: number; after: number }[];
+  /**
    * Game Performance-kortet (solospel): rätt svar är primärt, snittiden att
    * låsa ett svar sekundär. `avgSeconds` null = inget tidsunderlag.
    */
@@ -140,6 +145,12 @@ export interface BuildMultiplayerSummaryInput {
    * remote, guest-hostat spel eller inget resultat).
    */
   selfHcp?: { before: number; after: number } | null;
+  /**
+   * Hybrid 1 by 1 host: HCP results for every player who played on THIS
+   * (host) device. With two or more, they replace the single self card with
+   * one stacked card. Guests are dropped.
+   */
+  deviceHcps?: { playerId: string; name: string; before: number; after: number }[];
 }
 
 /** Multiplayer-däcket — se filhuvudet. */
@@ -151,7 +162,15 @@ export function buildMultiplayerSummary(
   const cards: HighlightCard[] = [];
 
   // ── HCP Progress — denna enhets inloggade spelare ─────────────────────
-  if (input.selfHcp && selfId && !guestIds.has(selfId)) {
+  const deviceHcps = (input.deviceHcps ?? []).filter((h) => !guestIds.has(h.playerId));
+  if (deviceHcps.length >= 2) {
+    cards.push({
+      id: 'hcp-progress',
+      kind: 'hcp-progress',
+      title: 'HCP progress',
+      hcpList: deviceHcps,
+    });
+  } else if (input.selfHcp && selfId && !guestIds.has(selfId)) {
     cards.push({
       id: 'hcp-progress',
       kind: 'hcp-progress',

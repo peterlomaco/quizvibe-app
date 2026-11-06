@@ -189,6 +189,18 @@ import { QuizVibeDefaultAvatar } from '@/src/components/QuizVibeDefaultAvatar';
 import { QuizVibeDialog } from '@/src/components/QuizVibeDialog';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import { runBehindGlobalOverlay } from '@/src/utils/globalOverlay';
+import {
+  acceptsHybridScore,
+  allTurnsResolved,
+  hybridRole,
+  DELETED_TURN_PLAYER_ID,
+  HYBRID_MISSING_SCORE_GRACE_MS,
+  mergeServerResults,
+  parseOwnDeviceIds,
+  turnOwner,
+  type HybridRole,
+} from '@/src/utils/hybridTurns';
+import { getTurnResults, recordTurnResult } from '@/src/utils/turnResults';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 
@@ -1610,6 +1622,11 @@ export default function QuizScreen() {
     age?: string;
     gameMode?: 'pass-the-phone' | 'individual-devices' | 'remote-1v1';
     isHost?: string;
+    // Multiplayer v2 Step 4: 'true' = hybrid 1 by 1 (some participants play
+    // on their own phone). Set by the lobby ONLY from a frozen v2 config.
+    hybridOneByOne?: string;
+    // JSON array of non-host player ids playing on their own phone.
+    hybridOwnDeviceIds?: string;
     // Remote 1v1: server-side match-id (remote_matches.id) — sätts av
     // Lobby:s handleStartGame (host) resp. Play now-prompten / My 1v1
     // Matches (motståndare). Driver sekvens-auktoritet + answer-persistens.
@@ -1735,12 +1752,16 @@ export default function QuizScreen() {
   const seedForSyncedQuestion = useCallback(
     (questionId: string): string | undefined => {
       if (isRemote && remoteMatchId) return `${remoteMatchId}:${questionId}`;
-      if (gameMode === 'individual-devices' && params.roomCode) {
+      // Hybrid 1 by 1 renders the same question on several devices too.
+      if (
+        (gameMode === 'individual-devices' || params.hybridOneByOne === 'true') &&
+        params.roomCode
+      ) {
         return `${params.roomCode}:${questionId}`;
       }
       return undefined;
     },
-    [isRemote, remoteMatchId, gameMode, params.roomCode],
+    [isRemote, remoteMatchId, gameMode, params.roomCode, params.hybridOneByOne],
   );
   // Det egna player_id:t (= lobby_players.player_id) som Lobby skickade.
   // Används av non-host:s Leave-flöde för att broadcasta `player_left` så
@@ -1957,7 +1978,22 @@ export default function QuizScreen() {
   // ptpMultiDevice är en över-approximation: host-tillagda gäster utan egen
   // enhet räknas in, så en PtP-host kan prenumerera på en kanal ingen
   // lyssnar på. Kostnaden är en Realtime-kanal + 10s heartbeat.
-  const isPtPSpectator = gameMode === 'pass-the-phone' && !isHost;
+  // ── Multiplayer v2 Step 4: hybrid 1 by 1 ─────────────────────────────
+  // PtP where some participants play on their OWN phone. They answer their
+  // own turn there and watch a read-only question view otherwise; the host
+  // watches the same view during their turns. Gated on the explicit param —
+  // legacy PtP (and v2 PtP where everyone is on the host's phone) never gets
+  // it, so every `isHybrid` branch below is dead code there.
+  const isHybrid = gameMode === 'pass-the-phone' && params.hybridOneByOne === 'true';
+  const hybridOwnIds = useMemo(
+    () => (isHybrid ? parseOwnDeviceIds(params.hybridOwnDeviceIds) : new Set<string>()),
+    [isHybrid, params.hybridOwnDeviceIds],
+  );
+  const isOwnDeviceParticipant =
+    isHybrid && !isHost && !!selfPlayerId && hybridOwnIds.has(selfPlayerId);
+  // Host-device followers (Yes on "Follow leaderboard") keep today's
+  // spectator view; own-device participants are players, not spectators.
+  const isPtPSpectator = gameMode === 'pass-the-phone' && !isHost && !isOwnDeviceParticipant;
   // Wifi-kolumnen i leaderboarden härleds ur "hur många frågor ligger
   // spelaren efter ledaren" — en giltig proxy för tappad uppkoppling ENDAST
   // när alla spelare förväntas svara på varje fråga. Det gäller bara
@@ -2828,7 +2864,8 @@ export default function QuizScreen() {
   // HELT annan slumpad pool än host:ens (den spelar aldrig ur den), så clampen
   // skulle ge ett godtyckligt kortare spel. Host:s sekvenslängd kommer i
   // stället via broadcastAllQuestionIds (game_sequence_init / question_advance).
-  const totalQuestions = isPtPSpectator
+  // Hybrid own-device participants likewise play the HOST's sequence.
+  const totalQuestions = isPtPSpectator || isOwnDeviceParticipant
     ? Math.max(1, broadcastAllQuestionIds?.length ?? requestedQuestions)
     : Math.max(1, Math.min(requestedQuestions, gameQuestions.length));
 
@@ -3464,6 +3501,18 @@ export default function QuizScreen() {
   phaseRef.current = phase;
   const questionIndexRef = useRef(questionIndex);
   questionIndexRef.current = questionIndex;
+  // Hybrid 1 by 1: who owns the current turn, and what THIS device does.
+  // null outside hybrid → every existing code path is untouched.
+  const hybridOwner = isHybrid ? turnOwner(turnOrder, questionIndex) : undefined;
+  const hybridRoleNow: HybridRole | null = isHybrid
+    ? hybridRole({ isHost, selfPlayerId, ownerId: hybridOwner?.id, ownDeviceIds: hybridOwnIds })
+    : null;
+  const isHybridWatch = hybridRoleNow === 'watch';
+  const hybridRoleRef = useRef(hybridRoleNow);
+  hybridRoleRef.current = hybridRoleNow;
+  // Questions the HOST has accepted a result for (server row written or in
+  // flight). A later/late score for such an index is ignored everywhere.
+  const hybridFinalizedRef = useRef<Set<number>>(new Set());
   // Synkron spegel av totalQuestions så callbacks (t.ex. triggerGameEndedAlert)
   // kan läsa aktuellt värde utan att capture:a en stale mount-closure.
   const totalQuestionsRef = useRef(totalQuestions);
@@ -3648,6 +3697,9 @@ export default function QuizScreen() {
   // per-spelare-totals härleds från allRoundScoresHistory via gameTotals.
   const [currentRoundScores, setCurrentRoundScores] = useState<RoundScore[]>([]);
   const [allRoundScoresHistory, setAllRoundScoresHistory] = useState<RoundScore[][]>([]);
+  // Synchronous mirror for callbacks (hybrid persistence retries).
+  const allRoundScoresHistoryRef = useRef(allRoundScoresHistory);
+  allRoundScoresHistoryRef.current = allRoundScoresHistory;
   const [playerHcpChanges, setPlayerHcpChanges] = useState<Record<string, HcpChange>>({});
   // True när DENNA enhets egna HCP-bokföring vid game-end är avgjord — antingen
   // skriven, eller inte tillämplig (gäst / inga svar / fel). Solospelets Game
@@ -3686,6 +3738,11 @@ export default function QuizScreen() {
   // timer-bar:en i Individual Devices — confirmade spelares avatar fryses vid
   // sin position, ej-confirmade rör sig med timern. Reset:as vid frågebyte.
   const [playerConfirms, setPlayerConfirms] = useState<Record<string, number>>({});
+  // PtP timer-bar marker: the local confirm, or — on a hybrid watcher — the
+  // turn owner's lock-in received from their phone.
+  const ptpMarkerUsed: number | null =
+    confirmedTimeUsed ??
+    (isHybridWatch && hybridOwner ? playerConfirms[hybridOwner.id] ?? null : null);
 
   // Spel-start: trackas en gång när QuizScreen mountas (router pushar
   // hit från Lobby:s "Start Game"-flöde). Region/land sätts av
@@ -4378,7 +4435,9 @@ export default function QuizScreen() {
   // selfPlayerId → fallback till audio på så ljudet hörs i mock-mode. I
   // IndDev läses overrides-mappen; default-policyn kickar in vid saknad key.
   const isAudioMutedForSelf = useMemo(() => {
-    if (gameMode === 'pass-the-phone' || isLocalSoloGame) return false;
+    // Hybrid own-device participants follow the All at Once rule below
+    // (muted by default, own toggle); the host + host-device play stay on.
+    if ((gameMode === 'pass-the-phone' && !isOwnDeviceParticipant) || isLocalSoloGame) return false;
     // Remote 1v1: solo-session på egen enhet — ljudet spelas lokalt på BÅDA
     // enheterna (ingen host-only-audio-policy; IndDev:s override-map gäller
     // inte här). Default på; spelaren äger sin egen mute via remoteAudioOn.
@@ -4388,7 +4447,7 @@ export default function QuizScreen() {
       return !playerAudioOverrides[selfPlayerId];
     }
     return !isHost;
-  }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn, isLocalSoloGame]);
+  }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn, isLocalSoloGame, isOwnDeviceParticipant]);
 
   // Countdown-röst för DENNA enhet. Seedas ur profil-spegeln; enheten kan
   // byta den i GetReady → Game settings → "Voice type" (persisteras till profilen
@@ -4577,8 +4636,8 @@ export default function QuizScreen() {
   // bekräftat än. (Peter 2026-09-09.)
   const computeLastConfirmedProgress = useCallback((): number | null => {
     if (gameMode !== 'individual-devices') {
-      if (confirmedTimeUsed !== null) {
-        return Math.max(0, Math.min(1, (responseSeconds - confirmedTimeUsed) / responseSeconds));
+      if (ptpMarkerUsed !== null) {
+        return Math.max(0, Math.min(1, (responseSeconds - ptpMarkerUsed) / responseSeconds));
       }
       return null;
     }
@@ -4591,7 +4650,7 @@ export default function QuizScreen() {
     return Math.max(0, Math.min(1, (responseSeconds - maxUsed) / responseSeconds));
   }, [
     gameMode,
-    confirmedTimeUsed,
+    ptpMarkerUsed,
     responseSeconds,
     turnOrder,
     leftPlayerIds,
@@ -4723,6 +4782,10 @@ export default function QuizScreen() {
       return;
     }
     if (phase === 'question') {
+      // Hybrid 1 by 1 watcher: this device doesn't own the turn — no round,
+      // no score, no early reveal. It reveals when the owner's result (or the
+      // host's server-confirmed "No answer") arrives — see the grace effect.
+      if (isHybridWatch) return;
       // Spotify DJ svarar aldrig på sin egen fråga (canConfirm=false) — ingen
       // runda och ingen score ska registreras. Utan post attribueras frågan
       // aldrig till DJ:n på NÅGON enhet (den skulle annars broadcastats
@@ -4780,6 +4843,62 @@ export default function QuizScreen() {
     // ändras aldrig mid-question (response_time gäller nästa fråga).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft]);
+
+  // Hybrid 1 by 1: the timer ran out while another device owned the turn and
+  // no result has arrived. The HOST waits a short grace, then records
+  // "No answer" (connection lost) for the owner — server-persisted, then
+  // broadcast as a host_final hint so every device converges. A watching
+  // participant instead asks the server once, as a fallback for a missed hint.
+  useEffect(() => {
+    if (!isHybridWatch || timeLeft !== 0) return;
+    if (phase !== 'question' && phase !== 'awaiting') return;
+    const idx = questionIndex;
+    const ownerId = hybridOwner?.id;
+    const t = setTimeout(
+      () => {
+        if (questionIndexRef.current !== idx) return;
+        if (phaseRef.current !== 'question' && phaseRef.current !== 'awaiting') return;
+        if (isHost) {
+          if (ownerId) hostFinalizeNoAnswer(idx, ownerId);
+        } else {
+          void applyServerTurnResult(idx);
+        }
+      },
+      isHost ? HYBRID_MISSING_SCORE_GRACE_MS : HYBRID_MISSING_SCORE_GRACE_MS + 3000,
+    );
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHybridWatch, timeLeft, phase, questionIndex]);
+
+  const hostFinalizeNoAnswer = (idx: number, ownerId: string) => {
+    if (hybridFinalizedRef.current.has(idx)) return; // owner's answer won the race
+    const noAnswer: RoundScore = {
+      playerId: ownerId,
+      points: 0,
+      correct: false,
+      timeUsed: responseSeconds,
+      questionIndex: idx,
+      connectionError: true,
+    };
+    setAllRoundScoresHistory((prev) => [...prev, [noAnswer]]);
+    // Hint only AFTER the server row exists, so a receiver that verifies it
+    // immediately finds the row. (Next / Final Leaderboard retry the write.)
+    void persistHybridResult(idx, noAnswer).then((ok) => {
+      if (!ok || !syncChannelRef.current) return;
+      const payload: PlayerScoreRecordedPayload = {
+        player_id: ownerId,
+        question_index: idx,
+        points: 0,
+        correct: false,
+        time_used: responseSeconds,
+        connection_error: true,
+        host_final: true,
+      };
+      pendingScoreBroadcastsRef.current.push(payload);
+      syncChannelRef.current.broadcastPlayerScoreRecorded(payload).catch(() => {});
+    });
+    setPhase('reveal');
+  };
 
   // Avslöja i FÖRTID när alla förväntade svarare har bekräftat — i stället för
   // att vänta ut hela timern. Reveal-kortet, multiplayer-facitet ("All Players")
@@ -5084,6 +5203,13 @@ export default function QuizScreen() {
     // skulle en framtida ändring kunna injicera en fantom-post (0 pts) under
     // spelarens id OCH broadcasta den tillbaka till host.
     if (isPtPSpectator) return;
+    // Hybrid 1 by 1: only the device that owns this turn records it (the
+    // host for its own + host-device turns, a participant for its own turn).
+    // A turn the host has already finalized can never be scored again.
+    if (isHybrid) {
+      if (hybridRoleRef.current !== 'answer') return;
+      if (hybridFinalizedRef.current.has(questionIndexRef.current)) return;
+    }
     // Spotify DJ:n svarar aldrig på sin egen fråga (canConfirm=false) — ingen
     // RoundScore ska attribueras till DJ:n. Belt-and-suspenders utöver
     // timeout-effektens tidiga return: skulle någon annan väg anropa hit får
@@ -5112,8 +5238,10 @@ export default function QuizScreen() {
     //   • Direkt-nav utan turnOrder: 'you' som sista fallback.
     // Remote 1v1 attribueras som IndDev — solo-session där selfPlayerId
     // ÄR den enda spelaren (turnOrder = [self], ingen rotation).
+    // Hybrid own-device participant: it only ever records its own turn.
     const activePlayerId =
-      (gameMode === 'individual-devices' || gameMode === 'remote-1v1') && selfPlayerId
+      (gameMode === 'individual-devices' || gameMode === 'remote-1v1' || isOwnDeviceParticipant) &&
+      selfPlayerId
         ? selfPlayerId
         : (turnOrder[currentPlayerIndex]?.id ?? 'you');
     // questionIndex bärs med så match highlights kan joina score → fråga
@@ -5177,6 +5305,7 @@ export default function QuizScreen() {
         correct: yourCorrect,
         time_used: yourTimeUsed,
         ...(answerText ? { answer: answerText } : {}),
+        ...(isHybrid && connectionError ? { connection_error: true } : {}),
       };
       // Spara alltid i pending-kön — vid reconnect skickas alla om.
       // Dedup-nyckeln player_id+question_index på mottagarsidan gör re-send säkert.
@@ -5185,6 +5314,62 @@ export default function QuizScreen() {
         .broadcastPlayerScoreRecorded(scorePayload)
         .catch(() => {});
     }
+    // Hybrid 1 by 1: the HOST persists every accepted result server-side
+    // (its own + host-device turns here; own-device turns on receive).
+    if (isHybrid && isHost) {
+      persistHybridResult(scoredQuestionIndex, yourScore);
+    }
+  };
+
+  // ── Hybrid 1 by 1: host-authoritative results (migration 0066) ───────
+  // One write per question; Next / Final Leaderboard await it. The server
+  // keeps the FIRST row, so a late answer can never overwrite a decision.
+  const hybridPersistRef = useRef<Map<number, Promise<boolean>>>(new Map());
+  const persistHybridResult = (index: number, score: RoundScore): Promise<boolean> => {
+    const existing = hybridPersistRef.current.get(index);
+    if (existing) return existing;
+    hybridFinalizedRef.current.add(index);
+    const attempt = recordTurnResult(params.roomCode ?? '', {
+      questionIndex: index,
+      playerId: score.playerId,
+      points: score.points,
+      correct: score.correct,
+      timeUsed: score.timeUsed,
+      answer: score.answer,
+      connectionError: score.connectionError,
+    }).then((row) => row !== null);
+    hybridPersistRef.current.set(index, attempt);
+    // A failed write is forgotten so the awaited retry on Next can try again.
+    attempt.then((ok) => {
+      if (!ok) hybridPersistRef.current.delete(index);
+    });
+    return attempt;
+  };
+  /** Hybrid 1 by 1: tell watchers the turn owner locked in (timer-bar marker
+   *  + "Answer locked"). Only the answering device sends it. */
+  const broadcastHybridLockIn = (timeUsed: number) => {
+    if (!isHybrid || hybridRoleRef.current !== 'answer' || !syncChannelRef.current) return;
+    const ownerId = isOwnDeviceParticipant ? selfPlayerId : turnOrder[currentPlayerIndex]?.id;
+    if (!ownerId) return;
+    syncChannelRef.current
+      .broadcastPlayerAnswerConfirmed({ player_id: ownerId, time_used: timeUsed })
+      .catch(() => {});
+  };
+  /** Next / Final Leaderboard gate: the current turn's result must be saved. */
+  const ensureHybridResultPersisted = async (index: number): Promise<boolean> => {
+    if (!isHybrid || !isHost) return true;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const pending = hybridPersistRef.current.get(index);
+      if (pending && (await pending)) return true;
+      // Nothing in flight (or it failed): re-send from local history.
+      const local = allRoundScoresHistoryRef.current
+        .flat()
+        .find((s) => s.questionIndex === index);
+      if (!local) return false;
+      hybridPersistRef.current.delete(index);
+      if (await persistHybridResult(index, local)) return true;
+    }
+    return false;
   };
 
   useEffect(() => {
@@ -5640,7 +5825,7 @@ export default function QuizScreen() {
     // historik till sin egen enhet — de spelade aldrig här.
     if (isHost && gameMode !== 'individual-devices' && turnOrder.length > 1) {
       const registeredNames = turnOrder
-        .filter((p) => p.type === 'registered' && p.name)
+        .filter((p) => p.type === 'registered' && p.name && !hybridOwnIds.has(p.id))
         .map((p) => p.name);
       if (registeredNames.length > 0) {
         addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
@@ -5823,6 +6008,7 @@ export default function QuizScreen() {
           .catch(() => {});
       }
     }
+    broadcastHybridLockIn(exactElapsedSec);
     setPhase('awaiting');
     // Confirm under bufferten: timern hann aldrig starta (timerActive false →
     // setTimerActive(true)-timeouten rensas när phase blir 'awaiting'), så
@@ -6055,6 +6241,7 @@ export default function QuizScreen() {
           .catch(() => {});
       }
     }
+    broadcastHybridLockIn(exactElapsedSec);
     setPhase('awaiting');
     // Se handleConfirm: starta timern om confirm skedde innan den hann starta.
     if (timerNotStarted) startTimer();
@@ -6108,6 +6295,7 @@ export default function QuizScreen() {
           .catch(() => {});
       }
     }
+    broadcastHybridLockIn(exactElapsedSec);
     setPhase('awaiting');
     // Se handleConfirm: starta timern om confirm skedde innan den hann starta.
     if (timerNotStarted) startTimer();
@@ -6480,7 +6668,44 @@ export default function QuizScreen() {
   // ── IndDev host-broadcast-wrappers ───────────────────────────────────────
   // Host:s Play-tap: 2 s dramatisk paus innan nedräkning startar.
   // Broadcast skickas efter samma fördröjning så host + non-host synkar.
+  // Hybrid 1 by 1: the turn owner (own-device player) has left the game, so
+  // this question can never be answered. The host is told at Press Play and
+  // the question is deleted: a server row marks it resolved without a score
+  // (DELETED_TURN_PLAYER_ID), then the game moves to the next question in the
+  // queue (or the Final Leaderboard) exactly like a normal Next tap.
+  const deleteLeftPlayersTurn = async () => {
+    const idx = questionIndexRef.current;
+    const row = await recordTurnResult(params.roomCode ?? '', {
+      questionIndex: idx,
+      playerId: DELETED_TURN_PLAYER_ID,
+      points: 0,
+      correct: false,
+      timeUsed: 0,
+    });
+    if (!row) {
+      Alert.alert("Couldn't delete this question", 'Check your connection and try again.');
+      return;
+    }
+    hybridFinalizedRef.current.add(idx);
+    skippedQuestionIndicesRef.current.add(idx);
+    hybridPersistRef.current.set(idx, Promise.resolve(true));
+    if (idx >= totalQuestionsRef.current - 1) {
+      void handleHostShowLeaderboard();
+    } else {
+      void handleHostAdvanceFromReveal();
+    }
+  };
+
   const handleHostStartFromGetReady = () => {
+    if (isHybrid && isHost && hybridOwner && leftPlayerIds.has(hybridOwner.id)) {
+      Alert.alert(
+        `${hybridOwner.name} has left, question will be deleted.`,
+        undefined,
+        [{ text: 'OK', onPress: () => void deleteLeftPlayersTurn() }],
+        { cancelable: false },
+      );
+      return;
+    }
     // Beräkna exakt när non-host:s timer kommer att starta:
     // countdown: 700 ms initial paus + 3 × 1300 ms tick (3→2→1→0) = 4600 ms
     // när "?" VISAS, + 1000 ms "?"-display → onComplete vid **5600 ms**.
@@ -6490,7 +6715,9 @@ export default function QuizScreen() {
     // Ändra inte 7900 utan att räkna om mot CountdownIntro:s offset-tabell.
     const timerStartAt = Date.now() + 7900;
     setPhase('countdown');
-    if (gameMode === 'individual-devices' && syncChannelRef.current) {
+    // Hybrid 1 by 1 reuses the All at Once start broadcast so own-device
+    // participants enter countdown → question on the host's clock.
+    if ((gameMode === 'individual-devices' || isHybrid) && syncChannelRef.current) {
       // Skicka IDENTISK payload tre gånger: direkt + 600 ms + 1800 ms.
       // Supabase Realtime replayar aldrig till en sen subscriber, så en enda
       // sändning går förlorad för gott om mottagarens kanal hickar just då.
@@ -6530,7 +6757,30 @@ export default function QuizScreen() {
   // isLastQuestion-fallet broadcastar next_question_index=null så non-host
   // går till leaderboard, men host själv kör handleShowLeaderboard via
   // existing Next-tab-callback (denna funktion täcker bara non-last-fallet).
-  const handleHostAdvanceFromReveal = () => {
+  // Hybrid 1 by 1: the host's accepted result for the current question must
+  // be saved server-side BEFORE moving on (no UI change when it already is —
+  // the usual case, since it's written at reveal). Busy-guarded so a double
+  // tap can't advance twice while the write is in flight.
+  const hybridAdvanceBusyRef = useRef(false);
+  const gateHybridAdvance = async (): Promise<boolean> => {
+    if (!isHybrid || !isHost) return true;
+    if (hybridAdvanceBusyRef.current) return false;
+    hybridAdvanceBusyRef.current = true;
+    try {
+      const ok = await ensureHybridResultPersisted(questionIndexRef.current);
+      if (!ok) {
+        Alert.alert(
+          "Couldn't save this result",
+          'Check your connection and try again.',
+        );
+      }
+      return ok;
+    } finally {
+      hybridAdvanceBusyRef.current = false;
+    }
+  };
+  const handleHostAdvanceFromReveal = async () => {
+    if (!(await gateHybridAdvance())) return;
     handleAdvanceToNextRound();
     // syncActive (inte bara IndDev): PtP-spectatorn följer sin progress —
     // och därmed "Now answering" + Question N of M — enbart via detta event.
@@ -6542,7 +6792,8 @@ export default function QuizScreen() {
     });
   };
   // Host:s Final Leaderboard-tap.
-  const handleHostShowLeaderboard = () => {
+  const handleHostShowLeaderboard = async () => {
+    if (!(await gateHybridAdvance())) return;
     handleShowLeaderboard();
     // next_question_index: null = "spelet är slut". Det är ENDA signalen som
     // tar PtP-spectatorn till Final Leaderboard (host_active_ping är bara
@@ -6749,6 +7000,11 @@ export default function QuizScreen() {
       // setQuestionIndex är idempotent när qIdx === questionIndex, så
       // normalfallet (B var online och redan synkad) är no-op.
       setQuestionIndex(qIdx);
+      // Hybrid 1 by 1: keep the PtP rotation aligned with the host (turn
+      // owner = turnOrder[qIdx % n]) for "Next:" / markers / roles.
+      if (isHybrid && turnOrder.length > 0) {
+        setCurrentPlayerIndex(qIdx % turnOrder.length);
+      }
       // IndDev-frågefixering: spara host:s question_id så non-host renderar
       // exakt samma fråga oavsett lokal shuffle-ordning.
       setBroadcastQuestionId(qId ?? null);
@@ -6894,6 +7150,18 @@ export default function QuizScreen() {
           next.delete(playerId);
           return next;
         });
+        // Hybrid 1 by 1: an OWN-device player leaving really stops playing
+        // (their turns can't be answered anywhere else). Mark them left —
+        // no Alert here; the host is told when it tries to start their turn
+        // ("X has left, question will be deleted.").
+        if (isHybrid && hybridOwnIds.has(playerId)) {
+          setLeftPlayerIds((prev) => {
+            if (prev.has(playerId)) return prev;
+            const next = new Set(prev);
+            next.add(playerId);
+            return next;
+          });
+        }
         return;
       }
       setLeftPlayerIds((prev) => {
@@ -6986,6 +7254,21 @@ export default function QuizScreen() {
     // ett svar. Lägg in deras RoundScore i lokal allRoundScoresHistory så
     // liveLeaderboard + final leaderboard visar komplett bild.
     playerScoreRecordedHandlerRef.current = (payload) => {
+      // ── Hybrid 1 by 1 ───────────────────────────────────────────────
+      if (isHybrid) {
+        // The host's "No answer" is only a HINT (broadcast senders are not
+        // authenticated) — verify against the server row before applying.
+        // Checked BEFORE the self-filter: it may concern this device's own
+        // turn (the owner whose answer arrived too late).
+        if (payload.host_final) {
+          if (!isHost) void applyServerTurnResult(payload.question_index);
+          return;
+        }
+        // Only the turn owner may score a question.
+        if (!acceptsHybridScore(payload.player_id, payload.question_index, turnOrder)) return;
+        // Already decided by the host → a late answer never counts.
+        if (hybridFinalizedRef.current.has(payload.question_index)) return;
+      }
       // Ignorera egna scores (broadcast.self: false garanterar detta, men
       // defensiv guard mot edge-case om selfPlayerId ändrar sig).
       //
@@ -7011,6 +7294,7 @@ export default function QuizScreen() {
         // appendas i ankomstordning, så detta är ENDA kopplingen till
         // vilken fråga svaret gällde.
         questionIndex: payload.question_index,
+        ...(payload.connection_error ? { connectionError: true } : {}),
       };
       // PtP-spectator: buffra tills host går vidare — se
       // flushSpectatorScores för varför.
@@ -7019,8 +7303,39 @@ export default function QuizScreen() {
         return;
       }
       setAllRoundScoresHistory((prev) => [...prev, [incoming]]);
+      if (isHybrid) {
+        // The host accepts an own-device owner's answer → server record.
+        if (isHost) persistHybridResult(payload.question_index, incoming);
+        // Watchers reveal as soon as the owner's result for THIS question
+        // is in — never earlier, so the correct answer can't leak.
+        if (
+          payload.question_index === questionIndexRef.current &&
+          hybridRoleRef.current === 'watch' &&
+          (phaseRef.current === 'question' || phaseRef.current === 'awaiting')
+        ) {
+          setPhase('reveal');
+        }
+      }
     };
   });
+
+  // Hybrid 1 by 1: apply the SERVER's decision for one question (after a
+  // host_final hint). Replaces any local entry — including this device's own
+  // late answer — and reveals if it is the current question. A forged hint
+  // finds no server row and changes nothing.
+  const applyServerTurnResult = async (index: number) => {
+    const rows = await getTurnResults(params.roomCode ?? '');
+    const row = rows?.find((r) => r.question_index === index);
+    if (!row) return;
+    hybridFinalizedRef.current.add(index);
+    setAllRoundScoresHistory((prev) => mergeServerResults(prev, [row]) as RoundScore[][]);
+    if (
+      index === questionIndexRef.current &&
+      (phaseRef.current === 'question' || phaseRef.current === 'awaiting')
+    ) {
+      setPhase('reveal');
+    }
+  };
 
   // Engångs-guard: appendGameHistoryEntry får skrivas EXAKT en gång per spel.
   // Krävs sedan spectatorn har TVÅ triggers (leaderboard-effekten + den nya
@@ -7044,7 +7359,7 @@ export default function QuizScreen() {
     // PtP-spel ÄR ids:en byggda för att matcha (samma lobby_players-id på
     // båda enheter), men en join-race kan ge dubblettrader + ID-heal så att
     // selfPlayerId divergerar från det id host attribuerar våra scores under.
-    const strictSelfScores = isPtPSpectator
+    const strictSelfScores = isPtPSpectator || isOwnDeviceParticipant
       ? allRoundScoresHistory.flat().filter((sc) => sc.playerId === selfPlayerId)
       : null;
     if (__DEV__ && isPtPSpectator && strictSelfScores && strictSelfScores.length === 0) {
@@ -7223,8 +7538,41 @@ export default function QuizScreen() {
     }
   };
 
+  // ── Hybrid 1 by 1: server-confirmed results before anything is saved ──
+  // The final screen shows local results PROVISIONALLY; HCP progression and
+  // Player history wait until the server (0066) has a row for every
+  // question. Then local history is replaced by the server rows and the
+  // game-end effect below runs ONCE. Retries every 5 s and on app foreground.
+  // If the player leaves before the server is reached, nothing is saved for
+  // this game on this device (by design — never a conflicting result).
+  const [hybridResultsConfirmed, setHybridResultsConfirmed] = useState(!isHybrid);
+  useEffect(() => {
+    if (!isHybrid || hybridResultsConfirmed) return;
+    if (phase !== 'leaderboard' || !isLastQuestion) return;
+    let cancelled = false;
+    const tryConfirm = async () => {
+      const rows = await getTurnResults(params.roomCode ?? '');
+      if (cancelled || !rows || !allTurnsResolved(rows, totalQuestionsRef.current)) return;
+      setAllRoundScoresHistory((prev) => mergeServerResults(prev, rows) as RoundScore[][]);
+      setHybridResultsConfirmed(true);
+    };
+    void tryConfirm();
+    const interval = setInterval(() => void tryConfirm(), 5000);
+    const sub = AppState.addEventListener('change', (s) => {
+      if (s === 'active') void tryConfirm();
+    });
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      sub.remove();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHybrid, hybridResultsConfirmed, phase, isLastQuestion]);
+
   // Kör när sista rundans leaderboard visas: beräkna HCP-förändringar + spara spel
   useEffect(() => {
+    // Hybrid: wait for the server-confirmed results (see above).
+    if (isHybrid && !hybridResultsConfirmed) return;
     if (phase === 'leaderboard' && isLastQuestion) {
       // §2/§5 — HCP-motorn vid game-end. Grundar INGET HCP: guest-hostade spel
       // (anonyma), remote (server-side finalize) och PtP-spectator (spelaren
@@ -7272,13 +7620,16 @@ export default function QuizScreen() {
         const hasAnswers = (m: CategoryAnswers): boolean =>
           (m.Music?.length ?? 0) + (m.Film?.length ?? 0) > 0;
 
-        if (gameMode === 'pass-the-phone') {
+        // Hybrid own-device participants ground ONLY themselves (below), and
+        // the host skips them here — each player is counted exactly once.
+        if (gameMode === 'pass-the-phone' && !isOwnDeviceParticipant) {
           void (async () => {
             try {
             const changes: Record<string, HcpChange> = {};
             const catChanges: Record<string, HcpCategoryChange> = {};
             for (const p of turnOrder) {
               if (p.type === 'guest') continue;
+              if (hybridOwnIds.has(p.id)) continue;
               const byCat = answersByCategoryFor(p.id);
               if (!hasAnswers(byCat)) continue;
               const level: AssistanceLevel = p.assistance ?? fallbackAssistance;
@@ -7331,7 +7682,7 @@ export default function QuizScreen() {
               setPlayerHcpCategoryChanges((prev) => ({ ...prev, [selfPlayerId]: buildHcpCategoryChange(before, after) }));
               // IndDev: dela self:s delta med peers så allas leaderboard visar
               // det (retries mot tappade broadcasts; mottagaren är idempotent).
-              if (gameMode === 'individual-devices' && syncChannelRef.current) {
+              if ((gameMode === 'individual-devices' || isOwnDeviceParticipant) && syncChannelRef.current) {
                 const payload: PlayerHcpChangedPayload = {
                   player_id: selfPlayerId,
                   before: beforeT,
@@ -7379,7 +7730,9 @@ export default function QuizScreen() {
         remote_1v1: isRemote,
       });
     }
-  }, [phase, isLastQuestion]);
+    // hybridResultsConfirmed is constant `true` outside hybrid → no extra runs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, isLastQuestion, hybridResultsConfirmed]);
 
   // PtP-spectator: spara spelet så fort game-over-signalen kommer, OBEROENDE
   // av om render:n någonsin når phase 'leaderboard'. Fångar cause B (den
@@ -7390,11 +7743,12 @@ export default function QuizScreen() {
   // till en no-op; allRoundScoresHistory i deps kör om effekten om flaggan
   // hann sättas före flush-committen.
   useEffect(() => {
-    if (isPtPSpectator && spectatorGameOver) {
+    // Hybrid: history is saved only from server-confirmed results.
+    if (isPtPSpectator && spectatorGameOver && (!isHybrid || hybridResultsConfirmed)) {
       void saveFinalGame();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spectatorGameOver, allRoundScoresHistory]);
+  }, [spectatorGameOver, allRoundScoresHistory, hybridResultsConfirmed]);
 
   // ── Aggregate Leaderboard ───────────────────────────────────────────────
   // Slutskärmen visar ALLTID spelet som just spelats. Har host kört
@@ -9028,6 +9382,10 @@ export default function QuizScreen() {
       if (allQuestionIds && allQuestionIds.length > 0) {
         setBroadcastAllQuestionIds((prev) => prev ?? allQuestionIds);
       }
+      // Hybrid 1 by 1: heal the PtP rotation along with the index.
+      if (isHybrid && turnOrder.length > 0) {
+        setCurrentPlayerIndex(hostQuestionIndex % turnOrder.length);
+      }
       // D-vi heal-on-reconnect: sync questionIndex mot host:s canonical
       // värde. Idempotent när redan synkad. Skyddar mot stale-index efter
       // offline-fönster där missade play_command/question_advance inte
@@ -9161,7 +9519,7 @@ export default function QuizScreen() {
                 // nycklar (samma rationale som leaderboard-recordingen).
                 if (gameMode !== 'individual-devices' && turnOrder.length > 1) {
                   const registeredNames = turnOrder
-                    .filter((p) => p.type === 'registered' && p.name)
+                    .filter((p) => p.type === 'registered' && p.name && !hybridOwnIds.has(p.id))
                     .map((p) => p.name);
                   if (registeredNames.length > 0) {
                     addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
@@ -9413,14 +9771,14 @@ export default function QuizScreen() {
   const summaryPlayerLabel = useMemo(() => {
     // Pass-the-Phone-follower (non-host som följer leaderboarden på egen
     // telefon): sitt eget namn, inte host:ens.
-    if (!isRemote && (gameMode === 'individual-devices' || isPtPSpectator)) {
+    if (!isRemote && (gameMode === 'individual-devices' || isPtPSpectator || isOwnDeviceParticipant)) {
       return (turnOrder.find((p) => p.id === selfPlayerId) ?? turnOrder[0])?.name;
     }
     const hostName = isRemote
       ? remoteHostName ?? (isHost ? turnOrder[0]?.name : null)
       : (turnOrder.find((p) => p.id === '1') ?? turnOrder[0])?.name;
     return hostName ? `Host: ${hostName}` : undefined;
-  }, [isRemote, gameMode, isPtPSpectator, turnOrder, selfPlayerId, remoteHostName, isHost]);
+  }, [isRemote, gameMode, isPtPSpectator, isOwnDeviceParticipant, turnOrder, selfPlayerId, remoteHostName, isHost]);
 
   const matchHighlights = useMemo(() => {
     if (phase !== 'leaderboard' || !isLastQuestion || !remoteSummaryReady) return [];
@@ -9447,6 +9805,21 @@ export default function QuizScreen() {
       // gäst (guestIds-spärren i buildern) eller för ett spel utan HCP.
       selfHcp:
         summaryShowsHcp && selfPlayerId ? playerHcpChanges[selfPlayerId] ?? null : null,
+      // Pass-the-Phone host (normal and hybrid 1 by 1): every registered
+      // player who played on this phone gets an HCP progression, stacked in
+      // ONE card (Peter 2026-11-06). Hybrid own-device players are excluded
+      // (hybridOwnIds) — they see their own on their phone.
+      deviceHcps:
+        summaryShowsHcp && gameMode === 'pass-the-phone' && isHost
+          ? turnOrder
+              .filter((p) => !hybridOwnIds.has(p.id) && p.type !== 'guest' && !!playerHcpChanges[p.id])
+              .map((p) => ({
+                playerId: p.id,
+                name: p.name,
+                before: playerHcpChanges[p.id].before,
+                after: playerHcpChanges[p.id].after,
+              }))
+          : undefined,
     });
   }, [
     phase,
@@ -9462,6 +9835,9 @@ export default function QuizScreen() {
     selfHcpReady,
     summaryGuestIds,
     summaryShowsHcp,
+    gameMode,
+    hybridOwnIds,
+    turnOrder,
   ]);
 
   // Skyddsnät: hänger HCP-skrivningen (AsyncStorage) får solospelets summary
@@ -9734,7 +10110,8 @@ export default function QuizScreen() {
   // vi inte startar om kedjan vid varje re-render.
   const playerReadySentRef = useRef(false);
   useEffect(() => {
-    if (isHost || gameMode !== 'individual-devices' || !selfPlayerId) return;
+    // Hybrid own-device participants play too → same readiness handshake.
+    if (isHost || !(gameMode === 'individual-devices' || isOwnDeviceParticipant) || !selfPlayerId) return;
     if (!selfReadyToPlay || playerReadySentRef.current) return;
     playerReadySentRef.current = true;
     const send = () => {
@@ -9771,11 +10148,14 @@ export default function QuizScreen() {
   // hostPlayerId filtreras så en legacy-payload utan selfPlayerId inte ger en
   // fantom-peer som aldrig hälsar.
   const expectedPeerIds = useMemo(() => {
+    // Hybrid 1 by 1: the host waits for the own-device participants only
+    // (host-device players have no device; followers aren't required).
+    if (isHybrid && isHost) return [...hybridOwnIds];
     if (gameMode !== 'individual-devices' || !isHost) return [];
     return turnOrder
       .map((p) => p.id)
       .filter((id) => !!id && id !== selfPlayerId && id !== hostPlayerId);
-  }, [gameMode, isHost, turnOrder, selfPlayerId, hostPlayerId]);
+  }, [gameMode, isHost, turnOrder, selfPlayerId, hostPlayerId, isHybrid, hybridOwnIds]);
 
   // ⚠ Grinden räknar på `playerReadyIds`, INTE `playerConnectionStatus`.
   // `player_rejoined` betyder bara "jag är på kanalen" och skickas 300 ms
@@ -10234,7 +10614,7 @@ export default function QuizScreen() {
     //     i handlern ovan, så en sent anländande spelare dras in ändå.
     const shouldAnnouncePresence =
       !!selfPlayerId &&
-      (isPtPSpectator || (gameMode === 'individual-devices' && !isHost));
+      (isPtPSpectator || isOwnDeviceParticipant || (gameMode === 'individual-devices' && !isHost));
     if (shouldAnnouncePresence) {
       const sayHello = () => {
         sync.broadcastPlayerRejoined({ sender_id: selfPlayerId }).catch(() => {});
@@ -10621,6 +11001,8 @@ export default function QuizScreen() {
       <View style={styles.touchWrap} onTouchStart={signalHostActivity}>
       <GetReadyIntro
         mode={gameMode}
+        hybridParticipant={isOwnDeviceParticipant}
+        nextOnOwnDevice={isHybrid && isHost && !!hybridOwner && hybridOwnIds.has(hybridOwner.id)}
         currentPlayer={currentPlayer}
         queue={introQueue}
         queueRoundNumbers={queueRoundNumbers}
@@ -10692,7 +11074,7 @@ export default function QuizScreen() {
         // något; isAudioMutedForSelf faller då tillbaka på ljud PÅ.
         onSelfAudioChange={
           gameMode === 'remote-1v1' ||
-          (gameMode === 'individual-devices' && !isHost && !!selfPlayerId)
+          ((gameMode === 'individual-devices' || isOwnDeviceParticipant) && !isHost && !!selfPlayerId)
             ? handleSelfAudioChange
             : undefined
         }
@@ -10771,7 +11153,7 @@ export default function QuizScreen() {
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         playerAvatarUri={countdownPlayer?.avatarUri}
-        hidePlayerLabel={isLocalSoloGame}
+        hidePlayerLabel={isLocalSoloGame || (isHybrid && !!hybridOwner && hybridOwnIds.has(hybridOwner.id))}
         mediaSource={effectiveMediaSourceByQuestion[questionIndex] ?? null}
         answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
         category={effectiveCategoryByQuestion[questionIndex] ?? null}
@@ -10790,7 +11172,7 @@ export default function QuizScreen() {
         // PtP + remote skickar undefined → oförändrad lokal timing.
         anchorT0={
           !isHost &&
-          gameMode === 'individual-devices' &&
+          (gameMode === 'individual-devices' || isOwnDeviceParticipant) &&
           hostTimerStartAtRef.current > 0
             ? hostTimerStartAtRef.current - 7900
             : undefined
@@ -11656,14 +12038,14 @@ export default function QuizScreen() {
                       lämnat (hasLeft) döljs. Vertikal stagger per index så
                       ej-confirmade avatarer som ligger på samma x ändå syns. */}
                 {gameMode === 'pass-the-phone'
-                  ? confirmedTimeUsed !== null && !(isSpotifyQuestion && isCurrentPlayerDJ) && (
+                  ? ptpMarkerUsed !== null && !(isSpotifyQuestion && isCurrentPlayerDJ) && (
                       <View
                         pointerEvents="none"
                         style={[
                           styles.timerMarker,
                           {
                             left: `${
-                              ((responseSeconds - confirmedTimeUsed) /
+                              ((responseSeconds - ptpMarkerUsed) /
                                 responseSeconds) *
                               100
                             }%`,
@@ -12047,7 +12429,99 @@ export default function QuizScreen() {
                 )}
               </View>
             )}
-            {isSpotifyNameQuestion && spotifyNameVariant && !isCurrentPlayerDJ && (spotifyDJStarted || phase === 'reveal') ? (
+            {isHybridWatch ? (
+              // ── Hybrid 1 by 1 watcher (host or own-device participant) ──
+              // No answer controls. While the owner answers: who is answering
+              // + lock-in status. At reveal: the Spotify DJ result structure
+              // (correct-answer card, no badge for THIS device) with one line
+              // for the player who answered — never "You".
+              (() => {
+                const ownerName = hybridOwner?.name ?? 'Player';
+                const ownerLockedAt = hybridOwner ? playerConfirms[hybridOwner.id] : undefined;
+                if (phase !== 'reveal') {
+                  return (
+                    <View style={styles.questionSkippedBlock}>
+                      <Text style={styles.questionSkippedTitle}>{`${ownerName} is answering`}</Text>
+                      <Text style={styles.questionSkippedSub}>
+                        {ownerLockedAt !== undefined
+                          ? `Answer locked · ${ownerLockedAt.toFixed(2)}s`
+                          : 'Waiting for the answer'}
+                      </Text>
+                    </View>
+                  );
+                }
+                const ownerResult = hybridOwner
+                  ? [...allRoundScoresHistory.flat()]
+                      .reverse()
+                      .find((s) => s.playerId === hybridOwner.id && s.questionIndex === questionIndex)
+                  : undefined;
+                const isYear = question.type === 'timeline';
+                const correctLabel = isYear ? 'Correct year:' : 'Correct Name:';
+                const correctValue = isYear
+                  ? String(question.correctYear)
+                  : question.type === 'actor-select'
+                    ? question.correctNames[0] ?? ''
+                    : question.displayName;
+                const meta = isYear
+                  ? question.hint ?? ''
+                  : question.type === 'actor-select'
+                    ? `${question.displayName} · ${question.correctYear}`
+                    : '';
+                const outcome: 'correct' | 'wrong' | 'none' = !ownerResult
+                  ? 'none'
+                  : ownerResult.correct
+                    ? 'correct'
+                    : isNoAnswerScore(ownerResult, responseSeconds)
+                      ? 'none'
+                      : 'wrong';
+                const outcomeText =
+                  outcome === 'correct'
+                    ? `✓ ${ownerName}`
+                    : outcome === 'wrong'
+                      ? `✗ ${ownerName}`
+                      : `${ownerName} · ${ownerResult?.connectionError ? 'No connection' : 'No answer'}`;
+                const answerLine =
+                  outcome === 'none'
+                    ? `${ownerName} did not answer`
+                    : `${ownerName} answered: ${ownerResult?.answer ?? (isYear ? '—' : '—')}`;
+                return (
+                  <View style={rv.container}>
+                    <Animated.View
+                      style={[
+                        rv.feedbackCard,
+                        outcome === 'correct' ? rv.feedbackCorrect : rv.feedbackWrong,
+                        { transform: [{ scale: revealScale }], opacity: revealOpacity },
+                      ]}
+                    >
+                      <Text
+                        numberOfLines={1}
+                        maxFontSizeMultiplier={TIGHT_TEXT_MAX_SCALE}
+                        style={[
+                          rv.feedbackBadge,
+                          outcome === 'correct' ? rv.feedbackBadgeCorrect : rv.feedbackBadgeWrong,
+                        ]}
+                      >
+                        {outcomeText}
+                      </Text>
+                      <View style={rv.feedbackBody}>
+                        <Text style={rv.feedbackCorrectYear}>
+                          {correctLabel}{' '}
+                          <Text style={rv.feedbackCorrectYearBold}>{correctValue}</Text>
+                        </Text>
+                        {!!meta && (
+                          <Text style={rv.feedbackSongMeta} numberOfLines={1} ellipsizeMode="tail">
+                            {meta}
+                          </Text>
+                        )}
+                        <Text style={rv.feedbackSongMeta} numberOfLines={1} ellipsizeMode="tail">
+                          {answerLine}
+                        </Text>
+                      </View>
+                    </Animated.View>
+                  </View>
+                );
+              })()
+            ) : isSpotifyNameQuestion && spotifyNameVariant && !isCurrentPlayerDJ && (spotifyDJStarted || phase === 'reveal') ? (
               // Spotify Name-fråga: gissa artistnamnet via Letter Grid.
               // Döljs helt tills DJ aktiverat timern (spotifyDJStarted=true).
               // reveal-grenen visas alltid (isTimedOut-hantering inuti komponenten).
@@ -12378,7 +12852,9 @@ export default function QuizScreen() {
           Fas-medveten action-knapp:
             • question  → Confirm (blå glow + pulse)
             • awaiting  → låst "Answer Locked" */}
-      {(phase === 'question' || phase === 'awaiting' || (phase === 'reveal' && isSpotifyQuestion && isCurrentPlayerDJ)) && (
+      {/* Hybrid 1 by 1 watcher: no Confirm bar — it never answers this turn. */}
+      {!isHybridWatch &&
+        (phase === 'question' || phase === 'awaiting' || (phase === 'reveal' && isSpotifyQuestion && isCurrentPlayerDJ)) && (
         /* Icke-DJ Spotify pre-timer: baren renderas ALLTID (Peter 2026-10-27)
            med en grå, otappbar kontroll på samma plats och i samma storlek som
            den aktiva — ingen layout-hopp när timern/svaret blir tillgängligt. */
@@ -12629,7 +13105,8 @@ export default function QuizScreen() {
                 <SequentialDots color={Colors.textSecondary} />
               </View>
             )
-          ) : gameMode === 'individual-devices' && !isHost ? (
+          ) : (gameMode === 'individual-devices' || isOwnDeviceParticipant) && !isHost ? (
+            // Hybrid own-device participants never advance — the host does.
             <View style={rv.waitingForHostPill}>
               <Text style={rv.waitingForHostPillText}>Waiting for host</Text>
               <SequentialDots color={Colors.textSecondary} />

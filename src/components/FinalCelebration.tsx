@@ -126,6 +126,8 @@ const PAGE_W = SCREEN_W;
  * binder taket aldrig.
  */
 const RANK_LIST_MAX_H = Math.round(SCREEN_H * 0.34);
+// Taller than the rank list: each HCP progression is a full shield row.
+const HCP_LIST_MAX_H = Math.round(SCREEN_H * 0.5);
 
 /**
  * Extra hålltid per rad i ett placeringskort. En lista med tio namn hinner
@@ -515,8 +517,9 @@ export default function FinalCelebration({
     const rowCount = highlights[pageIndex]?.rows?.length ?? 0;
     // HCP-kortet står tills myntsnurret landat, pulsen klingat ut och
     // resultatet hunnit läsas — annars bläddrar det mitt i avslöjandet.
-    const hold = highlights[pageIndex]?.hcp
-      ? Math.max(timingRef.current.cardHold, HCP_CARD_HOLD_MS)
+    const hold = highlights[pageIndex]?.hcp || highlights[pageIndex]?.hcpList
+      ? Math.max(timingRef.current.cardHold, HCP_CARD_HOLD_MS) *
+        Math.max(1, Math.min(2, highlights[pageIndex]?.hcpList?.length ?? 1))
       : timingRef.current.cardHold + rowCount * RANK_ROW_HOLD_MS;
     const id = setTimeout(() => {
       const next = pageIndex + 1;
@@ -707,7 +710,30 @@ export default function FinalCelebration({
                     <Text style={[styles.cardTitle, styles.cardTitleSolo]}>
                       {card.title}
                     </Text>
-                    {card.hcp ? (
+                    {card.hcpList ? (
+                      /* Hybrid 1 by 1 host: one HCP progression per player
+                         who played on this phone, in ONE taller card that
+                         scrolls vertically when they don't all fit. */
+                      <ScrollView
+                        style={styles.hcpListScroll}
+                        contentContainerStyle={styles.hcpListContent}
+                        nestedScrollEnabled
+                        showsVerticalScrollIndicator
+                      >
+                        {card.hcpList.map((h) => (
+                          <View key={h.playerId} style={styles.hcpListItem}>
+                            <Text style={styles.hcpListName} numberOfLines={1}>
+                              {h.name}
+                            </Text>
+                            <HcpProgressSummary
+                              before={h.before}
+                              after={h.after}
+                              active={stage === 'highlights' && pageIndex === cardIndex}
+                            />
+                          </View>
+                        ))}
+                      </ScrollView>
+                    ) : card.hcp ? (
                       <HcpProgressSummary
                         before={card.hcp.before}
                         after={card.hcp.after}
@@ -954,6 +980,25 @@ const styles = StyleSheet.create({
   cardTitleSolo: {
     fontSize: 15,
     letterSpacing: 1,
+  },
+  // ── Hybrid 1 by 1: stacked HCP progressions on the host ───────────────
+  hcpListScroll: {
+    alignSelf: 'stretch',
+    maxHeight: HCP_LIST_MAX_H,
+    flexGrow: 0,
+  },
+  hcpListContent: {
+    gap: Spacing.lg,
+    paddingBottom: Spacing.sm,
+  },
+  hcpListItem: {
+    alignItems: 'center',
+  },
+  hcpListName: {
+    color: Colors.textPrimary,
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    marginBottom: Spacing.xs,
   },
   // ── Placeringslista — ALLA korttyper som namnger spelare ──────────────
   rankList: {

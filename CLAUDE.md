@@ -129,6 +129,15 @@ Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-on
 - [x] Add for Review → Submit — SUBMITTED 2026-09-24 23:41, build **#38** (ersatte #36/#37 pga Expo-template-ikon), submission `709a5a00-769d-441a-b3e5-9cf5bbd005c9`. **Bytt till MANUELL release 2026-09-26** (under Waiting for Review) — efter godkännande står den i "Pending Developer Release" tills Peter trycker Release. JS-/innehållsfixar före release går via `npx eas update --branch production --platform ios`; nytt binärbygge för 1.0 kräver Developer Reject (= ny review).
 - [ ] **Efter Apple-godkännande — återregistrerings-block (0060)**: kör `0060_deleted_account_tombstones.sql` i PROD SQL Editor → redeploya `delete-account` på PROD (Verify JWT OFF, verifiera Code-fliken) → läs + pusha privacy-raden till master → `npx eas update --branch production --platform ios` för Register-texten. Verifiera: radera ett testkonto i PROD → `select * from public.deleted_account_tombstones` ger en rad. Staging klart + verifierat 2026-10-19. ⚠ Ordningen: migrationen FÖRE funktionen (funktionen skriver till tabellen; utan den failar delete med `tombstone_failed`).
 - [ ] **Efter Apple-godkännande — Hints av för nya konton (0061)**: kör `0061_profiles_hints_default_off.sql` i PROD SQL Editor (en rad, ingen OTA). Staging klart 2026-11-04.
+- [ ] **Efter Apple-godkännande — Multiplayer v2-migrationer (0062–0066)**: kör i PROD SQL Editor, i ordning:
+  - `0062_multiplayer_v2_gates.sql`: bara huvud-SQL:en, ALDRIG de kommenterade snippetarna längst ned.
+  - `0063_lobby_players_device_mode.sql`
+  - `0064_multiplayer_v2_server_rules.sql`
+  - `0065_multiplayer_v2_removals.sql`
+  - `0066_hybrid_turn_results.sql` (Step 4)
+
+  Verifiera med `check-migrations.sql` (alla fem ✅) och `select value from public.app_config where key = 'feature_gates';`, som ska ge `"multiplayerV2": false`. Flaggen förblir **false i PROD** tills Step 8 (hela hybrid-flödet klart och testat). Migrationerna är no-op för rum med `multiplayer_v2 = false`, så de ändrar inget beteende i PROD. Ingen OTA krävs. Staging klart + verifierat 2026-11-06 (commits `40fadcb`, `dcb3799`, `054bdf2`).
+  - OBS: klientkoden på `logo-gold-home` fungerar mot PROD även INNAN migrationerna körts (fallbacks för saknade kolumner). Två ändringar gäller dock ALLA rum så fort koden når PROD via OTA/build, oberoende av flaggen: credit dras först efter lyckad start (C1) och "Game already started" vid sen join (C5).
 - [ ] **Ny tagline i "Confirm signup"-mailet (2026-11-04)**: repo-filen `supabase/email-templates/confirm-signup.html` har "Play your way. Anytime. Anywhere." men det LIVE mailet renderas från dashboard-templaten — klistra in filen i Auth → Emails → Templates → "Confirm signup" på BÅDE staging och PROD. (Landningssidan `docs/email-confirmed.html`, "Music. Film/TV. Memories.", går live först när branchen når master.)
 - [ ] **Lanseringsdagen**: sätt `app_config.free_premium_promo.until` i PROD = go-live + 1 månad (placeholder 2026-12-31 nu).
 - [ ] **Betald prenumeration efter kampanjen** (planera ~1 mån efter lansering). Kampanjslut styrs av `free_premium_promo.until` — förläng med SQL om 1.0.1 dröjer (tak: `OFFER_BACKSTOP_UNTIL` 2026-12-31, senare kräver OTA). Förslag: kampanjslut = lansering + 5–6 v, submit 1.0.1 vecka 3–4. Ordning:
@@ -2115,6 +2124,79 @@ YouTube-klippen är NOTERAT INTE bara musik — kan vara filmscener, sporthände
 **Döda / blockerade klipp — pre-game först, popup som skyddsnät (2026-09-23, ERSÄTTER 2026-06-03-vägen med "Video unavailable" + 0 pts).** Bakgrund: `drake-one-dance` (re-upload av "Billion Stars") gav "Video unavailable" i TestFlight (SE) fast Data API, oEmbed och CI:s embed-audit alla sa spelbart — claim-baserade embed-block per land syns BARA vid riktig uppspelning från landet. (1) **Pre-game (primärt)**: `validateSequenceClips` ([quiz.tsx](app/quiz.tsx)) kollar spelfönstret + `CLIP_PROBE_RESERVE` innan Play och byter döda frågor mot reserver (`swapDeadYtItems`) — utbytt fråga räknas som vanligt. `checkYoutubeClipsAlive` ([youtubeLiveness.ts](src/utils/youtubeLiveness.ts)) kör oEmbed PARALLELLT med `serverCheck` = Edge Function **`check-clips`** ([supabase/functions/check-clips](supabase/functions/check-clips/index.ts), Verify JWT AV, secret `YOUTUBE_API_KEY`): Data API (raderat/privat/embeddable=false/åldersgräns/regionRestriction utan SE) ∪ **blocklistan** `clip_playback_errors` (migration **0056**; bara `video_not_found`/`embed_not_allowed`, 30 dagar, ej `cleared`). serverCheck kan bara LÄGGA TILL döda ids, aldrig säga levande; fail-open. (2) **In-game (skyddsnät)**: `handleYoutubeError` → `handleClipUnavailable` rapporterar felet (`reportClipError` i [clipErrorReport.ts](src/utils/clipErrorReport.ts) → blocklistan, så NÄSTA spel byter ut klippet före Play), fryser timer + scoring-latch och visar Alert **"Clip unavailable / Sorry but this clip has been removed for your region"**. Host/single/PtP byter frågan på SAMMA index (`pickReplacementQuestion` → `lockedSequenceRef`) och går till Get Ready utan PtP-rotation (`handleAdvanceToNextRound(idx, { keepPlayer: true })`); trasiga frågan får ingen poängrad. IndDev: non-host skickar `clip_unavailable` till host; host broadcastar `question_advance` med samma index + **`swap_question_id`** (ingår i dedupe-nyckeln `lastHandledAdvanceRef` — utan den droppas swap-advancen). Remote 1v1 (server-låst sekvens): frågan HOPPAS ÖVER via `upsertAnswer({ skipped: true })` (migration **0057**; forfeit-RPC:n ignorerar skippade rader, resume-seeden hoppar dem). Ingen reserv → hoppa till nästa plats utan poäng. ⚠ Försök INTE byta till nästa klipp på itemet mitt i frågan (gamla C1-fallbacken) — Peter vill hela frågan bytt. `failedClipVideoIds` används bara av pre-game-kollen. (3) **Nightly auto-PR**: rött `validate` → jobbet `autofix-pr` kör autofix --apply + export och öppnar PR `bot/clip-fix` med review-request till peterlomaco (tabell via [clip-fix-pr-body.ts](backend/scripts/clip-fix-pr-body.ts), klickbara länkar + ⚠ för inofficiell kanal / år i titeln). Merge → [ota-on-clip-fix-merge.yml](.github/workflows/ota-on-clip-fix-merge.yml) publicerar OTA till `preview` (kräver secret `EXPO_TOKEN`; byt till production vid launch).
 
 **Katalog-schema-diskrepans (löst 2026-05-22)**: tidigare använde [songs-gen-z.yaml](backend/content/catalog/songs-gen-z.yaml) + [songs-gen-alpha.yaml](backend/content/catalog/songs-gen-alpha.yaml) `media: {kind: youtube, ...}`-format medan resten av songs-files använder `youtubeClips: [...]`-array. Schema validerade båda men [export-music-questions.ts](backend/scripts/export-music-questions.ts) läser BARA `youtubeClips:` → 51 items var "död data". **Bulk-conversion-script** [backend/scripts/convert-media-to-youtubeclips.ts](backend/scripts/convert-media-to-youtubeclips.ts) konverterade allt 2026-05-22 (29 items i gen-z + 22 i gen-alpha) via text-baserad rad-walk som bevarar kommentarer och indentation. Music v1-curation samma dag lade dessutom till `youtubeClips:` på 10 nya items i songs-elder/gen-x/millennials (sedan flyttade alla 10 till songs-all.yaml som cross-gen-iconic). Slutresultat: 66 music-questions playable. Den `media:`-discriminerade unionen finns kvar i schema för framtida non-youtube-typer (`ai-image` är schema-definierad men inte i bruk).
+
+## Multiplayer v2 — "1 by 1" / "All at Once" (Steg 1–4 klara, STAGING ONLY, 2026-11-06)
+
+Ersätter på sikt det manuella valet Pass-the-Phone/Individual devices.
+- **Lägen:** spelläget härleds ur varje spelares **device-val** (`own` = egen telefon, `host` = host:ens telefon), låst vid join.
+- **Interna id:n är oförändrade:** **1 by 1 = `'pass-the-phone'`**, **All at Once = `'individual-devices'`**. Döp inte om dem — de kollas på ~175 ställen + DB-CHECKs + historik.
+- **Plan:** `C:\Users\46725\.claude\plans\pasted-content-id-08c3-we-are-snuggly-toucan.md` (Steg 5 = lobby-UI, 6 = device-val vid join, 7 = copy, 8 = slå på i PROD). Varje steg kräver Peters uttryckliga OK.
+
+**Gate:**
+- `app_config.feature_gates = { multiplayerV2, allAtOnce: 'everyone'|'premium' }`, läses vid app-start ([featureGates.ts](src/utils/featureGates.ts), [entitlements.ts](src/utils/entitlements.ts) `canUse('allAtOnce', …)`).
+- Fångas atomiskt i `rooms.multiplayer_v2` vid `registerActiveRoom`, så ett rum byter aldrig modell mitt i.
+- **true i staging, false i PROD** till Steg 8. Allt nytt är no-op för rum med `multiplayer_v2 = false`.
+- Slå av/på (staging): `update public.app_config set value = jsonb_set(value,'{multiplayerV2}','true'::jsonb), updated_at = now() where key = 'feature_gates';`, sedan stäng appen helt och skapa ett NYTT rum (flaggan läses bara vid start).
+
+**Steg 1–4:**
+
+| Steg | Vad | Migration | Commit |
+|---|---|---|---|
+| 1 | Gates, entitlement, ren resolver + kapacitetsregler ([gameFlow.ts](src/utils/gameFlow.ts)) | 0062 | `40fadcb` |
+| 2 | `lobby_players.device_mode`. Skrivs BARA av spelarens egen targeted UPDATE (`publishOwnDeviceMode`), aldrig i host:s bulk-upsert. Host = `own`, "+ Add Guest" = `host` (härlett). v2-joiners defaultar `own`; legacy-rum skriver inget. Följer med vid re-match (`deviceMode`-param). | 0063 | `dcb3799` |
+| 3 | Server-regler: join-trigger, `set_lobby_spotify`, `start_lobby_game` + fryst `rooms.game_config`. Credit dras först efter accepterad start. Sen join säger "Game already started". | 0064, 0065 | `054bdf2` |
+| 4 | Hybrid 1 by 1-motorn (nedan) | 0066 | se git log |
+
+**Steg 3, server-reglerna (0064/0065):**
+- Trigger `enforce_lobby_join_eligibility` nekar:
+  - ny rad efter Start;
+  - fullt rum;
+  - gäst eller host-device när Spotify är på;
+  - host-device när > 4 spelare;
+  - byte av device på levande rad. Leave + rejoin nollställer.
+- Rader host skriver åt andra (`user_id` null) som inte får finnas hoppas över (`return null`), så de aldrig fäller host:s bulk-write.
+- Spotify-borttagna lagras i `lobby_removed_players` och kan bara komma tillbaka med ett NYTT `player_id` via ordinarie join.
+- `start_lobby_game` låser rummet, validerar rostern och läget och fryser `game_config` (spelare, ordning, device, läge, Spotify, `allAtOnceAllowed`). Non-hosts läser rostern, läget och Spotify ur den frysta configen.
+- Felkoder `qv_<join|start|spotify|turn>_rejected:<reason>` mappas till texter i `gameFlow.ts` (`joinRejectionMessage` / `startRejectionMessage`).
+
+**Credits (gäller ALLA rum, även legacy):**
+- Saldot kontrolleras först, men dras först efter att starten accepterats, på ETT ställe i `handleStartGame`. Inga refunds behövs.
+- `hostGameStartedRef`-guard överst stoppar en upprepad Start.
+- ⚠ Inte exactly-once: saldot är device-lokalt (AsyncStorage). Dör appen mellan serverstart och skrivning blir spelet gratis.
+
+**Steg 4 — hybrid 1 by 1** ([quiz.tsx](app/quiz.tsx), [hybridTurns.ts](src/utils/hybridTurns.ts), [turnResults.ts](src/utils/turnResults.ts)):
+- **Gate:** quiz-param `hybridOneByOne='true'` + `hybridOwnDeviceIds`. Lobbyn sätter dem ENBART från en fryst v2-config med 1 by 1 + minst en icke-host på `own` (`hybridQuizParams`). Legacy-PtP och v2-PtP där alla sitter på host:ens telefon får aldrig parametrarna. Varje `isHybrid`-gren är död kod där.
+- **Turägare:** `turnOrder[questionIndex % n]` (samma rotation som PtP). `hybridRole`:
+  - host svarar på egna + host-device-turer och tittar på own-device-turer;
+  - own-device-spelare svarar bara på sin egen tur.
+- **Watch-vy:**
+  - media + timer + "{namn} is answering" + lock-in (`player_answer_confirmed`), inga svarskontroller;
+  - reveal återanvänder Spotify DJ-kortets struktur (rätt svar + en rad om vad spelaren svarade, aldrig "You");
+  - host:en ser samma vy och har dessutom Next.
+- **Start:** `play_command` skickas även i hybrid. Own-device-spelare går IndDev-non-host-vägen (countdown på host:ens klocka, frågan pinnad). Ingen "Follow leaderboard"-prompt för dem. Host-device-följare har kvar dagens spectator-vy.
+- **Score:** bara turägaren registrerar (`recordRoundScore`-guard). Mottagare godtar bara turägarens score (`acceptsHybridScore`).
+- **Host-auktoritet (0066 `lobby_turn_results`):**
+  - Host skriver VARJE accepterat resultat via host-only RPC `record_turn_result`; första raden vinner (`on conflict do nothing`).
+  - Next/Final Leaderboard väntar på lyckad skrivning.
+  - Uteblivet svar → host:en sätter "No answer" (`connectionError`) 3 s efter timern och broadcastar `host_final` som **hint**. Mottagare verifierar mot `get_turn_results` innan de byter ut något, eftersom broadcast-avsändare inte är autentiserade.
+- **Spelslut:** leaderboard visas direkt, men HCP + Player history sparas först när servern har en rad för VARJE fråga. Retry var 5 s + vid app-förgrund; sparas en gång. Lämnar man slutskärmen innan dess sparas inget för det spelet på den enheten (medvetet).
+- **Spelare som lämnat:**
+  - own-device-spelare som trycker Leave markeras borta hos host:en;
+  - vid Press Play på deras tur: "{namn} has left, question will be deleted." → frågan raderas (server-rad med `player_id = '__deleted__'`, ingen poäng) → nästa fråga;
+  - force-quit utan Leave ger "No answer" efter timern.
+- **Ljud:** own-device-spelare mutade som default med egen toggle. Host + host-device-spel har ljud på.
+- **Seed:** `roomCode`-seed så alla enheter får samma svarsalternativ.
+- **HCP / Game Summary:**
+  - host:en grundar bara host-device-spelare och own-device-spelare grundar sig själva;
+  - HCP-kortet i Game Summary listar på host:ens telefon (BÅDE vanlig PtP och hybrid) varje registrerad spelare som spelade där, staplat i ETT högre scrollbart kort;
+  - own-device-spelare ser sitt eget namn och sitt eget HCP.
+- **Test av "app-user på host:ens telefon"** innan Steg 6 finns, efter join men före Start:
+  ```sql
+  update lobby_players set device_mode = null where …;
+  update lobby_players set device_mode = 'host' where …;
+  ```
+
+**PROD:** migrationerna 0062–0066 körs efter Apple-godkännandet (se checklistan överst). Flaggan förblir false i PROD till Steg 8.
 
 ## Pass-the-Phone — non-host som live-spectator (2026-08-25)
 

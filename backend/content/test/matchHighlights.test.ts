@@ -191,3 +191,28 @@ describe('buildSinglePlayerSummary', () => {
     expect(cards.map((c) => c.kind)).toEqual(['game-performance']);
   });
 });
+
+describe('buildMultiplayerSummary — hybrid host-device HCP (Step 4)', () => {
+  it('two or more host-device players → ONE stacked HCP card, before Top', () => {
+    const cards = build({
+      deviceHcps: [
+        { playerId: 'p1', name: 'Anna', before: 60, after: 57 },
+        { playerId: 'p3', name: 'Cia', before: 80, after: 81 },
+      ],
+    });
+    expect(kinds(cards)).toEqual(['hcp-progress', 'top-performance']);
+    expect(cards[0].hcpList?.map((h) => h.name)).toEqual(['Anna', 'Cia']);
+    expect(cards[0].hcp).toBeUndefined();
+  });
+  it('guests are dropped; a single entry keeps the normal self card', () => {
+    const cards = build({
+      guestIds: new Set(['p3']),
+      deviceHcps: [
+        { playerId: 'p1', name: 'Anna', before: 60, after: 57 },
+        { playerId: 'p3', name: 'Cia', before: 80, after: 81 },
+      ],
+    });
+    expect(cards[0].hcpList).toBeUndefined();
+    expect(cards[0].hcp).toEqual({ before: 60, after: 57 });
+  });
+});

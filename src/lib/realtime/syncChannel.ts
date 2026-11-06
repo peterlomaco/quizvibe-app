@@ -404,6 +404,14 @@ export interface PlayerScoreRecordedPayload {
   /** Svaret som visningstext (namn eller år/årsintervall) för reveal-facitet.
    *  Optional — äldre klienter skickar det inte. */
   answer?: string;
+  /** Hybrid 1 by 1 (Step 4): the turn was lost to a connection problem, so
+   *  every device shows "No connection" consistently. Optional/additive. */
+  connection_error?: boolean;
+  /** Hybrid 1 by 1: the HOST recorded this result on the owner's behalf
+   *  ("No answer" after timeout + grace). A HINT only — receivers verify it
+   *  against the server row (get_turn_results, migration 0066) before
+   *  replacing anything, since broadcast senders are not authenticated. */
+  host_final?: boolean;
 }
 
 /**
@@ -921,6 +929,8 @@ function vPlayerScoreRecorded(raw: unknown): PlayerScoreRecordedPayload | null {
     ...(typeof raw.answer === 'string' && raw.answer.length > 0 && raw.answer.length <= 80
       ? { answer: raw.answer }
       : {}),
+    ...(raw.connection_error === true ? { connection_error: true } : {}),
+    ...(raw.host_final === true ? { host_final: true } : {}),
   };
 }
 
