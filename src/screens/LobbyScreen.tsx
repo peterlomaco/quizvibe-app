@@ -1894,13 +1894,9 @@ export default function LobbyScreen() {
         };
         // Spara payloaden för self-heal om upsert:en nedan tyst misslyckas.
         ownPlayerRef.current = guestPlayer;
-        // Sätt in gästen direkt efter host (index 1) så de syns högt upp.
         setPlayers((prev) => {
-          const hostIdx = prev.findIndex((p) => p.isHost);
-          const insertAt = hostIdx === -1 ? 0 : hostIdx + 1;
-          const next = [...prev];
-          next.splice(insertAt, 0, guestPlayer);
-          return next;
+          // Ankomstordning: den som kommer in sist hamnar sist (Peter 2026-11-06).
+          return [...prev, guestPlayer];
         });
         // Publicera egen rad till lobby_players så host:s Realtime-channel
         // får broadcast och hen ser den nya spelaren direkt i sin vy.
@@ -2029,11 +2025,8 @@ export default function LobbyScreen() {
           const existing = prev.find((p) => p.id === joinerId);
           const joinerWithApproval = { ...joiner, approved: existing?.approved ?? joiner.approved };
           const filtered = prev.filter((p) => p.id !== joinerId);
-          const hostIdx = filtered.findIndex((p) => p.isHost);
-          const insertAt = hostIdx === -1 ? 0 : hostIdx + 1;
-          const next = [...filtered];
-          next.splice(insertAt, 0, joinerWithApproval);
-          return next;
+          // Ankomstordning: den som kommer in sist hamnar sist (Peter 2026-11-06).
+          return [...filtered, joinerWithApproval];
         });
         // Publicera egen rad till lobby_players så host:s Realtime-channel
         // får broadcast och hen ser den nya spelaren direkt i sin vy.
@@ -4198,6 +4191,10 @@ export default function LobbyScreen() {
       ) return;
       if (promptedIdsRef.current.has(p.id)) return;
       promptedIdsRef.current.add(p.id);
+      // Host slog själv av godkännandet (eller lade till gästen manuellt):
+      // ingen join-popup — kortet flyttas bara till "To be Approved by Host",
+      // precis som för en QuizVibe user (Peter 2026-11-06).
+      if (hostUnapprovedIdsRef.current.has(p.id) || p.addedByHost) return;
       setJoinPopupQueue((prev) => (prev.includes(p.id) ? prev : [...prev, p.id]));
     });
     // `friends` i deps: hostFriendsRef är en ref (triggar ingen re-run) —
@@ -5811,9 +5808,9 @@ export default function LobbyScreen() {
         );
         if (newJoiners.length === 0) return changed ? synced : prev;
         const base = changed ? synced : [...prev];
-        const hostIdx = base.findIndex((p) => p.isHost);
-        const insertAt = hostIdx === -1 ? base.length : hostIdx + 1;
-        base.splice(insertAt, 0, ...newJoiners);
+        // Ankomstordning: nya joiners läggs SIST, efter manuellt tillagda gäster
+        // och tidigare joiners — den som kommer in sist spelar sist (Peter 2026-11-06).
+        base.push(...newJoiners);
         return base;
       });
     };
