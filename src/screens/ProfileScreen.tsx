@@ -3498,8 +3498,10 @@ export default function ProfileScreen() {
                 <Text style={styles.logoutHeaderName}>
                   {playerName.trim() || 'Signed in'}
                 </Text>
-                {/* "Logged in" i stället för e-post — renare meny (UI 2026-10-20). */}
-                <Text style={styles.logoutHeaderStatus}>Logged in</Text>
+                {/* E-post under namnet (återinförd 2026-11-06, Peter). */}
+                <Text style={styles.logoutHeaderStatus} numberOfLines={1}>
+                  {email.trim() || 'Logged in'}
+                </Text>
               </View>
             </View>
             {/* Samma avdelare som Home:s konto-sheet (profileMenu.menuDivider). */}
