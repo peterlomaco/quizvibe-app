@@ -130,15 +130,14 @@ export function PlayerRow({
 }: PlayerRowProps) {
   // "Details +/-"-toggle per spelarkort — gömmer Assistance + Age-pillarna
   // tills man fäller ut. Default hopfällt (Details +).
-  // Default-läge för "Details": utfällt för non-host som väntar på godkännande
-  // (host ska se assist level + age innan approve), hopfällt för host:ens eget
-  // kort och för redan godkända spelare. När en väntande spelare godkänns löpande
-  // fäller den ihop sig automatiskt (effekten nedan reagerar på approved-byte).
-  // Manuell toggle gäller tills nästa approved-byte.
+  // Default-läge för "Details": ALLTID hopfällt (Peter 2026-11-06) — även för
+  // väntande non-hosts. När kortet byter sektion (godkänns, eller host slår av
+  // godkännandet så det flyttas till "To be approved by Host") fäller det ihop
+  // sig automatiskt. Manuell toggle gäller tills nästa sektionsbyte.
   const isWaitingNonHost = !isHostPlayer && !hasLeft && !approved;
-  const [detailsExpanded, setDetailsExpanded] = useState(isWaitingNonHost);
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
   useEffect(() => {
-    setDetailsExpanded(isWaitingNonHost);
+    setDetailsExpanded(false);
   }, [isWaitingNonHost]);
   const hasDetails = !hasLeft && hcpComplete && !!age && !!assistance;
   // Höger-slotens kontroller (approve-toggle / papperskorg) som måste synas
