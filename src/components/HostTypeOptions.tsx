@@ -5,6 +5,8 @@ import { TouchableOpacity } from '@/src/components/haptic';
 import { VersusIcon } from '@/src/components/VersusIcon';
 import { GroupOutlineIcon } from '@/src/components/GroupOutlineIcon';
 import { ProfileOutlineIcon } from '@/src/components/ProfileOutlineIcon';
+import { getCachedFeatureGates } from '@/src/utils/featureGates';
+import { modeLabels } from '@/src/utils/gameFlow';
 
 // ─── Lobbytyp-väljare (Start New Game / Start Game as Guest) ─────────────────
 // Renodlad 1vs1-lobby (2026-08-07): vägvalet mellan vanlig lobby och 1vs1-
@@ -113,8 +115,10 @@ export function HostTypeOptions({
         icon={<GroupOutlineIcon size={MODE_ICON_SIZE} color={iconColor ?? Colors.textPrimary} strokeWidth={MODE_ICON_STROKE} />}
         label="Multiplayer"
         subtitle="Play together here & now"
-        // Guest host kan inte hosta Individual device (Peter 2026-11-04).
-        detail={guestHost ? 'Pass-the-Phone' : 'Pass-the-Phone or individual devices'}
+        // Legacy: guest host kan inte hosta Individual device (Peter 2026-11-04).
+        // Multiplayer v2: båda lägena listas alltid — lobbyn visar vad som är
+        // låst för just den hosten (Peter 2026-11-07).
+        detail={multiplayerDetail(guestHost)}
         badgeText={localBadge?.text}
         badgeMuted={localBadge?.muted}
         onPress={() => onSelect('multiplayer')}
@@ -320,3 +324,10 @@ const hostTypeStyles = StyleSheet.create({
     lineHeight: 16,
   },
 });
+
+function multiplayerDetail(guestHost: boolean | undefined): string {
+  const gates = getCachedFeatureGates();
+  const { oneByOne, allAtOnce } = modeLabels(gates.multiplayerV2);
+  if (gates.multiplayerV2) return `${oneByOne} or ${allAtOnce}`;
+  return guestHost ? oneByOne : `${oneByOne} or individual devices`;
+}

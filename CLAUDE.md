@@ -2149,6 +2149,7 @@ Ersätter på sikt det manuella valet Pass-the-Phone/Individual devices.
 | 4 | Hybrid 1 by 1-motorn (nedan) | 0066 | se git log |
 | 5 | Lobby-UI: flödet härleds ur devices, "Play 1 by 1"-override, Spotify via RPC (nedan) | — | se git log |
 | 6 | Device-val vid join + Guest Host på resolvern (nedan) | 0067 | se git log |
+| 7 | Copy: lägesnamn följer gaten (nedan) | — | se git log |
 
 **Steg 3, server-reglerna (0064/0065):**
 - Trigger `enforce_lobby_join_eligibility` nekar:
@@ -2222,6 +2223,16 @@ Ersätter på sikt det manuella valet Pass-the-Phone/Individual devices.
 - **Manuella gäster** ("+ Add Guest") ser aldrig steget och är alltid `host`.
 - **Follow leaderboard-prompten** är oförändrad: host-device-deltagare med appen får den, own-device-deltagare går direkt in i quizet (Steg 4).
 - **Guest Host** går genom samma resolver: `isV2Lobby` utesluter inte längre guest-hostade lobbies. Guest-seedens PtP är bara startvärde i v2-rum (carry-over seedar overriden via `carriedGameModeRef`). Den avskalade guest-lobbyn visar en egen "Game Mode"-panel ovanför Quiz Tuning med samma rutor (`renderV2FlowBoxes`, delad med registrerade lobbyn). Oförändrat: max 4 (hasPremium tvingas false), YouTube-only, Spotify alltid av och dold. Legacy guest-rum är fortfarande låsta till PtP.
+
+**Steg 7 — copy** ([gameFlow.ts](src/utils/gameFlow.ts) `modeLabels`/`gameModeLabel`, [modeLabels.ts](src/utils/modeLabels.ts) `currentModeLabels`):
+- **Lägesnamnen följer gaten, inte en hårdkodad sträng.** Gate på → "1 by 1" / "All at Once" / "Pass the phone to:"; av → "Pass-the-Phone" / "Individual device" / "Pass-the-Phone to:". PROD (flagga av) läser alltså oförändrat tills Steg 8 — byt aldrig namnen till fasta strängar före dess.
+- **Lobbyn läser rummets egen flagga** (`lobbyModeLabels = modeLabels(roomIsMultiplayerV2 === true)`), så ett legacy-rum fortsätter säga Pass-the-Phone/Individual device även när gaten är på. Övriga skärmar (Home, Store, FAQ, Profile, GetReady, Countdown, HostTypeOptions, RoundsRuler, Player history/Marathon-grupperingen) läser den cachade gaten via `currentModeLabels()`.
+- `resolveGameForm(mode, single, v2)` byter bara ETIKETTEN — grupperingsnycklarna är oförändrade, så gamla och nya poster hamnar i samma grupp.
+- Home:s Premium-lista och Store/FAQ delar nu EN källa: `subscriptionFeatures()` i StoreScreen (Home:s `PREMIUM_FEATURES`-kopia är borta).
+- FAQ: `faqCategories()` returnerar legacy-texten när gaten är av; på → två frågor ersätts helt (skillnaden 1 by 1/All at Once, "kräver All at Once Premium?" som följer `allAtOnce`-gaten) och resten skrivs om med fras-ersättningar.
+- Inga texter i legacy-grenar (gatade på `!multiplayerV2Profile` / `roomIsMultiplayerV2 === false`) är ändrade — de syns bara när gaten är av.
+- **Home "Multiplayer Game"-undertexten** (HostTypeOptions) säger ALLTID "1 by 1 or All at Once" när gaten är på — oavsett Premium eller Guest Host. Lobbyn visar vad som är låst.
+- **Guest Host + `allAtOnce = 'premium'`** (`allAtOnceGuestLocked` i LobbyScreen): All at Once-rutan är låst (`modeOptionLocked` — dämpad kant/navy + litet lås, INGEN opacity-dimning), ingen PREMIUM-badge, tap ger info-only-alert och raden under säger `GUEST_ALL_AT_ONCE_LOCKED_TEXT` ("All at Once requires a QuizVibe account with Premium."). Aldrig Store/köp för en Guest Host. Inloggad host utan Premium behåller PREMIUM-badge + Store-popup. FAQ följer `guestHostCanPlayAllAtOnce` (entitlements.ts, samma `canUse` som lobbyn). Home:s user-vs-guest-tabell är lägesneutral: "Host Single Play Games" / "Host Multiplayer Games", ✓ för både user och Guest (Peter 2026-11-07).
 
 **PROD:** migrationerna 0062–0066 körs efter Apple-godkännandet (se checklistan överst). Flaggan förblir false i PROD till Steg 8.
 

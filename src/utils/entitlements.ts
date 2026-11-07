@@ -72,3 +72,18 @@ export function canUse(
       return false;
   }
 }
+
+/**
+ * Whether a Guest Host may play All at Once. One rule for Home's user-vs-guest
+ * table, the FAQ and the Home game-type panel, built on the same canUse the
+ * lobby uses (Guest Hosts are never premium). Gate off → false (legacy: a
+ * Guest Host could never use Individual device).
+ */
+export function guestHostCanPlayAllAtOnce(gates: FeatureGates): boolean {
+  return gates.multiplayerV2 && canUse('allAtOnce', { isPremium: false, isGuestHost: true }, gates);
+}
+
+/** Same rule for a FREE registered host (premium checked separately). */
+export function freeUserCanPlayAllAtOnce(gates: FeatureGates): boolean {
+  return !gates.multiplayerV2 || canUse('allAtOnce', { isPremium: false, isGuestHost: false }, gates);
+}

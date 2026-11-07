@@ -91,6 +91,7 @@ import {
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { LoadingContent } from '@/src/components/LoadingContent';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
+import { subscriptionFeatures } from '@/src/screens/StoreScreen';
 
 /**
  * Late join (C5, 2026-11-06): isActiveRoom hides started rooms, so a code for
@@ -212,23 +213,41 @@ function isRemoteBlockContext(value: unknown): value is RemoteBlockContext {
  * Store:s "Basic: 4 games per day". Guest = ogated men trial-begränsat
  * spel.
  */
-const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolean | string }[] = [
-  { label: 'Host Single & PtP Multiplayer', user: true, guest: true },
-  { label: 'Host Individual device (Multiplayer)', user: true, guest: false },
-  { label: 'Head-to-head matches', user: true, guest: false },
+type CompareRowData = { label: string; user: boolean | string; guest: boolean | string };
+
+// Tabellen i två grupper (Peter 2026-11-07): allt man gör SOM HOST överst,
+// övrigt under "Other".
+function userVsGuestGroups(): { title: string; rows: CompareRowData[] }[] {
+  const rows = userVsGuestRows();
+  const isHostRow = (r: CompareRowData) => r.label.includes('Host');
+  return [
+    { title: 'As Host', rows: rows.filter(isHostRow) },
+    { title: 'Other', rows: rows.filter((r) => !isHostRow(r)) },
+  ];
+}
+
+function userVsGuestRows(): CompareRowData[] {
+  // Lägesneutrala rader (Peter 2026-11-07): både user och Guest kan hosta
+  // single och multiplayer. Vad som är låst per läge visar lobbyn.
+  return [
+  { label: 'Host Single Play Games', user: true, guest: true },
+  { label: 'Host Multiplayer Games', user: true, guest: true },
+  { label: 'Host Head-to-head Games', user: true, guest: false },
+  { label: 'Host in-app invites', user: true, guest: false },
+  { label: 'Host Custom Game era', user: true, guest: true },
+  { label: 'Select categories as Host', user: true, guest: false },
+  { label: 'Host YouTube quiz', user: true, guest: true },
+  // Hints är avstängt i guest-hostade spel sedan 2026-11-02 (YouTube-only).
+  { label: 'Host Hints quiz', user: true, guest: false },
+  { label: 'Host Spotify quiz', user: true, guest: false },
+  { label: 'Host games per day', user: '4 free', guest: 'Trial' },
+  { label: 'Host replay & Marathon Games', user: true, guest: false },
   { label: 'Saved results & player history', user: true, guest: false },
   { label: 'Skill & HCP progression', user: true, guest: false },
-  { label: 'Friends list & in-app invites', user: true, guest: false },
-  { label: 'Custom Game era', user: true, guest: true },
-  { label: 'Select categories (Quiz mixer)', user: true, guest: false },
-  { label: 'YouTube', user: true, guest: true },
-  // Hints är avstängt i guest-hostade spel sedan 2026-11-02 (YouTube-only).
-  { label: 'Hints', user: true, guest: false },
-  { label: 'Spotify', user: true, guest: false },
-  { label: 'Host games per day', user: '4 free', guest: 'Trial' },
-  { label: 'Replay & Marathon table', user: true, guest: false },
+  { label: 'Manage your own Friend list', user: true, guest: false },
   { label: 'Premium option', user: true, guest: false },
-];
+  ];
+}
 
 /**
  * Vad Premium-abonnemanget lägger till ovanpå det gratis kontot. Listas
@@ -239,12 +258,8 @@ const USER_VS_GUEST_ROWS: { label: string; user: boolean | string; guest: boolea
  * strängar, samma ordning, samma Premium-vs-Basic-rendering (Peter
  * 2026-08-12: sektionen ska se ut som i Store). Ändra ALLTID båda.
  */
-const PREMIUM_FEATURES: { premium: string; basic: string }[] = [
-  { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
-  { premium: '20 rounds per game (Individual device & H2H)', basic: 'Max 4 rounds per game' },
-  { premium: 'Invite 12 players per game (Individual device)', basic: 'Max 4 players' },
-  { premium: 'All Extra Host packages included', basic: 'Generic content only' },
-];
+// Nu samma källa som Store (subscriptionFeatures) — ingen kopia att hålla i synk.
+const premiumFeatures = subscriptionFeatures;
 
 /**
  * Ifyllda guest-formulärsfält som bevaras när en Remote 1vs1-gate tar
@@ -4997,11 +5012,16 @@ export default function HomeScreen() {
                 <Text style={[styles.compareColHead, styles.compareColHeadUser]}>USER</Text>
                 <Text style={styles.compareColHead}>GUEST</Text>
               </View>
-              {USER_VS_GUEST_ROWS.map((row) => (
-                <View key={row.label} style={styles.compareRow}>
-                  <Text style={[styles.compareLabelCell, styles.compareLabel]}>{row.label}</Text>
-                  <CompareCell value={row.user} positive />
-                  <CompareCell value={row.guest} />
+              {userVsGuestGroups().map((group) => (
+                <View key={group.title}>
+                  <Text style={styles.compareGroupHead}>{group.title}</Text>
+                  {group.rows.map((row) => (
+                    <View key={row.label} style={styles.compareRow}>
+                      <Text style={[styles.compareLabelCell, styles.compareLabel]}>{row.label}</Text>
+                      <CompareCell value={row.user} positive />
+                      <CompareCell value={row.guest} />
+                    </View>
+                  ))}
                 </View>
               ))}
               {/* Premium listas SEPARAT — tabellen ovan gäller det gratis
@@ -5010,7 +5030,7 @@ export default function HomeScreen() {
                   Premium-rad + "Basic: …"-underrad i en bordered card). */}
               <Text style={styles.compareSectionHead}>With QuizVibe Premium</Text>
               <View style={styles.premiumFeatureList}>
-                {PREMIUM_FEATURES.map((feature) => (
+                {premiumFeatures().map((feature) => (
                   <View key={feature.premium} style={styles.premiumFeatureRow}>
                     <Text style={styles.premiumFeatureCheck}>✓</Text>
                     <View style={styles.premiumFeatureTextWrap}>
@@ -5297,6 +5317,17 @@ const styles = StyleSheet.create({
   compareValueText: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary },
   // Rubrik + punktlista för Premium-blocket under jämförelsetabellen.
   // Gold matchar PREMIUM-badgarnas färgspråk i resten av appen.
+  // Grupprubrik i user-vs-guest-tabellen ("As Host" / "Other"). Vit, inte
+  // guld — guld är reserverat för Premium-rubriken nedanför.
+  compareGroupHead: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    color: Colors.textPrimary,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.xs,
+  },
   compareSectionHead: {
     fontSize: 11,
     fontWeight: '700',

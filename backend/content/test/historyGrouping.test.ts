@@ -48,6 +48,15 @@ describe('resolveGameForm', () => {
     expect(resolveGameForm('individual-devices').key).toBe('individual-devices');
   });
 
+  it('Multiplayer v2: samma nycklar, nya etiketter', () => {
+    expect(resolveGameForm('pass-the-phone', false, true)).toEqual({ key: 'pass-the-phone', label: '1 by 1' });
+    expect(resolveGameForm('individual-devices', false, true)).toEqual({
+      key: 'individual-devices',
+      label: 'All at Once',
+    });
+    expect(resolveGameForm('pass-the-phone', true, true).label).toBe('Single player');
+  });
+
   it('okänt / saknat / remote-1v1 → Unknown mode', () => {
     expect(resolveGameForm(undefined, undefined).key).toBe('unknown');
     expect(resolveGameForm(null, null).key).toBe('unknown');

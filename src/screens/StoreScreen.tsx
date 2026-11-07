@@ -41,6 +41,7 @@ import {
   refreshPremiumMirror,
   setPremiumActive,
 } from '../utils/subscriptionStorage';
+import { currentModeLabels } from '../utils/modeLabels';
 
 // Extra bottenmarginal mellan det fokuserade voucher-fältet och tangentbordet
 // (läggs ovanpå iOS automatiska keyboard-inset). ~24pt = luftigt utan att
@@ -122,16 +123,20 @@ interface SubscriptionFeature {
 }
 
 /**
- * ⚠ ORDAGRANN SPEGEL av `PREMIUM_FEATURES` i [app/index.tsx](app/index.tsx)
+ * ⚠ Delas med Home (`premiumFeatures` i [app/index.tsx](app/index.tsx))
  * (Home:ns "QuizVibe user vs Guest"-info-modal renderar samma strängar i
  * samma kort-layout). Ändra ALLTID båda.
  */
-export const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
-  { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
-  { premium: '20 rounds per game (Individual device & H2H)', basic: 'Max 4 rounds per game' },
-  { premium: 'Invite 12 players per game (Individual device)', basic: 'Max 4 players' },
-  { premium: 'All Extra Host packages included', basic: 'Generic content only' },
-];
+export function subscriptionFeatures(): SubscriptionFeature[] {
+  // Lägesnamnet följer Multiplayer v2-gaten (Individual device → All at Once).
+  const { allAtOnce } = currentModeLabels();
+  return [
+    { premium: 'Host Game Credits Unlimited', basic: '4 games per day' },
+    { premium: `20 rounds per game (${allAtOnce} & H2H)`, basic: 'Max 4 rounds per game' },
+    { premium: `Invite 12 players per game (${allAtOnce})`, basic: 'Max 4 players' },
+    { premium: 'All Extra Host packages included', basic: 'Generic content only' },
+  ];
+}
 
 // Peters copy (2026): en promo-/voucher-månad kan bara aktiveras när INGEN
 // premium är aktiv. Server avvisar annars med 'already_active'; klienten visar
@@ -711,7 +716,7 @@ export default function StoreScreen() {
 
       {/* Feature-lista med Premium-vs-Basic-jämförelse per rad. */}
       <View style={styles.featureList}>
-        {SUBSCRIPTION_FEATURES.map((feature) => (
+        {subscriptionFeatures().map((feature) => (
           <View key={feature.premium} style={styles.featureRow}>
             <Text style={styles.featureCheck}>✓</Text>
             <View style={styles.featureTextWrap}>

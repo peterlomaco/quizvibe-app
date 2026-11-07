@@ -26,6 +26,7 @@ import {
   PLAYED_MEDIA_SOURCE_ORDER,
 } from '../utils/mediaSource';
 import { CollapsibleGroup } from './CollapsibleGroup';
+import { isMultiplayerV2Copy } from '../utils/modeLabels';
 import { finalizeRows, LeaderboardTable } from './LeaderboardTable';
 import { MyMatchesSection } from './MyMatchesSection';
 import { PlayerFilterPicker } from './PlayerFilterPicker';
@@ -165,7 +166,7 @@ export function PlayerHistorySection() {
     () => ({
       getHostName: (e) => e.hostName,
       getDateISO: (e) => e.date,
-      getGameForm: (e) => resolveGameForm(e.gameMode, e.singlePlayerDefault),
+      getGameForm: (e) => resolveGameForm(e.gameMode, e.singlePlayerDefault, isMultiplayerV2Copy()),
     }),
     [],
   );

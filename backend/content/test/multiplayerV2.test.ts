@@ -17,10 +17,13 @@ import {
   spotifyJoinBlock,
   type FlowParticipant,
 } from '../../../src/utils/gameFlow';
+import { GUEST_ALL_AT_ONCE_LOCKED_TEXT, gameModeLabel, modeLabels } from '../../../src/utils/gameFlow';
 import {
   DEFAULT_FEATURE_GATES,
   canUse,
   parseFeatureGates,
+  freeUserCanPlayAllAtOnce,
+  guestHostCanPlayAllAtOnce,
 } from '../../../src/utils/entitlements';
 
 const host: FlowParticipant = { id: '1', isHost: true, isRegistered: true, approved: true };
@@ -488,5 +491,47 @@ describe('evaluateDeviceChoice', () => {
       outcome: 'stay',
       reason: 'own_device_required',
     });
+  });
+});
+
+describe('mode labels (Step 7)', () => {
+  it('legacy names while the gate is off', () => {
+    expect(modeLabels(false)).toEqual({
+      oneByOne: 'Pass-the-Phone',
+      allAtOnce: 'Individual device',
+      passTo: 'Pass-the-Phone to:',
+    });
+    expect(gameModeLabel('individual-devices', false)).toBe('Individual device');
+  });
+
+  it('1 by 1 / All at Once with the gate on; internal ids unchanged', () => {
+    expect(gameModeLabel('pass-the-phone', true)).toBe('1 by 1');
+    expect(gameModeLabel('individual-devices', true)).toBe('All at Once');
+    expect(gameModeLabel('remote-1v1', true)).toBeNull();
+    expect(modeLabels(true).passTo).toBe('Pass the phone to:');
+  });
+});
+
+describe('All at Once availability for the Home table / FAQ (Step 7)', () => {
+  const off = { multiplayerV2: false, allAtOnce: 'everyone' } as const;
+  const onEveryone = { multiplayerV2: true, allAtOnce: 'everyone' } as const;
+  const onPremium = { multiplayerV2: true, allAtOnce: 'premium' } as const;
+
+  it('Guest Host: off → false, on+everyone → true, on+premium → false', () => {
+    expect(guestHostCanPlayAllAtOnce(off)).toBe(false);
+    expect(guestHostCanPlayAllAtOnce(onEveryone)).toBe(true);
+    expect(guestHostCanPlayAllAtOnce(onPremium)).toBe(false);
+  });
+
+  it('free registered host: legacy true, on+everyone true, on+premium false', () => {
+    expect(freeUserCanPlayAllAtOnce(off)).toBe(true);
+    expect(freeUserCanPlayAllAtOnce(onEveryone)).toBe(true);
+    expect(freeUserCanPlayAllAtOnce(onPremium)).toBe(false);
+  });
+});
+
+describe('Guest Host locked All at Once copy (Step 7)', () => {
+  it('names the account + Premium requirement, no purchase wording', () => {
+    expect(GUEST_ALL_AT_ONCE_LOCKED_TEXT).toBe('All at Once requires a QuizVibe account with Premium.');
   });
 });

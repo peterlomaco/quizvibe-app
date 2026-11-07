@@ -130,6 +130,7 @@ import { playVoiceClip } from '../utils/voicePlayback';
 import { loadOwnHcpBundle, refreshOwnHcpDecay } from '../utils/hcpProgress';
 import { useWaitingInviteSignal } from '../hooks/useWaitingInviteSignal';
 import { getCachedFeatureGates } from '../utils/featureGates';
+import { modeLabels } from '../utils/gameFlow';
 import { JoinModal } from '../../app/index';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -2001,7 +2002,7 @@ export default function ProfileScreen() {
               <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Players', 'Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with Individual device mode.')}
+                onPress={() => Alert.alert('Players', `Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with ${modeLabels(multiplayerV2Profile).allAtOnce} mode.`)}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>
@@ -2122,7 +2123,7 @@ export default function ProfileScreen() {
                   <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify</Text>
                   <Pressable
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    onPress={() => Alert.alert('Spotify', '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium', [
+                    onPress={() => Alert.alert('Spotify', `• Only applicable in ${modeLabels(multiplayerV2Profile).allAtOnce} mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium`, [
                       { text: 'Guide How it works', onPress: () => setSpotifyGuideVisible(true) },
                       { text: 'Close', style: 'cancel' },
                     ])}

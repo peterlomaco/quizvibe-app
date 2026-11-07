@@ -20,6 +20,7 @@ import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
 import { QuizVibeMarkArcsSvg, QuizVibeMarkQOnlySvg } from './brand/QuizVibeBrandSvg';
 import { MARK_RING, MARK_VIEWBOX } from './brand/quizVibeBrandGeometry';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
+import { currentModeLabels } from '../utils/modeLabels';
 
 interface Props {
   /** Anropas när nedräkningen passerat 1 → 0 OCH "?" har visats. */
@@ -534,7 +535,7 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
           </View>
         ) : playerName ? (
           <View style={styles.playerBlock}>
-            {!hidePlayerLabel && <Text style={styles.playerLabel}>Pass-the-Phone to:</Text>}
+            {!hidePlayerLabel && <Text style={styles.playerLabel}>{currentModeLabels().passTo}</Text>}
             <View style={styles.playerBox}>
               {/* Spelarens avatar — samma komponent som spelarkorten i lobbyn
                   (default = Q med smiley i stället för silhuetten 👤,

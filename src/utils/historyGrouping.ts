@@ -37,15 +37,17 @@ export const GAME_FORM_ORDER: readonly GameFormKey[] = [
 export function resolveGameForm(
   gameMode?: string | null,
   singlePlayerDefault?: boolean | null,
+  /** Multiplayer v2-etiketter (1 by 1 / All at Once). Nycklarna är desamma. */
+  v2 = false,
 ): GameForm {
   if (singlePlayerDefault === true) {
     return { key: 'single-player', label: 'Single player' };
   }
   if (gameMode === 'pass-the-phone') {
-    return { key: 'pass-the-phone', label: 'Pass-the-Phone' };
+    return { key: 'pass-the-phone', label: v2 ? '1 by 1' : 'Pass-the-Phone' };
   }
   if (gameMode === 'individual-devices') {
-    return { key: 'individual-devices', label: 'Individual Devices' };
+    return { key: 'individual-devices', label: v2 ? 'All at Once' : 'Individual Devices' };
   }
   return { key: 'unknown', label: 'Unknown mode' };
 }

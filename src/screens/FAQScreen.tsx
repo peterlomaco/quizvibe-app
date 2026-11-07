@@ -23,7 +23,9 @@ import {
   TargetOutlineIcon,
   TicketOutlineIcon,
 } from '../components/SectionIcons';
-import { SUBSCRIPTION_FEATURES } from './StoreScreen';
+import { subscriptionFeatures } from './StoreScreen';
+import { getCachedFeatureGates } from '../utils/featureGates';
+import { guestHostCanPlayAllAtOnce } from '../utils/entitlements';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 
 // ─── Data ───────────────────────────────────────────────────────────────────
@@ -298,6 +300,66 @@ const FAQ_CATEGORIES: FaqCategory[] = [
 // Kategori-ikoner (UI 2026-10-21): outline-familjen från Profile (24-grid,
 // 1.8-streck, dämpad vit) ersätter de färgglada emojierna. Data-filens
 // emoji-fält lämnas orört men renderas inte längre.
+// ---------------------------------------------------------------------------
+// Multiplayer v2-copy (Step 7). FAQ_CATEGORIES ovan är legacy-texten (PROD tills
+// flaggan slås på). Med gaten på skrivs svaren om: två frågor ersätts helt,
+// resten via fras-ersättningar (specifika fraser först, generiska namnbyten sist).
+// ---------------------------------------------------------------------------
+
+const V2_DIFFERENCE_Q = 'What is the difference between Pass-the-Phone and Individual device?';
+const V2_PREMIUM_Q = 'Does Individual device require Premium?';
+
+function faqCategories(): FaqCategory[] {
+  const gates = getCachedFeatureGates();
+  if (!gates.multiplayerV2) return FAQ_CATEGORIES;
+  const allAtOnceFree = gates.allAtOnce === 'everyone';
+  const guestAllAtOnce = guestHostCanPlayAllAtOnce(gates);
+  const phrases: [string, string][] = [
+    [
+      "on one shared phone (Pass-the-Phone) or on everyone's own phone (Individual device)",
+      "taking turns (1 by 1) or answering at the same time on everyone's own phone (All at Once)",
+    ],
+    [
+      "In Pass-the-Phone only the Host's phone needs to be online",
+      "When everyone plays on the Host's phone, only that phone needs to be online",
+    ],
+    ['In Individual device games, a player', 'When players use their own phones, a player'],
+    ['For Pass-the-Phone: normal', "On the Host's phone only: normal"],
+    ['For Individual device: every player', 'On their own phones: every player'],
+    [
+      '• Multiplayer is Pass-the-Phone only, up to 4 players.',
+      guestAllAtOnce
+        ? '• Multiplayer is 1 by 1 or All at Once, up to 4 players.'
+        : '• Multiplayer is 1 by 1 only, up to 4 players.',
+    ],
+    ['Individual device', 'All at Once'],
+    ['Pass-the-Phone', '1 by 1'],
+  ];
+  const rewrite = (text: string) => phrases.reduce((t, [from, to]) => t.split(from).join(to), text);
+
+  return FAQ_CATEGORIES.map((category) => ({
+    ...category,
+    items: category.items.map((item) => {
+      if (item.q === V2_DIFFERENCE_Q) {
+        return {
+          q: 'What is the difference between 1 by 1 and All at Once?',
+          a: "Both are Multiplayer games, and the Lobby picks the right one from how players join. When you join a game you choose whether you play on your own phone or on the Host's phone.\n• 1 by 1: players take turns answering — on the Host's phone, or on their own phone when it is their turn. Up to 4 players and 4 rounds.\n• All at Once: everyone answers the same question at the same time on their own phone.\nIf anyone plays on the Host's phone the game is 1 by 1. The Host can also choose 1 by 1 when everyone has their own phone. Spotify DJ always plays All at Once.",
+        };
+      }
+      if (item.q === V2_PREMIUM_Q) {
+        return {
+          ...item,
+          q: 'Does All at Once require Premium?',
+          a: allAtOnceFree
+            ? 'No — All at Once is free for everyone. Premium unlocks extra capacity in All at Once games: up to 12 players per room and up to 20 rounds per game (the free limit is 4 players and 4 rounds). Here is everything Premium adds:'
+            : 'Yes — All at Once requires QuizVibe Premium, which also allows up to 12 players per room and up to 20 rounds per game. Without Premium, Multiplayer games are played 1 by 1 (up to 4 players and 4 rounds). Here is everything Premium adds:',
+        };
+      }
+      return { ...item, q: rewrite(item.q), a: rewrite(item.a) };
+    }),
+  }));
+}
+
 const CATEGORY_ICONS: Record<string, (props: { size?: number; color?: string }) => React.ReactElement> = {
   'getting-started': RocketOutlineIcon,
   'game-modes': ControllerOutlineIcon,
@@ -376,7 +438,7 @@ export default function FAQScreen() {
           </Text>
         </View>
 
-        {FAQ_CATEGORIES.map((category) => {
+        {faqCategories().map((category) => {
           const isCategoryOpen = expandedCategories.has(category.id);
           return (
             <View key={category.id} style={styles.categoryWrap}>
@@ -423,7 +485,7 @@ export default function FAQScreen() {
                             <Text style={styles.answerText}>{item.a}</Text>
                             {item.membershipCard && (
                               <View style={styles.featureList}>
-                                {SUBSCRIPTION_FEATURES.map((feature) => (
+                                {subscriptionFeatures().map((feature) => (
                                   <View key={feature.premium} style={styles.featureRow}>
                                     <Text style={styles.featureCheck}>✓</Text>
                                     <View style={styles.featureTextWrap}>

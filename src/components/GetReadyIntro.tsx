@@ -35,6 +35,7 @@ import { WifiOffIcon } from './WifiOffIcon';
 import { HeartbeatSound } from './HeartbeatSound';
 import { DEFAULT_VOICE_ID, SILENT_VOICE_ID, VOICE_OPTIONS } from '../utils/voicePacks';
 import { playVoiceClip } from '../utils/voicePlayback';
+import { currentModeLabels } from '../utils/modeLabels';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
  *  Speglar TurnOrderPlayer i quiz.tsx. */
@@ -633,7 +634,7 @@ export function GetReadyIntro({
     if (responseSecondsLocked) {
       Alert.alert(
         'Answer response time locked',
-        'In Pass-the-Phone mode the response time can only be changed at the start of a new round — when all players have answered the same number of questions. The current round must finish first.',
+        `In ${currentModeLabels().oneByOne} mode the response time can only be changed at the start of a new round — when all players have answered the same number of questions. The current round must finish first.`,
       );
       return;
     }
@@ -697,7 +698,7 @@ export function GetReadyIntro({
               ? 'Next to answer:'
               : nextOnOwnDevice
                 ? 'Next:'
-                : 'Pass-the-Phone to:'}
+                : currentModeLabels().passTo}
           </Text>
         </View>
       </View>

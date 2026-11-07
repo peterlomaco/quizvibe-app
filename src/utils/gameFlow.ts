@@ -513,7 +513,7 @@ export function clampRoundsForFlow(rounds: number, gameMode: string): number {
 export function flowReasonText(reason: GameFlowReason): string | null {
   switch (reason) {
     case 'host-device-participant':
-      return 'Someone is playing on your phone, so the game is played 1 by 1.';
+      return 'Shared device requires 1 by 1.';
     case 'spotify':
       return 'Spotify DJ needs every player on their own phone, so the game is played All at Once.';
     case 'not-entitled':
@@ -522,3 +522,40 @@ export function flowReasonText(reason: GameFlowReason): string | null {
       return null;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Display labels (Step 7). Internal ids never change — only what the player
+// reads. `v2` = the Multiplayer v2 gate (or the room's frozen flag in the
+// lobby); off → the legacy names, so PROD keeps reading Pass-the-Phone /
+// Individual device until the flag is switched on (Step 8).
+// ---------------------------------------------------------------------------
+
+export interface ModeLabels {
+  /** 'pass-the-phone' as a mode name. */
+  oneByOne: string;
+  /** 'individual-devices' as a mode name. */
+  allAtOnce: string;
+  /** Heading above the next player's name on a shared phone. */
+  passTo: string;
+}
+
+export function modeLabels(v2: boolean): ModeLabels {
+  return v2
+    ? { oneByOne: '1 by 1', allAtOnce: 'All at Once', passTo: 'Pass the phone to:' }
+    : { oneByOne: 'Pass-the-Phone', allAtOnce: 'Individual device', passTo: 'Pass-the-Phone to:' };
+}
+
+/** Mode name for a stored gameMode string, or null for anything else. */
+export function gameModeLabel(gameMode: string | null | undefined, v2: boolean): string | null {
+  const l = modeLabels(v2);
+  if (gameMode === ONE_BY_ONE) return l.oneByOne;
+  if (gameMode === ALL_AT_ONCE) return l.allAtOnce;
+  return null;
+}
+
+/**
+ * Guest Host + `allAtOnce = 'premium'`: All at Once is locked. Shown under the
+ * flow boxes and in the info-only tap alert — never with a Premium badge or a
+ * Store action (a Guest Host has no account to upgrade).
+ */
+export const GUEST_ALL_AT_ONCE_LOCKED_TEXT = 'All at Once requires a QuizVibe account with Premium.';

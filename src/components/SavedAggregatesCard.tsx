@@ -28,6 +28,7 @@ import {
   type SortMode,
 } from '../utils/historyGrouping';
 import { CollapsibleGroup } from './CollapsibleGroup';
+import { isMultiplayerV2Copy } from '../utils/modeLabels';
 import { CompetitionRematchActions } from './CompetitionRematchActions';
 import { finalizeRows, LeaderboardTable } from './LeaderboardTable';
 import { NewUpdateBadge } from './NewUpdateBadge';
@@ -251,6 +252,7 @@ export function SavedAggregatesCard({
         resolveGameForm(
           it.latestSettings?.gameMode,
           it.latestSettings?.singlePlayerDefault,
+          isMultiplayerV2Copy(),
         ),
     }),
     [],

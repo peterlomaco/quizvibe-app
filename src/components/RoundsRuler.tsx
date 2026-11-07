@@ -5,6 +5,7 @@ import { CappedText as Text } from './CappedText';
 import { TouchableOpacity } from '@/src/components/haptic';
 import { Colors, Radius } from '../theme';
 import { TRACK_VIEWPORT_W } from '../utils/responsive';
+import { currentModeLabels } from '../utils/modeLabels';
 
 // Antal rundor:
 //   • Pass-the-Phone: 2–4 (telefonen rör sig fysiskt mellan spelare så
@@ -51,7 +52,7 @@ const RULER_WIDTH = TRACK_VIEWPORT_W;
  * också allt unlocked eftersom IndDev:s rounds-cap är 20 och locked-zonen
  * inte renderas.
  */
-export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false, applicable = true, indivActive = false, brandV2 = false, requirementPrefix = 'Individual device +' }: {
+export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscription = false, applicable = true, indivActive = false, brandV2 = false, requirementPrefix: requirementPrefixProp }: {
   value: number;
   min: number;
   gameModeMax: number;
@@ -68,6 +69,9 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
   /** brandV2-hintens krav före PREMIUM-badgen. Tom sträng = bara PREMIUM (H2H). */
   requirementPrefix?: string;
 }) {
+  // Default följer Multiplayer v2-gaten ("All at Once +" / "Individual device +").
+  const allAtOnceLabel = currentModeLabels().allAtOnce;
+  const requirementPrefix = requirementPrefixProp ?? `${allAtOnceLabel} +`;
   const accent = brandV2 ? Colors.warning : Colors.primary;
   // Klammer + ticks visas "unlocked" bara när BÅDA villkoren stämmer:
   // user äger premium OCH feature:n gäller i nuvarande mode. Annars grå.
@@ -241,7 +245,7 @@ export function RoundsRuler({ value, min, gameModeMax, onPremiumPress, hasSubscr
             >
               {/* "Individual device +" — grön när IndDev aktivt, röd annars. */}
               <Text style={[roundsRulerStyles.individualDeviceText, { color: brandV2 ? Colors.textSecondary : indivActive ? Colors.success : Colors.error }]} numberOfLines={1}>
-                Individual device +
+                {allAtOnceLabel} +
               </Text>
               {/* hasBracket => interactive => onPremiumPress definierad. Säkert
                   att rendera direkt utan onPremiumPress-presence-fallback.

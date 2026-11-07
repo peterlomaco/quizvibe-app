@@ -89,6 +89,8 @@ import {
   canAddManualGuest,
   clampRoundsForFlow,
   flowReasonText,
+  modeLabels,
+  GUEST_ALL_AT_ONCE_LOCKED_TEXT,
   hybridOwnDeviceIds,
   hybridQuizParams,
   joinRejectionMessage,
@@ -1366,6 +1368,9 @@ export default function LobbyScreen() {
   // the Game Mode section shows a neutral placeholder and every v2 path stays
   // inactive, so a legacy room never flashes v2 UI (and vice versa).
   const [roomIsMultiplayerV2, setRoomIsMultiplayerV2] = useState<boolean | null>(null);
+  // Lägesnamn i texter (Step 7): rummets EGEN flagga, inte den cachade gaten —
+  // ett legacy-rum ska fortsätta säga Pass-the-Phone / Individual device.
+  const lobbyModeLabels = useMemo(() => modeLabels(roomIsMultiplayerV2 === true), [roomIsMultiplayerV2]);
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -2800,7 +2805,7 @@ export default function LobbyScreen() {
   const handleIncrementRounds = useCallback(() => {
     if (roundsCount >= stepperMax) {
       if (singlePlayerDefault || gameMode === 'pass-the-phone') {
-        quizVibeAlert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
+        quizVibeAlert('More rounds not available', `More than 4 rounds is only available with both ${lobbyModeLabels.allAtOnce} and Premium activated.`);
       }
       return;
     }
@@ -2808,7 +2813,7 @@ export default function LobbyScreen() {
       const next = Math.min(stepperMax, prev + ROUNDS_STEP);
       return next;
     });
-  }, [stepperMax, roundsCount, singlePlayerDefault, gameMode]);
+  }, [stepperMax, roundsCount, singlePlayerDefault, gameMode, lobbyModeLabels]);
   // Tap på rounds-PREMIUM-badgen (RoundsRuler-badgen OCH stepper-badgen).
   // En premium-host får ALDRIG skickas till Store — de äger redan feature:n,
   // och Store ger inget mer (PtP är hårt cappad på 4 oavsett premium; IndDev
@@ -2819,9 +2824,9 @@ export default function LobbyScreen() {
       if (gameMode === 'remote-1v1') {
         quizVibeAlert('Premium active', 'You have QuizVibe Premium — up to 20 rounds are unlocked in Head-to-head.');
       } else if (gameMode === 'individual-devices' && !singlePlayerDefault) {
-        quizVibeAlert('Premium active', 'You have QuizVibe Premium — up to 20 rounds are unlocked in Individual device mode.');
+        quizVibeAlert('Premium active', `You have QuizVibe Premium — up to 20 rounds are unlocked in ${lobbyModeLabels.allAtOnce} mode.`);
       } else {
-        quizVibeAlert('Individual device required', 'Switch to Individual device mode to host up to 20 rounds. Premium is already active on your account.');
+        quizVibeAlert(`${lobbyModeLabels.allAtOnce} required`, `Switch to ${lobbyModeLabels.allAtOnce} mode to host up to 20 rounds. Premium is already active on your account.`);
       }
       return;
     }
@@ -2833,7 +2838,7 @@ export default function LobbyScreen() {
         { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
       ],
     );
-  }, [hasPremium, gameMode, singlePlayerDefault, roomCode]);
+  }, [hasPremium, gameMode, singlePlayerDefault, roomCode, lobbyModeLabels]);
   // Per-source profession-category-filter (ersätter youtubeEnabled/imagesEnabled/enabledMainCategories).
   // YouTube: alla tre valbara, min 1 krävs. Images: Film+Sport mandatory, Music valbar.
   const [youtubeEnabledCategories, setYoutubeEnabledCategories] = useState<MainCategory[]>(
@@ -2894,6 +2899,9 @@ export default function LobbyScreen() {
     { isPremium: hasPremium, isGuestHost },
     getCachedFeatureGates(),
   );
+  // Guest Host när All at Once är Premium-only: låst, men utan Premium-badge
+  // eller Store (Peter 2026-11-07). Under 'everyone' är guest entitled.
+  const allAtOnceGuestLocked = isGuestHost && !allAtOnceEntitled;
   const flow = useMemo(
     () =>
       resolveGameFlow({
@@ -4108,9 +4116,10 @@ export default function LobbyScreen() {
     if (n === 12) {
       // Fel läge: Max 12 kräver Individual device
       if (singlePlayerDefault || gameMode !== 'individual-devices') {
+        // Lägesnamnet följer rummets flagga (Step 7): v2 → "All at Once".
         quizVibeAlert(
-          'Individual device required',
-          'Please activate Individual device to be able to select Max 12 players.',
+          `${lobbyModeLabels.allAtOnce} required`,
+          `Please activate ${lobbyModeLabels.allAtOnce} to be able to select Max 12 players.`,
           [{ text: 'OK' }],
         );
         return;
@@ -4743,6 +4752,10 @@ export default function LobbyScreen() {
   const handleSelectFlow = (mode: 'pass-the-phone' | 'individual-devices') => {
     if (!hostMode || !isV2Lobby || mode === gameMode) return;
     if (mode === ALL_AT_ONCE) {
+      if (allAtOnceGuestLocked) {
+        quizVibeAlert('All at Once', GUEST_ALL_AT_ONCE_LOCKED_TEXT);
+        return;
+      }
       if (!allAtOnceEntitled) {
         quizVibeAlert('Premium feature', 'All at Once requires QuizVibe Premium. Go to Store?', [
           { text: 'Cancel', style: 'cancel' },
@@ -4798,6 +4811,12 @@ export default function LobbyScreen() {
       );
       return;
     }
+    // Guest Host har alltid max 4 spelare och 4 rundor, så 1 by 1-varningen
+    // säger inget nytt — byt direkt utan popup (Peter 2026-11-07).
+    if (isGuestHost) {
+      setHostOverrideOneByOne(true);
+      return;
+    }
     quizVibeAlert(
       'Switch to 1 by 1?',
       `Please be aware that 1 by 1 is limited to ${ONE_BY_ONE_MAX_PLAYERS} players and 4 rounds`,
@@ -4822,24 +4841,40 @@ export default function LobbyScreen() {
           [ALL_AT_ONCE, 'All at Once'],
         ] as const).map(([mode, label]) => {
           const active = gameMode === mode;
+          const locked = mode === ALL_AT_ONCE && allAtOnceGuestLocked;
           return (
             <TouchableOpacity
               key={mode}
-              style={[styles.modeOption, active ? styles.modeOptionPassActive : styles.modeOptionInactive]}
+              style={[
+                styles.modeOption,
+                active ? styles.modeOptionPassActive : styles.modeOptionInactive,
+                locked && styles.modeOptionLocked,
+              ]}
               onPress={() => handleSelectFlow(mode)}
               disabled={!hostMode}
               activeOpacity={0.7}
             >
               <Text
-                style={[styles.modeLabel, { textAlign: 'center' }, { fontSize: FontSize.xs }, active && styles.modeLabelActiveFree]}
+                style={[
+                  styles.modeLabel,
+                  { textAlign: 'center' },
+                  { fontSize: FontSize.xs },
+                  active && styles.modeLabelActiveFree,
+                  locked && styles.modeLabelLocked,
+                ]}
                 numberOfLines={1}
               >
                 {label}
               </Text>
+              {locked && (
+                <View style={styles.modeLockIcon} pointerEvents="none">
+                  <LockOutlineIcon size={13} />
+                </View>
+              )}
               {active && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
               {/* Host-only: entitlement is the HOST's, a non-host's
                   own premium status says nothing about this lobby. */}
-              {mode === ALL_AT_ONCE && hostMode && !allAtOnceEntitled && (
+              {mode === ALL_AT_ONCE && hostMode && !allAtOnceEntitled && !isGuestHost && (
                 <View style={[styles.premiumBadge, styles.premiumBadgeGrey]} pointerEvents="none">
                   <Text style={[styles.premiumBadgeText, styles.premiumBadgeTextGrey]}>PREMIUM</Text>
                 </View>
@@ -4848,8 +4883,12 @@ export default function LobbyScreen() {
           );
         })}
       </View>
-      {flowReasonText(flow.reason) && (hostMode || flow.reason !== 'not-entitled') && (
-        <Text style={styles.guestHostNote}>{flowReasonText(flow.reason)}</Text>
+      {allAtOnceGuestLocked && flow.reason === 'not-entitled' ? (
+        <Text style={styles.guestHostNote}>{GUEST_ALL_AT_ONCE_LOCKED_TEXT}</Text>
+      ) : (
+        flowReasonText(flow.reason) && (hostMode || flow.reason !== 'not-entitled') && (
+          <Text style={styles.guestHostNote}>{flowReasonText(flow.reason)}</Text>
+        )
       )}
     </>
   );
@@ -7289,7 +7328,7 @@ export default function LobbyScreen() {
       if (guestPlayer) {
         quizVibeAlert(
           'Own device required',
-          `${guestPlayer.name} was added by the Host and has no device of their own. Remove them or switch game mode before starting an Individual device game.`,
+          `${guestPlayer.name} was added by the Host and has no device of their own. Remove them or switch game mode before starting an ${lobbyModeLabels.allAtOnce} game.`,
         );
         return;
       }
@@ -8257,7 +8296,7 @@ export default function LobbyScreen() {
                   onPress={() =>
                     quizVibeAlert(
                       'Add Guest',
-                      `Guests added here play on your phone. The game is then played 1 by 1 (max ${ONE_BY_ONE_MAX_PLAYERS} players, 4 rounds).\n\nPlayers with their own phone can join with the room code instead.`,
+                      "Adding a guest requires 1 by 1 mode. Guests play on the host's device.",
                     )
                   }
                   hitSlop={8}
@@ -8946,7 +8985,7 @@ export default function LobbyScreen() {
                     onPress={() =>
                       quizVibeAlert(
                         'Spotify',
-                        '• Only applicable in Individual Devices mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium',
+                        `• Only applicable in ${lobbyModeLabels.allAtOnce} mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium`,
                         [
                           { text: 'Guide How it works', onPress: () => setSpotifyGuideVisible(true) },
                           { text: 'Close', style: 'cancel' },
@@ -9909,11 +9948,16 @@ export default function LobbyScreen() {
                       );
                     })}
                   </View>
-                  <Text style={styles.guestHostNote}>
-                    {isSingleLobby
-                      ? 'Max 4 rounds in Single player mode'
-                      : 'Upto 20 rounds option for registered Quizvibe users with Premium'}
-                  </Text>
+                  {/* 20-rundors-noten visas BARA för en inloggad QuizVibe-user
+                      som hostar som Guest — inte för utloggad Guest Host eller
+                      anslutna spelare (Peter 2026-11-07). */}
+                  {(isSingleLobby || (isGuestHost && !!getCachedProfile())) && (
+                    <Text style={styles.guestHostNote}>
+                      {isSingleLobby
+                        ? 'Max 4 rounds in Single player mode'
+                        : 'Up to 20 rounds option for Quizvibe user Host with Premium'}
+                    </Text>
+                  )}
                 </>
               ) : hostMode ? (
                 <>
@@ -11211,7 +11255,7 @@ export default function LobbyScreen() {
                     JSX-text så citattecknen inte triggar
                     react/no-unescaped-entities. */}
                 <Text style={styles.spotifyGuideStepText}>
-                  {'Switch on "I have Spotify App on this device" to confirm — now you are ready to play Spotify music in Individual device mode'}
+                  {`Switch on "I have Spotify App on this device" to confirm — now you are ready to play Spotify music in ${lobbyModeLabels.allAtOnce} mode`}
                 </Text>
               </View>
               <View style={styles.spotifyGuideStep}>
@@ -12042,6 +12086,20 @@ const styles = StyleSheet.create({
   modeOptionInactive: {
     borderColor: CHOICE_BORDER,
     backgroundColor: CHOICE_BG,
+  },
+  // Guest Host + All at Once Premium-only (Peter 2026-11-07): låst utan
+  // opacity-dimning — dämpad kant + navy, sekundär text och ett litet lås.
+  modeOptionLocked: {
+    borderColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: '#0E141F',
+  },
+  modeLabelLocked: {
+    color: Colors.textSecondary,
+  },
+  modeLockIcon: {
+    position: 'absolute',
+    top: 4,
+    right: 6,
   },
   // Dämpad variant — appliceras på Pass-the-Phone-rutan när
   // singlePlayerDefault-checkboxen är på. Matchar modeOptionInactive
