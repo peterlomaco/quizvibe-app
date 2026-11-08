@@ -131,6 +131,25 @@ import { loadOwnHcpBundle, refreshOwnHcpDecay } from '../utils/hcpProgress';
 import { useWaitingInviteSignal } from '../hooks/useWaitingInviteSignal';
 import { getCachedFeatureGates } from '../utils/featureGates';
 import { modeLabels } from '../utils/gameFlow';
+import { useInfoDialog } from '../components/InfoDialog';
+import {
+  PARENT_CONTROLLED_PACKAGE_TEXT,
+  answerTimeInfo,
+  assistanceInfo,
+  gameEraInfo,
+  hintsInfo,
+  parentControlInfo,
+  playersInfo,
+  regionScopeInfo,
+  roundsInfo,
+  spotifyInfo,
+  voiceInfo,
+  youtubeInfo,
+} from '../utils/infoTexts';
+
+// Legacy (multiplayerV2 av): oförändrad text, bara ny dialog-stil.
+const LEGACY_PROFILE_MULTIPLAYER_INFO =
+  'This is your default for Multiplayer games.\n\nPass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nSingle player and Head-to-head are picked per game on the Home screen — tap Start New Game and choose "Single Game" or "Head-to-head".';
 import { JoinModal } from '../../app/index';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -419,6 +438,8 @@ export default function ProfileScreen() {
   // has no mode choice — the default is All at Once (20 rounds with Premium;
   // a 1 by 1 game is clamped to 4 in the lobby / at Start).
   const multiplayerV2Profile = getCachedFeatureGates().multiplayerV2;
+  // Info-ikonernas popups (ⓘ) — QuizVibe-dialog i stället för native Alert.
+  const { showInfo, infoDialog } = useInfoDialog();
   const roundsMax =
     hasPremium && (multiplayerV2Profile || gameMode === 'individual-devices')
       ? ROUNDS_MAX_INDIV
@@ -1826,10 +1847,7 @@ export default function ProfileScreen() {
                 <Text style={styles.fieldLabelPlain}>Assistance level</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => Alert.alert(
-                    'Assistance level',
-                    'Full\n5-year answer window for Year questions. Full Name list — no letter prefix puzzle.\n\nStandard\n3-year answer window for Year questions. 2-letter prefix hint in Name questions.\n\nMinimal\nExact year required for Year questions. 1-letter prefix hint in Name questions (hardest).',
-                  )}
+                  onPress={() => showInfo(assistanceInfo())}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -1860,10 +1878,7 @@ export default function ProfileScreen() {
                 <Text style={styles.fieldLabelPlain}>Voice</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => Alert.alert(
-                    'Voice',
-                    'The voice used in the app — the 3-2-1 countdown before each question and the "QuizVibe" welcome in the lobby. Choose a female or male voice, or "No voice" for a silent countdown.\n\nTap the ▶ button in the list to hear a voice before choosing.',
-                  )}
+                  onPress={() => showInfo(voiceInfo())}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -1981,10 +1996,7 @@ export default function ProfileScreen() {
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                 onPress={() =>
-                  Alert.alert(
-                    'Multiplayer mode',
-                    'This is your default for Multiplayer games.\n\nPass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nSingle player and Head-to-head are picked per game on the Home screen — tap Start New Game and choose "Single Game" or "Head-to-head".',
-                  )
+                  showInfo({ title: 'Multiplayer mode', message: LEGACY_PROFILE_MULTIPLAYER_INFO })
                 }
                 hitSlop={8}
               >
@@ -2002,7 +2014,7 @@ export default function ProfileScreen() {
               <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Players', `Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with ${modeLabels(multiplayerV2Profile).allAtOnce} mode.`)}
+                onPress={() => showInfo(playersInfo(modeLabels(multiplayerV2Profile).allAtOnce))}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>
@@ -2060,7 +2072,7 @@ export default function ProfileScreen() {
               <Text style={styles.sectionLabel}>Region scope</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Region Scope', "Recognition context — the region the questions are drawn from and whose audience the recognition level is based on. Players get content that's familiar in the chosen region.")}
+                onPress={() => showInfo(regionScopeInfo())}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>
@@ -2123,10 +2135,7 @@ export default function ProfileScreen() {
                   <Text style={[styles.connectionLabel, { minWidth: 0 }]}>Spotify</Text>
                   <Pressable
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                    onPress={() => Alert.alert('Spotify', `• Only applicable in ${modeLabels(multiplayerV2Profile).allAtOnce} mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium`, [
-                      { text: 'Guide How it works', onPress: () => setSpotifyGuideVisible(true) },
-                      { text: 'Close', style: 'cancel' },
-                    ])}
+                    onPress={() => showInfo({ ...spotifyInfo(modeLabels(multiplayerV2Profile).allAtOnce), action: { label: 'How it works', onPress: () => setSpotifyGuideVisible(true) } })}
                     hitSlop={8}
                   >
                     <Text style={styles.infoIconText}>i</Text>
@@ -2209,7 +2218,7 @@ export default function ProfileScreen() {
                   <YouTubeBrandIcon size={20} />
                   <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
                   <Pressable
-                    onPress={() => Alert.alert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers')}
+                    onPress={() => showInfo(youtubeInfo())}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
@@ -2227,7 +2236,7 @@ export default function ProfileScreen() {
                   </View>
                   <Text style={styles.sourceMatrixSourceText}>Hints</Text>
                   <Pressable
-                    onPress={() => Alert.alert('Hints', 'Guess the artist, band or actor from a flag + progressive clues.')}
+                    onPress={() => showInfo(hintsInfo())}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
@@ -2297,7 +2306,7 @@ export default function ProfileScreen() {
               <Text style={styles.sectionLabel}>Parent Control</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Parent Control', 'When on, mature content is kept out of the games you host — parent-controlled clips and mature packages are excluded from the question selection.')}
+                onPress={() => showInfo(parentControlInfo('profile'))}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>
@@ -2323,7 +2332,7 @@ export default function ProfileScreen() {
               <Text style={styles.sectionLabel}>Game era (min 15 year interval)</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Game Era', 'Set the time span for questions')}
+                onPress={() => showInfo(gameEraInfo())}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>
@@ -2420,7 +2429,7 @@ export default function ProfileScreen() {
               <Text style={styles.sectionLabel}>Number of Rounds</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Number of Rounds', 'How many rounds in this game')}
+                onPress={() => showInfo(roundsInfo('multiplayer', modeLabels(multiplayerV2Profile).allAtOnce))}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>
@@ -2540,7 +2549,7 @@ export default function ProfileScreen() {
               <Text style={styles.sectionLabel}>Answer response time</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => Alert.alert('Answer response time', 'Seconds players have to answer each question')}
+                onPress={() => showInfo(answerTimeInfo())}
                 hitSlop={8}
               >
                 <Text style={styles.infoIconText}>i</Text>
@@ -3651,7 +3660,7 @@ export default function ProfileScreen() {
       <QuizVibeDialog
         visible={parentControlledDialogOpen}
         title="Parent controlled"
-        message={'This package is controlled by Parent Control.\nTurn off Parent Control to activate this package.'}
+        message={PARENT_CONTROLLED_PACKAGE_TEXT}
         secondaryLabel="Cancel"
         primaryLabel="Go to Parent Control"
         onClose={() => setParentControlledDialogOpen(false)}
@@ -3662,6 +3671,9 @@ export default function ProfileScreen() {
           else setHostDefaultsExpanded(true);
         }}
       />
+
+      {/* Info-ikonernas dialog (egen Modal, se InfoDialog). */}
+      {infoDialog}
 
       <Modal
         visible={spotifyGuideVisible}

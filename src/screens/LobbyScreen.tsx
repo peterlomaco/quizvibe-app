@@ -41,6 +41,27 @@ import { RotatingTagline } from '../components/RotatingTagline';
 import { GoldCtaButton } from '../components/GoldCtaButton';
 import { GroupOutlineIcon } from '../components/GroupOutlineIcon';
 import { LockOutlineIcon } from '../components/SectionIcons';
+import { useInfoDialog } from '../components/InfoDialog';
+import {
+  addGuestInfo,
+  answerTimeInfo,
+  gameEraInfo,
+  gameModeInfo,
+  gameSequenceInfo,
+  hintsInfo,
+  hostPackagesInfo,
+  mutualAssistanceInfo,
+  parentControlInfo,
+  parentControlledPackageInfo,
+  playersInfo,
+  roundsInfo,
+  spotifyInfo,
+  youtubeInfo,
+} from '../utils/infoTexts';
+
+// Legacy (multiplayerV2 av): oförändrad text, bara ny dialog-stil.
+const LEGACY_MULTIPLAYER_INFO =
+  'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or H2H? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Head-to-head".';
 import { PackageThumbnail, hasPackageThumbnail } from '../components/PackageThumbnail';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '../components/MetallicGoldFill';
 import { SectionToggle } from '../components/SectionToggle';
@@ -1371,6 +1392,8 @@ export default function LobbyScreen() {
   // Lägesnamn i texter (Step 7): rummets EGEN flagga, inte den cachade gaten —
   // ett legacy-rum ska fortsätta säga Pass-the-Phone / Individual device.
   const lobbyModeLabels = useMemo(() => modeLabels(roomIsMultiplayerV2 === true), [roomIsMultiplayerV2]);
+  // Info-ikonernas popups (ⓘ) — QuizVibe-dialog i stället för native Alert.
+  const { showInfo, infoDialog } = useInfoDialog();
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -8293,12 +8316,7 @@ export default function LobbyScreen() {
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() =>
-                    quizVibeAlert(
-                      'Add Guest',
-                      "Adding a guest requires 1 by 1 mode. Guests play on the host's device.",
-                    )
-                  }
+                  onPress={() => showInfo(addGuestInfo())}
                   hitSlop={8}
                   accessibilityLabel="Add Guest info"
                 >
@@ -8570,12 +8588,7 @@ export default function LobbyScreen() {
               <Text style={styles.mutualAssistanceLabel}>Mutual assistance level</Text>
               <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() =>
-                  quizVibeAlert(
-                    'Mutual assistance level',
-                    'Off: each player plays with their own personal assistance level.\n\nOn: both players get the SAME level — the one the Host picks below. In an H2H match both answer the same questions on their own devices, so a shared level makes the duel directly comparable.\n\nFull: the full names are listed, just pick the right one.\nStandard: 2-letter hints, then pick the name.\nMinimal: 1-letter hints, then pick the name.\n\nIt also sets how wide the year interval is on Year questions.',
-                  )
-                }
+                onPress={() => showInfo(mutualAssistanceInfo())}
                 hitSlop={8}
                 accessibilityLabel="Mutual assistance level info"
               >
@@ -8749,15 +8762,10 @@ export default function LobbyScreen() {
                 <Pressable
                 style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                 onPress={() =>
-                  isV2Lobby
-                    ? quizVibeAlert(
-                        'Multiplayer mode',
-                        "The mode follows the players' devices.\n\nAll at Once: everyone plays on their own phone and answers at the same time. Max 4 players on Basic, 12 with Premium.\n\n1 by 1: players take turns, one question each. Used when someone plays on your phone (added with + Add Guest), or when you tap 1 by 1. Max 4 players and 4 rounds.\n\nSpotify DJ is played All at Once.",
-                      )
-                    :
-                  quizVibeAlert(
-                    'Multiplayer mode',
-                    'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or H2H? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Head-to-head".',
+                  showInfo(
+                    isV2Lobby
+                      ? gameModeInfo()
+                      : { title: 'Multiplayer mode', message: LEGACY_MULTIPLAYER_INFO },
                   )
                 }
                 hitSlop={8}
@@ -8799,12 +8807,7 @@ export default function LobbyScreen() {
                 <Text style={styles.multiplayerBracketLabel}>Multiplayer</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() =>
-                    quizVibeAlert(
-                      'Multiplayer mode',
-                      'Pass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nLooking for Single player or H2H? Both are started from the Home screen — tap Start New Game and pick "Single Game" or "Head-to-head".',
-                    )
-                  }
+                  onPress={() => showInfo({ title: 'Multiplayer mode', message: LEGACY_MULTIPLAYER_INFO })}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -8825,12 +8828,7 @@ export default function LobbyScreen() {
             <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
             <Pressable
               style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-              onPress={() =>
-                quizVibeAlert(
-                  'Players',
-                  'Max 4 players - use as standard and applicable for all Single and Multiplayer modes.\n\nMax 12 players - only applicable with Individual device mode.',
-                )
-              }
+              onPress={() => showInfo(playersInfo(lobbyModeLabels.allAtOnce))}
               hitSlop={8}
               accessibilityLabel="Players info"
             >
@@ -8983,14 +8981,10 @@ export default function LobbyScreen() {
                   <Pressable
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                     onPress={() =>
-                      quizVibeAlert(
-                        'Spotify',
-                        `• Only applicable in ${lobbyModeLabels.allAtOnce} mode\n\n• For Spotify music, one player at a time (the DJ) will be directed via QuizVibe to Spotify\n\n• The DJ needs the Spotify app on their device — free or Premium`,
-                        [
-                          { text: 'Guide How it works', onPress: () => setSpotifyGuideVisible(true) },
-                          { text: 'Close', style: 'cancel' },
-                        ],
-                      )
+                      showInfo({
+                        ...spotifyInfo(lobbyModeLabels.allAtOnce),
+                        action: { label: 'How it works', onPress: () => setSpotifyGuideVisible(true) },
+                      })
                     }
                     hitSlop={8}
                     accessibilityLabel="Spotify info"
@@ -9156,7 +9150,7 @@ export default function LobbyScreen() {
                   <YouTubeBrandIcon size={20} />
                   <Text style={styles.sourceMatrixSourceText}>YouTube</Text>
                   <Pressable
-                    onPress={() => quizVibeAlert('YouTube sources', '• Artists – music videos\n• Actors – movie clips & trailers')}
+                    onPress={() => showInfo(youtubeInfo())}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
@@ -9171,7 +9165,7 @@ export default function LobbyScreen() {
                   </View>
                   <Text style={styles.sourceMatrixSourceText}>Hints</Text>
                   <Pressable
-                    onPress={() => quizVibeAlert('Hints', 'Guess the artist, band or actor from a flag + progressive clues.')}
+                    onPress={() => showInfo(hintsInfo())}
                     hitSlop={8}
                     style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   >
@@ -9300,7 +9294,7 @@ export default function LobbyScreen() {
                 <Text style={styles.sectionLabel}>Parent Control</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => quizVibeAlert('Parent Control', 'When on, mature content is kept out of the game — parent-controlled clips and mature packages are excluded from the question selection.')}
+                  onPress={() => showInfo(parentControlInfo('lobby'))}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -9336,12 +9330,7 @@ export default function LobbyScreen() {
                     styles.infoIconBtn,
                     pressed && { opacity: 0.7 },
                   ]}
-                  onPress={() =>
-                    quizVibeAlert(
-                      'Customized Host packages',
-                      'Generic - Generic portfolio includes the full music quiz (YouTube + Hints).\n\nExtra Host Packages - specific themes for a customized game experience',
-                    )
-                  }
+                  onPress={() => showInfo(hostPackagesInfo())}
                   hitSlop={8}
                   accessibilityLabel="Customized Host packages info"
                 >
@@ -9623,12 +9612,7 @@ export default function LobbyScreen() {
                         {pkg.parentRestricted && (
                           <Pressable
                             style={({ pressed }) => [styles.infoIconBtn, styles.infoIconBtnSubtle, pressed && { opacity: 0.7 }]}
-                            onPress={() =>
-                              quizVibeAlert(
-                                'Parent controlled',
-                                'This package is controlled by Parent Control.\nTurn off Parent Control to activate this package.',
-                              )
-                            }
+                            onPress={() => showInfo(parentControlledPackageInfo())}
                             hitSlop={12}
                             accessibilityLabel={`${pkg.name} info`}
                           >
@@ -9682,12 +9666,7 @@ export default function LobbyScreen() {
               {hostMode && (
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() =>
-                    quizVibeAlert(
-                      'Multiplayer mode',
-                      "The mode follows the players' devices.\n\nAll at Once: everyone plays on their own phone and answers at the same time.\n\n1 by 1: players take turns, one question each. Used when someone plays on your phone (added with + Add Guest), or when you tap 1 by 1. Max 4 rounds.\n\nGuest games: max 4 players.",
-                    )
-                  }
+                  onPress={() => showInfo(gameModeInfo())}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -9746,7 +9725,7 @@ export default function LobbyScreen() {
                 <Text style={styles.sectionLabel}>Game Era (min 15 year interval)</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => quizVibeAlert('Game Era', 'Set the time span for questions')}
+                  onPress={() => showInfo(gameEraInfo())}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -9904,7 +9883,18 @@ export default function LobbyScreen() {
                 <Text style={styles.sectionLabel}>Number of Rounds</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => quizVibeAlert('Number of Rounds', 'How many rounds in this game')}
+                  onPress={() =>
+                    showInfo(
+                      roundsInfo(
+                        isGuestHostedLobby || isSingleLobby
+                          ? 'basic'
+                          : gameMode === 'remote-1v1'
+                            ? 'h2h'
+                            : 'multiplayer',
+                        lobbyModeLabels.allAtOnce,
+                      ),
+                    )
+                  }
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -10082,12 +10072,7 @@ export default function LobbyScreen() {
                 <Text style={styles.sectionLabel}>Game Sequence</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() =>
-                    quizVibeAlert(
-                      'Game Sequence',
-                      'Preview of which source (Spotify / YouTube / Hints) each round will use based on current settings.'
-                    )
-                  }
+                  onPress={() => showInfo(gameSequenceInfo())}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -10155,7 +10140,7 @@ export default function LobbyScreen() {
                 <Text style={styles.sectionLabel}>Answer response time</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => quizVibeAlert('Answer response time', 'Seconds players have to answer each question')}
+                  onPress={() => showInfo(answerTimeInfo())}
                   hitSlop={8}
                 >
                   <Text style={styles.infoIconText}>i</Text>
@@ -11280,6 +11265,8 @@ export default function LobbyScreen() {
           (rot-hosten i _layout hamnar bakom native-stackens skärmar). Sist i
           trädet så dialogen ligger överst; öppna sheets har egna hostar. */}
       <QuizVibeAlertHost />
+      {/* Info-ikonernas dialog (egen Modal, se InfoDialog). */}
+      {infoDialog}
     </SafeAreaView>
   );
 }

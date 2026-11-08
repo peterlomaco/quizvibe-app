@@ -54,6 +54,9 @@ interface Props {
   /** Destruktiv knapp som dämpad mörkröd fyllning med vit text i stället för
    *  röd kontur — tydligare än Cancel men mindre dramatisk än Delete Account. */
   destructiveFilled?: boolean;
+  /** Valfritt eget innehåll under meddelandet (t.ex. InfoDialog:s scrollbara
+   *  term-rader). Skicka `message=""` för att bara visa body. */
+  body?: React.ReactNode;
 }
 
 export function QuizVibeDialog({ visible, onClose, ...rest }: Props) {
@@ -86,6 +89,7 @@ export function QuizVibeDialogOverlay({
   stackedActions,
   centered = false,
   destructiveFilled = false,
+  body,
 }: Omit<Props, 'visible'>) {
   const busy = (slideToConfirm?.busy ?? false) || primaryLoading;
   return (
@@ -101,6 +105,7 @@ export function QuizVibeDialogOverlay({
           {title}
         </Text>
         {message ? <Text style={[styles.message, centered && styles.textCentered]}>{message}</Text> : null}
+        {body}
         {warning ? (
           <>
             <View style={styles.warningDivider} />
