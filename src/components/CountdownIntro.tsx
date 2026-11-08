@@ -21,6 +21,8 @@ import { QuizVibeMarkArcsSvg, QuizVibeMarkQOnlySvg } from './brand/QuizVibeBrand
 import { MARK_RING, MARK_VIEWBOX } from './brand/quizVibeBrandGeometry';
 import { SPOTIFY_GREEN } from './SpotifyBrandIcon';
 import { currentModeLabels } from '../utils/modeLabels';
+import { PhoneOutlineIcon } from './PhoneOutlineIcon';
+import { GroupOutlineIcon } from './GroupOutlineIcon';
 
 interface Props {
   /** Anropas när nedräkningen passerat 1 → 0 OCH "?" har visats. */
@@ -52,6 +54,12 @@ interface Props {
   playerEmoji?: string;
   /** Single player: ingen "Pass-the-Phone to:"-rubrik (Peter 2026-11-04). */
   hidePlayerLabel?: boolean;
+  /** Ersätter "Pass the phone to:"-rubriken (t.ex. "Play from other device"
+   *  i 1 by 1 när turägaren svarar på en annan telefon). */
+  playerLabelOverride?: string;
+  /** Enhets-ikon före rubriken ("Play on this device:"): 'own' = telefon,
+   *  'host' = host:ens telefon (samma ikoner som lobbyns spelarkort). */
+  playerLabelDevice?: 'own' | 'host';
   /** Spelarens bild-avatar (om vald) — vinner över emoji. */
   playerAvatarUri?: string;
   /** Mediakälla för frågan som strax ska ställas — visas som ikon mellan
@@ -187,7 +195,7 @@ function SideTag({
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, playerAvatarUri, hidePlayerLabel = false, mediaSource, answerType = null, category = null, finalWord, silent = false, anchorT0, voice = DEFAULT_VOICE_ID }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, playerAvatarUri, hidePlayerLabel = false, playerLabelOverride, playerLabelDevice, mediaSource, answerType = null, category = null, finalWord, silent = false, anchorT0, voice = DEFAULT_VOICE_ID }: Props) {
   // Remote 1v1 delar IndDev:s headline ("Get Ready to QuizVibe") — varje
   // spelare sitter på egen enhet, ingen specifik spelare att namnge.
   const isIndDev = mode === 'individual-devices' || mode === 'remote-1v1';
@@ -535,7 +543,13 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
           </View>
         ) : playerName ? (
           <View style={styles.playerBlock}>
-            {!hidePlayerLabel && <Text style={styles.playerLabel}>{currentModeLabels().passTo}</Text>}
+            {!hidePlayerLabel && (
+              <View style={styles.playerLabelRow}>
+                {playerLabelDevice === 'own' && <PhoneOutlineIcon size={16} color={Colors.textSecondary} />}
+                {playerLabelDevice === 'host' && <GroupOutlineIcon size={16} color={Colors.textSecondary} />}
+                <Text style={styles.playerLabel}>{playerLabelOverride ?? currentModeLabels().passTo}</Text>
+              </View>
+            )}
             <View style={styles.playerBox}>
               {/* Spelarens avatar — samma komponent som spelarkorten i lobbyn
                   (default = Q med smiley i stället för silhuetten 👤,
@@ -603,6 +617,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.xl,
   },
+  playerLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   playerLabel: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,

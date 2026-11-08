@@ -36,7 +36,6 @@ import { PlayerNameInput } from '@/src/components/PlayerNameInput';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
-import { QuizVibeDefaultAvatar } from '../components/QuizVibeDefaultAvatar';
 import { RotatingTagline } from '../components/RotatingTagline';
 import { GoldCtaButton } from '../components/GoldCtaButton';
 import { GroupOutlineIcon } from '../components/GroupOutlineIcon';
@@ -8146,12 +8145,7 @@ export default function LobbyScreen() {
           {/* Lobby v2 (korrigering 2026-10-21): kompakt informationskort.
               Hierarki: ROOM CODE-etikett → koden → liten status-rad (host-
               crossfade / "You are invited") → Share som sekundär action.
-              Q-märket är en liten, dämpad signatur i övre vänstra hörnet. */}
-          <View style={styles.roomCodeLogoWrap} pointerEvents="none">
-            {/* Nya rena Q:t (default-avatarens, utan wifi-bågar) — samma
-                som Get Ready-headern. Gäller multiplayer + H2H (single har inget rumskort). */}
-            <QuizVibeDefaultAvatar size={30} framed />
-          </View>
+              Q-märket i övre vänstra hörnet är borttaget (Peter 2026-11-08). */}
           <Text style={styles.roomLabel}>Room Code</Text>
           {/* Koden i tre grupper (bokstäver · siffror · bokstäver) med EN ruta
               per tecken — host läser upp den tecken för tecken: E N – 7 9 – J E. */}
@@ -8314,6 +8308,9 @@ export default function LobbyScreen() {
                 guest plays on the host's phone and forces 1 by 1. */}
             {hostMode && isV2Lobby && !isRematchLobby && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
+                  <Text style={styles.addBtnText}>+ Add Guest</Text>
+                </TouchableOpacity>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() => showInfo(addGuestInfo())}
@@ -8322,9 +8319,6 @@ export default function LobbyScreen() {
                 >
                   <Text style={styles.infoIconText}>i</Text>
                 </Pressable>
-                <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
-                  <Text style={styles.addBtnText}>+ Add Guest</Text>
-                </TouchableOpacity>
               </View>
             )}
           </View>
@@ -11765,17 +11759,6 @@ const styles = StyleSheet.create({
   // Mindre än guest-spacing (64) eftersom host-rubriken "You are the host"
   // redan tar lite toppyta.
   roomCodeRowHostSpacing: { marginTop: 18 },
-  // Loggan pinnas i Card:s övre vänstra hörn. top/left: 0 = inkant av
-  // Card:s padding-edge (RN positionerar absolute children från padding-
-  // edge, inte content-edge). Negativa offsets drar in loggan i själva
-  // padding-zonen så den hamnar närmare Card:s rundade kant.
-  // Liten, dämpad Q-signatur i kortets övre vänstra hörn (Lobby v2).
-  roomCodeLogoWrap: {
-    position: 'absolute',
-    top: Spacing.sm,
-    left: Spacing.sm,
-    opacity: 0.45,
-  },
   roomCodeStack: { alignItems: 'center' },
   roomLabel: { ...Typography.overline, color: BrandUi.textMuted, marginBottom: Spacing.xs },
   // Guest-label position och utseende. Pinnas absolut i Card:ens övre del

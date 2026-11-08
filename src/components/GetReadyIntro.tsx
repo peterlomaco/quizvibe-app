@@ -36,6 +36,8 @@ import { HeartbeatSound } from './HeartbeatSound';
 import { DEFAULT_VOICE_ID, SILENT_VOICE_ID, VOICE_OPTIONS } from '../utils/voicePacks';
 import { playVoiceClip } from '../utils/voicePlayback';
 import { currentModeLabels } from '../utils/modeLabels';
+import { PhoneOutlineIcon } from './PhoneOutlineIcon';
+import { GroupOutlineIcon } from './GroupOutlineIcon';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
  *  Speglar TurnOrderPlayer i quiz.tsx. */
@@ -124,6 +126,9 @@ interface Props {
   /** Spelaren som ska börja sin runda — visas i Pass-the-Phone-rutan.
    *  I IndDev döljs current-player-raden helt; bara queue-tabellen renderas. */
   currentPlayer: IntroPlayer;
+  /** Multiplayer v2 1 by 1: device the current player answers on. Renders
+   *  the lobby's own-device / host-device icon in front of the player card. */
+  currentPlayerDevice?: 'own' | 'host';
   /** Spelare som kommer på tur EFTER current — i ordning, med ev. wrap-around.
    *  Capade i quiz.tsx så endast spelare som faktiskt hinner spela ingår.
    *  Används bara i Pass-the-Phone — i IndDev ignoreras detta fält. */
@@ -358,6 +363,7 @@ const QUEUE_AVATAR_SIZE = 32;
 export function GetReadyIntro({
   mode = 'pass-the-phone',
   currentPlayer,
+  currentPlayerDevice,
   queue,
   queueRoundNumbers,
   queueQuestionNumbers,
@@ -709,7 +715,9 @@ export function GetReadyIntro({
           (Music/Film/Sport) för nästa fråga så spelaren vet vad som
           kommer. */}
       <View style={styles.tableRow}>
-        <View style={[styles.colPlayer, styles.colPlayerCurrentWrap]}>
+        <View style={[styles.colPlayer, styles.colPlayerCurrentWrap, currentPlayerDevice && styles.colPlayerWithDevice]}>
+          {currentPlayerDevice === 'own' && <PhoneOutlineIcon size={22} color={Colors.textSecondary} />}
+          {currentPlayerDevice === 'host' && <GroupOutlineIcon size={22} color={Colors.textSecondary} />}
           <View style={styles.currentPlayerBox}>
             <Text style={styles.currentMediaNumber}>{currentQuestion}</Text>
             <PlayerAvatar player={currentPlayer} size={QUEUE_AVATAR_SIZE} />
@@ -2568,6 +2576,7 @@ const styles = StyleSheet.create({
   // För current-player-cellen: ingen egen padding (boxen styr sina margins
   // via container) men inner-box-wrappen behöver flex 1 så boxen sträcker
   // sig över hela kolumnens bredd minus ev. spacing.
+  colPlayerWithDevice: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   colPlayerCurrentWrap: {
     // Plats för de kant-skärande badgarna ovanför kortet.
     paddingTop: Spacing.md,

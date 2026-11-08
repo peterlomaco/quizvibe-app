@@ -4416,6 +4416,18 @@ export default function QuizScreen() {
   // bygger arrayen med host först). Används för default-audio-policyn
   // (host = on när override saknas).
   const hostPlayerId = turnOrder[0]?.id;
+  // Multiplayer v2 1 by 1: which device a player answers on, shown as an icon
+  // in front of the Get Ready player card. Only v2 rooms carry deviceMode, so
+  // legacy PtP and Single get no icon. Host always plays on its own phone.
+  const oneByOneDeviceFor = (playerId: string | undefined): 'own' | 'host' | undefined => {
+    if (gameMode !== 'pass-the-phone' || isLocalSoloGame || !playerId) return undefined;
+    if (!turnOrder.some((t) => t.deviceMode)) return undefined;
+    const stored = turnOrder.find((t) => t.id === playerId)?.deviceMode;
+    if (stored) return stored;
+    // Host row is id '1' (turn order can be reordered, so not always index 0).
+    const hostRowId = turnOrder.some((t) => t.id === '1') ? '1' : hostPlayerId;
+    return playerId === hostRowId ? 'own' : 'host';
+  };
   // Lokalt solo-spel (Single Player) — EN spelare på EN enhet, precis som
   // Pass-the-Phone. Appen ska då inte styra ljudet alls: det spelas, och
   // vill spelaren dämpa det använder de enhetens egen volymkontroll.
@@ -10856,7 +10868,7 @@ export default function QuizScreen() {
   // prisutdelnings-sekvensen renderas som för alla andra.
   if (isPtPSpectator && phase !== 'leaderboard') {
     const spectatorPlayerCount = Math.max(1, turnOrder.length);
-    const spectatorCurrentPlayer = turnOrder[currentPlayerIndex] ?? {
+    const spectatorCurrentPlayer = (isHybrid && hybridOwner) || turnOrder[currentPlayerIndex] || {
       id: 'you',
       name: 'Player',
       emoji: '👤',
@@ -10884,6 +10896,7 @@ export default function QuizScreen() {
           spectator
           mode={gameMode}
           currentPlayer={spectatorCurrentPlayer}
+          currentPlayerDevice={oneByOneDeviceFor(spectatorCurrentPlayer.id)}
           queue={introQueueData.players}
           queueRoundNumbers={introQueueData.roundNumbers}
           queueQuestionNumbers={introQueueData.questionNumbers}
@@ -10959,7 +10972,7 @@ export default function QuizScreen() {
   // tillbaka till 'You' om turnOrder skulle vara tom (defensiv — initial
   // phase-init filtrerar redan bort det fallet).
   if (phase === 'intro') {
-    const currentPlayer = turnOrder[currentPlayerIndex] ?? {
+    const currentPlayer = (isHybrid && hybridOwner) || turnOrder[currentPlayerIndex] || {
       id: 'you',
       name: 'You',
       emoji: '🎮',
@@ -11004,6 +11017,7 @@ export default function QuizScreen() {
         hybridParticipant={isOwnDeviceParticipant}
         nextOnOwnDevice={isHybrid && isHost && !!hybridOwner && hybridOwnIds.has(hybridOwner.id)}
         currentPlayer={currentPlayer}
+        currentPlayerDevice={oneByOneDeviceFor(currentPlayer.id)}
         queue={introQueue}
         queueRoundNumbers={queueRoundNumbers}
         queueQuestionNumbers={queueQuestionNumbers}
@@ -11140,7 +11154,30 @@ export default function QuizScreen() {
   // playerName + playerEmoji från turordningen så Pass-the-Phone-mode
   // anchorar nedräkningen till rätt spelare även medan telefonen lämnas över.
   if (phase === 'countdown') {
-    const countdownPlayer = turnOrder[currentPlayerIndex];
+    // Hybrid 1 by 1: an own-device participant's currentPlayerIndex does not
+    // rotate (IndDev path), so name the actual turn owner instead.
+    const countdownPlayer = isHybrid && hybridOwner ? hybridOwner : turnOrder[currentPlayerIndex];
+    // On an own-device player's phone, another player's turn is answered on
+    // a different phone — nothing is passed here (Peter 2026-11-08).
+    const countdownOnOtherDevice =
+      isOwnDeviceParticipant && !!hybridOwner && hybridOwner.id !== selfPlayerId;
+    const countdownOnThisDevice =
+      isOwnDeviceParticipant && !!hybridOwner && hybridOwner.id === selfPlayerId;
+    // Host's phone in a v2 1 by 1 game: the host and host-device players
+    // (joiners who picked the host's phone, manual guests) all play here.
+    const countdownHostDevice =
+      isHost && !isOwnDeviceParticipant ? oneByOneDeviceFor(countdownPlayer?.id) : undefined;
+    const countdownHostPlaysHere =
+      !!countdownHostDevice &&
+      !(isHybrid && !!countdownPlayer && hybridOwnIds.has(countdownPlayer.id));
+    // Host's phone while an own-device joiner answers on their own phone.
+    const countdownHostWatchesOther =
+      isHost && isHybrid && !!countdownPlayer && hybridOwnIds.has(countdownPlayer.id);
+    const countdownLabelDevice: 'own' | 'host' | undefined = countdownOnThisDevice
+      ? 'own'
+      : countdownHostPlaysHere
+        ? countdownHostDevice
+        : undefined;
     // Countdown-röst: device-lokal preferens ur profil-spegeln (som "Audio this
     // device"). Bara den talande enheten läser den — non-hosts är silent ändå.
     // Gäst/ohydrerad → Default (system-TTS).
@@ -11153,7 +11190,17 @@ export default function QuizScreen() {
         playerName={countdownPlayer?.name}
         playerEmoji={countdownPlayer?.emoji}
         playerAvatarUri={countdownPlayer?.avatarUri}
-        hidePlayerLabel={isLocalSoloGame || (isHybrid && !!hybridOwner && hybridOwnIds.has(hybridOwner.id))}
+        hidePlayerLabel={
+          isLocalSoloGame ||
+          (isHybrid && !!hybridOwner && hybridOwnIds.has(hybridOwner.id) && !isOwnDeviceParticipant && !isHost)
+        }
+        playerLabelOverride={
+          countdownOnOtherDevice ? 'Play from other device:'
+            : countdownHostWatchesOther ? 'Play from other device:'
+            : countdownLabelDevice ? 'Play on this device:'
+            : undefined
+        }
+        playerLabelDevice={countdownLabelDevice}
         mediaSource={effectiveMediaSourceByQuestion[questionIndex] ?? null}
         answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
         category={effectiveCategoryByQuestion[questionIndex] ?? null}
