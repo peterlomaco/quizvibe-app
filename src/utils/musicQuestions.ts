@@ -5849,7 +5849,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "spotifyTrackId": "2mJWtE3ViYUs8qalVAMveI",
     "youtubeClips": [
       {
-        "videoId": "kln_bIndDJg",
+        "videoId": "AnlIHaAkuTU",
         "startSec": 5,
         "endSec": 35,
         "license": "standard",
