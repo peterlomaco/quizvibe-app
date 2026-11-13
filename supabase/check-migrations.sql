@@ -61,7 +61,9 @@ with checks(migration, kind, obj) as (values
   ('0064_multiplayer_v2_server_rules',  'func',   'public.start_lobby_game'),
   ('0065_multiplayer_v2_removals',      'table',  'public.lobby_removed_players'),
   ('0066_hybrid_turn_results',          'table',  'public.lobby_turn_results'),
-  ('0067_multiplayer_v2_join_device',   'funcbody','public.enforce_lobby_join_eligibility|Step 6: host-device self-join')
+  ('0067_multiplayer_v2_join_device',   'funcbody','public.enforce_lobby_join_eligibility|Step 6: host-device self-join'),
+  ('0068_security_guards',              'func',   'public.guard_lobby_player_row'),
+  ('0068 (claim binds only seat owner)','funcbody','public.claim_carry_over_row|_lobby_seat_owner')
 )
 select * from (
 select

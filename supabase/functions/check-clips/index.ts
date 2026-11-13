@@ -11,8 +11,10 @@
 //      bearbetat / embeddable=false / åldersbegränsat / regionRestriction
 //      som utesluter SE.
 //   2. BLOCKLISTA: klippet har rapporterats som 'video_not_found' eller
-//      'embed_not_allowed' från en riktig spelares enhet (clip_playback_errors,
-//      migration 0056) de senaste 30 dagarna och raden är inte `cleared`.
+//      'embed_not_allowed' (clip_playback_errors, migration 0056) av minst
+//      2 olika icke-anonyma spelare de senaste 7 dagarna, ej `cleared`.
+//      Regeln + en global circuit breaker ligger i clip_blocklist() (0068);
+//      en per-request-breaker ligger här. Båda fail-open.
 //      Punkt 2 är enda sättet att fånga claim-baserade embed-block per land —
 //      de syns varken i Data API eller oEmbed.
 //
@@ -37,7 +39,6 @@ const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY') ?? '';
 const SERVED_REGIONS = ['SE'];
 const MAX_IDS = 60;
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
-const BLOCKLIST_CODES = ['video_not_found', 'embed_not_allowed'];
 const ID_RE = /^[A-Za-z0-9_-]{11}$/;
 
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
@@ -133,21 +134,40 @@ async function checkViaApi(ids: string[]): Promise<{ dead: Set<string>; ok: bool
   return { dead, ok };
 }
 
+// Blocklistan avgörs i databasen (clip_blocklist, migration 0068):
+// minst 2 olika icke-anonyma rapportörer inom 7 dagar, plus en global
+// circuit breaker. Här läggs en per-request-breaker ovanpå: om mer än
+// BLOCKLIST_MAX_SHARE av klippen i ett anrop är blocklistade ser listan
+// förgiftad ut och ignoreras (fail-open — Data API-kontrollen gäller ändå).
+const BLOCKLIST_MAX_SHARE = 0.1;
+// Korta spel skickar få ids — ett enda riktigt dött klipp är då >10 %.
+// Breakern löser därför först ut från BLOCKLIST_MIN_TRIP klipp i samma anrop.
+const BLOCKLIST_MIN_TRIP = 3;
+
+function applyRequestBreaker(ids: string[], blocked: Set<string>): Set<string> {
+  if (blocked.size >= BLOCKLIST_MIN_TRIP && blocked.size > ids.length * BLOCKLIST_MAX_SHARE) {
+    console.warn(
+      `[check-clips] blocklist circuit breaker: ${blocked.size}/${ids.length} ids blocked — ignoring blocklist`,
+    );
+    return new Set();
+  }
+  return blocked;
+}
+
 async function checkBlocklist(ids: string[]): Promise<Set<string>> {
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const { data, error } = await admin
-    .from('clip_playback_errors')
-    .select('video_id')
-    .in('video_id', ids)
-    .in('error_code', BLOCKLIST_CODES)
-    .eq('cleared', false)
-    .gte('created_at', since);
+  const { data, error } = await admin.rpc('clip_blocklist', { p_video_ids: ids });
   if (error) {
-    // 0056 ej applicerad eller tillfälligt fel — fail-open.
+    // 0068 ej applicerad eller tillfälligt fel — fail-open.
     console.warn('[check-clips] blocklist query failed:', error.message);
     return new Set();
   }
-  return new Set((data ?? []).map((r: { video_id: string }) => r.video_id));
+  const rows = (data ?? []) as { video_id: string | null; breaker_tripped: boolean }[];
+  if (rows.some((r) => r.breaker_tripped)) {
+    console.warn('[check-clips] blocklist circuit breaker tripped in database — ignoring blocklist');
+    return new Set();
+  }
+  const blocked = new Set(rows.map((r) => r.video_id).filter((v): v is string => !!v));
+  return applyRequestBreaker(ids, blocked);
 }
 
 Deno.serve(async (req) => {
