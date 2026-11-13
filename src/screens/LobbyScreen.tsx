@@ -3704,9 +3704,16 @@ export default function LobbyScreen() {
       setPcBlocked({ kind: 'single', id });
       return;
     }
+    if (isActivating && selectedExtraPackages.length > 0) {
+      // Ett paket är redan på → mixerboarden är redan i paket-läge; ingen
+      // varning (Peter 2026-11-13).
+      setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      return;
+    }
     if (isActivating) {
       // Ett aktivt paket kollapsar/omformar Source Mixerboard (tema-only pool
       // + coverage-graying + era-lås) → bekräfta med host innan valet appliceras.
+      // Visas bara när INGET paket redan är på.
       quizVibeAlert(
         'Extra package',
         'Please be aware that this might affect your selection in Source mixerboard.',
@@ -3735,18 +3742,10 @@ export default function LobbyScreen() {
       setSelectedExtraPackages([]);
       return;
     }
-    // Aktivering av paket kollapsar/omformar Source Mixerboard → bekräfta först.
-    quizVibeAlert(
-      'Extra package',
-      'Please be aware that this might affect your selection in Source mixerboard.',
-      [
-        { text: 'No', style: 'cancel' },
-        {
-          text: 'Yes',
-          onPress: () => {
-            // Select all: aktivera bara icke-restricted-paket när Parent Control
-            // är på; om något restricted-paket hoppas över, informera via block-
-            // alerten.
+    // Select all: aktivera bara icke-restricted-paket när Parent Control
+    // är på; om något restricted-paket hoppas över, informera via block-
+    // dialogen.
+    const applySelectAll = () => {
             const activatable = availablePackages.filter(
               (p) => !(parentControlEnabled && isPackageParentRestricted(p.id)),
             );
@@ -3759,7 +3758,21 @@ export default function LobbyScreen() {
               // vänta ut Alertens stängning.
               setTimeout(() => setPcBlocked({ kind: 'all', ids: blockedIds }), 350);
             }
-          },
+    };
+    // Ett paket redan på → mixerboarden är redan i paket-läge, ingen varning.
+    if (selectedExtraPackages.length > 0) {
+      applySelectAll();
+      return;
+    }
+    // Aktivering av paket kollapsar/omformar Source Mixerboard → bekräfta först.
+    quizVibeAlert(
+      'Extra package',
+      'Please be aware that this might affect your selection in Source mixerboard.',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: applySelectAll,
         },
       ],
     );
@@ -3783,6 +3796,12 @@ export default function LobbyScreen() {
         // först och visa dialogen när fade:en är klar.
         setAddPackageModalVisible(false);
         setTimeout(() => setPcBlocked({ kind: 'catalog', id }), 350);
+        return;
+      }
+      // Ett paket redan på → mixerboarden är redan i paket-läge, ingen varning.
+      if (selectedExtraPackages.length > 0) {
+        setEnabledHostPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
+        setSelectedExtraPackages((prev) => (prev.includes(id) ? prev : [...prev, id]));
         return;
       }
       // Aktivering kollapsar/omformar Source Mixerboard → bekräfta först.
@@ -9255,7 +9274,7 @@ export default function LobbyScreen() {
                 </View>
                 <Text style={styles.guestHostNote}>
                   {hostMode
-                    ? 'Package sources — each toggle controls all of the package’s categories. Spotify (above) is optional and can never be the only source.'
+                    ? 'Package sources — each toggle controls all of the package’s categories.'
                     : 'Package sources — selected by the Host'}
                 </Text>
               </View>
@@ -10923,20 +10942,32 @@ export default function LobbyScreen() {
                   .map((pkg) => {
                     const isOn = enabledHostPackages.includes(pkg.id);
                     return (
-                      <View key={pkg.id} style={styles.purchasedPackageRow}>
-                        <View
-                          style={[
-                            styles.purchasedPackageBox,
-                            isOn && styles.purchasedPackageBoxActive,
-                          ]}
-                        >
+                      // Samma rad-format som lobbyns paketlista (packageListRow):
+                      // [tumnagel] [namn] [toggle], svag guldkant när på.
+                      // Info-ikonen utelämnas här — dess dialog skulle öppnas
+                      // ovanpå den här Modal:en (modal-swap-fällan på iOS).
+                      <View
+                        key={pkg.id}
+                        style={[styles.packageListRow, isOn && styles.packageListRowOn, { marginBottom: Spacing.sm }]}
+                      >
+                        {hasPackageThumbnail(pkg.id) ? (
+                          <PackageThumbnail
+                            packageId={pkg.id}
+                            state={
+                              isOn
+                                ? 'on'
+                                : parentControlEnabled && pkg.parentRestricted
+                                  ? 'unavailable'
+                                  : 'off'
+                            }
+                          />
+                        ) : (
+                          <MusicNoteIcon size={18} color={isOn ? Colors.warning : BrandUi.iconMuted} />
+                        )}
+                        <View style={styles.packageNameWrap}>
                           <Text
-                            style={[
-                              styles.purchasedPackageName,
-                              isOn && styles.purchasedPackageNameActive,
-                            ]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
+                            style={[styles.packageRowText, !isOn && styles.packageRowTextInactive]}
+                            numberOfLines={2}
                           >
                             {pkg.name}
                           </Text>
@@ -10946,7 +10977,6 @@ export default function LobbyScreen() {
                           value={isOn}
                           onValueChange={() => handleToggleCatalogPackage(pkg.id)}
                           accessibilityLabel="Package"
-                          style={{ marginLeft: 'auto' }}
                         />
                       </View>
                     );
