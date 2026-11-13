@@ -394,9 +394,9 @@ export function LeaderboardTable({
                   <View style={s.lbHcpModalTitleSpacer} />
                 </View>
                 <View style={s.lbHcpModalRow}>
-                  <HCPShieldCard hcp={expandedCat.total.after} size={48} label="Total" deltaBadge={expandedCat.total.delta} />
-                  <HCPShieldCard hcp={expandedCat.music.after} size={48} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.music.delta} />
-                  <HCPShieldCard hcp={expandedCat.film.after} size={48} label="Film/TV" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.film.delta} />
+                  <HCPShieldCard hcp={expandedCat.total.after} size={56} label="Total" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.total.delta} />
+                  <HCPShieldCard hcp={expandedCat.music.after} size={56} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.music.delta} />
+                  <HCPShieldCard hcp={expandedCat.film.after} size={56} label="Film/TV" badgeColor={Colors.warning} badgeTextColor="#000" deltaBadge={expandedCat.film.delta} />
                 </View>
                 <Pressable pressFeedback style={s.lbHcpModalClose} onPress={() => setExpandedId(null)}>
                   <Text style={s.lbHcpModalCloseText}>Close</Text>

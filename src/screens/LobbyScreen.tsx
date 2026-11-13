@@ -2842,10 +2842,15 @@ export default function LobbyScreen() {
       return next;
     });
   }, []);
+  // "+" vid taket i 1 by 1 / Pass-the-Phone: popupen erbjuder ett val
+  // (byt till All at Once / Switch & remove / Go to Store). Logiken bor i
+  // handleRoundsCapReached längre ned — den behöver flödes-state som
+  // deklareras senare, så den nås via en ref (sätts varje render).
+  const roundsCapReachedRef = useRef<() => void>(() => {});
   const handleIncrementRounds = useCallback(() => {
     if (roundsCount >= stepperMax) {
       if (singlePlayerDefault || gameMode === 'pass-the-phone') {
-        quizVibeAlert('More rounds not available', `More than 4 rounds is only available with both ${lobbyModeLabels.allAtOnce} and Premium activated.`);
+        roundsCapReachedRef.current();
       }
       return;
     }
@@ -4938,6 +4943,71 @@ export default function LobbyScreen() {
       ],
     );
   };
+
+  // "+" vid 4 rundor i 1 by 1 (Peter 2026-11-13):
+  //   • Premium + v2-lobby → byt till All at Once direkt härifrån, eller
+  //     "Switch & remove" om spelare spelar på host:ens enhet.
+  //   • Utan Premium → Go to Store (Guest Host: bara info, kan inte köpa).
+  const handleRoundsCapReached = () => {
+    const infoText = `More than 4 rounds is only available with both ${lobbyModeLabels.allAtOnce} and Premium activated.`;
+    if (isGuestHost) {
+      quizVibeAlert('More rounds not available', infoText);
+      return;
+    }
+    if (!hasPremium) {
+      quizVibeAlert('More rounds', `More than 4 rounds needs QuizVibe Premium and ${lobbyModeLabels.allAtOnce}.`, [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Go to Store',
+          onPress: () =>
+            router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }),
+        },
+      ]);
+      return;
+    }
+    // Premium: byte bara möjligt i v2-lobbyns 1 by 1 (legacy PtP: info).
+    if (!hostMode || !isV2Lobby || singlePlayerDefault || gameMode !== ONE_BY_ONE || !allAtOnceEntitled) {
+      quizVibeAlert('More rounds not available', infoText);
+      return;
+    }
+    const hostDeviceIds = players
+      .filter((p) => !p.isHost && !p.hasLeft && deviceFor(p) === 'host')
+      .map((p) => p.id);
+    if (hostDeviceIds.length === 0) {
+      quizVibeAlert(
+        'More rounds',
+        `More than 4 rounds needs ${lobbyModeLabels.allAtOnce}. Switch to ${lobbyModeLabels.allAtOnce} to host up to 20 rounds.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: `Switch to\n${lobbyModeLabels.allAtOnce}`, onPress: () => setHostOverrideOneByOne(false) },
+        ],
+      );
+      return;
+    }
+    if (isRematchLobby) {
+      quizVibeAlert(
+        'More rounds not available',
+        `A re-match keeps the exact same players, so players on your device cannot be removed to switch to ${lobbyModeLabels.allAtOnce}.`,
+      );
+      return;
+    }
+    quizVibeAlert(
+      'More rounds',
+      `More than 4 rounds needs ${lobbyModeLabels.allAtOnce}. Players on your device will be removed.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Switch & remove',
+          style: 'destructive',
+          onPress: () => {
+            hostDeviceIds.forEach((id) => ejectPlayer(id));
+            setHostOverrideOneByOne(false);
+          },
+        },
+      ],
+    );
+  };
+  roundsCapReachedRef.current = handleRoundsCapReached;
 
   // Multiplayer v2 flow indicator (boxes + reason line). Shared by the
   // registered lobby's Game Mode section and the stripped Guest Host lobby

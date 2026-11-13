@@ -1778,7 +1778,7 @@ export default function ProfileScreen() {
                 Music + Film). Music/Film fälls ut via "HCP per category"-raden
                 i höger-kolumnen. */}
             <View style={styles.hcpShieldWrap}>
-              <HCPShieldCard hcp={hcpShieldBundle.total} size={54} label="Total" badgeColor={Colors.background} badgeTextColor={Colors.textPrimary} badgeBorderColor={Colors.warning} />
+              <HCPShieldCard hcp={hcpShieldBundle.total} size={56} label="Total" badgeColor={Colors.warning} badgeTextColor="#000" />
             </View>
           </View>
 
@@ -1909,8 +1909,8 @@ export default function ProfileScreen() {
               <View style={styles.hcpSubRow}>
                 {/* ~18 % mindre än förr (56) så Total förblir primär; mörka
                     pills med tunn guldkant i stället för solida guld-badges. */}
-                <HCPShieldCard hcp={hcpShieldBundle.music} size={46} label="Music" badgeColor={Colors.background} badgeTextColor={Colors.textPrimary} badgeBorderColor={Colors.warning} badgeMinWidth={68} />
-                <HCPShieldCard hcp={hcpShieldBundle.film} size={46} label="Film/TV" badgeColor={Colors.background} badgeTextColor={Colors.textPrimary} badgeBorderColor={Colors.warning} badgeMinWidth={68} />
+                <HCPShieldCard hcp={hcpShieldBundle.music} size={56} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" />
+                <HCPShieldCard hcp={hcpShieldBundle.film} size={56} label="Film/TV" badgeColor={Colors.warning} badgeTextColor="#000" />
               </View>
             )}
 

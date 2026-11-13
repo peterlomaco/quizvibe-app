@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
     color: Colors.textPrimary,
     letterSpacing: 0.1,
+    textAlign: 'center',
   },
   ghostLabel: { color: Colors.primary },
   secondaryLabel: { color: Colors.textPrimary },

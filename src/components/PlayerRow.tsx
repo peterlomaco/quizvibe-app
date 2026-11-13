@@ -457,7 +457,7 @@ export function PlayerRow({
           PlayerName-kolumnen. */}
       {!hasLeft && !hcpNotDefined && hcp !== undefined && detailsExpanded && (
         <View style={styles.hcpCatRow}>
-          <HCPShieldCard hcp={hcp ?? 99} size={56} label="Total" />
+          <HCPShieldCard hcp={hcp ?? 99} size={56} label="Total" badgeColor={Colors.warning} badgeTextColor="#000" />
           <HCPShieldCard hcp={hcpMusic ?? 99} size={56} label="Music" badgeColor={Colors.warning} badgeTextColor="#000" />
           <HCPShieldCard hcp={hcpFilm ?? 99} size={56} label="Film/TV" badgeColor={Colors.warning} badgeTextColor="#000" />
         </View>
