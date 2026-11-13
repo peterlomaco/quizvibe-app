@@ -181,6 +181,9 @@ interface FinalCelebrationProps {
   muted?: boolean;
   /** Spelarnamnet under "Game Summary"-rubriken (denna enhets spelare). */
   playerName?: string;
+  /** Ersätter "Game Summary"-rubriken, t.ex. för den som når H2H-slutskärmen
+   *  först (motståndaren har inte spelat klart → inga kort att visa). */
+  heading?: string;
 }
 
 /**
@@ -224,6 +227,7 @@ export default function FinalCelebration({
   onDone,
   muted = false,
   playerName,
+  heading,
 }: FinalCelebrationProps) {
 
   const [stage, setStage] = useState<Stage>('celebration');
@@ -684,8 +688,14 @@ export default function FinalCelebration({
               därför tillsammans med korten när spelaren trycker "Leave
               summary". Slutskärmens egen "Final Leaderboard"-rubrik tar då
               över. */}
-          <Text style={[styles.summaryHeading, !!playerName && styles.summaryHeadingWithName]}>
-            Game Summary
+          <Text
+            style={[
+              styles.summaryHeading,
+              !!heading && styles.summaryHeadingNotice,
+              !!playerName && styles.summaryHeadingWithName,
+            ]}
+          >
+            {heading ?? 'Game Summary'}
           </Text>
           {playerName ? (
             <Text style={styles.summaryPlayerName} numberOfLines={1}>
@@ -918,6 +928,11 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     textAlign: 'center',
     marginBottom: COMPACT ? Spacing.md : Spacing.lg,
+  },
+  // Längre text (H2H, först i mål) — något mindre och med sidoluft.
+  summaryHeadingNotice: {
+    fontSize: COMPACT ? 18 : 22,
+    paddingHorizontal: Spacing.lg,
   },
   // Med spelarnamn under: rubriken släpper sin luft till namnraden.
   summaryHeadingWithName: {

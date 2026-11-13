@@ -39,6 +39,7 @@ import { PhoneOutlineIcon } from './PhoneOutlineIcon';
 import { GroupOutlineIcon } from './GroupOutlineIcon';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
 import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
+import { ChevronIcon } from '@/src/components/ChevronIcon';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
  *  Speglar TurnOrderPlayer i quiz.tsx. */
@@ -862,23 +863,24 @@ export function GetReadyIntro({
                 • IndDev: enhetens egen spelare som ren text — informativ,
                   inte tappbar. */}
           {hasExitSheet ? (
+            // Samma utseende som 1 by 1 / All at Once (ren grå
+            // "Player Name: X"-text, Peter 2026-11-13) men fortfarande
+            // tappbar — öppnar Save & Exit / Quit-sheeten.
             <TouchableOpacity
-              style={styles.playerPill}
-              activeOpacity={0.7}
+              style={styles.selfPlayerTap}
+              activeOpacity={0.6}
               onPress={() => setExitSheetVisible(true)}
               accessibilityLabel="Game options"
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              {currentPlayer.avatarUri ? (
-                <Image
-                  source={{ uri: currentPlayer.avatarUri }}
-                  style={styles.playerPillAvatar}
-                />
-              ) : (
-                <Text style={styles.playerPillIcon}>{currentPlayer.emoji ?? '👤'}</Text>
-              )}
-              <Text style={styles.playerPillText} numberOfLines={1}>
-                {currentPlayer.name}
+              <Text
+                style={[styles.selfPlayerText, { maxWidth: undefined, flexShrink: 1 }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                Player Name: {currentPlayer.name}
               </Text>
+              <ChevronIcon size={16} color={Colors.textSecondary} direction="right" />
             </TouchableOpacity>
           ) : isIndDev && selfPlayerName ? (
             <Text
@@ -1854,6 +1856,20 @@ const styles = StyleSheet.create({
   // Remote 1v1: spelar-pill i bannerns högerkant — spegel av
   // TopUserBanner:s loginPill (avatar + namn, primaryMuted-fyllning +
   // primaryBorder). Tap öppnar utvägs-sheeten.
+  // H2H: tapp-ytan runt "Player Name: X" (maxWidth flyttad hit från texten
+  // så ellipsen fungerar inne i TouchableOpacity).
+  // Tunn ram så texten läses som tappbar (Peter 2026-11-13).
+  selfPlayerTap: {
+    maxWidth: '60%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs + 2,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+  },
   playerPill: {
     flexDirection: 'row',
     alignItems: 'center',

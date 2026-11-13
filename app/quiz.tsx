@@ -11610,6 +11610,12 @@ export default function QuizScreen() {
           <FinalCelebration
             highlights={matchHighlights}
             playerName={summaryPlayerLabel}
+            // H2H: motståndaren har inte spelat klart → inga kort än.
+            heading={
+              isRemote && !remoteSummaryReady
+                ? "You're the first player in this Game to reach the Leaderboard"
+                : undefined
+            }
             onDone={handleSummaryDone}
             // Sprakljudet under Q-ritningen. Grindas ENBART på
             // isAudioMutedForSelf, precis som appens övriga ljudkällor.

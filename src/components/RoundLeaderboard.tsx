@@ -859,7 +859,9 @@ export function RoundLeaderboard({
                   : 'Leaderboard'}
               {remote1v1 ? ' - H2H' : ''}
             </Text>
-            {remote1v1 && <VersusIcon height={26} />}
+            {remote1v1 && (
+              <VersusIcon height={26} color={BrandUi.icon} accentColor={BrandUi.icon} />
+            )}
             {liveBadge && <LiveBadge />}
             {/* Pennan bara på aggregat-sidan, och bara för host. Tappet på
                 FLIKEN byter redan sida, så rename får inte hänga där. */}
