@@ -1852,7 +1852,10 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                 // maxHeight sänks på korta skärmar (äldre iPhones) så fält +
                 // tangentbord ryms inom sheet:ens maxHeight (90 %).
                 style={{ flexShrink: 1, maxHeight: SCREEN_HEIGHT < 700 ? 240 : 420 }}
-                contentContainerStyle={{ gap: Spacing.md }}
+                // paddingBottom: rumskods-rutorna är sista innehållet; utan luft
+                // under dem klipptes deras nederkant av ScrollView-kanten när
+                // scrollToEnd landat (Peter 2026-11-13).
+                contentContainerStyle={{ gap: Spacing.md, paddingBottom: Spacing.sm }}
               >
                 {/* PlayerName — split-field: [Letters] – [Digits] [Check].
                     Två separata TextInputs så användaren ser tydligt
