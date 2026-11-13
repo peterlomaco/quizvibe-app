@@ -6045,9 +6045,7 @@ export default function LobbyScreen() {
     const syncFromMeta = async () => {
       const meta = await withTimeout(getRoomMeta(roomCode), SYNC_TIMEOUT_MS, undefined, 'getRoomMeta(meta-poll)');
       if (cancelled) return;
-      if (meta && meta.maxPlayers !== maxPlayers) {
-        setMaxPlayers(meta.maxPlayers);
-      }
+      if (meta) setMaxPlayers((prev) => (prev === meta.maxPlayers ? prev : meta.maxPlayers));
     };
     syncFromMeta();
     const interval = setInterval(syncFromMeta, 2000);
@@ -6055,7 +6053,7 @@ export default function LobbyScreen() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [hostMode, roomCode, maxPlayers]);
+  }, [hostMode, roomCode]);
 
   // Host: skriv players[]-state till lobby_players-tabellen vid varje
   // ändring så non-hosts (via Realtime-subscription) får authoritative
@@ -6205,7 +6203,10 @@ export default function LobbyScreen() {
       }
       setGameMode(stored.gameMode);
       setSinglePlayerDefault(stored.singlePlayerDefault);
-      setMaxPlayers(stored.maxPlayers);
+      // maxPlayers läses MEDVETET inte härifrån (#7, 2026-11-13): non-host
+      // får taket enbart från rooms.max_players (meta-pollen ovan) — det är
+      // värdet join-triggern använder. Två pollare som skrev samma state
+      // från två källor fick re-match-lobbyn att växla 4 ⇄ 12.
       // V1: Region är låst till 'Sweden'. Stored.region kan vara legacy
       // (Nordics/Europe/Global) — ignorera den och stå kvar på Sweden.
       setRegion('Sweden');
