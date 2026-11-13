@@ -3716,7 +3716,7 @@ export default function LobbyScreen() {
       // Visas bara när INGET paket redan är på.
       quizVibeAlert(
         'Extra package',
-        'Please be aware that this might affect your selection in Source mixerboard.',
+        'Please be aware that this might affect your selection in Quiz mixer.',
         [
           { text: 'No', style: 'cancel' },
           {
@@ -3767,7 +3767,7 @@ export default function LobbyScreen() {
     // Aktivering av paket kollapsar/omformar Source Mixerboard → bekräfta först.
     quizVibeAlert(
       'Extra package',
-      'Please be aware that this might affect your selection in Source mixerboard.',
+      'Please be aware that this might affect your selection in Quiz mixer.',
       [
         { text: 'No', style: 'cancel' },
         {
@@ -3807,7 +3807,7 @@ export default function LobbyScreen() {
       // Aktivering kollapsar/omformar Source Mixerboard → bekräfta först.
       quizVibeAlert(
         'Extra package',
-        'Please be aware that this might affect your selection in Source mixerboard.',
+        'Please be aware that this might affect your selection in Quiz mixer.',
         [
           { text: 'No', style: 'cancel' },
           {
