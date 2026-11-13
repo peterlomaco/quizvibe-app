@@ -7960,7 +7960,9 @@ export default function QuizScreen() {
   // - Övriga registrerade: defaults till standard/30 så Lobby:s profile-merge
   //   senare kan fylla i deras profil-värden vid mount.
   // - Guests: defaults till standard/30 så host får redigera om i Lobby.
-  const goToNewLobby = async (
+  const newLobbyLockRef = useRef(false);
+  const newLobbyNavigatedRef = useRef(false);
+  const goToNewLobbyImpl = async (
     reusePlayers: boolean,
     keepSettings: boolean = true,
     guestOverride?: { guestName: string; guestBirthYear: number },
@@ -8268,6 +8270,7 @@ export default function QuizScreen() {
         ? String(guestOverride.guestBirthYear)
         : params.guestBirthYear?.trim() ||
           String(new Date().getFullYear() - (turnOrder[0]?.age ?? 30));
+      newLobbyNavigatedRef.current = true;
       router.replace({
         pathname: '/lobby',
         params: {
@@ -8299,6 +8302,7 @@ export default function QuizScreen() {
       });
       return;
     }
+    newLobbyNavigatedRef.current = true;
     router.replace({
       pathname: '/lobby',
       params: {
@@ -8333,6 +8337,29 @@ export default function QuizScreen() {
           : {}),
       },
     });
+  };
+
+  // ── Single-flight för ALLA lobby-skapanden från slutskärmen (2026-11-13) ──
+  // Ett dubbeltapp på den tända Yes-knappen (eller Yes + en Alert-knapp,
+  // eller två snabba Start New Game-val) körde goToNewLobbyImpl två gånger
+  // parallellt → TVÅ rum registrerades och TVÅ play_again_lobby_ready
+  // broadcastades. Non-host följde den FÖRSTA, host navigerade till den
+  // ANDRA → spelarna hamnade i olika lobbies. Detta har fixats punktvis
+  // förut; nu går varje väg genom samma lås:
+  //   • en körning åt gången (lockRef),
+  //   • efter en lyckad navigation släpps låset ALDRIG — slutskärmen ska
+  //     aldrig kunna skapa en andra lobby (komponenten avmonteras ändå),
+  //   • avbryts körningen (credit-gate, misslyckad registrering, Cancel)
+  //     släpps låset så host kan försöka igen.
+  // Lägg ALDRIG ett nytt router.replace('/lobby') utanför goToNewLobbyImpl.
+  const goToNewLobby: typeof goToNewLobbyImpl = async (...args) => {
+    if (newLobbyLockRef.current || newLobbyNavigatedRef.current) return;
+    newLobbyLockRef.current = true;
+    try {
+      await goToNewLobbyImpl(...args);
+    } finally {
+      if (!newLobbyNavigatedRef.current) newLobbyLockRef.current = false;
+    }
   };
 
   // Sekventiell Alert-flow: först fråga om spelarna ska följa med, sedan
@@ -8635,7 +8662,7 @@ export default function QuizScreen() {
   // OBS: den PÅGÅENDE matchens rum lämnas orört (samma resonemang som i
   // handleGoHome ovan) — motståndaren har 48h på sig och rooms-raden
   // städas av 24h-expiry, så vi får inte deactivate:a den här.
-  const handleStartNewGameFromFinal = async (lobbyType: HostLobbyType) => {
+  const handleStartNewGameFromFinalImpl = async (lobbyType: HostLobbyType) => {
     const [freshProfile, premium] = await Promise.all([
       loadProfile(),
       hasPremiumSubscription(),
@@ -8683,6 +8710,7 @@ export default function QuizScreen() {
     track('room_code_created');
     // replace (inte push) — det avslutade spelet ska inte ligga kvar bakom
     // den nya lobbyn i navigationsstacken.
+    newLobbyNavigatedRef.current = true;
     router.replace({
       pathname: '/lobby',
       params: {
@@ -8693,6 +8721,17 @@ export default function QuizScreen() {
         lobbyType,
       },
     });
+  };
+  // Samma single-flight-lås som goToNewLobby — remote-/Start New Game-vägen
+  // skapar också ett rum och får aldrig köra parallellt med en annan.
+  const handleStartNewGameFromFinal = async (lobbyType: HostLobbyType) => {
+    if (newLobbyLockRef.current || newLobbyNavigatedRef.current) return;
+    newLobbyLockRef.current = true;
+    try {
+      await handleStartNewGameFromFinalImpl(lobbyType);
+    } finally {
+      if (!newLobbyNavigatedRef.current) newLobbyLockRef.current = false;
+    }
   };
 
   // ── Non-host Play Again-flöde ───────────────────────────────────────────
@@ -9113,7 +9152,20 @@ export default function QuizScreen() {
   /** Host svarade **Yes** på re-match-frågan — eller tappade Yes igen när
    *  den tänts efter att alla non-hosts godkänt. Läget är alltid
    *  `previousLocalMode`; en re-match byter aldrig läge. */
+  const replayYesBusyRef = useRef(false);
   const handleReplayYes = async () => {
+    // Ett tapp i taget: aggregat-dialogen och credit-gaten await:as, och ett
+    // andra tapp under tiden startade tidigare en parallell körning (två
+    // dialoger → två lobbies). Se single-flight-kommentaren vid goToNewLobby.
+    if (replayYesBusyRef.current || newLobbyNavigatedRef.current) return;
+    replayYesBusyRef.current = true;
+    try {
+      await handleReplayYesImpl();
+    } finally {
+      replayYesBusyRef.current = false;
+    }
+  };
+  const handleReplayYesImpl = async () => {
     // Guest host har varken re-match eller replay (Peter 2026-08-26) —
     // blocket renderas inte alls för dem; belt-and-suspenders mot
     // oväntade call-paths.
@@ -9188,6 +9240,7 @@ export default function QuizScreen() {
 
   // Refs för broadcast-handlers — captureras av syncChannel-subscribe:n.
   const playAgainInitiatedHandlerRef = useRef<() => void>(() => {});
+  const acceptedLobbyCodeRef = useRef<string | null>(null);
   const playAgainLobbyReadyHandlerRef = useRef<
     (code: string, autoJoin?: boolean, aggregateId?: string) => void
   >(() => {});
@@ -9292,7 +9345,15 @@ export default function QuizScreen() {
       aggregateId?: string,
     ) => {
       if (isHost) return;
+      // Följ EN lobby, aldrig två: samma kod kan komma flera gånger
+      // (omsändning) och är ofarlig, men en andra KOD ignoreras — host
+      // skapar bara en lobby (single-flight i goToNewLobby).
+      if (acceptedLobbyCodeRef.current && acceptedLobbyCodeRef.current !== code) {
+        console.warn('[quiz] ignoring second play_again_lobby_ready', code);
+        return;
+      }
       if (awaitingNewLobbyRef.current || autoJoin) {
+        acceptedLobbyCodeRef.current = code;
         // Non-host har tappat Approve och väntar med lock-overlay —
         // sätt koden så useEffect:en navigerar oss till nya lobbyn.
         // auto_join-fallet: host carry:ade över spelarna men bypassade
