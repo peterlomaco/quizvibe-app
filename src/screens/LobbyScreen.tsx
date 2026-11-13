@@ -11470,8 +11470,12 @@ export default function LobbyScreen() {
 
       {/* Skärm-host för quizVibeAlert: en vanlig vy i lobbyns eget träd
           (rot-hosten i _layout hamnar bakom native-stackens skärmar). Sist i
-          trädet så dialogen ligger överst; öppna sheets har egna hostar. */}
-      <QuizVibeAlertHost />
+          trädet så dialogen ligger överst; öppna sheets har egna hostar.
+          ⚠ active={screenFocused}: host:en pushar /quiz OVANPÅ lobbyn, som
+          förblir monterad. En ständigt aktiv host här var då kvar som översta
+          host och ritade quizets dialoger (t.ex. "Quit game?") i den dolda
+          lobbyn — Quit Game i Get Ready "gjorde ingenting" för host. */}
+      <QuizVibeAlertHost active={screenFocused} />
       {/* Info-ikonernas dialog (egen Modal, se InfoDialog). */}
       {infoDialog}
     </SafeAreaView>
