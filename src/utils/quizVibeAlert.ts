@@ -41,6 +41,8 @@ type Listener = () => void;
 const FALLBACK_MS = 1200;
 // Väntetid innan en ny dialog öppnas efter att en stängts (Modal-fade ~300 ms).
 const REOPEN_DELAY_MS = 400;
+// Modalens fade-out (~300 ms) + marginal. Knapp-handlers väntar så länge.
+const CLOSE_ANIM_MS = 350;
 const USE_IN_APP_DIALOG = true;
 
 // Tillståndet ligger på globalThis, inte i modul-variabler: när koden laddas
@@ -168,7 +170,11 @@ export function resolveCurrentAlert(button: QuizVibeAlertButton | undefined): vo
   if (done) displayed.delete(done.id);
   emit();
   scheduleFallbackCheck();
-  if (button?.onPress) setTimeout(() => button.onPress?.(), 0);
+  // Kör knappens handler först när dialogens Modal tonat ut (som en iOS-
+  // alert). Navigerade handlern direkt (t.ex. Leave Game → router.replace)
+  // stängdes Modalen mitt i skärmbytet och ett osynligt lager blev kvar
+  // ovanpå appen — Home frös (Peter 2026-11-13).
+  if (button?.onPress) setTimeout(() => button.onPress?.(), CLOSE_ANIM_MS);
 }
 
 export function registerAlertHost(): number {
