@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { QuizVibeDialog } from './QuizVibeDialog';
 import { BrandUi, Colors, FontSize, FontWeight, Spacing } from '../theme';
 
@@ -21,6 +21,8 @@ export interface InfoContent {
   /** Optional second action (e.g. Spotify "How it works"). With an action the
    *  buttons are Close + action; without, a single OK. */
   action?: { label: string; onPress: () => void };
+  /** Optional icon legend shown under the text (icon + short label per row). */
+  legend?: { icon: React.ReactNode; label: string }[];
 }
 
 const BODY_MAX_HEIGHT = Math.round(Dimensions.get('window').height * 0.55);
@@ -31,7 +33,7 @@ const ACTION_DELAY_MS = 350;
 // Longer leads like "Which source each round uses: …" stay plain sentences.
 const TERM_RE = /^([^:\n]{1,24}):\s+([\s\S]+)$/;
 
-function InfoBody({ message }: { message: string }) {
+function InfoBody({ message, legend }: { message: string; legend?: InfoContent['legend'] }) {
   const paragraphs = message.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} bounces={false}>
@@ -48,6 +50,16 @@ function InfoBody({ message }: { message: string }) {
           </Text>
         );
       })}
+      {legend && legend.length > 0 && (
+        <View style={styles.legend}>
+          {legend.map((row, i) => (
+            <View key={i} style={styles.legendRow}>
+              <View style={styles.legendIcon}>{row.icon}</View>
+              <Text style={styles.legendLabel}>{row.label}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -65,7 +77,7 @@ export function useInfoDialog() {
       visible={content !== null}
       title={content?.title ?? ''}
       message=""
-      body={content ? <InfoBody message={content.message} /> : null}
+      body={content ? <InfoBody message={content.message} legend={content.legend} /> : null}
       primaryLabel={action ? action.label : 'OK'}
       secondaryLabel={action ? 'Close' : undefined}
       onPrimary={() => {
@@ -90,6 +102,23 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     lineHeight: 22,
     color: BrandUi.textMuted,
+  },
+  legend: {
+    gap: Spacing.sm,
+    marginTop: Spacing.xs,
+  },
+  legendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  legendIcon: {
+    width: 22,
+    alignItems: 'center',
+  },
+  legendLabel: {
+    fontSize: FontSize.md,
+    color: Colors.textPrimary,
   },
   term: {
     fontWeight: FontWeight.semibold,

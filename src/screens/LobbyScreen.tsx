@@ -36,9 +36,9 @@ import { PlayerNameInput } from '@/src/components/PlayerNameInput';
 import { EraMarkerMinus, EraMarkerPlus } from '../components/EraSliderMarker';
 import { useLobbyPeerHealth } from '../lib/realtime/lobbyHealthChannel';
 import { Player, PlayerRow } from '../components/PlayerRow';
-import { RotatingTagline } from '../components/RotatingTagline';
 import { GoldCtaButton } from '../components/GoldCtaButton';
 import { GroupOutlineIcon } from '../components/GroupOutlineIcon';
+import { PhoneOutlineIcon } from '../components/PhoneOutlineIcon';
 import { LockOutlineIcon } from '../components/SectionIcons';
 import { useInfoDialog } from '../components/InfoDialog';
 import {
@@ -8226,11 +8226,6 @@ export default function LobbyScreen() {
           )}
         </View>
 
-        {/* Brand-tagline — egen rad under "Game Lobby", centrerad över hela
-            bredden för BÅDE host och non-host (Peter 2026-10-26). Samma
-            roterande text som Home. */}
-        <RotatingTagline style={styles.roomTaglineWrap} textStyle={styles.roomTagline} singleLine />
-
         {/* Room code-kortet döljs helt i single-player-lobbyn — ett solospel
             har ingen kod att dela, inga andra spelare som kan ansluta och
             koden behövs inte för sparade spel (Peter 2026-09-06). */}
@@ -8390,6 +8385,26 @@ export default function LobbyScreen() {
                     {waitingCount > 0 && (
                       <Text style={styles.readinessWaiting}>· {waitingCount} waiting</Text>
                     )}
+                    {/* Info-ikonen om "+ Add Guest" sitter vid Approved-
+                        rubriken; knappen står ensam till höger (Peter 2026-11-13). */}
+                    {hostMode && isV2Lobby && !isRematchLobby && (
+                      <Pressable
+                        style={({ pressed }) => [styles.infoIconBtn, { alignSelf: 'center' }, pressed && { opacity: 0.7 }]}
+                        onPress={() =>
+                          showInfo({
+                            ...addGuestInfo(),
+                            legend: [
+                              { icon: <PhoneOutlineIcon size={17} color={Colors.textSecondary} />, label: 'Playing on own device' },
+                              { icon: <GroupOutlineIcon size={17} color={Colors.textSecondary} />, label: 'Playing on Host device' },
+                            ],
+                          })
+                        }
+                        hitSlop={8}
+                        accessibilityLabel="Add Guest info"
+                      >
+                        <Text style={styles.infoIconText}>i</Text>
+                      </Pressable>
+                    )}
                   </View>
                 );
               })()}
@@ -8401,19 +8416,9 @@ export default function LobbyScreen() {
             {/* Multiplayer v2: available in either flow — a manually added
                 guest plays on the host's phone and forces 1 by 1. */}
             {hostMode && isV2Lobby && !isRematchLobby && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
-                  <Text style={styles.addBtnText}>+ Add Guest</Text>
-                </TouchableOpacity>
-                <Pressable
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => showInfo(addGuestInfo())}
-                  hitSlop={8}
-                  accessibilityLabel="Add Guest info"
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-              </View>
+              <TouchableOpacity style={styles.addBtn} onPress={handleOpenAddPlayer}>
+                <Text style={styles.addBtnText}>+ Add Guest</Text>
+              </TouchableOpacity>
             )}
           </View>
           )}
@@ -8421,12 +8426,10 @@ export default function LobbyScreen() {
           {/* Turordnings-hinten är meningslös i single player-lobbyn — det
               finns en enda spelare och ingen ordning att ändra. (Lobbyn kör
               PtP under huven, så gameMode-checken ensam räcker inte.) */}
-          {gameMode === 'pass-the-phone' && !isSingleLobby && approvedPlayers.length > 0 && (
-            <Text style={styles.turnOrderHint}>
-              {hostMode
-                ? 'Top plays first · reorder with the arrows'
-                : 'Playing order — selected by Host'}
-            </Text>
+          {/* Host-hinten ("Top plays first · reorder with the arrows") flyttad
+              till "Players in lobby"-info-popupen (Peter 2026-11-13). */}
+          {!hostMode && gameMode === 'pass-the-phone' && !isSingleLobby && approvedPlayers.length > 0 && (
+            <Text style={styles.turnOrderHint}>Playing order — selected by Host</Text>
           )}
 
           <View style={styles.playerBoard}>

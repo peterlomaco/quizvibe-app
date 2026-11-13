@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 import { QuizVibeDialogOverlay } from './QuizVibeDialog';
 import {
   type QuizVibeAlertButton,
   ensureAlertHost,
+  getAlertStoreVersion,
   getCurrentAlert,
   isTopAlertHost,
   markAlertDisplayed,
@@ -39,10 +40,14 @@ export function QuizVibeAlertHost({
    *  vanliga vyer. */
   inModal?: boolean;
 }) {
+  // ⚠ React Compiler är på (app.json experiments.reactCompiler). Den
+  // memoiserade getCurrentAlert()/isTopAlertHost() — de läser en modul-kö
+  // utanför React — så hosten fick aldrig se en ny dialog och skyddsnätet
+  // visade iOS-alerten (Peter 2026-11-13). Komponenten undantas därför, och
+  // prenumerationen går via useSyncExternalStore.
+  'use no memo';
   const [hostId, setHostId] = useState<number | null>(null);
-  const [, force] = useState(0);
-
-  useEffect(() => subscribeAlerts(() => force((n) => n + 1)), []);
+  useSyncExternalStore(subscribeAlerts, getAlertStoreVersion);
 
   useEffect(() => {
     if (!active) return;

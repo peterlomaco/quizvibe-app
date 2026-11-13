@@ -43,8 +43,11 @@ export function gameModeInfo(): InfoText {
 
 export function addGuestInfo(): InfoText {
   return {
-    title: 'Add Guest',
-    message: 'Adding a guest requires 1 by 1 mode. Guests play on the Host Device.',
+    title: 'Players in lobby',
+    message:
+      'Number of players in this lobby compared to the maximum players for this game mode setting.' +
+      '\n\nAdd Guest requires 1 by 1 game mode. Guests play on the Host device.' +
+      '\n\nTop plays first — reorder with the arrows.',
   };
 }
 

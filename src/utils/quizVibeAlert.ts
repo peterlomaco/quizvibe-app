@@ -36,7 +36,9 @@ type Listener = () => void;
 // rita om hostarna efter tappet, så skyddsnätet trodde att ingen ritade och
 // visade iOS-alerten — trots att dialogen var på väg (Metro-loggen 2026-11-13).
 // En riktigt saknad host fångas redan direkt (inga hostar → native).
-const FALLBACK_MS = 300;
+// 1200 ms (2026-11-13): hostarna ritar nu pålitligt, så timern är bara ett
+// skyddsnät; 300 ms hann gå ut på "+"-trycket (More rounds not available).
+const FALLBACK_MS = 1200;
 // Väntetid innan en ny dialog öppnas efter att en stängts (Modal-fade ~300 ms).
 const REOPEN_DELAY_MS = 400;
 const USE_IN_APP_DIALOG = true;
@@ -52,6 +54,7 @@ interface AlertStore {
   displayed: Set<number>;
   nextId: number;
   lastClosedAt: number;
+  version: number;
 }
 const g = globalThis as unknown as { __quizVibeAlertStore?: AlertStore };
 const store: AlertStore = (g.__quizVibeAlertStore ??= {
@@ -61,13 +64,22 @@ const store: AlertStore = (g.__quizVibeAlertStore ??= {
   displayed: new Set<number>(),
   nextId: 1,
   lastClosedAt: 0,
+  version: 0,
 });
 // Äldre store (från före Fast Refresh) kan sakna fältet.
 if (typeof store.lastClosedAt !== 'number') store.lastClosedAt = 0;
+if (typeof store.version !== 'number') store.version = 0;
 const { listeners, queue, hosts, displayed } = store;
 
 function emit() {
+  store.version += 1;
   listeners.forEach((fn) => fn());
+}
+
+/** Ändras vid varje förändring av kö eller hostar — snapshot för
+ *  useSyncExternalStore i QuizVibeAlertHost. */
+export function getAlertStoreVersion(): number {
+  return store.version;
 }
 
 /** Kontrollerar att aktuell dialog faktiskt ritats. Steg 1: låt rot-hosten
