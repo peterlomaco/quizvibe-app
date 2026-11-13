@@ -365,6 +365,13 @@ const ERA_TO_MIN = 1980;
 // pixel ERA_MIN_INTERVAL år motsvarar på SLIDER_INNER_WIDTH-skalan så lib:n
 // håller markörerna från att komma närmare än så. Ceil för att inte underskrida.
 const ERA_MIN_INTERVAL_PX = Math.ceil((ERA_MIN_INTERVAL / (ERA_MAX - ERA_MIN)) * SLIDER_INNER_WIDTH);
+// Med ett tema-paket aktivt är eran inte längre låst till paketets hela
+// spann — host kan smalna av den INOM paketets år, men aldrig under 25 år
+// (Peter 2026-11-13). Är paketets eget spann kortare än så förblir den låst.
+const PACKAGE_ERA_MIN_INTERVAL = 25;
+const PACKAGE_ERA_MIN_INTERVAL_PX = Math.ceil(
+  (PACKAGE_ERA_MIN_INTERVAL / (ERA_MAX - ERA_MIN)) * SLIDER_INNER_WIDTH,
+);
 
 // (Antal rundor: konstanter + RoundsRuler-komponenten lever i shared
 // `src/components/RoundsRuler.tsx` så både Lobby och Profile delar samma
@@ -1758,6 +1765,12 @@ export default function LobbyScreen() {
           const clampTo = Math.max(ERA_TO_MIN, Math.min(ERA_MAX, eraTo));
           const clampFrom = Math.max(ERA_MIN, Math.min(eraFrom, clampTo - ERA_MIN_INTERVAL));
           setEraValues([clampFrom, clampTo]);
+          // Carry-over med aktivt paket: förra spelets (ev. avsmalnade)
+          // paket-era seedar pkgEraValues när paketet åter aktiveras.
+          carriedPkgEraRef.current =
+            stored && (stored.selectedExtraPackages?.length ?? 0) > 0
+              ? [stored.eraFrom, stored.eraTo]
+              : null;
           // Clamp roundsCount mot gameMode:s tak OCH premium-status.
           // stepperMax-logiken (premium krävs för >4 i IndDev) speglas här
           // vid load så ett gammalt sparat värde från en premium-session
@@ -2342,6 +2355,11 @@ export default function LobbyScreen() {
   // Finish-handlern alltid läser det senaste värdet utan att vara
   // beroende av render-ordning mellan sista onValuesChange och Finish.
   const [dragEraValues, setDragEraValues] = useState<number[] | null>(null);
+  // Host:s era medan ett tema-paket är aktivt — separat från eraValues så
+  // Generic-eran finns kvar när paketet stängs av. null = paketets hela spann.
+  const [pkgEraValues, setPkgEraValues] = useState<[number, number] | null>(null);
+  const [eraSliderResetKey, setEraSliderResetKey] = useState(0);
+  const carriedPkgEraRef = useRef<[number, number] | null>(null);
   const dragEraValuesRef = useRef<number[] | null>(null);
   const [roundsCount, setRoundsCount] = useState(ROUNDS_DEFAULT);
   const [region, setRegion] = useState<Region>('Sweden');
@@ -3894,7 +3912,47 @@ export default function LobbyScreen() {
     () => computePackageEraRange(selectedExtraPackages),
     [selectedExtraPackages],
   );
-  const packageEraLocked = anyPackageActive && packageEraRange !== null;
+  // Paket-era: justerbar inom paketets år (min 25 år) när paketets spann
+  // räcker till; annars låst till hela spannet som tidigare.
+  const packageEraAdjustable =
+    anyPackageActive &&
+    packageEraRange !== null &&
+    packageEraRange[1] - packageEraRange[0] >= PACKAGE_ERA_MIN_INTERVAL;
+  const packageEraLocked = anyPackageActive && packageEraRange !== null && !packageEraAdjustable;
+  // Host: nytt paket-urval → starta på paketets hela spann (eller carry-over-
+  // eran om den ryms i spannet och är ≥ 25 år; förbrukas en gång).
+  const pkgRangeKey = packageEraRange ? `${packageEraRange[0]}-${packageEraRange[1]}` : '';
+  useEffect(() => {
+    if (!hostMode) return;
+    if (!packageEraRange) {
+      setPkgEraValues(null);
+      return;
+    }
+    const carried = carriedPkgEraRef.current;
+    carriedPkgEraRef.current = null;
+    if (
+      carried &&
+      carried[0] >= packageEraRange[0] &&
+      carried[1] <= packageEraRange[1] &&
+      carried[1] - carried[0] >= PACKAGE_ERA_MIN_INTERVAL
+    ) {
+      setPkgEraValues(carried);
+    } else {
+      setPkgEraValues([packageEraRange[0], packageEraRange[1]]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hostMode, pkgRangeKey]);
+  // Host-värdet clampat till paketets spann (skyddar mot en frame med stale
+  // värde innan reset-effekten ovan hunnit köra).
+  const hostPkgEra: [number, number] | null = packageEraRange
+    ? (() => {
+        const [lo, hi] = packageEraRange;
+        if (!pkgEraValues) return [lo, hi];
+        const from = Math.max(lo, Math.min(pkgEraValues[0], hi));
+        const to = Math.max(lo, Math.min(pkgEraValues[1], hi));
+        return to - from >= PACKAGE_ERA_MIN_INTERVAL ? [from, to] : [lo, hi];
+      })()
+    : null;
   // En (kategori × källa)-cell gråas när paket aktivt men saknar material där.
   const pkgGray = (cat: MainCategory, src: 'youtube' | 'hints'): boolean =>
     anyPackageActive && !packageCoverage[cat][src];
@@ -3945,8 +4003,12 @@ export default function LobbyScreen() {
   // Effektivt Game Era-spann: paketets innehålls-span när låst, annars host:s
   // slider-val. Används för display, lobby_settings-write, quiz-params + preview
   // så non-host + spelet alltid får det låsta spannet (aldrig tomt pga era-miss).
+  // Non-host: följer alltid den synkade eraValues (host:s faktiska, ev.
+  // avsmalnade paket-era) — inte paketets hela spann.
   const effectiveEraValues: [number, number] =
-    packageEraLocked && packageEraRange ? packageEraRange : [eraValues[0], eraValues[1]];
+    hostMode && anyPackageActive && hostPkgEra
+      ? hostPkgEra
+      : [eraValues[0], eraValues[1]];
 
   // Paket-läge: aggregat-toggle-handlers. Minst EN källa måste förbli aktiv —
   // YT, Hints ELLER Spotify (Spotify får numera vara enda källan för vilket
@@ -4577,12 +4639,21 @@ export default function LobbyScreen() {
   // displayEra speglar realtids-värdet under drag och commitat värde
   // däremellan — så box "1990 – 2020" + youngest-player-warning uppdateras
   // live medan host drar utan att vi behöver toucha lib:ns prop.
-  const displayEra = packageEraLocked ? effectiveEraValues : (dragEraValues ?? eraValues);
+  // Paket-läge (host): drag-värdet skrivs till samma dragEraValues men
+  // committas till pkgEraValues i stället för eraValues.
+  const hostPackageEra = hostMode && anyPackageActive && hostPkgEra !== null;
+  const displayEra = hostPackageEra
+    ? (dragEraValues ?? effectiveEraValues)
+    : packageEraLocked
+      ? effectiveEraValues
+      : (dragEraValues ?? eraValues);
   const { warning: eraWarning } = checkEraAgainstPlayer(displayEra[1], players);
   // To-året kan inte gå under ERA_TO_MIN (1980) — visa gul varning vid golvet.
-  const eraAtToFloor = displayEra[1] <= ERA_TO_MIN;
-  // Intervallet kan inte bli mindre än ERA_MIN_INTERVAL (15 år) — gul varning.
-  const eraAtMinInterval = displayEra[1] - displayEra[0] <= ERA_MIN_INTERVAL;
+  // Gäller inte paket-läge: där är paketets egna år gränsen.
+  const eraAtToFloor = !anyPackageActive && displayEra[1] <= ERA_TO_MIN;
+  // Minsta intervall: 15 år (Generic) / 25 år (paket) — gul varning.
+  const eraMinInterval = anyPackageActive ? PACKAGE_ERA_MIN_INTERVAL : ERA_MIN_INTERVAL;
+  const eraAtMinInterval = displayEra[1] - displayEra[0] <= eraMinInterval;
 
   // Räkna aktiva spelare (exkl. hasLeft, vars plats är frigjord) — används
   // som capacity-check både vid + Add Player-knappen och vid Confirm i
@@ -5999,6 +6070,10 @@ export default function LobbyScreen() {
     region,
     answerResponseSeconds,
     eraValues,
+    // Paket-era (pkgEraValues) ändrar effectiveEraValues utan att röra
+    // eraValues — måste trigga synken till non-hosts.
+    effectiveEraValues[0],
+    effectiveEraValues[1],
     roundsCount,
     selectedExtraPackages,
     packageYoutubeEnabled,
@@ -9735,7 +9810,7 @@ export default function LobbyScreen() {
             {/* Game Era — marginTop xs = samma luft panel→rubrik som Game Mode i Game Settings. */}
             <View style={{ marginTop: Spacing.xs }}>
               <View style={styles.regionLabelRow}>
-                <Text style={styles.sectionLabel}>Game Era (min 15 year interval)</Text>
+                <Text style={styles.sectionLabel}>{`Game Era (min ${eraMinInterval} year interval)`}</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() => showInfo(gameEraInfo())}
@@ -9763,11 +9838,23 @@ export default function LobbyScreen() {
                   Game era locked by selected package
                 </Text>
               )}
+              {/* Paket aktivt + tillräckligt spann: host kan smalna av eran
+                  inom paketets år (min 25 år) — se PACKAGE_ERA_MIN_INTERVAL. */}
+              {hostPackageEra && !packageEraLocked && packageEraRange && (
+                <Text style={styles.guestHostNote}>
+                  {`Limited to the package's years (${packageEraRange[0]}–${packageEraRange[1]})`}
+                </Text>
+              )}
               {/* Slidern renderas för ALLA hosts (guest host inkluderad sedan
                   2026-09-02) utom när ett paket låser eran. */}
               {hostMode && !packageEraLocked && (
                 <View style={{ alignItems: 'center', position: 'relative', width: SLIDER_WIDTH, alignSelf: 'center' }}>
                   <MultiSlider
+                    // Paket-läge: thumben får dras förbi paketets första/sista
+                    // år, men vid släpp studsar den tillbaka till gränsen.
+                    // Remount (key) behövs eftersom lib:n inte flyttar thumben
+                    // när det committade värdet är oförändrat.
+                    key={`era-slider-${eraSliderResetKey}`}
                     // values-propen hålls STABIL under drag (= committed
                     // eraValues). MultiSlider:s componentDidUpdate skulle
                     // annars återställa pastOne/pastTwo varje gång vi
@@ -9775,12 +9862,13 @@ export default function LobbyScreen() {
                     // gestureDx och får aktiv thumb att drifta från sin
                     // year-label. Vi skriver till dragEraValues för
                     // realtids-display istället; commit på Finish.
-                    values={eraValues}
+                    values={hostPackageEra ? effectiveEraValues : eraValues}
                     min={ERA_MIN}
                     max={ERA_MAX}
                     step={1}
                     onValuesChangeStart={() => {
-                      const snapshot: [number, number] = [eraValues[0], eraValues[1]];
+                      const base = hostPackageEra ? effectiveEraValues : eraValues;
+                      const snapshot: [number, number] = [base[0], base[1]];
                       dragEraValuesRef.current = snapshot;
                       setDragEraValues(snapshot);
                     }}
@@ -9793,11 +9881,18 @@ export default function LobbyScreen() {
                       // to-golv: clampa (inte frys) så rutan spårar exakt till
                       // 1980 även vid snabba drag, och thumben commit:as till
                       // 1980 vid släpp.
-                      const clampedTo = Math.max(vals[1], ERA_TO_MIN);
-                      if (clampedTo - vals[0] < ERA_MIN_INTERVAL) return;
+                      // Paket-läge: båda thumbs hålls inom paketets år och
+                      // intervallet är minst 25 år; inget 1980-golv.
+                      let fromV = vals[0];
+                      let clampedTo = Math.max(vals[1], ERA_TO_MIN);
+                      if (hostPackageEra && packageEraRange) {
+                        fromV = Math.max(packageEraRange[0], Math.min(vals[0], packageEraRange[1]));
+                        clampedTo = Math.max(packageEraRange[0], Math.min(vals[1], packageEraRange[1]));
+                      }
+                      if (clampedTo - fromV < eraMinInterval) return;
                       const prev = dragEraValuesRef.current;
-                      if (prev && prev[0] === vals[0] && prev[1] === clampedTo) return;
-                      const next: [number, number] = [vals[0], clampedTo];
+                      if (prev && prev[0] === fromV && prev[1] === clampedTo) return;
+                      const next: [number, number] = [fromV, clampedTo];
                       dragEraValuesRef.current = next;
                       // Tick-haptic per år-ändring — selectionAsync är
                       // Apple:s picker-tick på iOS, KEYBOARD_TAP på
@@ -9814,12 +9909,21 @@ export default function LobbyScreen() {
                       // ref så vi alltid får senaste värdet oavsett
                       // render-ordning.
                       const final = dragEraValuesRef.current;
-                      if (final) setEraValues([final[0], final[1]]);
+                      if (final) {
+                        if (hostPackageEra) {
+                          setPkgEraValues([final[0], final[1]]);
+                          // Studsa tillbaka: remount så thumbs ritas om på
+                          // det clampade (paket-begränsade) värdet.
+                          setEraSliderResetKey((k) => k + 1);
+                        } else {
+                          setEraValues([final[0], final[1]]);
+                        }
+                      }
                       dragEraValuesRef.current = null;
                       setDragEraValues(null);
                     }}
-                    minMarkerOverlapDistance={ERA_MIN_INTERVAL_PX}
-                    minMarkerValueTwo={ERA_TO_MIN}
+                    minMarkerOverlapDistance={anyPackageActive ? PACKAGE_ERA_MIN_INTERVAL_PX : ERA_MIN_INTERVAL_PX}
+                    minMarkerValueTwo={anyPackageActive ? undefined : ERA_TO_MIN}
                     isMarkersSeparated
                     customMarkerLeft={EraMarkerMinus}
                     customMarkerRight={EraMarkerPlus}
@@ -9883,7 +9987,7 @@ export default function LobbyScreen() {
                 </View>
               )}
               {hostMode && !packageEraLocked && eraAtToFloor && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ To-year can not be earlier than 1980</Text></View>}
-              {hostMode && !packageEraLocked && eraAtMinInterval && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ Min interval 15 years</Text></View>}
+              {hostMode && !packageEraLocked && eraAtMinInterval && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>{`⚠️ Min interval ${eraMinInterval} years`}</Text></View>}
               {eraWarning && <View style={styles.eraWarning}><Text style={styles.eraWarningText}>⚠️ {eraWarning}</Text></View>}
             </View>
 

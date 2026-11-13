@@ -161,7 +161,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What are Extra packages?',
-        a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop & RnB). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. Themes might be changed over time.',
+        a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop & RnB). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. With a package active, the Game Era can be narrowed within the package’s years, minimum 25 years (15 years without a package). Themes might be changed over time.',
       },
       {
         q: 'What is Parent Control?',
