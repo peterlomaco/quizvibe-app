@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   Animated,
   Dimensions,
   Image,
@@ -38,6 +37,8 @@ import { playVoiceClip } from '../utils/voicePlayback';
 import { currentModeLabels } from '../utils/modeLabels';
 import { PhoneOutlineIcon } from './PhoneOutlineIcon';
 import { GroupOutlineIcon } from './GroupOutlineIcon';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
  *  Speglar TurnOrderPlayer i quiz.tsx. */
@@ -464,7 +465,7 @@ export function GetReadyIntro({
     // 'disconnected' — checken nedan skulle alltså räkna dem till noll. Detta
     // fyrar bara efter parent:s timeout-escape (dessförinnan är knappen låst).
     if (startGateUnconfirmedCount > 0) {
-      Alert.alert(
+      quizVibeAlert(
         'Players not connected',
         `${startGateUnconfirmedCount} player(s) have not joined the quiz yet. They will miss this question. Start anyway?`,
         [
@@ -479,7 +480,7 @@ export function GetReadyIntro({
         (s) => s === 'disconnected',
       ).length;
       if (disconnectedCount > 0) {
-        Alert.alert(
+        quizVibeAlert(
           'Unstable network',
           'Some players seem to have unstable network. These will not participate in next question. Play anyway?',
           [
@@ -638,7 +639,7 @@ export function GetReadyIntro({
   // unlocked → öppna dropdown.
   const handleResponseTriggerPress = () => {
     if (responseSecondsLocked) {
-      Alert.alert(
+      quizVibeAlert(
         'Answer response time locked',
         `In ${currentModeLabels().oneByOne} mode the response time can only be changed at the start of a new round — when all players have answered the same number of questions. The current round must finish first.`,
       );
@@ -958,6 +959,7 @@ export function GetReadyIntro({
             </Pressable>
           </View>
         </View>
+        <QuizVibeAlertHost active={exitSheetVisible} />
       </Modal>
 
       {/* Allt under top-baren ligger i en ScrollView. Utan den kapades
@@ -1421,6 +1423,7 @@ export function GetReadyIntro({
             })}
           </Pressable>
         </Pressable>
+        <QuizVibeAlertHost active={voiceDropdownOpen} />
       </Modal>
 
       {/* Dropdown-modal för Answer response time-val. Tap utanför listan
@@ -1467,6 +1470,7 @@ export function GetReadyIntro({
             })}
           </Pressable>
         </Pressable>
+        <QuizVibeAlertHost active={responseDropdownOpen} />
       </Modal>
 
       <View style={styles.container}>

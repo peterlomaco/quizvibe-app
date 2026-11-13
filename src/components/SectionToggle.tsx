@@ -27,7 +27,7 @@ export function SectionToggle({ expanded, tone: _tone = 'accent', style }: Props
     <View style={[styles.box, accent && styles.boxActive, style]}>
       {/* Chevron i stället för +/− (Peter 2026-11-04): ned = hopfälld,
           upp = utfälld. */}
-      <ChevronIcon size={16} color={color} strokeWidth={2} direction={expanded ? 'up' : 'down'} />
+      <ChevronIcon size={16} color={color} strokeWidth={2} direction={expanded ? 'down' : 'right'} />
     </View>
   );
 }

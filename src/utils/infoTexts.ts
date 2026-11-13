@@ -96,7 +96,7 @@ export function parentControlledPackageInfo(): InfoText {
 }
 
 export function gameEraInfo(): InfoText {
-  return { title: 'Game Era', message: 'Choose the year range for your questions. Minimum 15 years. With an Extra package, the range stays within the package’s years and is minimum 25 years.' };
+  return { title: 'Game Era', message: 'Choose the year range for your questions. Minimum 15 year interval for generic content. Playing theme package the minimum is 25 year interval.' };
 }
 
 /**

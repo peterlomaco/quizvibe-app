@@ -19,7 +19,6 @@ import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   StyleSheet,
   Text,
   View,
@@ -47,6 +46,7 @@ import { loadProfile } from '../utils/profileStorage';
 import { getOwnUserId } from '../utils/remoteMatches';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import { SequentialDots } from './SequentialDots';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
 
 export function CompetitionRematchActions({
   saved,
@@ -161,7 +161,7 @@ export function CompetitionRematchActions({
       hasPremiumSubscription(),
     ]);
     if (!hasPremium && (profile?.freeGameCredits ?? 0) === 0) {
-      Alert.alert(
+      quizVibeAlert(
         'Out of Host Game Credits',
         'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
         [
@@ -205,7 +205,7 @@ export function CompetitionRematchActions({
         settings: saved.latestSettings,
       });
       if (!result.ok || !result.code) {
-        Alert.alert(
+        quizVibeAlert(
           'Could not start re-match',
           result.reason === 'identity'
             ? 'We could not match your account to this competition. Try again after signing in.'
@@ -255,7 +255,7 @@ export function CompetitionRematchActions({
       if (!gate) return;
       const id = await createRematchRequest(saved.id);
       if (!id) {
-        Alert.alert('Could not start re-match', 'Please try again.');
+        quizVibeAlert('Could not start re-match', 'Please try again.');
         return;
       }
       await reload();
@@ -274,7 +274,7 @@ export function CompetitionRematchActions({
       if (!activeRequest) return;
       const ok = await acceptRematchRequest(activeRequest.id);
       if (!ok) {
-        Alert.alert('Could not accept', 'The re-match may have expired. Try again.');
+        quizVibeAlert('Could not accept', 'The re-match may have expired. Try again.');
       } else {
         // Seeda den lokala Aggregate-serien från den sparade marathonen så
         // slutskärmens Marathon-flik visas REDAN på spel 1 av en återupptagen

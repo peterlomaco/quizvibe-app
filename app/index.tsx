@@ -92,6 +92,8 @@ import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { LoadingContent } from '@/src/components/LoadingContent';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import { subscriptionFeatures } from '@/src/screens/StoreScreen';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 
 /**
  * Late join (C5, 2026-11-06): isActiveRoom hides started rooms, so a code for
@@ -103,7 +105,7 @@ import { subscriptionFeatures } from '@/src/screens/StoreScreen';
 async function alertIfGameAlreadyStarted(code: string): Promise<boolean> {
   const meta = await getRoomMeta(code);
   if (!meta?.gameStarted) return false;
-  Alert.alert('Could not join', 'Game already started.');
+  quizVibeAlert('Could not join', 'Game already started.');
   return true;
 }
 
@@ -372,7 +374,7 @@ async function checkLobbyCapacity(code: string): Promise<boolean> {
   const message = meta?.hostIsPremium
     ? 'Lobby is full. Host need to remove players from lobby for others to join'
     : 'Lobby is full. Host either need to remove players from lobby or to upgrade';
-  Alert.alert('Lobby is full', message);
+  quizVibeAlert('Lobby is full', message);
   return true;
 }
 
@@ -391,7 +393,7 @@ async function checkLobbyCapacity(code: string): Promise<boolean> {
 async function checkSinglePlayerLobby(code: string): Promise<boolean> {
   const settings = await getLobbySettings(code);
   if (!settings?.singlePlayerDefault) return false;
-  Alert.alert(
+  quizVibeAlert(
     'Single player lobby',
     'This Room Code belongs to a single player lobby. Ask the Host to switch to a Multiplayer mode, then try again.',
   );
@@ -439,7 +441,7 @@ async function checkRematchLockedLobby(
     const seeded = await getLobbyPlayers(code);
     if (seeded?.some((p) => p.name.trim().toLowerCase() === name)) return false;
   }
-  Alert.alert(
+  quizVibeAlert(
     'Re-match lobby',
     'This Room Code belongs to a re-match. Only the players from the previous game can join.',
   );
@@ -589,7 +591,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     // Guests can never join a Spotify lobby — say so before asking.
     if (settings?.spotifyEnabled && !isRegistered) {
       const m = joinRejectionMessage('spotify_guest');
-      Alert.alert(m.title, m.message);
+      quizVibeAlert(m.title, m.message);
       return { proceed: false };
     }
     const choice = await new Promise<DeviceMode | null>((resolve) => {
@@ -619,7 +621,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       ]);
       if (!meta) {
         setJoiningLobby(false);
-        Alert.alert('Room not found', 'There is no Room code activated with this combination');
+        quizVibeAlert('Room not found', 'There is no Room code activated with this combination');
         finishDeviceStep(null);
         return;
       }
@@ -639,7 +641,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       setJoiningLobby(false);
       if (result.reason === 'room_full') {
         // Same copy as checkLobbyCapacity (Free vs Premium host).
-        Alert.alert(
+        quizVibeAlert(
           'Lobby is full',
           meta.hostIsPremium
             ? 'Lobby is full. Host need to remove players from lobby for others to join'
@@ -647,7 +649,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
         );
       } else {
         const m = joinRejectionMessage(result.reason);
-        Alert.alert(m.title, m.message);
+        quizVibeAlert(m.title, m.message);
       }
       if (result.outcome === 'abort') finishDeviceStep(null);
     } catch {
@@ -665,13 +667,13 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
   const handleSpotifyGateToggle = (v: boolean) => {
     if (!v || !spotifyGate) return;
     const { profile } = spotifyGate;
-    Alert.alert('Update your profile?', 'Your Profile will be changed to Spotify ON.', [
+    quizVibeAlert('Update your profile?', 'Your Profile will be changed to Spotify ON.', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'OK',
         onPress: async () => {
           if ((await checkSpotifyInstalled()) === 'not-found') {
-            Alert.alert(
+            quizVibeAlert(
               'Spotify app not found',
               'Spotify app not found on this device. Install Spotify and try again.',
             );
@@ -733,14 +735,14 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       if (index < ROOM_CODE_LEADING_LETTERS) {
         const leadingPair = arr.slice(0, ROOM_CODE_LEADING_LETTERS).join('');
         if (leadingPair.length === ROOM_CODE_LEADING_LETTERS && isBlockedLetterPair(leadingPair)) {
-          Alert.alert('Combination not compliant', 'Please re-enter');
+          quizVibeAlert('Combination not compliant', 'Please re-enter');
           return;
         }
       } else {
         const trailingStart = ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS;
         const trailingPair = arr.slice(trailingStart).join('');
         if (trailingPair.length === ROOM_CODE_TRAILING_LETTERS && isBlockedLetterPair(trailingPair)) {
-          Alert.alert('Combination not compliant', 'Please re-enter');
+          quizVibeAlert('Combination not compliant', 'Please re-enter');
           return;
         }
       }
@@ -965,7 +967,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       // ("Game Lobby deleted") så språket är konsekvent i hela appen. Vi
       // navigerar INTE — mottagaren blir kvar i Waiting Invites-listan
       // (formuläret på Home) med den döda inviten bortstädad.
-      Alert.alert(
+      quizVibeAlert(
         'Game Lobby deleted',
         'This Game Lobby has been deleted by Host.',
       );
@@ -978,7 +980,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       setJoiningLobby(false);
       const updated = await removeInvite(invite.id);
       setInvites(updated);
-      Alert.alert('Already in lobby', 'This is your own lobby.');
+      quizVibeAlert('Already in lobby', 'This is your own lobby.');
       return;
     }
     // Single-player-lobby: host kan ha skickat inbjudan och sedan bytt till
@@ -1071,7 +1073,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       await proceedAcceptInvite(invite);
       return;
     }
-    Alert.alert(
+    quizVibeAlert(
       'Accept invitation?',
       'By accepting this invitation you will both 1. join the lobby and 2. accept that both of you will be added to each others QuizVibe friend list.',
       [
@@ -1099,7 +1101,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
         const my = userId ? splitMatchForUser(remoteMatch, userId) : null;
         if (my) {
           if (my.me.finishedAt != null) {
-            Alert.alert(
+            quizVibeAlert(
               'Already played',
               'You have already played your questions in this H2H match. Check "H2H" on the Home screen for the result.',
             );
@@ -1110,7 +1112,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
         }
       }
       if (await alertIfGameAlreadyStarted(code)) return;
-      Alert.alert(
+      quizVibeAlert(
         'Room not found',
         'There is no Room code activated with this combination',
       );
@@ -1120,7 +1122,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     // sin egen lobby från device B. Måste komma före capacity-checken så
     // användaren får det mer specifika felmeddelandet.
     if (await isOwnLobby(code, currentPlayerName)) {
-      Alert.alert('Already in lobby', 'User already exists in the lobby');
+      quizVibeAlert('Already in lobby', 'User already exists in the lobby');
       return;
     }
     // Two-device-guard: blockera om kontot redan är aktivt i en ANNAN lobby
@@ -1290,7 +1292,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     const trimmedLetters = getPlayerNameLetters(guestName.trim());
     const isOwnLetters = trimmedLetters.length > 0 && trimmedLetters !== 'Guest';
     if (isOwnLetters) {
-      Alert.alert(
+      quizVibeAlert(
         'Generate another name',
         'Keep the letters you typed?',
         [
@@ -1371,7 +1373,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     // kollas redan vid Check (handleCheckPlayerName → player_name_exists).
     if (!(await isActiveRoom(code))) {
       if (await alertIfGameAlreadyStarted(code)) return;
-      Alert.alert(
+      quizVibeAlert(
         'Room not found',
         'There is no Room code activated with this combination',
       );
@@ -1418,7 +1420,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     const ownByLogin = await isOwnLobby(code, currentPlayerName);
     const ownByGuest = guestIdentity ? await isOwnLobby(code, guestIdentity) : false;
     if (ownByLogin || ownByGuest) {
-      Alert.alert('Already in lobby', 'User already exists in the lobby');
+      quizVibeAlert('Already in lobby', 'User already exists in the lobby');
       return;
     }
     // Two-device-guard: en inloggad user som joinar via guest-formen har ändå
@@ -1483,7 +1485,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     // riktiga session, utloggade får en anonym via anon-signup.
     const user = await ensureAuthSession();
     if (!user) {
-      Alert.alert(
+      quizVibeAlert(
         'Could not start',
         'Please check your connection and try again.',
       );
@@ -1506,7 +1508,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       isRemote1v1: false,
     });
     if (!roomRegistered) {
-      Alert.alert(
+      quizVibeAlert(
         'Could not create game lobby',
         'The room could not be registered. Check your connection and try again.',
       );
@@ -1588,7 +1590,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                   showUpdate={hasNewInvite && invites.length > 0}
                   onPress={() => {
                     if (invites.length === 0) {
-                      Alert.alert(
+                      quizVibeAlert(
                         'No Waiting Invites',
                         "You don't have any pending invites yet. When a host sends you one, it will appear here.",
                       );
@@ -2322,6 +2324,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
           </View>
         </View>
       )}
+      <QuizVibeAlertHost active={visible} />
     </Modal>
   );
 }
@@ -2979,7 +2982,7 @@ export default function HomeScreen() {
     // Membership = obegränsade host-spel; ingen gate. Lobby:s handleStartGame
     // skippar också deduktionen så Free-saldot förblir orört.
     if (!hasPremium && (freshProfile?.freeGameCredits ?? 0) === 0) {
-      Alert.alert(
+      quizVibeAlert(
         'Out of Host Game Credits',
         'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
         [
@@ -3026,7 +3029,7 @@ export default function HomeScreen() {
       isRemote1v1,
     });
     if (!roomRegistered) {
-      Alert.alert(
+      quizVibeAlert(
         'Could not create game lobby',
         'The room could not be registered. Check your connection and that you are signed in, then try again.',
       );
@@ -3111,7 +3114,7 @@ export default function HomeScreen() {
           // Kontot finns men mailet är inte bekräftat än. Email:en hålls
           // aldrig klient-side i PlayerName-läget → resend-by-name-funktionen
           // slår upp den server-side och ber GoTrue skicka om länken.
-          Alert.alert(
+          quizVibeAlert(
             'Confirm your email',
             'Please confirm your email first. Check your inbox for the activation link.',
             [
@@ -3120,7 +3123,7 @@ export default function HomeScreen() {
                 text: 'Resend link',
                 onPress: async () => {
                   const res = await resendActivationByName(normalized);
-                  Alert.alert(
+                  quizVibeAlert(
                     res.ok ? 'Email sent' : 'Could not resend',
                     res.ok
                       ? 'If that Player Name has an unconfirmed account, a new activation link has been sent. Confirm via the link and then log in.'
@@ -3147,7 +3150,7 @@ export default function HomeScreen() {
       if (error?.code === 'email_not_confirmed') {
         // Email ej bekräftad än — erbjud att skicka aktiveringslänken igen
         // (vi har email:en här, till skillnad från PlayerName-läget).
-        Alert.alert(
+        quizVibeAlert(
           'Confirm your email',
           'Please confirm your email first. Check your inbox for the activation link.',
           [
@@ -3159,7 +3162,7 @@ export default function HomeScreen() {
                   type: 'signup',
                   email: trimmed,
                 });
-                Alert.alert(
+                quizVibeAlert(
                   resendErr ? 'Could not resend' : 'Email sent',
                   resendErr
                     ? resendErr.message
@@ -3217,7 +3220,7 @@ export default function HomeScreen() {
     const { error } = await supabase.auth.resetPasswordForEmail(trimmed);
     setForgotSending(false);
     if (error) {
-      Alert.alert('Could not send code', error.message);
+      quizVibeAlert('Could not send code', error.message);
       return;
     }
     setForgotStep('code');
@@ -3237,13 +3240,13 @@ export default function HomeScreen() {
     });
     if (verifyErr) {
       setForgotSending(false);
-      Alert.alert('Invalid code', 'The code is incorrect or has expired. Request a new one.');
+      quizVibeAlert('Invalid code', 'The code is incorrect or has expired. Request a new one.');
       return;
     }
     const { error: updateErr } = await supabase.auth.updateUser({ password: forgotNewPassword });
     setForgotSending(false);
     if (updateErr) {
-      Alert.alert('Could not reset password', updateErr.message);
+      quizVibeAlert('Could not reset password', updateErr.message);
       return;
     }
     // Password uppdaterat — user är inloggad via recovery-sessionen.
@@ -3251,7 +3254,7 @@ export default function HomeScreen() {
     const profile = await loadProfile();
     if (profile) setProfile(profile);
     setProfileMenuVisible(false);
-    Alert.alert('Password updated', 'You are now signed in with your new password.');
+    quizVibeAlert('Password updated', 'You are now signed in with your new password.');
   };
 
   // ── Register-form: parsa year, gates, och submit ──────────────────
@@ -3393,7 +3396,7 @@ export default function HomeScreen() {
   const handleRegGenerateName = () => {
     const trimmedLetters = getPlayerNameLetters(regPlayerName.trim());
     if (trimmedLetters.length > 0) {
-      Alert.alert(
+      quizVibeAlert(
         'Auto-generate Player Name',
         'Try to keep PlayerName letters or not?',
         [
@@ -3511,7 +3514,7 @@ export default function HomeScreen() {
       // konto som raderats senaste 365 dagarna. GoTrue wrappar trigger-fel
       // som "Database error saving new user" — mappa till vänlig text.
       const blocked = /database error saving new user|registration_blocked_deleted_account/i.test(error.message);
-      Alert.alert(
+      quizVibeAlert(
         'Registration failed',
         blocked
           ? "This email or Player Name belonged to a deleted account and can't be reused for 12 months. Contact info@quizvibe.se if it was yours."
@@ -3520,14 +3523,14 @@ export default function HomeScreen() {
       return;
     }
     if (!data.user) {
-      Alert.alert('Registration failed', 'Could not create account. Please try again.');
+      quizVibeAlert('Registration failed', 'Could not create account. Please try again.');
       return;
     }
     // Redan-registrerad, bekräftad email: med "Confirm email" PÅ returnerar
     // signUp tyst en user med tom identities[] och skickar INGET mail
     // (GoTrue anti-enumerering). Visa då INTE "mail skickat"-popupen.
     if ((data.user.identities?.length ?? 0) === 0) {
-      Alert.alert(
+      quizVibeAlert(
         'Email already registered',
         'This email is already registered. Please log in.',
       );
@@ -3538,7 +3541,7 @@ export default function HomeScreen() {
     track('user_registered', { assistance: regAssistance, region: regRegion });
     // Ingen inloggning här — användaren måste bekräfta mailet först.
     setProfileMenuStep('login');
-    Alert.alert(
+    quizVibeAlert(
       'Check your email',
       'Email has been sent to you with Activation link. Confirm via the link and then login to your new QuizVibe account.',
     );
@@ -4973,6 +4976,7 @@ export default function HomeScreen() {
             onClose={() => { if (!loggingOut) setLogoutConfirmVisible(false); }}
           />
         )}
+        <QuizVibeAlertHost active={profileMenuVisible} />
       </Modal>
 
       {/* ── QuizVibe user vs Guest ─────────────────────────────
@@ -5054,6 +5058,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
+        <QuizVibeAlertHost active={compareInfoVisible} />
       </Modal>
     </SafeAreaView>
   );

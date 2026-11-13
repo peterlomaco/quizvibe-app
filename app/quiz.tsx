@@ -203,6 +203,8 @@ import {
 import { getTurnResults, recordTurnResult } from '@/src/utils/turnResults';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, G, Path } from 'react-native-svg';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
@@ -2979,7 +2981,7 @@ export default function QuizScreen() {
         }
         // ...utan sekvens finns inget att spela — bail istället för att
         // fastna i poll-loopen nedan (som väntar på question_ids).
-        Alert.alert(title, body, [{ text: 'OK', onPress: () => router.replace('/') }], {
+        quizVibeAlert(title, body, [{ text: 'OK', onPress: () => router.replace('/') }], {
           cancelable: false,
         });
         return true;
@@ -3003,7 +3005,7 @@ export default function QuizScreen() {
       const ids = match.questionIds.filter((id) => ALL_QUESTIONS_MAP.has(id));
       if (ids.length === 0) {
         // Katalog-skew: inga av matchens frågor finns i denna app-version.
-        Alert.alert(
+        quizVibeAlert(
           'Update required',
           'This match uses questions from a newer app version. Update QuizVibe to play it.',
           [{ text: 'OK', onPress: () => router.replace('/') }],
@@ -6058,7 +6060,7 @@ export default function QuizScreen() {
   const clipPopupShownRef = useRef(false);
 
   const showClipUnavailablePopup = () => {
-    Alert.alert(
+    quizVibeAlert(
       'Clip unavailable',
       'Sorry but this clip has been removed for your region',
       [{ text: 'OK' }],
@@ -6695,7 +6697,7 @@ export default function QuizScreen() {
       timeUsed: 0,
     });
     if (!row) {
-      Alert.alert("Couldn't delete this question", 'Check your connection and try again.');
+      quizVibeAlert("Couldn't delete this question", 'Check your connection and try again.');
       return;
     }
     hybridFinalizedRef.current.add(idx);
@@ -6710,7 +6712,7 @@ export default function QuizScreen() {
 
   const handleHostStartFromGetReady = () => {
     if (isHybrid && isHost && hybridOwner && leftPlayerIds.has(hybridOwner.id)) {
-      Alert.alert(
+      quizVibeAlert(
         `${hybridOwner.name} has left, question will be deleted.`,
         undefined,
         [{ text: 'OK', onPress: () => void deleteLeftPlayersTurn() }],
@@ -6781,7 +6783,7 @@ export default function QuizScreen() {
     try {
       const ok = await ensureHybridResultPersisted(questionIndexRef.current);
       if (!ok) {
-        Alert.alert(
+        quizVibeAlert(
           "Couldn't save this result",
           'Check your connection and try again.',
         );
@@ -6919,7 +6921,7 @@ export default function QuizScreen() {
       clearEjected(params.roomCode);
       clearGameStarted(params.roomCode);
     }
-    Alert.alert(
+    quizVibeAlert(
       'Game ended',
       'Game ended due to host inactivity.',
       [{ text: 'OK', onPress: () => router.replace('/') }],
@@ -7138,7 +7140,7 @@ export default function QuizScreen() {
       const deniedRematch = isHost && rematchInviteRef.current;
       if (deniedRematch && !rematchDeniedAlertedRef.current) {
         rematchDeniedAlertedRef.current = true;
-        Alert.alert(
+        quizVibeAlert(
           'Re-match not possible',
           'At least one player has denied the re-match.',
           [{ text: 'OK' }],
@@ -7206,7 +7208,7 @@ export default function QuizScreen() {
         // stället för att host upptäcker en saknad slide på slutskärmen.
         // Bara när spelet FAKTISKT ingår i en serie; annars vore raden
         // obegriplig.
-        Alert.alert(
+        quizVibeAlert(
           `${playerName} has left`,
           !gameOver && partOfCompetitionSeriesRef.current
             ? 'Marathon table will not be updated with this game result.'
@@ -8138,7 +8140,7 @@ export default function QuizScreen() {
       rematchPlayerIds: reusePlayers ? carryOverPlayers.map((p) => p.id) : [],
     });
     if (!roomRegistered) {
-      Alert.alert(
+      quizVibeAlert(
         'Could not create game lobby',
         'The new room could not be registered. Check your connection and try again.',
       );
@@ -8351,7 +8353,7 @@ export default function QuizScreen() {
     const title = withCancel
       ? 'Keep same setting for lobby'
       : 'Keep same settings per player?';
-    Alert.alert(
+    quizVibeAlert(
       title,
       'Settings (assistance level + age) may have been edited during this game. Keep them or reset to defaults?',
       withCancel
@@ -8441,7 +8443,7 @@ export default function QuizScreen() {
     // utgår i re-match-flödet: en guest-hostad re-match-lobby får inte
     // existera, och en knapp som tyst kastar bort både uppställningen och
     // Competition-kedjan mitt i en re-match vore vilseledande.
-    Alert.alert(
+    quizVibeAlert(
       'Out of Host Game Credits',
       'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
       allowGuestRestart
@@ -8518,7 +8520,7 @@ export default function QuizScreen() {
           askKeepSettingsThenGo(true, previousLocalMode);
         }
       } else {
-        Alert.alert(
+        quizVibeAlert(
           'Re-use all players?',
           'Start the next room with the same players, or begin fresh?',
           [
@@ -8637,7 +8639,7 @@ export default function QuizScreen() {
     // Credit-gate: Premium = obegränsat, annars krävs Free-saldo. Samma
     // copy + Store-deeplink som Home så upplevelsen är identisk.
     if (!premium && (freshProfile?.freeGameCredits ?? 0) === 0) {
-      Alert.alert(
+      quizVibeAlert(
         'Out of Host Game Credits',
         'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
         [
@@ -8662,7 +8664,7 @@ export default function QuizScreen() {
       isRemote1v1: newIsRemote1v1,
     });
     if (!roomRegistered) {
-      Alert.alert(
+      quizVibeAlert(
         'Could not create game lobby',
         'The room could not be registered. Check your connection and that you are signed in, then try again.',
       );
@@ -9229,7 +9231,7 @@ export default function QuizScreen() {
   const celebrationVisibleRef = useRef(false);
   const showLobbyDeletedAlert = useCallback(() => {
     setAwaitingNewLobby(false);
-    Alert.alert(
+    quizVibeAlert(
       'Game ended',
       'Game has been deleted by Host.',
       [{ text: 'OK', onPress: () => router.replace('/') }],
@@ -9312,7 +9314,7 @@ export default function QuizScreen() {
         // utgråad tills alla approvat). Visa info-popup + skicka non-host
         // till startskärmen.
         hostStartedWithoutMeAlertedRef.current = true;
-        Alert.alert(
+        quizVibeAlert(
           'Host has already started a new Game',
           '',
           [{ text: 'OK', onPress: () => router.replace('/') }],
@@ -9513,7 +9515,7 @@ export default function QuizScreen() {
   // utvägar (handleRemoteForfeit / handleRemoteSaveExit nedan) eftersom
   // matchen lever server-side och är frikopplad från lobby:ns livscykel.
   const handleQuitGame = () => {
-    Alert.alert(
+    quizVibeAlert(
       'Quit game?',
       'This will end the game and close the lobby for everyone. You will return to the start screen.',
       [
@@ -9576,7 +9578,7 @@ export default function QuizScreen() {
   // ned) blir host:s vy out-of-sync tills senare reconnect-flow, men user:s
   // navigation hem ska aldrig blockas.
   const handleLeaveGame = () => {
-    Alert.alert(
+    quizVibeAlert(
       'Leave game?',
       'You will return to the start screen. The game continues for the other players.',
       [
@@ -9662,7 +9664,7 @@ export default function QuizScreen() {
         opponentQuitAlertedRef.current = true;
         const myId = await getOwnUserId();
         const opp = m.players.find((p) => p.userId !== myId);
-        Alert.alert(
+        quizVibeAlert(
           'Walk over',
           `${formatPlayerLabel(opp, 'Your opponent')} has left this game — you win by walkover.`,
           [{ text: 'OK', onPress: () => router.replace('/') }],
@@ -9899,7 +9901,7 @@ export default function QuizScreen() {
   // hittills sparade svar till en delpoäng. Await:as så UPDATE:n hinner
   // committa innan Home mountar och 1vs1 Matches laddar.
   const handleRemoteForfeit = () => {
-    Alert.alert(
+    quizVibeAlert(
       'Quit game?',
       'You give up this H2H match. Your opponent wins by walkover, and the match cannot be resumed.',
       [
@@ -9938,7 +9940,7 @@ export default function QuizScreen() {
   // plockar upp vid första obesvarade frågan. Inget rums-cleanup ens för
   // host — båda ska kunna komma tillbaka.
   const handleRemoteSaveExit = () => {
-    Alert.alert(
+    quizVibeAlert(
       'Save & Exit?',
       'Your answers so far are saved. Resume this H2H match within 48 hours via "H2H Matches" on the Home screen.',
       [
@@ -10759,7 +10761,7 @@ export default function QuizScreen() {
     // när host kommer till nästa GetReady.
     if (pendingDisconnectAlertRef.current && phase === 'intro') {
       pendingDisconnectAlertRef.current = false;
-      Alert.alert('Please note', 'Some players connection unstable.');
+      quizVibeAlert('Please note', 'Some players connection unstable.');
     }
   }, [playerConnectionStatus, isHost, gameMode, phase]);
 
@@ -11465,7 +11467,7 @@ export default function QuizScreen() {
           // kvar måste acceptera själv. Hostens utväg om någon aldrig
           // svarar är Home, som raderar lobbyn och skickar alla hem.
           onReplayLockedPress={() =>
-            Alert.alert(
+            quizVibeAlert(
               'Waiting for players',
               'The new lobby opens as soon as every player has accepted the re-match. Tap Yes again when they have.',
             )
@@ -11516,7 +11518,7 @@ export default function QuizScreen() {
             isRemote && !remoteOpponentSummary && !remoteMatchEnded
           }
           onStartNewGameLockedPress={() =>
-            Alert.alert(
+            quizVibeAlert(
               'Waiting for your opponent',
               'You can start a new game as soon as both players have finished this match.',
             )
@@ -11570,6 +11572,7 @@ export default function QuizScreen() {
               </View>
             </View>
           </View>
+          <QuizVibeAlertHost active={awaitingNewLobby} />
         </Modal>
 
         {/* "Add to existing"-listan när det finns FLERA sparade serier med
@@ -11680,6 +11683,7 @@ export default function QuizScreen() {
               </Pressable>
             </View>
           </View>
+          <QuizVibeAlertHost active={pendingAggregatePick !== null} />
         </Modal>
 
         {/* Namn-prompt för en NY Marathon (Peter 2026-08-29). Öppnas av
@@ -11764,6 +11768,7 @@ export default function QuizScreen() {
               </Pressable>
             </View>
           </KeyboardAvoidingView>
+          <QuizVibeAlertHost active={aggregateNamePromptVisible} />
         </Modal>
 
         {/* ⚠ DORMANT sedan 2026-08-08 — öppnas bara av `handlePlayAgain`,
@@ -11875,6 +11880,7 @@ export default function QuizScreen() {
                   </View>
                 </View>
               </View>
+              <QuizVibeAlertHost active={playAgainModalVisible} />
             </Modal>
           );
         })()}
@@ -12821,7 +12827,7 @@ export default function QuizScreen() {
                         size={16}
                         strokeWidth={2}
                         color={answersExpanded ? Colors.warning : Colors.textSecondary}
-                        direction={answersExpanded ? 'up' : 'down'}
+                        direction={answersExpanded ? 'down' : 'right'}
                       />
                     </View>
                   </TouchableOpacity>

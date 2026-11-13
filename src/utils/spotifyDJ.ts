@@ -24,6 +24,7 @@
 
 import { Linking, Alert } from 'react-native';
 import { IS_EXPO_GO } from '@/src/utils/runtimeEnv';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
 // ARKIVERADE imports (FUTURE VERSION 2 — används bara av arkiverade block nedan):
 // import { supabase } from '@/src/utils/supabase';
 // import { getValidAccessToken } from '@/src/lib/spotify';
@@ -212,7 +213,7 @@ export async function openSpotifyTrack(spotifyTrackId: string): Promise<boolean>
       return true;
     } catch (webErr) {
       console.warn('[spotifyDJ] openSpotifyTrack web fallback failed:', webErr);
-      Alert.alert(
+      quizVibeAlert(
         'Kunde inte öppna Spotify',
         'Kontrollera att Spotify är installerat och försök igen.',
       );
@@ -235,7 +236,7 @@ export async function openSpotifyApp(): Promise<boolean> {
     return true;
   } catch (err) {
     console.warn('[spotifyDJ] openSpotifyApp failed:', err);
-    Alert.alert(
+    quizVibeAlert(
       'Kunde inte öppna Spotify',
       'Kontrollera att Spotify är installerat och försök igen.',
     );

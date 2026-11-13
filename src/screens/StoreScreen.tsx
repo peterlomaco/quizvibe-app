@@ -3,7 +3,6 @@ import * as WebBrowser from 'expo-web-browser';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Keyboard,
   SafeAreaView,
   ScrollView,
@@ -42,6 +41,7 @@ import {
   setPremiumActive,
 } from '../utils/subscriptionStorage';
 import { currentModeLabels } from '../utils/modeLabels';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
 
 // Extra bottenmarginal mellan det fokuserade voucher-fältet och tangentbordet
 // (läggs ovanpå iOS automatiska keyboard-inset). ~24pt = luftigt utan att
@@ -362,7 +362,7 @@ export default function StoreScreen() {
   const handleBuyCredits = async (tier: CreditTier) => {
     const pkg = packageByProductId[tier.productId];
     if (!pkg) {
-      Alert.alert(
+      quizVibeAlert(
         'Store unavailable',
         'Could not load this product right now. Please try again in a moment.',
       );
@@ -370,7 +370,7 @@ export default function StoreScreen() {
     }
     const profile = await loadProfile();
     if (!profile) {
-      Alert.alert('Sign in required', 'Log in or register before buying credits.');
+      quizVibeAlert('Sign in required', 'Log in or register before buying credits.');
       return;
     }
 
@@ -380,7 +380,7 @@ export default function StoreScreen() {
 
     if (result.kind === 'cancelled') return; // tyst — user trycka Cancel
     if (result.kind === 'error') {
-      Alert.alert('Purchase failed', result.reason);
+      quizVibeAlert('Purchase failed', result.reason);
       return;
     }
 
@@ -398,7 +398,7 @@ export default function StoreScreen() {
     const { title, body } = successCopy(
       `${amount} Host Games added — you now have ${newCredits} credits.`,
     );
-    Alert.alert(title, body, [{ text: 'OK', onPress: handleBack }]);
+    quizVibeAlert(title, body, [{ text: 'OK', onPress: handleBack }]);
   };
 
   // Themed packages (Hip Hop / Rock / Film & Actors) är parkerade till
@@ -407,13 +407,13 @@ export default function StoreScreen() {
   // funktion uppdateras till en riktig RC purchasePackage()-flow
   // motsvarande handleBuyCredits/handleBuySubscription nedan.
   const handleBuyPackage = (_tier: PackageTier) => {
-    Alert.alert('Coming soon', 'Themed packages are not yet available.');
+    quizVibeAlert('Coming soon', 'Themed packages are not yet available.');
   };
 
   const handleBuySubscription = async (tier: SubscriptionTier) => {
     const pkg = packageByProductId[tier.productId];
     if (!pkg) {
-      Alert.alert(
+      quizVibeAlert(
         'Store unavailable',
         'Could not load this subscription right now. Please try again in a moment.',
       );
@@ -426,7 +426,7 @@ export default function StoreScreen() {
 
     if (result.kind === 'cancelled') return;
     if (result.kind === 'error') {
-      Alert.alert('Subscription failed', result.reason);
+      quizVibeAlert('Subscription failed', result.reason);
       return;
     }
 
@@ -446,7 +446,7 @@ export default function StoreScreen() {
     const { title, body } = successCopy(
       'QuizVibe Premium is now active. Enjoy unlimited host games!',
     );
-    Alert.alert(
+    quizVibeAlert(
       fromLobby ? title : 'Subscription activated',
       body,
       [{ text: 'OK', onPress: handleBack }],
@@ -464,7 +464,7 @@ export default function StoreScreen() {
     // Belt-and-suspenders: state kan vara stale mellan load och tap. Servern
     // avvisar ändå, men detta ger direkt feedback utan round-trip.
     if (premiumActive) {
-      Alert.alert('Already active', ALREADY_ACTIVE_MESSAGE);
+      quizVibeAlert('Already active', ALREADY_ACTIVE_MESSAGE);
       return;
     }
 
@@ -474,23 +474,23 @@ export default function StoreScreen() {
       setClaiming(false);
       switch (result.reason) {
         case 'already_active':
-          Alert.alert('Already active', ALREADY_ACTIVE_MESSAGE);
+          quizVibeAlert('Already active', ALREADY_ACTIVE_MESSAGE);
           break;
         case 'already_used':
-          Alert.alert(
+          quizVibeAlert(
             'Free month already used',
             "You've already used your free month on this account. You continue on the free Basic plan.",
           );
           break;
         case 'not_registered':
         case 'not_authenticated':
-          Alert.alert(
+          quizVibeAlert(
             'Sign in required',
             'Register or log in to your QuizVibe account to activate your free month.',
           );
           break;
         default:
-          Alert.alert('Could not activate', 'Something went wrong. Please try again in a moment.');
+          quizVibeAlert('Could not activate', 'Something went wrong. Please try again in a moment.');
       }
       // Håll UI:t i synk (t.ex. already_used ⇒ gray-out efter refresh).
       await refreshPremiumMirror();
@@ -510,7 +510,7 @@ export default function StoreScreen() {
       expires_at: result.until.toISOString(),
     });
 
-    Alert.alert(
+    quizVibeAlert(
       'QuizVibe Premium activated',
       `Free until ${formatPromoDate(result.until)}. No payment and no auto-renewal.`,
       [{ text: 'OK', onPress: handleBack }],
@@ -524,7 +524,7 @@ export default function StoreScreen() {
     const code = voucherCode.trim();
     if (!code) return;
     if (premiumActive) {
-      Alert.alert('Already active', ALREADY_ACTIVE_MESSAGE);
+      quizVibeAlert('Already active', ALREADY_ACTIVE_MESSAGE);
       return;
     }
 
@@ -534,26 +534,26 @@ export default function StoreScreen() {
       setRedeeming(false);
       switch (result.reason) {
         case 'invalid_code':
-          Alert.alert('Invalid code', 'That voucher code was not recognised. Check it and try again.');
+          quizVibeAlert('Invalid code', 'That voucher code was not recognised. Check it and try again.');
           break;
         case 'already_redeemed':
-          Alert.alert('Code already used', 'This voucher code has already been redeemed.');
+          quizVibeAlert('Code already used', 'This voucher code has already been redeemed.');
           break;
         case 'expired':
-          Alert.alert('Code expired', 'This voucher code is no longer valid.');
+          quizVibeAlert('Code expired', 'This voucher code is no longer valid.');
           break;
         case 'already_active':
-          Alert.alert('Already active', ALREADY_ACTIVE_MESSAGE);
+          quizVibeAlert('Already active', ALREADY_ACTIVE_MESSAGE);
           break;
         case 'not_registered':
         case 'not_authenticated':
-          Alert.alert(
+          quizVibeAlert(
             'Sign in required',
             'Register or log in to your QuizVibe account to redeem a voucher.',
           );
           break;
         default:
-          Alert.alert('Could not redeem', 'Something went wrong. Please try again in a moment.');
+          quizVibeAlert('Could not redeem', 'Something went wrong. Please try again in a moment.');
       }
       return;
     }
@@ -565,7 +565,7 @@ export default function StoreScreen() {
 
     track('voucher_redeemed', { expires_at: result.until.toISOString() });
 
-    Alert.alert(
+    quizVibeAlert(
       'QuizVibe Premium activated',
       `Voucher redeemed. Premium is active until ${formatPromoDate(result.until)}.`,
       [{ text: 'OK', onPress: handleBack }],
@@ -582,16 +582,16 @@ export default function StoreScreen() {
     setRestoring(false);
 
     if (result.kind === 'error') {
-      Alert.alert('Restore failed', result.reason);
+      quizVibeAlert('Restore failed', result.reason);
       return;
     }
 
     const hasPremium = hasEntitlement(result.customerInfo, ENTITLEMENTS.PREMIUM);
     if (hasPremium) {
       await setPremiumActive(true);
-      Alert.alert('Purchases restored', 'Your QuizVibe Premium membership is active.');
+      quizVibeAlert('Purchases restored', 'Your QuizVibe Premium membership is active.');
     } else {
-      Alert.alert(
+      quizVibeAlert(
         'Nothing to restore',
         'No active purchases found for this Apple ID. If you believe this is an error, email info@quizvibe.se.',
       );

@@ -323,7 +323,7 @@ export function PlayerRow({
             >
               <View style={styles.detailsToggleRow}>
                 <Text style={styles.detailsToggleText}>Details</Text>
-                <ChevronIcon size={12} strokeWidth={2} color={detailsExpanded ? Colors.warning : BrandUi.textMuted} direction={detailsExpanded ? 'up' : 'down'} />
+                <ChevronIcon size={12} strokeWidth={2} color={detailsExpanded ? Colors.warning : BrandUi.textMuted} direction={detailsExpanded ? 'down' : 'right'} />
               </View>
             </Pressable>
           )}

@@ -55,7 +55,13 @@ export function QuizVibeAlertHost({
   }, [active]);
 
   const alert = getCurrentAlert();
-  const showing = active && hostId !== null && !!alert && isTopAlertHost(hostId);
+  // Normalt ritar den senast registrerade aktiva hosten. Har skyddsnätet
+  // flaggat dialogen (forceRoot) ritar i stället rot-hosten (inModal).
+  const showing =
+    active &&
+    hostId !== null &&
+    !!alert &&
+    (alert.forceRoot ? inModal : isTopAlertHost(hostId));
 
   // Självläkning + kvittens: håll hosten registrerad (om registret tappat
   // den) och kvittera att dialogen faktiskt ritats, annars tar
@@ -65,11 +71,14 @@ export function QuizVibeAlertHost({
     if (showing && alert) markAlertDisplayed(alert.id);
   });
 
-  if (!showing || !alert) return null;
+  // Inaktiv host (stängd sheet) ritar ingenting alls.
+  if (!active) return null;
 
-  const { buttons } = alert;
-  let content: React.ReactNode;
-  if (buttons.length >= 3) {
+  let content: React.ReactNode = null;
+  if (!showing || !alert) {
+    content = null;
+  } else if (alert.buttons.length >= 3) {
+    const { buttons } = alert;
     content = (
       <QuizVibeDialogOverlay
         title={alert.title}
@@ -92,6 +101,7 @@ export function QuizVibeAlertHost({
       />
     );
   } else {
+    const { buttons } = alert;
     let secondary: QuizVibeAlertButton | undefined;
     let primary: QuizVibeAlertButton;
     if (buttons.length === 2) {
@@ -118,20 +128,27 @@ export function QuizVibeAlertHost({
     );
   }
 
-  const layer = (
-    <View style={styles.layer} pointerEvents="box-none">
-      {content}
-    </View>
+  // Alltid i en egen RN-Modal (2026-11-13). En vanlig vy ritades inte på
+  // enhet (den hamnade bakom native-stackens skärmar / skärmens innehåll);
+  // en Modal ritas överst — samma mönster som info-popuparna (InfoDialog),
+  // som fungerar. En host inuti en öppen sheet-Modal får en nästlad Modal,
+  // vilket iOS presenterar ovanpå sheeten. `inModal` behålls för bakåt-
+  // kompatibilitet men styr inte längre något.
+  //
+  // ⚠ Modalen är ALLTID monterad medan hosten är aktiv och växlar bara
+  // `visible` (som InfoDialog). Att avmontera en synlig RN-Modal på iOS kan
+  // lämna ett osynligt lager kvar ovanpå appen som sväljer alla tryck — appen
+  // frös efter att en popup stängts (Peter 2026-11-13).
+  void inModal;
+  return (
+    <Modal visible={showing} transparent animationType="fade" onRequestClose={() => {}}>
+      <View style={styles.layer} pointerEvents="box-none">
+        {content}
+      </View>
+    </Modal>
   );
-  if (inModal) {
-    return (
-      <Modal visible transparent animationType="fade" onRequestClose={() => {}}>
-        {layer}
-      </Modal>
-    );
-  }
-  return layer;
 }
+
 
 const styles = StyleSheet.create({
   layer: {

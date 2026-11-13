@@ -24,12 +24,22 @@ export interface QuizVibeAlertRequest {
   title: string;
   message?: string;
   buttons: QuizVibeAlertButton[];
+  /** Satt av skyddsnätet när den översta hosten inte ritade dialogen —
+   *  då tar rot-hosten i app/_layout.tsx (alltid ritad) över. */
+  forceRoot?: boolean;
 }
 
 type Listener = () => void;
 
+// Skyddsnätets väntetid innan rot-hosten tar över, och innan native-alerten
+// används. Var 300 ms: på en tung skärm (Lobby i dev-bygget) hann React inte
+// rita om hostarna efter tappet, så skyddsnätet trodde att ingen ritade och
+// visade iOS-alerten — trots att dialogen var på väg (Metro-loggen 2026-11-13).
+// En riktigt saknad host fångas redan direkt (inga hostar → native).
 const FALLBACK_MS = 300;
-const USE_IN_APP_DIALOG = false;
+// Väntetid innan en ny dialog öppnas efter att en stängts (Modal-fade ~300 ms).
+const REOPEN_DELAY_MS = 400;
+const USE_IN_APP_DIALOG = true;
 
 // Tillståndet ligger på globalThis, inte i modul-variabler: när koden laddas
 // om (Fast Refresh) skapas en ny kopia av den här modulen medan redan
@@ -41,6 +51,7 @@ interface AlertStore {
   hosts: number[];
   displayed: Set<number>;
   nextId: number;
+  lastClosedAt: number;
 }
 const g = globalThis as unknown as { __quizVibeAlertStore?: AlertStore };
 const store: AlertStore = (g.__quizVibeAlertStore ??= {
@@ -49,20 +60,34 @@ const store: AlertStore = (g.__quizVibeAlertStore ??= {
   hosts: [],
   displayed: new Set<number>(),
   nextId: 1,
+  lastClosedAt: 0,
 });
+// Äldre store (från före Fast Refresh) kan sakna fältet.
+if (typeof store.lastClosedAt !== 'number') store.lastClosedAt = 0;
 const { listeners, queue, hosts, displayed } = store;
 
 function emit() {
   listeners.forEach((fn) => fn());
 }
 
-/** Kontrollerar att aktuell dialog faktiskt ritats; annars native-fallback. */
+/** Kontrollerar att aktuell dialog faktiskt ritats. Steg 1: låt rot-hosten
+ *  (egen Modal i _layout, ritas alltid) ta över. Steg 2: native-fallback. */
 function scheduleFallbackCheck() {
   const current = queue[0];
   if (!current) return;
   setTimeout(() => {
     if (queue[0] !== current || displayed.has(current.id)) return;
-    // Ingen host ritade dialogen → visa den som vanlig iOS-alert.
+    if (!current.forceRoot) {
+      // Den översta hosten ritade inte (t.ex. en skärm som inte syns och
+      // därför inte renderas om). Ge dialogen till rot-hosten.
+      if (__DEV__) console.warn('[quizVibeAlert] top host did not draw — handing to root host:', current.title, hosts);
+      current.forceRoot = true;
+      emit();
+      scheduleFallbackCheck();
+      return;
+    }
+    // Inte ens rot-hosten ritade dialogen → visa den som vanlig iOS-alert.
+    if (__DEV__) console.warn('[quizVibeAlert] no host drew the dialog — native fallback:', current.title);
     queue.shift();
     emit();
     Alert.alert(
@@ -83,16 +108,23 @@ export function quizVibeAlert(
   // en knapp, precis som en iOS-alert.
   _options?: unknown,
 ): void {
-  // ⚠ TILLFÄLLIGT (2026-10-21): den mörka in-app-dialogen ritades inte på
-  // Peters telefon — bara skyddsnätets native-alert syntes, 0,3 s för sent.
-  // Tills orsaken är hittad visas native-alerten DIREKT (samma hastighet som
-  // innan bytet). Sätt USE_IN_APP_DIALOG = true för att felsöka vidare.
-  if (!USE_IN_APP_DIALOG) {
+  // 2026-11-13: påslagen igen — hostarna ritar nu dialogen i en egen RN-Modal
+  // (som InfoDialog), vilket är det mönster som syns på enhet. Sätt false för
+  // att falla tillbaka på native iOS-alerten.
+  if (!USE_IN_APP_DIALOG || hosts.length === 0) {
     Alert.alert(
       title,
       message,
       buttons?.map((b) => ({ text: b.text, style: b.style, onPress: b.onPress })),
     );
+    return;
+  }
+  // En dialog som öppnas direkt efter att en annan stängts (t.ex. från dess
+  // knapp) väntar tills den förra Modalens stängning är klar — två RN-Modals
+  // som stängs/öppnas samtidigt kan sväljas eller låsa appen på iOS.
+  const sinceClose = Date.now() - store.lastClosedAt;
+  if (sinceClose < REOPEN_DELAY_MS) {
+    setTimeout(() => quizVibeAlert(title, message, buttons), REOPEN_DELAY_MS - sinceClose);
     return;
   }
   // Upprepade tryck på samma kontroll ska inte stapla identiska dialoger
@@ -120,6 +152,7 @@ export function markAlertDisplayed(id: number): void {
 /** Stänger aktuell dialog och kör knappens handler (efter stängning, som iOS). */
 export function resolveCurrentAlert(button: QuizVibeAlertButton | undefined): void {
   const done = queue.shift();
+  store.lastClosedAt = Date.now();
   if (done) displayed.delete(done.id);
   emit();
   scheduleFallbackCheck();

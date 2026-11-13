@@ -24,7 +24,7 @@ import { BOTTOM_BANNER_HEIGHT } from '../components/BottomBanner';
 import { SavedAggregatesCard } from '../components/SavedAggregatesCard';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { TrophyIcon } from '../components/TrophyIcon';
-import { Colors, FontSize, Spacing } from '../theme';
+import { BrandUi, Colors, FontSize, Spacing } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
 import { listMyAggregateLeaderboards } from '../utils/aggregateLeaderboards';
 
@@ -77,7 +77,7 @@ export default function CompetitionsScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>Marathons</Text>
-          <TrophyIcon height={28} />
+          <TrophyIcon height={28} color={BrandUi.icon} />
         </View>
         <Text style={styles.subtitle}>
           Your saved marathon tables. Open one to see the standings and

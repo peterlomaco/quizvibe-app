@@ -40,7 +40,6 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   Animated,
   type LayoutChangeEvent,
   Modal,
@@ -80,6 +79,8 @@ import {
 } from '../utils/remoteMatches';
 import { formatRoomCode } from '../utils/roomCode';
 import { getSavedLobbies, removeSavedLobby, type SavedLobby } from '../utils/savedLobbies';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 
 function hoursLeft(deadlineAt: string): number {
   return Math.max(0, Math.ceil((new Date(deadlineAt).getTime() - Date.now()) / 3_600_000));
@@ -288,7 +289,7 @@ export default function MyMatchesScreen() {
   const handleDeleteOpponent = useCallback(
     (oppKey: string) => {
       if (oppKey === 'unknown-opponent') return;
-      Alert.alert(
+      quizVibeAlert(
         'Delete H2H history?',
         'Are you sure you want to delete all of the H2H games against this player?',
         [
@@ -301,7 +302,7 @@ export default function MyMatchesScreen() {
               const ok = await dismissRemoteMatchesWithOpponent(oppKey);
               setDeletingOpp(null);
               if (!ok) {
-                Alert.alert('Could not delete', 'Please try again.');
+                quizVibeAlert('Could not delete', 'Please try again.');
                 return;
               }
               await reload();
@@ -569,7 +570,7 @@ export default function MyMatchesScreen() {
           </Text>
           {groupFlash && <NewUpdateBadge active style={styles.headerFlashBadge} />}
           <View style={[styles.subToggleBox, isOpen && styles.toggleBoxOpen]}>
-            <ChevronIcon size={14} strokeWidth={2} color={isOpen ? Colors.warning : Colors.textSecondary} direction={isOpen ? 'up' : 'down'} />
+            <ChevronIcon size={14} strokeWidth={2} color={isOpen ? Colors.warning : Colors.textSecondary} direction={isOpen ? 'down' : 'right'} />
           </View>
           <Text style={styles.sectionCount}>{rows.length}</Text>
         </Pressable>
@@ -649,7 +650,7 @@ export default function MyMatchesScreen() {
           {/* +/−-boxen sitter direkt efter rubriken (som i Profile);
               antalet högerställs via marginLeft: 'auto'. */}
           <View style={[styles.sectionToggleBox, isOpen && styles.toggleBoxOpen]}>
-            <ChevronIcon size={16} strokeWidth={2} color={isOpen ? Colors.warning : Colors.textSecondary} direction={isOpen ? 'up' : 'down'} />
+            <ChevronIcon size={16} strokeWidth={2} color={isOpen ? Colors.warning : Colors.textSecondary} direction={isOpen ? 'down' : 'right'} />
           </View>
           <Text style={styles.sectionCount}>{total}</Text>
         </Pressable>
@@ -744,6 +745,7 @@ export default function MyMatchesScreen() {
             </TouchableOpacity>
           </View>
         </View>
+        <QuizVibeAlertHost active={resultMatchId !== null} />
       </Modal>
     </SafeAreaView>
   );

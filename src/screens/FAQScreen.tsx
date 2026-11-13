@@ -481,7 +481,7 @@ export default function FAQScreen() {
                         >
                           <Text style={styles.questionText}>{item.q}</Text>
                           <View style={{ width: 22, alignItems: 'center' }}>
-                            <ChevronIcon size={18} color={isOpen ? Colors.warning : BrandUi.iconMuted} direction={isOpen ? 'up' : 'down'} />
+                            <ChevronIcon size={18} color={isOpen ? Colors.warning : BrandUi.iconMuted} direction={isOpen ? 'down' : 'right'} />
                           </View>
                         </Pressable>
                         {isOpen && (

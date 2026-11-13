@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Alert, Animated, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/src/components/haptic';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing } from '../theme';
 import { SectionToggle } from './SectionToggle';
@@ -34,6 +34,8 @@ import { finalizeRows, LeaderboardTable } from './LeaderboardTable';
 import { NewUpdateBadge } from './NewUpdateBadge';
 import { PlayerFilterPicker } from './PlayerFilterPicker';
 import { SegmentedControl } from './SegmentedControl';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 
 /**
  * Sparade Aggregate Leaderboards / Scores på Profile (migration 0037).
@@ -328,7 +330,7 @@ export function SavedAggregatesCard({
     const ok = await dismissAggregateLeaderboard(id);
     setDeletingId(null);
     if (!ok) {
-      Alert.alert('Could not delete', 'Please try again.');
+      quizVibeAlert('Could not delete', 'Please try again.');
       return;
     }
     setItems((prev) => prev.filter((a) => a.id !== id));
@@ -629,6 +631,7 @@ export function SavedAggregatesCard({
             />
           )}
         </View>
+        <QuizVibeAlertHost active={open !== null} />
       </Modal>
     </View>
   );

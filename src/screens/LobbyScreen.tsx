@@ -9810,7 +9810,7 @@ export default function LobbyScreen() {
             {/* Game Era — marginTop xs = samma luft panel→rubrik som Game Mode i Game Settings. */}
             <View style={{ marginTop: Spacing.xs }}>
               <View style={styles.regionLabelRow}>
-                <Text style={styles.sectionLabel}>{`Game Era (min ${eraMinInterval} year interval)`}</Text>
+                <Text style={styles.sectionLabel}>Game Era</Text>
                 <Pressable
                   style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
                   onPress={() => showInfo(gameEraInfo())}

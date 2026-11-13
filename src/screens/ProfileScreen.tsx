@@ -150,6 +150,8 @@ import {
 const LEGACY_PROFILE_MULTIPLAYER_INFO =
   'This is your default for Multiplayer games.\n\nPass-the-Phone: All players share one device. Max 4 players, even with Premium. Spotify not applicable for PtP mode.\n\nIndividual device: Each player uses their own device. Max 4 players on Basic, max 12 players with Premium.\n\nSingle player and Head-to-head are picked per game on the Home screen — tap Start New Game and choose "Single Game" or "Head-to-head".';
 import { JoinModal } from '../../app/index';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -504,7 +506,7 @@ export default function ProfileScreen() {
   const handleIncrementRounds = () => {
     if (roundsCount >= roundsMax) {
       if (!multiplayerV2Profile && (gameMode === 'pass-the-phone' || gameMode === 'remote-1v1')) {
-        Alert.alert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
+        quizVibeAlert('More rounds not available', 'More than 4 rounds is only available with both Individual device and Premium activated.');
       }
       return;
     }
@@ -732,7 +734,7 @@ export default function ProfileScreen() {
       setParentControlEnabled(true);
       return;
     }
-    Alert.alert(
+    quizVibeAlert(
       'Parent Control',
       'I am aware that this activates mature content, some of it might not be appropriate for children. Still want to deactivate Parent control?',
       [
@@ -749,7 +751,7 @@ export default function ProfileScreen() {
 
   const handleToggleAllSources = (value: boolean) => {
     if (!value && !spotifyEnabled) {
-      Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+      quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.');
       return;
     }
     // Music + Film (de enda live kategorierna sedan Sport togs bort 2026-09).
@@ -765,7 +767,7 @@ export default function ProfileScreen() {
         imagesEnabledCategories.includes('Film'),
       ].filter(Boolean).length;
       if (remainingActors < 2) {
-        Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
+        quizVibeAlert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
         return;
       }
     }
@@ -782,9 +784,9 @@ export default function ProfileScreen() {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
         // Utan Music-källa (Artists) finns inget kvar när Actors stängs av.
-        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
+        quizVibeAlert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
-      if (enabledColumnsCount <= 1) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
+      if (enabledColumnsCount <= 1) { quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
@@ -803,12 +805,12 @@ export default function ProfileScreen() {
           imagesEnabledCategories.includes('Film'),
         ].filter(Boolean).length;
         if (remainingActors < 2) {
-          Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
+          quizVibeAlert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
           return;
         }
       }
       if (enabledColumnsCount <= 1 && !artistsWouldStillBeActive) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.');
         return;
       }
     }
@@ -826,12 +828,12 @@ export default function ProfileScreen() {
           imagesEnabledCategories.includes('Film'),
         ].filter(Boolean).length;
         if (remainingActors < 2) {
-          Alert.alert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
+          quizVibeAlert('Not applicable', 'Enable at least 2 Actors combinations before turning off Artists, or keep Spotify active.');
           return;
         }
       }
       if (enabledColumnsCount <= 1 && !artistsWouldStillBeActive) {
-        Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.');
+        quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.');
         return;
       }
     }
@@ -845,9 +847,9 @@ export default function ProfileScreen() {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
         // Utan Music-källa (Artists) finns inget kvar när Actors-YT stängs av.
-        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
+        quizVibeAlert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
-      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
+      if (enabledColumnsCount <= 1 && !imagesEnabledCategories.includes('Film')) { quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setYoutubeEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
@@ -859,9 +861,9 @@ export default function ProfileScreen() {
       const artistsActive = youtubeEnabledCategories.includes('Music') || imagesEnabledCategories.includes('Music');
       if (!artistsActive) {
         // Utan Music-källa (Artists) finns inget kvar när Actors-Hints stängs av.
-        Alert.alert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
+        quizVibeAlert('Not applicable', 'Enable Artists or Spotify before turning off Actors.'); return;
       }
-      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Film')) { Alert.alert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
+      if (enabledColumnsCount <= 1 && !youtubeEnabledCategories.includes('Film')) { quizVibeAlert('Minimum 1 required', 'At least 1 profession must be enabled.'); return; }
     }
     setImagesEnabledCategories((prev) =>
       value ? ([...new Set([...prev, 'Film'])] as MainCategory[]) : prev.filter((c) => c !== 'Film'),
@@ -897,7 +899,7 @@ export default function ProfileScreen() {
     // (t.ex. om de tänker installera Spotify innan de spelar). Cancel rör
     // inte staten → den kontrollerade Switchen snäpper tillbaka av sig själv,
     // samma mönster som Year/Name-guardsen.
-    Alert.alert(
+    quizVibeAlert(
       'Spotify not found on this device',
       "We couldn't find the Spotify app on this device. You need it installed to be the DJ in a Spotify game.",
       [
@@ -911,7 +913,7 @@ export default function ProfileScreen() {
     if (!val) {
       const hasOtherSource = youtubeEnabledCategories.length > 0 || imagesEnabledCategories.length > 0;
       if (!hasOtherSource) {
-        Alert.alert('No active sources', 'Enable at least one YouTube or Guess Who source before disabling Spotify DJ.');
+        quizVibeAlert('No active sources', 'Enable at least one YouTube or Guess Who source before disabling Spotify DJ.');
         return;
       }
       if (
@@ -919,7 +921,7 @@ export default function ProfileScreen() {
         enabledSourceColumnsCount <= 1 &&
         !youtubeEnabledCategories.includes('Music')
       ) {
-        Alert.alert('Not applicable', 'Only one source combination is active. Please enable another profession or source before turning this off.');
+        quizVibeAlert('Not applicable', 'Only one source combination is active. Please enable another profession or source before turning this off.');
         return;
       }
     } else {
@@ -1242,7 +1244,7 @@ export default function ProfileScreen() {
   const handleDeleteSelectedFriends = () => {
     const count = selectedFriendIds.size;
     if (count === 0) return;
-    Alert.alert(
+    quizVibeAlert(
       count === 1 ? 'Remove friend' : 'Remove friends',
       `Are you sure you want to delete ${count} friend${count > 1 ? 's' : ''} from your QuizVibe friends list?`,
       [
@@ -1284,7 +1286,7 @@ export default function ProfileScreen() {
     // men mode-valet inte är IndDev.
     // v2: no mode default exists — the lobby forces All at Once for Spotify.
     if (spotifyEnabled && !multiplayerV2Profile && gameMode !== 'individual-devices') {
-      Alert.alert(
+      quizVibeAlert(
         'Spotify requires Individual Devices',
         'Spotify DJ mode is only available in Individual Devices mode. Please change the Game Mode or turn off Spotify.',
       );
@@ -1375,7 +1377,7 @@ export default function ProfileScreen() {
       navigateFn();
       return;
     }
-    Alert.alert(
+    quizVibeAlert(
       'Unsaved changes',
       'Do you want to save your changes before leaving?',
       [
@@ -1426,7 +1428,7 @@ export default function ProfileScreen() {
       goToStoreFromCredits();
       return;
     }
-    Alert.alert(
+    quizVibeAlert(
       'Go to Store?',
       'QuizVibe Premium gives you unlimited host games — no daily limit.',
       [
@@ -1488,7 +1490,7 @@ export default function ProfileScreen() {
     setDeletingAccount(false);
 
     if (!result.ok) {
-      Alert.alert(
+      quizVibeAlert(
         'Could not delete account',
         `Something went wrong (${result.reason}). Please try again, or email info@quizvibe.se if the problem persists.`,
       );
@@ -1557,7 +1559,7 @@ export default function ProfileScreen() {
     if (!freshHasPremium) {
       const free = freshProfile?.freeGameCredits ?? 0;
       if (free === 0) {
-        Alert.alert(
+        quizVibeAlert(
           'Out of Host Game Credits',
           'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
           [
@@ -1588,7 +1590,7 @@ export default function ProfileScreen() {
       isRemote1v1,
     });
     if (!roomRegistered) {
-      Alert.alert(
+      quizVibeAlert(
         'Could not create game lobby',
         'The room could not be registered. Check your connection and that you are signed in, then try again.',
       );
@@ -1616,7 +1618,7 @@ export default function ProfileScreen() {
       value={spotifyAnswerYear}
       onValueChange={(v) => {
         if (!v && !spotifyAnswerName) {
-          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+          quizVibeAlert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
           return;
         }
         setSpotifyAnswerYear(v);
@@ -1630,7 +1632,7 @@ export default function ProfileScreen() {
       value={spotifyAnswerName}
       onValueChange={(v) => {
         if (!v && !spotifyAnswerYear) {
-          Alert.alert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
+          quizVibeAlert('At least one answer type required', 'At least one Spotify answer type must be enabled.');
           return;
         }
         setSpotifyAnswerName(v);
@@ -1895,7 +1897,7 @@ export default function ProfileScreen() {
                   size={16}
                   strokeWidth={2}
                   color={hcpCategoriesExpanded ? Colors.warning : Colors.textSecondary}
-                  direction={hcpCategoriesExpanded ? 'up' : 'down'}
+                  direction={hcpCategoriesExpanded ? 'down' : 'right'}
                 />
               </View>
               <Text style={styles.fieldLabelPlain}>HCP by category</Text>
@@ -2397,7 +2399,7 @@ export default function ProfileScreen() {
                   pressed && roundsCount < roundsMax && { opacity: 0.7 },
                 ]}
                 onPress={roundsCount >= roundsMax && !hasPremium
-                  ? () => Alert.alert(
+                  ? () => quizVibeAlert(
                       'Premium feature',
                       'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
                       [
@@ -2418,7 +2420,7 @@ export default function ProfileScreen() {
               </Pressable>
               {roundsCount >= roundsMax && (
                 <TouchableOpacity
-                  onPress={() => Alert.alert(
+                  onPress={() => quizVibeAlert(
                     'Premium feature',
                     'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
                     [
@@ -2444,7 +2446,7 @@ export default function ProfileScreen() {
                 value={roundsCount}
                 min={ROUNDS_MIN}
                 gameModeMax={roundsMax}
-                onPremiumPress={() => Alert.alert(
+                onPremiumPress={() => quizVibeAlert(
                   'Premium feature',
                   'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
                   [
@@ -2564,11 +2566,11 @@ export default function ProfileScreen() {
               ]}
               onPress={() =>
                 hasPremium
-                  ? Alert.alert(
+                  ? quizVibeAlert(
                       'Included with Premium',
                       'Extra Host packages are included in your Premium subscription. Use the toggles below to choose which packages are available when you host.',
                     )
-                  : Alert.alert(
+                  : quizVibeAlert(
                       'Premium feature',
                       'Extra Host packages for a customized quiz experience are included with QuizVibe Premium. Get it in the Store?',
                       [
@@ -2930,6 +2932,7 @@ export default function ProfileScreen() {
           setSelectedId={setSelectedId}
           onClose={() => setPickerOpen(false)}
         />
+        <QuizVibeAlertHost active={pickerOpen} />
       </Modal>
 
       {/* ── Friends management modal ──────────────────────────────── */}
@@ -3110,6 +3113,7 @@ export default function ProfileScreen() {
             </View>
           </View>
         </KeyboardAvoidingView>
+        <QuizVibeAlertHost active={friendsModalOpen} />
       </Modal>
 
       {/* ── Birth year picker modal ──────────────────────────────── */}
@@ -3181,6 +3185,7 @@ export default function ProfileScreen() {
             />
           </Pressable>
         </Pressable>
+        <QuizVibeAlertHost active={yearPickerOpen} />
       </Modal>
 
       {/* ── Assistance picker modal ──────────────────────────────── */}
@@ -3237,6 +3242,7 @@ export default function ProfileScreen() {
             })}
           </Pressable>
         </Pressable>
+        <QuizVibeAlertHost active={assistancePickerOpen} />
       </Modal>
 
       {/* ── Countdown voice picker modal ─────────────────────────── */}
@@ -3309,6 +3315,7 @@ export default function ProfileScreen() {
             })}
           </Pressable>
         </Pressable>
+        <QuizVibeAlertHost active={voicePickerOpen} />
       </Modal>
 
       {/* ── Region picker modal ──────────────────────────────────── */}
@@ -3365,6 +3372,7 @@ export default function ProfileScreen() {
             })}
           </Pressable>
         </Pressable>
+        <QuizVibeAlertHost active={regionPickerOpen} />
       </Modal>
 
       {/* ── Answer response picker modal ─────────────────────────── */}
@@ -3421,6 +3429,7 @@ export default function ProfileScreen() {
             })}
           </Pressable>
         </Pressable>
+        <QuizVibeAlertHost active={answerResponsePickerOpen} />
       </Modal>
 
       {/* ── Logout-modal ──────────────────────────────────────────
@@ -3562,6 +3571,7 @@ export default function ProfileScreen() {
           hasNewInvite={inviteSignal.hasNewInvite}
           onInvitesSeen={inviteSignal.markInvitesSeen}
         />
+        <QuizVibeAlertHost active={logoutModalVisible} />
       </Modal>
 
       <QuizVibeDialog visible={deleteConfirmSource === 'screen'} {...deleteConfirmProps} />
@@ -3648,6 +3658,7 @@ export default function ProfileScreen() {
             </Pressable>
           </View>
         </View>
+        <QuizVibeAlertHost active={spotifyGuideVisible} />
       </Modal>
 
     </SafeAreaView>

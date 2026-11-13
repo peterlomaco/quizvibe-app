@@ -5,6 +5,7 @@ import {
   leaveOtherActiveMemberships,
 } from './mockLobbyPlayers';
 import { getOwnMembershipKeys } from './ownLobbyLedger';
+import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
 
 /**
  * Blockerar att samma REGISTRERADE konto är aktiv deltagare i mer än en
@@ -72,7 +73,7 @@ export async function checkActiveElsewhere(excludeCode?: string): Promise<boolea
       settled = true;
       resolve(value);
     };
-    Alert.alert(
+    quizVibeAlert(
       'Still active in another game',
       "You're still marked as active in another game or lobby. This can happen " +
         "after a force-quit, or if you're signed in on another device. Continue " +
