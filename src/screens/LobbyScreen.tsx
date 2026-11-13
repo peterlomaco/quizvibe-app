@@ -5772,7 +5772,12 @@ export default function LobbyScreen() {
   //   när komponenten unmountas.
   const handleGuestLeaveRoom = () => {
     setGuestLeaveSheetVisible(false);
-    quizVibeAlert(
+    // Samma timing som host:ens Delete-flöde (handleConfirmDeleteLobby):
+    // två RN-Modals som öppnas/stängs samtidigt kan låsa appen på iOS.
+    // Vänta tills sheeten tonat ut innan dialogen öppnas, och tills dialogen
+    // tonat ut innan den globala "Leaving lobby…"-covern (egen Modal) visas.
+    // Utan detta fastnade non-host på Home efter Leave (2026-11-13).
+    setTimeout(() => quizVibeAlert(
       'Leave this Game Lobby?',
       // Remote 1v1 spelas bara av QuizVibe-users — där finns ingen
       // guest-data att förlora, så meddelandet säger bara vad som händer.
@@ -5784,7 +5789,7 @@ export default function LobbyScreen() {
         {
           text: 'Yes',
           style: 'destructive',
-          onPress: () =>
+          onPress: () => setTimeout(() =>
             runBehindGlobalOverlay('Leaving lobby…', async () => {
               const ownId = ownPlayerIdRef.current;
               const ownPlayer = ownId ? players.find((p) => p.id === ownId) : undefined;
@@ -5813,10 +5818,10 @@ export default function LobbyScreen() {
                 ]);
               }
               router.replace('/');
-            }),
+            }), 350),
         },
       ],
-    );
+    ), 350);
   };
 
   // Delad delete-mekanik för host:en — används av BÅDE "Delete this Game

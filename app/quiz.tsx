@@ -7327,7 +7327,10 @@ export default function QuizScreen() {
           hybridRoleRef.current === 'watch' &&
           (phaseRef.current === 'question' || phaseRef.current === 'awaiting')
         ) {
-          setPhase('reveal');
+          // revealNow (inte bara setPhase) stoppar watcherns egen nedräkning
+          // och fryser baren vid ägarens svarstid — annars rullade timern
+          // vidare i reveal-vyn (2026-11-13).
+          revealNow(payload.time_used);
         }
       }
     };
@@ -7347,7 +7350,8 @@ export default function QuizScreen() {
       index === questionIndexRef.current &&
       (phaseRef.current === 'question' || phaseRef.current === 'awaiting')
     ) {
-      setPhase('reveal');
+      // Stoppa timern + frys baren (samma skäl som watcher-revealen ovan).
+      revealNow(row.time_used);
     }
   };
 

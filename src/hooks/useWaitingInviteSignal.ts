@@ -51,13 +51,23 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
   // tyst (hellre inget märke än ett som läcker mellan konton).
   const [seen, setSeen] = useState<string | null>(null);
   const seenKeyRef = useRef<string | null>(null);
+  // Inloggad user. Följer onAuthStateChange så Realtime-prenumerationen
+  // öppnas (om) vid login/logout — Home loggar in på plats utan att tappa
+  // focus, så en prenumeration som bara sattes upp vid mount förblev
+  // stängd om ingen var inloggad då (märket uteblev, 2026-11-13).
+  const [uid, setUid] = useState<string | null>(null);
+  // Bara det SENASTE reload-anropets svar får skriva state — annars kan ett
+  // äldre, långsammare svar skriva över en nyare lista.
+  const reloadSeqRef = useRef(0);
 
   const reload = useCallback(async () => {
+    const seq = ++reloadSeqRef.current;
     const [{ data: userResp }, list] = await Promise.all([
       // Lokal session — se kommentaren vid prenumerationen nedan.
       supabase.auth.getSession().then(({ data }) => ({ data: { user: data.session?.user ?? null } })),
       loadInvites(),
     ]);
+    if (seq !== reloadSeqRef.current) return;
     setInvites(list);
     const uid = userResp.user?.id;
     const key = uid ? `${SEEN_KEY_PREFIX}${uid}` : null;
@@ -66,12 +76,39 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
       setSeen(null);
       return;
     }
+    let stored = '';
     try {
-      setSeen((await AsyncStorage.getItem(key)) ?? '');
+      stored = (await AsyncStorage.getItem(key)) ?? '';
     } catch {
-      setSeen('');
+      stored = '';
     }
+    if (seq !== reloadSeqRef.current) return;
+    setSeen(stored);
   }, []);
+
+  // Håll uid i synk med auth-läget. Varje faktiskt byte (login, logout,
+  // kontobyte) laddar om inboxen och — via uid-depen nedan — öppnar om
+  // Realtime-prenumerationen för rätt konto.
+  useEffect(() => {
+    let active = true;
+    void supabase.auth.getSession().then(({ data }) => {
+      if (active) setUid(data.session?.user?.id ?? null);
+    });
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUid(session?.user?.id ?? null);
+    });
+    return () => {
+      active = false;
+      data.subscription.unsubscribe();
+    };
+  }, []);
+
+  const prevUidRef = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    // Första värdet täcks av focus-reloaden; ladda bara om vid faktiskt byte.
+    if (prevUidRef.current !== undefined && prevUidRef.current !== uid) void reload();
+    prevUidRef.current = uid;
+  }, [uid, reload]);
 
   useFocusEffect(
     useCallback(() => {
@@ -97,15 +134,14 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
   // raderade lobby:n eller startade spelet) släcker det. Defensiv channel-
   // cleanup speglar JoinModal:s pattern (supabase.channel återanvänder
   // topic:en → stale subscribed channels måste rensas före .on()).
+  // Prenumerationen är nycklad på uid (onAuthStateChange ovan) så den öppnas
+  // när någon loggar in på Home och byts vid kontobyte.
   useEffect(() => {
+    if (!uid) return;
     let cancelled = false;
     let channel: ReturnType<typeof supabase.channel> | null = null;
     (async () => {
-      // Lokal session (ingen nätverksrunda / inget auth-lås) — bara uid behövs;
-      // servern validerar JWT:n vid varje skrivning ändå (2026-10-21).
-      const userResp = { user: (await supabase.auth.getSession()).data.session?.user ?? null };
-      const uid = userResp.user?.id;
-      if (!uid || cancelled) return;
+      if (cancelled) return;
       const topic = `realtime:waiting_invites_signal:${uid}`;
       supabase
         .getChannels()
@@ -132,7 +168,7 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
       cancelled = true;
       if (channel) supabase.removeChannel(channel);
     };
-  }, [reload]);
+  }, [uid, reload]);
 
   const currentIds = idsOf(invites);
   const hasInvites = invites.length > 0;
