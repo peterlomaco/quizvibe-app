@@ -164,6 +164,10 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop & RnB). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. Themes might be changed over time.',
       },
       {
+        q: 'What is Parent Control?',
+        a: 'Parent Control filters out content that may not suit children, and blocks Extra packages marked as parent controlled (for example Hip Hop & RnB). When you register a QuizVibe account, Parent Control is turned off by default. You can turn it on anytime in Profile settings → Host default settings, and the Host can also switch it on or off in the Lobby for each game. Games hosted as Guest always have Parent Control on.',
+      },
+      {
         q: 'Why did a clip not play, or look different than before?',
         a: 'Please be aware that we don\'t own the external material (YouTube and Spotify). Clips can be changed, removed or blocked in your region over time, so some may not work as expected. If a clip can\'t be played, QuizVibe picks another question for you. We appreciate your understanding — enjoy, it\'s just a game! If you find anything that doesn\'t work as it should, please contact info@quizvibe.se and attach screenshots.',
       },

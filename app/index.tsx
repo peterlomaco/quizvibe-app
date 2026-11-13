@@ -3018,7 +3018,7 @@ export default function HomeScreen() {
       // Remote 1vs1 är alltid exakt 2 spelare. Sätts redan här (i stället
       // för att vänta på LobbyScreen:s setRoomMaxPlayers-effekt) så
       // kapacitetskollen vid join är korrekt från första sekunden.
-      maxPlayers: isRemote1v1 ? 2 : freshProfile?.maxPlayers ?? profile?.maxPlayers ?? 4,
+      maxPlayers: isRemote1v1 ? 2 : 4, // lobbyn höjer till 12 (Premium + All at Once) vid mount
       hostIsPremium: hasPremium,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? profile?.playerName ?? '',
@@ -3499,6 +3499,10 @@ export default function HomeScreen() {
           region: regRegion,
           gameEraFrom: regParsedBirthYear,
           gameEraTo: _defaultEraTo,
+          // Nya konton startar med Parent Control AV (Peter 2026-11-13).
+          // Ingen DB-kolumn — profileStorage läser detta som fallback när
+          // AsyncStorage-cachen saknar värdet (gäller varje enhet).
+          parentControlEnabled: false,
         },
       },
     });

@@ -139,7 +139,6 @@ import {
   gameEraInfo,
   hintsInfo,
   parentControlInfo,
-  playersInfo,
   regionScopeInfo,
   roundsInfo,
   spotifyInfo,
@@ -234,6 +233,10 @@ const REGION_OPTIONS: { id: Region; label: string }[] = [
   { id: 'sweden', label: 'Sweden' },
 ];
 const REGION_FLAGS: Record<string, string> = { sweden: '🇸🇪', Sweden: '🇸🇪' };
+// Region scope-raden döljs så länge Sweden är enda regionen (Peter
+// 2026-11-13) — valet påverkar inget då (load-effekten coercar till
+// 'sweden'). Visas automatiskt igen när en andra region läggs till här.
+const SHOW_REGION_SCOPE = REGION_OPTIONS.length > 1;
 
 // Hur länge spelarna har på sig att svara på en fråga (skiljer sig från
 // hur länge själva frågematerialet — låt/video/bild — spelas upp).
@@ -491,27 +494,6 @@ export default function ProfileScreen() {
       };
     }, []),
   );
-  const handleSelectMaxPlayers = (n: 4 | 12) => {
-    if (n === 12 && !multiplayerV2Profile && gameMode !== 'individual-devices') {
-      Alert.alert(
-        'Individual device required',
-        'Please activate Individual device mode to be able to select Max 12 players.',
-      );
-      return;
-    }
-    if (n === 12 && !hasPremium) {
-      Alert.alert(
-        'Premium feature',
-        'Hosting up to 12 players requires QuizVibe Premium. Get it in the Store?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
-        ],
-      );
-      return;
-    }
-    setMaxPlayers(n);
-  };
   const handleDecrementRounds = () => {
     setRoundsCount((prev) => {
       const next = Math.max(ROUNDS_MIN, prev - ROUNDS_STEP);
@@ -1598,7 +1580,7 @@ export default function ProfileScreen() {
     // Returvärdet MÅSTE kontrolleras — en tyst no-op ger en fantom-lobby
     // som joiners inte hittar ("Room not found"-buggen 2026-08-07).
     const roomRegistered = await registerActiveRoom(code, {
-      maxPlayers: isRemote1v1 ? 2 : freshProfile?.maxPlayers ?? 4,
+      maxPlayers: isRemote1v1 ? 2 : 4, // lobbyn höjer till 12 (Premium + All at Once) vid mount
       hostIsPremium: freshHasPremium,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? '',
@@ -1983,14 +1965,13 @@ export default function ProfileScreen() {
               Pass-the-Phone (free), guld aktiv för Individual Devices
               (premium-läge). Försök att välja Individual Devices utan
               Premium triggar Store-omdirigering. */}
-          <View style={styles.field}>
             {/* Rubrik + info-ikon (flyttad hit från den borttagna MULTIPLAYER-
                 klammern under rutorna — Profile v2, 2026-10-16). Single player
                 och Remote (1vs1) är INTE host-defaults: de väljs per spel via
                 "Start New Game" på Home (2026-08-26). */}
             {/* Multiplayer v2: no mode default — the lobby derives it. */}
             {!multiplayerV2Profile && (
-            <>
+            <View style={styles.field}>
             <View style={styles.regionLabelRow}>
               <Text style={styles.sectionLabel}>Multiplayer Game Mode</Text>
               <Pressable
@@ -2007,66 +1988,14 @@ export default function ProfileScreen() {
               {renderModeBox('ptp', 'Pass-the-Phone', true)}
               {renderModeBox('indiv', 'Individual device', true)}
             </View>
-            </>
+            </View>
             )}
-            {/* Players — max antal spelare (Max 4 gratis / Max 12 Premium). */}
-            <View style={styles.playersLabelRow}>
-              <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>Players</Text>
-              <Pressable
-                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => showInfo(playersInfo(modeLabels(multiplayerV2Profile).allAtOnce))}
-                hitSlop={8}
-              >
-                <Text style={styles.infoIconText}>i</Text>
-              </Pressable>
-            </View>
-            {/* "2 players (1vs1)"-indikatorn borttagen 2026-08-07 — remote är
-                inte längre en profil-default (stale-coerce vid load garanterar
-                att gameMode aldrig är 'remote-1v1' här). */}
-            <View style={styles.modeRow}>
-              {/* Max 4: aktiv (grön) när maxPlayers===4. Disabled enbart när
-                  premium-host valt IndDev (auto-upgrades till Max 12 redan). */}
-              <Pressable
-                style={({ pressed }) => [
-                  styles.modeOption,
-                  maxPlayers === 4 ? styles.modeOptionPassActive : styles.modeOptionInactive,
-                  pressed && { opacity: 0.7 },
-                  hasPremium && gameMode === 'individual-devices' && { opacity: 0.45 },
-                ]}
-                onPress={() => handleSelectMaxPlayers(4)}
-                disabled={hasPremium && gameMode === 'individual-devices'}
-              >
-                <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 4 && styles.modeLabelActiveFree]}>
-                  Max 4 players
-                </Text>
-                {maxPlayers === 4 && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
-              </Pressable>
-              {/* Max 12: aktiv (guld) när maxPlayers===12. Badge grå/guld per premium-status. */}
-              <Pressable
-                style={({ pressed }) => [
-                  styles.modeOption,
-                  maxPlayers === 12 ? styles.modeOptionPassActive : styles.modeOptionInactive,
-                  pressed && { opacity: 0.7 },
-                ]}
-                onPress={() => handleSelectMaxPlayers(12)}
-              >
-                {/* Låst Premium-val: dämpat + lås-ikon; den lilla guld-
-                    PREMIUM-badgen bär förklaringen (aldrig rött). */}
-                <View style={[styles.lockedContentRow, !hasPremium && styles.lockedContent]}>
-                  {!hasPremium && <LockOutlineIcon size={13} />}
-                  <Text style={[styles.modeLabel, { textAlign: 'center' }, maxPlayers === 12 && styles.modeLabelActiveFree]}>
-                    Max 12 players
-                  </Text>
-                </View>
-                {maxPlayers === 12 && <Text style={styles.modeCheck} pointerEvents="none">✓</Text>}
-                <View style={styles.premiumBadge} pointerEvents="none">
-                  <Text style={styles.premiumBadgeText}>PREMIUM</Text>
-                </View>
-              </Pressable>
-            </View>
-          </View>
+            {/* Players-valet (Max 4/12) borttaget 2026-11-13: lobbyn sätter
+                taket själv via resolveMaxPlayers (Premium + spelläge). */}
 
-          {/* Region scope — samma regionTrigger-stil som i Lobby + info-ikon. */}
+          {/* Region scope — samma regionTrigger-stil som i Lobby + info-ikon.
+              Dold medan Sweden är enda regionen (SHOW_REGION_SCOPE). */}
+          {SHOW_REGION_SCOPE && (
           <View style={styles.field}>
             <View style={styles.regionLabelRow}>
               <Text style={styles.sectionLabel}>Region scope</Text>
@@ -2088,6 +2017,7 @@ export default function ProfileScreen() {
               <ChevronIcon size={16} direction="down" />
             </TouchableOpacity>
           </View>
+          )}
 
           {/* Source Mixerboard */}
           <View style={styles.field}>

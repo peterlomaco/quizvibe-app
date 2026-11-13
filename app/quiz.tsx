@@ -8118,7 +8118,10 @@ export default function QuizScreen() {
     const roomRegistered = await registerActiveRoom(newCode, {
       // Guest host är alltid Free-nivå: max 4, ingen premium; hostPlayerName
       // = guest-namnet så own-lobby-detekteringen fungerar för replayn.
-      maxPlayers: asGuestHost ? 4 : profile?.maxPlayers ?? 4,
+      // Re-match med fler än 4 spelare: taket måste rymma uppställningen
+      // redan innan host-lobbyn hunnit synka (joiners kollar rooms.max_players).
+      // Annars 4; lobbyn höjer till 12 (Premium + All at Once) vid mount.
+      maxPlayers: !asGuestHost && initialCount > 4 ? 12 : 4,
       hostIsPremium: false,
       currentPlayerCount: initialCount,
       hostPlayerName: asGuestHost ? hostName : profile?.playerName ?? '',
@@ -8651,7 +8654,7 @@ export default function QuizScreen() {
     const roomRegistered = await registerActiveRoom(code, {
       // Remote 1vs1 är alltid exakt 2 spelare — sätts redan här så
       // kapacitetskollen vid join är korrekt från första sekunden.
-      maxPlayers: newIsRemote1v1 ? 2 : freshProfile?.maxPlayers ?? 4,
+      maxPlayers: newIsRemote1v1 ? 2 : 4, // lobbyn höjer till 12 (Premium + All at Once) vid mount
       hostIsPremium: premium,
       currentPlayerCount: 1,
       hostPlayerName: freshProfile?.playerName ?? '',

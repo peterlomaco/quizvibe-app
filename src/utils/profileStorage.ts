@@ -297,6 +297,12 @@ function profileToRow(userId: string, email: string, p: ProfileData): ProfileRow
 // läsa/skriva profiles-rader eller trigga backfillProfileFromSession (som
 // annars byggde en fantom-profil med tomt playerName → Home/BottomBanner
 // visade inloggat läge för guests som ejectats tillbaka till Home).
+/** Parent Control-default ur signup-metadata (bara satt på nya konton). */
+function metaParentControl(meta: Record<string, unknown> | undefined): boolean | undefined {
+  const v = meta?.parentControlEnabled;
+  return typeof v === 'boolean' ? v : undefined;
+}
+
 async function getCurrentUser() {
   // Lokal session först (ingen nätverksrunda). Saknas session, eller är den
   // anonym (gäst), finns ingen profil att hämta — svara direkt.
@@ -487,8 +493,13 @@ async function loadProfileFresh(): Promise<ProfileData | null> {
         spotifyAnswerYear: cached?.spotifyAnswerYear,
         spotifyAnswerName: cached?.spotifyAnswerName,
         spotifyAppConfirmed: cached?.spotifyAppConfirmed,
-        // AsyncStorage-only (ingen DB-kolumn) — alltid från cache.
-        parentControlEnabled: cached?.parentControlEnabled,
+        // AsyncStorage-only (ingen DB-kolumn) — alltid från cache. Saknas
+        // cache-värdet faller vi på signup-metadata: konton registrerade
+        // efter 2026-11-13 bär parentControlEnabled:false (Parent Control
+        // AV för nya konton, Peter). Äldre konton saknar metadata-fältet →
+        // undefined → `?? true` i skärmarna, dvs. oförändrat beteende.
+        parentControlEnabled:
+          cached?.parentControlEnabled ?? metaParentControl(user.user_metadata),
         hcp: cached?.hcp,
         hcpByCategory: cached?.hcpByCategory,
         voice: cached?.voice,
@@ -602,7 +613,7 @@ async function backfillProfileFromSession(user: { id: string; email?: string; us
     spotifyAnswerYear: cache?.spotifyAnswerYear,
     spotifyAnswerName: cache?.spotifyAnswerName,
     spotifyAppConfirmed: cache?.spotifyAppConfirmed,
-    parentControlEnabled: cache?.parentControlEnabled,
+    parentControlEnabled: cache?.parentControlEnabled ?? metaParentControl(user.user_metadata),
     hcp: cache?.hcp,
     hcpByCategory: cache?.hcpByCategory,
   };
