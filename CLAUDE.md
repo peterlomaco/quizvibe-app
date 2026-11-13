@@ -139,6 +139,7 @@ Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-on
 
   Verifiera med `check-migrations.sql` (alla sex ✅) och `select value from public.app_config where key = 'feature_gates';`, som ska ge `"multiplayerV2": false`. Flaggen förblir **false i PROD** tills Step 8 (hela hybrid-flödet klart och testat). Migrationerna är no-op för rum med `multiplayer_v2 = false`, så de ändrar inget beteende i PROD. Ingen OTA krävs. Staging klart + verifierat 2026-11-06 (commits `40fadcb`, `dcb3799`, `054bdf2`).
   - OBS: klientkoden på `logo-gold-home` fungerar mot PROD även INNAN migrationerna körts (fallbacks för saknade kolumner). Två ändringar gäller dock ALLA rum så fort koden når PROD via OTA/build, oberoende av flaggen: credit dras först efter lyckad start (C1) och "Game already started" vid sen join (C5).
+- [ ] **Efter Apple-godkännande — Security Batch 1 (0068) + check-clips**: kör `supabase/batch1-precheck.sql` (read-only) i PROD → visa resultatet för Peter → kör `0068_security_guards.sql` → `check-migrations.sql` (0068 ✅) → smoke-test (lobby, join, approve, spel, Final Leaderboard-re-match, Marathon-re-match, radera testkonto) → deploya `check-clips` (Verify JWT OFF, verifiera Code-fliken). Kör ALDRIG `batch1-staging-tests.sql` i PROD (den skapar testanvändare, även om allt rullas tillbaka). Se "Security remediation (2026-11-13)".
 - [ ] **Ny tagline i "Confirm signup"-mailet (2026-11-04)**: repo-filen `supabase/email-templates/confirm-signup.html` har "Play your way. Anytime. Anywhere." men det LIVE mailet renderas från dashboard-templaten — klistra in filen i Auth → Emails → Templates → "Confirm signup" på BÅDE staging och PROD. (Landningssidan `docs/email-confirmed.html`, "Music. Film/TV. Memories.", går live först när branchen når master.)
 - [ ] **Lanseringsdagen**: sätt `app_config.free_premium_promo.until` i PROD = go-live + 1 månad (placeholder 2026-12-31 nu).
 - [ ] **Betald prenumeration efter kampanjen** (planera ~1 mån efter lansering). Kampanjslut styrs av `free_premium_promo.until` — förläng med SQL om 1.0.1 dröjer (tak: `OFFER_BACKSTOP_UNTIL` 2026-12-31, senare kräver OTA). Förslag: kampanjslut = lansering + 5–6 v, submit 1.0.1 vecka 3–4. Ordning:
@@ -3381,6 +3382,73 @@ Säkerhetsgranskning (RLS, Edge Functions, klient-trust, input-validering) → �
 **Migrations appliceras manuellt** via Supabase SQL Editor (samma flöde som övriga). Edge Function login-by-name: kom ihåg dashboard-fällan (klistra kod i Code-fliken + re-deploy efter create).
 
 **Kvarstående säkerhetsbacklog** (ej åtgärdat): Realtime broadcast-authorization (server-side sender-auth); `game_sessions` SELECT `using(true)` → strama till deltagare; `lobby_players` INSERT `with check(true)` → blockera cross-user-injection; CAPTCHA på join/signup (rumkod-brute-force ~25-bit); per-(avsändare,mottagare) invite-tak + rum-skapande-rate-limit; server-side scoring/credits/premium-authority (idag klient-auktoritativt — svar ligger i bundlen, credits i AsyncStorage, premium togglingsbart).
+
+## Security remediation (2026-11-13) — 9 batcher, Batch 1 klar på staging
+
+Säkerhetsaudit + åtgärdsplan (rev 3, godkänd av Peter): `C:\Users\46725\.claude\plans\declarative-growing-kitten.md` (Batch 1 i detalj; batch 2–9 sammanfattade nedan).
+
+⚠ **PRODUCTION FREEZE** (Peter 2026-11-13) tills han uttryckligen häver den: inga SQL-frågor, migrationer, Edge Functions, config- eller dataändringar mot PROD och **ingen OTA** (den kan påverka bygget under App Store-granskning). Staging-deploy (migration/EF) kräver Peters separata OK per steg. Radera ingen befintlig användardata.
+
+**Batch 1 — DB-guards (commit `eb84e44`, ej pushad):**
+- `supabase/migrations/0068_security_guards.sql` — **APPLICERAD på staging** 2026-11-13, verifierad: `batch1-staging-tests.sql` 65/65 (rollback-by-RAISE, rapporten står i felmeddelandet) + app-tester #1–#11.
+  - Trigger `guard_lobby_player_row` på `lobby_players`:
+    - `room_code`, `player_id` och `is_host` är oföränderliga;
+    - bara host får godkänna;
+    - icke-host-INSERT tvingas till `approved=false`;
+    - `user_id` får bara bli NULL (account-delete-cascade) eller bindas av ägaren;
+    - re-match-platser binds till rätt user när host skriver dem.
+  - Andra funktioner:
+    - `claim_carry_over_row` binder bara platsens ägare;
+    - invites: avsändare/mottagare sätts server-side, rate-limit på `auth.uid()`;
+    - clip-rapporter kräver `reporter = auth.uid()`, max 10/24 h;
+    - anon-konton nekas `profiles`-insert, gratismånad och `create_remote_match`.
+  - Felsträngar: `qv_lobby_guard:*`.
+- `supabase/check-migrations.sql` har 0068-rader. `supabase/batch1-precheck.sql` = read-only förkontroller (rena på staging).
+- `supabase/functions/check-clips/index.ts`: blocklistan läses via RPC `clip_blocklist` + en per-request-brytare (`BLOCKLIST_MAX_SHARE` 0.1, `BLOCKLIST_MIN_TRIP` 3). **INTE deployad.**
+
+**Nästa steg i ordning:**
+1. ~1 dags normalt spel på staging.
+2. Med Peters OK: deploya `check-clips` till STAGING (Verify JWT OFF, kontrollera Code-fliken), testa att en ospelbar video fortfarande byts ut.
+3. Efter Apple-godkännande + Peters OK: 0068 + check-clips till PROD (se launch-checklistan ovan).
+
+**Batch 2–9 (ej påbörjade):**
+
+| Batch | Innehåll | Typ | När |
+|---|---|---|---|
+| 2 | `TEST_ROOM_SEEDS` bakom `__DEV__`; `isHost`-default i quiz.tsx `'true'` → `'false'` (greppa först att varje `/quiz`-navigation skickar `isHost`); voucher-UI bort (cherry-pick `7909cb1`) + droppa `redeem_voucher` | OTA (+DB) | När OTA-stoppet hävs |
+| 3 | Rums-enumerering (High-2): anon läser `rooms`/`lobby_settings` med `using(true)`. Fas A: app slutar behöva det (+ `min_supported_build`); fas B: stäng policyerna | App + DB | Efter Batch 1 i PROD |
+| 4 | Privata Realtime-kanaler (resten av High-2): oautentiserade broadcasts. Per-rum-flagga `realtime_private`, host-topic `quiz_host:*` | App + DB + projektinställning | Efter 1+3, före v2 i PROD |
+| 5 | Resultatintegritet: H2H-totaler räknas server-side + UPDATE WITH CHECK på answers; Marathon-skrivningar host-only med gränser | DB | När som helst |
+| 6 | Login/signup-missbruk: försökstabell per `player_name` + IP i `login-by-name`, CAPTCHA | EF + inställningar | När som helst |
+| 7 | v2-härdning: join-lås (MED-7), v2-rumskolumner server-satta (MED-8), rejoin efter Start bara för deltagare (L7), turresultat via `submit_own_turn_result` (MED-9) | DB | Före v2 Steg 8 |
+| 8 | Credits + Premium server-auktoritativa (High-3; klienten skriver idag credit-kolumnerna i `profileToRow`) | App + DB | Före QuizVibe 2.0 (betald prenumeration) |
+| 9 | Sentry/motsv. + expo-router `ErrorBoundary`, PII-scrubbing | Native build | Nästa native build |
+
+**Lågprio, ingen batch:**
+- polling;
+- Spotify-timeouts;
+- `getSession`;
+- JWT-krav i `check-clips`;
+- scope på `has_active_premium`;
+- SecureStore för sessioner;
+- ta bort `src/lib/spotify.ts`;
+- dubbla nycklar i `hintsData`;
+- `npm audit fix`;
+- städa grants.
+
+**Buggar hittade under Batch 1-testerna (inte säkerhet):**
+- ✅ fixade i `0de4c74`, verifierade på staging av Peter:
+  - non-host Leave frös appen (två Modals samtidigt — 350 ms-väntan i `handleGuestLeaveRoom`);
+  - "New update"-märket för invites uteblev efter login på Home (`useWaitingInviteSignal` prenumererar nu om på `onAuthStateChange`);
+  - 1 by 1-watcherns nedräkning fortsatte efter att ägaren svarat (watcher-reveal använder `revealNow`).
+- ⏳ **#7 öppen:** i re-match-lobbyn växlar non-host:s kapacitet mellan 4 och 12. Non-host läser taket från TVÅ 2 s-pollare (`getRoomMeta().maxPlayers` och `lobby_settings.max_players`) som skriver över varandra när de skiljer sig.
+  - Väntar på Peters SQL från en re-match-lobby, plus föregående spelläge och om A har Premium:
+    ```sql
+    select r.max_players as room_cap, s.max_players as settings_cap, r.multiplayer_v2, r.rematch_locked
+    from public.rooms r left join public.lobby_settings s on s.room_code = r.code
+    where r.code = '<KOD>';
+    ```
+  - Föreslagen fix: non-host läser taket bara från rummet (det servern använder för join), och laga den host-skrivning som saknas.
 
 ## EAS Update (OTA) — content-fixar utan App Store (2026-08-27)
 
