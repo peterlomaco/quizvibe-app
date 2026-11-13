@@ -3441,14 +3441,8 @@ Säkerhetsaudit + åtgärdsplan (rev 3, godkänd av Peter): `C:\Users\46725\.cla
   - non-host Leave frös appen (två Modals samtidigt — 350 ms-väntan i `handleGuestLeaveRoom`);
   - "New update"-märket för invites uteblev efter login på Home (`useWaitingInviteSignal` prenumererar nu om på `onAuthStateChange`);
   - 1 by 1-watcherns nedräkning fortsatte efter att ägaren svarat (watcher-reveal använder `revealNow`).
-- ⏳ **#7 öppen:** i re-match-lobbyn växlar non-host:s kapacitet mellan 4 och 12. Non-host läser taket från TVÅ 2 s-pollare (`getRoomMeta().maxPlayers` och `lobby_settings.max_players`) som skriver över varandra när de skiljer sig.
-  - Väntar på Peters SQL från en re-match-lobby, plus föregående spelläge och om A har Premium:
-    ```sql
-    select r.max_players as room_cap, s.max_players as settings_cap, r.multiplayer_v2, r.rematch_locked
-    from public.rooms r left join public.lobby_settings s on s.room_code = r.code
-    where r.code = '<KOD>';
-    ```
-  - Föreslagen fix: non-host läser taket bara från rummet (det servern använder för join), och laga den host-skrivning som saknas.
+- ✅ **#7 fixad (`eb8ce5a`, verifierad av Peter 2026-11-13):** re-match-lobbyns kapacitet växlade 4 ⇄ 12 på non-host eftersom två 2 s-pollare (`getRoomMeta().maxPlayers` och `lobby_settings.max_players`) skrev samma state. Non-host läser nu taket ENBART från rummet (det join-triggern använder); settings-syncen rör inte `maxPlayers`.
+- ✅ **Två re-match-lobbies fixat (`2ce2eca`, verifierat av Peter 2026-11-13):** ett dubbeltapp på den tända Yes körde `goToNewLobby` parallellt → två rum, invited i det första, host i det andra. Nu delar `goToNewLobby` + `handleStartNewGameFromFinal` ett single-flight-lås (`newLobbyLockRef`/`newLobbyNavigatedRef`; släpps aldrig efter lyckad navigation), `handleReplayYes` ignorerar tapp under pågående körning, och non-host följer bara första lobby-koden (`acceptedLobbyCodeRef`). ⚠ Lägg ALDRIG ett nytt `router.replace('/lobby')` i quiz.tsx utanför `goToNewLobbyImpl`/`handleStartNewGameFromFinalImpl`.
 
 ## EAS Update (OTA) — content-fixar utan App Store (2026-08-27)
 
