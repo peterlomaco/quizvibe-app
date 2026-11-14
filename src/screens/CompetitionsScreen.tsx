@@ -27,6 +27,7 @@ import { TrophyIcon } from '../components/TrophyIcon';
 import { BrandUi, Colors, FontSize, Spacing } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
 import { listMyAggregateLeaderboards } from '../utils/aggregateLeaderboards';
+import { LeaveScreenCover } from '@/src/components/LeaveScreenCover';
 
 export default function CompetitionsScreen() {
   // `from` sätts av CompetitionsButton (Home '/') så Back tar spelaren
@@ -93,6 +94,7 @@ export default function CompetitionsScreen() {
 
         <SavedAggregatesCard showRematch focusIds={focusIds} />
       </ScrollView>
+      <LeaveScreenCover />
     </SafeAreaView>
   );
 }

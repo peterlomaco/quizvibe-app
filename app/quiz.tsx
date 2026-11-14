@@ -205,6 +205,8 @@ import { getTurnResults, recordTurnResult } from '@/src/utils/turnResults';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { LeaveScreenCover } from '@/src/components/LeaveScreenCover';
+import { beginLeaveScreen, runWithLoadingCover } from '@/src/utils/leaveScreen';
 import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 
 type AssistanceLevel = 'minimal' | 'standard' | 'full';
@@ -2982,7 +2984,7 @@ export default function QuizScreen() {
         }
         // ...utan sekvens finns inget att spela — bail istället för att
         // fastna i poll-loopen nedan (som väntar på question_ids).
-        quizVibeAlert(title, body, [{ text: 'OK', onPress: () => router.replace('/') }], {
+        quizVibeAlert(title, body, [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }], {
           cancelable: false,
         });
         return true;
@@ -3009,7 +3011,7 @@ export default function QuizScreen() {
         quizVibeAlert(
           'Update required',
           'This match uses questions from a newer app version. Update QuizVibe to play it.',
-          [{ text: 'OK', onPress: () => router.replace('/') }],
+          [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
           { cancelable: false },
         );
         return;
@@ -6925,7 +6927,7 @@ export default function QuizScreen() {
     quizVibeAlert(
       'Game ended',
       'Game ended due to host inactivity.',
-      [{ text: 'OK', onPress: () => router.replace('/') }],
+      [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
       { cancelable: false },
     );
   }, [isHost, params.roomCode]);
@@ -8357,7 +8359,12 @@ export default function QuizScreen() {
     if (newLobbyLockRef.current || newLobbyNavigatedRef.current) return;
     newLobbyLockRef.current = true;
     try {
-      await goToNewLobbyImpl(...args);
+      // Loading feedback (2026-11-14): "Creating Game Lobby…" efter tröskeln,
+      // bort igen om körningen avbryts (credit-gate, fel, Cancel).
+      await runWithLoadingCover('Creating Game Lobby…', async () => {
+        await goToNewLobbyImpl(...args);
+        return newLobbyNavigatedRef.current;
+      });
     } finally {
       if (!newLobbyNavigatedRef.current) newLobbyLockRef.current = false;
     }
@@ -8486,14 +8493,14 @@ export default function QuizScreen() {
               onPress: () => restartAsGuestHost(freshProfile),
             },
             {
-              text: 'Go to Store',
+              text: 'Go to Store', leavesScreen: true,
               onPress: () => router.push('/store?focus=subscription'),
             },
           ]
         : [
             { text: 'Cancel', style: 'cancel' },
             {
-              text: 'Go to Store',
+              text: 'Go to Store', leavesScreen: true,
               onPress: () => router.push('/store?focus=subscription'),
             },
           ],
@@ -8584,6 +8591,9 @@ export default function QuizScreen() {
   };
 
   const handleGoHome = async () => {
+    // Loading feedback (2026-11-14): host väntar på deactivateRoom, non-host
+    // på player_left-broadcasten (upp till 1,2 s). Navigerar alltid.
+    beginLeaveScreen('Leaving Game…', { delayed: true });
     // När host trycker Home från Final Leaderboard är lobby:n effektivt
     // stängd — Play Again-flödet är övergivet. Notifiera non-host:s
     // syncChannel + cleanup alla per-rum-stores så de inte fastnar på
@@ -8676,7 +8686,7 @@ export default function QuizScreen() {
         'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/') },
+          { text: 'Go to Store', leavesScreen: true, onPress: () => router.push('/store?focus=subscription&from=/') },
         ],
       );
       return;
@@ -8729,7 +8739,10 @@ export default function QuizScreen() {
     if (newLobbyLockRef.current || newLobbyNavigatedRef.current) return;
     newLobbyLockRef.current = true;
     try {
-      await handleStartNewGameFromFinalImpl(lobbyType);
+      await runWithLoadingCover('Creating Game Lobby…', async () => {
+        await handleStartNewGameFromFinalImpl(lobbyType);
+        return newLobbyNavigatedRef.current;
+      });
     } finally {
       if (!newLobbyNavigatedRef.current) newLobbyLockRef.current = false;
     }
@@ -9292,7 +9305,7 @@ export default function QuizScreen() {
     quizVibeAlert(
       'Game ended',
       'Game has been deleted by Host.',
-      [{ text: 'OK', onPress: () => router.replace('/') }],
+      [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
       { cancelable: false },
     );
   }, []);
@@ -9383,7 +9396,7 @@ export default function QuizScreen() {
         quizVibeAlert(
           'Host has already started a new Game',
           '',
-          [{ text: 'OK', onPress: () => router.replace('/') }],
+          [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
           { cancelable: false },
         );
       }
@@ -9589,8 +9602,9 @@ export default function QuizScreen() {
         {
           text: 'Quit game',
           style: 'destructive',
+          leavesScreen: 'Ending Game…',
           onPress: () =>
-            runBehindGlobalOverlay('Please Wait — Ending this Game', async () => {
+            runBehindGlobalOverlay('Ending Game…', async () => {
               // Spara frågor som visats hittills (index 0 till questionIndex-1)
               // så hosten inte ser dem igen vid nästa spelstart.
               if (questionIndex > 0) {
@@ -9652,6 +9666,7 @@ export default function QuizScreen() {
         {
           text: 'Leave game',
           style: 'destructive',
+          leavesScreen: 'Leaving Game…',
           onPress: () => {
             // Spara frågor som hunnit visas (spegling av Quit Games recording,
             // men mot host:s faktiska sekvens — lokala gameQuestions är bara
@@ -9733,7 +9748,7 @@ export default function QuizScreen() {
         quizVibeAlert(
           'Walk over',
           `${formatPlayerLabel(opp, 'Your opponent')} has left this game — you win by walkover.`,
-          [{ text: 'OK', onPress: () => router.replace('/') }],
+          [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
           { cancelable: false },
         );
       })();
@@ -9975,8 +9990,9 @@ export default function QuizScreen() {
         {
           text: 'Quit game',
           style: 'destructive',
+          leavesScreen: 'Ending Game…',
           onPress: () =>
-            runBehindGlobalOverlay('Please Wait — Ending this Game', async () => {
+            runBehindGlobalOverlay('Ending Game…', async () => {
               selfForfeitedRef.current = true;
               await recordRemoteQuestionsShown();
               if (remoteMatchId) {
@@ -10013,8 +10029,9 @@ export default function QuizScreen() {
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Save & Exit',
+          leavesScreen: 'Saving…',
           onPress: () =>
-            runBehindGlobalOverlay('Please Wait — Saving', async () => {
+            runBehindGlobalOverlay('Saving…', async () => {
               await recordRemoteQuestionsShown();
               router.replace('/');
             }),
@@ -11034,6 +11051,7 @@ export default function QuizScreen() {
             )
           }
         />
+        <LeaveScreenCover />
       </SafeAreaView>
     );
   }
@@ -11217,6 +11235,7 @@ export default function QuizScreen() {
           MorseAmbientSound) och sitter direkt efter den i BÅDA grenarna, så
           index är stabilt och instansen återanvänds över intro→countdown. */}
       {isAudioMutedForSelf && gameMode === 'individual-devices' && !isHost && <WebViewWarmer />}
+        <LeaveScreenCover />
       </View>
     );
   }
@@ -11310,6 +11329,7 @@ export default function QuizScreen() {
           efter MorseAmbientSound-sloten) så WebView-instansen återanvänds över
           intro→countdown i stället för att rivas + återskapas. */}
       {isAudioMutedForSelf && gameMode === 'individual-devices' && !isHost && <WebViewWarmer />}
+        <LeaveScreenCover />
       </View>
     );
   }
@@ -11956,6 +11976,7 @@ export default function QuizScreen() {
             </Modal>
           );
         })()}
+        <LeaveScreenCover />
       </SafeAreaView>
     );
   }
@@ -13359,6 +13380,7 @@ export default function QuizScreen() {
         onRetry={!isHost ? handleRetryFromUnstable : undefined}
         canRetry={!isConnectionUnstable && stickyUnstableForQuestion}
       />
+      <LeaveScreenCover />
     </SafeAreaView>
   );
 }

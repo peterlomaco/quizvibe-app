@@ -1,4 +1,5 @@
 import { Alert } from 'react-native';
+import { beginLeaveScreen } from './leaveScreen';
 
 // Drop-in ersättare för Alert.alert i navy/guld-systemet (Lobby v2,
 // 2026-10-21). Samma signatur som RN:s Alert.alert så call-sites bara byter
@@ -17,6 +18,10 @@ export type QuizVibeAlertButton = {
   text?: string;
   onPress?: () => void;
   style?: 'default' | 'cancel' | 'destructive';
+  /** The button navigates away (2026-11-14). The leave cover goes up at the
+   *  tap, so the dialog fades into it instead of into the screen being left.
+   *  A string is shown as the cover's text (with a spinner) if it takes a while. */
+  leavesScreen?: boolean | string;
 };
 
 export interface QuizVibeAlertRequest {
@@ -174,6 +179,9 @@ export function resolveCurrentAlert(button: QuizVibeAlertButton | undefined): vo
   // alert). Navigerade handlern direkt (t.ex. Leave Game → router.replace)
   // stängdes Modalen mitt i skärmbytet och ett osynligt lager blev kvar
   // ovanpå appen — Home frös (Peter 2026-11-13).
+  if (button?.leavesScreen) {
+    beginLeaveScreen(typeof button.leavesScreen === 'string' ? button.leavesScreen : '');
+  }
   if (button?.onPress) setTimeout(() => button.onPress?.(), CLOSE_ANIM_MS);
 }
 

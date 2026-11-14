@@ -152,6 +152,8 @@ const LEGACY_PROFILE_MULTIPLAYER_INFO =
 import { JoinModal } from '../../app/index';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
 import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
+import { LeaveScreenCover } from '@/src/components/LeaveScreenCover';
+import { beginLeaveScreen, endLeaveScreen, MODAL_CLOSE_WAIT_MS } from '@/src/utils/leaveScreen';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -1377,6 +1379,9 @@ export default function ProfileScreen() {
       navigateFn();
       return;
     }
+    // A "Go to Store"-type button may have raised the leave cover already;
+    // the user hasn't left yet (they may pick Stay), so show the screen again.
+    endLeaveScreen();
     quizVibeAlert(
       'Unsaved changes',
       'Do you want to save your changes before leaving?',
@@ -1384,10 +1389,12 @@ export default function ProfileScreen() {
         {
           text: "Don't save",
           style: 'destructive',
+          leavesScreen: true,
           onPress: () => navigateFn(),
         },
         {
           text: 'Save',
+          leavesScreen: true,
           onPress: async () => {
             await handleSave('defaults');
             await handleSave('host');
@@ -1433,7 +1440,7 @@ export default function ProfileScreen() {
       'QuizVibe Premium gives you unlimited host games — no daily limit.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Go to Store', onPress: goToStoreFromCredits },
+        { text: 'Go to Store', leavesScreen: true, onPress: goToStoreFromCredits },
       ],
     );
   };
@@ -1465,9 +1472,12 @@ export default function ProfileScreen() {
       track('user_logged_out');
       resetIdentity();
     } finally {
+      // Cover upp i samma render som sheeten stängs, Home efter Modal-
+      // stängningen (2026-11-14) — Profile syns aldrig igen.
+      beginLeaveScreen();
       setLoggingOut(false);
       setLogoutModalVisible(false);
-      router.replace('/');
+      setTimeout(() => router.replace('/'), MODAL_CLOSE_WAIT_MS);
     }
   };
 
@@ -1499,9 +1509,10 @@ export default function ProfileScreen() {
 
     track('user_account_deleted');
     resetIdentity();
+    beginLeaveScreen();
     setDeleteConfirmSource(null);
     setLogoutModalVisible(false);
-    router.replace('/');
+    setTimeout(() => router.replace('/'), MODAL_CLOSE_WAIT_MS);
   };
 
   // Wrapper som visar två-stegs confirmation FÖRE deletion. Tydlig copy
@@ -1564,7 +1575,7 @@ export default function ProfileScreen() {
           'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+            { text: 'Go to Store', leavesScreen: true, onPress: () => router.push('/store?focus=subscription&from=/profile') },
           ],
         );
         return;
@@ -2404,7 +2415,7 @@ export default function ProfileScreen() {
                       'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
                       [
                         { text: 'Cancel', style: 'cancel' },
-                        { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+                        { text: 'Go to Store', leavesScreen: true, onPress: () => router.push('/store?focus=subscription&from=/profile') },
                       ],
                     )
                   : handleIncrementRounds}
@@ -2425,7 +2436,7 @@ export default function ProfileScreen() {
                     'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
                     [
                       { text: 'Cancel', style: 'cancel' },
-                      { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+                      { text: 'Go to Store', leavesScreen: true, onPress: () => router.push('/store?focus=subscription&from=/profile') },
                     ],
                   )}
                   activeOpacity={0.7}
@@ -2451,7 +2462,7 @@ export default function ProfileScreen() {
                   'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
                   [
                     { text: 'Cancel', style: 'cancel' },
-                    { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+                    { text: 'Go to Store', leavesScreen: true, onPress: () => router.push('/store?focus=subscription&from=/profile') },
                   ],
                 )}
                 hasSubscription={hasPremium}
@@ -2575,7 +2586,7 @@ export default function ProfileScreen() {
                       'Extra Host packages for a customized quiz experience are included with QuizVibe Premium. Get it in the Store?',
                       [
                         { text: 'Cancel', style: 'cancel' },
-                        { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/profile') },
+                        { text: 'Go to Store', leavesScreen: true, onPress: () => router.push('/store?focus=subscription&from=/profile') },
                       ],
                     )
               }
@@ -3661,6 +3672,7 @@ export default function ProfileScreen() {
         <QuizVibeAlertHost active={spotifyGuideVisible} />
       </Modal>
 
+      <LeaveScreenCover />
     </SafeAreaView>
   );
 }

@@ -67,6 +67,8 @@ import { SectionToggle } from '../components/SectionToggle';
 import { QuizVibeToggle, quizVibeToggleWidth } from '../components/QuizVibeToggle';
 import { QuizVibeWatermark } from '../components/QuizVibeWatermark';
 import { QuizVibeAlertHost } from '../components/QuizVibeAlertHost';
+import { LeaveScreenCover } from '../components/LeaveScreenCover';
+import { beginLeaveScreen, endLeaveScreen, MODAL_CLOSE_WAIT_MS } from '../utils/leaveScreen';
 import { QuizVibeDialogOverlay } from '../components/QuizVibeDialog';
 import { quizVibeAlert } from '../utils/quizVibeAlert';
 import { ClapperboardIcon, MusicNoteIcon } from '../components/CategoryIcons';
@@ -89,7 +91,7 @@ import {
 } from '../components/RoundsRuler';
 import { TopUserBanner } from '../components/TopUserBanner';
 import { MorseAmbientSound } from '../components/MorseAmbientSound';
-import { hideGlobalOverlay, runBehindGlobalOverlay, showGlobalOverlay } from '../utils/globalOverlay';
+import { hideGlobalOverlay, showGlobalOverlay } from '../utils/globalOverlay';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
@@ -1115,6 +1117,8 @@ const OVERLAY_SETTLE_MS = 150;
 // MorseAmbientSound rampar master-gain till 0 på 300 ms; vänta ut den innan
 // en navigation som unmountar WebView:n (annars ett hörbart klick).
 const AMBIENT_FADE_BEFORE_UNMOUNT_MS = 320;
+// Delete-dialogen ger upp efter så här lång tid och visar Try again.
+const DELETE_LOBBY_TIMEOUT_MS = 10000;
 
 /**
  * Alert.alert som en await-bar Promise<boolean>. Används för guards inuti
@@ -2776,7 +2780,7 @@ export default function LobbyScreen() {
       'QuizVibe Premium gives you unlimited host games — no daily limit.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Go to Store', onPress: goToStoreFromCredits },
+        { text: 'Go to Store', leavesScreen: true, onPress: goToStoreFromCredits },
       ],
     );
   }, [hasPremium, goToStoreFromCredits]);
@@ -2880,7 +2884,7 @@ export default function LobbyScreen() {
       'Host more than 4 rounds require QuizVibe Premium. Get in Store?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+        { text: 'Go to Store', leavesScreen: true, onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
       ],
     );
   }, [hasPremium, gameMode, singlePlayerDefault, roomCode, lobbyModeLabels]);
@@ -4239,7 +4243,7 @@ export default function LobbyScreen() {
           'Hosting up to 12 players requires QuizVibe Premium. Get it in the Store?',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+            { text: 'Go to Store', leavesScreen: true, onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
           ],
         );
         return;
@@ -4877,7 +4881,7 @@ export default function LobbyScreen() {
         quizVibeAlert('Premium feature', 'All at Once requires QuizVibe Premium. Go to Store?', [
           { text: 'Cancel', style: 'cancel' },
           {
-            text: 'Go to Store',
+            text: 'Go to Store', leavesScreen: true,
             onPress: () =>
               router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }),
           },
@@ -4958,7 +4962,7 @@ export default function LobbyScreen() {
       quizVibeAlert('More rounds', `More than 4 rounds needs QuizVibe Premium and ${lobbyModeLabels.allAtOnce}.`, [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Go to Store',
+          text: 'Go to Store', leavesScreen: true,
           onPress: () =>
             router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }),
         },
@@ -5758,7 +5762,7 @@ export default function LobbyScreen() {
     quizVibeAlert(
       'H2H lobby saved',
       'Find it under "H2H" on the Home screen, with status Not started. The lobby stays open for 24 hours.',
-      [{ text: 'OK', onPress: () => router.replace('/') }],
+      [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
     );
   };
 
@@ -5770,58 +5774,60 @@ export default function LobbyScreen() {
   //   lobby:n ser "LEFT THIS GAME LOBBY" på spelarkortet) → router.replace('/')
   //   tar dem till Home. Lokal lobby-state + URL-params kasseras automatiskt
   //   när komponenten unmountas.
+  // 2026-11-14: samma mönster som Delete this Game Lobby — bekräftelsen
+  // visas INNE i sheeten (QuizVibeDialogOverlay), Yes kör leave-arbetet medan
+  // dialogen står kvar (spinner), sedan cover + stäng sheet i samma render
+  // och Home efter Modal-stängningen. Tidigare stängdes sheeten, en separat
+  // dialog öppnades och lobbyn syntes ~0,7 s innan covern kom.
+  // Cover över lobbyn från att spelaren lämnar tills nästa skärm visas
+  // (Delete + Leave; se LeaveScreenCover).
+  const [leavingScreen, setLeavingScreen] = useState(false);
+  const [leaveConfirmVisible, setLeaveConfirmVisible] = useState(false);
+  const [leaveBusy, setLeaveBusy] = useState(false);
+  const leaveInFlightRef = useRef(false);
   const handleGuestLeaveRoom = () => {
+    setLeaveConfirmVisible(true);
+  };
+  const handleCancelGuestLeave = () => {
+    if (leaveBusy) return;
+    setLeaveConfirmVisible(false);
     setGuestLeaveSheetVisible(false);
-    // Samma timing som host:ens Delete-flöde (handleConfirmDeleteLobby):
-    // två RN-Modals som öppnas/stängs samtidigt kan låsa appen på iOS.
-    // Vänta tills sheeten tonat ut innan dialogen öppnas, och tills dialogen
-    // tonat ut innan den globala "Leaving lobby…"-covern (egen Modal) visas.
-    // Utan detta fastnade non-host på Home efter Leave (2026-11-13).
-    setTimeout(() => quizVibeAlert(
-      'Leave this Game Lobby?',
-      // Remote 1v1 spelas bara av QuizVibe-users — där finns ingen
-      // guest-data att förlora, så meddelandet säger bara vad som händer.
-      isRemoteLobby
-        ? 'You will be removed from this Game Lobby.'
-        : 'You will be directed to Home page and Guest Player data will be lost.',
-      [
-        { text: 'No', style: 'cancel' },
-        {
-          text: 'Yes',
-          style: 'destructive',
-          onPress: () => setTimeout(() =>
-            runBehindGlobalOverlay('Leaving lobby…', async () => {
-              const ownId = ownPlayerIdRef.current;
-              const ownPlayer = ownId ? players.find((p) => p.id === ownId) : undefined;
-              if (ownPlayer) {
-                // Cross-device-sync (Slice 3C-ii): UPDATE:a egen rad i
-                // lobby_players med has_left=true så övriga klienter får
-                // Realtime-broadcast → ser kortet renderat med grå "LEFT
-                // THIS GAME LOBBY"-styling utan att vänta på polling.
-                // Parallellt med AsyncStorage-snapshot:en (legacy + offline-
-                // fallback för test-seed-rum). Båda körs i parallel — DB
-                // failar tyst om guests saknar anon-session, AsyncStorage
-                // funkar alltid lokalt.
-                await Promise.all([
-                  markOwnPlayerLeft(roomCode, ownPlayer.id),
-                  addLeftPlayer(roomCode, {
-                    id: ownPlayer.id,
-                    name: ownPlayer.name,
-                    emoji: ownPlayer.emoji,
-                    avatarUri: ownPlayer.avatarUri,
-                    type: ownPlayer.type,
-                    age: ownPlayer.age,
-                    assistance: ownPlayer.assistance,
-                    hcpComplete: ownPlayer.hcpComplete,
-                    approved: ownPlayer.approved,
-                  }),
-                ]);
-              }
-              router.replace('/');
-            }), 350),
-        },
-      ],
-    ), 350);
+  };
+  const handleConfirmGuestLeave = async () => {
+    if (leaveInFlightRef.current) return;
+    leaveInFlightRef.current = true;
+    setLeaveBusy(true);
+    const ownId = ownPlayerIdRef.current;
+    const ownPlayer = ownId ? players.find((p) => p.id === ownId) : undefined;
+    if (ownPlayer) {
+      // Cross-device-sync (Slice 3C-ii): UPDATE:a egen rad i lobby_players
+      // med has_left=true så övriga klienter ser kortet som lämnat utan att
+      // vänta på polling. Parallellt med AsyncStorage-snapshot:en (legacy +
+      // offline-fallback). DB failar tyst om guests saknar anon-session —
+      // leave fortsätter ändå (som förut).
+      await Promise.race([
+        Promise.all([
+          markOwnPlayerLeft(roomCode, ownPlayer.id),
+          addLeftPlayer(roomCode, {
+            id: ownPlayer.id,
+            name: ownPlayer.name,
+            emoji: ownPlayer.emoji,
+            avatarUri: ownPlayer.avatarUri,
+            type: ownPlayer.type,
+            age: ownPlayer.age,
+            assistance: ownPlayer.assistance,
+            hcpComplete: ownPlayer.hcpComplete,
+            approved: ownPlayer.approved,
+          }),
+        ]).catch(() => {}),
+        new Promise<void>((resolve) => setTimeout(resolve, DELETE_LOBBY_TIMEOUT_MS)),
+      ]);
+    }
+    setLeavingScreen(true);
+    setLeaveConfirmVisible(false);
+    setLeaveBusy(false);
+    setGuestLeaveSheetVisible(false);
+    setTimeout(() => router.replace('/'), MODAL_CLOSE_WAIT_MS);
   };
 
   // Delad delete-mekanik för host:en — används av BÅDE "Delete this Game
@@ -5831,7 +5837,7 @@ export default function LobbyScreen() {
   // Speglar EXAKT tidigare handleDeleteLobby-beteende (clearLeftPlayers
   // ingår medvetet INTE — anropades inte tidigare heller).
   const lobbyDeleteInFlightRef = useRef(false);
-  const performLobbyDelete = async (onDone: () => void) => {
+  const performLobbyDelete = async (onDone: () => void, overlayText = 'Deleting Game Lobby…') => {
     // Dubbeltrycks-skydd: ett andra Yes (eller en annan väg hit) medan
     // raderingen pågår ignoreras.
     if (lobbyDeleteInFlightRef.current) return;
@@ -5842,7 +5848,7 @@ export default function LobbyScreen() {
     // i app/_layout.tsx (utanför Stack) så den överlever router.replace —
     // Home + BottomBanner monteras och målas BAKOM covern, som tonas bort
     // först efter en kort settle. Ingen banner-flash före Home.
-    showGlobalOverlay('Deleting lobby…');
+    showGlobalOverlay(overlayText);
     // Tona ut ambient-ljudet FÖRST så WebView:n är tyst (~0 gain efter 300ms
     // FADE_OUT) innan router.replace unmountar den — annars ett hörbart klick.
     // Element:et förblir monterat via `active`-flaggan; se ambientSilenced.
@@ -5889,6 +5895,9 @@ export default function LobbyScreen() {
   // lobbyn. Ingen credit dras här (deduktionen sker vid Start Game i den nya
   // single-lobbyn, precis som vanligt).
   const handleSwitchToSingleLobby = async () => {
+    // Covern går upp vid tappet så multiplayer-lobbyn inte syns medan den
+    // nya single-lobbyn registreras (2026-11-14).
+    beginLeaveScreen('Creating Game Lobby…');
     const cachedProfile = getCachedProfile();
     const newCode = generateRoomCode();
     const hostPlayerName = isGuestHost
@@ -5905,6 +5914,7 @@ export default function LobbyScreen() {
       isRemote1v1: false,
     });
     if (!roomRegistered) {
+      endLeaveScreen();
       quizVibeAlert(
         'Could not create game lobby',
         'The room could not be registered. Check your connection and that you are signed in, then try again.',
@@ -5978,7 +5988,7 @@ export default function LobbyScreen() {
             : {}),
         },
       });
-    });
+    }, 'Creating Game Lobby…');
   };
 
   // Två-stegs delete-flow för host:en (motsvarighet till non-host:s
@@ -5995,19 +6005,79 @@ export default function LobbyScreen() {
   // performLobbyDelete som förut — efter MODAL_SWAP-fördröjningen så den
   // globala "Deleting lobby…"-covern (egen Modal) inte presenteras medan
   // sheeten fortfarande tonar ut.
+  //
+  // 2026-11-14 (screen-exit PoC): raderingen körs MEDAN dialogen står kvar
+  // (Delete-knappen visar spinner, Cancel + overlay avstängda). Först när
+  // rummet faktiskt är raderat höjs LeaveScreenCover i lobbyns eget träd i
+  // samma tick som dialog + sheet stängs — sheeten tonar ut rakt in i covern
+  // i stället för in i lobbyn. Navigeringen väntar sedan bara den befintliga
+  // Modal-stängningen (iOS-frysen), aldrig på nätverket. Misslyckas
+  // raderingen stannar dialogen öppen med felet + Try again.
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
   const handleDeleteLobby = () => {
+    setDeleteError(false);
     setDeleteConfirmVisible(true);
   };
   const handleCancelDeleteLobby = () => {
+    if (deleteBusy) return;
     setDeleteConfirmVisible(false);
+    setDeleteError(false);
     setHostDeleteSheetVisible(false);
   };
-  const handleConfirmDeleteLobby = () => {
+  const handleConfirmDeleteLobby = async () => {
+    // Dubbeltrycks-skydd (delas med performLobbyDelete).
+    if (lobbyDeleteInFlightRef.current) return;
+    lobbyDeleteInFlightRef.current = true;
+    setDeleteBusy(true);
+    setDeleteError(false);
+    // Tona ut ambient-ljudet medan rummet raderas, så WebView:n är tyst när
+    // skärmen unmountar (annars hörbart klick).
+    setAmbientSilenced(true);
+    const fadeDone = new Promise<void>((resolve) =>
+      setTimeout(resolve, AMBIENT_FADE_BEFORE_UNMOUNT_MS),
+    );
+    // Hängande nätverk får inte låsa dialogen för alltid.
+    const deleted = await Promise.race([
+      deactivateRoom(roomCode),
+      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), DELETE_LOBBY_TIMEOUT_MS)),
+    ]);
+    if (!deleted) {
+      lobbyDeleteInFlightRef.current = false;
+      setAmbientSilenced(false);
+      setDeleteBusy(false);
+      setDeleteError(true);
+      return;
+    }
+    // Samma städning som performLobbyDelete (se kommentarerna där).
+    void clearWaitingInvitesForRoom(roomCode).catch(() => { /* loggas i waitingInvites */ });
+    clearLobbyPlayers(roomCode);
+    clearLobbySettings(roomCode);
+    clearEjected(roomCode);
+    clearGameStarted(roomCode);
+    await fadeDone;
+    // Cover upp + dialog/sheet stängs i SAMMA render → ingen frame av lobbyn.
+    setLeavingScreen(true);
     setDeleteConfirmVisible(false);
+    setDeleteBusy(false);
     setHostDeleteSheetVisible(false);
-    setTimeout(() => performLobbyDelete(() => router.replace('/')), 350);
+    // Vänta bara ut sheet-Modalens stängning (iOS-frysen vid navigering mitt
+    // i en Modal-fade), sedan Home.
+    setTimeout(() => router.replace('/'), MODAL_CLOSE_WAIT_MS);
   };
+  // Stack:en kan återanvända skärm-instansen — en ny lobby ska aldrig ärva covern.
+  useFocusEffect(
+    useCallback(() => {
+      setLeavingScreen(false);
+    }, []),
+  );
+  // "Switch to single player" replace:ar till /lobby igen — återanvänder
+  // Stack:en instansen får den nya lobbyn aldrig ärva covern.
+  useEffect(() => {
+    setLeavingScreen(false);
+    endLeaveScreen();
+  }, [roomCode]);
 
   // Non-host detection: pollar roomExists var 2:a sekund. När rummet
   // blir borta (host har deletat det) sätter vi roomDeletedDetected=true
@@ -6766,6 +6836,7 @@ export default function LobbyScreen() {
               {
                 text: 'Follow leaderboard',
                 style: 'cancel',
+                leavesScreen: 'Loading Leaderboard…',
                 onPress: async () => {
                   // Host kan ha hunnit trycka Quit Game EFTER att denna
                   // Alert visats — den står kvar (cancelable:false) medan
@@ -6780,13 +6851,15 @@ export default function LobbyScreen() {
                   // från ett levande spel.
                   const stillActive = await roomExists(roomCode);
                   if (!stillActive) {
+                    // Stannar i lobbyn (dess "deleted"-popup följer) — ta ner covern.
+                    endLeaveScreen();
                     setRoomDeletedDetected(true);
                     return;
                   }
                   goToQuizAsNonHost();
                 },
               },
-              { text: 'Not now', onPress: () => router.replace('/') },
+              { text: 'Not now', leavesScreen: true, onPress: () => router.replace('/') },
             ],
             { cancelable: false },
           );
@@ -7062,7 +7135,7 @@ export default function LobbyScreen() {
     quizVibeAlert(
       'Game Lobby deleted',
       'This Game Lobby has been deleted by Host.',
-      [{ text: 'OK', onPress: () => router.replace('/') }],
+      [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
       { cancelable: false },
     );
   }, [roomDeletedDetected]);
@@ -7086,7 +7159,7 @@ export default function LobbyScreen() {
       quizVibeAlert(
         title,
         message,
-        [{ text: 'OK', onPress: () => router.replace('/') }],
+        [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
         { cancelable: false },
       );
     });
@@ -7097,7 +7170,7 @@ export default function LobbyScreen() {
     quizVibeAlert(
       'Removed from lobby',
       'User have been removed from this lobby',
-      [{ text: 'OK', onPress: () => router.replace('/') }],
+      [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
       { cancelable: false },
     );
   }, [playerEjectedDetected]);
@@ -7116,8 +7189,8 @@ export default function LobbyScreen() {
       'Head-to-head Room',
       'This Room Code belongs to a Head-to-head match. Head-to-head duels can only be played between QuizVibe users — register a free account or log in to join.',
       [
-        { text: 'OK', onPress: () => router.replace('/') },
-        { text: 'Register or Login', onPress: () => router.replace('/?openAuth=join') },
+        { text: 'OK', leavesScreen: true, onPress: () => router.replace('/') },
+        { text: 'Register or Login', leavesScreen: true, onPress: () => router.replace('/?openAuth=join') },
       ],
       { cancelable: false },
     );
@@ -7130,7 +7203,7 @@ export default function LobbyScreen() {
     quizVibeAlert(
       'Game already started',
       'Host started game without this user',
-      [{ text: 'OK', onPress: () => router.replace('/') }],
+      [{ text: 'OK', leavesScreen: true, onPress: () => router.replace('/') }],
       { cancelable: false },
     );
   }, [startedWithoutMeDetected]);
@@ -7682,7 +7755,7 @@ export default function LobbyScreen() {
             'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
             [
               { text: 'Cancel', style: 'cancel' },
-              { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+              { text: 'Go to Store', leavesScreen: true, onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
             ],
           );
           return;
@@ -7708,6 +7781,10 @@ export default function LobbyScreen() {
     // (Lobby-skärmen ligger kvar monterad under /quiz). En sen joiner ska få
     // "started without me", inte en Follow-prompt till ett spel utan tur.
     hostGameStartedRef.current = true;
+    // Loading feedback (2026-11-14): härifrån gör Start Game flera server-
+    // anrop innan /quiz pushas. "Starting Game…" syns först efter tröskeln;
+    // varje fel-return nedan tar ner covern innan dess Alert.
+    beginLeaveScreen('Starting Game…', { delayed: true });
     await setLobbyPlayers(roomCode, players);
 
     // Remote 1v1: skapa den server-side matchen (remote_matches + 2 spelar-
@@ -7720,6 +7797,7 @@ export default function LobbyScreen() {
       const hostIsAnonymous = await isAnonymousSession();
       const hostUserId = await getOwnUserId();
       if (!hostUserId) {
+        endLeaveScreen();
         hostGameStartedRef.current = false; // spelet startade aldrig
         quizVibeAlert('Cannot start match', 'No active session. Check your connection and try again.');
         return;
@@ -7778,6 +7856,7 @@ export default function LobbyScreen() {
       );
       if (!remoteMatchId) {
         // Ingen credit har dragits än (C1) — inget att återbetala.
+        endLeaveScreen();
         hostGameStartedRef.current = false; // spelet startade aldrig
         quizVibeAlert('Cannot start match', 'The H2H match could not be created. Check your connection and try again.');
         return;
@@ -7809,6 +7888,7 @@ export default function LobbyScreen() {
         });
         if (!result.ok) {
           // No credit has been charged yet (C1) — nothing to refund.
+          endLeaveScreen();
           hostGameStartedRef.current = false; // spelet startade aldrig
           const { title, message } = startRejectionMessage(result.reason);
           quizVibeAlert(title, message);
@@ -9555,6 +9635,7 @@ export default function LobbyScreen() {
                         {
                           text: 'Yes',
                           style: 'destructive',
+                          leavesScreen: 'Deleting Game Lobby…',
                           onPress: () =>
                             performLobbyDelete(() =>
                               router.replace({ pathname: '/', params: { openRegister: '1' } }),
@@ -9570,7 +9651,7 @@ export default function LobbyScreen() {
                       'Extra Host packages for a customized quiz experience are included with QuizVibe Premium. Get it in the Store?',
                       [
                         { text: 'Cancel', style: 'cancel' },
-                        { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+                        { text: 'Go to Store', leavesScreen: true, onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
                       ],
                     );
                     return;
@@ -10172,7 +10253,7 @@ export default function LobbyScreen() {
                             'Host more than 4 rounds require QuizVibe Premium. Go to Store?',
                             [
                               { text: 'Cancel', style: 'cancel' },
-                              { text: 'Go to Store', onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
+                              { text: 'Go to Store', leavesScreen: true, onPress: () => router.push({ pathname: '/store' as const, params: { focus: 'subscription', from: '/lobby', fromCode: roomCode } }) },
                             ],
                           )
                         : handleIncrementRounds}
@@ -10976,6 +11057,24 @@ export default function LobbyScreen() {
             </Pressable>
           </View>
         </View>
+        {leaveConfirmVisible && (
+          <QuizVibeDialogOverlay
+            title="Leave this Game Lobby?"
+            message={
+              // Remote 1v1 spelas bara av QuizVibe-users — där finns ingen
+              // guest-data att förlora, så meddelandet säger bara vad som händer.
+              isRemoteLobby
+                ? 'You will be removed from this Game Lobby.'
+                : 'You will be directed to Home page and Guest Player data will be lost.'
+            }
+            secondaryLabel="No"
+            onClose={handleCancelGuestLeave}
+            primaryLabel="Yes"
+            onPrimary={() => { void handleConfirmGuestLeave(); }}
+            primaryLoading={leaveBusy}
+            destructive
+          />
+        )}
         <QuizVibeAlertHost active={guestLeaveSheetVisible} />
       </Modal>
 
@@ -11048,12 +11147,17 @@ export default function LobbyScreen() {
         </View>
         {deleteConfirmVisible && (
           <QuizVibeDialogOverlay
-            title="Delete this Game Lobby?"
-            message="All players currently in this lobby will be notified and disconnected. The room code will become inactive."
+            title={deleteError ? 'Could not delete lobby' : 'Delete this Game Lobby?'}
+            message={
+              deleteError
+                ? 'The lobby could not be deleted. Check your connection and try again.'
+                : 'All players currently in this lobby will be notified and disconnected. The room code will become inactive.'
+            }
             secondaryLabel="Cancel"
             onClose={handleCancelDeleteLobby}
-            primaryLabel="Delete"
-            onPrimary={handleConfirmDeleteLobby}
+            primaryLabel={deleteError ? 'Try again' : 'Delete'}
+            onPrimary={() => { void handleConfirmDeleteLobby(); }}
+            primaryLoading={deleteBusy}
             destructive
           />
         )}
@@ -11478,6 +11582,8 @@ export default function LobbyScreen() {
       <QuizVibeAlertHost active={screenFocused} />
       {/* Info-ikonernas dialog (egen Modal, se InfoDialog). */}
       {infoDialog}
+      {/* Täcker lobbyn från att host lämnar den tills Home visas. */}
+      <LeaveScreenCover visible={leavingScreen} />
     </SafeAreaView>
   );
 }

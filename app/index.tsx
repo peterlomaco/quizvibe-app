@@ -23,7 +23,6 @@ import {
   type DeviceMode,
 } from '@/src/utils/gameFlow';
 import { EnvelopeOutlineIcon, KeyOutlineIcon } from '@/src/components/SectionIcons';
-import { WaveDots } from '@/src/components/WaveDots';
 import { TopUserBanner } from '@/src/components/TopUserBanner';
 import { HostTypeOptions, type HostLobbyType } from '@/src/components/HostTypeOptions';
 import { BrandUi, Colors, Radius, Spacing } from '@/src/theme';
@@ -70,7 +69,7 @@ import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellInde
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
 import { addFriend } from '@/src/utils/friendsStorage';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -94,6 +93,8 @@ import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import { subscriptionFeatures } from '@/src/screens/StoreScreen';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
 import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
+import { LeaveScreenCover, LoadingCard, LOADING_THRESHOLD_MS } from '@/src/components/LeaveScreenCover';
+import { runWithLoadingCover } from '@/src/utils/leaveScreen';
 
 /**
  * Late join (C5, 2026-11-06): isActiveRoom hides started rooms, so a code for
@@ -517,11 +518,38 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
   // andra tyst, se MODAL_SWAP_DELAY_MS) så listan lämnas direkt och usern ser
   // en tydlig väntevy tills lobbyn öppnas. Rensas vid varje guard-failure.
   const [joiningLobby, setJoiningLobby] = useState(false);
+  // Loading feedback (2026-11-14): Join with code / Join as Guest / Start as
+  // Guest kedjar flera Supabase-anrop. runJoin visar samma processing-kort
+  // som invite-flödet, men först efter tröskeln (LOADING_THRESHOLD_MS) så
+  // snabba svar inte blinkar. Knappens spinner ger omedelbar feedback.
+  const [joinLoadingText, setJoinLoadingText] = useState<string | null>(null);
+  const runJoin = (key: string, text: string, fn: () => Promise<unknown>) =>
+    joinAction.run(key, async () => {
+      setJoinLoadingText(text);
+      try {
+        await fn();
+      } finally {
+        setJoinLoadingText(null);
+      }
+    });
   // Spotify-attest-overlay (se profileNeedingSpotifyAttest). En vanlig View
   // inuti JoinModal:s <Modal> — en andra Modal hade svalts tyst av iOS.
   const [spotifyGate, setSpotifyGate] = useState<{ playerName: string; profile: ProfileData } | null>(null);
   const [spotifyGateOn, setSpotifyGateOn] = useState(false);
   const spotifyGateResolveRef = useRef<((abort: boolean) => void) | null>(null);
+  // Processing-kortet (invite-accept + runJoin) visas först efter tröskeln och
+  // aldrig medan ett val väntar på användaren (Spotify-gate, device-steget).
+  const joinCoverWanted =
+    (joiningLobby || joinLoadingText !== null) && !spotifyGate && step !== 'device';
+  const [joinCoverShown, setJoinCoverShown] = useState(false);
+  useEffect(() => {
+    if (!joinCoverWanted) {
+      setJoinCoverShown(false);
+      return;
+    }
+    const t = setTimeout(() => setJoinCoverShown(true), LOADING_THRESHOLD_MS);
+    return () => clearTimeout(t);
+  }, [joinCoverWanted]);
 
   // Samma kontrakt som checkSinglePlayerLobby: true = abortera (kvar i
   // Join-formuläret), false = fortsätt joinen.
@@ -1679,7 +1707,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                 return (
                   <TouchableOpacity
                     style={[modal.joinBtn, ready ? modal.joinBtnGold : modal.joinBtnDisabled]}
-                    onPress={() => joinAction.run('join-code', handleJoinWithCode)}
+                    onPress={() => runJoin('join-code', 'Joining Game Lobby…', handleJoinWithCode)}
                     disabled={!ready || joinAction.busy}
                   >
                     {ready && <MetallicGoldFill />}
@@ -2125,7 +2153,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                     modal.joinBtn,
                     isGuestFormValid ? modal.joinBtnGold : modal.joinBtnDisabled,
                   ]}
-                  onPress={() => joinAction.run('join-guest', handleJoinAsGuest)}
+                  onPress={() => runJoin('join-guest', 'Joining Game Lobby…', handleJoinAsGuest)}
                   disabled={!isGuestFormValid || joinAction.busy}
                 >
                   {/* Guld primär-CTA först när allt obligatoriskt är giltigt. */}
@@ -2140,7 +2168,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                     modal.joinBtn,
                     isGuestHostFormValid ? modal.joinBtnGold : modal.joinBtnDisabled,
                   ]}
-                  onPress={() => joinAction.run('host-guest', handleStartGameAsGuestHost)}
+                  onPress={() => runJoin('host-guest', 'Creating Game Lobby…', handleStartGameAsGuestHost)}
                   disabled={!isGuestHostFormValid || joinAction.busy}
                 >
                   {isGuestHostFormValid && <MetallicGoldFill />}
@@ -2205,12 +2233,13 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
           </View>
         )}
       </KeyboardAvoidingView>
-      {/* Part B: "Waiting for Lobby access…"-cover. En vanlig absolut-
+      {/* Part B: processing-cover ("Joining Game Lobby…" m.fl., 2026-11-14:
+          standard-LoadingCard + tröskel, var "Waiting for Lobby access…"). En vanlig absolut-
           positionerad View INUTI JoinModal:s <Modal> (INTE en andra Modal —
           iOS sväljer den andra tyst). Renderas sist så den målas ovanpå
           KeyboardAvoidingView och täcker invites-listan under väntetiden.
-          Speglar GlobalOverlay:s card-look (WaveDots + "Please Wait"). */}
-      {joiningLobby && (
+          Samma kort som LeaveScreenCover/GlobalOverlay. */}
+      {joinCoverShown && (
         <View
           style={{
             position: 'absolute',
@@ -2223,23 +2252,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
             justifyContent: 'center',
           }}
         >
-          <View
-            style={{
-              backgroundColor: Colors.card,
-              paddingHorizontal: Spacing.xl,
-              paddingVertical: Spacing.lg,
-              borderRadius: Radius.md,
-              borderWidth: 1,
-              borderColor: Colors.border,
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 16, fontWeight: '500', color: Colors.textPrimary }}>
-                Waiting for Lobby access…
-              </Text>
-              <WaveDots />
-            </View>
-          </View>
+          <LoadingCard text={joinLoadingText ?? 'Joining Game Lobby…'} />
         </View>
       )}
       {spotifyGate && (
@@ -2441,6 +2454,17 @@ function DeviceCard({
 
 
 export default function HomeScreen() {
+  // Dev-only (2026-11-14, screen-exit Stage 2): logga vilka routes som ligger
+  // i stacken när Home får fokus — för att verifiera om en lämnad Lobby/Quiz
+  // ligger kvar monterad under Home innan någon dismissAll()-fix övervägs.
+  const navigation = useNavigation();
+  useFocusEffect(
+    useCallback(() => {
+      if (!__DEV__) return;
+      const routes = navigation.getState()?.routes ?? [];
+      console.log('[nav] stack on Home focus:', routes.map((r) => r.name).join(' > '));
+    }, [navigation]),
+  );
   // Spinner + dubbeltrycks-skydd för auth-formuläret (Log in / Register).
   const authAction = useAsyncAction();
   const [joinVisible, setJoinVisible] = useState(false);
@@ -2990,7 +3014,7 @@ export default function HomeScreen() {
         'You have used your free host games for today. Wait for the daily refresh at midnight CET, or upgrade to QuizVibe Premium for unlimited host games.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Go to Store', onPress: () => router.push('/store?focus=subscription&from=/') },
+          { text: 'Go to Store', leavesScreen: true, onPress: () => router.push('/store?focus=subscription&from=/') },
         ],
       );
       return null;
@@ -2998,15 +3022,20 @@ export default function HomeScreen() {
     return { freshProfile, hasPremium };
   };
 
-  const handleCreateGame = async (lobbyType: HostLobbyType = 'multiplayer') => {
+  // Loading feedback (2026-11-14): credit-check + registerActiveRoom kan ta
+  // en märkbar stund — runWithLoadingCover visar "Creating Game Lobby…" först
+  // efter tröskeln (inget blinkar vid snabba svar) och tas bort vid fel.
+  const handleCreateGame = (lobbyType: HostLobbyType = 'multiplayer') =>
+    runWithLoadingCover('Creating Game Lobby…', () => createGameWork(lobbyType));
+  const createGameWork = async (lobbyType: HostLobbyType): Promise<boolean> => {
     const credits = await checkHostCredits();
-    if (!credits) return;
+    if (!credits) return false;
     const { freshProfile, hasPremium } = credits;
 
     // Two-device-guard: kan inte hosta ett nytt spel medan kontot redan är
     // aktivt i en annan lobby på en annan enhet (excludeCode saknas — detta
     // är ett fräscht rum).
-    if (await checkActiveElsewhere()) return;
+    if (await checkActiveElsewhere()) return false;
 
     const code = generateRoomCode();
     // Registrera koden i Supabase rooms-tabellen + lagra host:s metadata så
@@ -3036,7 +3065,7 @@ export default function HomeScreen() {
         'Could not create game lobby',
         'The room could not be registered. Check your connection and that you are signed in, then try again.',
       );
-      return;
+      return false;
     }
     // Säkerställ att leftPlayers-storen är tom för den nya koden så
     // ingen stale test-data smyger in i den färska lobby:n och felaktigt
@@ -3059,6 +3088,7 @@ export default function HomeScreen() {
         lobbyType,
       },
     });
+    return true;
   };
 
   // Mock-login: sparar en minimal profil med användarens playerName.
@@ -5063,6 +5093,7 @@ export default function HomeScreen() {
         </View>
         <QuizVibeAlertHost active={compareInfoVisible} />
       </Modal>
+      <LeaveScreenCover />
     </SafeAreaView>
   );
 }

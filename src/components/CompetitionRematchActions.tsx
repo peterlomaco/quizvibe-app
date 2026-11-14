@@ -167,7 +167,7 @@ export function CompetitionRematchActions({
         [
           { text: 'Cancel', style: 'cancel' },
           {
-            text: 'Go to Store',
+            text: 'Go to Store', leavesScreen: true,
             onPress: () =>
               router.push('/store?focus=subscription&from=/competitions'),
           },

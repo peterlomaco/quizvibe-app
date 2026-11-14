@@ -868,6 +868,18 @@ Alla lobbyvarianter (guest host utloggad, inloggad som Guest, QuizVibe-user; Sin
 - **`QuizVibeToggle`** flippar optimistiskt (`shown`-state, återgår efter 900 ms om värdet inte bekräftas) och anropar `onValueChange` i `requestAnimationFrame`; `locked`- och `style`-props.
 - ⚠ **Prestanda — använd `getSession()`, aldrig `getUser()`, för uid** ([profileStorage.ts](src/utils/profileStorage.ts) `getCurrentUser`, `mockActiveRooms`, `useWaitingInviteSignal`, `app/index.tsx`). `getUser()` är ett nätverksanrop som håller Supabase-auth-låset och serialiserade alla `loadProfile` — inloggning tog upp till 27 s och lobby-switchar svarade sent. RLS sköter behörigheten ändå.
 
+### Lämna en skärm utan att den syns igen (2026-11-14)
+
+En tap som lämnar skärmen får ALDRIG visa den igen innan destinationen. Orsaken var att en RN `<Modal>` (sheet/dialog) måste tona ut innan vi navigerar (iOS-frysen), och under väntan syntes skärmen.
+- [LeaveScreenCover](src/components/LeaveScreenCover.tsx) = ogenomskinlig vanlig View SIST i skärmens eget träd (inte Modal, inte `_layout`). Den ritas i samma frame som tappet, under den stängande Modalen, och täcker tills skärmen avmonteras/tappar fokus. Finns i Lobby, quiz (alla fem render-grenar), Profile, Store, Home, Competitions.
+- **Alert-knapp som navigerar** → `leavesScreen: true` (eller en text) på knappen i `quizVibeAlert`. Covern går upp vid tappet, handlern körs som förut efter 350 ms.
+- **Egen handler som stänger en sheet och sedan navigerar** → `beginLeaveScreen()` i samma tick som sheeten stängs, sedan `setTimeout(router.replace, MODAL_CLOSE_WAIT_MS)` ([leaveScreen.ts](src/utils/leaveScreen.ts)). Väntan BARA där en Modal stängs — navigering utan stängande Modal ska vara omedelbar.
+- **Backendarbete** körs medan bekräftelsen står kvar (`QuizVibeDialogOverlay primaryLoading`), inte efter att den stängts. Delete Game Lobby: fel/timeout (10 s) → dialogen visar "Could not delete lobby" + Try again. Leave lobby navigerar som förut även om markOwnPlayerLeft failar.
+- Varje väg som INTE navigerar efter `beginLeaveScreen` (fel-Alert, "Stay") måste anropa `endLeaveScreen()` först. 8 s auto-clear är bara skyddsnät.
+- Covern visas bara av skärmen som var fokuserad när leave startade och var monterad före den — en skärm längre ned i stacken (Lobby under Store vid Back) eller destinationen visar den aldrig.
+- **Laddningsfeedback (samma dag)**: väntar nästa skärm på backend → `runWithLoadingCover(text, work)` (`work` returnerar true = navigerade). Ingenting syns de första `LOADING_THRESHOLD_MS` (250 ms; covern blockerar bara tryck), sedan standardkortet `LoadingCard` (spinner + text). Fel → covern bort före felet. Används för Home Create Game ("Creating Game Lobby…"), Lobby Start Game ("Starting Game…", efter guards/dialoger), Final Leaderboard Home ("Leaving Game…") + Start New Game / Re-match ("Creating Game Lobby…"). JoinModal har samma kort inuti sin Modal via `runJoin` ("Joining Game Lobby…"; invite-accept använder det också). Snabb navigering utan väntan visar inget. Texter: kort, handlingsspecifik, "…Game Lobby…"/"…Game…".
+- Dev-loggen `[nav] stack on Home focus` (app/index.tsx) finns för att verifiera om en lämnad Lobby/Quiz ligger kvar i stacken. Ingen `dismissAll()` förrän det är bekräftat.
+
 ### Q-märke v2 (2026-11-02)
 
 Peter öppnade Brand Master igen och valde variant D ur `design/logo-validation/mark-v2.html`. Ordmärket (Manrope Bold) och komposition B är oförändrade.

@@ -42,6 +42,7 @@ import {
 } from '../utils/subscriptionStorage';
 import { currentModeLabels } from '../utils/modeLabels';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { LeaveScreenCover } from '@/src/components/LeaveScreenCover';
 
 // Extra bottenmarginal mellan det fokuserade voucher-fältet och tangentbordet
 // (läggs ovanpå iOS automatiska keyboard-inset). ~24pt = luftigt utan att
@@ -398,7 +399,7 @@ export default function StoreScreen() {
     const { title, body } = successCopy(
       `${amount} Host Games added — you now have ${newCredits} credits.`,
     );
-    quizVibeAlert(title, body, [{ text: 'OK', onPress: handleBack }]);
+    quizVibeAlert(title, body, [{ text: 'OK', leavesScreen: true, onPress: handleBack }]);
   };
 
   // Themed packages (Hip Hop / Rock / Film & Actors) är parkerade till
@@ -449,7 +450,7 @@ export default function StoreScreen() {
     quizVibeAlert(
       fromLobby ? title : 'Subscription activated',
       body,
-      [{ text: 'OK', onPress: handleBack }],
+      [{ text: 'OK', leavesScreen: true, onPress: handleBack }],
     );
   };
 
@@ -513,7 +514,7 @@ export default function StoreScreen() {
     quizVibeAlert(
       'QuizVibe Premium activated',
       `Free until ${formatPromoDate(result.until)}. No payment and no auto-renewal.`,
-      [{ text: 'OK', onPress: handleBack }],
+      [{ text: 'OK', leavesScreen: true, onPress: handleBack }],
     );
   };
 
@@ -568,7 +569,7 @@ export default function StoreScreen() {
     quizVibeAlert(
       'QuizVibe Premium activated',
       `Voucher redeemed. Premium is active until ${formatPromoDate(result.until)}.`,
-      [{ text: 'OK', onPress: handleBack }],
+      [{ text: 'OK', leavesScreen: true, onPress: handleBack }],
     );
   };
 
@@ -909,6 +910,7 @@ export default function StoreScreen() {
 
         <View style={styles.bottomPad} />
       </ScrollView>
+      <LeaveScreenCover />
     </SafeAreaView>
   );
 }

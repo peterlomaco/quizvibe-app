@@ -284,8 +284,8 @@ export async function roomExists(code: string): Promise<boolean> {
  * Idempotent — delete på okänd kod är no-op. Test-seeds påverkas inte
  * (de finns bara i minnet, inte i DB).
  */
-export async function deactivateRoom(code: string): Promise<void> {
-  if (!code) return;
+export async function deactivateRoom(code: string): Promise<boolean> {
+  if (!code) return true;
   const normalized = normalizeCode(code);
   const { error } = await supabase.from('rooms').delete().eq('code', normalized);
   if (error) {
@@ -294,6 +294,9 @@ export async function deactivateRoom(code: string): Promise<void> {
   // Rummet är borta — släpp denna enhets ledger-entries för koden (host + ev.
   // egna rader) så guarden inte försöker "återta" ett rum som inte finns.
   await forgetRoomMemberships(normalized);
+  // true = DB-raderingen gick igenom. Delete-dialogen (2026-11-14) visar fel +
+  // Try again vid false; övriga anropare ignorerar värdet som förut.
+  return !error;
 }
 
 /**
