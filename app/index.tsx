@@ -543,12 +543,12 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
     (joiningLobby || joinLoadingText !== null) && !spotifyGate && step !== 'device';
   const [joinCoverShown, setJoinCoverShown] = useState(false);
   useEffect(() => {
-    if (!joinCoverWanted) {
-      setJoinCoverShown(false);
-      return;
-    }
+    if (!joinCoverWanted) return;
     const t = setTimeout(() => setJoinCoverShown(true), LOADING_THRESHOLD_MS);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      setJoinCoverShown(false);
+    };
   }, [joinCoverWanted]);
 
   // Samma kontrakt som checkSinglePlayerLobby: true = abortera (kvar i
@@ -2239,7 +2239,7 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
           iOS sväljer den andra tyst). Renderas sist så den målas ovanpå
           KeyboardAvoidingView och täcker invites-listan under väntetiden.
           Samma kort som LeaveScreenCover/GlobalOverlay. */}
-      {joinCoverShown && (
+      {joinCoverWanted && joinCoverShown && (
         <View
           style={{
             position: 'absolute',

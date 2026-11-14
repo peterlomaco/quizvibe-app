@@ -574,46 +574,47 @@ export default function MyMatchesScreen() {
           </View>
           <Text style={styles.sectionCount}>{rows.length}</Text>
         </Pressable>
+        {/* Facit + "Delete all" syns alltid under rubriken (Peter 2026-11-14);
+            bara själva matchlistan fälls ut med chevronen. */}
+        <View style={styles.recordRow}>
+          <View style={styles.recordText}>
+            <Text style={styles.recordLine} numberOfLines={2}>
+              <Text style={styles.recordLabel}>You: </Text>
+              <Text style={styles.recordWins}>
+                {wins} {wins === 1 ? 'win' : 'wins'}
+              </Text>
+              <Text style={styles.recordLabel}>{'   ·   '}</Text>
+              <Text style={styles.recordLabel}>{oppName}: </Text>
+              <Text style={styles.recordWins}>
+                {losses} {losses === 1 ? 'win' : 'wins'}
+              </Text>
+            </Text>
+            <Text style={styles.recordNetLine}>
+              <Text style={styles.recordLabel}>Record: </Text>
+              <Text style={[styles.recordNet, { color: netColor }]}>
+                {net >= 0 ? '+' : ''}
+                {net}
+              </Text>
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => handleDeleteOpponent(oppKey)}
+            disabled={deletingOpp === oppKey}
+            activeOpacity={0.7}
+            hitSlop={8}
+            style={[
+              styles.deleteAllBtn,
+              deletingOpp === oppKey && { opacity: 0.6 },
+            ]}
+          >
+            <Text style={styles.deleteAllText}>
+              {deletingOpp === oppKey ? 'Deleting…' : 'Delete all'}
+            </Text>
+          </TouchableOpacity>
+        </View>
         {!isOpen && <View style={styles.sectionDivider} />}
         {isOpen && (
           <View style={styles.list}>
-            {/* Facit + "Delete all" överst i den utfällda gruppen. */}
-            <View style={styles.recordRow}>
-              <View style={styles.recordText}>
-                <Text style={styles.recordLine} numberOfLines={2}>
-                  <Text style={styles.recordLabel}>You: </Text>
-                  <Text style={styles.recordWins}>
-                    {wins} {wins === 1 ? 'win' : 'wins'}
-                  </Text>
-                  <Text style={styles.recordLabel}>{'   ·   '}</Text>
-                  <Text style={styles.recordLabel}>{oppName}: </Text>
-                  <Text style={styles.recordWins}>
-                    {losses} {losses === 1 ? 'win' : 'wins'}
-                  </Text>
-                </Text>
-                <Text style={styles.recordNetLine}>
-                  <Text style={styles.recordLabel}>Record: </Text>
-                  <Text style={[styles.recordNet, { color: netColor }]}>
-                    {net >= 0 ? '+' : ''}
-                    {net}
-                  </Text>
-                </Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => handleDeleteOpponent(oppKey)}
-                disabled={deletingOpp === oppKey}
-                activeOpacity={0.7}
-                hitSlop={8}
-                style={[
-                  styles.deleteAllBtn,
-                  deletingOpp === oppKey && { opacity: 0.6 },
-                ]}
-              >
-                <Text style={styles.deleteAllText}>
-                  {deletingOpp === oppKey ? 'Deleting…' : 'Delete all'}
-                </Text>
-              </TouchableOpacity>
-            </View>
             {rows.map((m) => renderRow(m, 'history'))}
           </View>
         )}

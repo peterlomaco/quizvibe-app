@@ -6074,8 +6074,8 @@ export default function LobbyScreen() {
   );
   // "Switch to single player" replace:ar till /lobby igen — återanvänder
   // Stack:en instansen får den nya lobbyn aldrig ärva covern.
+  // (Den lokala leavingScreen nollas av fokus-effekten ovan.)
   useEffect(() => {
-    setLeavingScreen(false);
     endLeaveScreen();
   }, [roomCode]);
 
