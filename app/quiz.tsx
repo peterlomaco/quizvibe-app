@@ -186,6 +186,7 @@ import {
 } from 'react-native';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { QuizVibeDefaultAvatar } from '@/src/components/QuizVibeDefaultAvatar';
+import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeDialog } from '@/src/components/QuizVibeDialog';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import { runBehindGlobalOverlay } from '@/src/utils/globalOverlay';
@@ -11045,7 +11046,7 @@ export default function QuizScreen() {
     const currentPlayer = (isHybrid && hybridOwner) || turnOrder[currentPlayerIndex] || {
       id: 'you',
       name: 'You',
-      emoji: '🎮',
+      emoji: '👤',
     };
     const playerCount = Math.max(1, turnOrder.length);
     const currentRound = Math.floor(questionIndex / playerCount) + 1;
@@ -12165,36 +12166,63 @@ export default function QuizScreen() {
                       lämnat (hasLeft) döljs. Vertikal stagger per index så
                       ej-confirmade avatarer som ligger på samma x ändå syns. */}
                 {gameMode === 'pass-the-phone'
-                  ? ptpMarkerUsed !== null && !(isSpotifyQuestion && isCurrentPlayerDJ) && (
-                      <View
-                        pointerEvents="none"
-                        style={[
-                          styles.timerMarker,
-                          {
-                            left: `${
-                              ((responseSeconds - ptpMarkerUsed) /
-                                responseSeconds) *
-                              100
-                            }%`,
-                          },
-                        ]}
-                      >
-                        {turnOrder[currentPlayerIndex]?.avatarUri ? (
-                          <Image
-                            source={{
-                              uri: turnOrder[currentPlayerIndex].avatarUri,
-                            }}
-                            style={styles.timerMarkerAvatar}
-                          />
-                        ) : (
-                          <View style={styles.timerMarkerFallback}>
-                            <Text style={styles.timerMarkerEmoji}>
-                              {turnOrder[currentPlayerIndex]?.emoji ?? '👤'}
-                            </Text>
+                  ? !(isSpotifyQuestion && isCurrentPlayerDJ) && (() => {
+                      // 1 by 1: turägarens avatar ligger på timer-baren redan
+                      // från start och följer fyllningens kant tills svaret
+                      // låses — då fryses den vid svarstiden (Peter 2026-11-14).
+                      // Hybrid: currentPlayerIndex roterar inte på own-device-
+                      // telefoner, så turägaren läses ur hybridOwner.
+                      // Samma Avatar som lobbyn/leaderboarden → profilens valda
+                      // avatar (Q-märket för alla utan egen bild, även gäster).
+                      const markerPlayer =
+                        isHybrid && hybridOwner ? hybridOwner : turnOrder[currentPlayerIndex];
+                      if (!markerPlayer) return null;
+                      const markerAvatar = (
+                        <Avatar
+                          uri={markerPlayer.avatarUri}
+                          emoji={markerPlayer.emoji}
+                          name={markerPlayer.name}
+                          size={28}
+                          useBrandFallback
+                          style={styles.timerMarkerAvatarFrame}
+                        />
+                      );
+                      if (ptpMarkerUsed !== null) {
+                        return (
+                          <View
+                            pointerEvents="none"
+                            style={[
+                              styles.timerMarker,
+                              {
+                                left: `${
+                                  ((responseSeconds - ptpMarkerUsed) /
+                                    responseSeconds) *
+                                  100
+                                }%`,
+                              },
+                            ]}
+                          >
+                            {markerAvatar}
                           </View>
-                        )}
-                      </View>
-                    )
+                        );
+                      }
+                      return (
+                        <Animated.View
+                          pointerEvents="none"
+                          style={[
+                            styles.timerMarker,
+                            {
+                              left: timerProgressAnim.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: ['0%', '100%'],
+                              }),
+                            },
+                          ]}
+                        >
+                          {markerAvatar}
+                        </Animated.View>
+                      );
+                    })()
                   : turnOrder
                       .filter((p) => !leftPlayerIds.has(p.id))
                       .map((p, idx) => {
@@ -12291,8 +12319,10 @@ export default function QuizScreen() {
             {/* 2-decimal countdown under timer-bar:en. Döljs för DJ på Spotify-
                 frågor — DJ svarar inte och har ingen svarstid att visa.
                 B1: tickandet är isolerat i AnswerStopwatch (self-ticking memo)
-                så det inte re-renderar hela quiz-trädet 20×/sek. */}
-            {!(isSpotifyQuestion && isCurrentPlayerDJ) && (
+                så det inte re-renderar hela quiz-trädet 20×/sek.
+                Döljs även för enheter som bara tittar i 1 by 1 (hybrid watch) —
+                de svarar inte och har ingen svarstid (Peter 2026-11-14). */}
+            {!(isSpotifyQuestion && isCurrentPlayerDJ) && !isHybridWatch && (
               <AnswerStopwatch
                 live={phase === 'question' && timerActive}
                 startMsRef={questionStartMsRef}
@@ -14271,6 +14301,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.warning,
     backgroundColor: Colors.cardElevated,
+  },
+  // 1 by 1-markören använder delade Avatar — guldkant som övriga markörer.
+  timerMarkerAvatarFrame: {
+    borderColor: Colors.warning,
   },
   timerMarkerFallback: {
     width: 28,

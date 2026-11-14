@@ -48,6 +48,8 @@ export interface IntroPlayer {
   name: string;
   emoji?: string;
   avatarUri?: string;
+  /** 'guest' behåller silhuetten; registrerade utan egen bild får Q-märket. */
+  type?: 'registered' | 'guest';
 }
 
 export type AnswerResponseSeconds = 30 | 45 | 60;
@@ -285,47 +287,20 @@ interface Props {
   nextOnOwnDevice?: boolean;
 }
 
-/** Liten avatar-cell som visas före spelarnamnet — uri-bild om finns, annars
- *  emoji, annars 👤-fallback. Storleken sätts av call-site (stor i big-counter-
- *  raden, mindre i kö-listan). */
+/** Spelarens avatar i "Pass-the-Phone to:"-rutan — samma Avatar-komponent
+ *  som lobbyns spelarkort och countdownen, så profilens valda avatar visas
+ *  (Q-märket för alla utan egen bild — även gäster, Peter 2026-11-14). */
 function PlayerAvatar({ player, size }: { player: IntroPlayer; size: number }) {
-  if (player.avatarUri) {
-    return (
-      <Image
-        source={{ uri: player.avatarUri }}
-        style={[avatarStyles.image, { width: size, height: size, borderRadius: size / 2 }]}
-      />
-    );
-  }
   return (
-    <View
-      style={[
-        avatarStyles.emojiWrap,
-        { width: size, height: size, borderRadius: size / 2 },
-      ]}
-    >
-      <Text style={[avatarStyles.emoji, { fontSize: size * 0.62 }]}>
-        {player.emoji ?? '👤'}
-      </Text>
-    </View>
+    <Avatar
+      uri={player.avatarUri}
+      emoji={player.emoji}
+      name={player.name}
+      size={size}
+      useBrandFallback
+    />
   );
 }
-
-const avatarStyles = StyleSheet.create({
-  image: {
-    backgroundColor: Colors.cardElevated,
-  },
-  emojiWrap: {
-    backgroundColor: Colors.cardElevated,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emoji: {
-    textAlign: 'center',
-  },
-});
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
