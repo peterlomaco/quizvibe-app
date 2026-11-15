@@ -1,4 +1,5 @@
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -1539,6 +1540,29 @@ export default function LobbyScreen() {
   // Polling-effekten fyrar både via Realtime-tick OCH 2s-interval — utan
   // denna ref skulle vi anropa router.push flera gånger innan unmount.
   const navigatedToQuizRef = useRef(false);
+
+  // Kopiera rumskoden (Peter 2026-11-15): tap på kod-raden lägger ENBART
+  // den kanoniska 6-teckenskoden i urklipp så den kan delas i valfri app.
+  // "✓ Copied!" visas först när skrivningen lyckats, absolut-positionerad
+  // så ingen annan text i kortet flyttas eller döljs.
+  const [roomCodeCopied, setRoomCodeCopied] = useState(false);
+  const roomCodeCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (roomCodeCopiedTimerRef.current) clearTimeout(roomCodeCopiedTimerRef.current);
+  }, []);
+  const handleCopyRoomCode = useCallback(async () => {
+    if (!roomCode) return;
+    try {
+      await Clipboard.setStringAsync(roomCode);
+    } catch {
+      quizVibeAlert('Could not copy', 'The room code could not be copied. Please try again.');
+      return;
+    }
+    Haptics.selectionAsync().catch(() => {});
+    setRoomCodeCopied(true);
+    if (roomCodeCopiedTimerRef.current) clearTimeout(roomCodeCopiedTimerRef.current);
+    roomCodeCopiedTimerRef.current = setTimeout(() => setRoomCodeCopied(false), 1500);
+  }, [roomCode]);
 
   // Cross-fade host-badge: "You are the host" → "Invite friends" → "Single
   // or multiplayer game". I 1vs1-lobbyn hoppas den tredje frasen över —
@@ -8394,7 +8418,13 @@ export default function LobbyScreen() {
           <Text style={styles.roomLabel}>Room Code</Text>
           {/* Koden i tre grupper (bokstäver · siffror · bokstäver) med EN ruta
               per tecken — host läser upp den tecken för tecken: E N – 7 9 – J E. */}
-          <View style={styles.roomCodeCellsRow}>
+          <Pressable
+            onPress={handleCopyRoomCode}
+            accessibilityRole="button"
+            accessibilityLabel="Copy room code"
+            hitSlop={6}
+            style={styles.roomCodeCellsRow}
+          >
             {[
               roomCode.slice(0, ROOM_CODE_LEADING_LETTERS),
               roomCode.slice(ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS),
@@ -8411,7 +8441,30 @@ export default function LobbyScreen() {
                 </View>
               </React.Fragment>
             ))}
-          </View>
+          </Pressable>
+          {/* Kopiera-ikonen i kortets övre högra hörn (Peter 2026-11-15).
+              Hela kod-raden är fortfarande tappbar. "✓ Copied!" står till
+              vänster om ikonen, absolut — inget i kortet flyttas. */}
+          <Pressable
+            onPress={handleCopyRoomCode}
+            accessibilityRole="button"
+            accessibilityLabel="Copy room code"
+            hitSlop={8}
+            style={styles.roomCodeCopyIcon}
+          >
+            <Svg width={18} height={18} viewBox="0 0 24 24">
+              <Path
+                d="M9 9h10v12H9zM5 15V3h10"
+                fill="none"
+                stroke={roomCodeCopied ? Colors.warning : BrandUi.iconMuted}
+                strokeWidth={1.8}
+                strokeLinejoin="round"
+              />
+            </Svg>
+            {roomCodeCopied && (
+              <Text style={styles.roomCodeCopiedText} numberOfLines={1}>✓ Copied!</Text>
+            )}
+          </Pressable>
           {hostMode ? (
             <View style={[styles.hostBadge, { position: 'relative' }]}>
               {/* Index 0 — "You are the host" (blå, starts visible) */}
@@ -12154,6 +12207,27 @@ const styles = StyleSheet.create({
   // i fyllt läge. Storleken (36×50) håller raden tillräckligt smal för att
   // logga + cell-rad ska få plats sida vid sida i den centrerade stacken.
   roomCodeCellsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  // Kopiera-ikonen i kortets övre högra hörn. "✓ Copied!" ligger absolut
+  // till vänster om ikonen så inget flyttas och host-badgen/"You are
+  // invited" står kvar orörda.
+  roomCodeCopyIcon: {
+    position: 'absolute',
+    top: Spacing.sm,
+    right: Spacing.sm,
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roomCodeCopiedText: {
+    position: 'absolute',
+    right: 34,
+    width: 80,
+    textAlign: 'right',
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.semibold,
+    color: Colors.warning,
+  },
   // En grupp av koden (t.ex. "EN") — tecknen tätt ihop, streck mellan grupper.
   roomCodeGroup: { flexDirection: 'row', gap: 3 },
   // En ruta per tecken — liten, mörk, svag guldkant (premium, inte biljett).

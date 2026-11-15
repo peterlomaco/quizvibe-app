@@ -65,7 +65,7 @@ import { emailExists, getCachedProfile, loadProfile, playerNameExists, saveProfi
 import { checkSpotifyInstalled } from '@/src/utils/spotifyDJ';
 import { hasPremiumSubscription } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
-import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
+import { formatRoomCode, generateRoomCode, isBlockedLetterPair, isLetterCellIndex, parseRoomCode, ROOM_CODE_DIGITS, ROOM_CODE_LEADING_LETTERS, ROOM_CODE_LENGTH, ROOM_CODE_TRAILING_LETTERS } from '@/src/utils/roomCode';
 import { loadInvites, removeInvite, type WaitingInvite } from '@/src/utils/waitingInvites';
 import { addFriend } from '@/src/utils/friendsStorage';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold, useFonts } from '@expo-google-fonts/nunito';
@@ -92,6 +92,7 @@ import { LoadingContent } from '@/src/components/LoadingContent';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import { subscriptionFeatures } from '@/src/screens/StoreScreen';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { PasteCodeButton } from '@/src/components/PasteCodeButton';
 import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 import { LeaveScreenCover, LoadingCard, LOADING_THRESHOLD_MS } from '@/src/components/LeaveScreenCover';
 import { runWithLoadingCover } from '@/src/utils/leaveScreen';
@@ -829,6 +830,22 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       handleCodeCellChange(prevIdx, '');
       codeRefs.current[prevIdx]?.focus();
     }
+  };
+
+  // Paste code (Peter 2026-11-15): en giltig inklistrad kod ersätter hela
+  // inmatningen och stänger CodeKeyboardet; Join kräver fortfarande ett
+  // eget tryck. Ogiltigt urklipp → kort dialog, befintlig inmatning orörd.
+  // Rör inte cell-handlers ovan — det här är en separat väg in till `code`.
+  const handlePastedCode = (text: string, locked = false) => {
+    if (locked) return;
+    const parsed = parseRoomCode(text);
+    if (!parsed) {
+      quizVibeAlert('No room code found', 'The clipboard doesn’t contain a valid room code.');
+      return;
+    }
+    setCode(parsed);
+    setFocusedCodeIdx(null);
+    codeRefs.current.forEach((r) => r?.blur());
   };
 
   // När modalen öppnas: nollställ ALLT state och börja på det step caller
@@ -1692,6 +1709,9 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                   });
                 })()}
               </View>
+              <View style={modal.pasteCodeRow}>
+                <PasteCodeButton onText={(t) => handlePastedCode(t)} />
+              </View>
               {focusedCodeIdx !== null && (
                 <CodeKeyboard
                   mode={isLetterCellIndex(focusedCodeIdx) ? 'letter' : 'digit'}
@@ -2120,6 +2140,15 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
                         </React.Fragment>
                       );
                     })}
+                  </View>
+                  {/* Explicit codeUnlocked-gate: den låsta fieldGroupens
+                      pointerEvents räcker inte för native-kontrollen, så
+                      knappen får egen disabled + handlern egen guard. */}
+                  <View style={modal.pasteCodeRow}>
+                    <PasteCodeButton
+                      disabled={!codeUnlocked}
+                      onText={(t) => handlePastedCode(t, !codeUnlocked)}
+                    />
                   </View>
                 </View>
                 </>
@@ -5938,6 +5967,7 @@ const modal = StyleSheet.create({
   // Room code cells (6 separata rutor med auto-focus): 3 bokstäver +
   // 2 siffror + 1 trailing bokstav. flex:1 fördelar bredd jämnt över
   // tillgänglig yta så cellerna krymper graciöst på smalare devices.
+  pasteCodeRow: { marginTop: Spacing.sm, alignItems: 'center' },
   codeCellRow: {
     flexDirection: 'row',
     gap: Spacing.sm,

@@ -117,3 +117,25 @@ export function formatRoomCode(code: string): string {
   const trailing = code.slice(middleEnd);
   return [leading, middle, trailing].filter(Boolean).join('-');
 }
+
+/**
+ * Tolkar en inklistrad rumkod (Paste code i JoinModal). Tar bort
+ * inledande/avslutande blanksteg samt mellanslag och bindestreck, och
+ * kräver sedan EXAKT den kanoniska formen: 2 bokstäver ur LETTER_CHARSET +
+ * 2 siffror + 2 bokstäver ur LETTER_CHARSET, där inget bokstavspar är
+ * blockerat. Samma regler som manuell inmatning i code-cellerna — ingen
+ * sökning efter en kod inne i längre text. Returnerar kanonisk kod
+ * ("AB23XY") eller null.
+ */
+export function parseRoomCode(text: string): string | null {
+  const compact = text.trim().toUpperCase().replace(/[\s-]/g, '');
+  if (compact.length !== ROOM_CODE_LENGTH) return null;
+  for (let i = 0; i < ROOM_CODE_LENGTH; i++) {
+    const charset = isLetterCellIndex(i) ? LETTER_CHARSET : DIGIT_CHARSET;
+    if (!charset.includes(compact[i])) return null;
+  }
+  const leading = compact.slice(0, ROOM_CODE_LEADING_LETTERS);
+  const trailing = compact.slice(ROOM_CODE_LEADING_LETTERS + ROOM_CODE_DIGITS);
+  if (isBlockedLetterPair(leading) || isBlockedLetterPair(trailing)) return null;
+  return compact;
+}
