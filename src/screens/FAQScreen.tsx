@@ -109,6 +109,10 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         a: 'A game hosted as a Guest is a trial with fixed settings, so the Lobby only shows Players in Lobby and Quiz Tuning:\n• Questions: YouTube clips only (music and film) — no Hints or Spotify.\n• Answer time: always 30 seconds.\n• Assistance level: always Full.\n• Rounds: 2 or 4. You can still choose the Game Era.\n• Multiplayer is Pass-the-Phone only, up to 4 players.\n• Parent Control is always on, so mature content is kept out.\nRegister a free QuizVibe account to unlock all settings.',
       },
       {
+        q: 'Which assistance level do I play with?',
+        a: 'Everyone plays with their own assistance level, set in Profile or in the Lobby. In Head-to-head the Host can turn on "Mutual assistance level" to make both players use the same level, chosen by the Host.',
+      },
+      {
         q: 'How many players can be in one room?',
         a: 'Up to 4 players per room. With Premium, Individual device games can have up to 12 players (Pass-the-Phone is always max 4). Single Player is one player and Head-to-head is two.',
       },

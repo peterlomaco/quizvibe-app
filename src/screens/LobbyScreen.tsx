@@ -47,7 +47,6 @@ import {
   answerTimeInfo,
   gameEraInfo,
   gameModeInfo,
-  gameSequenceInfo,
   hintsInfo,
   hostPackagesInfo,
   mutualAssistanceInfo,
@@ -134,7 +133,7 @@ import { clearLobbySettings, getLobbySettings, setLobbySettings, type LobbyRemot
 import { createRemoteMatch, getMatchByRoomCode, getOwnUserId, hasRemote1v1RelationshipWith } from '../utils/remoteMatches';
 import { saveLobby } from '../utils/savedLobbies';
 import { TRACK_VIEWPORT_W } from '../utils/responsive';
-import { defaultEnabledMainCategories, subjectToMainCategory, subjectInEnabledCategories, MAIN_CATEGORIES, type MainCategory } from '../utils/mainCategory';
+import { defaultEnabledMainCategories, subjectToMainCategory, type MainCategory } from '../utils/mainCategory';
 import { MUSIC_QUESTIONS } from '../utils/musicQuestions';
 import { IMAGE_QUIZ_QUESTIONS } from '../utils/quizImageQuestions';
 import { supabase } from '../utils/supabase';
@@ -149,8 +148,6 @@ import {
   hasActivePackage,
   computePackageCoverage,
   computePackageEraRange,
-  resolveActivePackageTags,
-  itemInActivePackages,
 } from '../utils/hostPackages';
 import { consumePendingLobbyPlayers } from '../utils/pendingLobby';
 import {
@@ -6920,9 +6917,16 @@ export default function LobbyScreen() {
           // create_remote_match skrev samma värde på båda raderna. Egen rad
           // först, annars motpartens (identiska), annars lobby-raden som
           // fallback för matcher skapade före den gemensamma nivån infördes.
+          // ⚠ ownId är LOBBY-spelar-id:t, inte auth-uid — match.players
+          // nycklas på userId. Tidigare jämfördes de direkt, träffen missade
+          // alltid och fallbacken till players[0] gav motståndaren HOSTENS
+          // nivå (bugg 2026-11-16). Slå upp via uid; fallback = non-host-raden
+          // (den här grenen körs bara för non-host).
+          const ownUserId = await getOwnUserId();
+          if (cancelled) return;
           const matchAssistance =
-            match.players.find((p) => p.userId === ownId)?.assistance ??
-            match.players[0]?.assistance ??
+            (ownUserId ? match.players.find((p) => p.userId === ownUserId)?.assistance : undefined) ??
+            match.players.find((p) => !p.isHost)?.assistance ??
             selfRow.assistance ??
             'standard';
           const selfTurnOrder = [{
@@ -8117,155 +8121,6 @@ export default function LobbyScreen() {
     router.push(quizNav);
   };
   handleStartGameRef.current = handleStartGame;
-
-  // ── Game Sequence förhandsvisning ──────────────────────────────────────────
-  // Speglar quiz.tsx:s 3-pool-block-logik (Spotify → YouTube → Image) och
-  // härleder medie-källa + kategori per rund baserat på aktuella lobby-inställningar.
-  type GsSlot = { source: 'spotify' | 'youtube' | 'image' | 'none'; category: MainCategory | null };
-  const gameSequencePreview = useMemo<GsSlot[]>(() => {
-    // Host-paket (tema-only): speglar quiz.tsx:s pool-filter så previewn matchar
-    // det spelet faktiskt spelas med. Aktivt paket → bara tema-taggade music-
-    // items; image-items bär inga paket-taggar → tom Hints-pool.
-    const activePkgTags = resolveActivePackageTags(selectedExtraPackages);
-    const pkgActive = activePkgTags.size > 0;
-    const inPkg = (gp: readonly string[] | undefined) => !pkgActive || itemInActivePackages(gp, activePkgTags);
-    // Paket LÅSER källorna: covered YT-kategorier spelas alltid (grön+låst i
-    // mixerboarden), host:s toggle ignoreras. Speglar quiz.tsx:s effektiva val.
-    const cov = pkgActive ? computePackageCoverage(selectedExtraPackages) : null;
-    const effYtCats: MainCategory[] = cov
-      ? MAIN_CATEGORIES.filter((mc) => cov[mc].youtube)
-      : youtubeEnabledCategories;
-    // Källmedlemskap via DELAD helper (native mainCategory, ingen crossover) —
-    // samma logik som quiz-poolen (app/quiz.tsx) så preview och spel aldrig driftar.
-    const ytFiltered = MUSIC_QUESTIONS.filter(
-      (q) => inPkg(q.genrePackages) && subjectInEnabledCategories(q.contentSubject, effYtCats),
-    );
-    const imgFiltered = pkgActive
-      ? []
-      : IMAGE_QUIZ_QUESTIONS.filter((q) =>
-          subjectInEnabledCategories(q.contentSubject, imagesEnabledCategories),
-        );
-    // Spotify bara i IndDev — PtP och Single Player kör utan Spotify DJ.
-    const spotifyActive = spotifyEnabled && gameMode === 'individual-devices' && !singlePlayerDefault;
-    const spotifyPool = spotifyActive ? MUSIC_QUESTIONS.filter(q => q.spotifyTrackId && inPkg(q.genrePackages)) : [];
-    // Ren YT-pool: ytFiltered (respekterar youtubeEnabledCategories) minus Spotify-items.
-    const pureYtPool = spotifyActive ? ytFiltered.filter(q => !q.spotifyTrackId) : ytFiltered;
-    const imagePool = imgFiltered;
-    const hasSpotify = spotifyPool.length > 0;
-    const hasPureYt = pureYtPool.length > 0;
-    const hasImage = imagePool.length > 0;
-
-    // Sekventiell fasordning: Spotify → YouTube → Hints/Image.
-    //
-    // ⚠ MÅSTE spegla quiz.tsx:s block-count-logik EXAKT (app/quiz.tsx, "Fas-
-    // storlekar") — annars lovar previewn en fas-fördelning spelet inte
-    // levererar (t.ex. 2-rundors Sport-YT+Sport-Hints visade [YT, Hints] medan
-    // quiz spelar [YT, YT]). Ratio: Hints golvas FÖRST till 25% (utfyllnad, inte
-    // dragare — Peter 2026-08-14), resten går till YouTube; Spotify tar hela
-    // DJ-varv. Ändras kvoten i quiz.tsx måste den ändras här också.
-    //
-    // Golvningens följd (avsiktlig): vid 2-3 rundor får Hints NOLL.
-    let imageCount = hasImage ? Math.floor(roundsCount / 4) : 0;
-    let restBlocks = roundsCount - imageCount;
-
-    // Spotify: helt antal DJ-varv (gated till IndDev där block = frågor).
-    const playerCount = Math.max(1, approvedPlayers.length);
-    const canRotateDJ = hasSpotify && playerCount > 0 && roundsCount >= playerCount;
-    let spotifyCount = 0;
-    if (canRotateDJ) {
-      const rawSpotify = Math.min(Math.floor(restBlocks / 2), spotifyPool.length);
-      const rotations = Math.max(1, Math.floor(rawSpotify / playerCount));
-      const capped = Math.min(rotations * playerCount, spotifyPool.length, roundsCount);
-      spotifyCount = Math.floor(capped / playerCount) * playerCount;
-      if (spotifyCount > restBlocks) {
-        imageCount = roundsCount - spotifyCount;
-        restBlocks = spotifyCount;
-      }
-    }
-
-    let ytCount = hasPureYt ? restBlocks - spotifyCount : 0;
-
-    // Degenererade lägen: otillgänglig källas block → YouTube först, sedan Hints,
-    // sist Spotify (samma turordning som quiz.tsx).
-    const unallocated = roundsCount - spotifyCount - ytCount - imageCount;
-    if (unallocated > 0) {
-      if (hasPureYt) ytCount += unallocated;
-      else if (hasImage) imageCount += unallocated;
-      else if (hasSpotify) spotifyCount = Math.min(spotifyCount + unallocated, spotifyPool.length);
-    }
-
-    const slots: GsSlot[] = [];
-
-    // Fas 1: Spotify-slots
-    for (let b = 0; b < spotifyCount; b++) {
-      if (spotifyPool.length === 0) { slots.push({ source: 'none', category: null }); continue; }
-      const item = spotifyPool[b % spotifyPool.length];
-      slots.push({ source: 'spotify', category: subjectToMainCategory(item?.contentSubject) });
-    }
-
-    // Fas 2: YouTube-slots med jämn rotation per aktiverad kategori.
-    // Inom varje block gäller en kategori (Music → Film → Music …).
-    if (ytCount > 0) {
-      type YtCatEntry = { cat: MainCategory; items: typeof pureYtPool };
-      const subjectForCat: Record<MainCategory, string[]> = {
-        Music: ['song'],
-        Film: ['movie'],
-      };
-      // Fast ordning Music → Film (MAIN_CATEGORIES), INTE toggle-arrayens
-      // ordning — den kan bli ['Film','Music'] efter av/på, men spelet spelar
-      // alltid YT-Music före YT-Film (orderedCategories i quiz.tsx).
-      const ytCatEntries: YtCatEntry[] = MAIN_CATEGORIES
-        .filter((cat) => effYtCats.includes(cat))
-        .map((cat) => ({
-          cat,
-          items: pureYtPool.filter((q) => subjectForCat[cat]?.includes(q.contentSubject ?? '')),
-        }))
-        .filter((e) => e.items.length > 0);
-
-      if (ytCatEntries.length > 0) {
-        const base = Math.floor(ytCount / ytCatEntries.length);
-        const remainder = ytCount % ytCatEntries.length;
-        ytCatEntries.forEach(({ cat }, catIdx) => {
-          const blocksForCat = base + (catIdx < remainder ? 1 : 0);
-          for (let b = 0; b < blocksForCat; b++) {
-            slots.push({ source: 'youtube', category: cat });
-          }
-        });
-      }
-    }
-
-    // Fas 3: Hints/Image-slots — alla block per kategori samlade (Music → Film).
-    if (imageCount > 0 && imagePool.length > 0) {
-      const imgSubjectForCat: Record<MainCategory, string[]> = {
-        Music: ['artist', 'band'],
-        Film: ['actor', 'character'],
-      };
-      const imgCatEntries = MAIN_CATEGORIES
-        .filter((cat) => (imagesEnabledCategories as MainCategory[]).includes(cat))
-        .map((cat) => ({
-          cat,
-          items: imagePool.filter((q) => imgSubjectForCat[cat]?.includes(q.contentSubject ?? '')),
-        }))
-        .filter((e) => e.items.length > 0);
-
-      if (imgCatEntries.length > 0) {
-        const base = Math.floor(imageCount / imgCatEntries.length);
-        const remainder = imageCount % imgCatEntries.length;
-        imgCatEntries.forEach(({ cat }, catIdx) => {
-          const blocksForCat = base + (catIdx < remainder ? 1 : 0);
-          for (let b = 0; b < blocksForCat; b++) {
-            slots.push({ source: 'image', category: cat });
-          }
-        });
-      } else {
-        for (let b = 0; b < imageCount; b++) {
-          slots.push({ source: 'image', category: subjectToMainCategory(imagePool[b % imagePool.length]?.contentSubject) });
-        }
-      }
-    }
-
-    return slots;
-  }, [roundsCount, youtubeEnabledCategories, imagesEnabledCategories, spotifyEnabled, gameMode, singlePlayerDefault, selectedExtraPackages, approvedPlayers.length]);
 
   // Gemensamt vertikalt spacing-system för ALLA lobby-varianter (2026-10-21):
   // rubrik → kontroll för GAME MODE / PLAYERS / QUIZ MIXER (ett token), och
@@ -10396,77 +10251,6 @@ export default function LobbyScreen() {
                     />
                   </View>
                 </>
-              )}
-            </View>
-            )}
-
-            {/* Game Sequence — ruta per rund med medie-källa och kategori.
-                Speglar quiz.tsx:s 3-pool-logik baserat på aktuella inställningar.
-                Synlig för alla (host + non-host) som read-only feedback. Döljs
-                HELT i guest-hostade lobbies — för guest host (Peter 2026-09-11)
-                OCH för spelare som ansluter dit (Peter 2026-11-05). */}
-            {!isGuestHostedLobby && (
-            <View>
-              <View style={styles.regionLabelRow}>
-                <Text style={styles.sectionLabel}>Game Sequence</Text>
-                <Pressable
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => showInfo(gameSequenceInfo())}
-                  hitSlop={8}
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-              </View>
-              {/* Guest-hostad lobby: YouTube-only sedan 2026-11-02; Music/Film
-                  slumpas per fråga vid spelstart (viktad dragning i quiz.tsx) — previewn KAN inte veta utfallet, så
-                  slots renderas som "?" + en förklarande not. Ärligare än
-                  att spegla en fördelning som inte kommer stämma. */}
-              {isGuestHostedLobby ? (
-                <>
-                  <View style={styles.gsGrid}>
-                    {Array.from({ length: roundsCount }, (_, idx) => (
-                      <View key={idx} style={styles.gsBox}>
-                        <View style={styles.gsInlineIconWrap}>
-                          <Text style={styles.gsNumber}>{idx + 1}</Text>
-                          {/* Fristående ?-glyf (gsSourceQMark är absolut-
-                              positionerad för Q-ring-wrappen och funkar
-                              inte utanför den). */}
-                          <Text style={styles.gsRandomMark}>?</Text>
-                        </View>
-                      </View>
-                    ))}
-                  </View>
-                  <Text style={styles.guestHostNote}>
-                    YouTube Music & Film clips, randomized for Guest games
-                  </Text>
-                </>
-              ) : (
-              <View style={styles.gsGrid}>
-                {gameSequencePreview.map((slot, idx) => (
-                  <View key={idx} style={styles.gsBox}>
-                    <View style={styles.gsInlineIconWrap}>
-                      <Text style={styles.gsNumber}>{idx + 1}</Text>
-                      {slot.source === 'spotify' ? (
-                        <SpotifyBrandIcon size={12} variant="white" />
-                      ) : slot.source === 'youtube' ? (
-                        <YouTubeBrandIcon size={14} />
-                      ) : slot.source === 'image' ? (
-                        <View style={styles.gsSourceQWrap}>
-                          {/* Förenklad Hints-ikon (samma familj som mixern). */}
-                          <HintsIcon size={17} color={Colors.warning} />
-                        </View>
-                      ) : null}
-                    </View>
-                    {slot.category != null && (
-                      <View style={styles.gsCategoryWrap} pointerEvents="none">
-                        <View style={styles.gsCategoryBadge}>
-                          <Text style={styles.gsCategoryText}>{slot.category}</Text>
-                        </View>
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </View>
               )}
             </View>
             )}

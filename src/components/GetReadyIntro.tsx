@@ -406,6 +406,10 @@ export function GetReadyIntro({
   // gömms. Blink-pulsen på "nästa fråga"-rutan gäller alla tre lägen
   // (Single, PtP, IndDev) — den lever utanför denna gating.
   const isSinglePlayer = !isIndDev && playerCount === 1;
+  // All at Once (individual-devices) / 1 by 1 (pass-the-phone) med flera
+  // spelare: avskalat settings-block (bara Game era + Audio this device).
+  const isMultiplayerSettings =
+    !isSinglePlayer && (mode === 'individual-devices' || mode === 'pass-the-phone');
   // Helper: vad är effektiv audio-state för en spelare just nu? Saknad
   // key i overrides-mappen → default-policy: host on, övriga off.
   const audioOnForPlayer = (playerId: string): boolean => {
@@ -961,6 +965,39 @@ export function GetReadyIntro({
             ett stort 96 pt-märke som dominerade och sköt ned resten. */}
         {/* Q-märket vänster om "Game settings" borttaget (Peter 2026-11-04). */}
         <View style={styles.settingsTextWrap}>
+          {/* Multiplayer (All at Once / 1 by 1): ingen "Game settings"-rubrik,
+              ingen svarstid och ingen röst — bara Game era + "Audio this
+              device" (Peter 2026-11-16). H2H behåller det fulla blocket. */}
+          {isMultiplayerSettings ? (
+            <>
+              <View style={styles.responseDropdownRow}>
+                <Text style={styles.settingsRow}>Game era:</Text>
+                <View style={styles.settingsValueBox}>
+                  <Text style={styles.settingsValueBoxText}>
+                    {eraFrom} – {eraTo}
+                  </Text>
+                </View>
+              </View>
+              {showAudioRow && (
+                <View style={styles.responseDropdownRow}>
+                  <Text style={styles.settingsRow}>Audio this device:</Text>
+                  <TouchableOpacity
+                    style={styles.responseDropdownTrigger}
+                    onPress={handleAudioRowToggle}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.responseDropdownTriggerText}>
+                      {audioRowOn ? 'On' : 'Off'}
+                    </Text>
+                    <Text style={styles.selfAudioGlyph}>
+                      {audioRowOn ? '🔊' : '🔇'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
+          ) : (
+          <>
           <TouchableOpacity
             style={styles.settingsTitleRow}
             onPress={() => setSettingsExpanded((v) => !v)}
@@ -1056,6 +1093,8 @@ export function GetReadyIntro({
                 </View>
               )}
             </>
+          )}
+          </>
           )}
         </View>
       </View>
