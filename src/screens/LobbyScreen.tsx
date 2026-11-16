@@ -1626,7 +1626,15 @@ export default function LobbyScreen() {
               isHost: true,
               approved: true,
             }]
-          : [SEED_PLAYERS[0]]
+          : // Seed:a host-kortet ur den synkrona profil-spegeln så namn +
+            // avatar är rätt redan första framen. Annars syntes platshållaren
+            // "Alex K." 🦊 tills useFocusEffect:s loadProfile() hunnit merga
+            // (avatar-flimmer, Peter 2026-11-16). loadProfile-mergen körs
+            // fortfarande som auktoritativ källa.
+            (() => {
+              const cached = getCachedProfile();
+              return [cached ? mergeProfileIntoHost(SEED_PLAYERS[0], cached) : SEED_PLAYERS[0]];
+            })()
         : [],
     );
     ownPlayerIdRef.current = null;

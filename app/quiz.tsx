@@ -1900,7 +1900,11 @@ export default function QuizScreen() {
   // local modes until the probe settles; clipCheckRanRef makes it one-shot.
   // setSequenceRevision forces a re-render after an in-place sequence swap so
   // downstream memos recompute. (Remote validates inline in its init effect below.)
-  const [clipCheckPending, setClipCheckPending] = useState(false);
+  // clipCheckDone startar false och sätts true när proben är klar (eller inte
+  // behövs). Låset (clipCheckPending) härleds i RENDER nära startLocked — inte
+  // via ett effekt-satt true — annars renderades en frame med upplåst Press Play
+  // mellan att sekvensen settlat och att effekten hann låsa (Peter 2026-11-16).
+  const [clipCheckDone, setClipCheckDone] = useState(false);
   const clipCheckRanRef = useRef(false);
   const [, setSequenceRevision] = useState(0);
   // Antal rundor sätts av host i Lobby (slider 3–20, default 10). Fallback 5
@@ -2898,12 +2902,12 @@ export default function QuizScreen() {
     const seq = gameQuestionsRef.current;
     if (collectSequenceVideoIds(seq.slice(0, totalQuestions)).length === 0) {
       clipCheckRanRef.current = true; // no YouTube will be played → nothing to check
+      setClipCheckDone(true);
       return;
     }
     clipCheckRanRef.current = true;
-    setClipCheckPending(true);
     const escape = setTimeout(
-      () => setClipCheckPending(false),
+      () => setClipCheckDone(true),
       CLIP_CHECK_HARD_TIMEOUT_MS,
     );
     validateSequenceClips(seq, totalQuestions)
@@ -2920,7 +2924,7 @@ export default function QuizScreen() {
       .catch(() => {})
       .finally(() => {
         clearTimeout(escape);
-        setClipCheckPending(false);
+        setClipCheckDone(true);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHost, isRemote, isPtPSpectator, localSequenceSettledForLock, totalQuestions]);
@@ -10362,6 +10366,15 @@ export default function QuizScreen() {
   // box (Source/Category/Answer-type-badges) är definierad — annars vore knappen
   // guld/tappbar innan frågedatan finns. De tre loaded-flaggorna resolvar alltid
   // via .finally, så (b) släpper garanterat inom den vanliga async-load-fönstret.
+  // Pre-game clip-check-låset, härlett synkront: samma villkor som effekten
+  // som kör proben (host, lokalt läge, frusen sekvens med YouTube-klipp).
+  const clipCheckPending =
+    !clipCheckDone &&
+    isHost &&
+    !isRemote &&
+    !isPtPSpectator &&
+    localSequenceSettled &&
+    collectSequenceVideoIds(gameQuestions.slice(0, totalQuestions)).length > 0;
   const startLocked =
     (startGateApplies &&
       !startGateTimedOut &&
