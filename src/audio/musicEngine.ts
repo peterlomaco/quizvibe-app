@@ -143,7 +143,56 @@ function rampTo(slot: Slot, target: number, ms: number, onDone?: () => void) {
   }, RAMP_STEP_MS);
 }
 
+// ─── Ducking (Answer Locked sound) ───────────────────────────────────────
+// Lowers the ACTIVE track briefly, then restores it to its approved gain.
+// Every other volume path (fade in/out, track change, stop, app background,
+// DEV gain change) calls endDuck() first, which cancels the pending restore —
+// so a restore can never override a newer transition, fade or volume.
+let duck: { track: MusicTrack; seq: number; timer: ReturnType<typeof setTimeout> | null } | null = null;
+let duckSeq = 0;
+
+function endDuck() {
+  if (!duck) return;
+  if (duck.timer) clearTimeout(duck.timer);
+  duck = null;
+}
+
+export interface DuckOptions {
+  factor: number;
+  inMs: number;
+  holdMs: number;
+  restoreMs: number;
+}
+
+/** Duck QuizVibe's own background music only. No-op when no track is
+ *  audibly playing (silence, delayed start, fading out, app not active). */
+export function duckMusic(opts: DuckOptions): void {
+  const track = active;
+  if (!track || appState !== 'active') return;
+  const slot = slots.get(track);
+  if (!slot || !slot.shouldPlay) return;
+  endDuck();
+  duckSeq += 1;
+  const seq = duckSeq;
+  duck = { track, seq, timer: null };
+  rampTo(slot, getTrackGain(track) * opts.factor, opts.inMs, () => {
+    if (!duck || duck.seq !== seq) return;
+    duck.timer = setTimeout(() => {
+      if (!duck || duck.seq !== seq) return;
+      duck.timer = null;
+      if (active !== track || !slot.shouldPlay || appState !== 'active') {
+        endDuck();
+        return;
+      }
+      rampTo(slot, getTrackGain(track), opts.restoreMs, () => {
+        if (duck && duck.seq === seq) duck = null;
+      });
+    }, opts.holdMs);
+  });
+}
+
 function fadeOutSlot(track: MusicTrack, ms: number) {
+  endDuck();
   const slot = slots.get(track);
   if (!slot || !slot.shouldPlay) return;
   rampTo(slot, 0, ms, () => {
@@ -157,6 +206,7 @@ function fadeOutSlot(track: MusicTrack, ms: number) {
 }
 
 function fadeInSlot(track: MusicTrack) {
+  endDuck();
   const slot = getSlot(track);
   if (!slot) return;
   void ensureVoiceAudioMode();
@@ -228,6 +278,7 @@ function reconcile() {
 
 /** Hard stop without fade — used when the app leaves 'active'. */
 function pauseAllNow() {
+  endDuck();
   if (startTimer) {
     clearTimeout(startTimer);
     startTimer = null;
@@ -264,7 +315,10 @@ function start() {
   subscribeExternalAudio(() => reconcile());
   subscribeGain((track) => {
     const slot = slots.get(track);
-    if (slot && slot.shouldPlay && active === track) rampTo(slot, getTrackGain(track), FADE_IN_MS);
+    if (slot && slot.shouldPlay && active === track) {
+      endDuck();
+      rampTo(slot, getTrackGain(track), FADE_IN_MS);
+    }
   });
 }
 

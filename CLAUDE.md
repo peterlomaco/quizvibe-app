@@ -185,6 +185,8 @@ Ingen musik under countdown (bara "Get ready"-klippet), YouTube-, Spotify- eller
 - **Q1:** en non-host med ljud PÅ får `audioOn=1` på rematch-navigationen → hör Part 1 i rematch-lobbyn och seedas PÅ i nästa spel. Inget annat sätt in i ett rum bär paramet → nytt rum = AV.
 - ⚠ Värd-toggeln ("Audio this device" för IndDev-host) och H2H-toggeln är BORTTAGNA. Avsnittet om "Audio this device" under Remote 1v1 nedan beskriver den äldre modellen — tabellen här är facit. `player_audio_overrides`-persistens/broadcast ligger kvar orörd.
 
+**Svarsljud (2026-11-16, DEV):** `src/audio/sfxConfig.ts` (volymer select 0.35 / locked 0.45, ducking) + `src/audio/sfx.ts` (förladdade expo-audio-players). Klick när valt namn ÄNDRAS (`handleNameSelect`/`handleActorSelect` i quiz.tsx) och "Answer Locked" när `recordRoundScore` returnerar `true` i `handleConfirmName`/`handleConfirmActor` — Hints, Spotify/Name och Film/Name; aldrig vid timeout. Grindas på `isAudioMutedForSelf`. Locked duckar ENDAST aktiv QuizVibe-musik (`duckMusic` i musicEngine, 55 %, 60 ms ned / 250 ms upp); varje annan volymväg anropar `endDuck()` så en restore aldrig skriver över en nyare fade. Ljudfilerna i `assets/sfx/` är DEV-platshållare från `backend/scripts/generate-sfx-placeholders.sh` — byt 1:1 med samma namn.
+
 **Apple 2.5.4:** musiken ändrar ingen session-inställning (`ensureVoiceAudioMode` oförändrad: `playsInSilentMode: true`, `mixWithOthers`, `shouldPlayInBackground: false`). Se checklistraden i launch-listan.
 
 ## Routing

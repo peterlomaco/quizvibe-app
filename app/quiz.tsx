@@ -147,6 +147,7 @@ import { buildHintsDistractorPool } from '@/src/utils/hintsDistractorPool';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { clearRouteMusic, createMusicOwner, setRouteMusic } from '@/src/audio/musicController';
+import { playSfx, preloadSfx } from '@/src/audio/sfx';
 import { WebViewWarmer } from '@/src/components/WebViewWarmer';
 // Person-bilderna är juridiskt parkerade sedan 2026-06-04 — en "image"-fråga
 // renderar bara flagga + ledtrådar via HintsQuizCard. assets/quiz-images/,
@@ -4465,6 +4466,39 @@ export default function QuizScreen() {
     return true;
   }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, isLocalSoloGame, isOwnDeviceParticipant, isPtPSpectator]);
 
+  // ─── Answer sound effects (src/audio/sfx) ────────────────────────────────
+  // Click when the selected name changes; "Answer Locked" when Confirm records
+  // the answer (Hints, Spotify/Name, Film/Name). Same gate as all other audio:
+  // isAudioMutedForSelf. Never on timeout (that path never calls these).
+  const playAnswerSfx = (name: 'select' | 'locked') => {
+    if (isAudioMutedForSelf) return;
+    playSfx(name);
+  };
+  useEffect(() => {
+    if (!isAudioMutedForSelf) preloadSfx();
+  }, [isAudioMutedForSelf]);
+  // Last option that clicked, per question — a re-tap of the same option
+  // (or a stale closure in a fast double tap) stays silent.
+  const lastSelectSfxRef = useRef<{ q: number; key: string } | null>(null);
+  const clickIfSelectionChanged = (key: string | null) => {
+    if (key === null) return;
+    const last = lastSelectSfxRef.current;
+    if (last && last.q === questionIndex && last.key === key) return;
+    lastSelectSfxRef.current = { q: questionIndex, key };
+    playAnswerSfx('select');
+  };
+  const handleNameSelect = (opt: ImageNameOption | null) => {
+    setPendingNameOption(opt);
+    clickIfSelectionChanged(opt ? opt.displayName : null);
+  };
+  const handleActorSelect = (name: string | null) => {
+    setPendingActorName(name);
+    // Tapping the chosen name again deselects it — no click for that; the
+    // next pick of the same name clicks again.
+    if (name === null) lastSelectSfxRef.current = null;
+    clickIfSelectionChanged(name);
+  };
+
   // Countdown-röst för DENNA enhet. Seedas ur profil-spegeln; enheten kan
   // byta den i GetReady → Game settings → "Voice type" (persisteras till profilen
   // när en finns, annars bara för sessionen — t.ex. utloggad guest host).
@@ -5212,28 +5246,30 @@ export default function QuizScreen() {
     // Svaret som visningstext (namn / år / årsintervall) — bara för reveal-
     // facitet "All Players". Utelämnas vid timeout.
     answerText?: string,
-  ) => {
+  ): boolean => {
+    // Returns true only when THIS call recorded the answer (drives the
+    // Answer Locked sound — never on a duplicate or refused call).
     // PtP-spectatorn spelar inte — dess poäng kommer via host:s broadcasts.
     // Belt-and-suspenders: enhetens phase når aldrig 'question', så varken
     // timeout-vägen eller någon handleConfirm* kan fyra här. Utan guarden
     // skulle en framtida ändring kunna injicera en fantom-post (0 pts) under
     // spelarens id OCH broadcasta den tillbaka till host.
-    if (isPtPSpectator) return;
+    if (isPtPSpectator) return false;
     // Hybrid 1 by 1: only the device that owns this turn records it (the
     // host for its own + host-device turns, a participant for its own turn).
     // A turn the host has already finalized can never be scored again.
     if (isHybrid) {
-      if (hybridRoleRef.current !== 'answer') return;
-      if (hybridFinalizedRef.current.has(questionIndexRef.current)) return;
+      if (hybridRoleRef.current !== 'answer') return false;
+      if (hybridFinalizedRef.current.has(questionIndexRef.current)) return false;
     }
     // Spotify DJ:n svarar aldrig på sin egen fråga (canConfirm=false) — ingen
     // RoundScore ska attribueras till DJ:n. Belt-and-suspenders utöver
     // timeout-effektens tidiga return: skulle någon annan väg anropa hit får
     // DJ:n ändå ingen post (som annars broadcastats till alla enheter och
     // dykt upp i både leaderboard och reveal-facit).
-    if (isSpotifyQuestion && isCurrentPlayerDJ) return;
+    if (isSpotifyQuestion && isCurrentPlayerDJ) return false;
     // Förhindra double-scoring per fråga (race: handleConfirm* + useEffect([timeLeft])).
-    if (hasRecordedScoreForCurrentQuestionRef.current) return;
+    if (hasRecordedScoreForCurrentQuestionRef.current) return false;
     hasRecordedScoreForCurrentQuestionRef.current = true;
     // Samla in svar-statistik per fråga (% rätt globalt) — fire-and-forget.
     // Används i framtida svårighetsgradsstyrning. Hoppas över vid direkt-nav
@@ -5335,6 +5371,7 @@ export default function QuizScreen() {
     if (isHybrid && isHost) {
       persistHybridResult(scoredQuestionIndex, yourScore);
     }
+    return true;
   };
 
   // ── Hybrid 1 by 1: host-authoritative results (migration 0066) ───────
@@ -6241,7 +6278,8 @@ export default function QuizScreen() {
         timeUsed: exactElapsedSec,
       },
     ]);
-    recordRoundScore(pts, correct, exactElapsedSec, undefined, opt.displayName);
+    const recorded = recordRoundScore(pts, correct, exactElapsedSec, undefined, opt.displayName);
+    if (recorded) playAnswerSfx('locked');
     // Frys own avatar-markör lokalt i alla non-PtP-lägen (IndDev + remote-1v1;
     // PtP delar enhet/markör via confirmedTimeUsed). Broadcasten är däremot
     // IndDev-only — remote-1v1 har ingen quiz_sync-kanal, så self-markören där
@@ -6295,7 +6333,8 @@ export default function QuizScreen() {
         timeUsed: exactElapsedSec,
       },
     ]);
-    recordRoundScore(pts, correct, exactElapsedSec, undefined, name);
+    const recorded = recordRoundScore(pts, correct, exactElapsedSec, undefined, name);
+    if (recorded) playAnswerSfx('locked');
     // Frys own avatar-markör lokalt i alla non-PtP-lägen (IndDev + remote-1v1;
     // PtP delar enhet/markör via confirmedTimeUsed). Broadcasten är däremot
     // IndDev-only — remote-1v1 har ingen quiz_sync-kanal, så self-markören där
@@ -12695,7 +12734,7 @@ export default function QuizScreen() {
                   pendingName={pendingNameOption}
                   confirmedName={confirmedNameOption}
                   isTimedOut={phase === 'reveal' && confirmedNameOption === null}
-                  onNameSelect={setPendingNameOption}
+                  onNameSelect={handleNameSelect}
                   resetKey={`spotify-name-${questionIndex}-${currentAssistance}`}
                 />
                 </NameSwipeHint>
@@ -12730,7 +12769,7 @@ export default function QuizScreen() {
                   pendingName={pendingActorName}
                   confirmedName={confirmedActorName}
                   isTimedOut={phase === 'reveal' && confirmedActorName === null}
-                  onNameSelect={setPendingActorName}
+                  onNameSelect={handleActorSelect}
                   resetKey={questionIndex}
                   assistance={currentAssistance}
                   movieTitle={question.displayName}
@@ -12756,7 +12795,7 @@ export default function QuizScreen() {
                   pendingName={pendingNameOption}
                   confirmedName={confirmedNameOption}
                   isTimedOut={phase === 'reveal' && confirmedNameOption === null}
-                  onNameSelect={setPendingNameOption}
+                  onNameSelect={handleNameSelect}
                   resetKey={`${questionIndex}-${currentAssistance}`}
                 />
                 </NameSwipeHint>
