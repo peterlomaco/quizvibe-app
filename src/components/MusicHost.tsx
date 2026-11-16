@@ -23,6 +23,8 @@ import {
 import { setDesired, type DesiredMusic } from '@/src/audio/musicEngine';
 
 const HOME_ZONE = new Set(['/', '/profile', '/store', '/faq', '/my-matches', '/competitions']);
+/** Home-zone routes where the Home loop skips its start delay. */
+const HOME_ZONE_START_NOW = new Set(['/profile', '/store']);
 
 function routeKeyFor(pathname: string): MusicRouteKey | null {
   if (pathname === '/lobby') return 'lobby';
@@ -48,7 +50,14 @@ export function MusicHost() {
       holdTimer.current = null;
     }
     if (inHomeZone) {
-      setDesired({ track: 'home', audible: true });
+      // Profile / Store: the Home loop starts right away with its normal
+      // fade-in (TRACK_FADE_IN_MS.home) instead of waiting out the 10 s
+      // Home delay — also cutting a pending delay short (2026-11-16).
+      setDesired(
+        HOME_ZONE_START_NOW.has(pathname)
+          ? { track: 'home', audible: true, fadeInDelayMs: 0 }
+          : { track: 'home', audible: true },
+      );
       return;
     }
     if (routeKey && entry) {
@@ -67,6 +76,7 @@ export function MusicHost() {
     }
     setDesired(SILENCE);
   }, [
+    pathname,
     inHomeZone,
     routeKey,
     entry?.track,

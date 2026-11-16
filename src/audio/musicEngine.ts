@@ -177,8 +177,15 @@ function resolveTarget(): MusicTrack | null {
 function reconcile() {
   const target = resolveTarget();
   if (target === active) {
-    // Same track — nothing to restart. Make sure it's actually up (e.g. a
-    // pending delayed start was cancelled by an AppState blip).
+    // Same track — nothing to restart. One exception: the track is still
+    // waiting out its start delay and the new state asks for no delay
+    // (Home → Profile/Store) → start the fade-in now instead.
+    if (target && startTimer && desired.fadeInDelayMs === 0) {
+      clearTimeout(startTimer);
+      startTimer = null;
+      fadeInSlot(target);
+      log('→', target, '(start now)');
+    }
     return;
   }
   if (startTimer) {
