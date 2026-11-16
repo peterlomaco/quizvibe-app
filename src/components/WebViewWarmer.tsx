@@ -3,14 +3,13 @@ import { View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 // Osynlig, tyst WebView vars ENDA syfte är att förvärma vägen till YouTube så
-// den mutade non-host:ens YouTube-spelare bootar snabbare vid question-entry.
+// YouTube-spelaren bootar snabbare vid question-entry.
 //
-// Bakgrund: host har en levande WebView (MorseAmbientSound) genom hela
-// intro+countdown, vilket incidentellt värmer iOS delade WKWebView-process-
-// pool → host:s YouTube-WebView spinner upp snabbt. Non-host är mutad →
-// MorseAmbientSound gatas bort (!isAudioMutedForSelf) → ingen WebView alls →
-// kall pool + kall nätverksväg → videon syns märkbart senare även när fasen är
-// perfekt synkad. Den här komponenten återställer symmetrin.
+// Bakgrund: utan en levande WebView under intro+countdown är iOS delade
+// WKWebView-process-pool + nätverksvägen kall → videon syns märkbart senare
+// även när fasen är perfekt synkad. (Tidigare gjorde ambient-ljudets WebView
+// detta för enheter med ljud; bakgrundsmusiken spelas nu via expo-audio, så
+// värmaren monteras för ALLA enheter sedan 2026-11-16.)
 //
 // Två saker värms:
 //   1. WKWebView-PROCESS-poolen (bara att en WebView lever).
@@ -27,8 +26,8 @@ import { WebView } from 'react-native-webview';
 // spelaren (villkorlig autoplay-patch + player som överlever countdown→
 // question) — medvetet INTE här pga ToS + refaktor.
 //
-// ⚠ Montera på SAMMA barn-position i både intro- och countdown-grenen (samma
-// mönster som MorseAmbientSound) så WebView-instansen återanvänds över
+// ⚠ Montera på SAMMA barn-position i både intro- och countdown-grenen så
+// WebView-instansen återanvänds över
 // intro→countdown och varmvärmningen inte kastas bort mitt i.
 const WARM_HTML = `<!doctype html><meta name="viewport" content="width=device-width">
 <link rel="preconnect" href="https://www.youtube.com" crossorigin>

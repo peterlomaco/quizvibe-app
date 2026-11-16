@@ -31,7 +31,6 @@ import { ConnectionUnstableOverlay } from './ConnectionUnstableOverlay';
 import { useConnectionStatus } from '../lib/network/connectionMonitor';
 import { WifiFanIcon } from './WifiFanIcon';
 import { WifiOffIcon } from './WifiOffIcon';
-import { HeartbeatSound } from './HeartbeatSound';
 import { DEFAULT_VOICE_ID, SILENT_VOICE_ID, VOICE_OPTIONS } from '../utils/voicePacks';
 import { playVoiceClip } from '../utils/voicePlayback';
 import { currentModeLabels } from '../utils/modeLabels';
@@ -803,7 +802,6 @@ export function GetReadyIntro({
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* HeartbeatSound ersatt av MorseAmbientSound-fortsättning monterad i quiz.tsx (phase==='intro') */}
       {/* Top-bar längst upp — Quit Game för host (river hela lobbyn) eller
           Leave Game för non-host i IndDev (lämnar bara egen plats, går till
           Home). Båda speglar TopUserBanner:s vokabulär (Colors.card bg +

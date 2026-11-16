@@ -12,7 +12,8 @@
  *    klippte/knäppte i release-builds. Det VISUELLA 3-2-1 är kvar.)
  *  - '1'..'5' är KVAR som klipp men talas inte längre i nedräkningen (behålls
  *    för enkel återaktivering / om voiceFrom-modellen återinförs)
- *  - 'quizvibe' talas i lobbyn (ersätter den gamla expo-speech-välkomsten)
+ *  - 'quizvibe' används bara som röst-förhandslyssning (Profile / Get Ready);
+ *    lobby-välkomsten togs bort 2026-11-16 (G6)
  *  - 'when'/'who' är KVAR som klipp men talas inte (slut-ordet borttaget 2026-09-07)
  *
  * ⚠ Klippen genereras via `backend/scripts/generate-voice-packs.ts` (OpenAI TTS,

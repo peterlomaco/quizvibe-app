@@ -7,15 +7,14 @@ import { WebView } from 'react-native-webview';
  * medan pennan går, och en fyrverkerismäll när svansen är klar.
  *
  * ── Varför WebView och inte en ljudfil ──────────────────────────────────
- * Repot har INGEN audio-modul: `expo-audio` är parkerad och det finns inga
- * ljud-assets. Den etablerade vägen är osynlig WebView + Web Audio API —
- * samma mönster som [MorseAmbientSound](src/components/MorseAmbientSound.tsx).
- * Allt syntetiseras, ingen fil laddas, inget nytt beroende.
+ * Byggdes när repot saknade audio-modul; osynlig WebView + Web Audio API,
+ * allt syntetiseras och ingen fil laddas. (Bakgrundsmusiken spelas numera
+ * via expo-audio i src/audio/ — Sparklern är kvar som den är, G3.)
  *
  * ── Allt schemaläggs på EN gång ─────────────────────────────────────────
  * Sekvensen är bara ~1,7 s, så varje smäll och knaster läggs på absolut
- * tid direkt vid start. Ingen look-ahead-loop behövs (till skillnad från
- * MorseAmbientSounds oändliga slinga) och ingenting kan drifta.
+ * tid direkt vid start. Ingen look-ahead-loop behövs och ingenting kan
+ * drifta.
  *
  * ── ⚠ WebView:n laddar långsammare än animationen startar ───────────────
  * HTML-laddning + AudioContext-uppstart tar 100–300 ms på enhet, medan
