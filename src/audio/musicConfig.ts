@@ -14,7 +14,7 @@ export type MusicTrack = 'home' | 'part1' | 'hints' | 'final';
 /** Initial DEV calibration values (Peter 2026-11-16) — not final loudness targets. */
 export const MUSIC_TRACK_GAIN: Record<MusicTrack, number> = {
   home: 0.2, // Home Short
-  part1: 0.25, // Part 1 — Lobby / Get Ready
+  part1: 0.2, // Part 1 — Lobby / Get Ready (lowered to match Home, 2026-11-16)
   hints: 0.2, // Part 2 Variant B — Hints
   final: 0.3, // Part 3 Version 4 — Final Leaderboard
 };
@@ -26,10 +26,12 @@ export const FADE_IN_MS = 400;
  *  → Get Ready) just continues. Peter 2026-11-16: Part 1 started too abruptly
  *  when entering the Lobby from Home and on each Get Ready after a question. */
 export const TRACK_START_DELAY_MS: Partial<Record<MusicTrack, number>> = {
+  home: 10000, // Home zone: 10 s of silence before the loop starts (2026-11-16)
   part1: 1500,
 };
 export const TRACK_FADE_IN_MS: Partial<Record<MusicTrack, number>> = {
   part1: 3000,
+  final: 5000, // Final Leaderboard: slow swell instead of starting loud (2026-11-16)
 };
 export const FADE_OUT_MS = 300;
 /** Final Leaderboard: Part 3 starts fading in this long after the Game
