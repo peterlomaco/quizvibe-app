@@ -61,3 +61,6 @@ app-example
 
 # Transient curation artifact — regenererad varje batch via batch-pick-clips/topic-pick-clips
 backend/scripts/batch-picks.json
+
+# Ljudmasters (WAV/MP3 som levererats) — bundlas aldrig, bara de omdöpta/konverterade filerna i assets/music/
+assets/music/masters/

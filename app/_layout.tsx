@@ -8,6 +8,7 @@ import {
 } from '@/src/lib/iap';
 import { BottomBanner } from '@/src/components/BottomBanner';
 import { GlobalOverlay } from '@/src/components/GlobalOverlay';
+import { MusicHost } from '@/src/components/MusicHost';
 import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 import { Colors } from '@/src/theme';
 import { refreshOfferConfig, refreshPromoGrants } from '@/src/utils/promoPremium';
@@ -144,6 +145,10 @@ export default function RootLayout() {
         <Stack.Screen name="competitions" />
       </Stack>
       <BottomBanner />
+      {/* Background music (non-visual). Lives outside the Stack so it
+          survives every router.replace; picks the track from the visible
+          route. See src/audio/. */}
+      <MusicHost />
       {/* Global cover (lobby-delete m.fl.) — renderas EFTER BottomBanner och
           utanför Stack:en så den överlever router.replace och täcker banner +
           transition. Se src/utils/globalOverlay.ts. */}
