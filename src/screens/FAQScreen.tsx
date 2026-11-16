@@ -74,6 +74,10 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         a: '(1) Tap Start New Game on the Home screen and choose how to play — Single Player, Multiplayer or Head-to-head, (2) share the Room Code with friends or tap Invite friends in the Lobby, (3) approve players who join, (4) tap Start Game. Friends join with Join a Game on their Home screen. As a registered user you get a set of free Host Game Credits that refresh every day.',
       },
       {
+        q: 'How do I share the Room Code with my friends?',
+        a: 'In the Lobby, tap the Room Code (or the copy icon in the top-right corner of the Room Code card) to copy it. Paste it into any message app, such as SMS, Messenger or WhatsApp, and send it to your friends. They tap Join with Room Code on their Home screen, then Paste to fill in the whole code, and Join. Registered friends can also be invited directly with Invite friends in the Lobby.',
+      },
+      {
         q: 'Does QuizVibe work on Android?',
         a: 'QuizVibe is currently developed for iOS only and is available on the App Store. An Android version is not available at this time.',
       },
