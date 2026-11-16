@@ -2638,18 +2638,6 @@ export default function LobbyScreen() {
     }, []),
   );
 
-  useEffect(() => {
-    const owner = musicOwnerRef.current as string;
-    if (!screenFocused) {
-      clearRouteMusic('lobby', owner);
-      return;
-    }
-    // Host: alltid på. Non-host: av — utom när spelaren slog PÅ ljudet i
-    // förra spelet i samma rematch-kedja (Q1). Ingen toggle i lobbyn (G2).
-    const audible = (hostMode || audioOnParam === '1') && !ambientSilenced;
-    setRouteMusic('lobby', { track: 'part1', audible }, owner);
-  }, [screenFocused, hostMode, ambientSilenced, audioOnParam]);
-
   useEffect(() => () => clearRouteMusic('lobby', musicOwnerRef.current as string), []);
 
   // Master "Approve All"-state — återställs automatiskt till 'no' när
@@ -2683,6 +2671,23 @@ export default function LobbyScreen() {
     if (seedGameMode === 'pass-the-phone') return 'pass-the-phone';
     return 'pass-the-phone';
   });
+
+  // Bakgrundsmusik (Part 1) för lobbyn — se musicOwnerRef ovan.
+  //   Host: alltid på.
+  //   H2H (remote-1v1): båda spelarna på egna enheter → på även för non-host
+  //     (gameMode syncas från host:s lobby_settings; Peter 2026-11-16).
+  //   Övriga non-hosts: av — utom när spelaren slog PÅ ljudet i förra spelet
+  //     i samma rematch-kedja (Q1). Ingen toggle i lobbyn (G2).
+  useEffect(() => {
+    const owner = musicOwnerRef.current as string;
+    if (!screenFocused) {
+      clearRouteMusic('lobby', owner);
+      return;
+    }
+    const audible =
+      (hostMode || gameMode === 'remote-1v1' || audioOnParam === '1') && !ambientSilenced;
+    setRouteMusic('lobby', { track: 'part1', audible }, owner);
+  }, [screenFocused, hostMode, gameMode, ambientSilenced, audioOnParam]);
 
   // Host-badgens cross-fade-loop (Animated.Values deklareras längre upp).
   // Ligger här nere eftersom den tredje frasens TEXT beror på lobby-typ
