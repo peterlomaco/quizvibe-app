@@ -91,7 +91,6 @@ import {
   getLobbySettings,
   getPlayerAudioOverrides,
   setLobbySettings,
-  setPlayerAudioOverride,
   type PlayerAudioOverrides,
 } from '@/src/utils/mockLobbySettings';
 import { buildAudienceSet, filterByAudience } from '@/src/utils/audienceFilter';
@@ -1637,6 +1636,10 @@ export default function QuizScreen() {
     // Matches (motståndare). Driver sekvens-auktoritet + answer-persistens.
     remoteMatchId?: string;
     selfPlayerId?: string;
+    // '1' = this non-host turned audio ON earlier in the rematch chain (Q1).
+    // Only set by the rematch path (quiz -> lobby -> quiz); any other way
+    // into a room starts with audio OFF.
+    audioOn?: string;
     players?: string;
     roundsCount?: string;
     roomCode?: string;
@@ -1829,16 +1832,16 @@ export default function QuizScreen() {
   // player_audio_state_changed-broadcast. Deklareras tidigt så
   // isAudioMutedForSelf-compute:n längre ner kan läsa state utan TDZ.
   const [playerAudioOverrides, setPlayerAudioOverridesState] =
-    useState<PlayerAudioOverrides>({});
+    useState<PlayerAudioOverrides>(() =>
+      params.audioOn === '1' && params.isHost === 'false' && params.selfPlayerId
+        ? { [params.selfPlayerId]: true }
+        : {},
+    );
   // Har spelaren själv rört sitt ljud på DENNA enhet (IndDev non-host)?
   // Mount-fetchen nedan ersätter hela overrides-mappen, så utan den här
   // flaggan kan en sen resolve nolla ett val användaren just gjort.
-  const selfAudioTouchedRef = useRef(false);
-  // Remote 1v1: varje spelare kör en egen solo-session på sin egen enhet, så
-  // IndDev:s host-styrda overrides-map gäller inte här — ljudet ägs lokalt och
-  // är PÅ som default på BÅDA enheterna. Spelaren kan stänga av det själv via
-  // Audio-raden i GetReadyIntro:s Game settings (session-lokalt, inte sparat).
-  const [remoteAudioOn, setRemoteAudioOn] = useState(true);
+  // Ett carry-over:at "On" (rematch-kedjan, Q1) räknas som spelarens eget val.
+  const selfAudioTouchedRef = useRef(params.audioOn === '1');
   // D-v: host-inactivity-watchdog. lastHostActivityRef speglar (a) host:s
   // egna tap-tid när isHost=true eller (b) senast mottagna host_active_ping
   // när isHost=false. Båda håller fönstret på "9 min utan host-aktivitet
@@ -4442,19 +4445,25 @@ export default function QuizScreen() {
   // selfPlayerId → fallback till audio på så ljudet hörs i mock-mode. I
   // IndDev läses overrides-mappen; default-policyn kickar in vid saknad key.
   const isAudioMutedForSelf = useMemo(() => {
-    // Hybrid own-device participants follow the All at Once rule below
-    // (muted by default, own toggle); the host + host-device play stay on.
+    // ONE audio rule per role (background music + YouTube + voice + Sparkler
+    // all read this). Approved 2026-11-16:
+    //   PtP spectator (host-device player following on own phone) → muted:
+    //     the game audio comes from the host device, never a second phone.
+    if (isPtPSpectator) return true;
+    // Host + host-device play (PtP) and local solo → on, no in-app toggle.
     if ((gameMode === 'pass-the-phone' && !isOwnDeviceParticipant) || isLocalSoloGame) return false;
-    // Remote 1v1: solo-session på egen enhet — ljudet spelas lokalt på BÅDA
-    // enheterna (ingen host-only-audio-policy; IndDev:s override-map gäller
-    // inte här). Default på; spelaren äger sin egen mute via remoteAudioOn.
-    if (gameMode === 'remote-1v1') return !remoteAudioOn;
+    // Remote 1v1: each player on own device → on, no in-app toggle.
+    if (gameMode === 'remote-1v1') return false;
+    // All at Once host → always on; a stale persisted host override is
+    // ignored (the host has no toggle to undo it).
+    if (isHost) return false;
     if (!selfPlayerId) return false;
+    // Own-device non-host (All at Once / 1 by 1): off by default, own toggle.
     if (Object.prototype.hasOwnProperty.call(playerAudioOverrides, selfPlayerId)) {
       return !playerAudioOverrides[selfPlayerId];
     }
-    return !isHost;
-  }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn, isLocalSoloGame, isOwnDeviceParticipant]);
+    return true;
+  }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, isLocalSoloGame, isOwnDeviceParticipant, isPtPSpectator]);
 
   // Countdown-röst för DENNA enhet. Seedas ur profil-spegeln; enheten kan
   // byta den i GetReady → Game settings → "Voice type" (persisteras till profilen
@@ -6812,28 +6821,6 @@ export default function QuizScreen() {
       spotify_answer_name: spotifyAnswerName,
     });
   };
-  // D-iv: host togglar audio för en spelare via GetReady-modalen.
-  // Trippelt parallellt: optimistisk lokal state (UI uppdateras direkt),
-  // Supabase-persist (cross-device durability) + broadcast (fast-path så
-  // den drabbade spelarens device mute:as inom <100ms istället för att
-  // vänta på Realtime-postgres-changes). Body:n är fire-and-forget; om
-  // Supabase-write fail:ar fortsätter broadcast:en så lokal session inte
-  // blockas av nätverks-glitch.
-  const handlePlayerAudioChange = useCallback(
-    (playerId: string, audioOn: boolean) => {
-      setPlayerAudioOverridesState((prev) => ({ ...prev, [playerId]: audioOn }));
-      if (params.roomCode) {
-        setPlayerAudioOverride(params.roomCode, playerId, audioOn).catch(() => {});
-      }
-      if (gameMode === 'individual-devices' && syncChannelRef.current) {
-        syncChannelRef.current
-          .broadcastPlayerAudioStateChanged({ player_id: playerId, audio_on: audioOn })
-          .catch(() => {});
-      }
-    },
-    [params.roomCode, gameMode],
-  );
-
   // Spelaren togglar ljudet på SIN EGEN enhet via Audio-raden i GetReady:s
   // Game settings. Två lägen delar handler eftersom de delar premiss — en
   // spelare per enhet, ljudet ägs lokalt:
@@ -6844,15 +6831,11 @@ export default function QuizScreen() {
   // INGEN broadcast — valet är device-local och angår ingen annan enhet.
   const handleSelfAudioChange = useCallback(
     (audioOn: boolean) => {
-      if (gameMode === 'remote-1v1') {
-        setRemoteAudioOn(audioOn);
-        return;
-      }
       if (!selfPlayerId) return;
       selfAudioTouchedRef.current = true;
       setPlayerAudioOverridesState((prev) => ({ ...prev, [selfPlayerId]: audioOn }));
     },
-    [gameMode, selfPlayerId],
+    [selfPlayerId],
   );
 
   // D-v: host:s tap-signal. Anropas av onTouchStart-wrapper på alla
@@ -9236,8 +9219,11 @@ export default function QuizScreen() {
       // rematchLocked: non-host når den här vägen ENBART via host:s
       // play_again_lobby_ready, dvs. alltid en re-match — så låst läge
       // renderas direkt på första framen i stället för efter en DB-läsning.
+      // Q1: a non-host who turned audio ON keeps it through the rematch
+      // chain (Lobby hears Part 1, quiz seeds the override). Off → no param.
+      const audioOnParam = !isAudioMutedForSelf ? '&audioOn=1' : '';
       router.replace(
-        `/lobby?code=${nextLobbyCode}&isHost=false${carryOverParam}${deviceModeParam}&rematchLocked=true`,
+        `/lobby?code=${nextLobbyCode}&isHost=false${carryOverParam}${deviceModeParam}&rematchLocked=true${audioOnParam}`,
       );
     }
   }, [awaitingNewLobby, nextLobbyCode]);
@@ -11190,21 +11176,18 @@ export default function QuizScreen() {
         // enhet behöver ingen app-kontroll, enhetens volymknappar räcker.
         hostPlayerId={hostPlayerId}
         playerAudioOverrides={playerAudioOverrides}
-        onPlayerAudioChange={isLocalSoloGame ? undefined : handlePlayerAudioChange}
-        // Enhetens EGET ljud — remote 1v1 (båda spelarna) samt IndDev
-        // non-host, som annars vore permanent tyst. Host i IndDev använder
-        // onPlayerAudioChange ovan i stället, och PtP delar enhet så där
-        // finns inget att styra → ingen callback, ingen rad. Värdet härleds
-        // ur isAudioMutedForSelf så raden alltid speglar det som faktiskt
-        // spelas (i remote är det identiskt med remoteAudioOn).
+        // Ljud-raden ("Audio this device") finns BARA för own-device non-hosts
+        // (All at Once / 1 by 1). Host, solo, PtP och H2H har ingen toggle —
+        // ljudet styrs med enhetens volymknappar (2026-11-16). Raden styr
+        // YouTube + bakgrundsmusik + röst + Sparkler (samma grind). Värdet
+        // härleds ur isAudioMutedForSelf så raden speglar det som spelas.
         selfAudioOn={!isAudioMutedForSelf}
         // selfPlayerId krävs i IndDev — utan id har handlern ingen nyckel att
         // skriva på, så raden skulle bli ett dött tap-mål. Saknas den (legacy-
         // payload/direkt-nav) döljs raden hellre än att ljuga om att den gör
         // något; isAudioMutedForSelf faller då tillbaka på ljud PÅ.
         onSelfAudioChange={
-          gameMode === 'remote-1v1' ||
-          ((gameMode === 'individual-devices' || isOwnDeviceParticipant) && !isHost && !!selfPlayerId)
+          (gameMode === 'individual-devices' || isOwnDeviceParticipant) && !isHost && !!selfPlayerId
             ? handleSelfAudioChange
             : undefined
         }

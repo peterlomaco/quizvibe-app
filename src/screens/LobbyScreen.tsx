@@ -1256,6 +1256,7 @@ export default function LobbyScreen() {
     carryOverPlayerId,
     lobbyType,
     rematchLocked,
+    audioOn: audioOnParam,
     competitionRematch,
     parentControl,
     carryPackages,
@@ -1331,6 +1332,10 @@ export default function LobbyScreen() {
      *  over on Play Again; set by the join UI from Step 6. Undefined → v2
      *  rooms default to 'own', legacy rooms write nothing. */
     deviceMode?: string;
+    /** '1' = non-host had audio ON in the previous game of this rematch
+     *  chain (Q1, 2026-11-16). Only quiz.tsx's rematch path sets it; every
+     *  other way into a lobby starts OFF. Forwarded to /quiz. */
+    audioOn?: string;
   }>();
   // Spotify Year/Name ur carry-over-params. Ogiltigt par (båda av) ignoreras —
   // minst en måste vara aktiv.
@@ -2639,8 +2644,11 @@ export default function LobbyScreen() {
       clearRouteMusic('lobby', owner);
       return;
     }
-    setRouteMusic('lobby', { track: 'part1', audible: hostMode && !ambientSilenced }, owner);
-  }, [screenFocused, hostMode, ambientSilenced]);
+    // Host: alltid på. Non-host: av — utom när spelaren slog PÅ ljudet i
+    // förra spelet i samma rematch-kedja (Q1). Ingen toggle i lobbyn (G2).
+    const audible = (hostMode || audioOnParam === '1') && !ambientSilenced;
+    setRouteMusic('lobby', { track: 'part1', audible }, owner);
+  }, [screenFocused, hostMode, ambientSilenced, audioOnParam]);
 
   useEffect(() => () => clearRouteMusic('lobby', musicOwnerRef.current as string), []);
 
@@ -6779,6 +6787,8 @@ export default function LobbyScreen() {
               // quiz.tsx använder isHost för att rendera Leave Game-knapp
               // istället för Quit Game-knapp i GetReadyIntro/CountdownIntro.
               isHost: 'false',
+              // Q1: bär ett carry-over:at "ljud PÅ" vidare in i spelet.
+              ...(audioOnParam === '1' ? { audioOn: '1' } : {}),
               // Non-host:s egna player_id — används av Leave-flödet för att
               // broadcasta `player_left` så host:s skärm får popup + markerar
               // spelaren som hasLeft i leaderboarden. I Pass-the-Phone är det
