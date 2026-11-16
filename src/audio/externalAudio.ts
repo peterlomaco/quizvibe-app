@@ -1,28 +1,34 @@
 // External-audio detection (Q2): QuizVibe background music must stay silent
-// while another app is playing audio.
+// while another app is playing audio, and must never interrupt it.
 //
-// expo-audio 57 has no API for this (verified 2026-11-15). Batch 6 adds a
-// small read-only local Expo module that exposes iOS
-// AVAudioSession.secondaryAudioShouldBeSilencedHint + its notification. Until
-// then this file is a stub that reports the detector as ABSENT — which keeps
-// the music engine disabled in every build without it (approved interim rule).
+// Backed by the local read-only Expo module `modules/audio-session-hint`
+// (iOS AVAudioSession.secondaryAudioShouldBeSilencedHint + its notification).
+// The module is OPTIONAL: binaries built before it existed (the App Store
+// build, older dev builds) report it as absent, and the music engine then
+// stays off in release builds (approved interim rule).
 //
 // This never changes the audio session and never affects YouTube, voice clips
 // or the Sparkler — it only gates the four background music tracks.
+
+import {
+  addHintListener,
+  isAudioSessionHintAvailable,
+  isOtherAudioPlaying as nativeIsOtherAudioPlaying,
+} from '@/modules/audio-session-hint';
 
 type Listener = () => void;
 
 /** True when the native detector module is present in this binary. */
 export function isExternalAudioDetectorAvailable(): boolean {
-  return false; // Batch 6: requireOptionalNativeModule('AudioSessionHint') !== null
+  return isAudioSessionHintAvailable();
 }
 
 /** True while another app's audio should silence our background music. */
 export function isOtherAudioPlaying(): boolean {
-  return false; // Batch 6: native secondaryAudioShouldBeSilencedHint
+  return nativeIsOtherAudioPlaying();
 }
 
 /** Called when the hint changes (other app starts/stops). Returns unsubscribe. */
-export function subscribeExternalAudio(_listener: Listener): () => void {
-  return () => {}; // Batch 6: silenceSecondaryAudioHintNotification
+export function subscribeExternalAudio(listener: Listener): () => void {
+  return addHintListener(() => listener());
 }

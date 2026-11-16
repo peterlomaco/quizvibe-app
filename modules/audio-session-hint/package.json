@@ -1,0 +1,10 @@
+{
+  "name": "audio-session-hint",
+  "version": "1.0.0",
+  "description": "Read-only iOS AVAudioSession hint: is another app playing audio that our background music should yield to?",
+  "license": "UNLICENSED",
+  "author": "LoMaCo AB",
+  "homepage": "https://quizvibe.se",
+  "main": "index.ts",
+  "private": true
+}
