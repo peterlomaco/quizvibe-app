@@ -31,6 +31,22 @@ function getPlayer(name: SfxName): AudioPlayer | null {
     const player = createAudioPlayer(SFX_SOURCE[name]);
     player.loop = false;
     player.volume = SFX_GAIN[name];
+    // Re-arm at 0 as soon as a clip finishes, so the next tap can play at
+    // once. Without this the player sits at the END of the clip, and a
+    // play() issued before the async seekTo(0) lands does nothing — every
+    // second tap was silent (Peter 2026-11-16).
+    const emitter = player as unknown as {
+      addListener: (
+        event: 'playbackStatusUpdate',
+        cb: (status: { didJustFinish?: boolean }) => void,
+      ) => { remove: () => void };
+    };
+    emitter.addListener('playbackStatusUpdate', (status) => {
+      if (status.didJustFinish) {
+        try { player.pause(); } catch {}
+        void player.seekTo(0).catch(() => {});
+      }
+    });
     players.set(name, player);
     return player;
   } catch (e) {
@@ -57,8 +73,19 @@ export function playSfx(name: SfxName): void {
   void ensureVoiceAudioMode();
   try {
     player.volume = SFX_GAIN[name]; // picks up DEV edits after Fast Refresh
-    void player.seekTo(0).catch(() => {});
-    player.play();
+    if (player.currentTime > 0.005) {
+      // Still playing (fast retap) or not re-armed yet: wait for the seek,
+      // otherwise play() races it and is lost.
+      player.pause();
+      player
+        .seekTo(0)
+        .then(() => player.play())
+        .catch(() => {
+          try { player.play(); } catch {}
+        });
+    } else {
+      player.play();
+    }
   } catch (e) {
     log('play failed', name, e);
     return;
