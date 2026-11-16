@@ -20,6 +20,17 @@ export const MUSIC_TRACK_GAIN: Record<MusicTrack, number> = {
 };
 
 export const FADE_IN_MS = 400;
+
+/** Per-track start: silence before the track begins, and a slower swell in.
+ *  Only applies when a track STARTS — a track that is already playing (Lobby
+ *  → Get Ready) just continues. Peter 2026-11-16: Part 1 started too abruptly
+ *  when entering the Lobby from Home and on each Get Ready after a question. */
+export const TRACK_START_DELAY_MS: Partial<Record<MusicTrack, number>> = {
+  part1: 1500,
+};
+export const TRACK_FADE_IN_MS: Partial<Record<MusicTrack, number>> = {
+  part1: 3000,
+};
 export const FADE_OUT_MS = 300;
 /** Faster fade into Countdown so Part 1 is silent before the "Get ready" clip. */
 export const COUNTDOWN_FADE_OUT_MS = 250;

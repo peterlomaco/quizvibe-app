@@ -24,6 +24,8 @@ import {
   MUSIC_TRACK_SOURCE,
   RAMP_STEP_MS,
   RESUMING_TRACKS,
+  TRACK_FADE_IN_MS,
+  TRACK_START_DELAY_MS,
   type MusicTrack,
 } from './musicConfig';
 import { getTrackGain, reportMusicSilent, subscribeGain } from './musicController';
@@ -156,7 +158,7 @@ function fadeInSlot(track: MusicTrack) {
     slot.shouldPlay = false;
     return;
   }
-  rampTo(slot, getTrackGain(track), FADE_IN_MS);
+  rampTo(slot, getTrackGain(track), TRACK_FADE_IN_MS[track] ?? FADE_IN_MS);
 }
 
 /** The track that should be audible after every gate. */
@@ -188,7 +190,7 @@ function reconcile() {
     if (t !== target && t !== outgoing && s.shouldPlay) fadeOutSlot(t, outMs);
   });
   if (target) {
-    const delay = Math.max(0, desired.fadeInDelayMs ?? 0);
+    const delay = Math.max(0, desired.fadeInDelayMs ?? TRACK_START_DELAY_MS[target] ?? 0);
     if (delay > 0) {
       startTimer = setTimeout(() => {
         startTimer = null;
