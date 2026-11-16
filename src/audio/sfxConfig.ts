@@ -2,7 +2,7 @@
 //
 // Approved 2026-11-16 (DEV): a soft click when the selected answer changes and
 // a neutral "Answer Locked" sound when Confirm records the answer, on every
-// name-answer question (Hints, Spotify/Name, Film/Name). The values below are
+// Hints question (not Spotify/Name, not Film/Name). The values below are
 // starting points for listening tests on the iPhone, not final levels.
 //
 // Gains are expo-audio PLAYER volumes (0..1) for these clips only. They never

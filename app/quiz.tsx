@@ -4468,7 +4468,8 @@ export default function QuizScreen() {
 
   // ─── Answer sound effects (src/audio/sfx) ────────────────────────────────
   // Click when the selected name changes; "Answer Locked" when Confirm records
-  // the answer (Hints, Spotify/Name, Film/Name). Same gate as all other audio:
+  // the answer — HINTS questions only (Peter 2026-11-16: not Spotify/Name,
+  // not Film/Name). Same gate as all other audio:
   // isAudioMutedForSelf. Never on timeout (that path never calls these).
   const playAnswerSfx = (name: 'select' | 'locked') => {
     if (isAudioMutedForSelf) return;
@@ -4490,13 +4491,6 @@ export default function QuizScreen() {
   const handleNameSelect = (opt: ImageNameOption | null) => {
     setPendingNameOption(opt);
     clickIfSelectionChanged(opt ? opt.displayName : null);
-  };
-  const handleActorSelect = (name: string | null) => {
-    setPendingActorName(name);
-    // Tapping the chosen name again deselects it — no click for that; the
-    // next pick of the same name clicks again.
-    if (name === null) lastSelectSfxRef.current = null;
-    clickIfSelectionChanged(name);
   };
 
   // Countdown-röst för DENNA enhet. Seedas ur profil-spegeln; enheten kan
@@ -6279,7 +6273,8 @@ export default function QuizScreen() {
       },
     ]);
     const recorded = recordRoundScore(pts, correct, exactElapsedSec, undefined, opt.displayName);
-    if (recorded) playAnswerSfx('locked');
+    // Answer sounds are Hints-only (not Spotify/Name, not Film/Name).
+    if (recorded && !isSpotifyNameQuestion) playAnswerSfx('locked');
     // Frys own avatar-markör lokalt i alla non-PtP-lägen (IndDev + remote-1v1;
     // PtP delar enhet/markör via confirmedTimeUsed). Broadcasten är däremot
     // IndDev-only — remote-1v1 har ingen quiz_sync-kanal, så self-markören där
@@ -6333,8 +6328,7 @@ export default function QuizScreen() {
         timeUsed: exactElapsedSec,
       },
     ]);
-    const recorded = recordRoundScore(pts, correct, exactElapsedSec, undefined, name);
-    if (recorded) playAnswerSfx('locked');
+    recordRoundScore(pts, correct, exactElapsedSec, undefined, name);
     // Frys own avatar-markör lokalt i alla non-PtP-lägen (IndDev + remote-1v1;
     // PtP delar enhet/markör via confirmedTimeUsed). Broadcasten är däremot
     // IndDev-only — remote-1v1 har ingen quiz_sync-kanal, så self-markören där
@@ -12734,7 +12728,7 @@ export default function QuizScreen() {
                   pendingName={pendingNameOption}
                   confirmedName={confirmedNameOption}
                   isTimedOut={phase === 'reveal' && confirmedNameOption === null}
-                  onNameSelect={handleNameSelect}
+                  onNameSelect={setPendingNameOption}
                   resetKey={`spotify-name-${questionIndex}-${currentAssistance}`}
                 />
                 </NameSwipeHint>
@@ -12769,7 +12763,7 @@ export default function QuizScreen() {
                   pendingName={pendingActorName}
                   confirmedName={confirmedActorName}
                   isTimedOut={phase === 'reveal' && confirmedActorName === null}
-                  onNameSelect={handleActorSelect}
+                  onNameSelect={setPendingActorName}
                   resetKey={questionIndex}
                   assistance={currentAssistance}
                   movieTitle={question.displayName}
