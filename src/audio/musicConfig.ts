@@ -32,7 +32,7 @@ export const TRACK_START_DELAY_MS: Partial<Record<MusicTrack, number>> = {
 export const TRACK_FADE_IN_MS: Partial<Record<MusicTrack, number>> = {
   home: 3000, // Home loop swells in after its 10 s silence (2026-11-16)
   part1: 3000,
-  final: 5000, // Final Leaderboard: slow swell instead of starting loud (2026-11-16)
+  final: 3000, // Final Leaderboard: ~3 s eased swell (ease-in curve, see musicEngine rampTo)
 };
 export const FADE_OUT_MS = 300;
 /** Final Leaderboard: Part 3 starts fading in this long after the Game

@@ -118,15 +118,22 @@ function stopRamp(slot: Slot) {
   }
 }
 
-/** Linear ramp from the current volume to `target`; ends clamped exactly. */
+/** Ramp from the current volume to `target`; ends clamped exactly.
+ *  Fade-ins follow an ease-in curve (p³): loudness is perceived
+ *  logarithmically, so a linear volume ramp sounds loud almost at once
+ *  (Peter 2026-11-16, Final Leaderboard). The cubic curve keeps the first
+ *  part of the swell very quiet and lets it build. Fade-outs stay linear. */
 function rampTo(slot: Slot, target: number, ms: number, onDone?: () => void) {
   stopRamp(slot);
   const from = slot.player.volume;
+  const rising = target > from;
   const steps = Math.max(1, Math.round(ms / RAMP_STEP_MS));
   let i = 0;
   slot.ramp = setInterval(() => {
     i += 1;
-    const v = i >= steps ? target : from + ((target - from) * i) / steps;
+    const p = i / steps;
+    const curve = rising ? p * p * p : p;
+    const v = i >= steps ? target : from + (target - from) * curve;
     try { slot.player.volume = v; } catch {}
     if (i >= steps) {
       stopRamp(slot);
@@ -155,7 +162,12 @@ function fadeInSlot(track: MusicTrack) {
   void ensureVoiceAudioMode();
   slot.shouldPlay = true;
   try {
-    if (!slot.player.playing) slot.player.play();
+    if (!slot.player.playing) {
+      // A stopped player always starts from silence, so the fade-in is the
+      // only way up — never a loud first frame.
+      slot.player.volume = 0;
+      slot.player.play();
+    }
   } catch (e) {
     log('play failed', track, e);
     slot.shouldPlay = false;
