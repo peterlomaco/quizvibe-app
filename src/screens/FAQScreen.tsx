@@ -148,6 +148,10 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         q: 'Why can\'t I join a room?',
         a: 'Common reasons: (1) Room Code misspelled — check against the Host\'s screen, (2) the Lobby is full (4 players, or up to 12 in a Premium Individual device game), (3) the Host has deleted the Lobby, (4) the Host has already started the game without you, (5) it is a Single Player lobby, or a Head-to-head match (which requires a QuizVibe account).',
       },
+      {
+        q: 'Why is there no sound on my phone?',
+        a: 'Sound plays on the phone that runs the game: the Host, Single Player and Head-to-head always have sound. In Individual device games, each player\'s own phone starts with sound off — turn it on under "Audio this device" in Game settings on the Get Ready screen. A phone that only follows the leaderboard in Pass-the-Phone stays silent; the game sound comes from the Host\'s phone. QuizVibe\'s background music pauses while another app is playing audio, and stops when you leave the app. The tap sounds on Hints answers always play on your own phone.',
+      },
     ],
   },
   {
@@ -336,6 +340,11 @@ function faqCategories(): FaqCategory[] {
       "When everyone plays on the Host's phone, only that phone needs to be online",
     ],
     ['In Individual device games, a player', 'When players use their own phones, a player'],
+    // Sound FAQ: own-device players in 1 by 1 also start with sound off.
+    [
+      "In Individual device games, each player's own phone starts",
+      'When players use their own phones, each phone starts',
+    ],
     ['For Pass-the-Phone: normal', "On the Host's phone only: normal"],
     ['For Individual device: every player', 'On their own phones: every player'],
     [
