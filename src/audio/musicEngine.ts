@@ -100,10 +100,13 @@ function getSlot(track: MusicTrack): Slot | null {
   }
 }
 
+/** Music counts as audible from the moment a fade-in starts until a fade-out
+ *  has fully finished (shouldPlay is cleared only then). A pending delayed
+ *  start is silent. CountdownIntro waits on this before "Get ready". */
 function updateSilent() {
   let silent = true;
   slots.forEach((s) => {
-    if (s.shouldPlay && s.player.volume > 0.001) silent = false;
+    if (s.shouldPlay) silent = false;
   });
   reportMusicSilent(silent);
 }
@@ -158,6 +161,7 @@ function fadeInSlot(track: MusicTrack) {
     slot.shouldPlay = false;
     return;
   }
+  updateSilent();
   rampTo(slot, getTrackGain(track), TRACK_FADE_IN_MS[track] ?? FADE_IN_MS);
 }
 
