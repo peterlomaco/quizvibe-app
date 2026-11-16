@@ -32,9 +32,9 @@ export const TRACK_FADE_IN_MS: Partial<Record<MusicTrack, number>> = {
   part1: 3000,
 };
 export const FADE_OUT_MS = 300;
-/** Final Leaderboard: Part 3 fades in this long after the Sparkler bang (the
- *  bang lands at DRAW_MS; its after-crackle lasts ~0.9 s). G3: no overlap. */
-export const FINAL_MUSIC_AFTER_BANG_MS = 900;
+/** Final Leaderboard: Part 3 starts fading in this long after the Game
+ *  Summary has appeared (after the Sparkler celebration). Peter 2026-11-16. */
+export const FINAL_MUSIC_AFTER_SUMMARY_MS = 0;
 /** Faster fade into Countdown so Part 1 is silent before the "Get ready" clip. */
 export const COUNTDOWN_FADE_OUT_MS = 250;
 /** How long the current track keeps playing while a newly visible route

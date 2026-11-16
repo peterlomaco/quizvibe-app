@@ -22,7 +22,7 @@ import SparkleDrawQ, {
   RING_TOP_FRACTION,
 } from './SparkleDrawQ';
 import SparklerSound from './SparklerSound';
-import { FINAL_MUSIC_AFTER_BANG_MS } from '../audio/musicConfig';
+import { FINAL_MUSIC_AFTER_SUMMARY_MS } from '../audio/musicConfig';
 import HcpProgressSummary, { HCP_CARD_HOLD_MS } from './HcpProgressSummary';
 import { QuizVibeWordmarkSvg } from './brand/QuizVibeBrandSvg';
 import { WORDMARK_VIEWBOX } from './brand/quizVibeBrandGeometry';
@@ -182,10 +182,10 @@ interface FinalCelebrationProps {
   muted?: boolean;
   /** Spelarnamnet under "Game Summary"-rubriken (denna enhets spelare). */
   playerName?: string;
-  /** Anropas EN gång när fyrverkerismällen + efterknastret är klart (direkt
-   *  om inget sprakljud spelas: Reduce Motion eller mutad). quiz.tsx tonar då
-   *  in Part 3 (bakgrundsmusik) så den aldrig överlappar smällen (G3). */
-  onFireworksDone?: () => void;
+  /** Anropas EN gång när Game Summary har visats (stage → 'highlights') +
+   *  FINAL_MUSIC_AFTER_SUMMARY_MS. quiz.tsx tonar då in Part 3 — aldrig under
+   *  fyrverkerierna (G3; Peter 2026-11-16: vänta tills summaryn syns). */
+  onSummaryShown?: () => void;
   /** Ersätter "Game Summary"-rubriken, t.ex. för den som når H2H-slutskärmen
    *  först (motståndaren har inte spelat klart → inga kort att visa). */
   heading?: string;
@@ -233,12 +233,12 @@ export default function FinalCelebration({
   muted = false,
   playerName,
   heading,
-  onFireworksDone,
+  onSummaryShown,
 }: FinalCelebrationProps) {
-  const onFireworksDoneRef = useRef(onFireworksDone);
+  const onSummaryShownRef = useRef(onSummaryShown);
   useEffect(() => {
-    onFireworksDoneRef.current = onFireworksDone;
-  }, [onFireworksDone]);
+    onSummaryShownRef.current = onSummaryShown;
+  }, [onSummaryShown]);
 
   const [stage, setStage] = useState<Stage>('celebration');
   const [pageIndex, setPageIndex] = useState(0);
@@ -253,6 +253,15 @@ export default function FinalCelebration({
   const doneFiredRef = useRef(false);
   const stageRef = useRef<Stage>('celebration');
   stageRef.current = stage;
+
+  // Part 3 (bakgrundsmusik) får tonas in först när Game Summary syns.
+  const summaryShownRef = useRef(false);
+  useEffect(() => {
+    if (stage !== 'highlights' || summaryShownRef.current) return;
+    summaryShownRef.current = true;
+    const t = setTimeout(() => onSummaryShownRef.current?.(), FINAL_MUSIC_AFTER_SUMMARY_MS);
+    return () => clearTimeout(t);
+  }, [stage]);
   const scrollRef = useRef<ScrollView>(null);
 
   // Startar på 1 — slöjan är OPAK redan i första framen. Med en fade-in
@@ -343,7 +352,6 @@ export default function FinalCelebration({
     let confetti: ReturnType<typeof setTimeout> | null = null;
     let watchdog: ReturnType<typeof setTimeout> | null = null;
     let startRaf: number | null = null;
-    let fireworksDone: ReturnType<typeof setTimeout> | null = null;
 
     // Reduce Motion är redan resolverad under beaten (se `ready`-effekten), så
     // vi läser den SYNKRONT här — ingen await mellan Q-ritningens start och
@@ -458,14 +466,6 @@ export default function FinalCelebration({
         // samma post-jank-anchor som ritningen och kan hoppa förbi sin egen
         // laddningstid via startedAt.
         if (!reduce && !muted) setPlaySound(true);
-        // Bakgrundsmusiken (Part 3) väntar tills smällen (vid DRAW_MS) och
-        // dess efterknaster klingat ut. Utan sprakljud → direkt.
-        fireworksDone = setTimeout(
-          () => {
-            if (!cancelled) onFireworksDoneRef.current?.();
-          },
-          reduce || muted ? 0 : DRAW_MS + FINAL_MUSIC_AFTER_BANG_MS,
-        );
         halo?.start();
         anim.start(({ finished }) => {
           if (!finished || cancelled) return;
@@ -508,7 +508,6 @@ export default function FinalCelebration({
       halo?.stop();
       if (confetti) clearTimeout(confetti);
       if (watchdog) clearTimeout(watchdog);
-      if (fireworksDone) clearTimeout(fireworksDone);
     };
     // Startar när `ready` blir true (post-settle); sekvensen äger sin livscykel.
     // eslint-disable-next-line react-hooks/exhaustive-deps

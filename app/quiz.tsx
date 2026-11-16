@@ -9824,12 +9824,12 @@ export default function QuizScreen() {
   //   countdown                 → tystnad, snabb uttoning före "Get ready" (G6)
   //   Hints-fråga + reveal      → Part 2 (G4; tonar ut vid nästa Get Ready)
   //   övriga frågor (YouTube/Spotify/Film-Name) → tystnad
-  //   Final Leaderboard         → Part 3 efter fyrverkerismällen (G3)
+  //   Final Leaderboard         → Part 3 när Game Summary syns (G3)
   const musicOwnerRef = useRef<string | null>(null);
   if (musicOwnerRef.current === null) musicOwnerRef.current = createMusicOwner();
-  // Sätts av FinalCelebration när smällen + efterknastret klingat ut.
-  const [finalFireworksDone, setFinalFireworksDone] = useState(false);
-  const handleFireworksDone = useCallback(() => setFinalFireworksDone(true), []);
+  // Sätts av FinalCelebration när Game Summary syns (efter fyrverkerierna).
+  const [finalSummaryShown, setFinalSummaryShown] = useState(false);
+  const handleSummaryShown = useCallback(() => setFinalSummaryShown(true), []);
   const isHintsMusicQuestion = isImageQuestion && !isSpotifyQuestion;
   useEffect(() => {
     const owner = musicOwnerRef.current as string;
@@ -9846,12 +9846,12 @@ export default function QuizScreen() {
     } else if (phase === 'leaderboard' && isLastQuestion) {
       // Celebrationen visas bara när !summaryDone; har spelaren redan lämnat
       // den (eller den aldrig visats) startar Part 3 direkt.
-      const ready = finalFireworksDone || summaryDone;
+      const ready = finalSummaryShown || summaryDone;
       setRouteMusic('quiz', { track: ready ? 'final' : null, audible }, owner);
     } else {
       setRouteMusic('quiz', { track: null, audible }, owner);
     }
-  }, [phase, isAudioMutedForSelf, isHintsMusicQuestion, isLastQuestion, finalFireworksDone, summaryDone]);
+  }, [phase, isAudioMutedForSelf, isHintsMusicQuestion, isLastQuestion, finalSummaryShown, summaryDone]);
   useEffect(() => () => clearRouteMusic('quiz', musicOwnerRef.current as string), []);
 
   // Highlights kräver per-fråge-underlag från BÅDA spelarna. I remote finns
@@ -11646,7 +11646,7 @@ export default function QuizScreen() {
                 : undefined
             }
             onDone={handleSummaryDone}
-            onFireworksDone={handleFireworksDone}
+            onSummaryShown={handleSummaryShown}
             // Sprakljudet under Q-ritningen. Grindas ENBART på
             // isAudioMutedForSelf, precis som appens övriga ljudkällor.
             muted={isAudioMutedForSelf}
