@@ -150,7 +150,15 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'Why is there no sound on my phone?',
-        a: 'Sound plays on the phone that runs the game: the Host, Single Player and Head-to-head always have sound. In Individual device games, each player\'s own phone starts with sound off — turn it on under "Audio this device" in Game settings on the Get Ready screen. A phone that only follows the leaderboard in Pass-the-Phone stays silent; the game sound comes from the Host\'s phone. QuizVibe\'s background music pauses while another app is playing audio, and stops when you leave the app. The tap sounds on Hints answers always play on your own phone.',
+        a: 'Sound plays on the phone that runs the game: the Host, Single Player and Head-to-head always have sound. In Individual device games, each player\'s own phone starts with sound off — turn it on under "Audio this device" in Game settings on the Get Ready screen. A phone that only follows the leaderboard in Pass-the-Phone stays silent; the game sound comes from the Host\'s phone. The tap sounds on Hints answers always play on your own phone.',
+      },
+      {
+        q: 'Can I keep listening to my own music while playing?',
+        a: 'Yes. QuizVibe never stops music from other apps. While another app is playing audio, QuizVibe\'s background music stays silent and comes back when you stop. All QuizVibe sound also stops when you lock your phone or switch apps, and continues when you return.',
+      },
+      {
+        q: 'Why does QuizVibe play sound when my phone is on silent?',
+        a: 'Sound is part of the game — clips, countdown and music — so QuizVibe plays even when your phone is in silent mode. Use the volume buttons to turn it down.',
       },
     ],
   },
