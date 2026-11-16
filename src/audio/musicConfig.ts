@@ -30,6 +30,7 @@ export const TRACK_START_DELAY_MS: Partial<Record<MusicTrack, number>> = {
   part1: 1500,
 };
 export const TRACK_FADE_IN_MS: Partial<Record<MusicTrack, number>> = {
+  home: 3000, // Home loop swells in after its 10 s silence (2026-11-16)
   part1: 3000,
   final: 5000, // Final Leaderboard: slow swell instead of starting loud (2026-11-16)
 };
