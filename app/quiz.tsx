@@ -148,6 +148,7 @@ import { buildHintsDistractorPool } from '@/src/utils/hintsDistractorPool';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
 import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
+import { clearRouteMusic, createMusicOwner, setRouteMusic } from '@/src/audio/musicController';
 import { WebViewWarmer } from '@/src/components/WebViewWarmer';
 // Person-bilderna är juridiskt parkerade sedan 2026-06-04 — en "image"-fråga
 // renderar bara flagga + ledtrådar via HintsQuizCard. assets/quiz-images/,
@@ -3488,16 +3489,6 @@ export default function QuizScreen() {
   const [phase, setPhase] = useState<'intro' | 'countdown' | 'question' | 'awaiting' | 'reveal' | 'leaderboard'>(
     turnOrder.length > 0 ? 'intro' : 'question',
   );
-  // Ambient-slingan från lobbyn tonas ut vid navigationen till quiz. Peter vill
-  // ha ~5 s tystnad i Get Ready-vyn innan slingan tas upp igen (2026-08-28).
-  // Sätts EN gång vid quiz-mount, så efterföljande intro-vyer mellan rundor
-  // spelar direkt (flaggan är då redan true). MorseAmbientSound skapar ingen
-  // AudioContext så länge active=false, så de 5 sekunderna är helt tysta.
-  const [ambientReady, setAmbientReady] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setAmbientReady(true), 5000);
-    return () => clearTimeout(t);
-  }, []);
   // Synkron mirror av phase-state. Uppdateras vid varje render (ingen delay).
   // Används av confirm-handlers för att undvika stale-closure-race mot
   // useEffect([timeLeft]) — om setPhase('awaiting') anropats men React inte
@@ -4465,6 +4456,27 @@ export default function QuizScreen() {
     }
     return !isHost;
   }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn, isLocalSoloGame, isOwnDeviceParticipant]);
+
+  // Bakgrundsmusik (src/audio) — quiz publicerar sitt läge för /quiz-routen;
+  // MusicHost läser det bara när /quiz är synlig. Get Ready (intro) = Part 1
+  // (fortsätter sömlöst från lobbyn — samma spår = ingen omstart), countdown =
+  // tystnad med snabb uttoning så "Get ready"-klippet hörs rent (G6). Hints +
+  // Final Leaderboard läggs till i Batch 3. Samma ljudgrind som allt annat:
+  // isAudioMutedForSelf.
+  const musicOwnerRef = useRef<string | null>(null);
+  if (musicOwnerRef.current === null) musicOwnerRef.current = createMusicOwner();
+  useEffect(() => {
+    const owner = musicOwnerRef.current as string;
+    const audible = !isAudioMutedForSelf;
+    if (phase === 'intro') {
+      setRouteMusic('quiz', { track: 'part1', audible }, owner);
+    } else if (phase === 'countdown') {
+      setRouteMusic('quiz', { track: null, audible, fastFadeOut: true }, owner);
+    } else {
+      setRouteMusic('quiz', { track: null, audible }, owner);
+    }
+  }, [phase, isAudioMutedForSelf]);
+  useEffect(() => () => clearRouteMusic('quiz', musicOwnerRef.current as string), []);
 
   // Countdown-röst för DENNA enhet. Seedas ur profil-spegeln; enheten kan
   // byta den i GetReady → Game settings → "Voice type" (persisteras till profilen
@@ -11217,24 +11229,13 @@ export default function QuizScreen() {
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
-      {/* Ambient-slingan tas upp under GetReady — men FÖRST efter ~5 s tystnad
-          när man just kommit in från lobbyn (ambientReady, se quiz-mount-
-          effekten). Grindas i övrigt ENBART på isAudioMutedForSelf, precis som
-          appens tre andra ljudkällor: den memon kodar redan hela policyn per
-          läge (PtP alltid på, remote lokalt, IndDev via override med host=on/
-          non-host=off som default). Ett extra isHost-villkor här skulle göra en
-          non-host som slagit på sitt ljud halvt tyst. Komponenten hålls
-          monterad och styrs via active-proppen så fördröjningen bara är tystnad,
-          inte en teardown (som klickar i högtalaren). */}
-      {!isAudioMutedForSelf && <MorseAmbientSound active={ambientReady} />}
-      {/* Processvärmare för den mutade non-host:en i IndDev: host har en levande
-          WebView (MorseAmbientSound ovan) som värmer iOS WebView-process-poolen,
-          non-host är mutad → ingen → kall pool → långsam YouTube-boot. Denna
-          tysta WebView (inget YouTube, ingen uppspelning, ingen ToS-yta) håller
-          poolen varm. Slotten är ALLTID närvarande (motsatt gate mot
-          MorseAmbientSound) och sitter direkt efter den i BÅDA grenarna, så
-          index är stabilt och instansen återanvänds över intro→countdown. */}
-      {isAudioMutedForSelf && gameMode === 'individual-devices' && !isHost && <WebViewWarmer />}
+      {/* Processvärmare: en tyst WebView (inget YouTube, ingen uppspelning)
+          som håller iOS WebView-process-poolen + nätverksvägen till YouTube
+          varm före question-entry. Tidigare gjorde Morse-ambient-WebView:n
+          detta för olåsta enheter; bakgrundsmusiken (src/audio, expo-audio)
+          är ingen WebView, så värmaren monteras nu för ALLA enheter. Samma
+          barn-POSITION i intro- och countdown-grenen så instansen återanvänds. */}
+      <WebViewWarmer />
         <LeaveScreenCover />
       </View>
     );
@@ -11319,16 +11320,8 @@ export default function QuizScreen() {
       {inactivityCountdownSec !== null && (
         <InactivityCountdownBanner secondsLeft={inactivityCountdownSec} />
       )}
-      {/* ⚠ Samma barn-POSITION som i intro-grenen ovan (index 2 under samma
-          touchWrap-View), så React återanvänder instansen i stället för att
-          riva den vid fasbytet. `active={false}` tonar då ut slingan mjukt.
-          Renderas den inte här — eller på annan position — är vi tillbaka i
-          den hårda WebView-teardownen som klickade i högtalaren. */}
-      {!isAudioMutedForSelf && <MorseAmbientSound active={false} />}
-      {/* Samma processvärmare + samma barn-POSITION som i intro-grenen (direkt
-          efter MorseAmbientSound-sloten) så WebView-instansen återanvänds över
-          intro→countdown i stället för att rivas + återskapas. */}
-      {isAudioMutedForSelf && gameMode === 'individual-devices' && !isHost && <WebViewWarmer />}
+      {/* Samma processvärmare + samma barn-POSITION som i intro-grenen. */}
+      <WebViewWarmer />
         <LeaveScreenCover />
       </View>
     );

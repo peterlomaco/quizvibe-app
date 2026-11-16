@@ -91,13 +91,12 @@ import {
     RoundsRuler,
 } from '../components/RoundsRuler';
 import { TopUserBanner } from '../components/TopUserBanner';
-import { MorseAmbientSound } from '../components/MorseAmbientSound';
 import { hideGlobalOverlay, showGlobalOverlay } from '../utils/globalOverlay';
 import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, Typography } from '../theme';
 import { isAnonymousSession } from '../utils/auth';
 import { AVATARS, getAvatarEmojiById } from '../utils/avatars';
 import { addFriend, loadFriends, type Friend } from '../utils/friendsStorage';
-import { playVoiceClip } from '../utils/voicePlayback';
+import { clearRouteMusic, createMusicOwner, setRouteMusic } from '../audio/musicController';
 import { MIN_HCP, calculateInitialHCP } from '../utils/hcp';
 import { resolveDisplayHcp } from '../utils/hcpEngine';
 import { loadOwnHcpBundle } from '../utils/hcpProgress';
@@ -1115,8 +1114,8 @@ function publishOwnHcpToLobby(roomCode: string, playerId: string): void {
 // ger destinationsskärmen (Home) + BottomBanner tid att måla BAKOM covern så
 // inget flimrar fram innan reveal. Tunbar (bumpa om en flash smiter förbi).
 const OVERLAY_SETTLE_MS = 150;
-// MorseAmbientSound rampar master-gain till 0 på 300 ms; vänta ut den innan
-// en navigation som unmountar WebView:n (annars ett hörbart klick).
+// Bakgrundsmusiken (src/audio) tonar ut på 300 ms; vänta ut den innan
+// Delete-navigationen så den inte kapas mitt i.
 const AMBIENT_FADE_BEFORE_UNMOUNT_MS = 320;
 // Delete-dialogen ger upp efter så här lång tid och visar Try again.
 const DELETE_LOBBY_TIMEOUT_MS = 10000;
@@ -2610,23 +2609,22 @@ export default function LobbyScreen() {
   // så handleStartGame kan avbryta en väntande skrivning före sin egen
   // explicita setLobbyPlayers (undviker en stale trailing-write efteråt).
   const hostBulkWriteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // True enbart när LobbyScreen är aktiv — stänger av MorseAmbientSound
-  // (WebView-baserat ljud) när Stack-navigatorn trycker Quiz ovanpå.
+  // True enbart när LobbyScreen är aktiv — styr lobbyns musik-post och
+  // QuizVibeAlertHost när Stack-navigatorn trycker Quiz ovanpå.
   const [screenFocused, setScreenFocused] = useState(true);
 
-  // Sätts true FÖRST i performLobbyDelete så MorseAmbientSound tonar ut till
-  // tystnad (300ms FADE_OUT) INNAN router.replace unmountar LobbyScreen +
-  // WebView:n. Att riva en WebView mitt i en ringande ton ger annars ett
-  // hörbart klick/beep (Peter 2026 — samma hazard som Start Game hade).
-  // performLobbyDelete väntar AMBIENT_FADE_BEFORE_UNMOUNT_MS innan den
-  // navigerar, så uttoningen hinner klart. Element:et förblir
-  // MONTERAT (hostMode && showAmbient orört) — bara `active` går false.
+  // Sätts true FÖRST i performLobbyDelete så Part 1 tonar ut (300 ms) INNAN
+  // router.replace — performLobbyDelete väntar AMBIENT_FADE_BEFORE_UNMOUNT_MS.
   const [ambientSilenced, setAmbientSilenced] = useState(false);
 
-  // Ambient-ljud startar 2.5 s efter att host-välkomst-rösten sagt "QuizVibe".
-  const [showAmbient, setShowAmbient] = useState(false);
-  // Engångsskydd så välkomst-rösten bara spelas en gång per lobby-session.
-  const hasSpokeRef = useRef(false);
+  // Bakgrundsmusik (Part 1) — se src/audio/. Lobbyn publicerar sitt läge
+  // ENBART medan den är fokuserad; MusicHost läser bara den synliga routens
+  // post, så en lobby som ligger kvar under /quiz kan aldrig ta tillbaka
+  // ljudet. Host hör Part 1, non-host är AV utan toggle i lobbyn (G2).
+  // "QuizVibe"-välkomstklippet är borttaget (G6, 2026-11-16).
+  // ambientSilenced tonar ut musiken innan Delete Game Lobby navigerar.
+  const musicOwnerRef = useRef<string | null>(null);
+  if (musicOwnerRef.current === null) musicOwnerRef.current = createMusicOwner();
 
   useFocusEffect(
     useCallback(() => {
@@ -2635,18 +2633,16 @@ export default function LobbyScreen() {
     }, []),
   );
 
-  // Välkomst-röst "QuizVibe" när host kliver in i lobbyn — en gång per session.
   useEffect(() => {
-    if (!hostMode || hasSpokeRef.current) return;
-    hasSpokeRef.current = true;
-    // Spela "QuizVibe" i spelarens valda röst (default = hype/Female voice).
-    // playVoiceClip resolvar utelämnat/stale id → default-rösten och faller
-    // tillbaka på expo-speech om klippet inte kan spelas.
-    playVoiceClip(getCachedProfile()?.voice, 'quizvibe', 'QuizVibe');
-    const t = setTimeout(() => setShowAmbient(true), 6000);
-    return () => clearTimeout(t);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hostMode]);
+    const owner = musicOwnerRef.current as string;
+    if (!screenFocused) {
+      clearRouteMusic('lobby', owner);
+      return;
+    }
+    setRouteMusic('lobby', { track: 'part1', audible: hostMode && !ambientSilenced }, owner);
+  }, [screenFocused, hostMode, ambientSilenced]);
+
+  useEffect(() => () => clearRouteMusic('lobby', musicOwnerRef.current as string), []);
 
   // Master "Approve All"-state — återställs automatiskt till 'no' när
   // waiting-listan blivit tom (efter approve all eller när ingen väntar).
@@ -8314,16 +8310,6 @@ export default function LobbyScreen() {
           Customize är hopfällda och ytan annars känns tom. */}
       {hostMode && (
         <QuizVibeWatermark size={LOBBY_WATERMARK_SIZE} style={styles.lobbyWatermark} />
-      )}
-      {/* Morse-ambient-ljud — tystas när skärmen tappar fokus (Stack-
-          navigation till t.ex. Quiz), annars fortsätter WebView:n spela trots
-          att LobbyScreen ligger kvar monterad i stacken.
-          ⚠ Elementet AVMONTERAS INTE vid blur — `active={screenFocused}`
-          tonar ut ljudet i stället. Att riva WebView:n mitt i en ringande ton
-          gav ett hörbart klick när host tryckte Start Game (Peter 2026-08-26);
-          se ⚠-noten i MorseAmbientSound.tsx. */}
-      {hostMode && showAmbient && (
-        <MorseAmbientSound active={screenFocused && !ambientSilenced} />
       )}
       {/* Top board (login status) — sticky utanför ScrollView så den följer
           med när användaren scrollar i lobbyn. Tap-beteendet är roll-

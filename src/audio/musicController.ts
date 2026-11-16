@@ -44,15 +44,34 @@ function sameMusic(a: RouteMusic | null, b: RouteMusic | null): boolean {
   );
 }
 
-/** Publish the music state for a route. Idempotent. */
-export function setRouteMusic(route: MusicRouteKey, music: RouteMusic): void {
-  if (sameMusic(routeMusic[route], music)) return;
+// Owner per route: two instances of the same screen can be mounted at once
+// (rematch replaces /quiz with a NEW Lobby while the old Lobby still sits
+// underneath). The latest publisher owns the entry; a clear from any other
+// instance (e.g. the old one unmounting later) is ignored.
+const routeOwner: Record<MusicRouteKey, string | null> = { lobby: null, quiz: null };
+let ownerSeq = 0;
+
+/** Unique owner id for one screen instance (keep it in a ref). */
+export function createMusicOwner(): string {
+  ownerSeq += 1;
+  return `owner-${ownerSeq}`;
+}
+
+/** Publish the music state for a route. Idempotent. Only call while the
+ *  publishing screen is focused — the entry is read only for the visible route. */
+export function setRouteMusic(route: MusicRouteKey, music: RouteMusic, owner: string): void {
+  const sameOwner = routeOwner[route] === owner;
+  if (sameOwner && sameMusic(routeMusic[route], music)) return;
+  routeOwner[route] = owner;
   routeMusic[route] = music;
   emit();
 }
 
-/** Clear a route's entry (unmount / leaving the screen). */
-export function clearRouteMusic(route: MusicRouteKey): void {
+/** Clear a route's entry (blur / unmount / leaving). Ignored unless `owner`
+ *  is the current owner. */
+export function clearRouteMusic(route: MusicRouteKey, owner: string): void {
+  if (routeOwner[route] !== owner) return;
+  routeOwner[route] = null;
   if (routeMusic[route] === null) return;
   routeMusic[route] = null;
   emit();

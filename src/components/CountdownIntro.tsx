@@ -14,6 +14,7 @@ import { BrandUi, Colors, FontSize, FontWeight, Radius, Spacing, TIGHT_TEXT_MAX_
 import { type MainCategory, mainCategoryDisplay } from '../utils/mainCategory';
 import { DEFAULT_VOICE_ID, resolveVoicePack, SILENT_VOICE_ID, type VoiceToken } from '../utils/voicePacks';
 import { ensureVoiceAudioMode } from '../utils/voicePlayback';
+import { waitForMusicSilent } from '../audio/musicController';
 import { Avatar } from './Avatar';
 import { HintsIcon } from './HintsIcon';
 import { MediaSourceIcon, MediaSourceType } from './MediaSourceIcon';
@@ -392,12 +393,17 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
       const now = Date.now();
       if (now - lastCountdownVoiceMs < GET_READY_MIN_GAP_MS) return;
       lastCountdownVoiceMs = now;
-      const player = pack ? playersRef.current.getready : undefined;
-      if (player) {
-        try { player.play(); } catch (_) {}
-      } else {
-        try { Speech.speak('Get ready', { language: 'en-US', rate: 0.9 }); } catch (_) {}
-      }
+      // Part 1 (bakgrundsmusiken) tonas ut när countdown börjar (250 ms) —
+      // vänta tills den är tyst (max 350 ms) så klippet aldrig överlappar
+      // musiken (G6). Påverkar bara ljudet; det visuella schemat är orört.
+      void waitForMusicSilent(350).then(() => {
+        const player = pack ? playersRef.current.getready : undefined;
+        if (player) {
+          try { player.play(); } catch (_) {}
+        } else {
+          try { Speech.speak('Get ready', { language: 'en-US', rate: 0.9 }); } catch (_) {}
+        }
+      });
     };
 
     // Schemalägg nästa nedräkningssteg rekursivt. `voiceAt` = absolut offset
