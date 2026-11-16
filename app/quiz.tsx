@@ -4469,15 +4469,15 @@ export default function QuizScreen() {
   // ─── Answer sound effects (src/audio/sfx) ────────────────────────────────
   // Click when the selected name changes; "Answer Locked" when Confirm records
   // the answer — HINTS questions only (Peter 2026-11-16: not Spotify/Name,
-  // not Film/Name). Same gate as all other audio:
-  // isAudioMutedForSelf. Never on timeout (that path never calls these).
-  const playAnswerSfx = (name: 'select' | 'locked') => {
-    if (isAudioMutedForSelf) return;
-    playSfx(name);
-  };
+  // not Film/Name). Never on timeout (that path never calls these).
+  // Tap feedback, NOT game audio: plays on the answering player's own device
+  // in every mode, independent of isAudioMutedForSelf / "Audio this device"
+  // (Peter 2026-11-16). Music, YouTube, Spotify, voice and Sparkler still
+  // follow isAudioMutedForSelf.
+  const playAnswerSfx = (name: 'select' | 'locked') => playSfx(name);
   useEffect(() => {
-    if (!isAudioMutedForSelf) preloadSfx();
-  }, [isAudioMutedForSelf]);
+    preloadSfx();
+  }, []);
   // Last option that clicked, per question — a re-tap of the same option
   // (or a stale closure in a fast double tap) stays silent.
   const lastSelectSfxRef = useRef<{ q: number; key: string } | null>(null);
