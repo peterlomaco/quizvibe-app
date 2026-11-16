@@ -147,7 +147,6 @@ import { meetsHintsThreshold } from '@/src/utils/hintsText';
 import { buildHintsDistractorPool } from '@/src/utils/hintsDistractorPool';
 import { isItemInRegionScope, PLAYER_COUNTRY } from '@/src/utils/regionScope';
 import { HintsQuizCard } from '@/src/components/HintsQuizCard';
-import { MorseAmbientSound } from '@/src/components/MorseAmbientSound';
 import { clearRouteMusic, createMusicOwner, setRouteMusic } from '@/src/audio/musicController';
 import { WebViewWarmer } from '@/src/components/WebViewWarmer';
 // Person-bilderna är juridiskt parkerade sedan 2026-06-04 — en "image"-fråga
@@ -4456,27 +4455,6 @@ export default function QuizScreen() {
     }
     return !isHost;
   }, [gameMode, selfPlayerId, playerAudioOverrides, isHost, remoteAudioOn, isLocalSoloGame, isOwnDeviceParticipant]);
-
-  // Bakgrundsmusik (src/audio) — quiz publicerar sitt läge för /quiz-routen;
-  // MusicHost läser det bara när /quiz är synlig. Get Ready (intro) = Part 1
-  // (fortsätter sömlöst från lobbyn — samma spår = ingen omstart), countdown =
-  // tystnad med snabb uttoning så "Get ready"-klippet hörs rent (G6). Hints +
-  // Final Leaderboard läggs till i Batch 3. Samma ljudgrind som allt annat:
-  // isAudioMutedForSelf.
-  const musicOwnerRef = useRef<string | null>(null);
-  if (musicOwnerRef.current === null) musicOwnerRef.current = createMusicOwner();
-  useEffect(() => {
-    const owner = musicOwnerRef.current as string;
-    const audible = !isAudioMutedForSelf;
-    if (phase === 'intro') {
-      setRouteMusic('quiz', { track: 'part1', audible }, owner);
-    } else if (phase === 'countdown') {
-      setRouteMusic('quiz', { track: null, audible, fastFadeOut: true }, owner);
-    } else {
-      setRouteMusic('quiz', { track: null, audible }, owner);
-    }
-  }, [phase, isAudioMutedForSelf]);
-  useEffect(() => () => clearRouteMusic('quiz', musicOwnerRef.current as string), []);
 
   // Countdown-röst för DENNA enhet. Seedas ur profil-spegeln; enheten kan
   // byta den i GetReady → Game settings → "Voice type" (persisteras till profilen
@@ -9839,6 +9817,43 @@ export default function QuizScreen() {
   // till Home avbryter alltså inte en non-host som fortfarande bläddrar.
   const [summaryDone, setSummaryDone] = useState(false);
 
+  // ─── Bakgrundsmusik (src/audio) ─────────────────────────────────────────
+  // Quiz publicerar sitt läge för /quiz-routen; MusicHost läser det bara när
+  // /quiz är synlig. Samma ljudgrind som allt annat: isAudioMutedForSelf.
+  //   intro (Get Ready)         → Part 1 (fortsätter sömlöst från lobbyn)
+  //   countdown                 → tystnad, snabb uttoning före "Get ready" (G6)
+  //   Hints-fråga + reveal      → Part 2 (G4; tonar ut vid nästa Get Ready)
+  //   övriga frågor (YouTube/Spotify/Film-Name) → tystnad
+  //   Final Leaderboard         → Part 3 efter fyrverkerismällen (G3)
+  const musicOwnerRef = useRef<string | null>(null);
+  if (musicOwnerRef.current === null) musicOwnerRef.current = createMusicOwner();
+  // Sätts av FinalCelebration när smällen + efterknastret klingat ut.
+  const [finalFireworksDone, setFinalFireworksDone] = useState(false);
+  const handleFireworksDone = useCallback(() => setFinalFireworksDone(true), []);
+  const isHintsMusicQuestion = isImageQuestion && !isSpotifyQuestion;
+  useEffect(() => {
+    const owner = musicOwnerRef.current as string;
+    const audible = !isAudioMutedForSelf;
+    if (phase === 'intro') {
+      setRouteMusic('quiz', { track: 'part1', audible }, owner);
+    } else if (phase === 'countdown') {
+      setRouteMusic('quiz', { track: null, audible, fastFadeOut: true }, owner);
+    } else if (
+      (phase === 'question' || phase === 'awaiting' || phase === 'reveal') &&
+      isHintsMusicQuestion
+    ) {
+      setRouteMusic('quiz', { track: 'hints', audible }, owner);
+    } else if (phase === 'leaderboard' && isLastQuestion) {
+      // Celebrationen visas bara när !summaryDone; har spelaren redan lämnat
+      // den (eller den aldrig visats) startar Part 3 direkt.
+      const ready = finalFireworksDone || summaryDone;
+      setRouteMusic('quiz', { track: ready ? 'final' : null, audible }, owner);
+    } else {
+      setRouteMusic('quiz', { track: null, audible }, owner);
+    }
+  }, [phase, isAudioMutedForSelf, isHintsMusicQuestion, isLastQuestion, finalFireworksDone, summaryDone]);
+  useEffect(() => () => clearRouteMusic('quiz', musicOwnerRef.current as string), []);
+
   // Highlights kräver per-fråge-underlag från BÅDA spelarna. I remote finns
   // ingen sync-channel — motståndarens rad kommer som färdigaggregerad
   // summaryStats — så vi väntar tills matchen är avgjord. Är den inte det
@@ -11297,8 +11312,8 @@ export default function QuizScreen() {
         category={effectiveCategoryByQuestion[questionIndex] ?? null}
         onComplete={() => setPhase('question')}
         finalWord={isImageQuestion || isActorSelectQuestion || isSpotifyNameQuestion ? 'Who' : isTimelineQuestion ? 'When' : undefined}
-        // Talad nedräkning följer samma grind som övriga ljudkällor — se
-        // MorseAmbientSound ovan för varför isHost inte hör hemma här.
+        // Talad nedräkning följer samma grind som övriga ljudkällor
+        // (isAudioMutedForSelf) — inget extra isHost-villkor.
         silent={isAudioMutedForSelf}
         // Non-host i IndDev ankrar nedräkningen mot host:s delade wall-clock
         // (timer_start_at − 7900 = host:s egen CountdownIntro-t0 = dess Play-
@@ -11631,6 +11646,7 @@ export default function QuizScreen() {
                 : undefined
             }
             onDone={handleSummaryDone}
+            onFireworksDone={handleFireworksDone}
             // Sprakljudet under Q-ritningen. Grindas ENBART på
             // isAudioMutedForSelf, precis som appens övriga ljudkällor.
             muted={isAudioMutedForSelf}
@@ -12002,19 +12018,8 @@ export default function QuizScreen() {
           Layout nu: [fixed-top: media+timer+question] + [ScrollView: bara
           answer-block + reveal-feedback] + [sticky-bottom: Confirm-bar]. */}
       <View style={styles.fixedTopZone}>
-        {/* Lobbyns närvaro-slinga i intensivt läge (samma melodi, snabbare/
-            ljusare/högre) enbart för Hints-frågor under aktiv svarstid —
-            ersatte hjärtslaget 2026-09-12 (Peter). YT- och Spotify-frågor är
-            tysta i quiz-vyn. Grindas ENBART på isAudioMutedForSelf — se
-            MorseAmbientSound i intro-vyn. Monteras för HELA image-frågan så
-            den fadar ut vid reveal (active=false) i stället för att rivas
-            mitt i en ringande pluck (= klick, se MorseAmbientSound-noten). */}
-        {!isAudioMutedForSelf && isImageQuestion && (
-          <MorseAmbientSound
-            active={phase === 'question' || phase === 'awaiting'}
-            intensity="high"
-          />
-        )}
+        {/* Hints-frågans bakgrundsmusik (Part 2) spelas av MusicHost — se
+            musik-effekten vid summaryDone. Ingen ljudkälla monteras här. */}
           {/* phase är här narrowed till 'question' | 'awaiting' | 'reveal'
             (leaderboard fångas av early-return ovan), så ingen extra
             phase-check behövs runt question UI. */}
