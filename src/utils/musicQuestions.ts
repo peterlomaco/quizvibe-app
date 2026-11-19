@@ -16661,7 +16661,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ],
     "youtubeClips": [
       {
-        "videoId": "lfiprM5l_cE",
+        "videoId": "BT3aBUBlEno",
         "startSec": 10,
         "endSec": 40,
         "channelTitle": "Aarush Boi",
@@ -37296,7 +37296,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "parentControlled": true,
     "youtubeClips": [
       {
-        "videoId": "9hSO7x8oLnI",
+        "videoId": "QDGZ1Fcz-g8",
         "startSec": 8,
         "endSec": 38,
         "license": "standard",
@@ -38244,7 +38244,7 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     "parentControlled": true,
     "youtubeClips": [
       {
-        "videoId": "U7wGh-rHjTQ",
+        "videoId": "FtJgQQrJq0M",
         "startSec": 30,
         "endSec": 60,
         "license": "standard",

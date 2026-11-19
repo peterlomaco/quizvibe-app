@@ -373,7 +373,7 @@ items:
     # är också huvudkaraktärer i Lejonkungen och skulle bli felmarkerade rätta svar.
     distractorNames: ["Nemo", "Shrek", "Mulan", "Aladdin"]
     youtubeClips:
-      - videoId: "lfiprM5l_cE"
+      - videoId: "BT3aBUBlEno"
         startSec: 10
         endSec: 40
         channelTitle: "Aarush Boi"
