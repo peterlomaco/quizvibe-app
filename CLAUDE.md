@@ -153,6 +153,19 @@ Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-on
 
 Full lista: `project_pre_launch_checklist.md`.
 
+## Klipp att ersätta (2026-11-24)
+
+Döda/SE-blockerade YouTube-klipp som togs bort ur katalogen. Itemen ligger kvar men exporteras inte (inget klipp, ingen Spotify) tills ett nytt klipp läggs in. PR #46 (nattens auto-förslag) mergades INTE — förslagen var fel film/karaoke/år i titeln. Lägg nytt klipp i YAML:en (kommentaren `# youtubeClips borttaget …` markerar platsen) och kör `npm run export-music-questions`.
+
+- [ ] `the-lion-king-1994` (movies-classics.yaml) — gamla `lfiprM5l_cE` raderad. Kräver 1994-filmen, inte 2019, och inget år i titeln. Officiella Disney-trailers är made-for-kids-blockerade.
+- [ ] `soppgirobygget-ompa` (songs-gen-alpha.yaml) — `CSnoXrCYGSU` olistad + blockerad i SE
+- [ ] `soppgirobygget-rikerud` (songs-gen-alpha.yaml) — `m7jCbk54iNI` olistad + blockerad i SE
+- [ ] `soppgirobygget-kjope-hele-sverige` (songs-gen-alpha.yaml) — `9hSO7x8oLnI` olistad + blockerad i SE
+- [ ] `soppgirobygget-nachpit` (songs-gen-alpha.yaml) — `jAhhNX8xUfk` olistad + blockerad i SE
+- [ ] `soppgirobygget-viva-la-vida` (songs-gen-alpha.yaml) — `U7wGh-rHjTQ` olistad + blockerad i SE
+
+De fem Soppgirobygget-låtarna är paket-exklusiva ("Party & Dunk"), så baspoolen påverkas inte.
+
 ## Bakgrundsmusik (2026-11-16, branch `logo-gold-home`, ej pushad)
 
 Fyra loopar spelas via **expo-audio** (ingen WebView). Plan: `C:\Users\46725\.claude\plans\pasted-content-id-4271-quizvibe-structured-blossom.md` (rev 3, godkänd av Peter).
