@@ -16633,44 +16633,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "the-lion-king-1994",
-    "displayName": "The Lion King",
-    "correctYear": 1994,
-    "contentSubject": "movie",
-    "questionText": "What is the name of the main character in this film?",
-    "itemHcp": 93,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "sweden"
-    ],
-    "isAnimated": true,
-    "correctNames": [
-      "Simba"
-    ],
-    "distractorNames": [
-      "Nemo",
-      "Shrek",
-      "Mulan",
-      "Aladdin"
-    ],
-    "youtubeClips": [
-      {
-        "videoId": "lfiprM5l_cE",
-        "startSec": 10,
-        "endSec": 40,
-        "channelTitle": "Aarush Boi",
-        "license": "standard",
-        "notes": "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
-      }
-    ]
-  },
-  {
     "id": "the-outhere-brothers-boom-boom-boom",
     "displayName": "Boom boom boom — The Outhere Brothers",
     "correctYear": 1994,
@@ -37273,38 +37235,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
     ]
   },
   {
-    "id": "soppgirobygget-kjope-hele-sverige",
-    "displayName": "Kjøpe hele Sverige — Soppgirobygget",
-    "correctYear": 2022,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 55,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "nordic"
-    ],
-    "genrePackages": [
-      "Party & Dunk"
-    ],
-    "inBaseCatalog": false,
-    "parentControlled": true,
-    "youtubeClips": [
-      {
-        "videoId": "9hSO7x8oLnI",
-        "startSec": 8,
-        "endSec": 38,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
-      }
-    ]
-  },
-  {
     "id": "taylor-swift-anti-hero",
     "displayName": "Anti-Hero — Taylor Swift",
     "correctYear": 2022,
@@ -37545,38 +37475,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 198,
         "channelTitle": "7clouds",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "soppgirobygget-ompa",
-    "displayName": "Ompa — Soppgirobygget",
-    "correctYear": 2023,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 55,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "nordic"
-    ],
-    "genrePackages": [
-      "Party & Dunk"
-    ],
-    "inBaseCatalog": false,
-    "parentControlled": true,
-    "youtubeClips": [
-      {
-        "videoId": "CSnoXrCYGSU",
-        "startSec": 4,
-        "endSec": 34,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
       }
     ]
   },
@@ -38153,102 +38051,6 @@ export const MUSIC_QUESTIONS: MusicQuestion[] = [
         "endSec": 171,
         "channelTitle": "7cloudsnation",
         "license": "standard"
-      }
-    ]
-  },
-  {
-    "id": "soppgirobygget-nachpit",
-    "displayName": "Nachpit — Soppgirobygget",
-    "correctYear": 2024,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 55,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "nordic"
-    ],
-    "genrePackages": [
-      "Party & Dunk"
-    ],
-    "inBaseCatalog": false,
-    "parentControlled": true,
-    "youtubeClips": [
-      {
-        "videoId": "jAhhNX8xUfk",
-        "startSec": 5,
-        "endSec": 35,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "soppgirobygget-rikerud",
-    "displayName": "Rikerud — Soppgirobygget",
-    "correctYear": 2024,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 55,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "nordic"
-    ],
-    "genrePackages": [
-      "Party & Dunk"
-    ],
-    "inBaseCatalog": false,
-    "parentControlled": true,
-    "youtubeClips": [
-      {
-        "videoId": "m7jCbk54iNI",
-        "startSec": 15,
-        "endSec": 45,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
-      }
-    ]
-  },
-  {
-    "id": "soppgirobygget-viva-la-vida",
-    "displayName": "Viva La Vida — Soppgirobygget",
-    "correctYear": 2024,
-    "contentSubject": "song",
-    "questionText": "Which Year was this song released?",
-    "itemHcp": 55,
-    "audiences": [
-      "elder",
-      "gen-x",
-      "millennials",
-      "gen-z",
-      "gen-alpha"
-    ],
-    "region": [
-      "nordic"
-    ],
-    "genrePackages": [
-      "Party & Dunk"
-    ],
-    "inBaseCatalog": false,
-    "parentControlled": true,
-    "youtubeClips": [
-      {
-        "videoId": "U7wGh-rHjTQ",
-        "startSec": 30,
-        "endSec": 60,
-        "license": "standard",
-        "notes": "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
       }
     ]
   },
