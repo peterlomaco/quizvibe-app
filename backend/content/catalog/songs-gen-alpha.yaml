@@ -2967,11 +2967,7 @@ items:
     inBaseCatalog: false
     parentControlled: true
     region: ["nordic"]
-    youtubeClips:
-      - videoId: "CSnoXrCYGSU"
-        startSec: 4
-        endSec: 34
-        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+    # youtubeClips borttaget 2026-11-24 (CSnoXrCYGSU dött/blockerat i SE) — ersätts senare, se CLAUDE.md 'Klipp att ersätta'.
   - id: soppgirobygget-rikerud
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Rikerud — Soppgirobygget"
@@ -2983,11 +2979,7 @@ items:
     inBaseCatalog: false
     parentControlled: true
     region: ["nordic"]
-    youtubeClips:
-      - videoId: "m7jCbk54iNI"
-        startSec: 15
-        endSec: 45
-        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+    # youtubeClips borttaget 2026-11-24 (m7jCbk54iNI dött/blockerat i SE) — ersätts senare, se CLAUDE.md 'Klipp att ersätta'.
   - id: soppgirobygget-kjope-hele-sverige
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Kjøpe hele Sverige — Soppgirobygget"
@@ -2999,11 +2991,7 @@ items:
     inBaseCatalog: false
     parentControlled: true
     region: ["nordic"]
-    youtubeClips:
-      - videoId: "9hSO7x8oLnI"
-        startSec: 8
-        endSec: 38
-        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+    # youtubeClips borttaget 2026-11-24 (9hSO7x8oLnI dött/blockerat i SE) — ersätts senare, se CLAUDE.md 'Klipp att ersätta'.
   - id: soppgirobygget-norge-ska-til-vm
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Norge ska til VM — Soppgirobygget"
@@ -3035,11 +3023,7 @@ items:
     inBaseCatalog: false
     parentControlled: true
     region: ["nordic"]
-    youtubeClips:
-      - videoId: "jAhhNX8xUfk"
-        startSec: 5
-        endSec: 35
-        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+    # youtubeClips borttaget 2026-11-24 (jAhhNX8xUfk dött/blockerat i SE) — ersätts senare, se CLAUDE.md 'Klipp att ersätta'.
   - id: soppgirobygget-viva-la-vida
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Viva La Vida — Soppgirobygget"
@@ -3051,11 +3035,7 @@ items:
     inBaseCatalog: false
     parentControlled: true
     region: ["nordic"]
-    youtubeClips:
-      - videoId: "U7wGh-rHjTQ"
-        startSec: 30
-        endSec: 60
-        notes: "Peter-kurerad 2026-09-21 ur YT-lista (xlsx)."
+    # youtubeClips borttaget 2026-11-24 (U7wGh-rHjTQ dött/blockerat i SE) — ersätts senare, se CLAUDE.md 'Klipp att ersätta'.
   - id: albatraoz-raggarbil
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Raggarbil — Albatraoz"

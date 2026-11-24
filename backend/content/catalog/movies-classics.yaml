@@ -372,12 +372,7 @@ items:
     # Distraktorer MÅSTE vara karaktärer ur ANDRA filmer — Mufasa/Scar/Nala/Timon
     # är också huvudkaraktärer i Lejonkungen och skulle bli felmarkerade rätta svar.
     distractorNames: ["Nemo", "Shrek", "Mulan", "Aladdin"]
-    youtubeClips:
-      - videoId: "lfiprM5l_cE"
-        startSec: 10
-        endSec: 40
-        channelTitle: "Aarush Boi"
-        notes: "Circle of Life-öppningsscenen (HD, 1994). Alla officiella Disney-trailers är made-for-kids-blockerade. Ersätt vid inbäddningsfel."
+    # youtubeClips borttaget 2026-11-24 (lfiprM5l_cE dött/blockerat i SE) — ersätts senare, se CLAUDE.md 'Klipp att ersätta'.
   - id: pulp-fiction
     audience: ["elder", "gen-x", "millennials", "gen-z", "gen-alpha"]
     displayName: "Pulp Fiction"
