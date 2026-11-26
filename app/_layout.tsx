@@ -8,6 +8,8 @@ import {
 } from '@/src/lib/iap';
 import { BottomBanner } from '@/src/components/BottomBanner';
 import { GlobalOverlay } from '@/src/components/GlobalOverlay';
+import { UpdateRequiredScreen } from '@/src/components/UpdateRequiredScreen';
+import { startMinSupportedBuildWatcher } from '@/src/utils/minSupportedBuild';
 import { Colors } from '@/src/theme';
 import { refreshOfferConfig, refreshPromoGrants } from '@/src/utils/promoPremium';
 import { clearPremiumSubscription, refreshPremiumMirror, setPremiumActive } from '@/src/utils/subscriptionStorage';
@@ -48,6 +50,9 @@ export default function RootLayout() {
     // skriva till samma nyckel (den skulle wipas av raderna nedan).
     void refreshOfferConfig();
 
+    // Forced-update gate (app_config.min_supported_build, Build 40 OTA).
+    const stopMinBuildWatcher = startMinSupportedBuildWatcher();
+
     // Kontots server-grant (gratismånad/voucher, migration 0047) speglas
     // lokalt så hasActiveFreePremium() blir korrekt vid nästa läsning. Rör
     // INTE den betalda `KEY` — refreshPremiumMirror räknar bara om den
@@ -72,6 +77,7 @@ export default function RootLayout() {
     return () => {
       cancelled = true;
       removeListener();
+      stopMinBuildWatcher();
     };
   }, []);
 
@@ -142,6 +148,8 @@ export default function RootLayout() {
           utanför Stack:en så den överlever router.replace och täcker banner +
           transition. Se src/utils/globalOverlay.ts. */}
       <GlobalOverlay />
+      {/* Forced-update gate — SIST så den täcker allt (src/utils/minSupportedBuild.ts). */}
+      <UpdateRequiredScreen />
     </GestureHandlerRootView>
   );
 }
