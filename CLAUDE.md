@@ -133,7 +133,7 @@ Varje steg nedan kräver Peters separata go.
   - Före publicering: bekräfta mot update group `e80008e0` att ingen annan text i den OTA:n saknas (t.ex. StoreScreen rad ~1054 "Redeem a voucher code above").
   - expo-updates-default: hämtas vid en start, tillämpas vid NÄSTA kallstart. En Build 40-enhet som inte öppnats får den aldrig.
 
-**Migration 0070** (`0070_v2_join_requires_device_client.sql`, EJ körd någonstans): own non-host join/rejoin i ett `multiplayer_v2`-rum utan `device_mode` → `qv_join_rejected:update_required`.
+**Migration 0070** (`0070_v2_join_requires_device_client.sql` — **STAGING: applicerad + verifierad 2026-11-26, `0070-staging-tests.sql` 19/19 PASS**; PROD: ej körd): own non-host join/rejoin i ett `multiplayer_v2`-rum utan `device_mode` → `qv_join_rejected:update_required`.
 - Build 40 skickar aldrig `device_mode`; Build 41 gör det alltid i v2-rum (join-vägen gör om rumsuppslaget vid timeout).
 - Legacy-rum, host-skrivningar och carry-over-claims påverkas inte.
 - Build 40:s UX: joinen loggas bara (`console.warn`), spelaren står kvar i sin egen lobbyvy utan att synas för host och kan trycka Leave. Ingen data skrivs.
