@@ -103,6 +103,13 @@ Two checklists:
 
 ### B2 — with the gate OTA (after publishing to `build40-compat-test`)
 
+**Published 2026-11-26:**
+- Update group `fe4319dd-104c-441d-9cc1-2240eefa2f9d` (iOS update `01a21a0f-a310-7619-be25-4e4dd2c32c24`).
+- Branch/channel `build40-compat-test`, runtime `build40-compat-1`, environment `preview` (STAGING), commit `6842839`.
+- `production` (still `e80008e0`) and `preview` (still `9a4b0555`) are untouched.
+
+**Run order (Peter):** C10, C8, C9, C14 first (with `multiplayerV2 = true`), then G1–G5. After G-tests: `min_supported_build` row deleted and `multiplayerV2` still `true` on STAGING.
+
 | # | Scenario | Steps | Expected |
 |---|---|---|---|
 | G1 | OTA delivery | Cold-start B40 twice. | Second start runs the OTA (gate inactive: no row). Store copy unchanged ("Free month used — you continue on the free Basic plan"). |
