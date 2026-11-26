@@ -21,6 +21,7 @@ import {
   type MusicRouteKey,
 } from '@/src/audio/musicController';
 import { setDesired, type DesiredMusic } from '@/src/audio/musicEngine';
+import { isUpdateRequired, subscribeUpdateRequired } from '@/src/utils/minSupportedBuild';
 
 const HOME_ZONE = new Set(['/', '/profile', '/store', '/faq', '/my-matches', '/competitions']);
 /** Home-zone routes where the Home loop skips its start delay. */
@@ -40,6 +41,8 @@ export function MusicHost() {
   useSyncExternalStore(subscribeMusic, getMusicVersion, getMusicVersion);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Forced-update gate (Build 41): ingen musik bakom "Update required".
+  const updateRequired = useSyncExternalStore(subscribeUpdateRequired, isUpdateRequired, isUpdateRequired);
   const routeKey = routeKeyFor(pathname);
   const entry = routeKey ? getRouteMusic(routeKey) : null;
   const inHomeZone = HOME_ZONE.has(pathname);
@@ -48,6 +51,10 @@ export function MusicHost() {
     if (holdTimer.current) {
       clearTimeout(holdTimer.current);
       holdTimer.current = null;
+    }
+    if (updateRequired) {
+      setDesired(SILENCE);
+      return;
     }
     if (inHomeZone) {
       // Profile / Store: the Home loop starts right away with its normal
@@ -76,6 +83,7 @@ export function MusicHost() {
     }
     setDesired(SILENCE);
   }, [
+    updateRequired,
     pathname,
     inHomeZone,
     routeKey,

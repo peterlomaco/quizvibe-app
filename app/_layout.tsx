@@ -13,6 +13,8 @@ import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 import { Colors } from '@/src/theme';
 import { refreshOfferConfig, refreshPromoGrants } from '@/src/utils/promoPremium';
 import { refreshFeatureGates } from '@/src/utils/featureGates';
+import { startMinSupportedBuildWatcher } from '@/src/utils/minSupportedBuild';
+import { UpdateRequiredScreen } from '@/src/components/UpdateRequiredScreen';
 import { clearPremiumSubscription, refreshPremiumMirror, setPremiumActive } from '@/src/utils/subscriptionStorage';
 import { supabase } from '@/src/utils/supabase';
 import { ensureVoiceAudioMode } from '@/src/utils/voicePlayback';
@@ -55,6 +57,10 @@ export default function RootLayout() {
     // Fire-and-forget; utan rad/nätverk gäller defaults (multiplayerV2 av).
     void refreshFeatureGates();
 
+    // Forced-update gate (app_config.min_supported_build, Build 41). Kollar
+    // nu + vid varje återgång till förgrunden; fail-open.
+    const stopMinBuildWatcher = startMinSupportedBuildWatcher();
+
     // Kontots server-grant (gratismånad/voucher, migration 0047) speglas
     // lokalt så hasActiveFreePremium() blir korrekt vid nästa läsning. Rör
     // INTE den betalda `KEY` — refreshPremiumMirror räknar bara om den
@@ -79,6 +85,7 @@ export default function RootLayout() {
     return () => {
       cancelled = true;
       removeListener();
+      stopMinBuildWatcher();
     };
   }, []);
 
@@ -155,6 +162,8 @@ export default function RootLayout() {
       <GlobalOverlay />
       {/* quizVibeAlert-dialoger (Lobby v2) — rot-host; RN-Modals har egna. */}
       <QuizVibeAlertHost inModal />
+      {/* Forced-update gate — SIST så den täcker allt (src/utils/minSupportedBuild.ts). */}
+      <UpdateRequiredScreen />
     </GestureHandlerRootView>
   );
 }
