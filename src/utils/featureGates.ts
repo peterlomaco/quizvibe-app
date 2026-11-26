@@ -5,7 +5,7 @@
 // (registerActiveRoom, later the lobby) can read the gates without awaiting.
 // Never-read / unreachable → DEFAULT_FEATURE_GATES (multiplayerV2 off).
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { envKey, scopedStorage } from './storageScope';
 import {
   DEFAULT_FEATURE_GATES,
   parseFeatureGates,
@@ -14,7 +14,7 @@ import {
 import { supabase } from './supabase';
 
 const CONFIG_KEY = 'feature_gates';
-const CACHE_KEY = '@quizvibe/featureGates/v1';
+const CACHE_KEY = envKey('featureGates');
 
 let mirror: FeatureGates = { ...DEFAULT_FEATURE_GATES };
 // Set once a network refresh has landed, so a slower cache warm can never
@@ -29,7 +29,7 @@ export function getCachedFeatureGates(): FeatureGates {
 /** Warms the mirror from AsyncStorage (module load). */
 async function warmFromCache(): Promise<void> {
   try {
-    const raw = await AsyncStorage.getItem(CACHE_KEY);
+    const raw = await scopedStorage.getItem(CACHE_KEY);
     if (raw && !refreshedFromServer) mirror = parseFeatureGates(JSON.parse(raw));
   } catch (err) {
     console.warn('[featureGates] warm failed:', err);
@@ -57,7 +57,7 @@ export async function refreshFeatureGates(): Promise<void> {
     mirror = parsed;
     refreshedFromServer = true;
     if (__DEV__) console.log('[featureGates] loaded from server:', parsed);
-    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(parsed));
+    await scopedStorage.setItem(CACHE_KEY, JSON.stringify(parsed));
   } catch (err) {
     console.warn('[featureGates] refresh failed:', err);
   }

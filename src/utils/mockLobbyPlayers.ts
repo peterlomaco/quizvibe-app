@@ -690,7 +690,8 @@ export async function publishOwnAccountName(
   await ensureAuthSession();
   const { data: userResp } = await supabase.auth.getUser();
   const userId = userResp.user?.id;
-  if (!userId) return;
+  // Build 41: en anonym session (ren gäst) har inget konto att publicera.
+  if (!userId || userResp.user?.is_anonymous) return;
   const { error } = await supabase
     .from('lobby_players')
     .update({ account_player_name: trimmed })
@@ -725,7 +726,8 @@ export async function publishOwnHcp(
   await ensureAuthSession();
   const { data: userResp } = await supabase.auth.getUser();
   const userId = userResp.user?.id;
-  if (!userId) return;
+  // Build 41: gäster (anonym session) har inget intjänat HCP att publicera.
+  if (!userId || userResp.user?.is_anonymous) return;
   const { error } = await supabase
     .from('lobby_players')
     .update({

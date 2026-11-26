@@ -13,7 +13,7 @@
 //
 //   2. GRANT (per KONTO, SERVER-side) — en beviljad Premium-månad, gratis
 //      eller via voucher. Bor i Supabase-tabellen `premium_grants`
-//      (migration 0047) och speglas lokalt i MIRROR_KEY för synkron-vänlig
+//      (migration 0047) och speglas lokalt (per konto) för synkron-vänlig
 //      läsning. Gratismånaden gäller EXAKT en gång per registrerad profil
 //      (unikt index server-side); vouchers är individuella engångskoder.
 //      REGEL (Peter): en månad kan bara aktiveras när INGEN premium är
@@ -36,8 +36,7 @@
 // (medvetet, minimalt med riktiga users innan launch).
 // ─────────────────────────────────────────────────────────────────────
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getCachedProfile, loadProfile } from './profileStorage';
+import { envKey, getUserScope, scopedStorage, userKey } from './storageScope';
 import { supabase } from './supabase';
 
 // ─── Offer window + paid-flagga (klocka 1 / remote-config) ────────────
@@ -56,18 +55,17 @@ const OFFER_CONFIG_KEY = 'free_premium_promo';
 const PAID_CONFIG_KEY = 'paid_subscription';
 
 /** Cache av senast hämtade remote-konfig. Överlever app-omstarter. */
-const OFFER_CACHE_KEY = '@quizvibe/promo/offerConfig/v1';
-const PAID_CACHE_KEY = '@quizvibe/promo/paidConfig/v1';
+const OFFER_CACHE_KEY = envKey('promo/offerConfig');
+const PAID_CACHE_KEY = envKey('promo/paidConfig');
 
 /**
  * Lokal spegel av kontots server-grant: `{ premiumUntil, freeMonthUsed, owner }`.
  *
- * ⚠ `owner` (= playerName, lowercased) är inte kosmetik. AsyncStorage är per
- * ENHET, medan granten tillhör ett KONTO. Utan ägarstämpeln skulle konto B på
- * samma telefon läsa konto A:s speglade grant. Vid ägar-mismatch behandlas
- * spegeln som frånvarande tills refreshPromoGrants körts för rätt konto.
+ * Build 41: lagras under kontots egen nyckel (project ref + Supabase-UUID), så
+ * konto B på samma telefon aldrig kan läsa konto A:s grant. `owner` (= uid)
+ * står kvar som extra kontroll.
  */
-const MIRROR_KEY = '@quizvibe/promo/premiumGrant/v3';
+const mirrorKeyFor = (uid: string) => userKey(uid, 'promoGrant');
 
 interface OfferConfig {
   enabled: boolean;
@@ -115,11 +113,11 @@ export async function refreshOfferConfig(): Promise<void> {
     for (const row of data ?? []) {
       if (row.key === OFFER_CONFIG_KEY) {
         const parsed = parseOfferConfig(row.value);
-        if (parsed) await AsyncStorage.setItem(OFFER_CACHE_KEY, JSON.stringify(parsed));
+        if (parsed) await scopedStorage.setItem(OFFER_CACHE_KEY, JSON.stringify(parsed));
       } else if (row.key === PAID_CONFIG_KEY) {
         const enabled = parsePaidEnabled(row.value);
         if (enabled !== null) {
-          await AsyncStorage.setItem(PAID_CACHE_KEY, JSON.stringify({ enabled }));
+          await scopedStorage.setItem(PAID_CACHE_KEY, JSON.stringify({ enabled }));
         }
       }
     }
@@ -132,7 +130,7 @@ export async function refreshOfferConfig(): Promise<void> {
 
 async function readOfferConfig(): Promise<OfferConfig | null> {
   try {
-    const raw = await AsyncStorage.getItem(OFFER_CACHE_KEY);
+    const raw = await scopedStorage.getItem(OFFER_CACHE_KEY);
     if (!raw) return null;
     return parseOfferConfig(JSON.parse(raw));
   } catch (err) {
@@ -162,7 +160,7 @@ export async function isOfferWindowOpen(): Promise<boolean> {
  */
 export async function isPaidSubscriptionEnabled(): Promise<boolean> {
   try {
-    const raw = await AsyncStorage.getItem(PAID_CACHE_KEY);
+    const raw = await scopedStorage.getItem(PAID_CACHE_KEY);
     if (!raw) return false;
     return parsePaidEnabled(JSON.parse(raw)) === true;
   } catch (err) {
@@ -178,7 +176,7 @@ interface GrantMirror {
   premiumUntil: string | null;
   /** Har kontot någonsin förbrukat sin gratismånad? */
   freeMonthUsed: boolean;
-  /** playerName (lowercased) på kontot spegeln gäller. */
+  /** Supabase-UUID för kontot spegeln gäller. */
   owner: string;
 }
 
@@ -204,25 +202,22 @@ function parseGrantMirror(raw: string | null): GrantMirror | null {
   }
 }
 
-/**
- * Inloggat playerName (lowercased), eller null om ingen är inloggad. Läser i
- * första hand den SYNKRONA profil-spegeln; `undefined` (cold start) → betala
- * för loadProfile(). `undefined` får ALDRIG tolkas som utloggad.
- */
+/** Registrerat kontos UUID (även offline), eller null för gäst/utloggad. */
 async function resolveCurrentOwner(): Promise<string | null> {
-  const cached = getCachedProfile();
-  const profile = cached === undefined ? await loadProfile() : cached;
-  const name = profile?.playerName?.trim();
-  return name ? name.toLowerCase() : null;
+  try {
+    return (await getUserScope())?.uid ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** Spegeln, men bara om den tillhör det INLOGGADE kontot. Annars null. */
 async function readOwnedMirror(): Promise<GrantMirror | null> {
   try {
-    const mirror = parseGrantMirror(await AsyncStorage.getItem(MIRROR_KEY));
-    if (!mirror) return null;
     const owner = await resolveCurrentOwner();
-    if (!owner || mirror.owner !== owner) return null;
+    if (!owner) return null;
+    const mirror = parseGrantMirror(await scopedStorage.getItem(mirrorKeyFor(owner)));
+    if (!mirror || mirror.owner !== owner) return null;
     return mirror;
   } catch (err) {
     console.warn('[promoPremium] readOwnedMirror failed:', err);
@@ -252,7 +247,9 @@ export async function refreshPromoGrants(): Promise<void> {
       freeMonthUsed: row.free_month_used === true,
       owner,
     };
-    await AsyncStorage.setItem(MIRROR_KEY, JSON.stringify(mirror));
+    // Sent svar efter kontobyte: skriv aldrig ett annat kontos grant.
+    if ((await resolveCurrentOwner()) !== owner) return;
+    await scopedStorage.setItem(mirrorKeyFor(owner), JSON.stringify(mirror));
     // Spegeln vilar på granten — räkna om den synkrona flagg-spegeln nu.
     await computePromoFlags();
   } catch (err) {

@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { AssistanceLevel } from './hcp';
 import {
   applyGameResult,
@@ -15,24 +14,22 @@ import {
 } from './hcpEngine';
 import type { MainCategory } from './mainCategory';
 import { loadProfile, saveProfile } from './profileStorage';
+import { getUserScope, scopedStorage, userKey } from './storageScope';
 
-// Persistens för HCP-progressen, per registrerad spelare (playerName) OCH per
-// region scope (§1.3). Räknekärnan (applyGameResult / applyInactivityDecay /
-// display) bor i hcpEngine.ts eftersom den är ren och enhetstestas utan
-// React/AsyncStorage — den här filen sköter bara läsning/skrivning + spegling.
+// Persistens för HCP-progressen, per konto (project ref + Supabase-UUID sedan
+// Build 41) OCH per region scope (§1.3). Räknekärnan (applyGameResult /
+// applyInactivityDecay / display) bor i hcpEngine.ts — den här filen sköter
+// bara läsning/skrivning + spegling.
 //
-// Nyckel per (region, playerName) så att en spelare som byter till en region
-// scope de aldrig spelat i börjar på 99 för alla kategorier (helt frisk
-// progress), och en svensk spelares svar aldrig påverkar en annan regions
-// bucket. Pass-the-Phone kan uppdatera VARJE registrerad deltagares progress på
-// den delade enheten (recordGameResultForName). Den inloggade spelarens värde
-// speglas dessutom till profile.hcp (+ profile.hcpByCategory) för synkron
-// UI-läsning (sköldarna).
-
-// Bumpat till v2 (kategori-uppdelning + region-segment). v1-nycklarna
-// (@quizvibe/hcpProgress/v1/<name>) läses aldrig igen — ett enskilt sparat
-// Total går inte att splittra i tre kategori-fönster, så vi startar friskt på 99.
-const HCP_KEY_PREFIX = '@quizvibe/hcpProgress/v2/';
+// Nyckel per (konto, region) så en spelare som byter till en region scope de
+// aldrig spelat börjar på 99. Den inloggade spelarens värde speglas till
+// profile.hcp (+ profile.hcpByCategory) för synkron UI-läsning (sköldarna).
+//
+// Pass-the-Phone-medspelare: progressen lagras HOST-SCOPED under värdens konto,
+// nycklad på medspelarens lobby-user_id (aldrig på namn), och adopteras aldrig
+// av medspelarens eget konto. Medspelare utan user_id (gäster) får bara en
+// sessions-lokal progress. Äldre playerName-nycklade v1/v2-poster rensas av
+// storageTransition.
 
 // Bundle av display-heltal (avrundade uppåt) för sköldarna (Total + Music + Film).
 export interface HcpBundle {
@@ -50,15 +47,27 @@ export type CategoryAnswers = Partial<Record<MainCategory, HcpContribution[]>>;
 // epochLedger:s sessionDebt). Försvinner vid app-omstart; gäster persisteras aldrig.
 const sessionProgress = new Map<string, HcpProgress>();
 
-function keyFor(region: string, playerName: string): string {
-  return `${HCP_KEY_PREFIX}${region}/${playerName.trim().toLowerCase()}`;
+function ownStore(region: string): string {
+  return `hcp/${region}`;
 }
 
 async function resolveOwnKey(region: string): Promise<string | null> {
   try {
-    const profile = await loadProfile();
-    if (!profile?.playerName) return null;
-    return keyFor(region, profile.playerName);
+    const scope = await getUserScope();
+    return scope ? userKey(scope.uid, ownStore(region)) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Host-scoped nyckel för en PtP-medspelare (lobby-user_id). null om värden
+// saknar registrerad session eller medspelaren saknar user_id.
+async function resolvePeerKey(peerUserId: string | null, region: string): Promise<string | null> {
+  if (!peerUserId) return null;
+  try {
+    const scope = await getUserScope();
+    if (!scope || scope.uid === peerUserId) return null;
+    return userKey(scope.uid, `ptpPeers/${peerUserId}/hcp/${region}`);
   } catch {
     return null;
   }
@@ -102,13 +111,13 @@ function coerce(raw: unknown): HcpProgress {
   };
 }
 
-async function readByKey(key: string | null, region: string): Promise<HcpProgress> {
+async function readByKey(key: string | null, sessionId: string): Promise<HcpProgress> {
   if (!key) {
-    const s = sessionProgress.get(region);
+    const s = sessionProgress.get(sessionId);
     return s ? coerce(s) : emptyHcpProgress();
   }
   try {
-    const raw = await AsyncStorage.getItem(key);
+    const raw = await scopedStorage.getItem(key);
     if (!raw) return emptyHcpProgress();
     return coerce(JSON.parse(raw));
   } catch {
@@ -116,13 +125,13 @@ async function readByKey(key: string | null, region: string): Promise<HcpProgres
   }
 }
 
-async function writeByKey(key: string | null, region: string, progress: HcpProgress): Promise<void> {
+async function writeByKey(key: string | null, sessionId: string, progress: HcpProgress): Promise<void> {
   if (!key) {
-    sessionProgress.set(region, progress);
+    sessionProgress.set(sessionId, progress);
     return;
   }
   try {
-    await AsyncStorage.setItem(key, JSON.stringify(progress));
+    await scopedStorage.setItem(key, JSON.stringify(progress));
   } catch {}
 }
 
@@ -180,7 +189,7 @@ function applyAllCategories(
 export async function refreshOwnHcpDecay(region: string, now: Date = new Date()): Promise<void> {
   const key = await resolveOwnKey(region);
   if (!key) return; // gäster har ingen persisterad progress att decay:a
-  const raw = await AsyncStorage.getItem(key).catch(() => null);
+  const raw = await scopedStorage.getItem(key).catch(() => null);
   if (!raw) {
     // Ingen v2-progress ännu → spegla fräsch 99 så en stale v1-mirrad
     // profile.hcp inte hänger kvar. Skriv bara om profilen inte redan är 99.
@@ -232,23 +241,25 @@ export async function recordSelfGameResult(
 }
 
 /**
- * §2.1 — samma som recordSelfGameResult men för en NAMNGIVEN deltagare på en
- * delad enhet (Pass-the-Phone). Speglar INTE till profilen (det är inte denna
- * enhets inloggade spelare). Returnerar display-bundle före/efter.
+ * §2.1 — samma som recordSelfGameResult men för en Pass-the-Phone-medspelare på
+ * värdens enhet. Lagras host-scoped på medspelarens lobby-user_id (Build 41,
+ * aldrig på namn); utan user_id sessions-lokalt per playerId. Speglar INTE till
+ * profilen. Returnerar display-bundle före/efter.
  */
-export async function recordGameResultForName(
-  playerName: string,
+export async function recordGameResultForPeer(
+  peer: { playerId: string; userId: string | null },
   region: string,
   level: AssistanceLevel,
   answersByCategory: CategoryAnswers,
   eraYears: number,
   now: Date = new Date(),
 ): Promise<{ before: HcpBundle; after: HcpBundle }> {
-  const key = keyFor(region, playerName);
-  const decayed = applyInactivityDecay(await readByKey(key, region), now);
+  const key = await resolvePeerKey(peer.userId, region);
+  const sessionId = `peer:${peer.playerId}:${region}`;
+  const decayed = applyInactivityDecay(await readByKey(key, sessionId), now);
   const before = bundleOf(decayed);
   const next = applyAllCategories(decayed, level, answersByCategory, eraYears, now.toISOString());
-  await writeByKey(key, region, next);
+  await writeByKey(key, sessionId, next);
   return { before, after: bundleOf(next) };
 }
 
@@ -292,17 +303,13 @@ export async function loadOwnHcpBundle(
 export async function clearOwnHcpProgress(region?: string): Promise<void> {
   sessionProgress.clear();
   try {
+    const scope = await getUserScope();
+    if (!scope) return;
     if (region) {
-      const key = await resolveOwnKey(region);
-      if (key) await AsyncStorage.removeItem(key);
+      await scopedStorage.removeItem(userKey(scope.uid, ownStore(region)));
       return;
     }
-    // Utan region: rensa alla v2-nycklar för den inloggade spelaren.
-    const profile = await loadProfile();
-    if (!profile?.playerName) return;
-    const suffix = `/${profile.playerName.trim().toLowerCase()}`;
-    const allKeys = await AsyncStorage.getAllKeys();
-    const mine = allKeys.filter((k) => k.startsWith(HCP_KEY_PREFIX) && k.endsWith(suffix));
-    if (mine.length > 0) await AsyncStorage.multiRemove(mine);
+    const mine = await scopedStorage.keysWithPrefix(userKey(scope.uid, 'hcp/'));
+    if (mine.length > 0) await scopedStorage.multiRemove(mine);
   } catch {}
 }

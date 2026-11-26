@@ -1,5 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { loadProfile } from './profileStorage';
+import { getUserScope, scopedStorage, userKey } from './storageScope';
 import { supabase } from './supabase';
 
 /**
@@ -17,25 +16,12 @@ import { supabase } from './supabase';
  *     SELECT * räcker, men vi filtrerar ändå för tydlighet).
  *   • `removeInvite` DELETE:ar via id.
  *
- * AsyncStorage parallellt med Supabase som:
+ * Lokal cache (userKey(uid,'invites'), Build 41) parallellt med Supabase:
  *   1. Optimistisk lokal cache så UI kan visa lista direkt vid load.
- *   2. Offline-fallback om Supabase-anrop failar (network, RLS-error).
- *   3. Single-device-testfall (logout/login mellan host och recipient på
- *      samma device — DB-anropet fail:ar tyst för guests, AsyncStorage
- *      bär flödet).
- *
- * **Per-user-namespacing av AsyncStorage-nyckeln**: `@quizvibe/waitingInvites/v1/<lowercase-playerName>`.
- * När backend kommer in helt kan denna ersättas med ren Supabase-cache;
- * tills dess är dual-write säker default.
+ *   2. Offline-fallback om Supabase-anrop failar.
+ * Avsändaren skriver ALDRIG i mottagarens lokala inbox — Supabase + Realtime
+ * är leveransvägen.
  */
-
-const INVITES_KEY_PREFIX = '@quizvibe/waitingInvites/v1/';
-// Flagga för one-shot reset av all v1-invites-data. Sätts efter första load
-// efter per-user-namespacing-fixen. Innan flaggan finns nuk:as allt:
-//   - legacy-nyckeln @quizvibe/waitingInvites/v1 (pre-namespacing global lista)
-//   - alla @quizvibe/waitingInvites/v1/<playerName>-nycklar.
-// Resultatet: alla startar tomma. Hostar får skicka invites på nytt.
-const INVITES_RESET_FLAG_KEY = '@quizvibe/migration/invitesReset/v1';
 
 export interface WaitingInvite {
   id: string;
@@ -82,18 +68,10 @@ function rowToInvite(row: WaitingInviteRow): WaitingInvite {
   };
 }
 
-function keyFor(playerName: string): string {
-  return `${INVITES_KEY_PREFIX}${playerName.toLowerCase()}`;
-}
-
-/**
- * Returnerar AsyncStorage-nyckeln för inloggade user:s invite-inbox.
- * null = ingen profil laddad → caller bör returnera tom lista / no-op:a save.
- */
+/** Kontots inbox-nyckel, eller null utan registrerad session. */
 async function resolveActiveInvitesKey(): Promise<string | null> {
-  const profile = await loadProfile();
-  if (!profile?.playerName) return null;
-  return keyFor(profile.playerName);
+  const scope = await getUserScope();
+  return scope ? userKey(scope.uid, 'invites') : null;
 }
 
 function parseInvites(json: string): WaitingInvite[] {
@@ -112,29 +90,6 @@ function parseInvites(json: string): WaitingInvite[] {
     // know, and showing a spurious consent popup is worse than skipping one.
     alreadyFriend: i.alreadyFriend ?? true,
   }));
-}
-
-/**
- * One-shot reset av all v1-invites-data. Tar bort legacy-nyckeln och alla
- * per-user-nycklar så ingen ärver felaktig data från pre-namespacing-tiden.
- * Sätter en flagga så reset:en bara körs en gång. Idempotent.
- */
-async function ensureInvitesReset(): Promise<void> {
-  try {
-    const flag = await AsyncStorage.getItem(INVITES_RESET_FLAG_KEY);
-    if (flag) return;
-    const allKeys = await AsyncStorage.getAllKeys();
-    const inviteKeys = allKeys.filter(
-      (k) =>
-        k === '@quizvibe/waitingInvites/v1' || k.startsWith(INVITES_KEY_PREFIX),
-    );
-    if (inviteKeys.length > 0) {
-      await AsyncStorage.multiRemove(inviteKeys);
-    }
-    await AsyncStorage.setItem(INVITES_RESET_FLAG_KEY, '1');
-  } catch (err) {
-    console.warn('[waitingInvites] Reset failed:', err);
-  }
 }
 
 /**
@@ -168,14 +123,12 @@ function mergeInvites(local: WaitingInvite[], remote: WaitingInvite[]): WaitingI
  * inte tappas.
  */
 export async function loadInvites(): Promise<WaitingInvite[]> {
-  await ensureInvitesReset();
-
   // 1) AsyncStorage först — snabb, alltid tillgänglig, fungerar offline.
   let local: WaitingInvite[] = [];
   try {
     const key = await resolveActiveInvitesKey();
     if (key) {
-      const json = await AsyncStorage.getItem(key);
+      const json = await scopedStorage.getItem(key);
       if (json) local = parseInvites(json);
     }
   } catch (err) {
@@ -207,12 +160,11 @@ export async function loadInvites(): Promise<WaitingInvite[]> {
 }
 
 async function saveInvitesForKey(key: string, invites: WaitingInvite[]): Promise<void> {
-  await AsyncStorage.setItem(key, JSON.stringify(invites));
+  await scopedStorage.setItem(key, JSON.stringify(invites));
 }
 
 export async function saveInvites(invites: WaitingInvite[]): Promise<void> {
   try {
-    await ensureInvitesReset();
     const key = await resolveActiveInvitesKey();
     if (!key) {
       console.warn('[waitingInvites] saveInvites called without active profile — no-op');
@@ -228,14 +180,10 @@ export async function saveInvites(invites: WaitingInvite[]): Promise<void> {
 /**
  * Lägger till en invite i `toPlayerName`:s inbox.
  *   • Supabase INSERT (cross-device delivery — primär källa).
- *   • AsyncStorage-skrivning i hostens egen device-namespace
- *     (`@quizvibe/waitingInvites/v1/<toPlayerName>`) som offline-fallback
- *     OCH single-device-testfall (logout/login mellan host och recipient
- *     på samma device).
+ *   • Ingen lokal kopia i mottagarens namespace (Build 41, togs bort så
+ *     ingen data skrivs under en annan spelares namn).
  *
- * Båda skrivningarna är best-effort — om Supabase failar (offline, RLS-
- * konfig, missing migration) bär AsyncStorage flödet på single-device.
- * Om AsyncStorage failar är det inte värt att blockera Supabase-vägen.
+ * Best-effort — fel loggas, kastas inte. Returnerar alltid [] (oanvänt).
  *
  * Caller måste passera mottagarens playerName explicit — invites är till
  * sin natur cross-user och kan inte härledas från inloggad profil (som är
@@ -245,7 +193,6 @@ export async function addInvite(
   toPlayerName: string,
   invite: Omit<WaitingInvite, 'id' | 'sentAt'>,
 ): Promise<WaitingInvite[]> {
-  await ensureInvitesReset();
   const trimmed = toPlayerName.trim();
   if (!trimmed) return [];
   const normalizedTo = trimmed.toLowerCase();
@@ -276,37 +223,9 @@ export async function addInvite(
     console.warn('[waitingInvites] Supabase insert threw:', err);
   }
 
-  // 2) AsyncStorage-skrivning i recipient:s namespace på hostens device.
-  //    Speglar AsyncStorage-mockens tidigare beteende exakt — kommer att
-  //    läsas av loadInvites när recipient loggar in på SAMMA device.
-  //    Skiljs från Supabase-vägen — om host-device är offline når invite:n
-  //    fortfarande recipient via login-byte på samma telefon.
-  const key = keyFor(trimmed);
-  let current: WaitingInvite[] = [];
-  try {
-    const json = await AsyncStorage.getItem(key);
-    if (json) current = parseInvites(json);
-  } catch (err) {
-    console.warn('[waitingInvites] addInvite read failed:', err);
-  }
-  const dup = current.find(
-    (i) =>
-      i.roomCode === invite.roomCode &&
-      i.fromPlayerName.toLowerCase() === invite.fromPlayerName.toLowerCase(),
-  );
-  if (dup) return current;
-  const next: WaitingInvite = {
-    ...invite,
-    id: `inv-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-    sentAt: Date.now(),
-  };
-  const updated = [next, ...current];
-  try {
-    await saveInvitesForKey(key, updated);
-  } catch (err) {
-    console.warn('[waitingInvites] addInvite save failed:', err);
-  }
-  return updated;
+  // Ingen lokal skrivning i mottagarens namespace (Build 41) — leveransen
+  // sker enbart via Supabase + Realtime.
+  return [];
 }
 
 /**
@@ -362,10 +281,9 @@ export async function removeInvite(id: string): Promise<WaitingInvite[]> {
 
   // AsyncStorage-cleanup på recipient:s egen inbox-nyckel.
   try {
-    await ensureInvitesReset();
     const key = await resolveActiveInvitesKey();
     if (key) {
-      const json = await AsyncStorage.getItem(key);
+      const json = await scopedStorage.getItem(key);
       if (json) {
         const current = parseInvites(json);
         const updated = current.filter((i) => i.id !== id);

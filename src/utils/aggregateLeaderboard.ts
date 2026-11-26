@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { envKey, scopedStorage } from './storageScope';
 import type { AssistanceLevel } from '../components/RoundLeaderboard';
 
 /**
@@ -33,7 +33,7 @@ import type { AssistanceLevel } from '../components/RoundLeaderboard';
  * (`buildAggregateStandings`), inte vid skrivning.
  */
 
-const KEY = '@quizvibe/aggregateSeries/v1';
+const KEY = envKey('aggregateSeries');
 /** Rullande tak — en serie är ett sittande, inte en livshistorik. */
 const MAX_GAMES = 20;
 
@@ -172,7 +172,7 @@ function isSeries(value: unknown): value is AggregateSeries {
 
 export async function loadAggregateSeries(): Promise<AggregateSeries | null> {
   try {
-    const raw = await AsyncStorage.getItem(KEY);
+    const raw = await scopedStorage.getItem(KEY);
     if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
     return isSeries(parsed) ? parsed : null;
@@ -183,7 +183,7 @@ export async function loadAggregateSeries(): Promise<AggregateSeries | null> {
 
 async function writeSeries(series: AggregateSeries): Promise<void> {
   try {
-    await AsyncStorage.setItem(KEY, JSON.stringify(series));
+    await scopedStorage.setItem(KEY, JSON.stringify(series));
   } catch {
     // Aggregate är en bonusvy — en misslyckad skrivning får aldrig blockera
     // slutskärmen.
@@ -192,7 +192,7 @@ async function writeSeries(series: AggregateSeries): Promise<void> {
 
 export async function clearAggregateSeries(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(KEY);
+    await scopedStorage.removeItem(KEY);
   } catch {
     // Ignorera — nästa recordGameInSeries skriver ändå över.
   }

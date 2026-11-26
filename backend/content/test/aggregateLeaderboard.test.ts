@@ -9,8 +9,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * native-store för att räknas ut.
  */
 const store = new Map<string, string>();
-vi.mock('@react-native-async-storage/async-storage', () => ({
-  default: {
+// Build 41: modulen går via storageScope (envKey + scopedStorage), som annars
+// drar in supabase-klienten. Mocka scope-lagret direkt med samma Map.
+vi.mock('../../../src/utils/storageScope', () => ({
+  envKey: (k: string) => `@quizvibe/env/test/${k}`,
+  scopedStorage: {
     getItem: async (k: string) => store.get(k) ?? null,
     setItem: async (k: string, v: string) => {
       store.set(k, v);

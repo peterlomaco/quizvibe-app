@@ -148,6 +148,7 @@ Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-on
   3. Demo-konto i PROD med förbrukad gratismånad (`premium_grants`-insert, se `project_appstore_submit_subscription.md`) — annars ser granskaren inget köp → avslag.
   4. Submit **1.0.1** (nytt build-nummer, koden kan vara oförändrad) med prenumerationen BIFOGAD — Apples första prenumeration måste granskas med en app-version, OTA räcker inte.
   5. Efter approval: `paid_subscription.enabled = true` i PROD (remote config, ingen OTA) + stäng/låt kampanjfönstret löpa ut + släpp 1.0.1.
+  6. **OBLIGATORISKT före kommersiell launch (Build 42) — RevenueCat vid kontobyte.** `addCustomerInfoListener` i [_layout.tsx](app/_layout.tsx) skriver `setPremiumActive(...)` under det Supabase-konto som är inloggat NÄR callbacken kommer, inte under kontot callbacken gäller. Ett customer-info-event för konto A som anländer efter bytet till B men innan `Purchases.logIn(B)` är klar kan sätta B:s betalda flagga. Verifiera på enhet med två sandbox-konton (A med aktiv prenumeration, B utan): logga ut A → in B, kalla start, snabbt byte, offline-byte — B får aldrig Premium. Trolig fix: jämför `info.originalAppUserId` med inloggat uid före skrivning. **Build 41 påverkas inte i praktiken**: inget betalt IAP är live, så entitlementen är alltid false och racet kan bara skriva `false` (ofarligt, spegeln räknas om). Gratismånaden (promo-grant) har redan ägarkontroll.
 - [ ] Post-launch: byt `ota-on-clip-fix-merge.yml` från `preview` till `production`.
 - [ ] **Före VARJE native build (Apple 2.5.4):** kör `npx expo config --type introspect` och bekräfta att `ios.infoPlist.UIBackgroundModes` saknas. Build #38 avvisades 2026-10-14 för att expo-audio-pluginet lade till `UIBackgroundModes: audio` som default (fix `b6d08cc`: `enableBackgroundPlayback: false`). Rör aldrig `enableBackgroundPlayback`, `UIBackgroundModes` eller `shouldPlayInBackground`. Gäller även när bakgrundsmusikens detektor-modul (Batch 6) läggs till.
 
@@ -234,6 +235,25 @@ Path alias: `@/*` → repo root (e.g. `@/src/theme`, `@/src/components/Button`).
 ## Persistence
 
 All client-side via AsyncStorage. No server. Screens reload data on focus (`useFocusEffect` + `loadX()`), so writing through `src/utils/*Storage.ts` is the canonical pattern. No reactive store yet.
+
+### ⚠ Scoped storage + session integrity (Build 41, branch `fix/auth-session-integrity`, 2026-11-26)
+
+**ERSÄTTER per-playerName-namespacingen som beskrivs längre ned** (friends, invites, gameHistory, hcpProgress, seenQuestionIds, ledgers, savedLobbies, promo/premium-speglar). Den texten är historik.
+
+- **Bara fyra moduler får röra AsyncStorage**: `storageScope.ts`, `storageTransition.ts`, `sessionState.ts`, `supabase.ts`. Allt annat går via `scopedStorage` med en av tre nyckeltyper:
+  - `userKey(uid, store)` → `@quizvibe/u/<projectRef>/<supabaseUUID>/<store>` — allt som hör till ett konto (profil, vänner, history, HCP, ledgers, Premium-speglar, seen-signaturer).
+  - `envKey(store)` → `@quizvibe/env/<projectRef>/<store>` — rum-/projektdata utan ägare (aggregateSeries, leftPlayers, featureGates, promo-config, pendingLobby).
+  - `deviceKey(store)` → `@quizvibe/device/<store>` — ren UI-layout.
+  Ett test (`authSessionIntegrity.test.ts`) failar om en annan fil importerar AsyncStorage eller skriver en `'@quizvibe/…'`-sträng.
+- **STAGING och PROD är separerade** via project ref i nyckeln (samma app-container för TestFlight-staging och App Store). Sessionen läses bara under `sb-<ref>-auth-token` för det egna projektet.
+- **Sessionstatus** (`getSessionState`): `online` / `offline` (utgången token, registrerad session kvar lokalt) / `guest` (anon) / `signedOut` / `unknown` (lagring oläsbar — radera aldrig något då). `getUserScope()` ger uid för online+offline. En lokal profil utan session ger ALDRIG inloggat läge. Offline ger aldrig serverbehörighet.
+- **Engångsövergång** (`storageTransition.ts`, körs vid modul-load, markör per project ref skrivs sist): rensar en explicit allowlist av gamla `@quizvibe/*`-nycklar + sessioner från ANDRA projekt — aldrig PROD-projektets session (`PROTECTED_SESSION_REFS`), aldrig okända nycklar. Lokal history, HCP (→ 99), ledgers, vänner och sparade lobbies nollställs. Server-data rörs inte. Bara sex preferensfält (`voice`, `parentControlEnabled`, `spotifyAppConfirmed`, `spotifyDefaultEnabled`, `spotifyAnswerYear`, `spotifyAnswerName`) flyttas, och bara när den gamla cachens e-post matchar projektets registrerade session. Misslyckas övergången: **degraderat läge** — alla `@quizvibe/u/`-skrivningar släpps tills nästa start lyckas.
+- **Profil**: cachen bär `ownerUserId`; ägarskap = uid, e-post bara som legacy-fallback, cache utan e-post är INTE ägd. DB-fel raderar aldrig cachen. Backfill tar signup-metadata före cache. **Ingen offline-synk**: `canSaveProfileNow()` är true bara online, och Profile-skärmen visar "You're offline" i stället för att spara.
+- **Auth-lås**: allt som SÄTTER en session (anon-signup, inloggning, signUp, OTP) går via `runAuthExclusive`. `ensureAuthSession` skapar aldrig en anon-session när en sparad session finns kvar (nätverksfel) och kollar igen precis före `setSession`.
+- **Kontobyte**: `currentAuthEpoch()` ökar när registrerat uid byts; profil- och Premium-speglarna kastar svar som startade före bytet. Promo-grant skrivs bara om ägaren fortfarande är inloggad.
+- **PtP-medspelare**: HCP lagras host-scoped `userKey(hostUid, 'ptpPeers/<lobbyUserId>/hcp/<region>')`, aldrig på namn och aldrig adopterat av medspelarens konto; gäst utan user_id = sessions-lokalt. `addSessionRecordForNames` är borttagen — seen-historik skrivs bara för den inloggade spelaren (cross-player-exkluderingen via `lobby_players.seen_question_ids` är oförändrad).
+- **Lobby**: `publishOwnAccountName`/`publishOwnHcp` gör inget för en anonym session (Guest alias för en inloggad user som spelar som gäst fungerar som förut).
+- **Delete Account** rensar bara det kontots nycklar (`clearUserScope(uid)`), inte hela `@quizvibe/`.
 
 **Synkron profil-spegel — login-state får ALDRIG seedas från `null`** (fix 2026-08-12): `getCachedProfile()` i [profileStorage.ts](src/utils/profileStorage.ts) returnerar senast kända profil **synkront** — `undefined` = ohydrerad (vi VET inte), `null` = utloggad, objekt = inloggad. Spegeln uppdateras av `loadProfile`/`saveProfile`/`clearProfile` och värms från AsyncStorage vid modul-load.
 
@@ -3445,7 +3465,7 @@ Säkerhetsgranskning (RLS, Edge Functions, klient-trust, input-validering) → �
 
 **Migrations appliceras manuellt** via Supabase SQL Editor (samma flöde som övriga). Edge Function login-by-name: kom ihåg dashboard-fällan (klistra kod i Code-fliken + re-deploy efter create).
 
-**Kvarstående säkerhetsbacklog** (ej åtgärdat): Realtime broadcast-authorization (server-side sender-auth); `game_sessions` SELECT `using(true)` → strama till deltagare; `lobby_players` INSERT `with check(true)` → blockera cross-user-injection; CAPTCHA på join/signup (rumkod-brute-force ~25-bit); per-(avsändare,mottagare) invite-tak + rum-skapande-rate-limit; server-side scoring/credits/premium-authority (idag klient-auktoritativt — svar ligger i bundlen, credits i AsyncStorage, premium togglingsbart).
+**Kvarstående säkerhetsbacklog** (ej åtgärdat): Realtime broadcast-authorization (server-side sender-auth); `game_sessions` SELECT `using(true)` → strama till deltagare; `lobby_players` INSERT `with check(true)` → blockera cross-user-injection; CAPTCHA på join/signup (rumkod-brute-force ~25-bit); per-(avsändare,mottagare) invite-tak + rum-skapande-rate-limit; server-side scoring/credits/premium-authority (idag klient-auktoritativt — svar ligger i bundlen, credits i AsyncStorage, premium togglingsbart); **`lobby_players.account_player_name` + `hcp`/`hcp_music`/`hcp_film` är klient-skrivbara** (2026-11-26) — en anon-user kan skriva dem på sin egen rad och host på andra rader i rummet, och 0068 guardar inte kolumnerna. Build 41 stoppar det i klienten; serverfixen är en trigger som sätter `account_player_name` från `profiles` och nollar hcp för anon/icke-ägare (ingen migration skriven än).
 
 ## Security remediation (2026-11-13) — 9 batcher, Batch 1 klar på staging
 

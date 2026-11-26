@@ -1,5 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { loadProfile } from './profileStorage';
+import { getUserScope, scopedStorage, userKey } from './storageScope';
 import { clampCategoryDebt, emptyCategoryDebt, type CategoryDebt } from './epochAllocation';
 
 // Persistens för kategori-skuldboken, per Host (playerName). Räknekärnan
@@ -13,17 +12,14 @@ import { clampCategoryDebt, emptyCategoryDebt, type CategoryDebt } from './epoch
 // aldrig. Genom att spara resten mellan spel ackumuleras 0,3 tills den passerar
 // 1 och Film får ett block (~vart 3:e 4-rundorsspel).
 
-const LEDGER_KEY_PREFIX = '@quizvibe/categoryLedger/v1/';
-
 // Guests saknar sparat playerName — de får en sessions-lokal skuldbok istället
 // för ingen alls, så kategori-spridningen fungerar även inom ett gästspel.
 let sessionDebt: CategoryDebt = emptyCategoryDebt();
 
 async function resolveKey(): Promise<string | null> {
   try {
-    const profile = await loadProfile();
-    if (!profile?.playerName) return null;
-    return `${LEDGER_KEY_PREFIX}${profile.playerName.toLowerCase()}`;
+    const scope = await getUserScope();
+    return scope ? userKey(scope.uid, 'categoryLedger') : null;
   } catch {
     return null;
   }
@@ -33,7 +29,7 @@ export async function loadCategoryLedger(): Promise<CategoryDebt> {
   try {
     const key = await resolveKey();
     if (!key) return { ...sessionDebt };
-    const raw = await AsyncStorage.getItem(key);
+    const raw = await scopedStorage.getItem(key);
     if (!raw) return emptyCategoryDebt();
     return clampCategoryDebt(JSON.parse(raw));
   } catch {
@@ -49,7 +45,7 @@ export async function saveCategoryLedger(debt: CategoryDebt): Promise<void> {
       sessionDebt = clamped;
       return;
     }
-    await AsyncStorage.setItem(key, JSON.stringify(clamped));
+    await scopedStorage.setItem(key, JSON.stringify(clamped));
   } catch {}
 }
 
@@ -57,6 +53,6 @@ export async function clearCategoryLedger(): Promise<void> {
   sessionDebt = emptyCategoryDebt();
   try {
     const key = await resolveKey();
-    if (key) await AsyncStorage.removeItem(key);
+    if (key) await scopedStorage.removeItem(key);
   } catch {}
 }

@@ -7,7 +7,7 @@
 // under "Not started" och tap:en tar spelaren tillbaka in i lobbyn.
 //
 // Lokal per-user-lagring (AsyncStorage), samma namespacing som friends/
-// gameHistory/seenQuestionIds: nyckeln bär inloggade users playerName så
+// gameHistory/seenQuestionIds: nyckeln bär project ref + kontots UUID (Build 41) så
 // User A:s sparade lobbies inte syns för User B på samma device. Remote
 // 1v1 är QuizVibe-users-only, så en profil finns alltid — saknas den
 // (anon-session) blir alla anrop no-ops.
@@ -17,11 +17,8 @@
 // rooms-raden — MyMatchesScreen prunar posten så fort rummet är borta,
 // expired eller startat (då tar den riktiga matchraden över listan).
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserScope, scopedStorage, userKey } from './storageScope';
 
-import { loadProfile } from './profileStorage';
-
-const KEY_PREFIX = '@quizvibe/savedLobbies/v1/';
 // Taket är rent defensivt — i praktiken har en spelare någon enstaka
 // sparad lobby åt gången (rummen lever bara 24h).
 const MAX_SAVED = 20;
@@ -43,9 +40,8 @@ export interface SavedLobby {
 
 async function resolveKey(): Promise<string | null> {
   try {
-    const profile = await loadProfile();
-    if (!profile?.playerName) return null;
-    return `${KEY_PREFIX}${profile.playerName.toLowerCase()}`;
+    const scope = await getUserScope();
+    return scope ? userKey(scope.uid, 'savedLobbies') : null;
   } catch {
     return null;
   }
@@ -53,7 +49,7 @@ async function resolveKey(): Promise<string | null> {
 
 async function readAll(key: string): Promise<SavedLobby[]> {
   try {
-    const raw = await AsyncStorage.getItem(key);
+    const raw = await scopedStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? (parsed as SavedLobby[]) : [];
@@ -84,7 +80,7 @@ export async function saveLobby(entry: SavedLobby): Promise<void> {
     ...existing.filter((e) => e.roomCode.toUpperCase() !== code),
   ].slice(0, MAX_SAVED);
   try {
-    await AsyncStorage.setItem(key, JSON.stringify(next));
+    await scopedStorage.setItem(key, JSON.stringify(next));
   } catch {
     // Tyst — sparandet är en bekvämlighet, inte en förutsättning för att
     // rummet ska leva vidare (det gör det server-side i 24h oavsett).
@@ -100,7 +96,7 @@ export async function removeSavedLobby(roomCode: string): Promise<void> {
   const next = existing.filter((e) => e.roomCode.toUpperCase() !== code);
   if (next.length === existing.length) return;
   try {
-    await AsyncStorage.setItem(key, JSON.stringify(next));
+    await scopedStorage.setItem(key, JSON.stringify(next));
   } catch {
     // Tyst — nästa prune-pass i MyMatchesScreen försöker igen.
   }

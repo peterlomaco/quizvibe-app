@@ -1,18 +1,23 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './supabase';
 import { MainCategory, defaultEnabledMainCategories, isMainCategory } from './mainCategory';
+import { cacheBelongsTo, pickBackfillIdentity } from './sessionIdentity';
+import {
+  getSessionState,
+  isRegisteredStored,
+  readStoredSession,
+  registeredUserOf,
+  type SessionUser,
+} from './sessionState';
+import { currentAuthEpoch, getUserScope, scopedStorage, userKey } from './storageScope';
 
 /**
- * Profil-lagring — dual-läge sedan Fas 2:
- * - **Med session**: source of truth är Supabase `profiles`-tabellen.
- *   AsyncStorage används som lokal cache så UI:t renderas direkt utan
- *   nätverks-roundtrip vid skärm-byten.
- * - **Utan session** (pre-login): bara AsyncStorage. Gäller t.ex. guest-
- *   spelare som joinar lobby utan att vara registrerade.
- *
- * AsyncStorage-nyckeln versioneras (v1) för framtida schema-migrationer.
+ * Profil-lagring:
+ * - Source of truth är Supabase `profiles`-tabellen.
+ * - En lokal cache per konto (userKey(uid,'profile'), se storageScope.ts) gör
+ *   att UI:t renderas direkt och att en inloggad användare fungerar offline.
+ * - Utan registrerad session i DETTA projekt finns ingen profil (Build 41) —
+ *   gäster och utloggade får null.
  */
-const PROFILE_KEY = '@quizvibe/profile/v1';
 
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 export type Region = 'sweden' | 'nordics' | 'global';
@@ -24,6 +29,9 @@ export interface ProfileData {
   // Email används vid registrering för att skicka aktiveringslänk.
   // Optional för bakåtkompatibilitet med profiler skapade innan fältet fanns.
   email?: string;
+  // Supabase user id för kontot som skrev den lokala cachen (Build 41).
+  // Stämplas vid varje cache-skrivning och avgör ägarskap (cacheBelongsTo).
+  ownerUserId?: string;
   birthYear: number | null;
   assistance: AssistanceLevel | null;
   region: Region | null;
@@ -291,37 +299,94 @@ function profileToRow(userId: string, email: string, p: ProfileData): ProfileRow
   };
 }
 
-// Hämtar current session.user. null = ingen session (= guest/pre-login).
-// Anonyma sessioner (guests får en via ensureAuthSession för RLS-writes)
-// räknas OCKSÅ som "ingen user" — en guest är inte inloggad och ska varken
-// läsa/skriva profiles-rader eller trigga backfillProfileFromSession (som
-// annars byggde en fantom-profil med tomt playerName → Home/BottomBanner
-// visade inloggat läge för guests som ejectats tillbaka till Home).
+// ── Session + cache helpers (Build 41, 2026-11-26) ──────────────────────
+//
+// Inloggat läge kräver en REGISTRERAD session för DETTA Supabase-projekt
+// (online eller offline — se sessionState.ts). En lokalt sparad profil räcker
+// aldrig ensam. Profil-cachen ligger under userKey(uid, 'profile') och bär
+// `ownerUserId`, så ett konto aldrig ser ett annat kontos cache.
+
 /** Parent Control-default ur signup-metadata (bara satt på nya konton). */
 function metaParentControl(meta: Record<string, unknown> | undefined): boolean | undefined {
   const v = meta?.parentControlEnabled;
   return typeof v === 'boolean' ? v : undefined;
 }
 
+// Levande, icke-anonym session — krävs för alla SERVER-skrivningar.
+// Läser den lokala sessionen (ingen getUser-nätverksrunda, se 2026-10-21).
 async function getCurrentUser() {
-  // Lokal session först (ingen nätverksrunda). Saknas session, eller är den
-  // anonym (gäst), finns ingen profil att hämta — svara direkt.
-  //
-  // Varför (2026-10-21): getUser() är ett nätverksanrop som håller Supabase-
-  // klientens auth-lås under hela rundan. Home + gästformuläret anropar
-  // loadProfile många gånger; för gäster köades de i följd, och
-  // ensureAuthSession (Start Game – Guest login) fick vänta bakom alla —
-  // 27 s på ett långsamt nät.
-  //
-  // Samma gäller registrerade users (loggen 2026-10-21: dussintals köade
-  // getUser-rundor när en inloggad user startade ett spel). Användar-id:t
-  // räcker här — profiles-läsningen skyddas ändå av RLS mot JWT:n, och
-  // klienten förnyar/validerar sessionen själv (autoRefreshToken). Därför
-  // läses användaren ur den lokala sessionen även för inloggade.
   const { data: sessionData } = await supabase.auth.getSession();
   const sessionUser = sessionData.session?.user;
   if (!sessionUser || sessionUser.is_anonymous) return null;
   return sessionUser;
+}
+
+const PROFILE_STORE = 'profile';
+// Godkända preferensfält som engångsövergången flyttat från en äldre cache
+// (storageTransition.ts). Konsumeras vid första lyckade online-laddning.
+const LEGACY_PREFS_STORE = 'legacyPrefs';
+
+type LegacyPrefs = Partial<
+  Pick<
+    ProfileData,
+    | 'voice'
+    | 'parentControlEnabled'
+    | 'spotifyAppConfirmed'
+    | 'spotifyDefaultEnabled'
+    | 'spotifyAnswerYear'
+    | 'spotifyAnswerName'
+  >
+>;
+
+function parseProfileCache(json: string | null): ProfileData | null {
+  if (!json) return null;
+  try {
+    const raw = JSON.parse(json) as Partial<ProfileData> & {
+      nickname?: string;
+      skill?: string;
+    };
+    if (raw.playerName === undefined && typeof raw.nickname === 'string') {
+      raw.playerName = raw.nickname;
+      delete raw.nickname;
+    }
+    if (raw.assistance === undefined && typeof raw.skill === 'string') {
+      raw.assistance = LEGACY_SKILL_TO_ASSISTANCE[raw.skill] ?? null;
+      delete raw.skill;
+    }
+    if (typeof raw.playerName !== 'string' || raw.playerName.trim() === '') return null;
+    return raw as ProfileData;
+  } catch {
+    return null;
+  }
+}
+
+/** Kontots egen profil-cache, eller null (saknas, trasig eller annan ägare). */
+async function readUserCache(user: { id: string; email?: string | null }): Promise<ProfileData | null> {
+  try {
+    const cache = parseProfileCache(await scopedStorage.getItem(userKey(user.id, PROFILE_STORE)));
+    if (!cache || !cacheBelongsTo(cache, user)) return null;
+    const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(cache);
+    if (changed) await writeUserCache(user.id, refreshed);
+    return refreshed;
+  } catch (err) {
+    console.warn('[profileStorage] Failed to read profile cache:', err);
+    return null;
+  }
+}
+
+async function writeUserCache(uid: string, data: ProfileData): Promise<ProfileData> {
+  const stamped: ProfileData = { ...data, ownerUserId: uid };
+  await scopedStorage.setItem(userKey(uid, PROFILE_STORE), JSON.stringify(stamped));
+  return stamped;
+}
+
+async function readLegacyPrefs(uid: string): Promise<LegacyPrefs | null> {
+  try {
+    const raw = await scopedStorage.getItem(userKey(uid, LEGACY_PREFS_STORE));
+    return raw ? (JSON.parse(raw) as LegacyPrefs) : null;
+  } catch {
+    return null;
+  }
 }
 
 // ── Synkron profil-spegel (login-state utan flimmer) ────────────────────
@@ -330,10 +395,9 @@ async function getCurrentUser() {
 //
 // Varför: Home nås ALLTID via router.replace('/') (BottomBanner, Profile,
 // Store, FAQ, Lobby) vilket är en full re-mount — skärmens `profile`-state
-// börjar då om på null medan loadProfile() gör en Supabase-roundtrip
-// (auth.getUser + profiles-select). Under den väntan renderades utloggat
-// läge, som sedan hoppade till inloggat. Spegeln låter en re-mountad skärm
-// rendera rätt läge redan på första framen.
+// börjar då om på null medan loadProfile() gör en Supabase-roundtrip. Under
+// den väntan renderades utloggat läge, som sedan hoppade till inloggat.
+// Spegeln låter en re-mountad skärm rendera rätt läge redan på första framen.
 let cachedProfile: ProfileData | null | undefined = undefined;
 
 /**
@@ -345,18 +409,18 @@ export function getCachedProfile(): ProfileData | null | undefined {
   return cachedProfile;
 }
 
-// Värm spegeln från AsyncStorage direkt vid modul-load så även app-cold-start
-// har rätt läge innan första skärm-renderingen. En riktig loadProfile() som
-// hinner före vinner (guarden nedan) — den har färskare data.
-// loadFromAsyncStorage används (i stället för en egen getItem) så legacy-
-// migrationerna (nickname→playerName, skill→assistance) och fantom-cache-
-// saneringen gäller även spegeln — annars kunde en legacy-profil rendera
-// tomt playerName på första framen.
+// Värm spegeln vid modul-load UTAN nätverk: den sparade sessionen för detta
+// projekt avgör kontot, och bara det kontots egen cache får seeda spegeln.
+// En riktig loadProfile() som hinner före vinner (guarden nedan).
 void (async () => {
   try {
-    const cached = await loadFromAsyncStorage();
-    // En riktig loadProfile() kan ha hunnit före — den har färskare data.
-    if (cachedProfile === undefined) cachedProfile = cached;
+    const epoch = currentAuthEpoch();
+    const stored = await readStoredSession();
+    if (stored.status === 'error') return; // vet inte — låt loadProfile avgöra
+    const warm = isRegisteredStored(stored)
+      ? await readUserCache({ id: stored.user.id, email: stored.user.email })
+      : null;
+    if (cachedProfile === undefined && epoch === currentAuthEpoch()) cachedProfile = warm;
   } catch {
     // Best-effort — loadProfile() hydrerar spegeln ändå strax efter.
   }
@@ -365,11 +429,9 @@ void (async () => {
 // ── Profil-change-notifier ──────────────────────────────────────────────
 // Lättviktig in-memory event-bus så komponenter utanför screen-trädet
 // (BottomBanner i app/_layout.tsx) kan reagera på login/logout utan
-// polling. useFocusEffect fungerar inte där (ingen route-focus), och
-// Supabase auth-events räcker inte ensamt — clearProfile körs EFTER
-// signOut i logout-flödet, så en SIGNED_OUT-triggad reload kan hinna
-// läsa stale AsyncStorage-cache. Notify:n från clearProfile stänger
-// det fönstret.
+// polling. clearProfile körs EFTER signOut i logout-flödet, så notify:n
+// därifrån stänger fönstret där en SIGNED_OUT-triggad reload annars kunde
+// läsa en inaktuell spegel.
 type ProfileChangeListener = () => void;
 const profileChangeListeners = new Set<ProfileChangeListener>();
 
@@ -385,26 +447,42 @@ function notifyProfileChanged(): void {
 }
 
 /**
- * Skriver profilen lokalt + (om session finns) till Supabase. AsyncStorage
- * skrivs alltid först som optimistisk cache så UI-läsare ser uppdateringen
- * direkt även innan nätverks-roundtrip:en klarar sig.
- *
- * Supabase-upsert:en är best-effort: om den failar (offline, RLS-violation,
- * etc.) loggas det men funktionen kastar inte — appen fortsätter funka med
- * lokal cache och nästa save försöker igen.
+ * True när profiländringar kan sparas till servern just nu. Offline (utgången
+ * token utan nät) blockeras profil-redigering i Build 41 — det finns ingen
+ * offline-synk, och en lokal ändring skulle annars skrivas över av DB-raden
+ * vid nästa online-laddning.
+ */
+export async function canSaveProfileNow(): Promise<boolean> {
+  return (await getSessionState()).kind === 'online';
+}
+
+/**
+ * Skriver profilen till kontots egen cache + (online) till Supabase.
+ * Utan registrerad session sparas ingenting — en gäst/utloggad har ingen
+ * profil. Supabase-upserten är best-effort som tidigare.
  */
 export async function saveProfile(data: ProfileData): Promise<void> {
+  const epoch = currentAuthEpoch();
+  const scope = await getUserScope();
+  if (!scope) {
+    if (__DEV__) console.warn('[profileStorage] saveProfile ignored — no registered session');
+    return;
+  }
+  let stamped: ProfileData;
   try {
-    await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+    stamped = await writeUserCache(scope.uid, data);
   } catch (err) {
     console.warn('[profileStorage] Failed to save profile to AsyncStorage:', err);
     throw err;
   }
-  cachedProfile = data;
-  notifyProfileChanged();
+  if (epoch === currentAuthEpoch()) {
+    cachedProfile = stamped;
+    notifyProfileChanged();
+  }
+  if (scope.state.kind !== 'online') return;
   const user = await getCurrentUser();
-  if (!user) return;
-  const row = profileToRow(user.id, user.email ?? '', data);
+  if (!user || user.id !== scope.uid) return;
+  const row = profileToRow(user.id, user.email ?? '', stamped);
   const { error } = await supabase.from('profiles').upsert(row);
   if (error) {
     console.warn('[profileStorage] Failed to upsert profile to Supabase:', error.message);
@@ -412,34 +490,29 @@ export async function saveProfile(data: ProfileData): Promise<void> {
 }
 
 /**
- * Laddar profilen — Supabase först (när session finns), AsyncStorage som
- * fallback/cache. Daglig free-credits-refresh körs alltid efter load så
- * top-up:en triggar oavsett källa.
- *
- * Edge case "session men ingen profiles-rad" (pre-Fas-2-användare som
- * registrerade sig innan tabellen fanns, eller insert som failade vid
- * signUp): backfilla från user_metadata + AsyncStorage-cache, INSERT
- * raden, returnera.
+ * Laddar profilen för den registrerade sessionen i detta projekt.
+ * - online: Supabase-raden (cache som fallback vid DB-fel).
+ * - offline: kontots egen cache.
+ * - gäst / utloggad / okänt: null. Inget raderas vid okänt läge.
  */
 export async function loadProfile(): Promise<ProfileData | null> {
-  const profile = await loadProfileFresh();
-  // Håll den synkrona spegeln färsk så nästa skärm-mount slipper flimra.
-  cachedProfile = profile;
+  let epoch = currentAuthEpoch();
+  let profile = await loadProfileFresh();
+  if (epoch !== currentAuthEpoch()) {
+    // Kontot bytte under laddningen — svaret gäller det gamla kontot.
+    epoch = currentAuthEpoch();
+    profile = await loadProfileFresh();
+  }
+  if (epoch === currentAuthEpoch()) cachedProfile = profile;
   return profile;
 }
 
 async function loadProfileFresh(): Promise<ProfileData | null> {
-  const user = await getCurrentUser();
+  const state = await getSessionState();
+  const user = registeredUserOf(state);
+  if (!user) return null;
+  if (state.kind === 'offline') return readUserCache(user);
 
-  // Pre-login: bara AsyncStorage (guest-mode/legacy).
-  if (!user) {
-    if (__DEV__) console.log('[profileStorage] loadProfile: no session, falling back to AsyncStorage');
-    return loadFromAsyncStorage();
-  }
-
-  if (__DEV__) console.log('[profileStorage] loadProfile: session user.id=', user.id);
-
-  // Logged in: försök Supabase först.
   const { data: row, error } = await supabase
     .from('profiles')
     .select('*')
@@ -448,201 +521,117 @@ async function loadProfileFresh(): Promise<ProfileData | null> {
 
   if (error) {
     console.warn('[profileStorage] Failed to fetch profile from Supabase:', error.message, error);
-    // Fall through to AsyncStorage cache; nätet kan vara nere men user ska
-    // fortfarande kunna använda appen.
-    return loadFromAsyncStorage();
+    return readUserCache(user);
   }
 
-  if (row) {
-    if (__DEV__) console.log('[profileStorage] loadProfile: found profiles row');
-    let profile = rowToProfile(row as ProfileRow);
-    // Fält som enbart lever i AsyncStorage mergas in (saknar DB-kolumn).
-    // youtubeEnabledCategories / imagesEnabledCategories: skrivs nu till DB (migration 0014
-    // applicerad) — men merge-logiken nedan bevaras som belt-and-suspenders-fallback.
-    // spotifyDefaultEnabled + spotifyAnswerYear + spotifyAnswerName: ingen DB-kolumn — alltid från cache.
-    {
-      const cached = await loadFromAsyncStorage();
-      // youtubeEnabledCategories / imagesEnabledCategories: Supabase är
-      // ALLTID auktoritativ källa för dessa fält (om migration 0014 är
-      // applicerad och kolumnen finns). Rationale: saveProfile() skriver
-      // till Supabase SIST (efter AS), medan loadProfile():s fire-and-forget
-      // cache-back skriver till AS utan await. Det skapar en race-condition
-      // där en tidig loadProfile()-anrop (LP1) startar sitt fire-and-forget
-      // med gamla data, och sedan kompletterar EFTER att user:s saveProfile()
-      // har lagt ny data i AS — LP1:s write raderar user:s save i AS.
-      // Supabase påverkas aldrig av fire-and-forget och speglar alltid
-      // den senaste explicita saveProfile()-körningen, dvs. user:s korrekta
-      // val. Fallback till AS om Supabase saknar kolumnen (migration 0014
-      // inte applicerad ännu, supabaseYT = undefined).
-      // spotifyDefaultEnabled: ingen DB-kolumn — alltid från AS-cache.
-      const supabaseYT = profile.youtubeEnabledCategories;
-      const supabaseImg = profile.imagesEnabledCategories;
-      profile = {
-        ...profile,
-        // En array från Supabase (även TOM = källan medvetet av) är
-        // auktoritativ. Bara null/undefined (kolumnen saknas, migration 0014
-        // ej applicerad) faller tillbaka på AS-cachen. Tidigare `length > 0`
-        // kastade en sparad tom array och kunde återuppliva alla 3 ur cachen.
-        youtubeEnabledCategories: Array.isArray(supabaseYT)
-          ? supabaseYT
-          : cached?.youtubeEnabledCategories,
-        imagesEnabledCategories: Array.isArray(supabaseImg)
-          ? supabaseImg
-          : cached?.imagesEnabledCategories,
-        spotifyDefaultEnabled: cached?.spotifyDefaultEnabled,
-        spotifyAnswerYear: cached?.spotifyAnswerYear,
-        spotifyAnswerName: cached?.spotifyAnswerName,
-        spotifyAppConfirmed: cached?.spotifyAppConfirmed,
-        // AsyncStorage-only (ingen DB-kolumn) — alltid från cache. Saknas
-        // cache-värdet faller vi på signup-metadata: konton registrerade
-        // efter 2026-11-13 bär parentControlEnabled:false (Parent Control
-        // AV för nya konton, Peter). Äldre konton saknar metadata-fältet →
-        // undefined → `?? true` i skärmarna, dvs. oförändrat beteende.
-        parentControlEnabled:
-          cached?.parentControlEnabled ?? metaParentControl(user.user_metadata),
-        hcp: cached?.hcp,
-        hcpByCategory: cached?.hcpByCategory,
-        voice: cached?.voice,
-      };
-    }
-    const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
-    // Cache till AsyncStorage så efterföljande loads har varm fallback.
-    AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(refreshed)).catch((err) => {
-      console.warn('[profileStorage] Failed to cache profile after Supabase fetch:', err);
-    });
-    if (changed) {
-      // Daily-refresh ändrade saldot — persistera mot Supabase också.
-      saveProfile(refreshed).catch(() => { /* loggas redan i saveProfile */ });
-    }
-    return refreshed;
+  if (!row) {
+    if (__DEV__) console.log('[profileStorage] loadProfile: no row found, running backfill');
+    return await backfillProfileFromSession(user);
   }
 
-  // Ingen rad i profiles — backfill från user_metadata + ev. AsyncStorage-cache.
-  if (__DEV__) console.log('[profileStorage] loadProfile: no row found, running backfill');
-  return await backfillProfileFromSession(user);
-}
-
-async function loadFromAsyncStorage(): Promise<ProfileData | null> {
+  let profile = rowToProfile(row as ProfileRow);
+  const cached = await readUserCache(user);
+  const legacy = cached ? null : await readLegacyPrefs(user.id);
+  const prefs: LegacyPrefs = cached ?? legacy ?? {};
+  // youtube/images-kategorierna: Supabase är auktoritativ när kolumnen finns
+  // (även en TOM array = källan medvetet av); bara null/undefined faller
+  // tillbaka på cachen. Övriga fält saknar DB-kolumn och kommer alltid från
+  // kontots egen cache (eller från engångsövergångens legacyPrefs).
+  const supabaseYT = profile.youtubeEnabledCategories;
+  const supabaseImg = profile.imagesEnabledCategories;
+  profile = {
+    ...profile,
+    youtubeEnabledCategories: Array.isArray(supabaseYT) ? supabaseYT : cached?.youtubeEnabledCategories,
+    imagesEnabledCategories: Array.isArray(supabaseImg) ? supabaseImg : cached?.imagesEnabledCategories,
+    spotifyDefaultEnabled: prefs.spotifyDefaultEnabled,
+    spotifyAnswerYear: prefs.spotifyAnswerYear,
+    spotifyAnswerName: prefs.spotifyAnswerName,
+    spotifyAppConfirmed: prefs.spotifyAppConfirmed,
+    // Saknas cache-värdet faller vi på signup-metadata (konton efter
+    // 2026-11-13 bär parentControlEnabled:false). Äldre konton → undefined →
+    // `?? true` i skärmarna, dvs. oförändrat beteende.
+    parentControlEnabled: prefs.parentControlEnabled ?? metaParentControl(user.userMetadata),
+    hcp: cached?.hcp,
+    hcpByCategory: cached?.hcpByCategory,
+    voice: prefs.voice,
+  };
+  const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
   try {
-    const json = await AsyncStorage.getItem(PROFILE_KEY);
-    if (!json) return null;
-    const raw = JSON.parse(json) as Partial<ProfileData> & {
-      nickname?: string;
-      skill?: string;
-    };
-    // Migrera gamla profiler (skapade när fältet hette `nickname`) till
-    // nya schemat med `playerName`. Nästa saveProfile skriver bara nya
-    // fältet, så storage konvergerar passivt mot det nya schemat.
-    if (raw.playerName === undefined && typeof raw.nickname === 'string') {
-      raw.playerName = raw.nickname;
-      delete raw.nickname;
-    }
-    // Migrera profiler skapade när fältet hette `skill` med värdena
-    // easy/intermediate/expert → nya `assistance` med full/standard/minimal.
-    if (raw.assistance === undefined && typeof raw.skill === 'string') {
-      raw.assistance = LEGACY_SKILL_TO_ASSISTANCE[raw.skill] ?? null;
-      delete raw.skill;
-    }
-    // Fantom-cache-sanering: en tidigare bugg lät anon-sessioner (guests)
-    // backfilla en profil med tomt playerName hit → guests såg inloggat
-    // läge på Home. Legitima profiler har alltid playerName (Register
-    // validerar non-empty) — tomt namn = bogus rad, rensa och returnera
-    // utloggat läge.
-    if (typeof raw.playerName !== 'string' || raw.playerName.trim() === '') {
-      AsyncStorage.removeItem(PROFILE_KEY).catch(() => { /* best-effort */ });
-      return null;
-    }
-    // Auto-refresh fria credits vid första load efter midnatt CET. Skriv
-    // tillbaka direkt om top-up skedde så storage konvergerar.
-    const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(raw as ProfileData);
-    if (changed) {
-      AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(refreshed)).catch((err) => {
-        console.warn('[profileStorage] Failed to persist daily-credits refresh:', err);
-      });
-    }
-    return refreshed;
+    await writeUserCache(user.id, refreshed);
+    if (legacy) await scopedStorage.removeItem(userKey(user.id, LEGACY_PREFS_STORE));
   } catch (err) {
-    console.warn('[profileStorage] Failed to load profile from AsyncStorage:', err);
-    return null;
+    console.warn('[profileStorage] Failed to cache profile after Supabase fetch:', err);
   }
+  if (changed) {
+    saveProfile(refreshed).catch(() => { /* loggas redan i saveProfile */ });
+  }
+  return { ...refreshed, ownerUserId: user.id };
 }
 
 /**
- * Backfill när session finns men profiles-tabellen saknar raden (pre-Fas-2-
- * registrering eller misslyckad insert). Bygger en minimal profil från
- * user_metadata + ev. AsyncStorage-cache, persisterar mot Supabase + cache.
+ * Backfill när session finns men profiles-raden saknas (pre-Fas-2-konton
+ * eller en misslyckad insert). Kontots egen signup-metadata vinner; en lokal
+ * cache används bara om den bevisligen tillhör samma konto.
  */
-async function backfillProfileFromSession(user: { id: string; email?: string; user_metadata?: Record<string, unknown> }): Promise<ProfileData | null> {
-  const cache = await loadFromAsyncStorage();
-  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
-  const metaPlayerName = typeof meta.playerName === 'string' ? meta.playerName : null;
-  const metaBirthYear = typeof meta.birthYear === 'number' ? meta.birthYear : null;
-  const metaAssistance: AssistanceLevel | null =
-    meta.assistance === 'minimal' || meta.assistance === 'standard' || meta.assistance === 'full'
-      ? (meta.assistance as AssistanceLevel)
-      : null;
-  const metaRegion: Region | null =
-    meta.region === 'sweden' || meta.region === 'nordics' || meta.region === 'global'
-      ? (meta.region as Region)
-      : null;
+async function backfillProfileFromSession(user: SessionUser): Promise<ProfileData | null> {
+  const owned = await readUserCache(user);
+  const legacy = owned ? null : await readLegacyPrefs(user.id);
+  const prefs: LegacyPrefs = owned ?? legacy ?? {};
+  const identity = pickBackfillIdentity(user.userMetadata, owned, user);
 
-  // Prio: cache > metadata > fallback. Cache vinner eftersom user kan ha
-  // hunnit redigera lokalt innan profiles-raden skapas.
   const profile: ProfileData = {
-    playerName: cache?.playerName ?? metaPlayerName ?? (user.email?.split('@')[0] ?? ''),
-    email: user.email,
-    birthYear: cache?.birthYear ?? metaBirthYear,
-    assistance: cache?.assistance ?? metaAssistance,
-    region: cache?.region ?? metaRegion,
-    avatarSource: cache?.avatarSource ?? 'default',
-    selectedAvatarId: cache?.selectedAvatarId ?? '',
-    gameCredits: cache?.gameCredits,
-    freeGameCredits: cache?.freeGameCredits,
-    lastFreeCreditsRefreshDate: cache?.lastFreeCreditsRefreshDate,
-    answerResponseSeconds: cache?.answerResponseSeconds,
-    gameEraFrom: cache?.gameEraFrom,
-    gameEraTo: cache?.gameEraTo,
-    maxPlayers: cache?.maxPlayers,
-    gameMode: cache?.gameMode,
-    singlePlayerDefault: cache?.singlePlayerDefault,
-    roundsDefault: cache?.roundsDefault,
-    enabledHostPackages: cache?.enabledHostPackages,
-    youtubeEnabledCategories: cache?.youtubeEnabledCategories,
-    imagesEnabledCategories: cache?.imagesEnabledCategories,
-    spotifyDefaultEnabled: cache?.spotifyDefaultEnabled,
-    spotifyAnswerYear: cache?.spotifyAnswerYear,
-    spotifyAnswerName: cache?.spotifyAnswerName,
-    spotifyAppConfirmed: cache?.spotifyAppConfirmed,
-    parentControlEnabled: cache?.parentControlEnabled ?? metaParentControl(user.user_metadata),
-    hcp: cache?.hcp,
-    hcpByCategory: cache?.hcpByCategory,
+    playerName: identity.playerName,
+    email: user.email ?? undefined,
+    birthYear: identity.birthYear,
+    assistance: identity.assistance,
+    region: identity.region,
+    avatarSource: owned?.avatarSource ?? 'default',
+    selectedAvatarId: owned?.selectedAvatarId ?? '',
+    gameCredits: owned?.gameCredits,
+    freeGameCredits: owned?.freeGameCredits,
+    lastFreeCreditsRefreshDate: owned?.lastFreeCreditsRefreshDate,
+    answerResponseSeconds: owned?.answerResponseSeconds,
+    gameEraFrom: owned?.gameEraFrom,
+    gameEraTo: owned?.gameEraTo,
+    maxPlayers: owned?.maxPlayers,
+    gameMode: owned?.gameMode,
+    singlePlayerDefault: owned?.singlePlayerDefault,
+    roundsDefault: owned?.roundsDefault,
+    enabledHostPackages: owned?.enabledHostPackages,
+    youtubeEnabledCategories: owned?.youtubeEnabledCategories,
+    imagesEnabledCategories: owned?.imagesEnabledCategories,
+    spotifyDefaultEnabled: prefs.spotifyDefaultEnabled,
+    spotifyAnswerYear: prefs.spotifyAnswerYear,
+    spotifyAnswerName: prefs.spotifyAnswerName,
+    spotifyAppConfirmed: prefs.spotifyAppConfirmed,
+    parentControlEnabled: prefs.parentControlEnabled ?? metaParentControl(user.userMetadata),
+    hcp: owned?.hcp,
+    hcpByCategory: owned?.hcpByCategory,
+    voice: prefs.voice,
   };
 
-  // Persistera mot Supabase. Vi använder upsert eftersom raden kan ha
-  // skapats av en parallell flöde (t.ex. signUp insert som råkar landa
-  // samtidigt). RLS-policyn enforcar att id matchar auth.uid().
+  // RLS-policyn kräver att id matchar auth.uid().
   const row = profileToRow(user.id, user.email ?? '', profile);
   const { error } = await supabase.from('profiles').upsert(row);
   if (error) {
     console.warn('[profileStorage] Failed to backfill profile to Supabase:', error.message);
   }
 
-  // Cache to AsyncStorage too.
-  AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(profile)).catch(() => { /* best-effort */ });
-  return profile;
+  try {
+    const stamped = await writeUserCache(user.id, profile);
+    if (legacy) await scopedStorage.removeItem(userKey(user.id, LEGACY_PREFS_STORE));
+    return stamped;
+  } catch {
+    return { ...profile, ownerUserId: user.id };
+  }
 }
 
 /**
- * Rensar LOKAL profil-cache. Server-side data (profiles-rad i Supabase)
- * lämnas orörd — den behövs för att kunna logga in igen från denna eller
- * annan enhet. Anropas typiskt av logout-flödet efter supabase.auth.signOut.
+ * Nollställer den inloggade profil-spegeln (logout). Kontots lokala data
+ * ligger kvar under sitt eget uid och syns inte för något annat konto;
+ * Delete Account raderar den via clearUserScope (auth.ts).
  */
 export async function clearProfile(): Promise<void> {
-  try {
-    await AsyncStorage.removeItem(PROFILE_KEY);
-  } catch (err) {
-    console.warn('[profileStorage] Failed to clear profile from AsyncStorage:', err);
-  }
   cachedProfile = null;
   notifyProfileChanged();
 }

@@ -27,9 +27,10 @@
 // "guest kommer tillbaka senare och ser sina egna left-rader" och för
 // att inte spamma auth.users med ny rad varje gång appen öppnas.
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User } from '@supabase/supabase-js';
 import { clearProfile } from './profileStorage';
+import { readStoredSession } from './sessionState';
+import { clearUserScope } from './storageScope';
 import { supabase } from './supabase';
 
 // In-flight Promise så samtidiga anrop (t.ex. både handleJoinAsGuest och
@@ -61,38 +62,73 @@ export async function ensureAuthSession(): Promise<User | null> {
         return sessionData.session.user;
       }
 
-      const { data, error } = await supabase.functions.invoke<{
-        access_token?: string;
-        refresh_token?: string;
-        user?: User;
-        error?: string;
-        message?: string;
-      }>('anon-signup', { method: 'POST' });
-
-      if (error) {
-        console.warn('[auth] anon-signup invoke failed:', error.message);
-        return null;
-      }
-      if (data?.error) {
-        // Edge Function returnerade ett 4xx/5xx-body med error-fält
-        // (typiskt 'rate_limited' eller 'signup_failed').
-        console.warn('[auth] anon-signup returned error:', data.error, data.message ?? '');
-        return null;
-      }
-      if (!data?.access_token || !data?.refresh_token) {
-        console.warn('[auth] anon-signup returned no tokens');
-        return null;
+      // Ingen användbar session. Finns en sparad session för DETTA projekt är
+      // det en utgången token som inte kunde förnyas (typiskt nätverksfel) —
+      // den får ALDRIG ersättas med ett anonymt konto (Build 41).
+      const stored = await readStoredSession();
+      if (stored.status === 'error') return null;
+      if (stored.status === 'present') {
+        try {
+          const { data: refreshed } = await supabase.auth.refreshSession();
+          if (refreshed.session?.user) return refreshed.session.user;
+        } catch (err) {
+          console.warn('[auth] refreshSession threw:', err);
+        }
+        // auth-js tar bara bort den sparade sessionen vid ett icke-retrybart
+        // fel (återkallad). Ligger den kvar var felet tillfälligt.
+        const after = await readStoredSession();
+        if (after.status !== 'none') return null;
       }
 
-      const { data: setData, error: setError } = await supabase.auth.setSession({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
+      // Anon-sessionen skapas inom auth-låset så en samtidig inloggning
+      // (eller en sparad session som dykt upp under väntan) aldrig skrivs över.
+      return await runAuthExclusive(async () => {
+        const recheck = await supabase.auth.getSession();
+        if (recheck.data.session?.user) return recheck.data.session.user;
+        const storedNow = await readStoredSession();
+        if (storedNow.status !== 'none') return null;
+
+        const { data, error } = await supabase.functions.invoke<{
+          access_token?: string;
+          refresh_token?: string;
+          user?: User;
+          error?: string;
+          message?: string;
+        }>('anon-signup', { method: 'POST' });
+
+        if (error) {
+          console.warn('[auth] anon-signup invoke failed:', error.message);
+          return null;
+        }
+        if (data?.error) {
+          // Edge Function returnerade ett 4xx/5xx-body med error-fält
+          // (typiskt 'rate_limited' eller 'signup_failed').
+          console.warn('[auth] anon-signup returned error:', data.error, data.message ?? '');
+          return null;
+        }
+        if (!data?.access_token || !data?.refresh_token) {
+          console.warn('[auth] anon-signup returned no tokens');
+          return null;
+        }
+
+        // Sista kontrollen direkt före setSession: har en registrerad session
+        // persisterats medan anon-signup pågick ska den vinna.
+        const beforeSet = await readStoredSession();
+        if (beforeSet.status !== 'none') {
+          const live = await supabase.auth.getSession();
+          return live.data.session?.user ?? null;
+        }
+
+        const { data: setData, error: setError } = await supabase.auth.setSession({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        });
+        if (setError || !setData.user) {
+          console.warn('[auth] setSession failed:', setError?.message);
+          return null;
+        }
+        return setData.user;
       });
-      if (setError || !setData.user) {
-        console.warn('[auth] setSession failed:', setError?.message);
-        return null;
-      }
-      return setData.user;
     } catch (err) {
       console.warn('[auth] ensureAuthSession threw:', err);
       return null;
@@ -102,6 +138,18 @@ export async function ensureAuthSession(): Promise<User | null> {
     }
   })();
   return pendingAuthPromise;
+}
+
+// ── Auth-lås (Build 41) ─────────────────────────────────────────────────
+// Allt som SÄTTER en session (anon-signup, inloggning, signUp, återställning)
+// körs i tur och ordning. Utan låset kunde ett anon-anrop som startade före en
+// inloggning skriva sin anon-session efter den och logga ut användaren.
+let authChain: Promise<unknown> = Promise.resolve();
+
+export function runAuthExclusive<T>(fn: () => Promise<T>): Promise<T> {
+  const run = authChain.then(fn, fn);
+  authChain = run.catch(() => undefined);
+  return run;
 }
 
 /**
@@ -164,6 +212,13 @@ export async function getCurrentUserId(): Promise<string | null> {
  * "Invalid PlayerName or password"-meddelande.
  */
 export async function signInWithPlayerName(
+  playerName: string,
+  password: string,
+): Promise<{ ok: true; user: User } | { ok: false; reason: string }> {
+  return runAuthExclusive(() => signInWithPlayerNameInner(playerName, password));
+}
+
+async function signInWithPlayerNameInner(
   playerName: string,
   password: string,
 ): Promise<{ ok: true; user: User } | { ok: false; reason: string }> {
@@ -234,10 +289,8 @@ export async function resendActivationByName(
  *      kör admin.auth.admin.deleteUser(user_id). CASCADE-policies på
  *      profiles + rooms + waiting_invites rensar resten automatiskt
  *      server-side. lobby_players.user_id → NULL (SET NULL).
- *   2. Nuke:ar ALL lokal AsyncStorage under `@quizvibe/*`-prefixet —
- *      profile-cache, friends, waiting-invites-cache, gameHistory osv.
- *      User har explicit bett om permanent deletion så ingen anledning
- *      att behålla per-user-data lokalt.
+ *   2. Raderar kontots lokala namespace (clearUserScope, storageScope.ts) —
+ *      profil-cache, friends, historik, HCP osv. för just detta konto.
  *   3. Kör supabase.auth.signOut() för att rensa session-token.
  *
  * Returnerar `{ ok: true }` vid success, `{ ok: false, reason }` annars.
@@ -250,6 +303,10 @@ export async function deleteAccount(): Promise<
   { ok: true } | { ok: false; reason: string }
 > {
   try {
+    // Kontots uid fångas FÖRE raderingen — efteråt finns ingen session.
+    const { data: sessionData } = await supabase.auth.getSession();
+    const deletedUid = sessionData.session?.user?.id ?? null;
+
     const { data, error } = await supabase.functions.invoke<{
       ok?: boolean;
       error?: string;
@@ -263,13 +320,11 @@ export async function deleteAccount(): Promise<
       return { ok: false, reason: data?.error ?? 'unknown_error' };
     }
 
-    // Server-deletion lyckades — rensa lokal storage.
+    // Server-deletion lyckades — rensa kontots lokala data (Build 41: bara
+    // detta kontos namespace i detta projekt; andra konton + projekt- och
+    // enhetsdata rörs inte).
     try {
-      const allKeys = await AsyncStorage.getAllKeys();
-      const quizvibeKeys = allKeys.filter((k) => k.startsWith('@quizvibe/'));
-      if (quizvibeKeys.length > 0) {
-        await AsyncStorage.multiRemove(quizvibeKeys);
-      }
+      if (deletedUid) await clearUserScope(deletedUid);
     } catch (storageErr) {
       // Logga men bryt inte success-pathen — server-side är redan klart,
       // local storage kan rensas senare via reinstall om det skulle behövas.

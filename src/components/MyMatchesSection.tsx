@@ -24,7 +24,7 @@
 // Live-uppdatering via subscribeToMyMatches + refetch vid varje
 // Home-focus (spelaren kan komma tillbaka från quiz/my-matches).
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { scopedStorage, userKey } from '../utils/storageScope';
 import { router, useFocusEffect, usePathname } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, AppState, type AppStateStatus, StyleSheet, Text, View } from 'react-native';
@@ -47,7 +47,6 @@ import {
 
 // Per-user-namespacad nyckel (samma mönster som friends/gameHistory) så
 // User A:s "sett"-snapshot inte tystar signalen för User B på samma device.
-const SEEN_KEY_PREFIX = '@quizvibe/myMatches/seen/v1/';
 
 /**
  * Signatur över matchernas tillstånd. Ändras så fort något som är
@@ -143,14 +142,14 @@ export function MyMatchesSection({
     // Läs "sett"-snapshotten för aktuell user. Saknas user-id kan vi inte
     // namespace:a — då hoppar vi signalen helt (hellre ingen badge än en
     // som läcker mellan konton).
-    const key = user?.id ? `${SEEN_KEY_PREFIX}${user.id}` : null;
+    const key = user?.id ? userKey(user.id, 'myMatchesSeen') : null;
     seenKeyRef.current = key;
     if (!key) {
       setSeenSignature(null);
       return;
     }
     try {
-      setSeenSignature((await AsyncStorage.getItem(key)) ?? '');
+      setSeenSignature((await scopedStorage.getItem(key)) ?? '');
     } catch {
       setSeenSignature('');
     }
@@ -212,7 +211,7 @@ export function MyMatchesSection({
       const changed = changedMatchIds(visible, seenSignature);
       setSeenSignature(signature);
       const key = seenKeyRef.current;
-      if (key) void AsyncStorage.setItem(key, signature).catch(() => {});
+      if (key) void scopedStorage.setItem(key, signature).catch(() => {});
       router.push({
         pathname: '/my-matches',
         params: {

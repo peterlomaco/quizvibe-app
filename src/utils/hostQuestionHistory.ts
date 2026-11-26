@@ -1,19 +1,17 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { loadProfile } from './profileStorage';
+import { getUserScope, scopedStorage, userKey } from './storageScope';
 
-// Lagrar vilka fråge-IDs en Host har sett i tidigare spelomgångar,
-// per spelarkonto (playerName). Används av quiz.tsx för att prioritera
-// osedda frågor i varje ny omgång — sedda frågor visas bara när
-// de osedda är uttömda inom de aktiva filter-inställningarna.
+// Lagrar vilka fråge-IDs en Host har sett i tidigare spelomgångar, per konto
+// (project ref + Supabase-UUID sedan Build 41). Används av quiz.tsx för att
+// prioritera osedda frågor i varje ny omgång.
 //
-// V2: session-baserad lagring med rullande 20-sessions fönster.
-// Varje session är en spelomgång (alla frågor i en hel quiz-körning).
-// Äldre sessioner faller automatiskt ur fönstret när nya läggs till.
-// Migration: v1 (flat Set<string>) läses vid första load och importeras
-// som en enda syntetisk session.
+// Session-baserad lagring med rullande 20-sessions fönster. Varje session är
+// en spelomgång. Äldre playerName-nycklade v1/v2-poster rensas av
+// storageTransition — de importeras inte (ägarskapet kan inte verifieras).
+//
+// Historiken skrivs ENBART för den inloggade spelaren på den här enheten.
+// Medspelare i Pass-the-Phone får ingen lokal historik under sitt namn
+// (Build 41: inga lokala skrivningar under en annan spelares identitet).
 
-const SEEN_KEY_PREFIX = '@quizvibe/seenQuestionIds/v1/';
-const SESSION_KEY_PREFIX = '@quizvibe/seenQuestionIds/v2/';
 const MAX_SESSIONS = 20;
 
 interface SessionRecord {
@@ -25,81 +23,35 @@ interface SessionHistory {
   sessions: SessionRecord[];
 }
 
-async function resolveKey(prefix: string): Promise<string | null> {
+async function resolveKey(): Promise<string | null> {
   try {
-    const profile = await loadProfile();
-    if (!profile?.playerName) return null;
-    return `${prefix}${profile.playerName.toLowerCase()}`;
+    const scope = await getUserScope();
+    return scope ? userKey(scope.uid, 'seenQuestionIds') : null;
   } catch {
     return null;
   }
 }
 
-// Läs v2-historik för explicita nycklar, med migration från v1 om v2 saknas.
-async function loadHistoryForKeys(
-  v2Key: string,
-  v1Key: string | null,
-): Promise<SessionHistory> {
+async function loadHistoryForKey(key: string): Promise<SessionHistory> {
   try {
-    const raw = await AsyncStorage.getItem(v2Key);
-    if (raw) {
-      return JSON.parse(raw) as SessionHistory;
-    }
-
-    // Migration: importera v1 flat Set som en syntetisk session
-    if (v1Key) {
-      const v1Raw = await AsyncStorage.getItem(v1Key);
-      if (v1Raw) {
-        const ids: string[] = JSON.parse(v1Raw);
-        if (ids.length > 0) {
-          const history: SessionHistory = {
-            sessions: [{ id: 'v1-migration', qIds: ids }],
-          };
-          await AsyncStorage.setItem(v2Key, JSON.stringify(history));
-          return history;
-        }
-      }
-    }
-
-    return { sessions: [] };
+    const raw = await scopedStorage.getItem(key);
+    if (!raw) return { sessions: [] };
+    const parsed = JSON.parse(raw) as SessionHistory;
+    return Array.isArray(parsed?.sessions) ? parsed : { sessions: [] };
   } catch {
     return { sessions: [] };
   }
 }
 
-// Gäster saknar sparat playerName → resolveKey ger null och ingen nyckel finns
-// att läsa eller skriva. De får därför en sessions-lokal historik i stället för
-// ingen alls, så att t.ex. Play Again i ett gäst-hostat spel inte serverar om
-// exakt samma frågor. Samma mönster som sessionDebt i epochLedger.ts.
+// Gäster (ingen registrerad session) får en sessions-lokal historik så att
+// t.ex. Play Again i ett gäst-hostat spel inte serverar om exakt samma frågor.
 // Försvinner vid app-omstart — avsiktligt, gästdata ska inte persisteras.
 let sessionHistory: SessionHistory = { sessions: [] };
 
-// Läs v2-historik för inloggade profilen (eller sessions-historiken för gäster).
 async function loadSessionHistory(): Promise<SessionHistory> {
-  const v2Key = await resolveKey(SESSION_KEY_PREFIX);
-  if (!v2Key) return { sessions: sessionHistory.sessions };
-  const v1Key = await resolveKey(SEEN_KEY_PREFIX);
-  return loadHistoryForKeys(v2Key, v1Key);
-}
-
-// Session-append under en explicit v2-nyckel. Delas av addSessionRecord
-// (profil-baserad) och addSessionRecordForNames (explicita playerNames).
-async function appendSessionForKey(
-  v2Key: string,
-  v1Key: string | null,
-  qIds: string[],
-): Promise<void> {
-  try {
-    const history = await loadHistoryForKeys(v2Key, v1Key);
-    const newSession: SessionRecord = {
-      id: String(Date.now()),
-      qIds: [...new Set(qIds)], // dedupera inom sessionen
-    };
-    const sessions = [...history.sessions, newSession];
-    // Håll fönstret — ta bort äldsta om för många
-    const trimmed = sessions.slice(-MAX_SESSIONS);
-    await AsyncStorage.setItem(v2Key, JSON.stringify({ sessions: trimmed }));
-  } catch {}
+  const key = await resolveKey();
+  if (!key) return { sessions: sessionHistory.sessions };
+  return loadHistoryForKey(key);
 }
 
 // Returnerar alla fråge-IDs från de senaste MAX_SESSIONS sessionerna som ett Set.
@@ -130,67 +82,29 @@ export async function loadLastSessionIds(): Promise<Set<string>> {
 // Sparar en ny spelomgång. Håller max MAX_SESSIONS sessioner (äldsta tas bort).
 export async function addSessionRecord(qIds: string[]): Promise<void> {
   if (!qIds.length) return;
+  const newSession: SessionRecord = { id: String(Date.now()), qIds: [...new Set(qIds)] };
   try {
-    const v2Key = await resolveKey(SESSION_KEY_PREFIX);
-    if (!v2Key) {
-      // Gäst: håll historiken i minnet för resten av sessionen.
-      const sessions = [...sessionHistory.sessions, { id: String(Date.now()), qIds: [...new Set(qIds)] }];
-      sessionHistory = { sessions: sessions.slice(-MAX_SESSIONS) };
+    const key = await resolveKey();
+    if (!key) {
+      sessionHistory = { sessions: [...sessionHistory.sessions, newSession].slice(-MAX_SESSIONS) };
       return;
     }
-    const v1Key = await resolveKey(SEEN_KEY_PREFIX);
-    await appendSessionForKey(v2Key, v1Key, qIds);
-  } catch {}
-}
-
-// Sparar en spelomgång under EXPLICITA playerName-nycklar (Pass-the-Phone:
-// alla registrerade deltagare delar host-enheten, men resolveKey ser bara
-// den inloggade profilen). Skriver `@quizvibe/seenQuestionIds/v2/<name>` för
-// varje namn så deltagarnas historik finns på enheten om de senare loggar
-// in/hostar där. Inloggade profilens eget namn hoppas över — det skrivs
-// redan av addSessionRecord (dubbelskrivning skulle konsumera två av de
-// 20 sessions-slotten för samma spel).
-export async function addSessionRecordForNames(
-  names: string[],
-  qIds: string[],
-): Promise<void> {
-  if (!qIds.length || !names.length) return;
-  try {
-    let ownName: string | null = null;
-    try {
-      const profile = await loadProfile();
-      ownName = profile?.playerName?.toLowerCase() ?? null;
-    } catch {}
-    const unique = [
-      ...new Set(
-        names
-          .map((n) => n.trim().toLowerCase())
-          .filter((n) => n.length > 0 && n !== ownName),
-      ),
-    ];
-    await Promise.all(
-      unique.map((n) =>
-        appendSessionForKey(`${SESSION_KEY_PREFIX}${n}`, `${SEEN_KEY_PREFIX}${n}`, qIds),
-      ),
-    );
+    const history = await loadHistoryForKey(key);
+    const trimmed = [...history.sessions, newSession].slice(-MAX_SESSIONS);
+    await scopedStorage.setItem(key, JSON.stringify({ sessions: trimmed }));
   } catch {}
 }
 
 // Bakåtkompatibel wrapper — anropas från quiz.tsx:s äldre callsites.
-// Skapar en ny session-post av de givna IDs.
 export async function addSeenQuestionIds(ids: string[]): Promise<void> {
   return addSessionRecord(ids);
 }
 
-// Rensar BÅDE v1 och v2 för inloggad användare.
+// Rensar historiken för inloggad användare (och gästens sessions-historik).
 export async function clearSeenQuestionIds(): Promise<void> {
   sessionHistory = { sessions: [] };
   try {
-    const [v1Key, v2Key] = await Promise.all([
-      resolveKey(SEEN_KEY_PREFIX),
-      resolveKey(SESSION_KEY_PREFIX),
-    ]);
-    const keys = [v1Key, v2Key].filter(Boolean) as string[];
-    if (keys.length > 0) await AsyncStorage.multiRemove(keys);
+    const key = await resolveKey();
+    if (key) await scopedStorage.removeItem(key);
   } catch {}
 }

@@ -3,7 +3,7 @@ import { PlayerNameInput } from '@/src/components/PlayerNameInput';
 import { RotatingTagline } from '@/src/components/RotatingTagline';
 import { MARK_HEIGHT_FROM_V1, QuizVibeMarkSvg, QuizVibeWordmarkSvg, WORDMARK_LOGO_SCALE } from '@/src/components/brand/QuizVibeBrandSvg';
 import * as WebBrowser from 'expo-web-browser';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { deviceKey, scopedStorage } from '@/src/utils/storageScope';
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '@/src/components/MetallicGoldFill';
 import { Avatar } from '@/src/components/Avatar';
 import { QuizVibeQAvatar } from '@/src/components/QuizVibeQAvatar';
@@ -59,7 +59,7 @@ import {
   PLAYER_NAME_MAX_DIGITS,
   PLAYER_NAME_MAX_LETTERS,
 } from '@/src/utils/playerName';
-import { ensureAuthSession, resendActivationByName, signInWithPlayerName } from '@/src/utils/auth';
+import { ensureAuthSession, resendActivationByName, runAuthExclusive, signInWithPlayerName } from '@/src/utils/auth';
 import { containsProfanity } from '@/src/utils/profanity';
 import { emailExists, getCachedProfile, loadProfile, playerNameExists, saveProfile, type ProfileData } from '@/src/utils/profileStorage';
 import { checkSpotifyInstalled } from '@/src/utils/spotifyDJ';
@@ -114,7 +114,7 @@ async function alertIfGameAlreadyStarted(code: string): Promise<boolean> {
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 // Utloggads "Start New Game"-y (content-y) — inloggad lägger sin knapp på
 // samma skärmnivå. Device-lokalt (beror på skärmstorlek).
-const GUEST_START_BTN_Y_KEY = '@quizvibe/home/guestStartBtnY/v1';
+const GUEST_START_BTN_Y_KEY = deviceKey('home/guestStartBtnY');
 let guestStartBtnYCache: number | null = null;
 
 // ─── Join Modal ───────────────────────────────────────────────────────────────
@@ -2516,7 +2516,7 @@ export default function HomeScreen() {
   const [bannerHeight, setBannerHeight] = useState(0);
   useEffect(() => {
     if (guestStartBtnYCache != null) return;
-    AsyncStorage.getItem(GUEST_START_BTN_Y_KEY)
+    scopedStorage.getItem(GUEST_START_BTN_Y_KEY)
       .then((v) => {
         const n = v != null ? Number(v) : NaN;
         if (Number.isFinite(n)) {
@@ -2820,7 +2820,7 @@ export default function HomeScreen() {
     if (y === guestStartBtnYCache) return;
     guestStartBtnYCache = y;
     setGuestStartBtnY(y);
-    AsyncStorage.setItem(GUEST_START_BTN_Y_KEY, String(y)).catch(() => {});
+    scopedStorage.setItem(GUEST_START_BTN_Y_KEY, String(y)).catch(() => {});
   }, [isLoggedIn, hostTypeExpanded, guestPinLayout]);
   // + LOGGED_IN_EXTRA_DROP: inloggads knapp något lägre (Peter 2026-11-04).
   const LOGGED_IN_EXTRA_DROP = Spacing.xxl;
@@ -3205,10 +3205,12 @@ export default function HomeScreen() {
       userId = result.user.id;
       identifierMethod = 'player_name';
     } else {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: trimmed,
-        password: loginPassword,
-      });
+      const { data, error } = await runAuthExclusive(() =>
+        supabase.auth.signInWithPassword({
+          email: trimmed,
+          password: loginPassword,
+        }),
+      );
       if (error?.code === 'email_not_confirmed') {
         // Email ej bekräftad än — erbjud att skicka aktiveringslänken igen
         // (vi har email:en här, till skillnad från PlayerName-läget).
@@ -3295,11 +3297,13 @@ export default function HomeScreen() {
     Keyboard.dismiss();
     // verifyOtp med type:'recovery' valideras koden mot Supabase och
     // returnerar en session som ger oss rätt att updateUser.
-    const { error: verifyErr } = await supabase.auth.verifyOtp({
-      email: trimmed,
-      token: forgotCode,
-      type: 'recovery',
-    });
+    const { error: verifyErr } = await runAuthExclusive(() =>
+      supabase.auth.verifyOtp({
+        email: trimmed,
+        token: forgotCode,
+        type: 'recovery',
+      }),
+    );
     if (verifyErr) {
       setForgotSending(false);
       quizVibeAlert('Invalid code', 'The code is incorrect or has expired. Request a new one.');
@@ -3549,7 +3553,7 @@ export default function HomeScreen() {
     }
     // Supabase auth (email + password). Profil-fält skickas som user_metadata
     // → handle_new_user-trigger:n (0048) skapar profiles-raden server-side.
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await runAuthExclusive(() => supabase.auth.signUp({
       email: trimmedEmail,
       password: regPassword,
       options: {
@@ -3570,7 +3574,7 @@ export default function HomeScreen() {
           parentControlEnabled: false,
         },
       },
-    });
+    }));
     if (error) {
       // Migration 0060: handle_new_user RAISE:ar när email/namn tillhör ett
       // konto som raderats senaste 365 dagarna. GoTrue wrappar trigger-fel

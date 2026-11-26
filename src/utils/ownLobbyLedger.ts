@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { envKey, scopedStorage } from './storageScope';
 
 /**
  * "Own lobby ledger" — DENNA ENHETS lokala minne av vilka lobby_players-
@@ -27,7 +27,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * en trasig ledger ska aldrig blockera eller krascha spelflödet.
  */
 
-const LEDGER_KEY = '@quizvibe/ownLobbyLedger/v1';
+const LEDGER_KEY = envKey('ownLobbyLedger');
 
 // Lokal kopia av mockActiveRooms/mockLobbyPlayers normalizeCode — medvetet
 // duplicerad så modulen inte importerar dem (undviker cirkulär dep: bägge
@@ -42,7 +42,7 @@ function membershipKey(roomCode: string, playerId: string): string {
 
 async function readKeys(): Promise<string[]> {
   try {
-    const raw = await AsyncStorage.getItem(LEDGER_KEY);
+    const raw = await scopedStorage.getItem(LEDGER_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? (parsed as string[]) : [];
@@ -54,7 +54,7 @@ async function readKeys(): Promise<string[]> {
 
 async function writeKeys(keys: string[]): Promise<void> {
   try {
-    await AsyncStorage.setItem(LEDGER_KEY, JSON.stringify(keys));
+    await scopedStorage.setItem(LEDGER_KEY, JSON.stringify(keys));
   } catch (e) {
     console.warn('[ownLobbyLedger] write failed:', e);
   }
@@ -96,7 +96,7 @@ export async function getOwnMembershipKeys(): Promise<Set<string>> {
 /** Nollställ hela ledgern (logout). */
 export async function clearOwnMemberships(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(LEDGER_KEY);
+    await scopedStorage.removeItem(LEDGER_KEY);
   } catch (e) {
     console.warn('[ownLobbyLedger] clear failed:', e);
   }

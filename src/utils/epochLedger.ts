@@ -1,5 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { loadProfile } from './profileStorage';
+import { getUserScope, scopedStorage, userKey } from './storageScope';
 import { clampEpochDebt, emptyEpochDebt, type EpochDebt } from './epochAllocation';
 
 // Persistens för epok-skuldboken, per Host (playerName). Räknekärnan
@@ -13,17 +12,14 @@ import { clampEpochDebt, emptyEpochDebt, type EpochDebt } from './epochAllocatio
 // fanns. Genom att spara resten mellan spel ackumuleras 0,44 tills den passerar
 // 1 och epoken får sin plats.
 
-const LEDGER_KEY_PREFIX = '@quizvibe/epochLedger/v1/';
-
 // Guests saknar sparat playerName — de får en sessions-lokal skuldbok istället
 // för ingen alls, så epok-spridningen fungerar även inom ett gästspel.
 let sessionDebt: EpochDebt = emptyEpochDebt();
 
 async function resolveKey(): Promise<string | null> {
   try {
-    const profile = await loadProfile();
-    if (!profile?.playerName) return null;
-    return `${LEDGER_KEY_PREFIX}${profile.playerName.toLowerCase()}`;
+    const scope = await getUserScope();
+    return scope ? userKey(scope.uid, 'epochLedger') : null;
   } catch {
     return null;
   }
@@ -33,7 +29,7 @@ export async function loadEpochLedger(): Promise<EpochDebt> {
   try {
     const key = await resolveKey();
     if (!key) return { ...sessionDebt };
-    const raw = await AsyncStorage.getItem(key);
+    const raw = await scopedStorage.getItem(key);
     if (!raw) return emptyEpochDebt();
     return clampEpochDebt(JSON.parse(raw));
   } catch {
@@ -49,7 +45,7 @@ export async function saveEpochLedger(debt: EpochDebt): Promise<void> {
       sessionDebt = clamped;
       return;
     }
-    await AsyncStorage.setItem(key, JSON.stringify(clamped));
+    await scopedStorage.setItem(key, JSON.stringify(clamped));
   } catch {}
 }
 
@@ -57,6 +53,6 @@ export async function clearEpochLedger(): Promise<void> {
   sessionDebt = emptyEpochDebt();
   try {
     const key = await resolveKey();
-    if (key) await AsyncStorage.removeItem(key);
+    if (key) await scopedStorage.removeItem(key);
   } catch {}
 }

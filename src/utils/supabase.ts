@@ -11,6 +11,7 @@
 import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
+import { projectRefFromUrl } from './sessionIdentity';
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -20,6 +21,12 @@ if (!url || !key) {
     'Missing Supabase env vars. Copy .env.example to .env and fill in EXPO_PUBLIC_SUPABASE_URL + EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY.',
   );
 }
+
+// AsyncStorage-nyckeln där supabase-js persisterar sessionen (samma regel som
+// SDK:ns default: `sb-<projektref>-auth-token`). Läses rått av sessionState.ts
+// så vi kan skilja "offline med giltig sparad session" från "utloggad".
+export const SUPABASE_PROJECT_REF = projectRefFromUrl(url);
+export const SUPABASE_AUTH_STORAGE_KEY = `sb-${SUPABASE_PROJECT_REF}-auth-token`;
 
 export const supabase = createClient(url, key, {
   auth: {

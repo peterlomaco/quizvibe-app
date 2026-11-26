@@ -56,7 +56,7 @@ import { containsProfanity } from '@/src/utils/profanity';
 import { getAvatarEmojiById } from '@/src/utils/avatars';
 import { clearEjected } from '@/src/utils/ejectedPlayers';
 import { appendGameHistoryEntry, saveLatestResult, type GameResult, type HistoryEntry, type RoundResult } from '@/src/utils/gameResults';
-import { recordGameResultForName, recordSelfGameResult, loadOwnCategoryHcp, type CategoryAnswers } from '@/src/utils/hcpProgress';
+import { recordGameResultForPeer, recordSelfGameResult, loadOwnCategoryHcp, type CategoryAnswers } from '@/src/utils/hcpProgress';
 import { filterByItemHcp, HCP_START } from '@/src/utils/hcpEngine';
 import {
   finalizePlayer,
@@ -153,7 +153,7 @@ import { WebViewWarmer } from '@/src/components/WebViewWarmer';
 // renderar bara flagga + ledtrådar via HintsQuizCard. assets/quiz-images/,
 // quizImages.ts och hela sketch-pipelinen raderades 2026-08-17.
 import { generateRoomCode } from '@/src/utils/roomCode';
-import { addSeenQuestionIds, addSessionRecord, addSessionRecordForNames, loadSeenQuestionIds, loadLastSessionIds } from '@/src/utils/hostQuestionHistory';
+import { addSeenQuestionIds, addSessionRecord, loadSeenQuestionIds, loadLastSessionIds } from '@/src/utils/hostQuestionHistory';
 import { consumePendingPeerSeenIds } from '@/src/utils/pendingSeenQuestions';
 import { allocateCategoryBlocks, buildActiveCategories, buildEpochPhase, emptyCategoryDebt, emptyEpochDebt, getActiveEpochs, pickTiered, planCategorySequence, planEpochSequence, sequenceToCategoryQuotas, sequenceToQuotas, type CategoryCapacity, type CategoryDebt, type EpochDebt, type EpochId, type EpochPlayer, type EpochQuestion } from '@/src/utils/epochAllocation';
 import { loadEpochLedger, saveEpochLedger } from '@/src/utils/epochLedger';
@@ -5866,22 +5866,8 @@ export default function QuizScreen() {
         ? broadcastAllQuestionIds
         : gameQuestions.map((q) => q.id);
     const playedIds = [...new Set(effectivePlayedIds)];
-    // Pass-the-Phone: alla registrerade deltagare spelade på DENNA enhet —
-    // skriv sessionen även under deras playerName-nycklar så historiken
-    // finns här om de senare loggar in/hostar på samma enhet. Egen profil
-    // skippas internt (skrivs av addSessionRecord nedan). Guests utan konto
-    // filtreras bort — deras historik kan inte valideras.
-    // ⚠ isHost-gate: rationalen ovan ("alla spelade på DENNA enhet") gäller
-    // bara host:ens telefon. En PtP-spectator ska inte skriva andra spelares
-    // historik till sin egen enhet — de spelade aldrig här.
-    if (isHost && gameMode !== 'individual-devices' && turnOrder.length > 1) {
-      const registeredNames = turnOrder
-        .filter((p) => p.type === 'registered' && p.name && !hybridOwnIds.has(p.id))
-        .map((p) => p.name);
-      if (registeredNames.length > 0) {
-        addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
-      }
-    }
+    // Build 41: historiken skrivs bara för den inloggade spelaren på den här
+    // enheten — aldrig under medspelares namn (Pass-the-Phone).
     addSessionRecord(playedIds).then(() => {
       setSeenQuestionIds((prev) => new Set([...prev, ...playedIds]));
       // Uppdatera lastSessionIds direkt så Play Again i samma session
@@ -7658,6 +7644,16 @@ export default function QuizScreen() {
             try {
             const changes: Record<string, HcpChange> = {};
             const catChanges: Record<string, HcpCategoryChange> = {};
+            // Build 41: medspelarnas HCP nycklas på lobby-user_id (aldrig namn).
+            // Misslyckas uppslaget blir deras progress sessions-lokal.
+            const peerUserIds = new Map<string, string | null>();
+            if (params.roomCode) {
+              try {
+                (await getLobbyPlayerUserIds(params.roomCode)).forEach((r) =>
+                  peerUserIds.set(r.playerId, r.userId),
+                );
+              } catch {}
+            }
             for (const p of turnOrder) {
               if (p.type === 'guest') continue;
               if (hybridOwnIds.has(p.id)) continue;
@@ -7667,7 +7663,13 @@ export default function QuizScreen() {
               const { before, after } =
                 p.id === selfPlayerId
                   ? await recordSelfGameResult(region, level, byCat, eraYears)
-                  : await recordGameResultForName(p.name, region, level, byCat, eraYears);
+                  : await recordGameResultForPeer(
+                      { playerId: p.id, userId: peerUserIds.get(p.id) ?? null },
+                      region,
+                      level,
+                      byCat,
+                      eraYears,
+                    );
               // §5-raden visar Total (nytt värde + delta) under assistance/age.
               changes[p.id] = { before: before.total, after: after.total };
               // Per-kategori-FÖRÄNDRING för leaderboardens "+"-utfällning.
@@ -9625,16 +9627,6 @@ export default function QuizScreen() {
                   ...new Set(gameQuestions.slice(0, questionIndex).map((q) => q.id)),
                 ];
                 await addSessionRecord(playedIds);
-                // PtP: skriv även under registrerade deltagares playerName-
-                // nycklar (samma rationale som leaderboard-recordingen).
-                if (gameMode !== 'individual-devices' && turnOrder.length > 1) {
-                  const registeredNames = turnOrder
-                    .filter((p) => p.type === 'registered' && p.name && !hybridOwnIds.has(p.id))
-                    .map((p) => p.name);
-                  if (registeredNames.length > 0) {
-                    addSessionRecordForNames(registeredNames, playedIds).catch(() => {});
-                  }
-                }
                 persistEpochLedger();
                 persistCategoryLedger();
               }

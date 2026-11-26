@@ -9,7 +9,7 @@
 // (waiting_invites_signal:) så den inte krockar med JoinModal:s egen
 // waiting_invites:-channel för samma user.
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { scopedStorage, userKey } from '../utils/storageScope';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
@@ -19,7 +19,6 @@ import { loadInvites, type WaitingInvite } from '../utils/waitingInvites';
 
 // Per-user-namespacad (samma skäl som MyMatchesSection:s SEEN_KEY) så User A:s
 // "sett" inte tystar signalen för User B på samma device.
-const SEEN_KEY_PREFIX = '@quizvibe/waitingInvites/seen/v1/';
 
 // Snapshot = de sedda invite-id:na, sorterade + |-joinade. Vi jämför per
 // MEDLEMSKAP (finns en NUVARANDE invite som INTE är sedd?), inte via
@@ -70,7 +69,7 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
     if (seq !== reloadSeqRef.current) return;
     setInvites(list);
     const uid = userResp.user?.id;
-    const key = uid ? `${SEEN_KEY_PREFIX}${uid}` : null;
+    const key = uid ? userKey(uid, 'waitingInvitesSeen') : null;
     seenKeyRef.current = key;
     if (!key) {
       setSeen(null);
@@ -78,7 +77,7 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
     }
     let stored = '';
     try {
-      stored = (await AsyncStorage.getItem(key)) ?? '';
+      stored = (await scopedStorage.getItem(key)) ?? '';
     } catch {
       stored = '';
     }
@@ -179,7 +178,7 @@ export function useWaitingInviteSignal(): WaitingInviteSignal {
   const markInvitesSeen = useCallback(() => {
     setSeen(currentIds);
     const key = seenKeyRef.current;
-    if (key) void AsyncStorage.setItem(key, currentIds).catch(() => {});
+    if (key) void scopedStorage.setItem(key, currentIds).catch(() => {});
   }, [currentIds]);
 
   return { invites, hasInvites, hasNewInvite, markInvitesSeen };

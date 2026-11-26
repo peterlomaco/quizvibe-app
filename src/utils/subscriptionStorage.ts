@@ -21,16 +21,22 @@
 // raderats vid nästa app-start. Därför utvärderas promon vid LÄSNING här
 // nedan i stället för att lagras i samma nyckel.
 //
-// `KEY` är per-device-state. RevenueCat knyter köpet till user-id via sin
-// egen SDK och skriver om nyckeln vid identitetsbyte, och registrering
-// rensar den explicit (se handleRegisterSubmit) så ett nytt konto inte
-// ärver föregående kontos `true`. Promo-claimen ligger också lokalt men är
-// ÄGARSTÄMPLAD med playerName och gäller därför bara sitt eget konto.
+// Båda lagren är per KONTO sedan Build 41 (nyckeln bär Supabase-UUID), så en
+// flagga från ett annat konto på samma telefon läses aldrig.
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { hasActiveFreePremium } from './promoPremium';
+import { currentAuthEpoch, getUserScope, scopedStorage, userKey } from './storageScope';
 
-const KEY = '@quizvibe/subscription/hasPremium/v1';
+// Build 41: den betalda flaggan lagras per konto (project ref + UUID). Utan
+// registrerad session finns ingen nyckel → lager 1 är alltid false.
+async function resolvePaidKey(): Promise<string | null> {
+  try {
+    const scope = await getUserScope();
+    return scope ? userKey(scope.uid, 'hasPremium') : null;
+  } catch {
+    return null;
+  }
+}
 
 // ── Synkron spegel ──────────────────────────────────────────────────────
 //
@@ -63,15 +69,25 @@ export function getCachedPremium(): boolean | undefined {
  * mount snabbare.
  */
 export async function hasPremiumSubscription(): Promise<boolean> {
-  const result = await computePremium();
-  cachedPremium = result;
-  return result;
+  // Kontobyte medan läsningen pågick: förra kontots svar får aldrig hamna i
+  // spegeln (Build 41). Räkna om tills epoken är stabil (max 3 försök).
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const epoch = currentAuthEpoch();
+    const result = await computePremium();
+    if (epoch === currentAuthEpoch()) {
+      cachedPremium = result;
+      return result;
+    }
+  }
+  cachedPremium = undefined;
+  return false;
 }
 
 async function computePremium(): Promise<boolean> {
   try {
     // Lager 1 — betald entitlement (speglad från RevenueCat av _layout).
-    const value = await AsyncStorage.getItem(KEY);
+    const key = await resolvePaidKey();
+    const value = key ? await scopedStorage.getItem(key) : null;
     if (value === 'true') return true;
   } catch (err) {
     console.warn('[subscriptionStorage] hasPremiumSubscription failed:', err);
@@ -99,7 +115,8 @@ export async function refreshPremiumMirror(): Promise<void> {
  */
 export async function setPremiumActive(active: boolean): Promise<void> {
   try {
-    await AsyncStorage.setItem(KEY, active ? 'true' : 'false');
+    const key = await resolvePaidKey();
+    if (key) await scopedStorage.setItem(key, active ? 'true' : 'false');
   } catch (err) {
     console.warn('[subscriptionStorage] setPremiumActive failed:', err);
   }
@@ -114,7 +131,8 @@ export async function setPremiumActive(active: boolean): Promise<void> {
  */
 export async function clearPremiumSubscription(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(KEY);
+    const key = await resolvePaidKey();
+    if (key) await scopedStorage.removeItem(key);
   } catch (err) {
     console.warn('[subscriptionStorage] clearPremiumSubscription failed:', err);
   }

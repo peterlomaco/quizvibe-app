@@ -86,6 +86,7 @@ import {
 } from '../utils/friendsStorage';
 import { PURCHASED_PACKAGES, parentRestrictedPackageMessage, type MusicPackage } from '../utils/mockPurchasedPackages';
 import {
+    canSaveProfileNow,
     getCachedProfile,
     loadProfile,
     playerNameExists,
@@ -1283,7 +1284,16 @@ export default function ProfileScreen() {
     (o) => o.id === answerResponseSeconds,
   )?.label;
 
-  const handleSave = async (section: 'defaults' | 'host' | 'packages') => {
+  const handleSave = async (section: 'defaults' | 'host' | 'packages'): Promise<boolean> => {
+    // Build 41: profilen synkas aldrig offline — blockera i stället för att
+    // spara lokalt och skriva över servern senare.
+    if (!(await canSaveProfileNow())) {
+      quizVibeAlert(
+        "You're offline",
+        "Changes can't be saved right now. Check your connection and try again.",
+      );
+      return false;
+    }
     // Spotify DJ kräver Individual Devices-läge — blockera om Spotify är på
     // men mode-valet inte är IndDev.
     // v2: no mode default exists — the lobby forces All at Once for Spotify.
@@ -1292,7 +1302,7 @@ export default function ProfileScreen() {
         'Spotify requires Individual Devices',
         'Spotify DJ mode is only available in Individual Devices mode. Please change the Game Mode or turn off Spotify.',
       );
-      return;
+      return false;
     }
     try {
       await saveProfile({
@@ -1337,8 +1347,10 @@ export default function ProfileScreen() {
       });
       setSavedSection(section);
       setTimeout(() => setSavedSection(null), 2000);
+      return true;
     } catch {
       // TODO: visa felmeddelande till användaren om spara misslyckas
+      return false;
     }
   };
 
@@ -1396,9 +1408,9 @@ export default function ProfileScreen() {
           text: 'Save',
           leavesScreen: true,
           onPress: async () => {
-            await handleSave('defaults');
-            await handleSave('host');
-            navigateFn();
+            const ok = (await handleSave('defaults')) && (await handleSave('host'));
+            if (ok) navigateFn();
+            else endLeaveScreen();
           },
         },
         { text: 'Stay', style: 'cancel' },

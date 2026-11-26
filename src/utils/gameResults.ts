@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { AggregateGamePlayer } from './aggregateLeaderboard';
-import { loadProfile, type GameMode } from './profileStorage';
+import type { GameMode } from './profileStorage';
+import { getUserScope, scopedStorage, userKey } from './storageScope';
 import type { PlayedMediaSource } from './mediaSource';
 
 /**
@@ -31,27 +31,20 @@ import type { PlayedMediaSource } from './mediaSource';
  *   inte ärvs in i namespaced-strukturen.
  */
 
-const LATEST_KEY = '@quizvibe/latestResult/v1';
-const HISTORY_KEY_PREFIX = '@quizvibe/gameHistory/v1/';
-const HISTORY_LEGACY_GLOBAL_KEY = '@quizvibe/gameHistory/v1';
-const HISTORY_RESET_KEY = '@quizvibe/migration/historyReset/v1';
-const HISTORY_PER_USER_RESET_KEY = '@quizvibe/migration/historyPerUserReset/v1';
-// V2-reset: wipe:ar gamla totalPoints/avgPointsPerQuestion-entries vid
-// första load efter shape-bytet 2026-05-22 (correctAnswers/totalQuestions).
-const HISTORY_V2_RESET_KEY = '@quizvibe/migration/historyV2Reset/v1';
-// V3-reset: wipe:ar pre-age/assistance/era-entries vid första load efter
-// shape-utökningen 2026-05-22 (samma dag som v2 men annan flagga så
-// migrationen är distinkt).
-const HISTORY_V3_RESET_KEY = '@quizvibe/migration/historyV3Reset/v1';
-// V4-reset: wipe:ar pre-packages/sources-entries vid första load efter
-// shape-utökningen 2026-05-25 (selectedExtraPackages + youtubeEnabled +
-// imagesEnabled). Distinkt flagga så migrationen kan rullas oberoende.
-const HISTORY_V4_RESET_KEY = '@quizvibe/migration/historyV4Reset/v1';
-// V5-reset: wipe:ar entries vars source-etikett byggdes ur host:s TOGGLE-
-// läge (youtubeEnabled/imagesEnabled) vid shape-bytet 2026-08-26 → `sources`
-// (källor som FAKTISKT serverades). Gamla rader kan INTE migreras — toggle-
-// läget säger inget om vad som spelades — därför wipe i stället för dual-read.
-const HISTORY_V5_RESET_KEY = '@quizvibe/migration/historyV5Reset/v1';
+// Build 41: alla nycklar är per konto (project ref + Supabase-UUID). Gamla
+// playerName-nycklade poster + reset-flaggorna rensas av storageTransition.
+// Gäster (ingen registrerad session) skriver ingen history; deras
+// latestResult hålls bara i minnet.
+async function resolveScopedKey(store: string): Promise<string | null> {
+  try {
+    const scope = await getUserScope();
+    return scope ? userKey(scope.uid, store) : null;
+  } catch {
+    return null;
+  }
+}
+
+let sessionLatest: string | null = null;
 
 export type AssistanceLevel = 'minimal' | 'standard' | 'full';
 
@@ -86,7 +79,12 @@ const LEGACY_SKILL_TO_ASSISTANCE: Record<string, AssistanceLevel> = {
 
 export async function saveLatestResult(result: GameResult): Promise<void> {
   try {
-    await AsyncStorage.setItem(LATEST_KEY, JSON.stringify(result));
+    const key = await resolveScopedKey('latestResult');
+    if (!key) {
+      sessionLatest = JSON.stringify(result);
+      return;
+    }
+    await scopedStorage.setItem(key, JSON.stringify(result));
   } catch (err) {
     console.warn('[gameResults] Failed to save latest result:', err);
     throw err;
@@ -95,7 +93,8 @@ export async function saveLatestResult(result: GameResult): Promise<void> {
 
 export async function loadLatestResult(): Promise<GameResult | null> {
   try {
-    const json = await AsyncStorage.getItem(LATEST_KEY);
+    const key = await resolveScopedKey('latestResult');
+    const json = key ? await scopedStorage.getItem(key) : sessionLatest;
     if (!json) return null;
     const raw = JSON.parse(json) as Partial<GameResult> & { skill?: string };
     // Migrera result sparade när fältet hette `skill` med värdena
@@ -114,7 +113,9 @@ export async function loadLatestResult(): Promise<GameResult | null> {
 
 export async function clearLatestResult(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(LATEST_KEY);
+    sessionLatest = null;
+    const key = await resolveScopedKey('latestResult');
+    if (key) await scopedStorage.removeItem(key);
   } catch (err) {
     console.warn('[gameResults] Failed to clear latest result:', err);
   }
@@ -186,75 +187,16 @@ export interface HistoryEntry {
   players?: AggregateGamePlayer[];
 }
 
-/**
- * Returnerar AsyncStorage-nyckeln för inloggade user:s history.
- * null = ingen profil laddad → caller bör returnera tom lista / no-op:a save.
- */
-async function resolveHistoryKey(): Promise<string | null> {
-  const profile = await loadProfile();
-  if (!profile?.playerName) return null;
-  return `${HISTORY_KEY_PREFIX}${profile.playerName.toLowerCase()}`;
-}
-
-/**
- * One-shot reset av all v1-history-data. Wipe:ar BÅDE legacy global key
- * (pre-per-user-namespacing) OCH alla per-user-keys (i fall någon tidigare
- * implementering claim:ade legacy global → first-user-on-device). Sätter
- * `HISTORY_PER_USER_RESET_KEY` så reset:en bara körs en gång per device.
- * Alla startar tomma — användarna får börja om history från noll.
- * Idempotent — säkert att anropa flera gånger.
- *
- * (Legacy `HISTORY_RESET_KEY` från 2026-05-18-förenklingen lämnas orörd —
- * den var per-device-wipe under den globala-nyckel-eran och är inte
- * relevant för per-user-namespacing-migrationen.)
- */
-async function ensureHistoryReset(): Promise<void> {
-  try {
-    // ALLA reset-flaggor (per-user, v2, v3, v4, v5) måste vara satta — annars
-    // wipe:a och sätt samtliga. Multi-flag-check så successiva shape-
-    // ändringar var sin triggar wipe utan att räkningarna kollideras.
-    const perUserFlag = await AsyncStorage.getItem(HISTORY_PER_USER_RESET_KEY);
-    const v2Flag = await AsyncStorage.getItem(HISTORY_V2_RESET_KEY);
-    const v3Flag = await AsyncStorage.getItem(HISTORY_V3_RESET_KEY);
-    const v4Flag = await AsyncStorage.getItem(HISTORY_V4_RESET_KEY);
-    const v5Flag = await AsyncStorage.getItem(HISTORY_V5_RESET_KEY);
-    if (
-      perUserFlag === '1' &&
-      v2Flag === '1' &&
-      v3Flag === '1' &&
-      v4Flag === '1' &&
-      v5Flag === '1'
-    )
-      return;
-    const allKeys = await AsyncStorage.getAllKeys();
-    const historyKeys = allKeys.filter(
-      (k) =>
-        k === HISTORY_LEGACY_GLOBAL_KEY ||
-        k.startsWith(HISTORY_KEY_PREFIX),
-    );
-    if (historyKeys.length > 0) {
-      await AsyncStorage.multiRemove(historyKeys);
-    }
-    await AsyncStorage.setItem(HISTORY_PER_USER_RESET_KEY, '1');
-    await AsyncStorage.setItem(HISTORY_V2_RESET_KEY, '1');
-    await AsyncStorage.setItem(HISTORY_V3_RESET_KEY, '1');
-    await AsyncStorage.setItem(HISTORY_V4_RESET_KEY, '1');
-    await AsyncStorage.setItem(HISTORY_V5_RESET_KEY, '1');
-    // Sätt även den äldre reset-flaggan så ensureHistoryReset i den
-    // tidigare pre-namespacing-versionen aldrig fyrar igen om koden
-    // skulle rullas tillbaka.
-    await AsyncStorage.setItem(HISTORY_RESET_KEY, '1');
-  } catch (err) {
-    console.warn('[gameResults] history reset failed:', err);
-  }
+/** Kontots history-nyckel. null = ingen registrerad session → tom lista / no-op. */
+function resolveHistoryKey(): Promise<string | null> {
+  return resolveScopedKey('gameHistory');
 }
 
 export async function loadGameHistory(): Promise<HistoryEntry[]> {
-  await ensureHistoryReset();
   try {
     const key = await resolveHistoryKey();
     if (!key) return [];
-    const json = await AsyncStorage.getItem(key);
+    const json = await scopedStorage.getItem(key);
     if (!json) return [];
     const parsed = JSON.parse(json);
     if (!Array.isArray(parsed)) return [];
@@ -266,7 +208,6 @@ export async function loadGameHistory(): Promise<HistoryEntry[]> {
 }
 
 export async function appendGameHistoryEntry(entry: HistoryEntry): Promise<void> {
-  await ensureHistoryReset();
   try {
     const key = await resolveHistoryKey();
     if (!key) {
@@ -275,7 +216,7 @@ export async function appendGameHistoryEntry(entry: HistoryEntry): Promise<void>
     }
     const existing = await loadGameHistory();
     const next = [...existing, entry];
-    await AsyncStorage.setItem(key, JSON.stringify(next));
+    await scopedStorage.setItem(key, JSON.stringify(next));
   } catch (err) {
     console.warn('[gameResults] Failed to append history entry:', err);
   }
@@ -293,7 +234,7 @@ export async function deleteGameHistoryEntry(id: string): Promise<void> {
     if (!key) return;
     const existing = await loadGameHistory();
     const next = existing.filter((e) => e.id !== id);
-    await AsyncStorage.setItem(key, JSON.stringify(next));
+    await scopedStorage.setItem(key, JSON.stringify(next));
   } catch (err) {
     console.warn('[gameResults] Failed to delete history entry:', err);
   }
@@ -303,7 +244,7 @@ export async function clearGameHistory(): Promise<void> {
   try {
     const key = await resolveHistoryKey();
     if (!key) return;
-    await AsyncStorage.removeItem(key);
+    await scopedStorage.removeItem(key);
   } catch (err) {
     console.warn('[gameResults] Failed to clear history:', err);
   }

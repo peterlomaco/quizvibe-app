@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { envKey, scopedStorage } from './storageScope';
 
 /**
  * "Left players" — snapshot:s av spelare som lämnat en specifik lobby
@@ -14,13 +14,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * bara för existing-card-marking.
  *
  * Mock-implementation: utan backend kan vi bara simulera kross-device-
- * synk via lokal AsyncStorage. När backend är inkopplad ersätts detta
+ * synk via lokal scopedStorage. När backend är inkopplad ersätts detta
  * med en API-event-prenumeration eller polling — call-sites
  * (handleGuestLeaveRoom, useFocusEffect) håller signaturen så impl-byte
  * blir lokalt här.
  */
 
-const KEY = (roomCode: string) => `@quizvibe/leftPlayers/${roomCode.toUpperCase()}/v1`;
+const KEY = (roomCode: string) => envKey(`leftPlayers/${roomCode.toUpperCase()}`);
 
 export interface LeftPlayerSnapshot {
   id: string;
@@ -44,7 +44,7 @@ export async function addLeftPlayer(
     const existing = await getLeftPlayers(roomCode);
     if (existing.some((p) => p.id === snapshot.id)) return; // idempotent
     const updated = [...existing, snapshot];
-    await AsyncStorage.setItem(KEY(roomCode), JSON.stringify(updated));
+    await scopedStorage.setItem(KEY(roomCode), JSON.stringify(updated));
   } catch (err) {
     console.warn('[leftPlayers] Failed to add:', err);
   }
@@ -52,7 +52,7 @@ export async function addLeftPlayer(
 
 export async function getLeftPlayers(roomCode: string): Promise<LeftPlayerSnapshot[]> {
   try {
-    const json = await AsyncStorage.getItem(KEY(roomCode));
+    const json = await scopedStorage.getItem(KEY(roomCode));
     if (!json) return [];
     const parsed = JSON.parse(json);
     return Array.isArray(parsed) ? (parsed as LeftPlayerSnapshot[]) : [];
@@ -64,7 +64,7 @@ export async function getLeftPlayers(roomCode: string): Promise<LeftPlayerSnapsh
 
 export async function clearLeftPlayers(roomCode: string): Promise<void> {
   try {
-    await AsyncStorage.removeItem(KEY(roomCode));
+    await scopedStorage.removeItem(KEY(roomCode));
   } catch (err) {
     console.warn('[leftPlayers] Failed to clear:', err);
   }
@@ -91,9 +91,9 @@ export async function removeLeftPlayer(
     const filtered = existing.filter((p) => p.id !== playerId);
     if (filtered.length === existing.length) return;
     if (filtered.length === 0) {
-      await AsyncStorage.removeItem(KEY(roomCode));
+      await scopedStorage.removeItem(KEY(roomCode));
     } else {
-      await AsyncStorage.setItem(KEY(roomCode), JSON.stringify(filtered));
+      await scopedStorage.setItem(KEY(roomCode), JSON.stringify(filtered));
     }
   } catch (err) {
     console.warn('[leftPlayers] Failed to remove:', err);
