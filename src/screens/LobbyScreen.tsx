@@ -1995,9 +1995,15 @@ export default function LobbyScreen() {
       // Multiplayer v2 device choice (Step 2). Explicit param (carry-over,
       // later the join UI) wins; v2 rooms default to 'own'; legacy rooms
       // write nothing. Read-only DB lookup — failure → treated as legacy.
-      const roomMetaForDevice = deviceModeParam || hostMode
+      // Build 41 (0070): en v2-join UTAN device_mode avvisas av servern som
+      // "update_required", så en timeout får inte tyst bli "legacy". Vid
+      // timeout görs ett andra försök utan tak innan vi faller tillbaka.
+      let roomMetaForDevice = deviceModeParam || hostMode
         ? undefined
         : await withTimeout(getRoomMeta(roomCode), SYNC_TIMEOUT_MS, undefined, 'getRoomMeta(device)');
+      if (roomMetaForDevice === undefined && !deviceModeParam && !hostMode && !cancelled) {
+        roomMetaForDevice = await getRoomMeta(roomCode).catch(() => undefined);
+      }
       if (cancelled) return;
       const joinDeviceMode = resolveJoinDeviceMode(
         deviceModeParam,

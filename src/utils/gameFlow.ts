@@ -445,6 +445,9 @@ export function joinRejectionMessage(reason: string): { title: string; message: 
       return { title: 'Removed from lobby', message: 'The Host enabled Spotify. Join again from your own device as a QuizVibe user.' };
     case 'device_locked':
       return { title: 'Device choice locked', message: 'Leave the lobby and join again to change device.' };
+    case 'update_required':
+      // 0070: a v2 join without a device choice (pre-Build-41 client).
+      return { title: 'Update required', message: 'This game needs the latest version of QuizVibe. Update the app and join again.' };
     default:
       return { title: 'Could not join', message: 'Check your connection and try again.' };
   }

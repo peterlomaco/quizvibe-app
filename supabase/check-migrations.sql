@@ -65,7 +65,8 @@ with checks(migration, kind, obj) as (values
   ('0068_security_guards',              'func',   'public.guard_lobby_player_row'),
   ('0068 (claim binds only seat owner)','funcbody','public.claim_carry_over_row|_lobby_seat_owner'),
   ('0069_lobby_settings_filters',       'column', 'public.lobby_settings.parent_control_enabled'),
-  ('0069_lobby_settings_filters',       'column', 'public.lobby_settings.include_theme_questions')
+  ('0069_lobby_settings_filters',       'column', 'public.lobby_settings.include_theme_questions'),
+  ('0070_v2_join_requires_device_client','func',  'public.enforce_v2_join_client')
 )
 select * from (
 select

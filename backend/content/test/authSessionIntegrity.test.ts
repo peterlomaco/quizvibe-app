@@ -407,6 +407,41 @@ describe('lobby — gäster publicerar inget konto', () => {
   });
 });
 
+// 0070 (Build 41): servern avvisar en v2-join utan device_mode som
+// "update_required" — Build 41:s egen join-skrivning måste alltid bära den.
+describe('lobby — v2-join bär device_mode (0070-kontraktet)', () => {
+  const joiner = (deviceMode?: 'own' | 'host') =>
+    ({ id: 'joiner-1', name: 'Anna', emoji: '🙂', type: 'registered', isHost: false, approved: false, deviceMode }) as any;
+
+  it('egen non-host-join med device skickar device_mode i samma skrivning', async () => {
+    const t = await boot();
+    const lobby = await import('../../../src/utils/mockLobbyPlayers');
+    t.fake.signIn(ANNA);
+    await lobby.upsertOwnLobbyPlayer('AB23XY', joiner('own'));
+    expect(t.fake.state.upserts.at(-1)).toMatchObject({ device_mode: 'own', has_left: false, user_id: ANNA.id });
+  });
+
+  it('legacy-rum (ingen device) skickar ingen device_mode', async () => {
+    const t = await boot();
+    const lobby = await import('../../../src/utils/mockLobbyPlayers');
+    t.fake.signIn(ANNA);
+    await lobby.upsertOwnLobbyPlayer('AB23XY', joiner());
+    expect(t.fake.state.upserts.at(-1)).not.toHaveProperty('device_mode');
+  });
+
+  it('v2-rum: resolveJoinDeviceMode defaultar own när steget saknas', async () => {
+    const flow = await import('../../../src/utils/gameFlow');
+    expect(flow.resolveJoinDeviceMode(undefined, true)).toBe('own');
+    expect(flow.resolveJoinDeviceMode('host', true)).toBe('host');
+    expect(flow.resolveJoinDeviceMode(undefined, false)).toBeUndefined();
+  });
+
+  it('update_required har ett eget meddelande', async () => {
+    const flow = await import('../../../src/utils/gameFlow');
+    expect(flow.joinRejectionMessage('update_required').title).toBe('Update required');
+  });
+});
+
 describe('ingen rå lagringsåtkomst utanför scope-lagret', () => {
   it('bara de fyra tillåtna modulerna importerar AsyncStorage eller skriver @quizvibe/-nycklar', async () => {
     const fs = await import('node:fs');
