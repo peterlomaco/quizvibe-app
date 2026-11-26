@@ -1,15 +1,23 @@
 diff --git a/node_modules/react-native-youtube-iframe/lib/commonjs/PlayerScripts.js b/node_modules/react-native-youtube-iframe/lib/commonjs/PlayerScripts.js
-index 7867fe7..11e3631 100644
+index 7867fe7..26fa437 100644
 --- a/node_modules/react-native-youtube-iframe/lib/commonjs/PlayerScripts.js
 +++ b/node_modules/react-native-youtube-iframe/lib/commonjs/PlayerScripts.js
-@@ -181,6 +181,7 @@ const MAIN_SCRIPT = (videoId, playList, initialPlayerParams, allowWebViewZoom, c
-             end: ${end},
-             rel: ${rel_s},
-             playsinline: 1,
-+            autoplay: 1,
-             loop: ${loop_s},
-             color: ${color},
-             start: ${start},
+@@ -132,6 +132,7 @@ const MAIN_SCRIPT = (videoId, playList, initialPlayerParams, allowWebViewZoom, c
+ <!DOCTYPE html>
+ <html>
+   <head>
++    <meta name="referrer" content="strict-origin-when-cross-origin">
+     <meta
+       name="viewport"
+       content="width=device-width, ${scale}"
+@@ -191,6 +192,7 @@ const MAIN_SCRIPT = (videoId, playList, initialPlayerParams, allowWebViewZoom, c
+             iv_load_policy: ${iv_load_policy},
+             modestbranding: ${modestbranding_s},
+             cc_load_policy: ${showClosedCaptions_s},
++            origin: window.location.origin,
+           },
+           events: {
+             'onReady': onPlayerReady,
 diff --git a/node_modules/react-native-youtube-iframe/lib/commonjs/YoutubeIframe.js b/node_modules/react-native-youtube-iframe/lib/commonjs/YoutubeIframe.js
 index 0be2dad..af23f04 100644
 --- a/node_modules/react-native-youtube-iframe/lib/commonjs/YoutubeIframe.js
@@ -43,18 +51,49 @@ index 0be2dad..af23f04 100644
    }, [playerReady]);
    (0, _react.useImperativeHandle)(ref, () => ({
      getVideoUrl: () => {
+diff --git a/node_modules/react-native-youtube-iframe/lib/commonjs/constants.js b/node_modules/react-native-youtube-iframe/lib/commonjs/constants.js
+index 096ca2d..07dd85a 100644
+--- a/node_modules/react-native-youtube-iframe/lib/commonjs/constants.js
++++ b/node_modules/react-native-youtube-iframe/lib/commonjs/constants.js
+@@ -28,14 +28,16 @@ const PLAYER_ERROR_NAMES = exports.PLAYER_ERROR_NAMES = {
+   INVALID_PARAMETER: 'invalid_parameter',
+   HTML5_ERROR: 'HTML5_error',
+   VIDEO_NOT_FOUND: 'video_not_found',
+-  EMBED_NOT_ALLOWED: 'embed_not_allowed'
++  EMBED_NOT_ALLOWED: 'embed_not_allowed',
++  MISSING_CLIENT_IDENTITY: 'missing_client_identity'
+ };
+ const PLAYER_ERROR = exports.PLAYER_ERROR = {
+   2: PLAYER_ERROR_NAMES.INVALID_PARAMETER,
+   5: PLAYER_ERROR_NAMES.HTML5_ERROR,
+   100: PLAYER_ERROR_NAMES.VIDEO_NOT_FOUND,
+   101: PLAYER_ERROR_NAMES.EMBED_NOT_ALLOWED,
+-  150: PLAYER_ERROR_NAMES.EMBED_NOT_ALLOWED
++  150: PLAYER_ERROR_NAMES.EMBED_NOT_ALLOWED,
++  153: PLAYER_ERROR_NAMES.MISSING_CLIENT_IDENTITY
+ };
+ const CUSTOM_USER_AGENT = exports.CUSTOM_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36';
+ const DEFAULT_BASE_URL = exports.DEFAULT_BASE_URL = 'https://lonelycpp.github.io/react-native-youtube-iframe/iframe_v2.html';
 diff --git a/node_modules/react-native-youtube-iframe/src/PlayerScripts.js b/node_modules/react-native-youtube-iframe/src/PlayerScripts.js
-index 547b51f..acb4493 100644
+index 547b51f..7e5694e 100644
 --- a/node_modules/react-native-youtube-iframe/src/PlayerScripts.js
 +++ b/node_modules/react-native-youtube-iframe/src/PlayerScripts.js
-@@ -201,6 +201,7 @@ export const MAIN_SCRIPT = (
-             end: ${end},
-             rel: ${rel_s},
-             playsinline: 1,
-+            autoplay: 1,
-             loop: ${loop_s},
-             color: ${color},
-             start: ${start},
+@@ -152,6 +152,7 @@ export const MAIN_SCRIPT = (
+ <!DOCTYPE html>
+ <html>
+   <head>
++    <meta name="referrer" content="strict-origin-when-cross-origin">
+     <meta
+       name="viewport"
+       content="width=device-width, ${scale}"
+@@ -211,6 +212,7 @@ export const MAIN_SCRIPT = (
+             iv_load_policy: ${iv_load_policy},
+             modestbranding: ${modestbranding_s},
+             cc_load_policy: ${showClosedCaptions_s},
++            origin: window.location.origin,
+           },
+           events: {
+             'onReady': onPlayerReady,
 diff --git a/node_modules/react-native-youtube-iframe/src/YoutubeIframe.js b/node_modules/react-native-youtube-iframe/src/YoutubeIframe.js
 index 4bbf487..1835a16 100644
 --- a/node_modules/react-native-youtube-iframe/src/YoutubeIframe.js
@@ -90,3 +129,23 @@ index 4bbf487..1835a16 100644
      },
      [playerReady],
    );
+diff --git a/node_modules/react-native-youtube-iframe/src/constants.js b/node_modules/react-native-youtube-iframe/src/constants.js
+index b257921..b2b02d4 100644
+--- a/node_modules/react-native-youtube-iframe/src/constants.js
++++ b/node_modules/react-native-youtube-iframe/src/constants.js
+@@ -26,6 +26,7 @@ export const PLAYER_ERROR_NAMES = {
+   HTML5_ERROR: 'HTML5_error',
+   VIDEO_NOT_FOUND: 'video_not_found',
+   EMBED_NOT_ALLOWED: 'embed_not_allowed',
++  MISSING_CLIENT_IDENTITY: 'missing_client_identity',
+ };
+ 
+ export const PLAYER_ERROR = {
+@@ -34,6 +35,7 @@ export const PLAYER_ERROR = {
+   100: PLAYER_ERROR_NAMES.VIDEO_NOT_FOUND,
+   101: PLAYER_ERROR_NAMES.EMBED_NOT_ALLOWED,
+   150: PLAYER_ERROR_NAMES.EMBED_NOT_ALLOWED,
++  153: PLAYER_ERROR_NAMES.MISSING_CLIENT_IDENTITY,
+ };
+ 
+ export const CUSTOM_USER_AGENT =

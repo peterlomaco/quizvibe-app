@@ -35,6 +35,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import Constants from 'expo-constants';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import {
   MARK_HEIGHT_FROM_V1,
@@ -67,6 +68,23 @@ interface Props {
 // Pro Max: 22 pt) medan 375–390 pt råkade klara sig — därav "bara vissa
 // enheter". Måtten kommer nu från quizLayout.ts och är alltid exakt 16:9.
 // Ha ALDRIG en lokal kopia av formeln här.
+// API-klient-identitet (YouTube RMF, "API Client Identity and Credentials",
+// 2026-11-26). Utan flaggan laddas spelaren från bibliotekets egen sida
+// (lonelycpp.github.io) — då ser YouTube en tredje parts webbplats som
+// inbäddare, inte QuizVibe. Med flaggan bygger vi spelarsidan lokalt
+// (useLocalHTML) och sätter WebView:ns baseUrl till https://<bundle-id>,
+// vilket är exakt vad YouTube kräver för iOS WKWebView ("setting the baseUrl
+// will set the Referer"; domänen ska vara appens bundle ID). Ingen
+// webbhosting behövs. Sidan sätter också Referrer-Policy
+// strict-origin-when-cross-origin och origin-playerVar (patch-package).
+//
+// AV som default. Slås på per build via EXPO_PUBLIC_YT_OWN_WRAPPER=1
+// (lokal .env för dev builds, EAS "preview"-miljön för TestFlight). Ingen
+// produktionsbuild påverkas förrän variabeln sätts i EAS "production".
+const OWN_PLAYER_WRAPPER = process.env.EXPO_PUBLIC_YT_OWN_WRAPPER === '1';
+const APP_ID = (Constants.expoConfig?.ios?.bundleIdentifier ?? 'se.quizvibe.app').toLowerCase();
+const EMBED_BASE_URL = `https://${APP_ID}/`;
+
 const PLAYER_W = QUIZ_MEDIA_W;
 const PLAYER_H = QUIZ_MEDIA_H;
 // End-of-clip-brandingen = Home:s låsta Brand Master (metallisk vektor-Q +
@@ -258,6 +276,8 @@ export function YouTubeMediaPlayer({
         onReady={handleReady}
         onError={handleError}
         forceAndroidAutoplay
+        useLocalHTML={OWN_PLAYER_WRAPPER}
+        baseUrlOverride={OWN_PLAYER_WRAPPER ? EMBED_BASE_URL : undefined}
         initialPlayerParams={{
           controls: false,
           rel: false,
