@@ -232,6 +232,11 @@ export function CompetitionRematchActions({
           ...(saved.latestSettings
             ? { parentControl: String(saved.latestSettings.parentControlEnabled) }
             : {}),
+          // Filter: tema-specifika frågor — bara när snapshoten bär fältet;
+          // annars seedar lobbyn från host:ens profil.
+          ...(typeof saved.latestSettings?.includeThemeQuestions === 'boolean'
+            ? { includeTheme: String(saved.latestSettings.includeThemeQuestions) }
+            : {}),
           ...(result.isMulti
             ? { rematchLocked: 'true', competitionRematch: 'true' }
             : {}),

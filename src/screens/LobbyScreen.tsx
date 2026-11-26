@@ -50,7 +50,6 @@ import {
   hintsInfo,
   hostPackagesInfo,
   mutualAssistanceInfo,
-  parentControlInfo,
   parentControlledPackageInfo,
   playersInfo,
   roundsInfo,
@@ -65,6 +64,7 @@ import { PackageThumbnail, hasPackageThumbnail } from '../components/PackageThum
 import { METALLIC_GOLD_EDGE, MetallicGoldFill } from '../components/MetallicGoldFill';
 import { SectionToggle } from '../components/SectionToggle';
 import { QuizVibeToggle, quizVibeToggleWidth } from '../components/QuizVibeToggle';
+import { FilterGroup } from '../components/FilterGroup';
 import { QuizVibeWatermark } from '../components/QuizVibeWatermark';
 import { QuizVibeAlertHost } from '../components/QuizVibeAlertHost';
 import { LeaveScreenCover } from '../components/LeaveScreenCover';
@@ -1256,6 +1256,7 @@ export default function LobbyScreen() {
     audioOn: audioOnParam,
     competitionRematch,
     parentControl,
+    includeTheme,
     carryPackages,
     seedGameMode,
     carrySpotifyYear,
@@ -1307,6 +1308,10 @@ export default function LobbyScreen() {
      *  — utan denna param skulle en re-match återgå till profil-defaulten.
      *  Undefined = fresh lobby (ej carry-over) → seeden faller på profilen. */
     parentControl?: string;
+    /** Play Again carry-over: host:s "Include theme-specific questions" från
+     *  spelet som just spelades ('true'/'false'). Undefined = fresh lobby →
+     *  seeden faller på profilen. */
+    includeTheme?: string;
     /** Play Again carry-over: JSON-array av host:s aktiva Host-paket från
      *  spelet som just spelades. AUKTORITATIV källa (kringgår ev. stale
      *  lobby_settings + profil-filtret i seeden). Undefined = ej carry-over. */
@@ -1733,6 +1738,9 @@ export default function LobbyScreen() {
         // OCH multiplayer, Peter 2026-09-11): en guest/trial-lobby är alltid
         // barnvänlig. Switchen renderas disabled nedan. Persisteras aldrig i DB.
         setParentControlEnabled(true);
+        // Filter: tema-specifika frågor alltid AV för guest host (Peter
+        // 2026-11-26) — en gratis registrering låser upp switchen.
+        setIncludeThemeQuestions(false);
         setYoutubeEnabledCategories(defaultEnabledMainCategories());
         // Hints AV för guest host (Peter 2026-11-02): guest-spel är enbart
         // YouTube (Music + Film). Quiz Mixer döljs i guest-lobbyn.
@@ -1918,9 +1926,17 @@ export default function LobbyScreen() {
           // (fresh lobby) faller vi på host:ens profil-default.
           const carriedParentControl =
             parentControl === undefined ? undefined : parentControl === 'true';
-          // Default PÅ (safe default) — undefined profil-fält läses PÅ.
+          // QuizVibe-user-default (Peter 2026-11-26): mature content INGÅR
+          // (parentControlEnabled false) om inte användaren själv slagit av det.
           setParentControlEnabled(
-            carriedParentControl ?? profile?.parentControlEnabled ?? true,
+            carriedParentControl ?? profile?.parentControlEnabled ?? false,
+          );
+          // Filter: "Include theme-specific questions" — carry-over-param vinner,
+          // annars profil-defaulten (AV).
+          const carriedIncludeTheme =
+            includeTheme === undefined ? undefined : includeTheme === 'true';
+          setIncludeThemeQuestions(
+            carriedIncludeTheme ?? profile?.includeThemeQuestions ?? false,
           );
           // Spotify Year/Name — carry-over-param vinner (persisteras inte i DB).
           if (carriedSpotifyAnswers) {
@@ -2201,7 +2217,7 @@ export default function LobbyScreen() {
       if (seedHost) ownPlayerIdRef.current = seedHost.id;
     });
     return () => { cancelled = true; };
-  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType, parentControl, carryPackages, carriedSpotifyAnswers, carryPkgYoutube, carryPkgHints, deviceModeParam]);
+  }, [code, guestMode, guestName, guestBirthYear, guestAssistance, hostMode, isGuestHost, carryOverPlayerId, lobbyType, parentControl, includeTheme, carryPackages, carriedSpotifyAnswers, carryPkgYoutube, carryPkgHints, deviceModeParam]);
 
   // Varje gång Lobby får fokus (t.ex. man kommer tillbaka från Profile-tabben):
   // ladda sparad profil och uppdatera host-spelarkortet med profilens värden.
@@ -2946,6 +2962,10 @@ export default function LobbyScreen() {
   // OCH parent-restricted-paket (Hip Hop) får inte aktiveras. Default PÅ (safe
   // default; seed-effekten sätter om från param/profil). Non-host speglar host.
   const [parentControlEnabled, setParentControlEnabled] = useState(true);
+  // Filter: "Include theme-specific questions" (Peter 2026-11-26). PÅ =
+  // tema-only-items (inBaseCatalog: false) ingår även i Generic-spel. Host-
+  // styrd, non-host speglar host via lobby_settings (0069). Default AV.
+  const [includeThemeQuestions, setIncludeThemeQuestions] = useState(false);
   // Remote 1v1: EN gemensam hjälpnivå för båda spelarna (default Full).
   // Assistance är annars personligt, men i en duell där båda kör samma
   // frågesekvens var för sig blir olika nivåer inte jämförbart — därför KAN
@@ -3170,7 +3190,7 @@ export default function LobbyScreen() {
   const guestParentControlAlert = () =>
     quizVibeAlert(
       'Locked for Guest Host',
-      'Parent Control can only be changed when a registered QuizVibe user hosts the game.',
+      'Register a free QuizVibe account to change the filters.',
     );
 
   // Tap på den låsta Game Mode-indikatorn i en replay/re-match-lobby (single,
@@ -3895,11 +3915,11 @@ export default function LobbyScreen() {
   const handleToggleParentControlLobby = (next: boolean) => {
     if (!next) {
       quizVibeAlert(
-        'Parent Control',
-        'I am aware that this activates mature content, some of it might not be appropriate for children. Still want to deactivate Parent control?',
+        'Include mature content?',
+        'Mature content might not be appropriate for children. Include it in this game?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Deactivate', style: 'destructive', onPress: () => setParentControlEnabled(false) },
+          { text: 'Include', style: 'destructive', onPress: () => setParentControlEnabled(false) },
         ],
       );
       return;
@@ -3907,12 +3927,12 @@ export default function LobbyScreen() {
     const activeRestricted = selectedExtraPackages.filter(isPackageParentRestricted);
     if (activeRestricted.length > 0) {
       quizVibeAlert(
-        'Parent Control',
-        'This will turn off the activated package and content that is restricted with Parent control. Still want to activate Parent control?',
+        'Exclude mature content?',
+        'This will turn off the activated mature package and all mature content. Continue?',
         [
           { text: 'Cancel', style: 'cancel' },
           {
-            text: 'Activate',
+            text: 'Exclude',
             onPress: () => {
               setSelectedExtraPackages((prev) => prev.filter((p) => !isPackageParentRestricted(p)));
               setParentControlEnabled(true);
@@ -5998,6 +6018,7 @@ export default function LobbyScreen() {
       spotifyAnswerYear,
       spotifyAnswerName,
       parentControlEnabled,
+      includeThemeQuestions,
       remoteAssistance,
       mutualAssistanceEnabled,
     }).catch(() => { /* loggas i mockLobbySettings */ });
@@ -6014,6 +6035,7 @@ export default function LobbyScreen() {
           // Parental Control persisteras aldrig i lobby_settings — seeden läser
           // den via denna nav-param (?? profile ?? false). Krävs för carry-over.
           parentControl: parentControlEnabled ? 'true' : 'false',
+          includeTheme: includeThemeQuestions ? 'true' : 'false',
           // Bevara guest-host-identiteten om lobbyn skapades via "Start Game
           // as Guest" — annars faller den nya lobbyn tillbaka till profilen.
           ...(isGuestHost
@@ -6237,6 +6259,7 @@ export default function LobbyScreen() {
         spotifyAnswerYear,
         spotifyAnswerName,
         parentControlEnabled,
+        includeThemeQuestions,
         remoteAssistance,
         mutualAssistanceEnabled,
       }, { omitSpotify: isV2Lobby }).catch(() => { /* loggas i mockLobbySettings */ });
@@ -6266,6 +6289,7 @@ export default function LobbyScreen() {
     spotifyAnswerYear,
     spotifyAnswerName,
     parentControlEnabled,
+    includeThemeQuestions,
     remoteAssistance,
     mutualAssistanceEnabled,
     roomIsMultiplayerV2,
@@ -6340,11 +6364,11 @@ export default function LobbyScreen() {
       setSpotifyEnabled(stored.spotifyEnabled);
       setSpotifyAnswerYear(stored.spotifyAnswerYear);
       setSpotifyAnswerName(stored.spotifyAnswerName);
-      // Parent Control (read-only för non-host). OBS: fältet persisteras inte
-      // till DB → stored.parentControlEnabled är alltid false, så non-host
-      // visar av. Filtret körs ändå bara på host:ens enhet (host bygger och
-      // broadcastar frågesekvensen), så non-host-värdet är rent kosmetiskt.
+      // Filter (read-only för non-host): host:ens faktiska värden via
+      // lobby_settings (migration 0069). Filtret körs ändå bara på host:ens
+      // enhet (host bygger och broadcastar frågesekvensen).
       setParentControlEnabled(stored.parentControlEnabled);
+      setIncludeThemeQuestions(stored.includeThemeQuestions);
       // Remote 1v1: hostens gemensamma hjälpnivå + om den alls är påslagen
       // (read-only för non-host).
       setRemoteAssistance(stored.remoteAssistance);
@@ -8106,6 +8130,8 @@ export default function LobbyScreen() {
         // broadcastar sekvensen; PtP/Single spelar bara på host:s enhet), så
         // det räcker att host:s nav bär flaggan.
         parentControlEnabled: String(parentControlEnabled),
+        // Filter: tema-specifika frågor i Generic-poolen (host bygger poolen).
+        includeThemeQuestions: String(includeThemeQuestions && !isGuestHost),
         // Skickas så Quit Game-flödet i quiz.tsx kan deactivera rummet
         // och rensa leftPlayers när host avslutar mitt i ett spel.
         roomCode,
@@ -8203,6 +8229,7 @@ export default function LobbyScreen() {
         // self-loadar bannern en ev. inloggad users profil och visar deras
         // registrerade pill istället för guest-identiteten.
         profile={isGuestHost ? null : undefined}
+        open={hostMode ? hostDeleteSheetVisible : guestLeaveSheetVisible}
         onPress={
           hostMode
             ? () => setHostDeleteSheetVisible(true)
@@ -9441,40 +9468,23 @@ export default function LobbyScreen() {
               </Text>
             )}
 
-            {/* Parent Control — host-styrd, non-host read-only (disabled).
-                Sitter längst ner i Source Mixerboard, precis ovanför Customized
-                Host packages. När på filtrerar quiz.tsx bort YT-klipp taggade
-                parentControlled ur frågeurvalet. */}
-            {/* Guest host: HELA raden är tappbar och visar samma låst-popup som
-                switchen (info-ikonen och switchen behåller sina egna tapp —
-                innersta tryckbara element vinner). Ingen tryck-feedback, så
-                raden ser exakt likadan ut. Övriga roller: inget onPress. */}
-            <Pressable
-              style={styles.parentControlRow}
-              onPress={hostMode && isGuestHost ? guestParentControlAlert : undefined}
-              accessible={false}
-            >
-              <View style={styles.regionLabelRow}>
-                <Text style={styles.sectionLabel}>Parent Control</Text>
-                <Pressable
-                  style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                  onPress={() => showInfo(parentControlInfo('lobby'))}
-                  hitSlop={8}
-                >
-                  <Text style={styles.infoIconText}>i</Text>
-                </Pressable>
-              </View>
-              <QuizVibeToggle
-                variant="mixer"
-                value={parentControlEnabled}
-                // Guest host: tappbar men låst — samma locked-popup som de
-                // låsta mixer-switcharna, så kontrollen aldrig känns trasig.
-                onValueChange={hostMode ? (isGuestHost ? guestParentControlAlert : handleToggleParentControlLobby) : undefined}
-                disabled={!hostMode}
-                locked={isGuestHost} accessibilityLabel="Parent Control"
-                style={(!hostMode || isGuestHost) && { opacity: 0.45 }}
-              />
-            </Pressable>
+            {/* Filter (Peter 2026-11-26) — delad grupp med Profile. Regel:
+                AV = exkluderat, PÅ = ingår. "Include mature content" är den
+                UI-inverterade Parent Control (parentControlEnabled). Host-
+                styrd; non-host read-only (host:ens värden via 0069); guest
+                host låst AV (en gratis registrering låser upp). */}
+            <FilterGroup
+              scope="lobby"
+              style={styles.filterGroup}
+              matureIncluded={!parentControlEnabled}
+              themeIncluded={includeThemeQuestions && !isGuestHost}
+              onToggleMature={() => handleToggleParentControlLobby(!parentControlEnabled)}
+              onToggleTheme={() => setIncludeThemeQuestions((v) => !v)}
+              onInfo={showInfo}
+              disabled={!hostMode}
+              locked={hostMode && isGuestHost}
+              onLockedPress={guestParentControlAlert}
+            />
 
             {/* Use Packages — sub-block sist i Game Connections för musikpaket-val.
                 Basic-utbudet är alltid implicit aktivt (ingen synlig chip);
@@ -11038,14 +11048,14 @@ export default function LobbyScreen() {
 
       <QuizVibeDialog
         visible={pcBlocked !== null}
-        title="Parent Control"
+        title="Mature content"
         message={parentRestrictedPackageMessage(
           pcBlocked && pcBlocked.kind !== 'all'
             ? allPackagesCatalog.find((p) => p.id === pcBlocked.id)?.name ?? null
             : null,
         )}
         secondaryLabel="Cancel"
-        primaryLabel="Deactivate now"
+        primaryLabel="Include now"
         onClose={() => setPcBlocked(null)}
         onPrimary={handlePcBlockedDeactivateNow}
       />
@@ -13034,6 +13044,11 @@ const styles = StyleSheet.create({
   },
   // Parent Control-rad längst ner i Source Mixerboard (ovanför Customized
   // Host packages). Extra luft ovanför så den lossnar från matrisen.
+  filterGroup: {
+    // Egen logisk grupp ovanför Customized Host packages (= gamla
+    // parentControlRow-luften).
+    marginTop: Spacing.lg,
+  },
   parentControlRow: {
     flexDirection: 'column',
     alignItems: 'flex-start',

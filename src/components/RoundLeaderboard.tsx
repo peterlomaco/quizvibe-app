@@ -194,6 +194,59 @@ function PlayAgainLoopBorder({
 //   så den skulle överlappa chevron i en 56-px-button. Vi använder 74 px
 //   istället — bottenkanten + chevron skiftas ner ~18 px, vilket ger
 //   ~4-5 px luft mellan text-botten och chevron-toppen.
+/** Re-match-inbjudan (Peter 2026-11-26): non-host:s "Accept / Re-match"
+ *  dyker upp mitt på skärmen och flyger ned till sin plats ovanför Home.
+ *  Positionen mäts med measureInWindow efter layout; tills dess är rutan
+ *  osynlig så den aldrig blinkar till på slutplatsen. `active` = false
+ *  (Game Summary-overlayen ligger fortfarande ovanpå) → väntar med
+ *  animationen tills spelaren faktiskt ser slutskärmen. */
+function FlyInFromCenter({ active, children }: { active: boolean; children: React.ReactNode }) {
+  const ref = React.useRef<View>(null);
+  const translateY = React.useRef(new Animated.Value(0)).current;
+  // Start i scale 0 (osynlig) i stället för en opacity-animation: en
+  // halvgenomskinlig förälder ritade knappen med raka hörn under flygningen
+  // på iOS (Peter 2026-11-26) — hörnen rundades först när den landat.
+  const scale = React.useRef(new Animated.Value(0)).current;
+  const [offset, setOffset] = useState<number | null>(null);
+  const doneRef = React.useRef(false);
+  const measure = () => {
+    if (offset !== null) return;
+    ref.current?.measureInWindow((_x, y, _w, h) => {
+      const screenH = Dimensions.get('window').height;
+      // Rutan står i scale 0 vid mätningen → h kan vara 0, men y + h/2 är
+      // ändå dess mittpunkt (skalningen sker kring mitten). Fallback om
+      // mätningen inte gav något: ungefär halva skärmen upp.
+      const dy = Number.isFinite(y) && y > 0 ? screenH / 2 - (y + h / 2) : -screenH * 0.35;
+      translateY.setValue(dy);
+      setOffset(dy);
+    });
+  };
+  React.useEffect(() => {
+    if (!active || offset === null || doneRef.current) return;
+    doneRef.current = true;
+    Animated.sequence([
+      // 0.9, inte >1: knappen är redan fullbredd, så en förstoring sköt de
+      // rundade hörnen utanför skärmkanten (såg ut som raka hörn, Peter
+      // 2026-11-26). Ingen överslängning (friction 9) av samma skäl.
+      Animated.spring(scale, { toValue: 0.9, friction: 9, useNativeDriver: true }),
+      Animated.delay(450),
+      Animated.parallel([
+        Animated.spring(translateY, { toValue: 0, friction: 7, tension: 40, useNativeDriver: true }),
+        Animated.spring(scale, { toValue: 1, friction: 7, tension: 40, useNativeDriver: true }),
+      ]),
+    ]).start();
+  }, [active, offset, scale, translateY]);
+  return (
+    <Animated.View
+      ref={ref}
+      onLayout={measure}
+      style={{ zIndex: 50, elevation: 50, borderRadius: Radius.md, transform: [{ translateY }, { scale }] }}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
 /** Scale-puls 1 ↔ 1.04 över 700 ms — samma cadens som PlayAgainButton och
  *  Home:s gameBtn, så alla CTA:er på slutskärmen andas i takt. Pausas när
  *  `paused` (låst/grå knapp ska stå still) och nollas till 1. */
@@ -326,11 +379,24 @@ function PlayAgainButton({
         stacked && { flex: 0, alignSelf: 'stretch' },
         // Filled-läget (non-host:s "Accept / Re-match"): ingen loop-border/pil
         // — bara en solid gold rounded-rect (Peter 2026-08-29).
-        filled && { backgroundColor: color, borderRadius: Radius.md },
         { height: buttonHeight },
         !disabled && pressed && { opacity: 0.85 },
       ]}
     >
+      {/* Filled-läget: guldytan är ett EGET klippt lager i stället för
+          bakgrund på Pressable:n. Under in-flygningen (FlyInFromCenter,
+          transform på föräldern) ritades Pressable-bakgrunden med raka hörn
+          på iOS (Peter 2026-11-26); ett lager med overflow: 'hidden' klipper
+          alltid till rundade hörn. */}
+      {filled && (
+        <View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: color, borderRadius: Radius.md, overflow: 'hidden' },
+          ]}
+        />
+      )}
       {!filled && width > 0 && (
         <PlayAgainLoopBorder
           width={width}
@@ -540,6 +606,7 @@ export function RoundLeaderboard({
   replayNote,
   rematchUnavailableNote,
   rematchImpossible = false,
+  inviteRevealReady = true,
   interimFooter,
   liveBadge = false,
   trackConnectionErrors = false,
@@ -668,6 +735,9 @@ export function RoundLeaderboard({
    *  får då bara Home i stället för den dimmade "Accept / Re-match"-
    *  platshållaren, som annars vore ett löfte om något som aldrig kommer. */
   rematchImpossible?: boolean;
+  /** False medan Game Summary ligger ovanpå — Accept-rutans in-flygning
+   *  väntar tills slutskärmen syns. */
+  inviteRevealReady?: boolean;
   /** Ersätter "Next Round →"-knappen på INTERIM-leaderboarden.
    *  ⚠ Den knappen renderas annars identiskt tänd även utan `onNextRound`
    *  (onPress blir bara undefined, ingen disabled-styling) — en läsare utan
@@ -1235,6 +1305,7 @@ export function RoundLeaderboard({
           if (!isHost) {
             return (
               <View style={styles.finalActionsColumn}>
+                <FlyInFromCenter active={inviteRevealReady}>
                 <PlayAgainButton
                   lines={['Accept', 'Re-match']}
                   color={Colors.warning}
@@ -1249,6 +1320,7 @@ export function RoundLeaderboard({
                   buttonHeight={PLAY_AGAIN_BUTTON_HEIGHT_COMPACT}
                   bottomY={bottomY}
                 />
+                </FlyInFromCenter>
                 {homeButton(PLAY_AGAIN_BUTTON_HEIGHT_COMPACT, true)}
               </View>
             );

@@ -7,7 +7,7 @@ import { TouchableOpacity } from '@/src/components/haptic';
 import { BrandUi, Colors, Radius, Spacing } from '../theme';
 import { getAvatarEmojiById } from '../utils/avatars';
 import { getCachedProfile, loadProfile, type ProfileData } from '../utils/profileStorage';
-import { QuizVibeAvatarQ } from './QuizVibeDefaultAvatar';
+import { QuizVibeAvatarQ, QuizVibeDefaultAvatar } from './QuizVibeDefaultAvatar';
 import { ChevronIcon } from './ChevronIcon';
 import { BRAND_UI_INACTIVE } from './brand/QuizVibeBrandSvg';
 import { ProfileOutlineIcon } from './ProfileOutlineIcon';
@@ -117,9 +117,13 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
     isLoggedIn && (!profile?.selectedAvatarId || profile?.avatarSource === 'default');
   // Utloggad / gäst: dämpad outline-profilikon (UI 2026-10-21) i stället för
   // den färgade 👤-emojin — samma ikon som bottom-navens Profile-tab.
-  // Inloggad med default-avatar: ingen Q-ikon före PlayerName (Peter 2026-11-04).
+  // Inloggad med default-avatar: default-avataren (guld-Q, samma som
+  // leaderboarden) före PlayerName — återinförd av Peter 2026-11-26
+  // (2026-11-04 visades ingen ikon alls).
   // Gäst (guest host i lobbyn): ingen silhuett före namnet (Peter 2026-11-04).
-  const leadingIcon = showBrandAvatar || (!isLoggedIn && isGuest) ? null : !isLoggedIn ? (
+  const leadingIcon = showBrandAvatar ? (
+    <QuizVibeDefaultAvatar size={22} smile />
+  ) : !isLoggedIn && isGuest ? null : !isLoggedIn ? (
     <ProfileOutlineIcon size={18} color={BrandUi.iconMuted} />
   ) : (
     <Text style={styles.loginPillIcon}>{iconTextFor(profile, isLoggedIn)}</Text>
@@ -170,8 +174,8 @@ export function TopUserBanner({ onPress, onBackPress, backLabel = 'Home', profil
           <Text style={[labelStyle, styles.loginPillTextFlex, styles.loginPillTextCentered]} numberOfLines={1}>
             {labelText}
           </Text>
-          {/* Liten nedåt-chevron = pillen öppnar en meny. */}
-          <ChevronIcon size={14} direction="down" color={open ? Colors.warning : BrandUi.iconMuted} />
+          {/* Chevron höger = pillen öppnar en meny; nedåt medan den är öppen (Peter 2026-11-26). */}
+          <ChevronIcon size={14} direction={open ? 'down' : 'right'} color={open ? Colors.warning : BrandUi.iconMuted} />
         </TouchableOpacity>
       ) : (
         <View style={pillStyle}>

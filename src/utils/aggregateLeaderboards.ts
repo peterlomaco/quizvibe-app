@@ -52,6 +52,9 @@ export interface AggregateGameSettings {
   imagesEnabledCategories: string[];
   selectedExtraPackages: string[];
   parentControlEnabled: boolean;
+  /** Filter "Include theme-specific questions" (2026-11-26). Optional — äldre
+   *  snapshots saknar fältet → re-matchen faller på profil-defaulten. */
+  includeThemeQuestions?: boolean;
   spotifyEnabled: boolean;
   /** ⚠ ENBART för spelform-grupperingen i Marathon-listan (resolveGameForm).
    *  Optional — äldre snapshots saknar dem → "Unknown mode". Läs dem ALDRIG i

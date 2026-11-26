@@ -61,6 +61,9 @@ interface Props {
   /** Enhets-ikon före rubriken ("Play on this device:"): 'own' = telefon,
    *  'host' = host:ens telefon (samma ikoner som lobbyns spelarkort). */
   playerLabelDevice?: 'own' | 'host';
+  /** 1 by 1 på flera enheter: turägaren svarar INTE på den här telefonen →
+   *  spelarrutan + namnet grått i stället för guld (Peter 2026-11-26). */
+  playerElsewhere?: boolean;
   /** Spelarens bild-avatar (om vald) — vinner över emoji. */
   playerAvatarUri?: string;
   /** Mediakälla för frågan som strax ska ställas — visas som ikon mellan
@@ -196,7 +199,7 @@ function SideTag({
  * att "?" visats i ~1 s fyras `onComplete` så parent kan växla fas till
  * `'question'`.
  */
-export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, playerAvatarUri, hidePlayerLabel = false, playerLabelOverride, playerLabelDevice, mediaSource, answerType = null, category = null, finalWord, silent = false, anchorT0, voice = DEFAULT_VOICE_ID }: Props) {
+export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode = 'pass-the-phone', playerName, playerEmoji, playerAvatarUri, hidePlayerLabel = false, playerLabelOverride, playerLabelDevice, playerElsewhere = false, mediaSource, answerType = null, category = null, finalWord, silent = false, anchorT0, voice = DEFAULT_VOICE_ID }: Props) {
   // Remote 1v1 delar IndDev:s headline ("Get Ready to QuizVibe") — varje
   // spelare sitter på egen enhet, ingen specifik spelare att namnge.
   const isIndDev = mode === 'individual-devices' || mode === 'remote-1v1';
@@ -556,12 +559,15 @@ export function CountdownIntro({ onComplete, startFrom = 3, voiceFrom = 3, mode 
                 <Text style={styles.playerLabel}>{playerLabelOverride ?? currentModeLabels().passTo}</Text>
               </View>
             )}
-            <View style={styles.playerBox}>
+            <View style={[styles.playerBox, playerElsewhere && styles.playerBoxElsewhere]}>
               {/* Spelarens avatar — samma komponent som spelarkorten i lobbyn
                   (default = Q med smiley i stället för silhuetten 👤,
                   Peter 2026-11-04). */}
               <Avatar uri={playerAvatarUri} emoji={playerEmoji} name={playerName} size={40} useBrandFallback />
-              <Text style={styles.playerName} numberOfLines={1}>
+              <Text
+                style={[styles.playerName, playerElsewhere && styles.playerNameElsewhere]}
+                numberOfLines={1}
+              >
                 {playerName}
               </Text>
             </View>
@@ -666,6 +672,16 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.lg,
+  },
+  // Turägaren svarar på en ANNAN telefon: neutral kant, ingen fyllning,
+  // dämpad — så den här telefonen inte ser ut att vara den som spelar.
+  playerBoxElsewhere: {
+    borderColor: Colors.borderStrong,
+    backgroundColor: 'transparent',
+    opacity: 0.5,
+  },
+  playerNameElsewhere: {
+    color: Colors.textSecondary,
   },
   playerEmojiWrap: {
     width: 40,

@@ -650,7 +650,7 @@ export default function MyMatchesScreen() {
           hitSlop={8}
         >
           <Text style={styles.sectionHeader}>{SECTION_TITLES[key]}</Text>
-          {sectionFlash && <NewUpdateBadge active style={styles.headerFlashBadge} />}
+          {sectionFlash && (!isOpen || key !== 'history') && <NewUpdateBadge active style={styles.headerFlashBadge} />}
           {/* +/−-boxen sitter direkt efter rubriken (som i Profile);
               antalet högerställs via marginLeft: 'auto'. */}
           <View style={[styles.sectionToggleBox, isOpen && styles.toggleBoxOpen]}>

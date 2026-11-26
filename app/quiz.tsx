@@ -102,7 +102,7 @@ import {
 } from '@/src/utils/matchHighlights';
 import { clearGameStarted } from '@/src/utils/mockStartedGames';
 import { MUSIC_QUESTIONS } from '@/src/utils/musicQuestions';
-import { resolveActivePackageTags, itemInActivePackages, computePackageCoverage } from '@/src/utils/hostPackages';
+import { resolveActivePackageTags, itemInActivePackages, computePackageCoverage, inGenericPool } from '@/src/utils/hostPackages';
 import {
   computeDJRotationPlan,
   getDJForQuestionIndex,
@@ -1665,6 +1665,9 @@ export default function QuizScreen() {
     /** 'true' om host har Parent Control påslaget — YT-items taggade
      *  parentControlled filtreras då bort ur frågeurvalet. Default 'false'. */
     parentControlEnabled?: string;
+    /** Filter "Include theme-specific questions" ('true'/'false', default
+     *  'false'): tema-only-items (inBaseCatalog: false) ingår även i Generic. */
+    includeThemeQuestions?: string;
     /** 'true' om spelets host är en guest (lobbyn skapad via "Start Game as
      *  Guest"). Sätts på ALLA enheter (host-path + non-host-path) — döljer
      *  Play Again på final leaderboard och skippar Player history-skrivning. */
@@ -1802,9 +1805,12 @@ export default function QuizScreen() {
   const spotifyAnswerName = (params.spotifyAnswerName ?? 'true') === 'true';
   // Parent Control — host:ens val (Profile/Lobby-switch). När på filtreras
   // YT-items taggade parentControlled bort ur frågeurvalet (se inEraMusic).
-  // Default PÅ (safe default) om paramet saknas — lobbyn skickar alltid det,
-  // så detta gäller bara direkt-nav/edge cases.
-  const parentControlEnabled = (params.parentControlEnabled ?? 'true') === 'true';
+  // Saknas paramet gäller QuizVibe-user-defaulten (Peter 2026-11-26): mature
+  // content ingår. Lobbyn skickar alltid paramet (guest host: alltid 'true').
+  const parentControlEnabled = (params.parentControlEnabled ?? 'false') === 'true';
+  // Filter: tema-specifika frågor i Generic-poolen. Aldrig i guest-hostade spel.
+  const includeThemeQuestions =
+    params.includeThemeQuestions === 'true' && params.guestHost !== 'true';
 
   // Deterministisk svarstyp per Spotify-fråga baserat på Spotify-frågens ordinalposition.
   // Båda aktiva → alternerande per "Spotify-runda" = turnOrder.length Spotify-frågor.
@@ -1855,6 +1861,7 @@ export default function QuizScreen() {
   // interval-tick:en gör flera överskridanden innan navigation-replace
   // hinner unmounta /quiz.
   const inactivityShutdownTriggeredRef = useRef(false);
+  const hostLeftFinalRef = useRef(false);
   // Visar countdown-banner när non-null (60→0). null = host aktiv inom
   // 9 min, ingen banner.
   const [inactivityCountdownSec, setInactivityCountdownSec] =
@@ -2216,8 +2223,9 @@ export default function QuizScreen() {
     // ── Host-paket (tema-only) ─────────────────────────────────────────
     // Aktivt paket → musikpoolen restrikteras till paketets taggar (inkluderar
     // både inBaseCatalog true/false tema-items, utesluter all icke-tema-musik).
-    // Inget paket → exkludera paket-exklusiva (inBaseCatalog===false) items ur
-    // baspoolen (oförändrat beteende). Image/Hints-poolen bär inga paket-taggar
+    // Inget paket → paket-exklusiva (inBaseCatalog===false) items exkluderas ur
+    // baspoolen, UTOM när Filter-switchen "Include theme-specific questions" är
+    // PÅ (inGenericPool; mature content har företräde — se hostPackages.ts). Image/Hints-poolen bär inga paket-taggar
     // (image-exporten emitterar dem inte), så när ett Music-paket är aktivt
     // exkluderas hela image-poolen (tema-only) — Lobby gråar redan ut Hints.
     // eraFrom/eraTo levereras redan som paketets span från Lobby (era-lås).
@@ -2226,7 +2234,7 @@ export default function QuizScreen() {
     const packagedMusic = SEED_QUESTIONS.filter((q) =>
       packageActive
         ? itemInActivePackages(q.genrePackages, activePackageTags)
-        : q.inBaseCatalog !== false,
+        : inGenericPool(q, includeThemeQuestions, parentControlEnabled),
     );
     // Paket-läge: host:s Hints-aggregat-toggle styr om paketets Hints-material
     // spelas. Image-exporten emitterar inga genrePackages ännu, så ett paket har
@@ -2832,7 +2840,7 @@ export default function QuizScreen() {
       return shuffleArray(SEED_QUESTIONS.filter(pcOk));
     }
     return mixed;
-  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt, categoryDebt, parentControlEnabled, selectedExtraPackages, regionHcp, packageYoutubeEnabled, packageHintsEnabled]);
+  }, [eraFrom, eraTo, turnOrder, totalRounds, youtubeEnabled, imagesEnabled, gameMode, youtubeEnabledCategories, imagesEnabledCategories, combinedSeenIds, combinedLastIds, spotifyEnabled, isGuestHostGame, remoteQuestionIds, epochDebt, categoryDebt, parentControlEnabled, includeThemeQuestions, selectedExtraPackages, regionHcp, packageYoutubeEnabled, packageHintsEnabled]);
 
   // ── Sekvens-frys ─────────────────────────────────────────────────────
   // gameQuestionsRaw är en LIVE useMemo vars shuffleBlocks/freshness-ordning
@@ -6907,6 +6915,8 @@ export default function QuizScreen() {
   // rooms-tabellen. Båda får samma Alert + Home-nav.
   const handleInactivityShutdown = useCallback(async () => {
     if (inactivityShutdownTriggeredRef.current) return;
+    // Host har redan lämnat slutskärmen — non-host står kvar på sitt eget val.
+    if (hostLeftFinalRef.current) return;
     inactivityShutdownTriggeredRef.current = true;
     if (isHost && params.roomCode) {
       try {
@@ -7934,6 +7944,7 @@ export default function QuizScreen() {
         imagesEnabledCategories,
         selectedExtraPackages,
         parentControlEnabled,
+        includeThemeQuestions,
         spotifyEnabled,
         // ⚠ ENBART för spelform-grupperingen i Marathon-listan. Läses aldrig
         // av buildRematchSettings (den härleder gameMode av lobbytypen).
@@ -7965,6 +7976,7 @@ export default function QuizScreen() {
     imagesEnabledCategories,
     selectedExtraPackages,
     parentControlEnabled,
+    includeThemeQuestions,
     spotifyEnabled,
   ]);
 
@@ -8339,6 +8351,7 @@ export default function QuizScreen() {
         ...((keepSettings || reusePlayers)
           ? {
               parentControl: String(parentControlEnabled),
+              includeTheme: String(includeThemeQuestions),
               carryPackages: JSON.stringify(selectedExtraPackages),
               seedGameMode: gameMode,
               // Spotify Year/Name + paketets YT/Hints-aggregat persisteras inte
@@ -9315,6 +9328,13 @@ export default function QuizScreen() {
   // visas när spelaren själv lämnar summary:n.
   const pendingLobbyDeletedRef = useRef(false);
   const celebrationVisibleRef = useRef(false);
+  // Host lämnade MEDAN vi står på Final Leaderboard (Peter 2026-11-26):
+  // ingen "Game ended"-popup och ingen tvångsnavigering. Non-host stannar
+  // kvar och ser hela leaderboarden; QuizVibe-users får Start New Game i
+  // stället för "Accept / Re-match", alla får Home. Synkron spegel av
+  // slutskärms-läget eftersom funneln anropas ur en mount-registrerad handler.
+  const atFinalLeaderboardRef = useRef(false);
+  const [hostLeftFinal, setHostLeftFinal] = useState(false);
   const showLobbyDeletedAlert = useCallback(() => {
     setAwaitingNewLobby(false);
     quizVibeAlert(
@@ -9345,6 +9365,14 @@ export default function QuizScreen() {
     if (isPtPSpectator && questionIndexRef.current >= totalQuestionsRef.current - 1) {
       flushSpectatorScores();
       setSpectatorGameOver(true);
+    }
+    // Final Leaderboard: stanna kvar. Släpp ev. "Please Wait"-overlay efter
+    // Accept och dölj Accept-knappen — host kan aldrig skapa re-matchen nu.
+    if (atFinalLeaderboardRef.current) {
+      setAwaitingNewLobby(false);
+      setHostInitiatedPlayAgain(false);
+      setHostLeftFinal(true);
+      return;
     }
     if (celebrationVisibleRef.current) {
       pendingLobbyDeletedRef.current = true;
@@ -9994,6 +10022,8 @@ export default function QuizScreen() {
   // sekvensen — den ska aldrig avbrytas mitt i.
   celebrationVisibleRef.current =
     phase === 'leaderboard' && isLastQuestion && !summaryDone;
+  atFinalLeaderboardRef.current = phase === 'leaderboard' && isLastQuestion;
+  hostLeftFinalRef.current = hostLeftFinal;
 
   // Spelaren lämnade sekvensen. Har host hunnit radera lobbyn under tiden
   // visas den uppskjutna popupen nu i stället.
@@ -11328,6 +11358,7 @@ export default function QuizScreen() {
             : undefined
         }
         playerLabelDevice={countdownLabelDevice}
+        playerElsewhere={countdownOnOtherDevice || countdownHostWatchesOther}
         mediaSource={effectiveMediaSourceByQuestion[questionIndex] ?? null}
         answerType={effectiveAnswerTypeByQuestion[questionIndex] ?? null}
         category={effectiveCategoryByQuestion[questionIndex] ?? null}
@@ -11451,6 +11482,7 @@ export default function QuizScreen() {
     // sig, förklaringen under. `guestReplayNote` är centrerad, så båda
     // raderna centreras.
     const rematchUnavailableNote = ((): string | undefined => {
+      if (isLastQuestion && !isHost && hostLeftFinal) return 'The Host has left the game';
       if (!isLastQuestion || !isHost || isRemote) return undefined;
       // Guest host: varken re-match eller replay finns för dem, i något läge.
       if (isGuestHostGame) return 'No re-match possible for Guest Host';
@@ -11546,7 +11578,12 @@ export default function QuizScreen() {
           // re-match-frågan (rev 3) — dess frånvaro är det som döljer
           // knappen. Remote har ingen re-match och får den direkt.
           onStartNewGame={
-            isRemote && isLastQuestion && !isGuestHostGame
+            // Host lämnade slutskärmen → registrerade non-hosts startar ett
+            // eget nytt spel härifrån (samma väg som remote: Home:s
+            // handleCreateGame-spegel, rör inte det gamla rummet).
+            hostLeftFinal && !isHost && isLastQuestion && hostIsRegisteredUser
+              ? (t: HostLobbyType) => finalAction.run('start-new', () => handleStartNewGameFromFinal(t))
+              : isRemote && isLastQuestion && !isGuestHostGame
               ? (t: HostLobbyType) => finalAction.run('start-new', () => handleStartNewGameFromFinal(t))
               : localStartNewGameReady
                 ? (t: HostLobbyType) => finalAction.run('start-new', () => handleLocalStartNewGameSelect(t))
@@ -11591,9 +11628,12 @@ export default function QuizScreen() {
           // enbart mellan QuizVibe-users. Men en INLOGGAD guest host lämnar
           // guest-läget när de trycker Start New Game (nya lobbyn blir en
           // vanlig user-lobby), så då ska raden vara med.
-          hideRemotePlay={isGuestHostGame && !startNewGameLeavesGuestMode}
+          hideRemotePlay={
+            hostLeftFinal && !isHost ? false : isGuestHostGame && !startNewGameLeavesGuestMode
+          }
           rematchUnavailableNote={rematchUnavailableNote}
-          rematchImpossible={rematchImpossibleForGame}
+          rematchImpossible={rematchImpossibleForGame || hostLeftFinal}
+          inviteRevealReady={summaryDone}
           replayNote={
             localRematchFlow && rematchNeedsApproval ? (
               rematchAllApproved ? (

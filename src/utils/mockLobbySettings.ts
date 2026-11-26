@@ -76,6 +76,11 @@ export interface LobbySettings {
   // mönster som spotify_answer_*). Källa i praktiken: host:ens profil-default
   // (LobbyScreen seedar från profile.parentControlEnabled) + lokal toggle.
   parentControlEnabled: boolean;
+  // Filter (Peter 2026-11-26): true = tema-specifika frågor (inBaseCatalog:
+  // false) ingår även i Generic-spel. DB-kolumn: include_theme_questions
+  // (migration 0069), skrivs via SEPARAT targeted UPDATE tillsammans med
+  // parent_control_enabled. Default false.
+  includeThemeQuestions: boolean;
   // Remote 1v1: gemensam hjälpnivå för BÅDA spelarna. Default 'full'.
   // Gäller BARA när mutualAssistanceEnabled är true — annars kör varje spelare
   // sin egen personliga nivå (samma modell som i lokala lägen).
@@ -118,9 +123,10 @@ interface LobbySettingsRow {
   // Spotify-svarstyper. Optional tills kolumnerna lagts till (tolerant read via ?? true).
   spotify_answer_year?: boolean;
   spotify_answer_name?: boolean;
-  // Parent Control. Optional — kolumnen finns inte i DB (ingen migration).
-  // Tolerant read via ?? false; skrivs INTE i settingsToRow.
-  parent_control_enabled?: boolean;
+  // Filter-switcharna. Optional tills migration 0069 körts. Skrivs via
+  // SEPARAT targeted UPDATE (INTE settingsToRow); null = okänt → fallback.
+  parent_control_enabled?: boolean | null;
+  include_theme_questions?: boolean | null;
   // Paket-aggregat-toggles. Optional — kolumnerna läggs till av migration 0055.
   // Skrivs via SEPARAT targeted UPDATE (INTE settingsToRow), samma mönster som
   // remote_assistance; tolerant read via ?? true om migrationen ej körts.
@@ -183,9 +189,10 @@ function rowToSettings(row: LobbySettingsRow): LobbySettings {
     // Tolerant: kolumner kanske inte finns ännu → default true (båda aktiva).
     spotifyAnswerYear: row.spotify_answer_year ?? true,
     spotifyAnswerName: row.spotify_answer_name ?? true,
-    // Tolerant: kolumnen saknas i DB → default true (Parent Control på, safe
-    // default; kosmetisk non-host-spegling — filtret körs bara på host-enheten).
-    parentControlEnabled: row.parent_control_enabled ?? true,
+    // Tolerant: kolumnen saknas/null (pre-0069 eller host har inte skrivit än)
+    // → QuizVibe-user-defaulten: mature content ingår (false), tema-frågor av.
+    parentControlEnabled: row.parent_control_enabled ?? false,
+    includeThemeQuestions: row.include_theme_questions ?? false,
     // Tolerant: kolumnerna saknas i DB → default true (paketets material spelas).
     packageYoutubeEnabled: row.package_youtube_enabled ?? true,
     packageHintsEnabled: row.package_hints_enabled ?? true,
@@ -293,6 +300,22 @@ export async function setLobbySettings(
         ptError.message,
       );
     }
+  }
+  // Filter-switcharna (0069) skrivs SEPARAT och alltid, så non-host-enheterna
+  // speglar host:ens faktiska val. Saknas kolumnerna → console.warn; raden
+  // ovan är redan committad och rowToSettings faller på defaulten.
+  const { error: fError } = await supabase
+    .from('lobby_settings')
+    .update({
+      parent_control_enabled: settings.parentControlEnabled,
+      include_theme_questions: settings.includeThemeQuestions,
+    })
+    .eq('room_code', normalized);
+  if (fError) {
+    console.warn(
+      '[lobbySettings] filter update failed (migration 0069 applied?):',
+      fError.message,
+    );
   }
   // Remote 1v1: mutual-assistance-fälten skrivs SEPARAT (se settingsToRow för
   // varför). Bara i remote-lobbies — lokala lägen har per-spelare-assistance

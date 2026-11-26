@@ -39,6 +39,7 @@ import { GroupOutlineIcon } from './GroupOutlineIcon';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
 import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 import { ChevronIcon } from '@/src/components/ChevronIcon';
+import { SpeakerIcon } from './SpeakerIcon';
 
 /** Minimal player-shape som GetReadyIntro behöver för att rendera namn + avatar.
  *  Speglar TurnOrderPlayer i quiz.tsx. */
@@ -982,16 +983,29 @@ export function GetReadyIntro({
                 <View style={styles.responseDropdownRow}>
                   <Text style={styles.settingsRow}>Audio this device:</Text>
                   <TouchableOpacity
-                    style={styles.responseDropdownTrigger}
+                    style={[
+                      styles.responseDropdownTrigger,
+                      !audioRowOn && styles.audioTriggerOff,
+                    ]}
                     onPress={handleAudioRowToggle}
                     activeOpacity={0.7}
+                    accessibilityRole="switch"
+                    accessibilityState={{ checked: audioRowOn }}
+                    accessibilityLabel="Audio this device"
                   >
-                    <Text style={styles.responseDropdownTriggerText}>
+                    <Text
+                      style={[
+                        styles.responseDropdownTriggerText,
+                        !audioRowOn && styles.responseDropdownTriggerTextLocked,
+                      ]}
+                    >
                       {audioRowOn ? 'On' : 'Off'}
                     </Text>
-                    <Text style={styles.selfAudioGlyph}>
-                      {audioRowOn ? '🔊' : '🔇'}
-                    </Text>
+                    <SpeakerIcon
+                      size={18}
+                      on={audioRowOn}
+                      color={audioRowOn ? Colors.textPrimary : Colors.textSecondary}
+                    />
                   </TouchableOpacity>
                 </View>
               )}
@@ -1079,16 +1093,29 @@ export function GetReadyIntro({
                 <View style={styles.responseDropdownRow}>
                   <Text style={styles.settingsRow}>Audio this device:</Text>
                   <TouchableOpacity
-                    style={styles.responseDropdownTrigger}
+                    style={[
+                      styles.responseDropdownTrigger,
+                      !audioRowOn && styles.audioTriggerOff,
+                    ]}
                     onPress={handleAudioRowToggle}
                     activeOpacity={0.7}
+                    accessibilityRole="switch"
+                    accessibilityState={{ checked: audioRowOn }}
+                    accessibilityLabel="Audio this device"
                   >
-                    <Text style={styles.responseDropdownTriggerText}>
+                    <Text
+                      style={[
+                        styles.responseDropdownTriggerText,
+                        !audioRowOn && styles.responseDropdownTriggerTextLocked,
+                      ]}
+                    >
                       {audioRowOn ? 'On' : 'Off'}
                     </Text>
-                    <Text style={styles.selfAudioGlyph}>
-                      {audioRowOn ? '🔊' : '🔇'}
-                    </Text>
+                    <SpeakerIcon
+                      size={18}
+                      on={audioRowOn}
+                      color={audioRowOn ? Colors.textPrimary : Colors.textSecondary}
+                    />
                   </TouchableOpacity>
                 </View>
               )}
@@ -2145,8 +2172,11 @@ const styles = StyleSheet.create({
   },
   // Remote-Audio-radens högtalar-glyf. Egen fontSize — chevron-stilens 10 px
   // är för litet för en emoji (den ärver ändå inte color).
-  selfAudioGlyph: {
-    fontSize: 13,
+  // "Audio this device" i Off-läge: neutral kant (guld = aktivt), grå
+  // text + grå högtalare med ×. On behåller trigger-guldet.
+  audioTriggerOff: {
+    borderColor: BrandUi.border,
+    backgroundColor: 'transparent',
   },
   // Non-host:s read-only-rendering av Answer response time. Bara värdet
   // som primary-fet text — ingen border/bg/chevron/lock-ikon.

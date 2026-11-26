@@ -110,5 +110,5 @@ export function getGenerationKeyFromBirthYear(
 // när flera paket berörs (Select all).
 export function parentRestrictedPackageMessage(name: string | null): string {
   const subject = name ? `${name} is` : 'Some packages are';
-  return `${subject} restricted by Parent Control. You need to deactivate Parent Control to activate ${name ? 'this package' : 'them'}.\n\nDeactivating Parent Control allows mature content, some of which might not be appropriate for children.`;
+  return `${subject} mature content. Turn on Include mature content to activate ${name ? 'this package' : 'them'}.\n\nMature content might not be appropriate for children.`;
 }

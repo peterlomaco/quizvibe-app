@@ -25,9 +25,10 @@ const SNAPSHOT: AggregateGameSettings = {
   youtubeEnabledCategories: ['Music', 'Film'],
   imagesEnabledCategories: ['Film'],
   selectedExtraPackages: ['pkg-hiphop'],
-  // Medvetet motsatt den nya safe-default:en (PÅ) så "no-leak"-assertionen
-  // nedan bevisar att blobben ignorerar snapshotens värde.
-  parentControlEnabled: false,
+  // Medvetet motsatt blob-defaulten (mature ingår = false, 2026-11-26) så
+  // "no-leak"-assertionen nedan bevisar att blobben ignorerar snapshotens värde.
+  parentControlEnabled: true,
+  includeThemeQuestions: true,
   spotifyEnabled: true,
 };
 
@@ -58,9 +59,10 @@ describe('buildRematchSettings — reuse of the last game settings', () => {
     expect(s.gameMode).toBe('individual-devices');
     expect(s.singlePlayerDefault).toBe(false);
     expect(s.maxPlayers).toBe(12);
-    // Parent Control bärs som URL-param, ALDRIG via denna blob: snapshoten säger
-    // false men blobben returnerar sin egen safe-default (true) → inget läckage.
-    expect(s.parentControlEnabled).toBe(true);
+    // Filtren bärs som URL-param, ALDRIG via denna blob: snapshoten säger true
+    // men blobben returnerar sina egna defaults (false) → inget läckage.
+    expect(s.parentControlEnabled).toBe(false);
+    expect(s.includeThemeQuestions).toBe(false);
   });
 
   it('falls back to profile defaults when there is no snapshot', () => {

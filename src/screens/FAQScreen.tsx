@@ -110,7 +110,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What settings does a guest-hosted game use?',
-        a: 'A game hosted as a Guest is a trial with fixed settings, so the Lobby only shows Players in Lobby and Quiz Tuning:\n• Questions: YouTube clips only (music and film) — no Hints or Spotify.\n• Answer time: always 30 seconds.\n• Assistance level: always Full.\n• Rounds: 2 or 4. You can still choose the Game Era.\n• Multiplayer is Pass-the-Phone only, up to 4 players.\n• Parent Control is always on, so mature content is kept out.\nRegister a free QuizVibe account to unlock all settings.',
+        a: 'A game hosted as a Guest is a trial with fixed settings, so the Lobby only shows Players in Lobby and Quiz Tuning:\n• Questions: YouTube clips only (music and film) — no Hints or Spotify.\n• Answer time: always 30 seconds.\n• Assistance level: always Full.\n• Rounds: 2 or 4. You can still choose the Game Era.\n• Multiplayer is Pass-the-Phone only, up to 4 players.\n• Filters: mature content and theme-specific questions are always left out.\nRegister a free QuizVibe account to unlock all settings.',
       },
       {
         q: 'Which assistance level do I play with?',
@@ -184,8 +184,8 @@ const FAQ_CATEGORIES: FaqCategory[] = [
         a: 'Extra packages let the Host focus a game on a specific theme (for example Melodifestivalen or Hip Hop & RnB). They are included with QuizVibe Premium — a Premium Host activates them in the Lobby or in Profile settings. With a package active, the Game Era can be narrowed within the package’s years, minimum 25 years (15 years without a package). Themes might be changed over time.',
       },
       {
-        q: 'What is Parent Control?',
-        a: 'Parent Control filters out content that may not suit children, and blocks Extra packages marked as parent controlled (for example Hip Hop & RnB). When you register a QuizVibe account, Parent Control is turned off by default. You can turn it on anytime in Profile settings → Host default settings, and the Host can also switch it on or off in the Lobby for each game. Games hosted as Guest always have Parent Control on.',
+        q: 'What are the Filters?',
+        a: 'The Filter group has two switches. Off means left out, on means included in the game.\n• Include mature content (Parent Control): content that may not suit children, and Extra packages marked as mature (for example Hip Hop & RnB). For a QuizVibe account it is on by default.\n• Include theme-specific questions: questions that otherwise only appear in the theme packages (for example Melodifestivalen) can also show up in normal games. Off by default. Mature themes still need Include mature content.\nSet your defaults in Profile settings → Host default settings; the Host can also change them in the Lobby for each game. Games hosted as Guest always leave both out — a free QuizVibe account unlocks them.',
       },
       {
         q: 'Why did a clip not play, or look different than before?',

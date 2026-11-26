@@ -102,3 +102,39 @@ export function computePackageEraRange(selectedIds: readonly string[]): [number,
   if (min === Infinity) return null;
   return [min, max];
 }
+
+// ── Filter: "Include theme-specific questions" (Peter 2026-11-26) ─────────
+// Theme-only items (inBaseCatalog: false) are normally kept out of Generic
+// games. With the theme filter ON they join the Generic pool too — but mature
+// content always takes precedence: while mature content is EXCLUDED
+// (parentControlEnabled), items tagged to a parentRestricted package (Hip Hop
+// & RnB) stay out. The item-level `parentControlled` filter runs separately in
+// quiz.tsx and is unchanged.
+
+/** Union of the tags of every parentRestricted package. */
+const PARENT_RESTRICTED_TAGS: ReadonlySet<string> = new Set(
+  PURCHASED_PACKAGES.filter((p) => p.parentRestricted).flatMap((p) => p.tags),
+);
+
+/** May a theme-only item join a Generic game when the theme filter is ON? */
+export function themeItemAllowed(
+  genrePackages: readonly string[] | undefined,
+  parentControlEnabled: boolean,
+): boolean {
+  if (!parentControlEnabled) return true;
+  return !(genrePackages ?? []).some((t) => PARENT_RESTRICTED_TAGS.has(t));
+}
+
+/**
+ * Generic-pool membership (no package active):
+ *  • base-catalog items always;
+ *  • theme-only items only when includeThemeQuestions, subject to themeItemAllowed.
+ */
+export function inGenericPool(
+  q: { inBaseCatalog?: boolean; genrePackages?: readonly string[] },
+  includeThemeQuestions: boolean,
+  parentControlEnabled: boolean,
+): boolean {
+  if (q.inBaseCatalog !== false) return true;
+  return includeThemeQuestions && themeItemAllowed(q.genrePackages, parentControlEnabled);
+}

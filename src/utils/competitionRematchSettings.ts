@@ -115,9 +115,11 @@ export function buildRematchSettings(
     spotifyEnabled: last?.spotifyEnabled ?? false,
     spotifyAnswerYear: true,
     spotifyAnswerName: true,
-    // Bärs egentligen via `parentControl`-URL-param (se doc ovan); detta är
-    // bara required-field-defaulten → safe default PÅ.
-    parentControlEnabled: true,
+    // Bärs egentligen via `parentControl`/`includeTheme`-URL-param (se doc
+    // ovan); dessa är bara required-field-defaulten (QuizVibe-user-default:
+    // mature ingår, tema-frågor av).
+    parentControlEnabled: false,
+    includeThemeQuestions: false,
     remoteAssistance: 'full',
     mutualAssistanceEnabled: false,
   };

@@ -49,6 +49,7 @@ import { TrashIcon } from '../components/TrashIcon';
 import { PackageThumbnail, hasPackageThumbnail } from '@/src/components/PackageThumbnail';
 import { QuizVibeAvatarQ, QuizVibeDefaultAvatar } from '../components/QuizVibeDefaultAvatar';
 import { QuizVibeToggle, quizVibeToggleWidth } from '../components/QuizVibeToggle';
+import { FilterGroup } from '../components/FilterGroup';
 import { ClapperboardIcon, MusicNoteIcon } from '../components/CategoryIcons';
 import { ChevronIcon } from '../components/ChevronIcon';
 import { LogoutIcon } from '../components/LogoutIcon';
@@ -139,7 +140,6 @@ import {
   assistanceInfo,
   gameEraInfo,
   hintsInfo,
-  parentControlInfo,
   regionScopeInfo,
   roundsInfo,
   spotifyInfo,
@@ -740,21 +740,27 @@ export default function ProfileScreen() {
   // Host-default: när på filtreras YT-items taggade parentControlled bort ur
   // frågeurvalet i alla spel där denna profil är host. Default PÅ (safe default;
   // load-effekten sätter om från profilen via `?? true`).
-  const [parentControlEnabled, setParentControlEnabled] = useState(true);
-  // Turning OFF kräver bekräftelse (mature-content-varning); turning ON sker
-  // direkt — ett aktiverat paket i Profile betyder bara "valbart i lobby", så
-  // ingen paket-hantering behövs här (Peter 2026-09-15).
+  // QuizVibe-user-default (Peter 2026-11-26): mature content INGÅR
+  // (parentControlEnabled false). UI:t visar det inverterade värdet som
+  // "Include mature content" i Filter-gruppen.
+  const [parentControlEnabled, setParentControlEnabled] = useState(false);
+  // Filter: "Include theme-specific questions" — host-default, default AV.
+  const [includeThemeQuestions, setIncludeThemeQuestions] = useState(false);
+  // "Include mature content" PÅ kräver bekräftelse (mature-content-varning);
+  // AV sker direkt — ett aktiverat paket i Profile betyder bara "valbart i
+  // lobby", så ingen paket-hantering behövs här (Peter 2026-09-15).
+  // `next` = nytt parentControlEnabled-värde.
   const handleToggleParentControl = (next: boolean) => {
     if (next) {
       setParentControlEnabled(true);
       return;
     }
     quizVibeAlert(
-      'Parent Control',
-      'I am aware that this activates mature content, some of it might not be appropriate for children. Still want to deactivate Parent control?',
+      'Include mature content?',
+      'Mature content might not be appropriate for children. Include it in the games you host?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Deactivate', style: 'destructive', onPress: () => setParentControlEnabled(false) },
+        { text: 'Include', style: 'destructive', onPress: () => setParentControlEnabled(false) },
       ],
     );
   };
@@ -1114,9 +1120,10 @@ export default function ProfileScreen() {
           spotifyAnswerYear: augmented.spotifyAnswerYear ?? true,
           spotifyAnswerName: augmented.spotifyAnswerName ?? true,
         });
-        // Parent Control är default PÅ (safe default för alla QuizVibe-users,
-        // inkl. befintliga profiler som aldrig satt fältet → undefined läses PÅ).
-        setParentControlEnabled(augmented.parentControlEnabled ?? true);
+        // Mature content INGÅR som default för QuizVibe-users (Peter
+        // 2026-11-26) → undefined läses false. Tema-frågor default AV.
+        setParentControlEnabled(augmented.parentControlEnabled ?? false);
+        setIncludeThemeQuestions(augmented.includeThemeQuestions ?? false);
         // Snapshot av laddad state — jämförs vid navigation bort.
         // gameMode speglar den COERCADE staten (inte rå augmented) så en
         // stale 'remote-1v1'-profil inte fastnar i evig "unsaved changes".
@@ -1136,7 +1143,8 @@ export default function ProfileScreen() {
           youtubeEnabledCategories: augmented.youtubeEnabledCategories ?? defaultEnabledMainCategories(),
           imagesEnabledCategories: augmented.imagesEnabledCategories ?? defaultEnabledMainCategories(),
           enabledHostPackages: augmented.enabledHostPackages ?? [],
-          parentControlEnabled: augmented.parentControlEnabled ?? true,
+          parentControlEnabled: augmented.parentControlEnabled ?? false,
+          includeThemeQuestions: augmented.includeThemeQuestions ?? false,
         });
       });
       loadFriends().then((list) => {
@@ -1359,6 +1367,7 @@ export default function ProfileScreen() {
         spotifyAnswerName,
         spotifyAppConfirmed: spotifyConnected,
         parentControlEnabled,
+        includeThemeQuestions,
         voice,
       });
       savedSnapshotRef.current = JSON.stringify({
@@ -1367,7 +1376,7 @@ export default function ProfileScreen() {
         gameMode, maxPlayers, roundsCount,
         answerResponseSeconds, youtubeEnabledCategories,
         imagesEnabledCategories, enabledHostPackages,
-        parentControlEnabled,
+        parentControlEnabled, includeThemeQuestions,
       });
       recordSavedSpotify({ spotifyConnected, spotifyEnabled, spotifyAnswerYear, spotifyAnswerName });
       setSavedSection(section);
@@ -1387,7 +1396,7 @@ export default function ProfileScreen() {
       gameMode, maxPlayers, roundsCount,
       answerResponseSeconds, youtubeEnabledCategories,
       imagesEnabledCategories, enabledHostPackages,
-      parentControlEnabled,
+      parentControlEnabled, includeThemeQuestions,
     });
     // Profilen har inte laddats klart (loadProfile gör en Supabase-roundtrip)
     // → inget att jämföra mot, alltså inga osparade ändringar.
@@ -2281,9 +2290,9 @@ export default function ProfileScreen() {
 
           </View>
 
-          {/* Parent Control — host-default. När på filtreras YT-klipp taggade
-              parentControlled bort ur frågeurvalet i spel där denna profil är
-              host. Placerad under Source Mixerboard, precis ovanför Game era. */}
+          {/* Filter (Peter 2026-11-26) — samma grupp som i lobbyn. AV =
+              exkluderat, PÅ = ingår. Placerad under Source Mixerboard, precis
+              ovanför Game era. onLayout = scroll-mål för "Go to Filter". */}
           <View
             style={styles.field}
             onLayout={(e) => {
@@ -2291,28 +2300,14 @@ export default function ProfileScreen() {
               tryScrollToParentControl();
             }}
           >
-            <View style={styles.regionLabelRow}>
-              <Text style={styles.sectionLabel}>Parent Control</Text>
-              <Pressable
-                style={({ pressed }) => [styles.infoIconBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => showInfo(parentControlInfo('profile'))}
-                hitSlop={8}
-              >
-                <Text style={styles.infoIconText}>i</Text>
-              </Pressable>
-              {/* QuizVibe-toggle på rubrikraden, högerställd så den linjerar
-                  med Film/TV-togglarna (mixerboard-ram 1 + padding 4 = +5 pt).
-                  Kontrollerad: avstängningens bekräftelse-Alert lämnar den på
-                  ON tills användaren bekräftar. */}
-              <View style={{ marginLeft: 'auto', marginRight: mixerToggleRightInset + 5 }}>
-                <QuizVibeToggle
-                  variant="mixer"
-                  value={parentControlEnabled}
-                  onValueChange={handleToggleParentControl}
-                  accessibilityLabel="Parent Control"
-                />
-              </View>
-            </View>
+            <FilterGroup
+              scope="profile"
+              matureIncluded={!parentControlEnabled}
+              themeIncluded={includeThemeQuestions}
+              onToggleMature={() => handleToggleParentControl(!parentControlEnabled)}
+              onToggleTheme={() => setIncludeThemeQuestions((v) => !v)}
+              onInfo={showInfo}
+            />
           </View>
 
           {/* Game era — adjustable år-spann för frågor. */}
@@ -3638,12 +3633,12 @@ export default function ProfileScreen() {
           raden. Plan B (2026-07-22): ingen kontokoppling — bara Spotify-appen. */}
       <QuizVibeDialog
         visible={pcBlockedPackageId !== null}
-        title="Parent Control"
+        title="Mature content"
         message={parentRestrictedPackageMessage(
           PURCHASED_PACKAGES.find((p) => p.id === pcBlockedPackageId)?.name ?? null,
         )}
         secondaryLabel="Cancel"
-        primaryLabel="Deactivate now"
+        primaryLabel="Include now"
         onClose={() => setPcBlockedPackageId(null)}
         onPrimary={() => {
           const id = pcBlockedPackageId;
@@ -3656,10 +3651,10 @@ export default function ProfileScreen() {
 
       <QuizVibeDialog
         visible={parentControlledDialogOpen}
-        title="Parent controlled"
+        title="Mature content"
         message={PARENT_CONTROLLED_PACKAGE_TEXT}
         secondaryLabel="Cancel"
-        primaryLabel="Go to Parent Control"
+        primaryLabel="Go to Filter"
         onClose={() => setParentControlledDialogOpen(false)}
         onPrimary={() => {
           setParentControlledDialogOpen(false);

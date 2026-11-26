@@ -452,7 +452,7 @@ export function SavedAggregatesCard({
                   onToggle={() =>
                     setExpandedL1((prev) => toggleSetKey(prev, m.monthKey))
                   }
-                  badge={monthFlash ? <NewUpdateBadge active /> : undefined}
+                  badge={monthFlash && !expandedL1.has(m.monthKey) ? <NewUpdateBadge active /> : undefined}
                 >
                   {m.dates.map((d) => {
                     const dateKey = `${m.monthKey}::${d.dateKey}`;
@@ -475,7 +475,7 @@ export function SavedAggregatesCard({
                         onToggle={() =>
                           setExpandedDates((prev) => toggleSetKey(prev, dateKey))
                         }
-                        badge={dateFlash ? <NewUpdateBadge active /> : undefined}
+                        badge={dateFlash && !expandedDates.has(dateKey) ? <NewUpdateBadge active /> : undefined}
                       >
                         {d.forms.map((f) => {
                           const formKey = `${dateKey}::${f.formKey}`;
@@ -527,7 +527,7 @@ export function SavedAggregatesCard({
                   onToggle={() =>
                     setExpandedL1((prev) => toggleSetKey(prev, g.l1Key))
                   }
-                  badge={l1Flash ? <NewUpdateBadge active /> : undefined}
+                  badge={l1Flash && !expandedL1.has(g.l1Key) ? <NewUpdateBadge active /> : undefined}
                 >
                   {g.forms.map((f) => {
                     const formKey = `${g.l1Key}::${f.formKey}`;

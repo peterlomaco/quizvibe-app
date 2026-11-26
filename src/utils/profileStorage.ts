@@ -102,6 +102,10 @@ export interface ProfileData {
   // AsyncStorage-ONLY (ingen DB-kolumn — samma mönster som spotifyDefaultEnabled).
   // Default false om saknas.
   parentControlEnabled?: boolean;
+  // Filter: "Include theme-specific questions" (Peter 2026-11-26). true =
+  // theme-only items (inBaseCatalog: false) also join Generic games. Host
+  // default. AsyncStorage-ONLY, default false (excluded) om saknas.
+  includeThemeQuestions?: boolean;
   // Spotify-svarstyper. Båda true = alternerar per frågeindex (Year / Name).
   // Minst en måste vara true när Spotify är aktiverat.
   spotifyAnswerYear?: boolean;   // default true
@@ -325,6 +329,13 @@ const PROFILE_STORE = 'profile';
 // Godkända preferensfält som engångsövergången flyttat från en äldre cache
 // (storageTransition.ts). Konsumeras vid första lyckade online-laddning.
 const LEGACY_PREFS_STORE = 'legacyPrefs';
+// Engångsreset (Peter 2026-11-26): "Include mature content" ska vara PÅ som
+// default för QuizVibe-users (= parentControlEnabled false). Äldre konton bär
+// det gamla defaultet true sparat och går inte att skilja från ett manuellt
+// val → första laddningen efter uppdateringen sätter false EN gång; därefter
+// gäller användarens eget val. Egen nyckel (inte ett profilfält) så en
+// saveProfile som inte spreadar profilen aldrig kan tappa markören.
+const MATURE_DEFAULT_STORE = 'matureDefaultV2';
 
 type LegacyPrefs = Partial<
   Pick<
@@ -551,13 +562,23 @@ async function loadProfileFresh(): Promise<ProfileData | null> {
     // 2026-11-13 bär parentControlEnabled:false). Äldre konton → undefined →
     // `?? true` i skärmarna, dvs. oförändrat beteende.
     parentControlEnabled: prefs.parentControlEnabled ?? metaParentControl(user.userMetadata),
+    includeThemeQuestions: cached?.includeThemeQuestions,
     hcp: cached?.hcp,
     hcpByCategory: cached?.hcpByCategory,
     voice: prefs.voice,
   };
+  // Engångsreset av mature-defaulten (se MATURE_DEFAULT_STORE).
+  let matureResetDone = true;
+  try {
+    matureResetDone = (await scopedStorage.getItem(userKey(user.id, MATURE_DEFAULT_STORE))) === '1';
+  } catch {
+    // Oläsbar markör → rör inget (hellre behålla valet än att skriva över det).
+  }
+  if (!matureResetDone) profile = { ...profile, parentControlEnabled: false };
   const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
   try {
     await writeUserCache(user.id, refreshed);
+    if (!matureResetDone) await scopedStorage.setItem(userKey(user.id, MATURE_DEFAULT_STORE), '1');
     if (legacy) await scopedStorage.removeItem(userKey(user.id, LEGACY_PREFS_STORE));
   } catch (err) {
     console.warn('[profileStorage] Failed to cache profile after Supabase fetch:', err);
@@ -605,6 +626,7 @@ async function backfillProfileFromSession(user: SessionUser): Promise<ProfileDat
     spotifyAnswerName: prefs.spotifyAnswerName,
     spotifyAppConfirmed: prefs.spotifyAppConfirmed,
     parentControlEnabled: prefs.parentControlEnabled ?? metaParentControl(user.userMetadata),
+    includeThemeQuestions: owned?.includeThemeQuestions,
     hcp: owned?.hcp,
     hcpByCategory: owned?.hcpByCategory,
     voice: prefs.voice,

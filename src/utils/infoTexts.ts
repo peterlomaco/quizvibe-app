@@ -75,13 +75,28 @@ export function hintsInfo(): InfoText {
   return { title: 'Hints', message: 'Guess the artist, band or actor using progressively revealed clues.' };
 }
 
-export function parentControlInfo(scope: 'lobby' | 'profile'): InfoText {
+/** "Include mature content" (Filter-gruppen) — UI-inverterad Parent Control. */
+export function matureContentInfo(scope: 'lobby' | 'profile'): InfoText {
   return {
-    title: 'Parent Control',
+    title: 'Include mature content',
     message:
       scope === 'profile'
-        ? 'When on, mature clips and packages are left out of the games you host.'
-        : 'When on, mature clips and packages are left out of the game.',
+        ? 'This is Parent Control. When off, mature clips and packages are left out of the games you host.'
+        : 'This is Parent Control. When off, mature clips and packages are left out of the game.',
+  };
+}
+
+/** @deprecated Alias kvar för äldre call-sites — använd matureContentInfo. */
+export const parentControlInfo = matureContentInfo;
+
+/** "Include theme-specific questions" (Filter-gruppen). */
+export function themeQuestionsInfo(scope: 'lobby' | 'profile'): InfoText {
+  return {
+    title: 'Include theme-specific questions',
+    message:
+      scope === 'profile'
+        ? 'When on, questions from the theme packages (for example Melodifestivalen) can also appear in the normal games you host. Mature themes still need Include mature content.'
+        : 'When on, questions from the theme packages (for example Melodifestivalen) can also appear in this game. Mature themes still need Include mature content.',
   };
 }
 
@@ -92,10 +107,10 @@ export function hostPackagesInfo(): InfoText {
   };
 }
 
-export const PARENT_CONTROLLED_PACKAGE_TEXT = 'Turn off Parent Control to use this package.';
+export const PARENT_CONTROLLED_PACKAGE_TEXT = 'Turn on Include mature content to use this package.';
 
 export function parentControlledPackageInfo(): InfoText {
-  return { title: 'Parent controlled', message: PARENT_CONTROLLED_PACKAGE_TEXT };
+  return { title: 'Mature content', message: PARENT_CONTROLLED_PACKAGE_TEXT };
 }
 
 export function gameEraInfo(): InfoText {
