@@ -329,13 +329,9 @@ const PROFILE_STORE = 'profile';
 // Godkända preferensfält som engångsövergången flyttat från en äldre cache
 // (storageTransition.ts). Konsumeras vid första lyckade online-laddning.
 const LEGACY_PREFS_STORE = 'legacyPrefs';
-// Engångsreset (Peter 2026-11-26): "Include mature content" ska vara PÅ som
-// default för QuizVibe-users (= parentControlEnabled false). Äldre konton bär
-// det gamla defaultet true sparat och går inte att skilja från ett manuellt
-// val → första laddningen efter uppdateringen sätter false EN gång; därefter
-// gäller användarens eget val. Egen nyckel (inte ett profilfält) så en
-// saveProfile som inte spreadar profilen aldrig kan tappa markören.
-const MATURE_DEFAULT_STORE = 'matureDefaultV2';
+// "Include mature content" (= !parentControlEnabled): ett sparat val bevaras
+// alltid, även från Build 40 (Peter 2026-11-26). Den tidigare engångsreseten
+// (nyckeln 'matureDefaultV2') är borttagen; en kvarliggande nyckel ignoreras.
 
 type LegacyPrefs = Partial<
   Pick<
@@ -558,27 +554,19 @@ async function loadProfileFresh(): Promise<ProfileData | null> {
     spotifyAnswerYear: prefs.spotifyAnswerYear,
     spotifyAnswerName: prefs.spotifyAnswerName,
     spotifyAppConfirmed: prefs.spotifyAppConfirmed,
-    // Saknas cache-värdet faller vi på signup-metadata (konton efter
-    // 2026-11-13 bär parentControlEnabled:false). Äldre konton → undefined →
-    // `?? true` i skärmarna, dvs. oförändrat beteende.
+    // Ett sparat val (cache eller engångsövergångens legacyPrefs) bevaras
+    // alltid (Peter 2026-11-26 — ingen reset). Saknas det faller vi på
+    // signup-metadata; saknas även den → undefined → `?? false` i skärmarna,
+    // dvs. "Include mature content" PÅ för QuizVibe-users.
     parentControlEnabled: prefs.parentControlEnabled ?? metaParentControl(user.userMetadata),
     includeThemeQuestions: cached?.includeThemeQuestions,
     hcp: cached?.hcp,
     hcpByCategory: cached?.hcpByCategory,
     voice: prefs.voice,
   };
-  // Engångsreset av mature-defaulten (se MATURE_DEFAULT_STORE).
-  let matureResetDone = true;
-  try {
-    matureResetDone = (await scopedStorage.getItem(userKey(user.id, MATURE_DEFAULT_STORE))) === '1';
-  } catch {
-    // Oläsbar markör → rör inget (hellre behålla valet än att skriva över det).
-  }
-  if (!matureResetDone) profile = { ...profile, parentControlEnabled: false };
   const { data: refreshed, changed } = refreshFreeCreditsIfNeeded(profile);
   try {
     await writeUserCache(user.id, refreshed);
-    if (!matureResetDone) await scopedStorage.setItem(userKey(user.id, MATURE_DEFAULT_STORE), '1');
     if (legacy) await scopedStorage.removeItem(userKey(user.id, LEGACY_PREFS_STORE));
   } catch (err) {
     console.warn('[profileStorage] Failed to cache profile after Supabase fetch:', err);

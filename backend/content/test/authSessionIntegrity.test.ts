@@ -250,6 +250,44 @@ describe('profil — ägarskap och läckage', () => {
   });
 });
 
+// Parent Control / "Include mature content" (Peter 2026-11-26): ett sparat val
+// bevaras alltid — även Build 40-användarens. Ingen engångsreset.
+describe('Parent Control — sparade val bevaras', () => {
+  const legacyCache = (parentControlEnabled: boolean) => (s: ReturnType<typeof createFakeAsyncStorage>) => {
+    s.store.set(TEST_AUTH_KEY, JSON.stringify({ access_token: 'a', refresh_token: 'r', user: ANNA }));
+    s.store.set('@quizvibe/profile/v1', JSON.stringify({ email: ANNA.email, playerName: 'Anna', parentControlEnabled }));
+  };
+
+  it('Build 40-användare med Parent Control PÅ behåller det (mature content AV)', async () => {
+    const t = await boot(legacyCache(true));
+    t.fake.signIn(ANNA);
+    expect((await t.profile.loadProfile())?.parentControlEnabled).toBe(true);
+    // Andra laddningen (egen cache) ändrar inget.
+    expect((await t.profile.loadProfile())?.parentControlEnabled).toBe(true);
+  });
+
+  it('Build 40-användare med Parent Control AV behåller det (mature content PÅ)', async () => {
+    const t = await boot(legacyCache(false));
+    t.fake.signIn(ANNA);
+    expect((await t.profile.loadProfile())?.parentControlEnabled).toBe(false);
+  });
+
+  it('ett val sparat i Build 41 överlever omladdning', async () => {
+    const t = await boot();
+    t.fake.signIn(ANNA);
+    const p = await t.profile.loadProfile();
+    await t.profile.saveProfile({ ...p!, parentControlEnabled: true });
+    expect((await t.profile.loadProfile())?.parentControlEnabled).toBe(true);
+    expect((await t.profile.loadProfile())?.parentControlEnabled).toBe(true);
+  });
+
+  it('nytt konto utan sparat val → ej satt (skärmarnas default = mature content PÅ)', async () => {
+    const t = await boot();
+    t.fake.signIn(ANNA);
+    expect((await t.profile.loadProfile())?.parentControlEnabled ?? false).toBe(false);
+  });
+});
+
 describe('Premium — ingen läcka mellan konton', () => {
   it('Annas betalda flagga syns inte för Bo, och utan session är Premium av', async () => {
     const t = await boot();
