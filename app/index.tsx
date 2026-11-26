@@ -1536,6 +1536,9 @@ export function JoinModal({ visible, onClose, initialStep = 'choose', hideGuest 
       );
       return;
     }
+    // Ett konto, ett spel åt gången — gäller även en inloggad user som
+    // hostar som Guest (raden bär kontots user_id). Rena gäster passerar.
+    if (await checkActiveElsewhere()) return;
     const hostName = normalizePlayerName(guestName.trim());
     const newCode = generateRoomCode();
     // Guest host är alltid Free-nivå: max 4 spelare, ingen premium.

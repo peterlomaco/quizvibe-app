@@ -80,6 +80,7 @@ import {
 import { formatRoomCode } from '../utils/roomCode';
 import { getSavedLobbies, removeSavedLobby, type SavedLobby } from '../utils/savedLobbies';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { checkActiveElsewhere } from '@/src/utils/activeLobbyGuard';
 import { QuizVibeAlertHost } from '@/src/components/QuizVibeAlertHost';
 
 function hoursLeft(deadlineAt: string): number {
@@ -497,7 +498,9 @@ export default function MyMatchesScreen() {
         key={`saved-${s.roomCode}`}
         style={[styles.row, styles.rowSaved]}
         activeOpacity={0.7}
-        onPress={() =>
+        onPress={async () => {
+          // Ett konto, ett spel åt gången. Den sparade lobbyn själv är undantagen.
+          if (await checkActiveElsewhere(s.roomCode)) return;
           router.push({
             pathname: '/lobby',
             params: {
@@ -505,8 +508,8 @@ export default function MyMatchesScreen() {
               isHost: String(s.isHost),
               ...(s.isHost ? { lobbyType: '1v1' } : {}),
             },
-          })
-        }
+          });
+        }}
       >
         <View style={styles.rowText}>
           <Text style={styles.opponentName} numberOfLines={1}>

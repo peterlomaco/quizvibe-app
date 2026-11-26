@@ -1,11 +1,10 @@
-import { Alert } from 'react-native';
-
+import { getRoomMeta } from './mockActiveRooms';
 import {
   findOtherActiveMembershipsForUser,
   leaveOtherActiveMemberships,
 } from './mockLobbyPlayers';
 import { getOwnMembershipKeys } from './ownLobbyLedger';
-import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { quizVibeAlert } from './quizVibeAlert';
 
 /**
  * Blockerar att samma REGISTRERADE konto är aktiv deltagare i mer än en
@@ -28,9 +27,16 @@ import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
  * lokala minne av vilka rader den SJÄLV skapade):
  *   • EGNA (i ledgern) → tyst reclaim (leaveOtherActiveMemberships), INGEN
  *     popup. Fångar force-quit / stängd quiz-vy / avslutat spel på samma enhet.
- *   • FRÄMMANDE (ej i ledgern → skapade av en ANNAN enhet) → popupen fyrar.
- *     "Continue here" river de främmande deltagandena och flyttar sessionen hit
- *     (den andra enheten får "lobby deleted"/ejectas).
+ *   • FRÄMMANDE (ej i ledgern → skapade av en ANNAN enhet) → HÅRD SPÄRR
+ *     (Peter 2026-11-26): ett konto spelar ett spel åt gången, från att en
+ *     lobby skapats till att spelet avslutats. Ingen "Continue here" — den
+ *     raderade bara den andra enhetens rum i databasen medan en host-enhet
+ *     spelade vidare, så samma konto kunde spela två spel samtidigt.
+ *     Utvägen är att lämna/avsluta spelet (eller logga ut) på den andra
+ *     enheten. Priset: om den andra enheten stängs utan Leave/Home ligger
+ *     raden kvar tills den enheten loggar ut eller rummet går ut (24h).
+ *   • Ett STARTAT Remote 1vs1-rum spärrar inte: duellen är asynkron (48h)
+ *     och lever i remote_matches, medan rummet medvetet ligger kvar.
  *
  * Fail-open: anonyma/gäst-sessioner och alla DB-fel ger tom lista →
  * inte blockerad, så en misslyckad uppslagning aldrig låser ute en spelare.
@@ -63,38 +69,22 @@ export async function checkActiveElsewhere(excludeCode?: string): Promise<boolea
   // Bara egna stale rader (inget FRÄMMANDE deltagande) → fritt fram, ingen popup.
   if (foreign.length === 0) return false;
 
+  // Startade Remote 1vs1-rum räknas inte som pågående spel (se ovan).
+  const blocking: typeof foreign = [];
+  for (const m of foreign) {
+    const meta = await getRoomMeta(m.roomCode).catch(() => undefined);
+    if (meta?.isRemote1v1 && meta.gameStarted) continue;
+    blocking.push(m);
+  }
+  if (blocking.length === 0) return false;
+
   return new Promise<boolean>((resolve) => {
-    // Resolve-exactly-once: både onPress och onDismiss kan fyra (Android
-    // back stänger dialogen OCH triggar onDismiss) — latchen garanterar att
-    // promisen bara avgörs en gång.
-    let settled = false;
-    const done = (value: boolean) => {
-      if (settled) return;
-      settled = true;
-      resolve(value);
-    };
     quizVibeAlert(
-      'Still active in another game',
-      "You're still marked as active in another game or lobby. This can happen " +
-        "after a force-quit, or if you're signed in on another device. Continue " +
-        'here to move your session to this device?',
-      [
-        { text: 'Cancel', style: 'cancel', onPress: () => done(true) },
-        {
-          text: 'Continue here',
-          onPress: async () => {
-            try {
-              await leaveOtherActiveMemberships(foreign);
-            } catch {
-              // Best-effort — helpers loggar sina egna fel och kastar aldrig.
-              // Släpp ändå igenom: en misslyckad städning ska inte låsa ute
-              // användaren (fail-open, samma princip som ovan).
-            }
-            done(false);
-          },
-        },
-      ],
-      { cancelable: true, onDismiss: () => done(true) },
+      'Already in a game',
+      'This account is already in a game or lobby on another device. ' +
+        'Finish or leave that game, or log out on the other device, then try again.',
+      [{ text: 'OK', onPress: () => resolve(true) }],
+      { cancelable: true, onDismiss: () => resolve(true) },
     );
   });
 }

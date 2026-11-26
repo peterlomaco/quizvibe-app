@@ -47,6 +47,7 @@ import { getOwnUserId } from '../utils/remoteMatches';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import { SequentialDots } from './SequentialDots';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
+import { checkActiveElsewhere } from '@/src/utils/activeLobbyGuard';
 
 export function CompetitionRematchActions({
   saved,
@@ -180,6 +181,8 @@ export function CompetitionRematchActions({
 
   const createLobbyAndGo = useCallback(
     async (requestId?: string) => {
+      // Ett konto, ett spel åt gången (hård spärr mot annan enhet).
+      if (await checkActiveElsewhere()) return;
       const gate = await ensureCredits();
       if (!gate) return;
       const { profile, hasPremium } = gate;
@@ -250,7 +253,9 @@ export function CompetitionRematchActions({
 
   const handleInitiate = () =>
     runBusy(async () => {
-      // Credit-gate FÖRST — initiera inte om host inte kan starta ändå.
+      // Initiera inte om kontot redan spelar på en annan enhet, eller om
+      // host inte kan starta ändå (credit-gate).
+      if (await checkActiveElsewhere()) return;
       const gate = await ensureCredits();
       if (!gate) return;
       const id = await createRematchRequest(saved.id);
@@ -272,6 +277,7 @@ export function CompetitionRematchActions({
   const handleAccept = () =>
     runBusy(async () => {
       if (!activeRequest) return;
+      if (await checkActiveElsewhere()) return;
       const ok = await acceptRematchRequest(activeRequest.id);
       if (!ok) {
         quizVibeAlert('Could not accept', 'The re-match may have expired. Try again.');
