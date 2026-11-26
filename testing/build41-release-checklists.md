@@ -142,6 +142,16 @@ order by r.created_at desc, lp.is_host desc;
 - In the Scenario A room (`multiplayer_v2 = true`), only the Build 41 host (and any other Build 41 joiners) should appear. Nothing should have Build 40's `user_id` or `device_mode` null on a non-host row.
 - In the Scenario B room (`multiplayer_v2 = false`), Build 40 is the host and Build 41 is a non-host with `device_mode` null.
 
+### Results — round 4 (Peter, 2026-11-26), STAGING `multiplayerV2 = false`, Build 41 host + Build 40 participant
+| # | Result | Observed |
+|---|---|---|
+| C3 | **PASS** | Build 40 joins a Build 41 legacy lobby by code; approval + game OK. |
+| C4 | **PASS** | Build 40 guest join into a Build 41 legacy lobby OK. |
+| C5 | **PASS** | Build 40 leave + rejoin OK under 0068. |
+| C7 | **PASS** | Build 41 host Re-match → Build 40 accepts, claims its seat (0068 `_lobby_seat_owner`), stays approved, next game OK. |
+
+Both critical re-match directions (C6, C7) now pass. The ghost-player display on Build 40 after an approved guest left is the known existing bug (round 3), fixed in 1.0.1 only.
+
 ### Finding — ghost players on the non-host Final Leaderboard (round 3, Peter 2026-11-26)
 **Setup:** STAGING, `multiplayerV2 = false` (legacy room), Build 41 host, Build 40 non-host.
 
@@ -174,7 +184,9 @@ order by r.created_at desc, lp.is_host desc;
 3. **C14:** register + delete account on Build 40 against STAGING (0060 tombstone + current `delete-account`). 0060 and the function redeploy go to PROD while Build 40 is still live.
 4. **G1 + G2:** the gate OTA reaches the test build and blocks build 40 at `min_supported_build = 41` while Build 41 stays unblocked. It needs a go to publish the test OTA to `build40-compat-test`. This proves the forced-update path before the real Build 40 OTA.
 
-**Mandatory before 0068 goes to PROD (NOT a blocker for submitting 1.0.1; 0068 is applied after release):** C7 + C5, with `multiplayerV2 = false` on STAGING. In PROD that state only exists between cutover steps 6 and 7, or after a v2 rollback.
+**Mandatory before 0068 goes to PROD:** C7 + C5 — **DONE (PASS, round 4)**. All 0068-relevant Build 40 paths are now device-tested: C2, C5, C6, C7, C11.
+
+**Status after round 4:** C1–C7 and C11 PASS, C10 UX PASS. Still open and mandatory: items 1–4 above (C10 DB check, C8 + C9, C14, G1 + G2). C8 + C9 need `multiplayerV2 = true` again on STAGING.
 
 **Optional / covered elsewhere:** C3, C4, C12, C13, C15, G3–G5. The server side is covered by `0070-staging-tests.sql` and the Batch 1 suite.
 
