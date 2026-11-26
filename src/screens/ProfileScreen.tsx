@@ -325,6 +325,9 @@ function DecadeMarks() {
 // Synlig OFF-färg för Source Dashboard-switchar (Colors.borderStrong är för transparent).
 const PROFILE_MATRIX_OFF = '#3A5068';
 
+// De fyra Spotify-inställningarna som följer "Unsaved changes"-varningen.
+type SpotifySettingKey = 'spotifyConnected' | 'spotifyEnabled' | 'spotifyAnswerYear' | 'spotifyAnswerName';
+
 export default function ProfileScreen() {
   // Save-knapparna skriver profilen till Supabase — spinner + dubbeltrycks-skydd.
   const saveAction = useAsyncAction();
@@ -351,6 +354,15 @@ export default function ProfileScreen() {
   // Automatiska klampningar (premium saknas → Max 4, rundor över taket) är
   // normalisering, inte användarändringar — uppdatera snapshoten så de
   // aldrig triggar "Unsaved changes".
+  // Spotify-inställningarna laddas av TVÅ oberoende async-läsningar (profil-
+  // laddningen + Spotify-blocket i focus-effekten) i okänd ordning. Därför en
+  // egen sparad-post per fält: varje laddare skriver exakt de värden den
+  // satte i state, så sista skrivaren per fält alltid matchar state och
+  // laddningsordningen aldrig ger en falsk "Unsaved changes".
+  const savedSpotifyRef = useRef<Partial<Record<SpotifySettingKey, boolean>>>({});
+  const recordSavedSpotify = (patch: Partial<Record<SpotifySettingKey, boolean>>) => {
+    savedSpotifyRef.current = { ...savedSpotifyRef.current, ...patch };
+  };
   const rebaseSnapshot = (patch: Record<string, unknown>) => {
     if (!savedSnapshotRef.current) return;
     try {
@@ -1097,6 +1109,11 @@ export default function ProfileScreen() {
         setSpotifyEnabled(augmented.spotifyDefaultEnabled ?? false);
         setSpotifyAnswerYear(augmented.spotifyAnswerYear ?? true);
         setSpotifyAnswerName(augmented.spotifyAnswerName ?? true);
+        recordSavedSpotify({
+          spotifyEnabled: augmented.spotifyDefaultEnabled ?? false,
+          spotifyAnswerYear: augmented.spotifyAnswerYear ?? true,
+          spotifyAnswerName: augmented.spotifyAnswerName ?? true,
+        });
         // Parent Control är default PÅ (safe default för alla QuizVibe-users,
         // inkl. befintliga profiler som aldrig satt fältet → undefined läses PÅ).
         setParentControlEnabled(augmented.parentControlEnabled ?? true);
@@ -1137,10 +1154,17 @@ export default function ProfileScreen() {
       loadProfile().then((p) => {
         if (!active) return;
         const attested = p?.spotifyAppConfirmed ?? false;
-        setSpotifyConnected(attested);
-        setSpotifyEnabled(attested ? (p?.spotifyDefaultEnabled ?? false) : false);
-        setSpotifyAnswerYear(p?.spotifyAnswerYear ?? true);
-        setSpotifyAnswerName(p?.spotifyAnswerName ?? true);
+        const loadedSpotify = {
+          spotifyConnected: attested,
+          spotifyEnabled: attested ? (p?.spotifyDefaultEnabled ?? false) : false,
+          spotifyAnswerYear: p?.spotifyAnswerYear ?? true,
+          spotifyAnswerName: p?.spotifyAnswerName ?? true,
+        };
+        setSpotifyConnected(loadedSpotify.spotifyConnected);
+        setSpotifyEnabled(loadedSpotify.spotifyEnabled);
+        setSpotifyAnswerYear(loadedSpotify.spotifyAnswerYear);
+        setSpotifyAnswerName(loadedSpotify.spotifyAnswerName);
+        recordSavedSpotify(loadedSpotify);
       }).catch(() => {});
       // Subscription-status — speglar Lobby:s hasPremium-source. Load:as på
       // focus så Store-köp (subscription / unsubscribe) reflektar direkt
@@ -1345,6 +1369,7 @@ export default function ProfileScreen() {
         imagesEnabledCategories, enabledHostPackages,
         parentControlEnabled,
       });
+      recordSavedSpotify({ spotifyConnected, spotifyEnabled, spotifyAnswerYear, spotifyAnswerName });
       setSavedSection(section);
       setTimeout(() => setSavedSection(null), 2000);
       return true;
@@ -1379,6 +1404,15 @@ export default function ProfileScreen() {
     }
     const now = JSON.parse(current) as Record<string, unknown>;
     const changed = Object.keys(now).filter((k) => norm(now[k]) !== norm(saved[k]));
+    // Spotify: jämförs bara mot fält som faktiskt laddats/sparats (se
+    // savedSpotifyRef) — ett ännu oladdat fält räknas aldrig som ändrat.
+    const spotifyNow: Record<SpotifySettingKey, boolean> = {
+      spotifyConnected, spotifyEnabled, spotifyAnswerYear, spotifyAnswerName,
+    };
+    (Object.keys(spotifyNow) as SpotifySettingKey[]).forEach((k) => {
+      const savedValue = savedSpotifyRef.current[k];
+      if (savedValue !== undefined && savedValue !== spotifyNow[k]) changed.push(k);
+    });
     if (__DEV__ && changed.length > 0) {
       console.log('[Profile] unsaved fields:', changed.map((k) => `${k}: ${norm(saved[k])} → ${norm(now[k])}`));
     }
