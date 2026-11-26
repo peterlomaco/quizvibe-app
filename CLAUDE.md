@@ -149,6 +149,14 @@ Varje steg nedan kräver Peters separata go.
 - Ny `check-clips` behöver 0068 för blocklistan (fail-open utan).
 - Edge Functions med gateway-JWT AV: `delete-account` validerar själv token (`getUser`) + nekar anon; `check-clips` saknar caller-auth (read-only, MAX_IDS 60, kvot-risk → Build 42).
 
+**Build-nummer (verifierat 2026-11-26):**
+- Den delade remote-räknaren låg på 40.
+- **STAGING TestFlight 1.0.1 = build #41** (`4b113e7`, staging-testflight, kanal `preview`, runtime `32682a4…`). ⚠ #41 pratar med STAGING och får **aldrig** väljas i App Store Connect.
+- **Production-bygget blir #42.**
+- `min_supported_build = {"ios": 41}` blockerar ändå bara ≤ 40.
+- Build 40-kompatibilitetsbygget (`test/build40-compat`, ad-hoc, `appVersionSource local`, buildNumber 40) förbrukar inget nummer.
+- Testchecklistor: [testing/build41-release-checklists.md](testing/build41-release-checklists.md).
+
 **v2 för Apple-granskare:** Build 40 läser aldrig `feature_gates`, så `multiplayerV2 = true` i PROD före submit påverkar bara Build 41 (TestFlight + granskare). Ingen allowlist-kod behövs. Reviewer-noter: tvåenhetstest med Apple-1 + Apple-2.
 
 **Cutover-ordning:**
