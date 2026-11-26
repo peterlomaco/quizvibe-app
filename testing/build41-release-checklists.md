@@ -113,3 +113,41 @@ Two checklists:
 
 ### Recording results
 For each C/G item, record PASS/FAIL plus what was seen. Deciding 0068 for PROD needs C2, C5, C6, C7 and C11, plus the EAS adoption of runtime `4b73aa7` after the real Build 40 OTA.
+
+### Results — round 1 (Peter, 2026-11-26)
+**Setup:**
+- iPhone 1 = TestFlight 1.0.1 (41), STAGING.
+- iPhone 2 = compatibility build 1.0.0 (40), STAGING, no gate OTA.
+- Two different registered accounts.
+- STAGING has 0068 + 0070 applied and `multiplayerV2 = true`.
+
+| # | Result | Observed |
+|---|---|---|
+| C10 | **PASS (UX as designed)** — DB check pending, see below | Build 41 (v2 room) invited Build 40; Build 40 received and accepted. Build 40 shows its own lobby, unapproved; the Build 41 host never sees it. This is the documented 0070 rejection: Build 40 only `console.warn`s the failed join. |
+| C11 | **PASS** | Build 40 (legacy room) invited Build 41; Build 41 received, accepted, appeared in the host's lobby. |
+| C1 | **PASS** (via invite instead of room code) | Build 41 joined Build 40's legacy lobby and the game completed. |
+| C2 | partly — confirm | Did the Build 40 host approve Build 41 manually, or was it auto-approved as a friend? A manual approve covers C2. |
+
+**DB check for C10** (STAGING SQL Editor, read-only). Expect **zero** rows for the Build 40 account in v2 rooms:
+```sql
+select r.code, r.multiplayer_v2, r.created_at, lp.player_id, lp.name, lp.type,
+       lp.is_host, lp.approved, lp.has_left, lp.device_mode, lp.user_id
+from public.rooms r
+join public.lobby_players lp on lp.room_code = r.code
+where r.created_at > now() - interval '1 day'
+order by r.created_at desc, lp.is_host desc;
+```
+- In the Scenario A room (`multiplayer_v2 = true`), only the Build 41 host (and any other Build 41 joiners) should appear. Nothing should have Build 40's `user_id` or `device_mode` null on a non-host row.
+- In the Scenario B room (`multiplayer_v2 = false`), Build 40 is the host and Build 41 is a non-host with `device_mode` null.
+
+**Remaining:**
+- **Now (flag stays true):**
+  - C2 (explicit approve on Build 40);
+  - **C6** (Build 40 host re-match → Build 41 accepts);
+  - C8 (Build 40 joins v2 by room code) + C9 (Build 40 guest join, v2);
+  - C12–C15;
+  - after the test-gate OTA is published (needs go): G1–G5.
+- **Needs STAGING `multiplayerV2 = false` temporarily (Peter's go)** so Build 41 creates legacy rooms with Build 40 as non-host:
+  - C3, C4, C5 (Build 40 leave + rejoin);
+  - **C7** (Build 41 host re-match → Build 40 accepts and claims its seat under 0068).
+  - Restore with `true` afterwards.
