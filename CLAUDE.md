@@ -255,6 +255,16 @@ All client-side via AsyncStorage. No server. Screens reload data on focus (`useF
 - **Lobby**: `publishOwnAccountName`/`publishOwnHcp` gör inget för en anonym session (Guest alias för en inloggad user som spelar som gäst fungerar som förut).
 - **Delete Account** rensar bara det kontots nycklar (`clearUserScope(uid)`), inte hela `@quizvibe/`.
 
+### ⚠ Ett spel per konto — hård spärr mot en annan enhet (Peter 2026-11-26, commit `2fa8c99`)
+
+`checkActiveElsewhere(excludeCode?)` i [activeLobbyGuard.ts](src/utils/activeLobbyGuard.ts) körs före varje väg som skapar eller joinar en lobby: Home (skapa, kod, guest-join, inbjudan, Start Game as Guest), Profile (skapa), Marathon re-match (starta, replay, skicka inbjudan, acceptera) och återgång till en sparad 1vs1-lobby.
+- **Aktiva rader på en ANNAN enhet** (`lobby_players` med kontots `user_id`, `has_left = false`, rummet ej utgånget, raden saknas i denna enhets `ownLobbyLedger`) → popupen "Already in a game", **bara OK**. Den andra enheten rörs aldrig.
+- ⚠ **Återinför INTE "Continue here".** Den raderade bara den andra enhetens rum i databasen; en host-enhet lyssnar inte på att sitt eget rum raderas (quiz.tsx:s rooms-DELETE-prenumeration returnerar tidigt för `isHost`), så samma konto spelade två spel samtidigt.
+- **Egna kvarlämnade rader på samma enhet** (i ledgern) städas tyst utan popup, som förut.
+- **Ett startat Remote 1vs1-rum spärrar inte** (asynkron duell, 48h; rummet ligger kvar med flit). En 1vs1-lobby som inte startat spärrar.
+- **Max 24 h låsning**: spärren räknar bara rum med `expires_at > now()`, och `expires_at` = skapandet + 24h (förlängs inte). Låses upp tidigare av Home/Leave/Quit eller logout på den andra enheten (logout kör `leaveAllActiveMembershipsForUser`). Peter har accepterat priset: en enhet som stängs mitt i spelet utan Leave låser kontot på andra enheter tills dess.
+- Spärren är klient-sidig (rena gäster har en egen anon-uid per enhet och påverkas inte). Tester: `backend/content/test/activeLobbyGuard.test.ts`.
+
 **Synkron profil-spegel — login-state får ALDRIG seedas från `null`** (fix 2026-08-12): `getCachedProfile()` i [profileStorage.ts](src/utils/profileStorage.ts) returnerar senast kända profil **synkront** — `undefined` = ohydrerad (vi VET inte), `null` = utloggad, objekt = inloggad. Spegeln uppdateras av `loadProfile`/`saveProfile`/`clearProfile` och värms från AsyncStorage vid modul-load.
 
 Varför: Home nås ALLTID via `router.replace('/')` (BottomBanner, Profile, Store, FAQ, Lobby) = **full re-mount**, och Lobby mountar sin TopUserBanner på nytt vid varje Start New Game. Med `useState(null)` renderades utloggat läge under hela `loadProfile`:s Supabase-roundtrip (`auth.getUser` + `profiles`-select) och hoppade sedan till inloggat — Peter såg "Register or Login" blinka förbi både på Home och i lobby-bannern. Konsumenter (Home, [BottomBanner](src/components/BottomBanner.tsx), [TopUserBanner](src/components/TopUserBanner.tsx)) seedar därför sitt state ur spegeln och sätter den igen synkront i focus-effekten INNAN den auktoritativa `loadProfile()` await:as. **`undefined` får aldrig tolkas som utloggad** — låt state stå orört då.
@@ -1061,6 +1071,8 @@ Ersätter gamla `enabledMainCategories` + `youtubeEnabled`/`imagesEnabled`-boole
 ## Profile — unsaved changes guard (2026-06-03)
 
 Snapshot-baserad jämförelse (`savedSnapshotRef` = JSON vid load/save). `hasUnsavedChanges()` jämför aktuell state vid navigation. `guardedNavigate(navigateFn)` wrappar alla exit-punkter: TopUserBanner back, Create Game ("Start New Game"), Join Game ("Join with Room code"), Store. Alert: "Don't save" (navigerar direkt) / "Save" (sparar defaults + host, sedan navigerar) / "Stay" (avbryter). Expo Routers native stack stödjer inte `usePreventRemove`/`beforeRemove` — explicit callback-wrapping är enda tillförlitliga metoden.
+
+**Spotify-fälten** (2026-11-26, commit `9f7e2c2`): "I have Spotify on this device", Spotify DJ-standarden, Year och Name ingår i jämförelsen, men INTE i `savedSnapshotRef`. De laddas av två oberoende async-läsningar (profil-laddningen + Spotify-blocket i focus-effekten) i okänd ordning, så de har en egen sparad-post (`savedSpotifyRef`) som varje laddare och Save patchar med exakt de värden de satte. Ett ännu oladdat fält räknas aldrig som ändrat. Lägg aldrig in dem i `savedSnapshotRef` — då ger laddningsordningen falska varningar.
 
 ## Generic + Activate Extra package-rad (Lobby host-vyn)
 
