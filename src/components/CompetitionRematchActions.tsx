@@ -247,11 +247,18 @@ export function CompetitionRematchActions({
   );
 
   // ── Handlers ──
+  // Synkron lås-ref (Build 41): `busy`-state hinner inte renderas mellan två
+  // tryck i samma frame, så ett dubbeltryck kunde skapa två re-match-
+  // förfrågningar/lobbies. State:t finns kvar bara för renderingen.
+  const busyRef = useRef(false);
   const runBusy = useCallback(async (fn: () => Promise<void>) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setBusy(true);
     try {
       await fn();
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   }, []);

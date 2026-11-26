@@ -8201,8 +8201,12 @@ export default function QuizScreen() {
     // Re-match: stämpla nya rumkoden som seriens fortsättning så nästa
     // slutskärm kan visa Aggregate Leaderboard. Görs bara när spelarna bärs
     // över — "Start New Game" är per definition en NY serie.
+    // AWAIT (port från fix/double-tap-single-flight 6d6f1e6, Peter
+    // 2026-10-15): stämpeln är en read-modify-write mot AsyncStorage — skriv
+    // klart innan vi navigerar, annars kan nästa session läsa den för tidigt
+    // och Marathon-kedjan bryts.
     if (reusePlayers) {
-      void markSeriesContinues(newCode);
+      await markSeriesContinues(newCode);
     }
     if (reusePlayers && params.roomCode && carryOverPlayers.length > 0) {
       // Re-mappa id:t med rumkoden i prefixet så lobby_players-rader inte
