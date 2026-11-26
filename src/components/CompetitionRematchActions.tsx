@@ -46,6 +46,7 @@ import { loadProfile } from '../utils/profileStorage';
 import { getOwnUserId } from '../utils/remoteMatches';
 import { hasPremiumSubscription } from '../utils/subscriptionStorage';
 import { SequentialDots } from './SequentialDots';
+import { useAsyncAction } from '@/src/utils/useAsyncAction';
 import { quizVibeAlert } from '@/src/utils/quizVibeAlert';
 import { checkActiveElsewhere } from '@/src/utils/activeLobbyGuard';
 
@@ -58,7 +59,8 @@ export function CompetitionRematchActions({
 }) {
   const [myUserId, setMyUserId] = useState<string | null>(null);
   const [request, setRequest] = useState<CompetitionRematchRequest | null>(null);
-  const [busy, setBusy] = useState(false);
+  const busyAction = useAsyncAction();
+  const busy = busyAction.busy;
   const [, forceTick] = useState(0);
   const navigatedRef = useRef(false);
 
@@ -247,21 +249,10 @@ export function CompetitionRematchActions({
   );
 
   // ── Handlers ──
-  // Synkron lås-ref (Build 41): `busy`-state hinner inte renderas mellan två
-  // tryck i samma frame, så ett dubbeltryck kunde skapa två re-match-
-  // förfrågningar/lobbies. State:t finns kvar bara för renderingen.
-  const busyRef = useRef(false);
-  const runBusy = useCallback(async (fn: () => Promise<void>) => {
-    if (busyRef.current) return;
-    busyRef.current = true;
-    setBusy(true);
-    try {
-      await fn();
-    } finally {
-      busyRef.current = false;
-      setBusy(false);
-    }
-  }, []);
+  // Synkront dubbeltrycks-lås (Build 41) via useAsyncAction: tidigare var
+  // `busy` bara React-state, som inte hinner renderas mellan två tryck i
+  // samma frame — ett dubbeltryck kunde skapa två re-match-förfrågningar/lobbies.
+  const runBusy = (fn: () => Promise<void>) => busyAction.run('rematch', fn);
 
   const handleInitiate = () =>
     runBusy(async () => {
