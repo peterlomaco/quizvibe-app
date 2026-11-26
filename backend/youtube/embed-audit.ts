@@ -1,3 +1,6 @@
+// ⚠ 2026-11-26: NOT run in CI any more (removed from youtube-validate-nightly).
+// Automated headless playback is a YouTube API audit risk. Do not schedule it.
+// Real-user playback errors (clip_playback_errors) replace it.
 // CLI: audit that every `youtubeClips` entry actually PLAYS in a real embedded
 // player on a third-party origin — the one failure mode the Data API and oEmbed
 // both miss (owner embed-block) plus the ones they catch (deleted/private).
