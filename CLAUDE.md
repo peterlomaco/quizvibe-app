@@ -108,6 +108,90 @@ Två script ÖVERLEVDE medvetet:
 
 Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog → Pre-launch → Launch).
 
+## Build 41 / 1.0.1 — release + PROD-cutover (2026-11-26)
+
+**Build 40 (1.0.0) är LIVE i App Store med publika användare mot PROD.** Build 41 = **1.0.1**, branch `fix/auth-session-integrity` (ej pushad). Beslut (Peter 2026-11-26):
+- manuell release, **Phased Release AV**;
+- egen YouTube-wrapper **PÅ** (`EXPO_PUBLIC_YT_OWN_WRAPPER=1` i EAS `production`-miljön);
+- Multiplayer v2 **PÅ** vid cutover;
+- sparade Parent Control-val bevaras;
+- reset av lokal history/HCP/vänner/ledgers/sparade lobbies accepteras.
+
+Varje steg nedan kräver Peters separata go.
+
+**Forced-update-grind** ([minSupportedBuild.ts](src/utils/minSupportedBuild.ts) + [minSupportedBuildCore.ts](src/utils/minSupportedBuildCore.ts) + [UpdateRequiredScreen.tsx](src/components/UpdateRequiredScreen.tsx)):
+- Konfiguration: `app_config.min_supported_build = {"ios": <int>, "message"?: string}`, läst vid start + varje återgång till förgrunden (60 s throttle).
+- Native build = `Constants.platform.ios.buildNumber` (CFBundleVersion, expo-constants). Inget nytt beroende.
+- Cachen är `envKey` (STAGING påverkar aldrig PROD). Fel → behåll senast bekräftade krav; lyckad hämtning utan krav → rensa.
+- Fail-open: ingen rad, Expo Go, okänt build → blockerar aldrig.
+- DEV: `__qvSetNativeBuildOverride(n)` / `__qvSetMinBuildOverride(n)`.
+- Musiken tystnar bakom skärmen. Sätt ALDRIG minimum över ett build med känd regression.
+- **Build 40-varianten** ligger på branch `release/build40-update-gate` (worktree `..\qv-build40-gate`), commit `a75b457` = `b6d08cc` + Store-texten från OTA:n 2026-10-29 (`e72e442`) + grinden.
+  - iOS-fingerprint verifierad = Build 40:s runtime `4b73aa7f78faf1a756a2b27b43fe7161d9ff841e` (patches LF-normaliserade).
+  - **EJ publicerad.**
+  - Publicering (kräver go): LF-normalisera `patches/*.patch` → `npx eas update --branch production --platform ios --environment production --message "Build 40: update-required gate"`.
+  - Före publicering: bekräfta mot update group `e80008e0` att ingen annan text i den OTA:n saknas (t.ex. StoreScreen rad ~1054 "Redeem a voucher code above").
+  - expo-updates-default: hämtas vid en start, tillämpas vid NÄSTA kallstart. En Build 40-enhet som inte öppnats får den aldrig.
+
+**Migration 0070** (`0070_v2_join_requires_device_client.sql`, EJ körd någonstans): own non-host join/rejoin i ett `multiplayer_v2`-rum utan `device_mode` → `qv_join_rejected:update_required`.
+- Build 40 skickar aldrig `device_mode`; Build 41 gör det alltid i v2-rum (join-vägen gör om rumsuppslaget vid timeout).
+- Legacy-rum, host-skrivningar och carry-over-claims påverkas inte.
+- Build 40:s UX: joinen loggas bara (`console.warn`), spelaren står kvar i sin egen lobbyvy utan att synas för host och kan trycka Leave. Ingen data skrivs.
+- Kvarvarande lucka: en Build 40-rejoin av en rad som redan har en device från en tidigare Build 41-join släpps igenom (samma konto på två enheter, extremt ovanligt).
+- Test: `supabase/0070-staging-tests.sql` (STAGING, rollback-by-error).
+
+**0068-rollback:** `supabase/rollback/0068_revert.sql`, granskad mot 0054/0056/0024/0001-definitionerna. Ny `check-clips` fail-open:ar utan `clip_blocklist`. Körs ALDRIG utan beslut.
+
+**Beroenden:**
+- 0060 → `delete-account`-redeploy;
+- 0062 → 0063 → 0064 → 0065 → 0066 → 0067 → 0070;
+- 0069 och 0068 är oberoende.
+- Ny `check-clips` behöver 0068 för blocklistan (fail-open utan).
+- Edge Functions med gateway-JWT AV: `delete-account` validerar själv token (`getUser`) + nekar anon; `check-clips` saknar caller-auth (read-only, MAX_IDS 60, kvot-risk → Build 42).
+
+**v2 för Apple-granskare:** Build 40 läser aldrig `feature_gates`, så `multiplayerV2 = true` i PROD före submit påverkar bara Build 41 (TestFlight + granskare). Ingen allowlist-kod behövs. Reviewer-noter: tvåenhetstest med Apple-1 + Apple-2.
+
+**Cutover-ordning:**
+1. RC → staging-testflight → R1–R11 på STAGING inkl. 0070 + `0070-staging-tests.sql`.
+2. Build 40-testbuild (`b6d08cc`, test-kanal) + test-OTA av grinden + Build 40 ⇄ 0068/0070-kompatibilitet.
+3. Push + PR + merge.
+4. Production build (verifiera nästa build-nummer: `eas build:version:get -p ios`) → TestFlight-test mot PROD (R6 40→41-uppgradering, R9, R10, R11).
+5. PROD backup/PITR.
+6. 0060 + delete-account, 0061, 0062–0067, 0069, 0070, sedan `check-migrations.sql`.
+7. `multiplayerV2 = true`.
+8. Publicera Build 40-OTA:n (inert).
+9. Submit 1.0.1.
+10. Release.
+11. `min_supported_build = {"ios": 41}`.
+12. 0068 (precheck → apply → smoke) + `check-clips`, när följande är uppfyllt:
+    - (a) steg 2 visar endast kontrollerade fel för Build 40;
+    - (b) gaten är aktiv;
+    - (c) EAS-adoption för runtime `4b73aa7` är försumbar — eller kvarvarande trafik bedöms acceptabel mot (a).
+13. Post-release-övervakning 48 h.
+
+### Build 42 — backlog (konsoliderad 2026-11-26)
+- [ ] Premium månad **49 kr** (auto-renew) — se "Betald prenumeration efter kampanjen" nedan.
+- [ ] **24-timmarspass 29 kr**.
+- [ ] **Årspass / presentkort ~499 kr**.
+- [ ] Ambassadör- och rabattkoder via **Apple Offer Codes** (aldrig egna vouchers, 3.1.1).
+- [ ] **RevenueCat-skydd vid kontobyte** (obligatoriskt före kommersiell launch — se listan nedan).
+- [ ] Kvarvarande YouTube-compliance-fixar + **YouTube API Audit + Quota Extension-ansökan**.
+- [ ] Verifiera att tema-specifika frågor nås av Free-användare (Filter-switchen, aldrig Premium-gate).
+- [ ] Utvärdera delad Supabase verdict-cache (klipp-liveness).
+- [ ] Säkerhet:
+  - Batch 2 (`remove-dormant-features` `7909cb1`), 3–9;
+  - `check-clips` JWT + rate limit;
+  - server-trigger för `account_player_name`/hcp;
+  - Batch 3:s `min_supported_build` är redan gjord i Build 41.
+- [ ] 10 gratis host-credits vid registrering (`feat/welcome-free-credits` `d01a15e`).
+- [ ] `fix/double-tap-single-flight`-rester: `663fd45` (Parent Control-erbjudande + ta bort "might affect Quiz mixer"-bekräftelsen), kvarvarande delar av `6d6f1e6` (direkta spinners, optimistisk panel). Lås + await portades till Build 41.
+- [ ] 6 döda klipp att ersätta (se "Klipp att ersätta").
+- [ ] `ota-on-clip-fix-merge.yml` → `production`.
+- [ ] Städ: 11 TS-fel (`parentControlled`-typ, StatusBar-prop, `Generation`-export, dubbla nycklar i `hintsData`), lint-baslinje, backend-tsconfig.
+- [ ] terms.md §7.1 bild-text.
+- [ ] Ingång till `/leaderboards`.
+- [ ] `QuizVibeAlertHost` (Modal) kan ritas ovanpå UpdateRequiredScreen — låt gaten stänga öppna dialoger.
+
 ### Pre-launch — Supabase PROD-status (verifierad 2026-09-23)
 
 Kör **[supabase/check-migrations.sql](supabase/check-migrations.sql)** (read-only, en rad per migration, ❌ MISSING först) i SQL Editor på BÅDA projekten före varje launch-/cutover-steg. Projekt: `QuizVibe` = **PROD** (`pyndqehlebtxochwpwex`), `quizvibe-staging` = **TEST** (`tottbiuikbdarsjlpxwn`) — namnen är bakvända mot känslan.
