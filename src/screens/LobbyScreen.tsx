@@ -25,6 +25,7 @@ import {
 } from 'react-native';
 import { Pressable, TouchableOpacity } from '@/src/components/haptic';
 import { useAsyncAction } from '@/src/utils/useAsyncAction';
+import { buildNonHostRoster } from '@/src/utils/nonHostRoster';
 import { LoadingContent } from '../components/LoadingContent';
 import { ScrollView } from 'react-native-gesture-handler';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -6789,11 +6790,9 @@ export default function LobbyScreen() {
         // turnOrder), skillnaden är bara att PtP frågar först.
         const goToQuizAsNonHost = () => {
           // v2: exactly the frozen participants, in the frozen order.
-          const rosterRows = frozenIds
-            ? frozenIds
-                .map((id) => (playersStored ?? []).find((p) => p.id === id))
-                .filter((p): p is LobbyPlayer => !!p)
-            : (playersStored ?? []).filter((p) => !!p.approved || !!p.isHost);
+          // Legacy: approved + host, minus anyone who left (Build 41 fix —
+          // a left approved guest showed up on the Final Leaderboard).
+          const rosterRows = buildNonHostRoster(playersStored, frozenIds);
           const frozenDevice = (id: string) =>
             frozenConfig?.participants.find((p) => p.playerId === id)?.deviceMode;
           const turnOrder = rosterRows
