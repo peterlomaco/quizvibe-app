@@ -108,6 +108,38 @@ Två script ÖVERLEVDE medvetet:
 
 Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog → Pre-launch → Launch).
 
+## Versioner, build-nummer och branchar (Peter 2026-11-26)
+
+**Håll app-version och tekniskt build-nummer isär:**
+
+| Version | Build | Vad |
+|---|---|---|
+| 1.0.0 | 40 | Nuvarande publika soft launch (App Store, PROD) |
+| 1.0.1 | 41 | STAGING TestFlight — UI + Multiplayer-releasen (aldrig välj i ASC) |
+| 1.0.1 | 42 (förväntat) | Production-release för Apple App Review, **utan ny betalfunktionalitet** |
+| 2.0.0 | framtida nummer | Kommersiell release: prenumerationer, betalning, presentpass |
+
+**Scope för 1.0.1 och 2.0.0 hålls strikt isär.** Inget betalrelaterat (prenumeration 49 kr, 24 h-pass, årspass/presentkort, rabatt-/ambassadörkoder, RevenueCat-kontobytesskydd) får glida in i 1.0.1. "Build 42 backlog" nedan = 2.0.0-scope plus övrigt uppskjutet.
+
+**Release candidate 1.0.1:** commit **`4b113e7`** på `fix/auth-session-integrity`. Det var exakt den commit STAGING TestFlight #41 byggdes från. Lokal tagg `rc/1.0.1-build41-staging`. Senare commits på branchen är endast dokumentation.
+
+**Branchar på GitHub (alla pushade 2026-11-26, ingen force, master orörd):**
+
+| Branch | Head | Roll |
+|---|---|---|
+| `fix/auth-session-integrity` | doc-commits ovanpå `4b113e7` | **1.0.1 RC** — innehåller allt från `logo-gold-home`, `feat/name-reveal-colors` och master:s lokala `5b74b64` |
+| `logo-gold-home` | `32f8e61` | tidigare utvecklingslinje, helt i RC |
+| `release/build40-update-gate` | `a75b457` | riktiga Build 40-OTA:n (gate), fingerprint `4b73aa7`, **ej publicerad** |
+| `test/build40-compat` | `da3f18c` | ENDAST TEST: Build 40-kompatbygge (ad-hoc, STAGING, runtime `build40-compat-1`, build 40). Mergas aldrig. |
+| `test/build40-compat-gate` | `6842839` | ENDAST TEST: gate-OTA för kompatbygget (kanal `build40-compat-test`). Mergas aldrig. |
+| `feat/welcome-free-credits` | `d01a15e` | uppskjuten (10 gratis credits) |
+| `fix/double-tap-single-flight` | `6de5c9d` | rester till senare; nödvändiga delar portade till RC |
+| `remove-dormant-features` | `7909cb1` | Security Batch 2, senare |
+| `feat/name-reveal-colors` | `6f24e0b` | redan mergad i RC |
+| `master` | origin `0c5c667` | orörd; mergas först efter godkända release-tester (separat beslut) |
+
+Worktrees: `..\qv-build40-gate` (release/build40-update-gate), `..\qv-build40-compat` (test-brancharna).
+
 ## Build 41 / 1.0.1 — release + PROD-cutover (2026-11-26)
 
 **Build 40 (1.0.0) är LIVE i App Store med publika användare mot PROD.** Build 41 = **1.0.1**, branch `fix/auth-session-integrity` (ej pushad). Beslut (Peter 2026-11-26):
