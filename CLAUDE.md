@@ -121,7 +121,7 @@ Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog →
 
 **Scope för 1.0.1 och 2.0.0 hålls strikt isär.** Inget betalrelaterat (prenumeration 49 kr, 24 h-pass, årspass/presentkort, rabatt-/ambassadörkoder, RevenueCat-kontobytesskydd) får glida in i 1.0.1. "Build 42 backlog" nedan = 2.0.0-scope plus övrigt uppskjutet.
 
-**Release candidate 1.0.1:** commit **`4b113e7`** på `fix/auth-session-integrity`. Det var exakt den commit STAGING TestFlight #41 byggdes från. Lokal tagg `rc/1.0.1-build41-staging`. Senare commits på branchen är endast dokumentation.
+**Release candidate 1.0.1:** commit **`4b113e7`** på `fix/auth-session-integrity`. Det var exakt den commit STAGING TestFlight #41 byggdes från. Tagg `rc/1.0.1-build41-staging` (pushad). Efter #41 har branchen fått EN kodändring: `e909500` (non-host legacy-roster utesluter spelare som lämnat — ghost players på Final Leaderboard). Övriga senare commits är dokumentation. Production-bygget #42 byggs från branchens HEAD och inkluderar alltså fixen; legacy-regressionstestet för den körs på #42.
 
 **Branchar på GitHub (alla pushade 2026-11-26, ingen force, master orörd):**
 
