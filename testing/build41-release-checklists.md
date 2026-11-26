@@ -142,6 +142,32 @@ order by r.created_at desc, lp.is_host desc;
 - In the Scenario A room (`multiplayer_v2 = true`), only the Build 41 host (and any other Build 41 joiners) should appear. Nothing should have Build 40's `user_id` or `device_mode` null on a non-host row.
 - In the Scenario B room (`multiplayer_v2 = false`), Build 40 is the host and Build 41 is a non-host with `device_mode` null.
 
+### Finding — ghost players on the non-host Final Leaderboard (round 3, Peter 2026-11-26)
+**Setup:** STAGING, `multiplayerV2 = false` (legacy room), Build 41 host, Build 40 non-host.
+
+**Observed on Build 40:**
+- Two guests joined from the Build 40 device, were approved, then left before the start.
+- Peter-1 joined from the same device, and the game was played by Peter-1 + Peter-99.
+- The Build 41 host showed 2 players (correct).
+- The Build 40 non-host showed 4: the left guests with 0 answers and 2 connection errors each.
+
+**Cause:**
+- The non-host's legacy roster (`goToQuizAsNonHost`) kept `approved || isHost` rows from `get_lobby_roster`, which also returns left rows (`has_left = true`, `approved` still true).
+- **This bug already exists in live Build 40.** It isn't caused by mixing versions or by 0068/0070.
+- v2 rooms were never affected (frozen server roster).
+
+**Build 41 fix (commit on `fix/auth-session-integrity`):**
+- `buildNonHostRoster` in `src/utils/nonHostRoster.ts` excludes `hasLeft` in legacy rooms. The v2 frozen roster is unchanged.
+- One helper is used by every non-host path: Individual Devices, the Pass-the-Phone "Follow leaderboard" follower, and v2 own-device.
+- Vitest: `backend/content/test/nonHostRoster.test.ts`, 8 tests.
+- Build 40 is not fixed (its OTA stays gate-only); the bug disappears as Build 40 is forced to update.
+
+**Regression item for the production-profile TestFlight run (#42), legacy path:**
+- Needs `multiplayerV2 = false` on the test environment.
+- Two devices on 1.0.1: approve a guest, the guest leaves before the start, play a game.
+- Non-host Final Leaderboard (Individual Devices) and the Pass-the-Phone follower view show only real participants.
+- Not covered by the STAGING build #41 (built before the fix).
+
 **Mandatory before approving the 1.0.1 RC (decided 2026-11-26):**
 1. C10 DB check (query above): no row for Build 40 in the v2 room.
 2. **C8 + C9:** Build 40 joins a Build 41 v2 room **by room code**, registered and as guest. This is the most likely real path (a shared code), and it has a different client path from the invite.
