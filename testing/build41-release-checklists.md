@@ -126,7 +126,9 @@ For each C/G item, record PASS/FAIL plus what was seen. Deciding 0068 for PROD n
 | C10 | **PASS (UX as designed)** — DB check pending, see below | Build 41 (v2 room) invited Build 40; Build 40 received and accepted. Build 40 shows its own lobby, unapproved; the Build 41 host never sees it. This is the documented 0070 rejection: Build 40 only `console.warn`s the failed join. |
 | C11 | **PASS** | Build 40 (legacy room) invited Build 41; Build 41 received, accepted, appeared in the host's lobby. |
 | C1 | **PASS** (via invite instead of room code) | Build 41 joined Build 40's legacy lobby and the game completed. |
-| C2 | partly — confirm | Did the Build 40 host approve Build 41 manually, or was it auto-approved as a friend? A manual approve covers C2. |
+| C2 | **PASS** (round 2) | Build 40 host approved Build 41; approval works under 0068. |
+| C6 | **PASS** (round 2) | Build 40 host → full game → Re-match / Play Again → both players carried over to the new lobby, approval works, next game starts. Build 41 claimed its re-match seat under 0068 (`claim_carry_over_row` + seat owner). |
+| C7 | **open** | The reverse direction (Build 41 host, Build 40 claims its seat) is NOT covered by round 2. It needs `multiplayerV2 = false` on STAGING. |
 
 **DB check for C10** (STAGING SQL Editor, read-only). Expect **zero** rows for the Build 40 account in v2 rooms:
 ```sql
@@ -140,7 +142,17 @@ order by r.created_at desc, lp.is_host desc;
 - In the Scenario A room (`multiplayer_v2 = true`), only the Build 41 host (and any other Build 41 joiners) should appear. Nothing should have Build 40's `user_id` or `device_mode` null on a non-host row.
 - In the Scenario B room (`multiplayer_v2 = false`), Build 40 is the host and Build 41 is a non-host with `device_mode` null.
 
-**Remaining:**
+**Mandatory before approving the 1.0.1 RC (decided 2026-11-26):**
+1. C10 DB check (query above): no row for Build 40 in the v2 room.
+2. **C8 + C9:** Build 40 joins a Build 41 v2 room **by room code**, registered and as guest. This is the most likely real path (a shared code), and it has a different client path from the invite.
+3. **C14:** register + delete account on Build 40 against STAGING (0060 tombstone + current `delete-account`). 0060 and the function redeploy go to PROD while Build 40 is still live.
+4. **G1 + G2:** the gate OTA reaches the test build and blocks build 40 at `min_supported_build = 41` while Build 41 stays unblocked. It needs a go to publish the test OTA to `build40-compat-test`. This proves the forced-update path before the real Build 40 OTA.
+
+**Mandatory before 0068 goes to PROD (NOT a blocker for submitting 1.0.1; 0068 is applied after release):** C7 + C5, with `multiplayerV2 = false` on STAGING. In PROD that state only exists between cutover steps 6 and 7, or after a v2 rollback.
+
+**Optional / covered elsewhere:** C3, C4, C12, C13, C15, G3–G5. The server side is covered by `0070-staging-tests.sql` and the Batch 1 suite.
+
+**Remaining (full list):**
 - **Now (flag stays true):**
   - C2 (explicit approve on Build 40);
   - **C6** (Build 40 host re-match → Build 41 accepts);
