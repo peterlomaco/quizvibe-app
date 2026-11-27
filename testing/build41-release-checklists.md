@@ -348,6 +348,8 @@ Details and order: [build41-release-readiness.md](build41-release-readiness.md) 
 | S3 | Compare with production #42 | No differences, or retaken |
 | S4 | Upload to App Store Connect (approval), replacing all old-UI screenshots | Done **before App Review submission** |
 
+**Note from E4 (welcome mail in Gmail):** in Gmail (web + iPhone) the **second** welcome mail in a thread (18:16) showed the tagline and logo alt text very dark and collapsed the body behind "•••". The first welcome mail in the same thread (17:50) and the confirmation mail render the same header markup correctly (light grey). The header HTML of welcome and confirmation mails is identical, so this is Gmail's repeated-content display in a thread, not the template. No template change. In E5a, check mails on fresh addresses (new thread) and note thread behaviour separately.
+
 **Note from E4 (reset password):** STAGING sends **8-digit** codes (the app accepts 6–8). The first code was valid: Auth log 18:22:07 `/verify` 200, then `PUT /user` 422 "New password should be different from the old password" (iOS autofill entered the old password). Re-submitting the same code then gave 403 "Token has expired or is invalid" and the app showed "Invalid code". Existing behaviour, also in Build 40 (`b6d08cc`); recorded as a known limitation, Build 42 backlog. In PROD tests, use a new password that differs from the old one.
 
 Website (master merge, step 4a): Pages build `built`; `/`, `/legal/privacy` (12-month row), `/legal/terms`, `/email-confirmed.html`, logo PNG and CSS return 200 on iPhone Safari + desktop; one confirmation from Build 40 and one from Build 42 land on the new `email-confirmed.html`.
