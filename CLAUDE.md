@@ -223,8 +223,8 @@ Varje steg nedan kräver Peters separata go.
 
 **Kvar, i Peters ordning** (resultat rapporteras i ny session; detaljerade steg i [testing/build41-release-checklists.md](testing/build41-release-checklists.md) Part B):
 1. ✅ **KLART 2026-11-27 (round 5)**: C8, C9, C10 DB-kontroll (rum `SM50MN`, ingen Build 40-rad), C14 (tombstone `Lomaco`), G1–G4 PASS, STAGING-städning efter G4 verifierad (`feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`, ingen `min_supported_build`-rad).
-2. **NÄSTA: G5** (överenskommet före Part A). Exakta steg + slutlig STAGING-städning står i checklistan under "G5 procedure".
-3. Sedan: installera STAGING TF #41 på båda iPhones → riktade R-tester (Part A). **R6 skjuts upp** till production-TestFlight (#42). Ghost-player-regressionen (`e909500`) ligger kvar på checklistan för #42.
+2. ✅ **G5 PASS 2026-11-27** (första start ej blockerad, 2:a kallstarten blockerad); slutlig STAGING-städning verifierad. **Part B är klar.**
+3. **NÄSTA:** installera STAGING TF #41 på båda iPhones → riktade R-tester (Part A). **R6 skjuts upp** till production-TestFlight (#42). Ghost-player-regressionen (`e909500`) ligger kvar på checklistan för #42.
 5. Därefter steg 3–13 ovan — varje steg kräver Peters separata go (merge, production-bygge #42, PROD-migrationer, publicering av Build 40-OTA:n, submit).
 
 **Standing constraints**: ingen PROD-ändring, ingen production-OTA, ingen merge till master, inga orelaterade kodändringar, inga force-pushar/branch-raderingar, inget production-bygge eller submit utan uttryckligt go. Rör inte kompatbygget eller Build 40-OTA:n (förblir gate-only). Ingen ny STAGING TF-build enbart för ghost-fixen.

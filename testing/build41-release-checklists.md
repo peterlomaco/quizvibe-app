@@ -173,7 +173,7 @@ Both critical re-match directions (C6, C7) now pass. The ghost-player display on
 - **G2 PASS (Peter, 2026-11-27):** with `min_supported_build = {"ios": 41}` on STAGING, Build 40 shows "Update required". The 1.0.1 device (Peter wrote "build42"; the only 1.0.1 build that exists is STAGING TestFlight #41) is not blocked.
 - **G3 PASS:** Build 40 stays blocked in airplane mode after a kill + reopen.
 - **G4 PASS:** after the row was deleted, foregrounding Build 40 removed the block.
-- **G5:** pending. Agreed to run before Part A; steps are in the G5 procedure below.
+- **G5 PASS (Peter, 2026-11-27):** compatibility build `9e504e22` reinstalled fresh with `min_supported_build = {"ios": 41}` set beforehand. The first launch was not blocked (embedded Build 40 JS, OTA downloading). The second cold start applied the OTA and showed "Update required". This documents the expected one-launch adoption window. **Final STAGING cleanup verified:** `min_supported_build` deleted; `app_config` returns only `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`. **Part B is complete (G1–G5 PASS).**
 - **Cleanup verified:** `app_config` returns only `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`, and there is no `min_supported_build` row.
 - **C10 also re-run in `SM50MN` (Peter, 2026-11-27):** before the query, the Build 41 host invited the Build 40 player and Build 40 accepted. The same single-row result covers the invite path too, so the C10 DB check is a **PASS**.
 
@@ -213,7 +213,7 @@ Both critical re-match directions (C6, C7) now pass. The ghost-player display on
 
 **Status after round 4:** C1–C7 and C11 PASS, C10 UX PASS. Still open and mandatory: items 1–4 above (C10 DB check, C8 + C9, C14, G1 + G2). C8 + C9 need `multiplayerV2 = true` again on STAGING.
 
-**Status after round 5 (2026-11-27):** C1–C11 and C14 PASS, including the C10 DB check: room `SM50MN`, with the invite, the room-code join and the guest join all rejected and no row written. G1–G4 PASS, and the STAGING cleanup after G4 is verified. **G5 is pending: it runs before Part A** (agreed with Peter). After G5, install STAGING TestFlight #41 on both iPhones and run the targeted R tests. **R6 stays deferred** until the production-profile TestFlight (#42) exists. The ghost-player regression item (`e909500`, below) stays on the list for #42.
+**Status after round 5 (2026-11-27):** C1–C11 and C14 PASS, including the C10 DB check: room `SM50MN`, with the invite, the room-code join and the guest join all rejected and no row written. G1–G5 PASS, and the final STAGING cleanup after G5 is verified. **Part B is complete.** After G5, install STAGING TestFlight #41 on both iPhones and run the targeted R tests. **R6 stays deferred** until the production-profile TestFlight (#42) exists. The ghost-player regression item (`e909500`, below) stays on the list for #42.
 
 **G5 procedure (STAGING, compatibility build):**
 1. Use the iPhone that has the Build 40 compatibility build (EAS `9e504e22`). It must not be the phone with App Store Build 40.
