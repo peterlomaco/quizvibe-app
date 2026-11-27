@@ -70,6 +70,7 @@ The gate OTA is published with `--environment production`, so it now gets `EXPO_
 | `QuizVibeAlertHost` can draw above `UpdateRequiredScreen` | cosmetic, backlog |
 | Athletes keep the old Hints grouping (no athlete questions in the playable pool today) | Peter 2026-11-27 |
 | `docs/legal/terms.md` §7.1 still mentions images | legal text, Peter's decision |
+| Reset password: reusing the old password gives 422, the form stays on the code step, and re-submitting the same (now consumed) code shows a misleading "Invalid code" (seen in STAGING E4). Existing in Build 40 | Build 42 backlog; testers use a different new password |
 | Gate OTA vs published `e80008e0` cannot be compared exactly (section 8, step 17) | open; not marked as passed |
 
 ## 6. Tagging, build source and deferred master merge
