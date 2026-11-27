@@ -336,10 +336,12 @@ Details and order: [build41-release-readiness.md](build41-release-readiness.md) 
 | # | Item | Done when |
 |---|---|---|
 | E1 | Inventory all Supabase Auth email templates on STAGING and PROD (Confirm signup, Reset password, Change email address, Magic link, Invite user, Reauthentication) + `send-welcome-email` | List recorded, used/unused marked |
-| E2 | Re-render `docs/assets/brand/quizvibe-logo-email.png` from the v2 Q logo (current PNG is from 2026-10-20, old ring) | New PNG reviewed and committed |
-| E3 | Brand all templates consistently; auth variables (`{{ .ConfirmationURL }}`, `{{ .Token }}`, …) unchanged | Diff of variables vs current templates is empty |
-| E4 | STAGING: paste templates (+ redeploy `send-welcome-email` if changed); phone test signup link, Resend link (email + Player Name), reset code, welcome mail | All flows work |
-| E5 | After the master merge (step 4a): logo renders in Apple Mail, Gmail, Outlook | Verified |
+| E2 | Re-render `docs/assets/brand/quizvibe-logo-email.png` from the v2 Q logo | **DONE** `b57fa17` (Peter approved 2026-11-27): 360×297 RGBA, same URL and canvas; site mark + `email-confirmed` logo also v2 |
+| E3 | Brand all templates consistently; auth variables (`{{ .ConfirmationURL }}`, `{{ .Token }}`, …) unchanged | Repo: **DONE** for reset password + welcome email tagline → "Play your way. Anytime. Anywhere." (text only, 1 line each). Confirm signup keeps its tagline; `email-confirmed.html` keeps "Music. Film/TV. Memories.". Dashboard-only templates (Change email, Magic link, Invite, Reauthentication) still to brand in E4 |
+| E3a | Compare the **deployed** `send-welcome-email` code (Supabase → Edge Functions → send-welcome-email → Code tab) on STAGING and on PROD with `supabase/functions/send-welcome-email/index.ts` at `v1.0.1` | Differences listed; only the tagline line (and the logo URL being the same) expected to differ |
+| E4 | STAGING (approval): paste confirm signup + reset password templates, brand the dashboard-only templates, redeploy `send-welcome-email` from `v1.0.1` (Verify JWT OFF, check Code tab); on a phone test signup link → `email-confirmed.html` → login, Resend link (email + Player Name), reset code, welcome mail | All flows work, tokens/links unchanged |
+| E5 | After the master merge (step 4a): `https://quizvibe.se/assets/brand/quizvibe-logo-email.png` returns 200 and shows the v2 logo; the site header and `email-confirmed.html` show the v2 mark | Verified in browser |
+| E5a | Real rendering of confirm signup, reset password and welcome mails (STAGING) in Apple Mail (iPhone), Gmail (iPhone app + web) and Outlook (where available): logo sharp, not stretched, tagline correct, button + link work | Verified per client, screenshots kept |
 | E6 | PROD (approval): same templates + welcome function; verified with a dedicated PROD test account | Done **before P8** |
 | S1 | Shot list for 1.0.1 (new branding, Lobby 1 by 1 / All at Once, Get Ready, question, Final Leaderboard / Game Summary, Profile/Store), 6.9" | Agreed |
 | S2 | Capture on STAGING #41 + OTA `5b056fd2` with test accounts | Screens captured |

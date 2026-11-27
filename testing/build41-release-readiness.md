@@ -254,17 +254,17 @@ Inventory (verify the dashboard list on both projects — the repo only holds so
 | Email | Source | Used by the app | Status |
 |---|---|---|---|
 | Confirm signup | Supabase dashboard template; repo `supabase/email-templates/confirm-signup.html` | Register, Resend link (email + Player Name via `resend-by-name`) | Repo version branded; **live = dashboard copy, must be pasted** |
-| Reset password | Dashboard template; repo `supabase/email-templates/reset-password.html` | Forgot password (6-digit code, `verifyOtp` type `recovery`) | Repo version branded; paste into dashboard |
+| Reset password | Dashboard template; repo `supabase/email-templates/reset-password.html` | Forgot password (6-digit code, `verifyOtp` type `recovery`) | Repo version branded, tagline updated 2026-11-27; paste into dashboard |
 | Change email address | Dashboard template only | Not triggered by the app (no `updateUser({ email })`) | Default Supabase template; brand it for consistency |
 | Magic link, Invite user, Reauthentication | Dashboard templates only | Not used by the app | Default; brand or leave, but list as reviewed |
-| Welcome mail | Edge Function `send-welcome-email` (HTML inline) | DB trigger 0049 after confirmation | Branded in repo; deploy = redeploy the function |
+| Welcome mail | Edge Function `send-welcome-email` (HTML inline) | DB trigger 0049 after confirmation | Branded in repo, tagline updated 2026-11-27; deploy = redeploy the function (compare deployed code first) |
 
 **Technical dependencies found:**
 - All branded mails load `https://quizvibe.se/assets/brand/quizvibe-logo-email.png`, which is **404 until the master merge** (step 4a). Before that, a test mail shows a broken image.
-- That PNG was made on 2026-10-20 from the **old Q mark**; the mark changed to v2 on 2026-11-02 (`design/brand/build-mark.py`). It must be re-rendered from the v2 logo (same file name, same size) and committed on the release branch **before tagging or before the merge**, so the merge publishes the new logo. It is a `docs/` asset, not app code.
+- ✅ The PNG was re-rendered from the v2 logo (same file name, canvas 360×297, transparent) and committed in `b57fa17` before tagging; the site mark and the `email-confirmed.html` logo were also moved to v2. The merge publishes them.
 
 Procedure:
-1. Re-render `docs/assets/brand/quizvibe-logo-email.png` from the v2 logo; review it. (Before the tag, or as a documentation commit merged after the tag per section 6.3.)
+1. ✅ Logo re-rendered and approved (`b57fa17`); taglines in reset password + welcome email set to "Play your way. Anytime. Anywhere." (text only). Remaining steps: checklist Part C (E3a–E6).
 2. STAGING (any time): paste the templates into STAGING Auth → Emails → Templates; brand Change email and the unused ones; redeploy `send-welcome-email` on STAGING if changed. Check per template: the `{{ .ConfirmationURL }}` / `{{ .Token }}` / `{{ .Email }}` variables are byte-identical to the current working templates, the subject line, plain wording.
 3. STAGING functional test on a phone (not desktop — link scanners consume tokens): signup → confirm link works → lands on `email-confirmed.html` → login; Resend link (email + Player Name); reset password code works; welcome mail arrives. Logo rendering can only be checked after step 4a.
 4. After step 4a: re-check logo rendering in Apple Mail, Gmail (app + web) and Outlook on STAGING mails.
