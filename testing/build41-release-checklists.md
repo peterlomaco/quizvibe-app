@@ -95,12 +95,27 @@ Expected: exactly one row, `feature_gates` = `{"allAtOnce":"everyone","multiplay
 | R9a | **PASS** | |
 | R9b | **PASS** | |
 | R9c | **N/A** (not passed) | No dead clip occurred, so the swap path was not exercised. |
-| R10a | **PASS, with a Hints finding** | Music works. Finding (video 2026-11-27, Adele): Hints clues were inserted above visible ones and "Other" showed early, so the list jumped. **Fix implemented after #41 (uncommitted, approved design):** category-complete reveal — each heading completes before the next, P1→P5 within a heading, headings ordered easiest first, "Other" last, Profession under Birth & Career, new clue always at the bottom, auto-scroll on content growth. Athletes unchanged. Catalog check: 509/509 questions append-only; difficulty ramp 0.50 (today 0.94). **Needs device verification via the STAGING OTA.** |
+| R10a | **PASS** (Hints fix verified in round 2) | Music works. Hints finding fixed in `ec13101` (category-complete reveal) and verified on both iPhones via STAGING OTA `5b056fd2` — see round 2. |
 | R10b, R10c | **PASS** | |
 | R11a–R11e | **PASS** | Includes R11d direct recovery from an active block. |
 | Final STAGING config | **verified** | Only `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`. |
 
 Ghost-player regression (`e909500`) is deferred to #42.
+
+### Part A results — round 2 (Peter, 2026-11-27), STAGING OTA on TestFlight #41
+**OTA:** update group `5b056fd2-c968-4da4-9d1b-6ef95beb020a` (iOS `01a21d9c-a930-7780-84cc-3f4a7d359f6b`), branch/channel `preview`, runtime `32682a4fbe103e5a00a729c3a53f0b033a4d225f`, commit `ec13101`, EAS env `preview` (STAGING). Production (`e80008e0`) and `build40-compat-test` (`fe4319dd`) unchanged.
+
+| # | Result | Observed |
+|---|---|---|
+| Step 0: OTA on both phones | **PASS** | Both iPhones run the new update (new Hints layout visible). |
+| R10a / Test A: Hints category-complete reveal | **PASS** | Clues only added at the bottom, headings complete in order, Other last, Profession under Birth & Career, auto-scroll keeps the newest clue visible; identical order on both phones (All at Once). |
+| Test B1: ghost players, Individual device (legacy) | **PASS** | Final Leaderboard on the non-host shows only real participants. |
+| Test B2: ghost players, Pass-the-Phone follower (legacy) | **PASS** | Live + final leaderboard show only real participants. |
+| STAGING restore after Test B | **verified** | Only `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`. |
+| R3c | **pending** | Not run. |
+| R2b (manual) | **pending** | Not run. |
+| R6 | **deferred** | Final production TestFlight build (#42). |
+| Ghost-player check on production build | **deferred** | Repeat on #42 (legacy path). |
 ---
 
 ## Part B — Build 40 compatibility (0068 + 0070 + gate)
