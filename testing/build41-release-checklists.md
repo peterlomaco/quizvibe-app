@@ -159,6 +159,24 @@ order by r.created_at desc, lp.is_host desc;
 
 Both critical re-match directions (C6, C7) now pass. The ghost-player display on Build 40 after an approved guest left is the known existing bug (round 3), fixed in 1.0.1 only.
 
+### Results — round 5 (Peter, 2026-11-27), STAGING `multiplayerV2 = true`, Build 41 host (v2 room) + Build 40 joiner by room code
+| # | Result | Observed |
+|---|---|---|
+| C8 | **PASS** (both physical iPhones) | Registered Build 40 user joined the Build 41 Multiplayer v2 lobby by room code and never appeared in the host's lobby (0070 `update_required` rejection). |
+| C9 | **PASS** (both physical iPhones) | Build 40 guest joined the same way and never appeared in the host's lobby. |
+
+**DB check (2026-11-27, STAGING, room `SM50MN`, created 08:23 UTC, `multiplayer_v2 = true`): PASS.** Run while the Build 40 guest sat in its own lobby view. The query returned exactly 1 row: the Build 41 host `Peter-99` (`is_host = true`, `approved = true`, `has_left = false`). There were no rows for the registered Build 40 user or the guest. The rejected joins wrote nothing.
+- The host row has `device_mode = NULL`. That's expected: `device_mode` is written only by a joiner's own join write, and the host is treated as `own` by the resolver.
+
+- **C14 PASS (Peter, 2026-11-27):** Peter registered, confirmed and deleted the account `Lomaco` on Build 40 against STAGING without errors. `deleted_account_tombstones` has a new top row `Lomaco` with `deleted_at` 2026-11-27 08:34:33 UTC and a hashed email.
+- **G1 PASS (Peter, 2026-11-27):** Peter cold-started Build 40 twice with the gate OTA on `build40-compat-test` and no `min_supported_build` row. No visible change and no block, as expected while the gate is inactive.
+- **G2 PASS (Peter, 2026-11-27):** with `min_supported_build = {"ios": 41}` on STAGING, Build 40 shows "Update required". The 1.0.1 device (Peter wrote "build42"; the only 1.0.1 build that exists is STAGING TestFlight #41) is not blocked.
+- **G3 PASS:** Build 40 stays blocked in airplane mode after a kill + reopen.
+- **G4 PASS:** after the row was deleted, foregrounding Build 40 removed the block.
+- **G5:** not run (optional).
+- **Cleanup verified:** `app_config` returns only `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`, and there is no `min_supported_build` row.
+- **C10 also re-run in `SM50MN` (Peter, 2026-11-27):** before the query, the Build 41 host invited the Build 40 player and Build 40 accepted. The same single-row result covers the invite path too, so the C10 DB check is a **PASS**.
+
 ### Finding — ghost players on the non-host Final Leaderboard (round 3, Peter 2026-11-26)
 **Setup:** STAGING, `multiplayerV2 = false` (legacy room), Build 41 host, Build 40 non-host.
 
@@ -186,14 +204,16 @@ Both critical re-match directions (C6, C7) now pass. The ghost-player display on
 - Not covered by the STAGING build #41 (built before the fix).
 
 **Mandatory before approving the 1.0.1 RC (decided 2026-11-26):**
-1. C10 DB check (query above): no row for Build 40 in the v2 room.
-2. **C8 + C9:** Build 40 joins a Build 41 v2 room **by room code**, registered and as guest. This is the most likely real path (a shared code), and it has a different client path from the invite.
-3. **C14:** register + delete account on Build 40 against STAGING (0060 tombstone + current `delete-account`). 0060 and the function redeploy go to PROD while Build 40 is still live.
-4. **G1 + G2:** the gate OTA reaches the test build and blocks build 40 at `min_supported_build = 41` while Build 41 stays unblocked. It needs a go to publish the test OTA to `build40-compat-test`. This proves the forced-update path before the real Build 40 OTA.
+1. **C10 DB check — DONE (PASS, round 5, `SM50MN`):** no row for Build 40 in the v2 room.
+2. **C8 + C9 — DONE (PASS, round 5):** Build 40 joins a Build 41 v2 room **by room code**, registered and as guest. This is the most likely real path (a shared code), and it has a different client path from the invite.
+3. **C14 — DONE (PASS, round 5, tombstone `Lomaco`):** register + delete account on Build 40 against STAGING (0060 tombstone + current `delete-account`). 0060 and the function redeploy go to PROD while Build 40 is still live.
+4. **G1 + G2 — DONE (PASS, round 5; G3 + G4 also PASS):** the gate OTA reaches the test build and blocks build 40 at `min_supported_build = 41` while Build 41 stays unblocked. It needs a go to publish the test OTA to `build40-compat-test`. This proves the forced-update path before the real Build 40 OTA.
 
 **Mandatory before 0068 goes to PROD:** C7 + C5 — **DONE (PASS, round 4)**. All 0068-relevant Build 40 paths are now device-tested: C2, C5, C6, C7, C11.
 
 **Status after round 4:** C1–C7 and C11 PASS, C10 UX PASS. Still open and mandatory: items 1–4 above (C10 DB check, C8 + C9, C14, G1 + G2). C8 + C9 need `multiplayerV2 = true` again on STAGING.
+
+**Status after round 5 (2026-11-27):** C1–C11 and C14 PASS, including the C10 DB check: room `SM50MN`, with the invite, the room-code join and the guest join all rejected and no row written. G1–G4 PASS, G5 not run (optional). STAGING cleanup is verified. **Part B (Build 40 compatibility) is complete.** Next: R1–R11 on TestFlight #41 (Part A).
 
 **Optional / covered elsewhere:** C3, C4, C12, C13, C15, G3–G5. The server side is covered by `0070-staging-tests.sql` and the Batch 1 suite.
 

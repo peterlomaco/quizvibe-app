@@ -211,7 +211,7 @@ Varje steg nedan kräver Peters separata go.
 
 ### ▶ Nästa session — status 2026-11-27 (börja här)
 
-**Var vi står**: steg 1 pågår (R1–R11 på TF #41 ej körda), steg 2 pågår (kompatibilitetstester). Inget i PROD är ändrat; master orörd (`0c5c667`); production-OTA:n (`release/build40-update-gate`) **opublicerad**.
+**Var vi står**: steg 1 pågår (R1–R11 på TF #41 ej körda), steg 2 KLART 2026-11-27 (alla obligatoriska kompatibilitetstester PASS). Inget i PROD är ändrat; master orörd (`0c5c667`); production-OTA:n (`release/build40-update-gate`) **opublicerad**.
 
 **Klart:**
 - 0070 på STAGING, `0070-staging-tests.sql` 19/19, `check-migrations.sql` alla ✅.
@@ -222,10 +222,8 @@ Varje steg nedan kräver Peters separata go.
 - **Gate-test-OTA publicerad** (2026-11-27) ENDAST till kanal/branch `build40-compat-test`, från `test/build40-compat-gate` @`6842839`, runtime `build40-compat-1`, env `preview` (STAGING). Update group **`fe4319dd-104c-441d-9cc1-2240eefa2f9d`**. Verifierat: production-kanalen fortfarande `e80008e0`, preview `9a4b0555`.
 
 **Kvar, i Peters ordning** (resultat rapporteras i ny session; detaljerade steg i [testing/build41-release-checklists.md](testing/build41-release-checklists.md) Part B):
-1. Med `multiplayerV2 = true` på STAGING: C10 DB-kontroll → C8 + C9 (Build 40 joinar Build 41-rum, registrerad + gäst) → C14 (registrera + radera konto på Build 40).
-2. G1–G5 (forced-update-grinden på kompatbygget): G1 två kallstarter utan block; G2 `insert … min_supported_build = {"ios": 41}` → Build 40 blockeras, TF #41 inte; G3 offline fortfarande blockerad; G4 radera raden → avblockeras; G5 ominstallation visar adoption-gapet.
-3. **Städning efter G-testerna**: radera STAGING-raden `min_supported_build`, behåll `multiplayerV2 = true`. Kontroll: `select key, value from public.app_config where key in ('feature_gates','min_supported_build');` ska bara ge `feature_gates` med `"multiplayerV2": true`.
-4. R1–R11 på TF #41.
+1. ✅ **KLART 2026-11-27 (round 5)**: C8, C9, C10 DB-kontroll (rum `SM50MN`, ingen Build 40-rad), C14 (tombstone `Lomaco`), G1–G4 PASS (G5 ej körd, valfri), STAGING-städning verifierad (`feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`, ingen `min_supported_build`-rad). **Part B är klar.**
+2. **NÄSTA: R1–R11 på TF #41** (Part A i checklistan).
 5. Därefter steg 3–13 ovan — varje steg kräver Peters separata go (merge, production-bygge #42, PROD-migrationer, publicering av Build 40-OTA:n, submit).
 
 **Standing constraints**: ingen PROD-ändring, ingen production-OTA, ingen merge till master, inga orelaterade kodändringar, inga force-pushar/branch-raderingar, inget production-bygge eller submit utan uttryckligt go. Rör inte kompatbygget eller Build 40-OTA:n (förblir gate-only). Ingen ny STAGING TF-build enbart för ghost-fixen.
