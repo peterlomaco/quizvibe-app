@@ -75,6 +75,32 @@ Two checklists:
 select key, value from public.app_config where key in ('feature_gates','min_supported_build');
 ```
 Expected: exactly one row, `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`; no `min_supported_build` row.
+
+### Part A results — round 1 (Peter, 2026-11-27, STAGING TestFlight #41 on both iPhones)
+| # | Result | Observed |
+|---|---|---|
+| R1a–R1d | **PASS** | |
+| R1e | **PASS** (by design) | The Guest Host lobby doesn't show the Filter group at all, so it can't be changed. Correct for the stripped-down guest lobby. |
+| R2a | **PASS** | |
+| R2b (automated) | **PASS** | See R2b-auto: real catalog + no-Premium-gate source guards, 12/12. |
+| R2b (manual) | **pending** | Theme-only clips in Generic games during real play were not separately reported. |
+| R2c | **PASS** | |
+| R3a, R3b | **PASS** | |
+| R3c | **pending** | Not run yet. |
+| R4 + R7d | **PASS** | |
+| R5 | **PASS** | |
+| R6 | **deferred** | Runs only on the final production TestFlight build (#42) over App Store Build 40. |
+| R7a, R7b, R7c, R7e | **PASS** | |
+| R8 | **PASS** | The legacy lobby kept its behaviour across the flag flip, and the new lobby `CQ75CX` = `multiplayer_v2 true`. Only the new lobby's code was checked in SQL; the legacy lobby is confirmed by its in-app behaviour. |
+| R9a | **PASS** | |
+| R9b | **PASS** | |
+| R9c | **N/A** (not passed) | No dead clip occurred, so the swap path was not exercised. |
+| R10a | **PASS, with a Hints finding** | Music works. Finding (video 2026-11-27, Adele): Hints clues were inserted above visible ones and "Other" showed early, so the list jumped. **Fix implemented after #41 (uncommitted, approved design):** category-complete reveal — each heading completes before the next, P1→P5 within a heading, headings ordered easiest first, "Other" last, Profession under Birth & Career, new clue always at the bottom, auto-scroll on content growth. Athletes unchanged. Catalog check: 509/509 questions append-only; difficulty ramp 0.50 (today 0.94). **Needs device verification via the STAGING OTA.** |
+| R10b, R10c | **PASS** | |
+| R11a–R11e | **PASS** | Includes R11d direct recovery from an active block. |
+| Final STAGING config | **verified** | Only `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`. |
+
+Ghost-player regression (`e909500`) is deferred to #42.
 ---
 
 ## Part B — Build 40 compatibility (0068 + 0070 + gate)

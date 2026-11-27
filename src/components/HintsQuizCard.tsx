@@ -255,6 +255,12 @@ function HintsQuizCardBase({
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          // Nya ledtrådar läggs alltid sist (rubrikmodellen, 2026-11-27). Scrolla
+          // när innehållet faktiskt vuxit — effekten på revealedCount kan köra
+          // innan den nya raden lagts ut och då stanna en rad för kort.
+          onContentSizeChange={() => {
+            if (displayRevealedCount > 0) scrollRef.current?.scrollToEnd({ animated: true });
+          }}
         >
           {!hintsActive && !isRevealed ? (
             <Text style={styles.hintsPlaceholder}>· · ·</Text>

@@ -2082,11 +2082,13 @@ Text-pipelinen är utbruten ur komponenten till `hintsText.ts` (filter-konstante
 
 | Rubrik | Innehåll |
 |---|---|
-| Birth & Career | birth_date, birth_place, peak_year, creation_year, debut (ej album), characteristic "Formed in" |
+| Birth & Career | profession (sedan 2026-11-27), birth_date, birth_place, peak_year, creation_year, debut (ej album), characteristic "Formed in" |
 | Film History | movie, tv_show (bara actor) |
 | Song titles / Albums | song / album + debut-album (bara artist) |
 | Trophies | all merit (ingen Titles-split) |
-| Other | allt annat — genre, Family, bandmedlemmar först, sedan profession, height, club, record label, fun facts m.m.; låtar/album för actor, filmer för artist |
+| Other | allt annat — genre, Family, bandmedlemmar först, sedan height, club, record label, fun facts m.m.; låtar/album för actor, filmer för artist |
+
+**Kategori-komplett reveal (Peter 2026-11-27, Build 41-test R10a):** ledtrådarna tänds i den ordning de visas, så en ny ledtråd hamnar ALLTID sist och inget hoppar. Varje rubrik fylls färdigt innan nästa börjar; inom rubriken P1 → P5 (lika prioritet → rubrikens naturliga ordning); rubrikerna sorteras på medelprioriteten hos frågans valda ledtrådar (lättast först), "Other" alltid sist; rubriker utan valda ledtrådar visas aldrig. Profession ligger under Birth & Career så att "Other" sist inte avslutar varje fråga på den lättaste ledtråden (ramp mot P1→P5 0,50; utan flytten 0,18; före ändringen 0,94 men listan hoppade). Selektion, antal, reveal-intervall, poäng och seedning är oförändrade — ordningen är deterministisk, så alla enheter i ett multiplayerspel får samma ordning. HintsQuizCard scrollar även på `onContentSizeChange` så den nya raden alltid syns. Idrottare (legacy-modellen) är medvetet oförändrade. Tester: `hintsHeadings.test.ts` (hela katalogen).
 
 **Ingenting tas bort**, rubriker visas även med EN post (inga lösa bullets), spelbarhets-gaten och poolen är oförändrade. Idrottare (`model` null) behåller den gamla grupperingen (Birth/Career History/Titles/Trophies, ≥2-regeln). Rubrikstil: versaler, spärrning 0.8, 78 % vit; jämn 4 pt-rytm mellan poster. Tester: [hintsHeadings.test.ts](backend/content/test/hintsHeadings.test.ts).
 

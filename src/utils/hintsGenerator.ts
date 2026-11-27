@@ -418,7 +418,29 @@ function birthSortKey(hint: HintItem): number {
  * sist) från de tidigare rollerna på P3-P4.
  */
 export function buildRenderEntries(hints: ResolvedHint[], model: HeadingModel = null): RenderEntry[] {
-  if (model) return buildHeadedEntries(hints, model);
+  // Rubrikmodellen (artister/band/skådespelare) tänds i render-ordning.
+  // Idrottare (legacy) behåller selektionens ordning — medvetet oförändrat.
+  return model ? sequenceInRenderOrder(buildHeadedEntries(hints, model)) : buildLegacyEntries(hints);
+}
+
+/**
+ * Reveal-ordningen = render-ordningen (Peter 2026-11-27, Build 41-test R10a).
+ * `index` styr när en rad tänds (`revealedCount > index`). Tidigare var det
+ * ledtrådens position i prioritets-sekvensen, men raderna renderas grupperade
+ * under rubriker — så en senare tänd ledtråd kunde hamna OVANFÖR redan synliga
+ * (listan "hoppade") och "Other" tändes tidigt. Nu numreras raderna uppifrån
+ * och ned efter bygget: varje ny ledtråd läggs alltid sist, en rubrik tänds med
+ * sin första ledtråd, och "Other" tänds sist. Gäller bara rubrikmodellen.
+ */
+function sequenceInRenderOrder(entries: RenderEntry[]): RenderEntry[] {
+  let next = 0;
+  return entries.map((entry) => {
+    if (entry.kind === 'single') return { ...entry, index: next++ };
+    return { ...entry, items: entry.items.map((item) => ({ ...item, index: next++ })) };
+  });
+}
+
+function buildLegacyEntries(hints: ResolvedHint[]): RenderEntry[] {
   const kinds = hints.map((h) => groupKindOf(h.hint));
 
   const indicesByKind = new Map<GroupKind, number[]>();
@@ -483,6 +505,10 @@ const HEADED_ORDER: HeadedGroup[] = ['birthCareer', 'film', 'songs', 'albums', '
 
 export function headedGroupOf(hint: HintItem, model: 'artist' | 'actor'): HeadedGroup {
   switch (hint.type) {
+    // Yrket är spelets lättaste ledtråd (P1). Under "Other" — som alltid tänds
+    // sist — skulle varje fråga sluta på den; här öppnar den listan i stället
+    // (Peter 2026-11-27).
+    case 'profession':
     case 'birth_date':
     case 'birth_place':
     case 'peak_year':
@@ -518,36 +544,61 @@ function otherRank(hint: HintItem): number {
 }
 
 function birthCareerRank(hint: HintItem): number {
-  if (hint.type === 'birth_date') return 0;
-  if (hint.type === 'birth_place') return 1;
-  return 2;
+  if (hint.type === 'profession') return 0;
+  if (hint.type === 'birth_date') return 1;
+  if (hint.type === 'birth_place') return 2;
+  return 3;
 }
 
+/**
+ * Kategori-komplett ordning (Peter 2026-11-27, Build 41-test R10a):
+ * - varje rubrik visas en gång och fylls färdigt innan nästa börjar;
+ * - inom en rubrik P1 → P5 (minst till mest avslöjande). Lika prioritet:
+ *   rubrikens naturliga ordning (födelsedatum före ort, äldst först, genre
+ *   först i Other) och sist selektionens ordning;
+ * - rubrikerna (utom Other) sorteras på medelprioriteten hos DENNA frågas
+ *   valda ledtrådar, lättast först; lika → HEADED_ORDER;
+ * - "Other" alltid sist; rubriker utan valda ledtrådar visas aldrig.
+ * Allt är deterministiskt ur den (seedade) selektionen, så alla enheter i
+ * ett multiplayerspel får samma ordning.
+ */
 function buildHeadedEntries(hints: ResolvedHint[], model: 'artist' | 'actor'): RenderEntry[] {
-  const buckets = new Map<HeadedGroup, { hint: ResolvedHint; index: number }[]>();
+  type Item = { hint: ResolvedHint; index: number };
+  const buckets = new Map<HeadedGroup, Item[]>();
   hints.forEach((h, index) => {
     const g = headedGroupOf(h.hint, model);
     if (!buckets.has(g)) buckets.set(g, []);
     buckets.get(g)!.push({ hint: h, index });
   });
-  const byYear = (a: { hint: ResolvedHint }, b: { hint: ResolvedHint }) =>
-    extractYearFromValue(a.hint.hint) - extractYearFromValue(b.hint.hint);
 
-  const entries: RenderEntry[] = [];
-  for (const g of HEADED_ORDER) {
-    const items = buckets.get(g);
-    if (!items?.length) continue;
-    if (g === 'birthCareer') {
-      items.sort((a, b) => birthCareerRank(a.hint.hint) - birthCareerRank(b.hint.hint) || byYear(a, b));
-    } else if (g === 'film' || g === 'songs' || g === 'albums') {
-      items.sort(byYear);
-    } else if (g === 'other') {
-      items.sort((a, b) => otherRank(a.hint.hint) - otherRank(b.hint.hint) || a.index - b.index);
-    }
-    // trophies: prioritets-ordning (index-ordning) behålls.
-    entries.push({ kind: 'group', label: HEADED_LABELS[g], items });
-  }
-  return entries;
+  // Rubrikens naturliga ordning vid lika prioritet. Odaterade värden ger
+  // Infinity från extractYearFromValue, så rang och år jämförs var för sig.
+  const byYear = (a: HintItem, b: HintItem) => {
+    const ya = extractYearFromValue(a), yb = extractYearFromValue(b);
+    return ya === yb ? 0 : ya < yb ? -1 : 1;
+  };
+  const naturalCompare = (g: HeadedGroup, a: HintItem, b: HintItem): number => {
+    if (g === 'birthCareer') return birthCareerRank(a) - birthCareerRank(b) || byYear(a, b);
+    if (g === 'film' || g === 'songs' || g === 'albums') return byYear(a, b);
+    if (g === 'other') return otherRank(a) - otherRank(b);
+    return 0;
+  };
+  const meanPriority = (items: Item[]) =>
+    items.reduce((sum, it) => sum + it.hint.hint.priority, 0) / items.length;
+
+  const groups = HEADED_ORDER.filter((g) => g !== 'other' && (buckets.get(g)?.length ?? 0) > 0)
+    .sort((a, b) =>
+      meanPriority(buckets.get(a)!) - meanPriority(buckets.get(b)!) ||
+      HEADED_ORDER.indexOf(a) - HEADED_ORDER.indexOf(b));
+  if ((buckets.get('other')?.length ?? 0) > 0) groups.push('other');
+
+  return groups.map((g) => {
+    const items = buckets.get(g)!.slice().sort((a, b) =>
+      a.hint.hint.priority - b.hint.hint.priority ||
+      naturalCompare(g, a.hint.hint, b.hint.hint) ||
+      a.index - b.index);
+    return { kind: 'group' as const, label: HEADED_LABELS[g], items };
+  });
 }
 
 /**
