@@ -83,10 +83,10 @@ Expected: exactly one row, `feature_gates` = `{"allAtOnce":"everyone","multiplay
 | R1e | **PASS** (by design) | The Guest Host lobby doesn't show the Filter group at all, so it can't be changed. Correct for the stripped-down guest lobby. |
 | R2a | **PASS** | |
 | R2b (automated) | **PASS** | See R2b-auto: real catalog + no-Premium-gate source guards, 12/12. |
-| R2b (manual) | **pending** | Theme-only clips in Generic games during real play were not separately reported. |
+| R2b (manual) | **PASS** (round 3) | Theme-only clips in Generic games for a Free account, no Hip Hop/RnB with mature OFF. |
 | R2c | **PASS** | |
 | R3a, R3b | **PASS** | |
-| R3c | **pending** | Not run yet. |
+| R3c | **PASS** (round 3) | No popup or forced exit after the host left; Start New Game worked. |
 | R4 + R7d | **PASS** | |
 | R5 | **PASS** | |
 | R6 | **deferred** | Runs only on the final production TestFlight build (#42) over App Store Build 40. |
@@ -112,10 +112,18 @@ Ghost-player regression (`e909500`) is deferred to #42.
 | Test B1: ghost players, Individual device (legacy) | **PASS** | Final Leaderboard on the non-host shows only real participants. |
 | Test B2: ghost players, Pass-the-Phone follower (legacy) | **PASS** | Live + final leaderboard show only real participants. |
 | STAGING restore after Test B | **verified** | Only `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`. |
-| R3c | **pending** | Not run. |
-| R2b (manual) | **pending** | Not run. |
+| R3c | **PASS** (round 3) | See round 3. |
+| R2b (manual) | **PASS** (round 3) | See round 3. |
 | R6 | **deferred** | Final production TestFlight build (#42). |
 | Ghost-player check on production build | **deferred** | Repeat on #42 (legacy path). |
+
+### Part A results — round 3 (Peter, 2026-11-27), same OTA `5b056fd2` on TestFlight #41
+| # | Result | Observed |
+|---|---|---|
+| R3c: host leaves the Final Leaderboard | **PASS** | Non-host kept the leaderboard, saw "The Host has left the game" + Start New Game / Home, no Accept / Re-match; no popup or forced exit after 2½+ min; Start New Game worked afterwards. |
+| R2b (manual): theme questions for a Free account | **PASS** | New STAGING account without a free-month grant: theme switch could be turned on with no Premium prompt; theme-only clips appeared in Generic games; no Hip Hop/RnB with mature content OFF. |
+
+**Part A status on #41:** everything passed except R6 (deferred to #42) and R9c (N/A, no dead clip occurred). Ghost-player regression is repeated on #42.
 ---
 
 ## Part B — Build 40 compatibility (0068 + 0070 + gate)
