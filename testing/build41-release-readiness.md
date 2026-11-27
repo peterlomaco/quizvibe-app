@@ -4,20 +4,23 @@ Prepared 2026-11-27. Nothing in this document has been executed against PROD, ma
 
 ## 1. Verdict
 
-**Ready for the cutover, with one blocker to clear first (B1).**
+**Ready for the cutover. No open blockers.**
 
-| # | Blocker | Fix | Needs |
-|---|---|---|---|
-| B1 | `EXPO_PUBLIC_YT_OWN_WRAPPER=1` is set in EAS **preview** (what #41 was tested with) but **missing in EAS production**. A production build without it ships the old YouTube player path, which was not tested in 1.0.1. | `npx eas env:create --environment production --name EXPO_PUBLIC_YT_OWN_WRAPPER --value 1 --visibility plaintext` | GO (EAS config change, not PROD Supabase) |
+| # | Blocker | Status |
+|---|---|---|
+| B1 | `EXPO_PUBLIC_YT_OWN_WRAPPER=1` was set in EAS **preview** (what #41 was tested with) but missing in EAS **production**, so #42 would have shipped the untested old YouTube player path. | **Resolved 2026-11-27** (Peter's go): variable created in EAS `production` only (plaintext, value `1`). Verified: production env lists it; preview unchanged; no build or OTA triggered (latest iOS build still the 2026-11-26 `build40-compat`, build counter still 41, channel heads `production` `e80008e0`, `preview` `5b056fd2`, `build40-compat-test` `fe4319dd`); PROD Supabase not contacted. |
 
 No other open defects. No feature work is pending for 1.0.1.
+
+### B1 and the Build 40 gate OTA
+The gate OTA (step 9) is published with `--environment production`, so it now gets `EXPO_PUBLIC_YT_OWN_WRAPPER=1` in its build environment. **No effect:** the gate branch `release/build40-update-gate` (`a75b457`) and the Build 40 source (`b6d08cc`) never reference the variable — the own wrapper only exists in 1.0.1 code. Metro inlines only `process.env.EXPO_PUBLIC_*` names the code reads, so the Build 40 bundle is unchanged. The only variables the gate code reads are the Supabase URL/key, RevenueCat keys and the Spotify client id, which are unchanged. No change to the step 9 command is needed.
 
 ## 2. Source
 
 | Item | Value |
 |---|---|
 | Release branch | `fix/auth-session-integrity` |
-| HEAD (local = origin) | `e61d54f` (+ uncommitted checklist round 3 and this file) |
+| Last code commit | `ec13101` (branch HEAD carries only documentation after it) |
 | Release candidate tag | `rc/1.0.1-build41-staging` → `4b113e7` (what TestFlight #41 was built from) |
 | Code commits after #41 | `e909500` (non-host legacy roster excludes players who left — ghost players), `ec13101` (Hints category-complete reveal) |
 | Other commits after #41 | documentation and tests only |
@@ -46,7 +49,7 @@ No other open defects. No feature work is pending for 1.0.1.
 | Part A — #41 on STAGING | R1a–e, R2a, R2b (automated + manual), R2c, R3a–c, R4, R5, R7a–e, R8, R9a–b, R10a–c, R11a–e **PASS** |
 | STAGING OTA `5b056fd2` on #41 | Hints reveal + ghost players (B1/B2) **PASS** on both iPhones |
 | R9c clip swap | **N/A** — no dead clip occurred; covered by unchanged code from 1.0.0 and unit tests |
-| R6 upgrade 40 → 41 | **Deferred** to production TestFlight #42 (section 8) |
+| R6 upgrade 1.0.0 (Build 40) → 1.0.1 (expected Build 42) | **Deferred** to the production TestFlight build (section 9, P1) |
 | Ghost-player regression | **Repeat** on #42 (section 8) |
 | Final STAGING config | `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`, no `min_supported_build` row |
 
@@ -88,7 +91,7 @@ git push origin v1.0.1
 |---|---|
 | Profile | `production` (channel `production`, `autoIncrement`, EAS environment `production`) |
 | Supabase | `pyndqehlebtxochwpwex` (PROD) — verified in EAS production env |
-| Env vars needed | `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `EXPO_PUBLIC_REVENUECAT_IOS_KEY` (present), `EXPO_PUBLIC_SPOTIFY_CLIENT_ID` (profile), **`EXPO_PUBLIC_YT_OWN_WRAPPER=1` (missing — B1)** |
+| Env vars needed | `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `EXPO_PUBLIC_REVENUECAT_IOS_KEY` (present), `EXPO_PUBLIC_SPOTIFY_CLIENT_ID` (profile), `EXPO_PUBLIC_YT_OWN_WRAPPER=1` (added 2026-11-27, B1) — all present |
 | Build number | #42 (verify with `npx eas build:version:get -p ios` right before) |
 | Version | 1.0.1 |
 
@@ -141,18 +144,19 @@ Run after step 6 (migrations in place), before submit.
 
 | # | Test | Expected |
 |---|---|---|
-| P1 = R6 | Phone with App Store Build 40, logged in to a PROD account with a few games. Install #42 over it | Still logged in; local history/HCP/friends/saved lobbies reset; Parent Control choice kept; Marathon tables + H2H intact; no other account's data |
+| P1 = R6 | **Upgrade public 1.0.0 (Build 40, App Store) → production 1.0.1 (expected Build 42, TestFlight).** Phone with the App Store 1.0.0 (Build 40), logged in to a PROD account, a few games played, a Parent Control choice saved. Install the production-profile TestFlight 1.0.1 (#42) over it without deleting the app. Not #41 — that build talks to STAGING | Still logged in (same account, no re-login); local history/HCP/friends/saved lobbies reset (accepted); saved Parent Control choice kept; Marathon tables + H2H intact; no other account's data |
 | P2 | Ghost-player regression (legacy room, `multiplayerV2` still false): approved guest joins and leaves before Start; play All at Once and Pass-the-Phone follower | Non-host live + Final Leaderboard show only real participants |
 | P3 | Smoke as `Apple-2` (review account): create lobby → join from second phone → approve → play → Re-match → Store shows the free month | Works end to end against PROD |
 | P4 | Hints question on #42 | Category-complete reveal, clues append at the bottom |
-| P5 | YouTube clip plays with own wrapper (B1 fixed) | Plays, ends with QuizVibe logo |
+| P5 | YouTube clip plays with own wrapper (B1) | Plays, ends with QuizVibe logo |
 | P6 | After step 8 (`multiplayerV2=true`): two-device 1 by 1 and All at Once game | v2 flow works; Build 40 device can't join the v2 room |
 | P7 | Delete a PROD test account | Tombstone row; re-registration with same email/name blocked |
 | P8 | Register a new PROD account | Confirmation mail arrives; Hints off by default; mature content on |
 
 ## 10. App Store submission checklist
 
-- [ ] B1 fixed and #42 built with production env (log verified)
+- [x] B1 resolved (EAS production env, 2026-11-27)
+- [ ] #42 built with production env (log verified)
 - [ ] Section 8 steps 1–8 done and verified
 - [ ] Section 9 P1–P8 pass
 - [ ] Version 1.0.1, build **#42** selected (not #41)
