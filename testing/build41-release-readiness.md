@@ -50,7 +50,7 @@ The gate OTA (step 9) is published with `--environment production`, so it now ge
 | STAGING OTA `5b056fd2` on #41 | Hints reveal + ghost players (B1/B2) **PASS** on both iPhones |
 | R9c clip swap | **N/A** — no dead clip occurred; covered by unchanged code from 1.0.0 and unit tests |
 | R6 upgrade 1.0.0 (Build 40) → 1.0.1 (expected Build 42) | **Deferred** to the production TestFlight build (section 9, P1) |
-| Ghost-player regression | **Repeat** on #42 (section 8) |
+| Ghost-player regression | **Repeat** on #42 (section 9, P2) |
 | Final STAGING config | `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`, no `min_supported_build` row |
 
 ## 5. Known limitations and accepted risks
