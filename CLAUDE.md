@@ -193,9 +193,9 @@ Varje steg nedan kräver Peters separata go.
 
 **Cutover-ordning (rev 2, Peter 2026-11-27 — facit är [testing/build41-release-readiness.md](testing/build41-release-readiness.md) avsnitt 8–10):**
 1. ✅ RC → staging-testflight #41 → R1–R11 på STAGING; ✅ Build 40-kompatibilitet (Part B).
-2. Merge (fast-forward) + tagg `v1.0.1` (godkänt 2026-11-27, se readiness avsnitt 6 + 11 om GitHub Pages).
+2. Annoterad tagg `v1.0.1` på release-branchen = källa för production build #42 (Peter 2026-11-27, alternativ 2). **master rörs INTE förrän 0060 + delete-account är verifierade i PROD** — då fast-forward till exakt `v1.0.1`, vilket också publicerar nya quizvibe.se + Privacy Policy via GitHub Pages (readiness avsnitt 6, 11). Taggpush triggar inget.
 3. Read-only förkontroller i PROD: `check-migrations.sql` (0013/0016/0017 ska saknas), `feature_gates` = `allAtOnce: everyone` + `multiplayerV2: false`, `free_premium_promo.until`, ingen `min_supported_build`.
-4. Färsk PITR → 0060 + delete-account → 0061 → smoke Build 40 → 0062–0067 → 0069 → 0070 → smoke Build 40 igen → confirm-signup-mallen.
+4. Färsk PITR → 0060 + delete-account → **merge master (Pages)** → 0061 → smoke Build 40 → 0062–0067 → 0069 → 0070 → smoke Build 40 igen → confirm-signup-mallen.
 5. Production build #42 (`--auto-submit` laddar BARA upp till ASC, ingen review). P1–P5, P7, P8 med `multiplayerV2` AV.
 6. `multiplayerV2 = true` (verifiera `allAtOnce = everyone`) → P6 + slutlig smoke.
 7. Submit för App Review (separat steg i ASC) → manuell release.
@@ -204,6 +204,7 @@ Varje steg nedan kräver Peters separata go.
 10. 0068 efter steg 9 (väntar INTE på Build 40-adoption): precheck → godkännande → färsk PITR → rollback granskad → apply → smoke → `check-clips` deploy + verifiering.
 11. 48 h övervakning.
 Destruktiva tester använder dedikerade PROD-testkonton.
+Obligatorisk release-förberedelse (readiness avsnitt 12): e-postmallar med nya loggan (STAGING först, PROD före P8; loggan `quizvibe-logo-email.png` är 404 tills master-mergen och visar fortfarande gamla Q-ringen) + nya App Store-screenshots före review.
 
 ### ▶ Nästa session — status 2026-11-27 (börja här)
 

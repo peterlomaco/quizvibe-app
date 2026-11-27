@@ -326,3 +326,24 @@ Expected: only `feature_gates`, with `{"allAtOnce":"everyone","multiplayerV2":tr
   - C3, C4, C5 (Build 40 leave + rejoin);
   - **C7** (Build 41 host re-match → Build 40 accepts and claims its seat under 0068).
   - Restore with `true` afterwards.
+
+---
+
+## Part C — Mandatory release preparation for 1.0.1 (added 2026-11-27)
+
+Details and order: [build41-release-readiness.md](build41-release-readiness.md) section 12. No PROD or App Store Connect change without separate approval.
+
+| # | Item | Done when |
+|---|---|---|
+| E1 | Inventory all Supabase Auth email templates on STAGING and PROD (Confirm signup, Reset password, Change email address, Magic link, Invite user, Reauthentication) + `send-welcome-email` | List recorded, used/unused marked |
+| E2 | Re-render `docs/assets/brand/quizvibe-logo-email.png` from the v2 Q logo (current PNG is from 2026-10-20, old ring) | New PNG reviewed and committed |
+| E3 | Brand all templates consistently; auth variables (`{{ .ConfirmationURL }}`, `{{ .Token }}`, …) unchanged | Diff of variables vs current templates is empty |
+| E4 | STAGING: paste templates (+ redeploy `send-welcome-email` if changed); phone test signup link, Resend link (email + Player Name), reset code, welcome mail | All flows work |
+| E5 | After the master merge (step 4a): logo renders in Apple Mail, Gmail, Outlook | Verified |
+| E6 | PROD (approval): same templates + welcome function; verified with a dedicated PROD test account | Done **before P8** |
+| S1 | Shot list for 1.0.1 (new branding, Lobby 1 by 1 / All at Once, Get Ready, question, Final Leaderboard / Game Summary, Profile/Store), 6.9" | Agreed |
+| S2 | Capture on STAGING #41 + OTA `5b056fd2` with test accounts | Screens captured |
+| S3 | Compare with production #42 | No differences, or retaken |
+| S4 | Upload to App Store Connect (approval), replacing all old-UI screenshots | Done **before App Review submission** |
+
+Website (master merge, step 4a): Pages build `built`; `/`, `/legal/privacy` (12-month row), `/legal/terms`, `/email-confirmed.html`, logo PNG and CSS return 200 on iPhone Safari + desktop; one confirmation from Build 40 and one from Build 42 land on the new `email-confirmed.html`.

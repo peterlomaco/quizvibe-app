@@ -1,6 +1,6 @@
 # QuizVibe 1.0.1 — Final Release Readiness Review
 
-Prepared 2026-11-27, accepted by Peter 2026-11-27 with corrections (rev 2, this version). Nothing in this document has been executed against PROD Supabase, production EAS (build/OTA) or App Store Connect. Every step marked **GO** needs Peter's separate approval.
+Prepared 2026-11-27, accepted by Peter 2026-11-27 with corrections (rev 3, this version: build from a tag on the release branch, master merge deferred until 0060 is live in PROD, email branding + screenshots added). Nothing in this document has been executed against PROD Supabase, production EAS (build/OTA) or App Store Connect. Every step marked **GO** needs Peter's separate approval.
 
 ## 1. Verdict
 
@@ -72,21 +72,36 @@ The gate OTA is published with `--environment production`, so it now gets `EXPO_
 | `docs/legal/terms.md` §7.1 still mentions images | legal text, Peter's decision |
 | Gate OTA vs published `e80008e0` cannot be compared exactly (section 8, step 17) | open; not marked as passed |
 
-## 6. Merge and tagging procedure
+## 6. Tagging, build source and deferred master merge
 
-Approved by Peter 2026-11-27 (fast-forward only, annotated `v1.0.1`), subject to: clean working tree, local = remote release branch, no app code change since `ec13101`, automated results still applicable, master an ancestor of the release branch, no unintended GitHub workflows/builds/OTA, tag on the exact commit for the production build. Stop if any precondition fails.
+**Decision (Peter 2026-11-27, option 2):** Production Build #42 is built from the release branch via an annotated `v1.0.1` tag. **master stays unchanged** until migration 0060 and the updated `delete-account` Edge Function are deployed and verified in PROD (section 8, step 4). Only then is master fast-forwarded, which also publishes the new quizvibe.se site and the updated Privacy Policy (section 11).
 
+### 6.1 Tag `v1.0.1` (GO)
+Preconditions (stop if any fails): clean working tree; local = remote `fix/auth-session-integrity`; `git diff --stat ec13101 <tag-commit> -- . ':!*.md' ':!testing'` empty (no app code change since the approved RC); automated results (700 passed, 3 skipped) still applicable; tag doesn't exist locally or on origin.
+```powershell
+git switch fix/auth-session-integrity
+git pull --ff-only origin fix/auth-session-integrity
+git tag -a v1.0.1 -m "QuizVibe 1.0.1 (production build source)"
+git push origin v1.0.1
+git rev-parse v1.0.1^{commit}
+```
+- **Pushing the tag triggers nothing** (verified 2026-11-27): no workflow has a `push`/`tags` trigger (`ota-on-clip-fix-merge.yml` = closed PR into master + manual dispatch; `youtube-validate-nightly.yml` = schedule + manual dispatch), and GitHub Pages builds only from the `master` branch. EAS builds/OTAs only start from explicit CLI commands. One thing the repo can't show: check the Expo project's GitHub integration (expo.dev → project → GitHub) has no "build on push" trigger configured.
+- The tag commit is the branch HEAD at the moment of tagging (documentation-only on top of `ec13101`).
+
+### 6.2 Build #42 from the tag
+Build from a checkout where `HEAD` = `v1.0.1^{commit}` (on the branch while it hasn't moved, or `git switch --detach v1.0.1`), clean tree. After the build, the EAS build's git commit must equal `v1.0.1^{commit}` — record both in the release notes. Section 7 has the command.
+
+### 6.3 Master merge after 0060 is verified (GO, section 8 step 4a)
 ```powershell
 git switch master
 git pull --ff-only origin master
-git merge --ff-only fix/auth-session-integrity
-git tag -a v1.0.1 -m "QuizVibe 1.0.1"
+git merge --ff-only v1.0.1
 git push origin master
-git push origin v1.0.1
 ```
+- Merge **exactly the tag first**, so master's head = the build source = the tag.
+- Documentation-only commits made on the branch after the tag may be fast-forwarded afterwards (`git merge --ff-only fix/auth-session-integrity`), after checking `git diff --stat v1.0.1 fix/auth-session-integrity -- . ':!*.md' ':!testing' ':!docs'` is empty and reviewing any `docs/` change (it publishes to quizvibe.se).
+- Traceability: `v1.0.1` = Build #42's EAS git commit = the commit master first fast-forwards to.
 - Do not merge or push `test/*` or `release/build40-update-gate`. No force-push, no branch deletion.
-- Production Build #42 is built from the commit `v1.0.1` points to.
-- ⚠ **Side effect of pushing master:** GitHub Pages publishes `quizvibe.se` from `master:/docs`. See section 11.
 
 ## 7. Production build configuration
 
@@ -104,7 +119,7 @@ npx eas env:list --environment production
 npx expo config --type introspect
 npx eas build:version:get -p ios
 ```
-Build (GO, from the `v1.0.1` commit):
+Build (GO, from a clean checkout of `v1.0.1`, section 6.2):
 ```powershell
 npx eas build --profile production --platform ios --auto-submit
 ```
@@ -136,12 +151,13 @@ Test accounts: every destructive test (deletes, the R6 upgrade, re-registration)
 |---|---|---|
 | 3 | Fresh PROD backup / PITR checkpoint | timestamp recorded |
 | 4 | `0060` → redeploy `delete-account` (Verify JWT OFF, check the Code tab) | `check-migrations.sql` 0060 ✅; deleting a **dedicated test account** adds one row to `deleted_account_tombstones` |
+| 4a | Fast-forward master to `v1.0.1` and push (section 6.3) | GitHub Pages deployment succeeds (Actions → "pages build and deployment" green, or `gh api repos/:owner/:repo/pages/builds/latest` = `built`); section 11 checks pass |
 | 5 | `0061` | `select column_default from information_schema.columns where table_name='profiles' and column_name='images_enabled_categories';` → `'{}'::text[]` |
 | 6 | **Build 40 smoke test** (public App Store 1.0.0): log in, host + join a game on two phones, play to Final Leaderboard, Re-match | works as before |
 | 7 | `0062` (main SQL only, never the commented snippets), `0063`, `0064`, `0065`, `0066`, `0067` | `check-migrations.sql` all ✅; `feature_gates.multiplayerV2` still `false` |
 | 8 | `0069`, then `0070` | `check-migrations.sql` 0069 + 0070 ✅. Never run `0070-staging-tests.sql` in PROD |
 | 9 | **Build 40 smoke test** again (same as step 6, plus Pass-the-Phone and a guest join) | works as before (legacy rooms are untouched by the v2 migrations) |
-| 10 | Confirm-signup email template: paste `supabase/email-templates/confirm-signup.html` into Auth → Emails → Templates → "Confirm signup" on **PROD** (and STAGING if not done) | register a dedicated test account → mail shows the current template and tagline |
+| 10 | Email templates to PROD (section 12.1), after STAGING verification and separate approval; requires step 4a (hosted logo) | test mails on a dedicated PROD account show the new logo; links/codes work |
 
 ### Phase C — production TestFlight #42 (section 9)
 | Step | Action | Verify |
@@ -154,6 +170,7 @@ Test accounts: every destructive test (deletes, the R6 upgrade, re-registration)
 ### Phase D — submission and release
 | Step | Action | Verify |
 |---|---|---|
+| 14a | New 1.0.1 screenshots uploaded to App Store Connect (section 12.2), after separate approval | screenshots verified against #42 |
 | 15 | Submit 1.0.1 build #42 for App Review in App Store Connect (section 10) | status "Waiting for Review" |
 | 16 | After approval: manual release (Phased Release OFF) | status "Ready for Distribution" |
 | 17 | Publish the Build 40 **gate-only** OTA from `release/build40-update-gate` (`a75b457`) — see "Gate OTA" below | runtime `4b73aa7…`; gate stays **inactive** (no `min_supported_build` row) |
@@ -184,7 +201,7 @@ Run after Phase B. P1–P5, P7, P8 with `multiplayerV2` **OFF** (step 12); P6 an
 | P5 | YouTube clip plays with own wrapper (B1) | Plays, ends with QuizVibe logo |
 | P6 | After `multiplayerV2 = true` + `allAtOnce = everyone`: two-device 1 by 1 and All at Once games; a Build 40 phone tries to join a v2 room | v2 flow works; Build 40 device can't join the v2 room |
 | P7 | Delete a **dedicated PROD test account** | Tombstone row; re-registration with the same email/name blocked |
-| P8 | Register a new **dedicated PROD test account** | Confirmation mail (current template) arrives; Hints off by default; mature content on |
+| P8 | Register a new **dedicated PROD test account** (after step 10) | Confirmation mail with the new branding arrives, link confirms and lands on `email-confirmed.html`; welcome mail arrives with the new logo; Hints off by default; mature content on |
 
 ## 10. App Store submission checklist
 
@@ -196,7 +213,8 @@ Upload vs submission: the EAS `--auto-submit` step only uploads #42 to App Store
 - [ ] Section 9 P1–P8 pass
 - [ ] Version 1.0.1, build **#42** selected (not #41)
 - [ ] What's New text (UI + Multiplayer)
-- [ ] Screenshots still accurate for the new UI (6.9")
+- [ ] New 1.0.1 screenshots uploaded and verified against #42 (section 12.2)
+- [ ] Email templates in PROD updated and verified (section 12.1) before P8
 - [ ] App Review Information: contact, `Apple-2` credentials, notes describing the two-device test (Apple-1 + Apple-2), All at Once vs 1 by 1
 - [ ] **No IAP attached**, no paid features in the build (`pkg_sub_monthly` stays for 2.0.0)
 - [ ] **Privacy declarations reviewed for 1.0.1** (not assumed unchanged): data types collected (incl. the deleted-account block — a one-way hash of the email + Player Name kept 12 months), purposes, linking to identity, third parties (Supabase, RevenueCat, YouTube, Spotify link-out), privacy policy URL current
@@ -205,11 +223,55 @@ Upload vs submission: the EAS `--auto-submit` step only uploads #42 to App Store
 - [ ] Manual release, Phased Release OFF
 - [ ] After release: steps 17–22
 
-## 11. GitHub Pages side effect of the master merge
+## 11. GitHub Pages publication at the master merge (step 4a)
 
-Pushing `master` triggers a GitHub Pages build (legacy, `master:/docs`, CNAME `quizvibe.se`). The release branch changes `docs/` versus master:
-- new site layout and CSS (`docs/_layouts/default.html`, `docs/assets/css/quizvibe.css`, brand assets);
+Pushing `master` triggers a GitHub Pages build (legacy, `master:/docs`, CNAME `quizvibe.se`). That is why the merge waits until 0060 is live (Peter 2026-11-27). The merge publishes:
+- new site layout and CSS (`docs/_layouts/default.html`, `docs/assets/css/quizvibe.css`, brand assets incl. `quizvibe-logo-email.png`);
 - redesigned `docs/email-confirmed.html` (the post-confirmation landing page);
-- `docs/legal/privacy.md`: a new retention row for the **deleted-account block** (12 months). That describes 0060, which is **not yet applied in PROD** — so the public privacy policy would describe a mechanism that isn't live until step 4.
+- `docs/legal/privacy.md`: the new retention row for the **deleted-account block** (12 months), accurate once 0060 is live.
 
-No GitHub Actions workflow runs on a push to master (`ota-on-clip-fix-merge.yml` runs on a closed PR / manual dispatch; `youtube-validate-nightly.yml` on schedule / manual dispatch).
+No GitHub Actions workflow runs on a push to master.
+
+**Live today (checked 2026-11-27):** `/email-confirmed.html` 200 (old version), `/legal/privacy` 301 (redirect), `/assets/brand/quizvibe-logo-email.png` **404**, `/assets/css/quizvibe.css` **404** — the new assets only exist after the merge.
+
+### email-confirmed.html — Build 40 / Build 42 compatibility
+- Both builds send the same `emailRedirectTo: 'https://quizvibe.se/email-confirmed.html'` (verified in `b6d08cc` and HEAD), and resent links land on the Site URL homepage in both.
+- The page is static (no script, no token handling): Supabase verifies the link server-side and only then redirects. Nothing on the page depends on the app build, so a page change can't break confirmation for either build.
+- Still verify after publishing: confirm one signup created from Build 40 and one from Build 42 → both land on the new page, it renders on iPhone Safari, and the account can log in.
+
+### After the Pages build (step 4a verify)
+- Pages build status `built`, no errors.
+- On iPhone Safari and desktop: `/`, `/legal/privacy` (shows the 12-month row), `/legal/terms`, `/legal/` index, `/email-confirmed.html`, `/assets/brand/quizvibe-logo-email.png` (200), `/assets/css/quizvibe.css` (200); CNAME still `quizvibe.se`, HTTPS valid; no broken links in the footer/legal navigation.
+- The App Store "Privacy Policy URL" and the app's in-app legal links still resolve.
+
+## 12. Mandatory release preparation (added 2026-11-27)
+
+Neither activity blocks tagging or Build #42. Dependencies: 12.1 needs the master merge (step 4a) for the hosted logo and must be in PROD before P8; 12.2 must be done before App Review submission (step 15). No PROD or App Store Connect change without separate approval.
+
+### 12.1 Email branding
+Inventory (verify the dashboard list on both projects — the repo only holds some of them):
+
+| Email | Source | Used by the app | Status |
+|---|---|---|---|
+| Confirm signup | Supabase dashboard template; repo `supabase/email-templates/confirm-signup.html` | Register, Resend link (email + Player Name via `resend-by-name`) | Repo version branded; **live = dashboard copy, must be pasted** |
+| Reset password | Dashboard template; repo `supabase/email-templates/reset-password.html` | Forgot password (6-digit code, `verifyOtp` type `recovery`) | Repo version branded; paste into dashboard |
+| Change email address | Dashboard template only | Not triggered by the app (no `updateUser({ email })`) | Default Supabase template; brand it for consistency |
+| Magic link, Invite user, Reauthentication | Dashboard templates only | Not used by the app | Default; brand or leave, but list as reviewed |
+| Welcome mail | Edge Function `send-welcome-email` (HTML inline) | DB trigger 0049 after confirmation | Branded in repo; deploy = redeploy the function |
+
+**Technical dependencies found:**
+- All branded mails load `https://quizvibe.se/assets/brand/quizvibe-logo-email.png`, which is **404 until the master merge** (step 4a). Before that, a test mail shows a broken image.
+- That PNG was made on 2026-10-20 from the **old Q mark**; the mark changed to v2 on 2026-11-02 (`design/brand/build-mark.py`). It must be re-rendered from the v2 logo (same file name, same size) and committed on the release branch **before tagging or before the merge**, so the merge publishes the new logo. It is a `docs/` asset, not app code.
+
+Procedure:
+1. Re-render `docs/assets/brand/quizvibe-logo-email.png` from the v2 logo; review it. (Before the tag, or as a documentation commit merged after the tag per section 6.3.)
+2. STAGING (any time): paste the templates into STAGING Auth → Emails → Templates; brand Change email and the unused ones; redeploy `send-welcome-email` on STAGING if changed. Check per template: the `{{ .ConfirmationURL }}` / `{{ .Token }}` / `{{ .Email }}` variables are byte-identical to the current working templates, the subject line, plain wording.
+3. STAGING functional test on a phone (not desktop — link scanners consume tokens): signup → confirm link works → lands on `email-confirmed.html` → login; Resend link (email + Player Name); reset password code works; welcome mail arrives. Logo rendering can only be checked after step 4a.
+4. After step 4a: re-check logo rendering in Apple Mail, Gmail (app + web) and Outlook on STAGING mails.
+5. PROD (separate approval, step 10): paste the same templates into PROD; redeploy `send-welcome-email` on PROD if changed (Verify JWT OFF, check the Code tab); verify with a dedicated PROD test account. Must be done **before P8**.
+
+### 12.2 App Store Connect screenshots
+1. Shot list (6.9" required): Home with the new branding; Game Lobby (Game Mode 1 by 1 / All at Once, players with device icons); Get Ready; a question (YouTube Year and Hints with the new reveal); Final Leaderboard / Game Summary; Profile or Store. Show multiplayer with two or more players.
+2. Capture on STAGING TestFlight #41 with the latest preview OTA (`5b056fd2`), using test accounts and neutral names; no STAGING-specific text visible.
+3. Verify against the final production build #42: same UI, no differences in the captured screens; retake any screen that differs.
+4. Upload to App Store Connect (separate approval) and replace all screenshots showing the previous UI, before step 15.
