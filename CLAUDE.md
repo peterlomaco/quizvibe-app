@@ -121,6 +121,8 @@ Se `memory/project_roadmap_phases.md` för bredare fas-status (Fas 4 backlog →
 
 **Scope för 1.0.1 och 2.0.0 hålls strikt isär.** Inget betalrelaterat (prenumeration 49 kr, 24 h-pass, årspass/presentkort, rabatt-/ambassadörkoder, RevenueCat-kontobytesskydd) får glida in i 1.0.1. "Build 42 backlog" nedan = 2.0.0-scope plus övrigt uppskjutet.
 
+**Production build 1.0.1 (2026-11-27):** tagg **`v1.0.1`** → `9bcbd1b`, EAS build `638dc7a6` = **build 42**, runtime `32682a4`, uppladdad till App Store Connect (TestFlight-processning), INTE skickad till App Review. master orörd (`0c5c667`) tills 0060 + delete-account är verifierade i PROD.
+
 **Release candidate 1.0.1:** commit **`4b113e7`** på `fix/auth-session-integrity`. Det var exakt den commit STAGING TestFlight #41 byggdes från. Tagg `rc/1.0.1-build41-staging` (pushad). Efter #41 har branchen fått EN kodändring: `e909500` (non-host legacy-roster utesluter spelare som lämnat — ghost players på Final Leaderboard). Övriga senare commits är dokumentation. Production-bygget #42 byggs från branchens HEAD och inkluderar alltså fixen; legacy-regressionstestet för den körs på #42.
 
 **Branchar på GitHub (alla pushade 2026-11-26, ingen force, master orörd):**
@@ -245,6 +247,8 @@ Obligatorisk release-förberedelse (readiness avsnitt 12–13): e-post — v2-lo
 - [ ] `fix/double-tap-single-flight`-rester: `663fd45` (Parent Control-erbjudande + ta bort "might affect Quiz mixer"-bekräftelsen), kvarvarande delar av `6d6f1e6` (direkta spinners, optimistisk panel). Lås + await portades till Build 41.
 - [ ] 6 döda klipp att ersätta (se "Klipp att ersätta").
 - [ ] `ota-on-clip-fix-merge.yml` → `production`.
+- [ ] **E-post-säkerhet, före kommersiella 2.0.0** (readiness 13.4): (1) `send-welcome-email` stoppar in `playerName` i HTML utan escaping — escapa (`&<>"'`); (2) webhook-hemligheten jämförs med `!==`, inte i konstant tid — byt till timing-safe jämförelse. Båda befintliga, låg risk (namnformatet begränsas vid signup, bara DB-triggern har hemligheten).
+- [ ] Reset password: samma lösenord som förut ger 422 och ett omförsök med samma (förbrukade) kod visar "Invalid code" — behåll verifierad session och be bara om ett annat lösenord.
 - [ ] Städ: 11 TS-fel (`parentControlled`-typ, StatusBar-prop, `Generation`-export, dubbla nycklar i `hintsData`), lint-baslinje, backend-tsconfig.
 - [ ] terms.md §7.1 bild-text.
 - [ ] Ingång till `/leaderboards`.

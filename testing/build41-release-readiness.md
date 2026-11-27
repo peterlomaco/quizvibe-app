@@ -92,6 +92,8 @@ git rev-parse v1.0.1^{commit}
 ### 6.2 Build #42 from the tag
 Build from a checkout where `HEAD` = `v1.0.1^{commit}` (on the branch while it hasn't moved, or `git switch --detach v1.0.1`), clean tree. After the build, the EAS build's git commit must equal `v1.0.1^{commit}` — record both in the release notes. Section 7 has the command.
 
+**Build #42 (2026-11-27):** EAS build `638dc7a6-ef9b-49f4-bbbc-bc3db4ef9970`, profile `production`, channel `production`, version 1.0.1 build **42**, commit `9bcbd1b` = tag `v1.0.1`, runtime `32682a4fbe103e5a00a729c3a53f0b033a4d225f`. Build log: project env vars incl. `EXPO_PUBLIC_YT_OWN_WRAPPER=1` and PROD Supabase; IPA: bundle `se.quizvibe.app` 1.0.1 (42), no `UIBackgroundModes`, JS bundle contains only the PROD Supabase host (STAGING ref absent). Auto-submit `d3e8afaf-7d00-4b23-8399-ffde7b4f2545` uploaded the binary to App Store Connect (TestFlight processing by Apple); **not** submitted for App Review.
+
 ### 6.3 Master merge after 0060 is verified (GO, section 8 step 4a)
 ```powershell
 git switch master
@@ -163,7 +165,7 @@ Test accounts: every destructive test (deletes, the R6 upgrade, re-registration)
 ### Phase C — production TestFlight #42 (section 9)
 | Step | Action | Verify |
 |---|---|---|
-| 11 | Build #42 (section 7) | build log env = production, build 42 |
+| 11 | Build #42 (section 7) — **DONE 2026-11-27**, see 6.2 | build log env = production, build 42 |
 | 12 | Run **P1–P5, P7, P8** with `multiplayerV2` **OFF** | all pass |
 | 13 | `feature_gates.multiplayerV2 = true` | `select value from public.app_config where key='feature_gates';` → `{"allAtOnce":"everyone","multiplayerV2":true}` (**allAtOnce must be `everyone`**) |
 | 14 | Run **P6** and the final smoke (P3 again) with this release configuration | all pass |
@@ -209,7 +211,7 @@ Run after Phase B. P1–P5, P7, P8 with `multiplayerV2` **OFF** (step 12); P6 an
 Upload vs submission: the EAS `--auto-submit` step only uploads #42 to App Store Connect / TestFlight. Submission for App Review is the manual "Add for Review" → "Submit" in App Store Connect, after Phase C.
 
 - [x] B1 resolved (EAS production env, 2026-11-27)
-- [ ] #42 built with production env (log verified) and uploaded to App Store Connect
+- [x] #42 built with production env (log verified) and uploaded to App Store Connect (2026-11-27; TestFlight processing by Apple)
 - [ ] Phase A–C done and verified (section 8 steps 1–14)
 - [ ] Section 9 P1–P8 pass
 - [ ] Version 1.0.1, build **#42** selected (not #41)
