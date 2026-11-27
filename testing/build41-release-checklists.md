@@ -30,6 +30,7 @@ Two checklists:
 | R1e | Guest Host locked | Start Game as Guest → lobby. | Filter switches locked OFF; tap shows the locked info. |
 | R2a | Mature OFF blocks restricted | Host, mature OFF → activate Hip Hop & RnB. | "Parent controlled" dialog; package not activated without "Deactivate now". |
 | R2b | Theme switch ON | Generic game (no package), theme switch ON, 4+ rounds × a few games. | Theme-only clips can appear in Generic games; with mature OFF no Hip Hop/RnB items. |
+| R2b-auto | Theme switch, automated (2026-11-27) | `cd backend; npx vitest run content/test/filterThemeQuestions.test.ts` | **PASS (12/12).** Real catalog: 257 theme-only items (48 Hip Hop/RnB, 209 other). Theme ON + mature OFF admits all 209 unrestricted and none of the 48; theme ON + mature ON admits all 257; theme OFF admits none. Source guards: no Premium input to the pool rule, and no Premium gate on the switch in Lobby, Profile, quiz or FilterGroup (only Guest Host is locked). Manual R2b still required for real gameplay. |
 | R2c | Filter sync | Phone 1 hosts, Phone 2 joins. Host flips both Filter switches. | Phone 2 shows the host's values read-only within a few seconds. |
 | R3a | Host leaves Final LB (All at Once) | Finish a game, Phone 1 (host) taps Home while Phone 2 is on the Final Leaderboard/Game Summary. | Phone 2: **no popup**, stays on the leaderboard, grey "The Host has left the game", **Start New Game** (QuizVibe user) + Home. Accept/Re-match not shown. |
 | R3b | Start New Game after host left | Phone 2 taps Start New Game. | Normal new lobby (own room), credits/premium rules as usual. |
@@ -42,7 +43,7 @@ Two checklists:
 | R7c | v2: Guest Host | Start Game as Guest, Phone 2 joins. | Guest Host on the resolver: 1 by 1 / All at Once rules as in Step 6–7; YouTube-only, 30 s. |
 | R7d | v2: re-match | After R7a/b, re-match. | Same line-up, re-match lobby works; Marathon table updates once. |
 | R7e | v2: join device step | Phone 2 joins by code. | Device step shown; "On the host's device" rejected with Spotify on / > 4 players. |
-| R8 | Legacy room after flip | Needs STAGING `multiplayerV2 = false` temporarily (Peter's go): create a lobby on Phone 1, then set the flag back to true, Phone 2 joins the SAME room. | Room keeps legacy behaviour (Pass-the-Phone / Individual device labels, no device step), game completes. New rooms after the flip are v2. |
+| R8 | Legacy room after flip | **Approved by Peter 2026-11-27** (temporary STAGING flag change, restore to true afterwards). Steps in "R8 procedure" below. | Room keeps legacy behaviour (Pass-the-Phone / Individual device labels, no device step), game completes. New rooms after the flip are v2. |
 | R9a | YouTube own wrapper | Play 3+ YouTube questions (music + film). | Clips play with audio; autoplay works; no error 153 / "Video unavailable". |
 | R9b | Mute + end overlay | Non-host muted device; let a clip end. | Muted device silent; end-of-clip QuizVibe overlay appears. |
 | R9c | Clip swap | (If a dead clip appears) | "Clip unavailable" handling swaps the question as before. |
@@ -50,11 +51,30 @@ Two checklists:
 | R10b | Other app's audio | Start Spotify/Apple Music, then open QuizVibe. | QuizVibe background music stays silent; the other app keeps playing. |
 | R10c | Background | Send QuizVibe to the background with music playing. | Music stops; does not play in the background. |
 | R11a | Gate: no requirement | Normal use (STAGING has no `min_supported_build`). | Never blocked. |
-| R11b | Gate: block | Peter's go: STAGING SQL `insert into app_config (key, value) values ('min_supported_build', '{"ios": 42}');` Bring the app to the foreground. | Full-screen "Update required"; music stops; Update opens the App Store page. |
-| R11c | Gate: offline | While blocked, enable airplane mode, kill + reopen. | Still blocked (confirmed requirement kept). |
-| R11d | Gate: clear | `delete from app_config where key = 'min_supported_build';` Online, foreground the app. | Unblocks on the next foreground. |
-| R11e | Gate: supported | Set `{"ios": 41}`. | Build 41 is NOT blocked. Afterwards delete the row again. |
+| R11b | Gate: block | STAGING SQL: set `min_supported_build = {"ios": 42}`. Background the app ≥ 60 s, foreground. | Full-screen "Update required"; music stops; Update opens the App Store page. |
+| R11c | Gate: offline | While blocked, enable airplane mode, kill + reopen. Airplane mode off afterwards. | Still blocked (confirmed requirement kept). |
+| R11d | Gate: direct recovery | While **still blocked on `{"ios": 42}`** (no lowering first): delete the row. Background ≥ 60 s, foreground (online). | Unblocks straight from the active "Update required" screen; app usable, music resumes where it belongs. |
+| R11e | Gate: supported | Set `{"ios": 41}`. Background ≥ 60 s, foreground. | Build 41 is NOT blocked. Afterwards delete the row again. |
 
+**R8 procedure (STAGING):**
+1. Flag off:
+   ```sql
+   update public.app_config set value = jsonb_set(value,'{multiplayerV2}','false'::jsonb), updated_at = now() where key = 'feature_gates';
+   ```
+2. Phone 1: kill the app fully and reopen it (the flag is read at app start). Create a Multiplayer lobby and note its room code. Expected labels: Pass-the-Phone / Individual device.
+3. Flag back on:
+   ```sql
+   update public.app_config set value = jsonb_set(value,'{multiplayerV2}','true'::jsonb), updated_at = now() where key = 'feature_gates';
+   ```
+4. Phone 2: kill + reopen (now on true), then join Phone 1's room by code. Expected: **no device step**; joins the legacy room; host approves; play a short game (2 rounds) to the end.
+5. Phone 1: Home → kill + reopen → create a NEW Multiplayer lobby; Phone 2 joins by code. Expected: v2 (1 by 1 / All at Once labels, device step shown).
+6. Confirm: `select r.code, r.multiplayer_v2 from public.rooms r where r.code in ('<legacy code>','<new code>');` → legacy `false`, new `true`.
+
+**Final STAGING configuration check (after all Part A tests):**
+```sql
+select key, value from public.app_config where key in ('feature_gates','min_supported_build');
+```
+Expected: exactly one row, `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`; no `min_supported_build` row.
 ---
 
 ## Part B — Build 40 compatibility (0068 + 0070 + gate)
@@ -239,14 +259,17 @@ select key, value from public.app_config where key in ('feature_gates','min_supp
 ```
 Expected: only `feature_gates`, with `{"allAtOnce":"everyone","multiplayerV2":true}`. The compatibility build stays installed; it does no harm, and the next step replaces it with TestFlight #41.
 
-**Optional / covered elsewhere:** C3, C4, C12, C13, C15, G3–G5. The server side is covered by `0070-staging-tests.sql` and the Batch 1 suite.
+**Part B final tally (2026-11-27):**
+- **Passed on devices:** C1, C2, C3, C4, C5, C6, C7, C8, C9, C10 (UX + DB check), C11, C14, G1, G2, G3, G4, G5.
+- **Optional, NOT executed:** C12 (Remote 1vs1 B40 ⇄ B41), C13 (clip error report from B40; needs a dead clip), C15 (B40 single player). They are untested, not passed. The server side they touch is covered by `0070-staging-tests.sql` and the Batch 1 suite.
+- G1: "no visible change" was confirmed; the Store copy was not separately compared.
 
 **Remaining (full list):**
 - **Now (flag stays true):**
   - C2 (explicit approve on Build 40);
   - **C6** (Build 40 host re-match → Build 41 accepts);
   - C8 (Build 40 joins v2 by room code) + C9 (Build 40 guest join, v2);
-  - C12–C15;
+  - C12, C13, C15 (optional, not executed); C14 PASS;
   - after the test-gate OTA is published (needs go): G1–G5.
 - **Needs STAGING `multiplayerV2 = false` temporarily (Peter's go)** so Build 41 creates legacy rooms with Build 40 as non-host:
   - C3, C4, C5 (Build 40 leave + rejoin);
