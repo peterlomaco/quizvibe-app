@@ -158,7 +158,7 @@ Test accounts: every destructive test (deletes, the R6 upgrade, re-registration)
 | 7 | `0062` (main SQL only, never the commented snippets), `0063`, `0064`, `0065`, `0066`, `0067` | `check-migrations.sql` all ✅; `feature_gates.multiplayerV2` still `false` |
 | 8 | `0069`, then `0070` | `check-migrations.sql` 0069 + 0070 ✅. Never run `0070-staging-tests.sql` in PROD |
 | 9 | **Build 40 smoke test** again (same as step 6, plus Pass-the-Phone and a guest join) | works as before (legacy rooms are untouched by the v2 migrations) |
-| 10 | Email templates to PROD (section 12.1), after STAGING verification and separate approval; requires step 4a (hosted logo) | test mails on a dedicated PROD account show the new logo; links/codes work |
+| 10 | PROD email update, sections 13.6 steps E-P1 → E-P7 (separate approval); requires step 4a (hosted logo) | per 13.6; done before P8 |
 
 ### Phase C — production TestFlight #42 (section 9)
 | Step | Action | Verify |
@@ -276,3 +276,109 @@ Procedure:
 2. Capture on STAGING TestFlight #41 with the latest preview OTA (`5b056fd2`), using test accounts and neutral names; no STAGING-specific text visible.
 3. Verify against the final production build #42: same UI, no differences in the captured screens; retake any screen that differs.
 4. Upload to App Store Connect (separate approval) and replace all screenshots showing the previous UI, before step 15.
+
+## 13. Final Email Readiness Review (2026-11-27)
+
+Review only. Nothing below has been applied to PROD.
+
+### 13.1 Changes made during the email work
+
+| Area | Change | Local | Committed + pushed | STAGING | Physically verified |
+|---|---|---|---|---|---|
+| Email logo `docs/assets/brand/quizvibe-logo-email.png` | Re-rendered from the v2 logo, same URL, same 360×297 transparent canvas | ✅ | ✅ `b57fa17` | n/a (hosted by GitHub Pages; live only after the master merge) | Local preview only — real emails show a broken image (404) |
+| Website `quizvibe-mark.svg`, `quizvibe-logo.svg` | v1 → v2 (header + favicon, `email-confirmed.html`) | ✅ | ✅ `b57fa17` | n/a | Local preview only |
+| `supabase/email-templates/reset-password.html` | Tagline → "Play your way. Anytime. Anywhere." (1 line) | ✅ | ✅ `c03e069` | ✅ dashboard template, 1 line edited | ✅ Gmail iPhone |
+| `supabase/email-templates/confirm-signup.html` | None in the repo (already had the new tagline since 2026-11-05) | — | — | ✅ dashboard template replaced (was the 2026-10-20 version) | ✅ Gmail iPhone, Gmail web, Outlook desktop |
+| Edge Function `send-welcome-email` | Tagline line only | ✅ | ✅ `c03e069` | ✅ deployed via dashboard (1 line), Verify JWT OFF | ✅ Gmail iPhone/web, Outlook desktop |
+| Other Supabase Auth settings (SMTP, OTP length, redirect URLs, rate limits) | None | — | — | none | — |
+| Database / migrations | None | — | — | none | — |
+| Mobile app code | None | — | — | — | — |
+| Dependencies, env vars, secrets | None in this work (the only env change today was B1, EAS production `EXPO_PUBLIC_YT_OWN_WRAPPER=1`) | — | — | Edge Function secrets untouched | — |
+
+### 13.2 Email acceptance tests (STAGING, 2026-11-27)
+
+| Test | Result | Evidence |
+|---|---|---|
+| New account registration | **PASS** | Pappa-100 (Gmail), Proflow-100 (Outlook) |
+| Signup confirmation email | **PASS** | New tagline, navy/gold layout; logo missing (expected) |
+| Confirmation link + landing page | **PASS** | Link `…/auth/v1/verify?…&type=signup&redirect_to=https://quizvibe.se/email-confirmed.html`; lands on the **old** landing page (accepted until the merge) |
+| Account activation + login | **PASS** | Logged in after confirmation |
+| Welcome email | **PASS** | New tagline; renders correctly as the first mail in a thread (Gmail thread dimming noted, 13.3) |
+| Correct Player Name in welcome email | **PASS** | "Hi Pappa-100,", "Hi Proflow-100," |
+| Forgot password email | **PASS** | New tagline, 8-digit code |
+| Reset code | **PASS** (2nd attempt) | First code was valid but the new password equalled the old one → 422; re-use → 403 (existing app behaviour, known limitation in section 5) |
+| Login with the new password | **PASS** | Logged in as Pappa-100 after the reset |
+| Old password rejected after reset | **NOT RUN** | |
+| Resend confirmation (email) | **NOT RUN** | |
+| Resend confirmation (Player Name, `resend-by-name`) | **NOT RUN** | |
+| Change email / Magic link / Invite / Reauthentication templates | **N/A** | Not used by the app; dashboard templates not branded |
+| Logo rendering in real emails | **DEFERRED** | Needs the master merge (E5, E5a) |
+| Apple Mail rendering | **NOT RUN** | E5a |
+| PROD emails | **DEFERRED** | 13.6 |
+
+### 13.3 Branding
+
+| Element | Real emails (STAGING) | Local preview only |
+|---|---|---|
+| v2 logo | ❌ not visible (404 until the master merge) | ✅ email PNG, site header, `email-confirmed.html` |
+| "Play your way. Anytime. Anywhere." | ✅ confirm, welcome, reset | ✅ |
+| "Music. Film/TV. Memories." | n/a in emails (by decision) | ✅ new `email-confirmed.html` (the live page is the old one until the merge) |
+| Navy/gold scheme | ✅ all three | ✅ |
+| Typography / layout | ✅ Gmail; ✅ Outlook with caveats | ✅ |
+
+Observed client quirks (not template defects, no change made):
+- **Gmail thread:** a second welcome mail in the same thread showed the tagline and alt text dimmed and the body behind "•••"; the first mail in the thread and fresh threads render correctly. The header HTML is identical in the confirm and welcome mails.
+- **Outlook desktop:** the gold button renders as highlighted text (purple on orange) and card corners are square; the link works. Existing since 2026-10-20; optional bulletproof-button polish, needs approval.
+
+Remaining dependencies: master merge (step 4a) → GitHub Pages → `quizvibe-logo-email.png` returns 200 → logo in all emails; the new `email-confirmed.html` and the v2 site mark go live at the same time.
+
+### 13.4 Security and authentication integrity
+
+| Check | Result |
+|---|---|
+| Auth links/tokens | ✅ `{{ .ConfirmationURL }}` ×3 in confirm, `{{ .Token }}` ×1 in reset, unchanged; confirmation link and reset code worked |
+| Password recovery | ✅ unchanged: code only (no link in the reset mail), single use (a used code returns 403), verified via `verifyOtp` type `recovery` |
+| Secrets in GitHub | ✅ none: lines added since `ec13101` scanned for keys/tokens/JWTs — no hits; `.env` and `.secrets/` are git-ignored and untracked |
+| Edge Function auth / JWT | ✅ `send-welcome-email` Verify JWT OFF (unchanged, by design); deployed STAGING code was byte-identical to the repo apart from the tagline |
+| Unauthorised sending | ✅ the function returns 401 unless `x-webhook-secret` equals `WELCOME_HOOK_SECRET`; only the DB trigger holds it (Vault `welcome_email_secret`) |
+| Duplicate welcome mails | ✅ trigger 0049 fires only when `email_confirmed_at` goes NULL → set, once per account; trigger unchanged. The two welcome mails in the Gmail thread came from two different accounts (Pappa, Pappa-100) |
+| STAGING / PROD separation | ✅ all dashboard work in `quizvibe-staging` (`tottbiuikbdarsjlpxwn`), checked in each screenshot |
+| PROD changes | ✅ none |
+
+Remaining concerns (not fixed, low, existing): the welcome function inserts `playerName` into HTML without escaping (input is constrained by the Player Name format at signup); the webhook secret comparison is not constant-time. Backlog.
+
+### 13.5 Repository and release source
+
+| Item | State |
+|---|---|
+| Branch / HEAD | `fix/auth-session-integrity`; HEAD = the commit that adds this section (local = remote); clean tree; no `v1.0.1` tag; master `0c5c667` |
+| Changes since `c03e069` | `testing/build41-release-checklists.md`, `testing/build41-release-readiness.md`, `CLAUDE.md` only |
+| Changes since `ec13101` (non-documentation) | `docs/assets/brand/*` (3 files), `supabase/email-templates/reset-password.html`, `supabase/functions/send-welcome-email/index.ts` — **no mobile app code** |
+| Native fingerprint | `32682a4fbe103e5a00a729c3a53f0b033a4d225f` = TestFlight #41 runtime |
+| Automated tests | 700 passed / 3 skipped still applicable — no code under test changed |
+| Extra regression tests | None needed for the app; email behaviour is covered by 13.2 and the PROD steps in 13.6 |
+
+### 13.6 PROD email activities (order; each needs approval)
+
+Prerequisites: step 4 (0060 + `delete-account`) verified → step 4a (master merge, Pages `built`).
+
+| Step | Action | Verify | Rollback |
+|---|---|---|---|
+| E-P1 | `https://quizvibe.se/assets/brand/quizvibe-logo-email.png` returns 200 and shows the v2 logo; new `email-confirmed.html` live | browser, iPhone Safari | revert the docs change on master (only if broken) |
+| E-P2 | PROD (`QuizVibe`, `pyndqehlebtxochwpwex`), read-only: copy the current Confirm signup + Reset password bodies and the deployed `send-welcome-email` code into a local backup; compare the function with the repo at `v1.0.1`; check `WELCOME_HOOK_SECRET` and `RESEND_API_KEY` exist (names only) and Vault `welcome_email_url` / `welcome_email_secret` exist; note the Email OTP length | differences limited to the tagline | — |
+| E-P3 | Confirm signup template: paste `confirm-signup.html` (without the comment header); subject unchanged | 3× `{{ .ConfirmationURL }}` | paste the E-P2 backup |
+| E-P4 | Reset password template: tagline line only (or full paste); subject unchanged | 1× `{{ .Token }}`, no `ConfirmationURL` | paste the E-P2 backup |
+| E-P5 | `send-welcome-email`: tagline line, Deploy; Verify JWT stays OFF; secrets untouched | Code tab shows the new line after reload | redeploy the E-P2 backup code |
+| E-P6 | Dedicated PROD test account on a fresh address (= P8): confirmation mail, link → new `email-confirmed.html`, login, welcome mail with the Player Name, reset code (new password ≠ old), login with the new password, old password rejected; Resend link once (email and Player Name) | all PASS; logo visible | E-P3–E-P5 rollbacks |
+| E-P7 | Rendering of received mails: Apple Mail (iPhone), Gmail (app + web), Outlook | logo sharp and not stretched, tagline readable | — |
+
+Optional, separately approved: Outlook bulletproof button; branding the unused dashboard templates.
+
+### 13.7 Verdict
+
+- **Release tag: GO.** No app code change since `ec13101`, fingerprint = #41, clean tree, branch pushed. The email work only touched `docs/`, one template and one Edge Function, none of which are part of the app build.
+- **Production Build 42: GO** (after the tag), per sections 6.2 and 7.
+- **Blockers:** none.
+- **Accepted limitations:** logo missing in emails until the master merge; old landing page until the merge; Gmail thread dimming; Outlook button rendering; reset-password reuse message (Build 42 backlog); dashboard-only templates unbranded; PROD templates and function still old until 13.6.
+- **Deferred production verification:** 13.6 E-P1–E-P7, E5a, and the NOT RUN items in 13.2 (resend link, old password rejected, Apple Mail), run in E-P6/E-P7.
+- **Recommended next step:** create the annotated `v1.0.1` tag on the release branch HEAD (the commit that adds this review), then Production Build 42 from a clean checkout of the tag with `--auto-submit` (upload only).

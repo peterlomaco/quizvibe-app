@@ -204,7 +204,7 @@ Varje steg nedan kräver Peters separata go.
 10. 0068 efter steg 9 (väntar INTE på Build 40-adoption): precheck → godkännande → färsk PITR → rollback granskad → apply → smoke → `check-clips` deploy + verifiering.
 11. 48 h övervakning.
 Destruktiva tester använder dedikerade PROD-testkonton.
-Obligatorisk release-förberedelse (readiness avsnitt 12): e-postmallar med nya loggan (STAGING först, PROD före P8; loggan `quizvibe-logo-email.png` är 404 tills master-mergen och visar fortfarande gamla Q-ringen) + nya App Store-screenshots före review.
+Obligatorisk release-förberedelse (readiness avsnitt 12–13): e-post — v2-loggan (`b57fa17`) och taglinen "Play your way. Anytime. Anywhere." (`c03e069`) är klara och **verifierade i STAGING 2026-11-27** (Confirm signup-mallen var den gamla från 2026-10-20 och är ersatt; welcome-funktionen deployad, JWT OFF). Loggan är 404 tills master-mergen. PROD-ordning E-P1–E-P7 i readiness 13.6 (backup → jämför → klistra/deploya → testa före P8). Kända: Gmail dimmar upprepat innehåll i trådar, Outlook visar guldknappen som markerad text (valfri fix). Nya App Store-screenshots före review.
 
 ### ▶ Nästa session — status 2026-11-27 (börja här)
 
