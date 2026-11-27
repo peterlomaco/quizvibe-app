@@ -173,7 +173,7 @@ Both critical re-match directions (C6, C7) now pass. The ghost-player display on
 - **G2 PASS (Peter, 2026-11-27):** with `min_supported_build = {"ios": 41}` on STAGING, Build 40 shows "Update required". The 1.0.1 device (Peter wrote "build42"; the only 1.0.1 build that exists is STAGING TestFlight #41) is not blocked.
 - **G3 PASS:** Build 40 stays blocked in airplane mode after a kill + reopen.
 - **G4 PASS:** after the row was deleted, foregrounding Build 40 removed the block.
-- **G5:** not run (optional).
+- **G5:** pending. Agreed to run before Part A; steps are in the G5 procedure below.
 - **Cleanup verified:** `app_config` returns only `feature_gates` = `{"allAtOnce":"everyone","multiplayerV2":true}`, and there is no `min_supported_build` row.
 - **C10 also re-run in `SM50MN` (Peter, 2026-11-27):** before the query, the Build 41 host invited the Build 40 player and Build 40 accepted. The same single-row result covers the invite path too, so the C10 DB check is a **PASS**.
 
@@ -213,7 +213,31 @@ Both critical re-match directions (C6, C7) now pass. The ghost-player display on
 
 **Status after round 4:** C1–C7 and C11 PASS, C10 UX PASS. Still open and mandatory: items 1–4 above (C10 DB check, C8 + C9, C14, G1 + G2). C8 + C9 need `multiplayerV2 = true` again on STAGING.
 
-**Status after round 5 (2026-11-27):** C1–C11 and C14 PASS, including the C10 DB check: room `SM50MN`, with the invite, the room-code join and the guest join all rejected and no row written. G1–G4 PASS, G5 not run (optional). STAGING cleanup is verified. **Part B (Build 40 compatibility) is complete.** Next: R1–R11 on TestFlight #41 (Part A).
+**Status after round 5 (2026-11-27):** C1–C11 and C14 PASS, including the C10 DB check: room `SM50MN`, with the invite, the room-code join and the guest join all rejected and no row written. G1–G4 PASS, and the STAGING cleanup after G4 is verified. **G5 is pending: it runs before Part A** (agreed with Peter). After G5, install STAGING TestFlight #41 on both iPhones and run the targeted R tests. **R6 stays deferred** until the production-profile TestFlight (#42) exists. The ghost-player regression item (`e909500`, below) stays on the list for #42.
+
+**G5 procedure (STAGING, compatibility build):**
+1. Use the iPhone that has the Build 40 compatibility build (EAS `9e504e22`). It must not be the phone with App Store Build 40.
+2. Delete the QuizVibe app from that iPhone, so no downloaded OTA is left on the device.
+3. Before reinstalling, set the row in the STAGING SQL Editor:
+   ```sql
+   insert into public.app_config (key, value) values ('min_supported_build', '{"ios": 41}'::jsonb)
+   on conflict (key) do update set value = excluded.value, updated_at = now();
+   ```
+4. Reinstall the compatibility build from its EAS install link (build `9e504e22`). Keep the network on.
+5. **First launch:** open the app and wait ~15 s on Home.
+   - Expected: **not** blocked. It runs the embedded Build 40 JS, which has no gate, while the gate OTA downloads in the background.
+   - Optional: from that first session, join a v2 lobby created on Build 41 by room code. The Build 41 host must not see Build 40; 0070 still protects the room.
+6. Fully close the app (swipe it away), then open it again (2nd cold start).
+   - Expected: the OTA is applied and "Update required" is shown.
+   - If it isn't blocked yet, close and reopen once more. A slow download can push the switch to the 3rd start. Note how many starts it took.
+7. Record the result in the G5 row.
+
+**Final STAGING cleanup after G5:**
+```sql
+delete from public.app_config where key = 'min_supported_build';
+select key, value from public.app_config where key in ('feature_gates','min_supported_build');
+```
+Expected: only `feature_gates`, with `{"allAtOnce":"everyone","multiplayerV2":true}`. The compatibility build stays installed; it does no harm, and the next step replaces it with TestFlight #41.
 
 **Optional / covered elsewhere:** C3, C4, C12, C13, C15, G3–G5. The server side is covered by `0070-staging-tests.sql` and the Batch 1 suite.
 
