@@ -188,7 +188,9 @@ Ghost-player regression (`e909500`) is deferred to #42.
 | G5 | No OTA yet | Fresh install of the compat build (no OTA fetched), row set. | **Not** blocked on the first launch (OTA not applied yet) — joins into v2 rooms are still rejected by 0070 (C8). Blocked after the second cold start. Documents the residual window. |
 
 ### Recording results
-For each C/G item, record PASS/FAIL plus what was seen. Deciding 0068 for PROD needs C2, C5, C6, C7 and C11, plus the EAS adoption of runtime `4b73aa7` after the real Build 40 OTA.
+For each C/G item, record PASS/FAIL plus what was seen. Deciding 0068 for PROD needs C2, C5, C6, C7 and C11 (all PASS). **Peter 2026-11-27:** 0068 does not wait for Build 40 adoption to become negligible; it is applied after the public 1.0.1 release is verified and Forced Update (`{"ios": 42}`) is active, with precheck, approval, fresh PITR, reviewed rollback and smoke tests. Full sequence: [build41-release-readiness.md](build41-release-readiness.md) section 8.
+
+⚠ The `{"ios": 41}` values in this file are **STAGING test values** only. In PROD, Forced Update uses the actual public build number, expected `{"ios": 42}`.
 
 ### Results — round 1 (Peter, 2026-11-26)
 **Setup:**

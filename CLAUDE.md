@@ -185,29 +185,25 @@ Varje steg nedan kräver Peters separata go.
 - Den delade remote-räknaren låg på 40.
 - **STAGING TestFlight 1.0.1 = build #41** (`4b113e7`, staging-testflight, kanal `preview`, runtime `32682a4…`). ⚠ #41 pratar med STAGING och får **aldrig** väljas i App Store Connect.
 - **Production-bygget blir #42.**
-- `min_supported_build = {"ios": 41}` blockerar ändå bara ≤ 40.
+- Forced Update i PROD = det faktiska publika build-numret, förväntat `min_supported_build = {"ios": 42}` (Peter 2026-11-27). `{"ios": 41}` användes bara som STAGING-testvärde.
 - Build 40-kompatibilitetsbygget (`test/build40-compat`, ad-hoc, `appVersionSource local`, buildNumber 40) förbrukar inget nummer.
 - Testchecklistor: [testing/build41-release-checklists.md](testing/build41-release-checklists.md).
 
 **v2 för Apple-granskare:** Build 40 läser aldrig `feature_gates`, så `multiplayerV2 = true` i PROD före submit påverkar bara Build 41 (TestFlight + granskare). Ingen allowlist-kod behövs. Reviewer-noter: tvåenhetstest med Apple-1 + Apple-2.
 
-**Cutover-ordning:**
-1. RC → staging-testflight → R1–R11 på STAGING inkl. 0070 + `0070-staging-tests.sql`.
-2. Build 40-testbuild (`b6d08cc`, test-kanal) + test-OTA av grinden + Build 40 ⇄ 0068/0070-kompatibilitet.
-3. Push + PR + merge.
-4. Production build (verifiera nästa build-nummer: `eas build:version:get -p ios`) → TestFlight-test mot PROD (R6 40→41-uppgradering, R9, R10, R11).
-5. PROD backup/PITR.
-6. 0060 + delete-account, 0061, 0062–0067, 0069, 0070, sedan `check-migrations.sql`.
-7. `multiplayerV2 = true`.
-8. Publicera Build 40-OTA:n (inert).
-9. Submit 1.0.1.
-10. Release.
-11. `min_supported_build = {"ios": 41}`.
-12. 0068 (precheck → apply → smoke) + `check-clips`, när följande är uppfyllt:
-    - (a) steg 2 visar endast kontrollerade fel för Build 40;
-    - (b) gaten är aktiv;
-    - (c) EAS-adoption för runtime `4b73aa7` är försumbar — eller kvarvarande trafik bedöms acceptabel mot (a).
-13. Post-release-övervakning 48 h.
+**Cutover-ordning (rev 2, Peter 2026-11-27 — facit är [testing/build41-release-readiness.md](testing/build41-release-readiness.md) avsnitt 8–10):**
+1. ✅ RC → staging-testflight #41 → R1–R11 på STAGING; ✅ Build 40-kompatibilitet (Part B).
+2. Merge (fast-forward) + tagg `v1.0.1` (godkänt 2026-11-27, se readiness avsnitt 6 + 11 om GitHub Pages).
+3. Read-only förkontroller i PROD: `check-migrations.sql` (0013/0016/0017 ska saknas), `feature_gates` = `allAtOnce: everyone` + `multiplayerV2: false`, `free_premium_promo.until`, ingen `min_supported_build`.
+4. Färsk PITR → 0060 + delete-account → 0061 → smoke Build 40 → 0062–0067 → 0069 → 0070 → smoke Build 40 igen → confirm-signup-mallen.
+5. Production build #42 (`--auto-submit` laddar BARA upp till ASC, ingen review). P1–P5, P7, P8 med `multiplayerV2` AV.
+6. `multiplayerV2 = true` (verifiera `allAtOnce = everyone`) → P6 + slutlig smoke.
+7. Submit för App Review (separat steg i ASC) → manuell release.
+8. Publicera Build 40-gate-OTA:n (inaktiv). Store-texten från `e80008e0` måste bevaras; exakt jämförelse är ännu overifierad.
+9. Fysisk iPhone: 1.0.1 finns som uppdatering i svenska App Store → först då `min_supported_build = {"ios": 42}`.
+10. 0068 efter steg 9 (väntar INTE på Build 40-adoption): precheck → godkännande → färsk PITR → rollback granskad → apply → smoke → `check-clips` deploy + verifiering.
+11. 48 h övervakning.
+Destruktiva tester använder dedikerade PROD-testkonton.
 
 ### ▶ Nästa session — status 2026-11-27 (börja här)
 
